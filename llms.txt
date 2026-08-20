@@ -174,6 +174,7 @@ building anything, rather than reconstructing a component from its description.
 - **Drawer** `drawer` — A panel that slides in from the right over the page. Shows a record, or the filters for a list, without losing the user's place in it. Variants: record, filters.
 - **Badge** `badge` — A small pill that labels a record — status, tag or count. Every pill is the same graphite shape; a 6px dot carries the colour. Variants: status, inline, sizes, icon, filter, removable, count, table, django.
 - **Tooltip** `tooltip` — A dark bubble on hover, done with group-hover alone — no JS, no Alpine. Variants: icon, truncated.
+- **Hovercard** `hovercard` — A card of record detail that opens under a link on hover or focus, after a deliberate delay, and stays open long enough to be read and clicked. Variants: default, vendor, user, placement, htmx, loading, error, mobile, django.
 - **Avatar** `avatar` — Initials in a circle standing in for a person. There are no photographs in this system, so a zinc tint and two letters is the whole thing. Variants: sizes, self, with-name, stacked, in-row, presence, menu, placeholder.
 
 ### Navigation
