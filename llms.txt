@@ -184,7 +184,7 @@ building anything, rather than reconstructing a component from its description.
 
 - **App shell** `app-shell` — The page skeleton: collapsible sidebar, topbar, and a single scrolling main column. Everything else in the app is rendered inside the main column. Variants: default.
 - **Page header** `page-header` — The top block of a page: where it sits in the app, what it is, and what you can do to it. One h1 per page and it lives here. Variants: default, tabs, filters.
-- **Card** `card` — A bordered white panel that groups one thing. A header row names it, the body holds the content, and an optional footer carries totals or actions. Variants: default, actions, stats, section.
+- **Card** `card` — A bordered white panel that groups one thing. A header names it, the body holds the content, and an optional footer carries totals or actions. Variants: default, actions, stats, section, table, clickable, grid, empty, django.
 - **List and detail** `list-detail` — A scrolling list on the left and the selected record on the right. Picking a row swaps the right pane without leaving the page. Variants: default.
 - **Form page** `form-page` — The layout a create or edit screen uses: fields in a card, and the Save and Cancel actions where the user can always reach them. Variants: two-column, side-rail.
 - **Auth page** `auth-page` — The signed-out screen: one centred card, the fewest fields that will do, and nothing else on the page. Variants: signin.

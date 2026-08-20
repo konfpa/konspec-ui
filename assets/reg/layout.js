@@ -133,7 +133,7 @@ register(
           <span class="flex transition-transform" :class="!sidebar && 'rotate-180'"><i data-lucide="chevrons-left" class="size-4"></i></span>
         </span>
         <span class="flex-1 text-left" :class="!sidebar && 'lg:hidden'">Collapse</span>
-        <kbd class="mr-3 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-500" :class="!sidebar && 'lg:hidden'">[</kbd>
+        <kbd class="mr-3 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-600" :class="!sidebar && 'lg:hidden'">[</kbd>
       </button>
     </div>
   </aside>
@@ -324,33 +324,39 @@ register(
 
   {
     id: 'card', name: 'Card', category: 'layout',
-    description: 'A bordered white panel that groups one thing. A header row names it, the body holds the content, and an optional footer carries totals or actions.',
-    when: 'Grouping related content on a page. Do not nest cards — if a card needs sections inside it, use dividers.',
+    description: 'A bordered white panel that groups one thing. A header names it, the body holds the content, and an optional footer carries totals or actions.',
+    when: 'Grouping related content on a page. Do not nest cards — if a card needs sections inside it, those are dividers.',
     notes: [
       'Panels are rounded-xl; controls inside them stay rounded-lg. A card inside a card is always a layout mistake.',
-      'Card padding is px-5 py-4 for the header and px-5 py-4 for the body. Tables sit flush with no body padding at all, so the header row and the borders line up.',
-      'Shadows are for things floating over the page — menus, popovers, modals. A card on the page uses a border, never a shadow.'
+      'Header is px-5 py-3.5, body px-5 py-4, footer px-5 py-3. The header is tighter than the body on purpose: it holds one line of 20px text, and py-4 makes it taller than the content it names.',
+      'A card holding a table takes no body padding at all. The table sits flush so its rules meet the card\'s edges; padding leaves the header row floating inside a border it does not touch.',
+      'Shadows are for things floating over the page — menus, popovers, modals. A card sitting on the page uses a border, never a shadow.',
+      'overflow-hidden on the panel only when nothing inside it needs to escape. A card containing a dropdown or a popover must round its own header and footer instead, or the menu is clipped.',
+      'Cards in a row size to their content. items-start, not items-stretch — equal heights across a row leave dead space that reads as missing data.'
     ],
     anatomy: [
-      ['Panel', 'rounded-xl, white, with a zinc-200 border. Never a shadow — shadows are for things floating over the page.'],
-      ['Header', 'px-5 py-4 with the title and any header action, on a bordered strip.'],
-      ['Body', 'px-5 py-4. A table sits flush with no body padding at all, so its borders line up with the card\'s.'],
-      ['Divider', 'border-zinc-100 between sections inside a card that already has a border.'],
-      ['Footer', 'Totals or actions on a zinc-100 strip, separated by a top border.']
+      ['Panel', 'rounded-xl, white, zinc-200 border. Never a shadow — shadows mean the thing is floating above the page.'],
+      ['Header', 'px-5 py-3.5 on a bordered strip: the title, an optional one-line subtitle, and any header action.'],
+      ['Title', 'A heading at the level the page outline implies — usually h2 or h3, never chosen for its size.'],
+      ['Body', 'px-5 py-4, or no padding at all when the content is a table or a divided list.'],
+      ['Divider', 'border-zinc-100 between sections inside a card that already has a zinc-200 border of its own.'],
+      ['Footer', 'px-5 py-3 on a zinc-100 strip above a top border, for totals or the actions that finish the card.']
     ],
     behaviour: [
       'Cards do not nest. If a card needs sections inside it, those are dividers.',
       'Panels are rounded-xl and controls inside them stay rounded-lg, so the shapes stay in a hierarchy.',
       'A card holding a table drops its body padding entirely, or the table\'s rules stop meeting the card\'s edges.',
       'The header stays present even when the card holds one thing — an unnamed panel is hard to refer to.',
-      'Card height is driven by content. Forcing equal heights across a row leaves dead space that reads as missing data.'
+      'Card height is driven by content. Forcing equal heights across a row leaves dead space that reads as missing data.',
+      'A card that is entirely clickable is one link around the whole panel, and then it contains no other links or buttons — a control inside a link is unreachable by keyboard and ambiguous by mouse.'
     ],
     a11y: [
       'The card title is a heading at the level the page outline implies, usually h2 or h3.',
-      'A card is a section, not a landmark, so it does not need a role — the heading is what makes it navigable.',
-      'A clickable card makes the whole panel the link rather than only the title.',
+      'A card is a section, not a landmark, so it needs no role — the heading is what makes it navigable.',
+      'A clickable card makes the whole panel the link rather than only the title, so the target is the size of the card.',
+      'A clickable card holds no nested links or buttons; if it needs a second action, the card is not the link and the title is.',
       'Dividers are borders, not <hr>, so they are not announced as separators inside a list of fields.',
-      'Footer actions are inside the card in the DOM as well as visually, so their context is clear.'
+      'Footer actions sit inside the card in the DOM as well as visually, so their context is clear when read out of order.'
     ],
     related: ['stat-card', 'table', 'page-header'],
     variants: [
@@ -388,15 +394,15 @@ register(
       <p class="text-[12px]/4 text-zinc-600">Quotation, drawing and test certificate</p>
     </div>
     <div class="flex items-center gap-2">
-      <button class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Download all</button>
-      <button class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+      <button class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">Download all</button>
+      <button class="inline-flex h-8 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
         <i data-lucide="upload" class="size-4"></i>Attach
       </button>
     </div>
   </div>
   <ul class="divide-y divide-zinc-100">
     <li class="flex items-center gap-3 px-5 py-3">
-      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
       <span class="min-w-0 flex-1">
         <span class="block truncate text-[13px]/5 font-medium">quotation-sharma-aug.pdf</span>
         <span class="block text-[11px]/4 text-zinc-500">248 KB · uploaded 04 Aug by Akshay Prabhu</span>
@@ -404,7 +410,7 @@ register(
       <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">View</a>
     </li>
     <li class="flex items-center gap-3 px-5 py-3">
-      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="ruler" class="size-4 text-zinc-600"></i></span>
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="ruler" class="size-4 text-zinc-600"></i></span>
       <span class="min-w-0 flex-1">
         <span class="block truncate text-[13px]/5 font-medium">drg-fab-2211-rev-c.pdf</span>
         <span class="block text-[11px]/4 text-zinc-500">1.4 MB · uploaded 05 Aug by Nilesh Patil</span>
@@ -462,6 +468,211 @@ register(
       </span>
     </label>
   </div>
+</div>` },
+
+      { id: 'table', name: 'Holding a table', code:
+`<!-- The one case where the body takes no padding. The table sits flush so its
+     rules run into the card's border and the header row meets the corners; add
+     px-5 py-4 here and the whole table floats inside an edge it never touches.
+
+     The footer is the totals row. It belongs in the card rather than the table
+     because it is a summary of the query, not another record. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+  <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200 px-5 py-3.5">
+    <div class="min-w-0">
+      <h2 class="text-[14px]/5 font-semibold">Order lines</h2>
+      <p class="text-[12px]/4 text-zinc-600">4 of 9 lines · PO-24-1187</p>
+    </div>
+    <button type="button" class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+      <i data-lucide="download" class="size-4 text-zinc-600"></i>Export
+    </button>
+  </div>
+
+  <table class="w-full table-fixed text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="px-5 py-2 font-medium">Item</th>
+        <th scope="col" class="hidden w-24 px-5 py-2 text-right font-medium sm:table-cell">Qty</th>
+        <th scope="col" class="w-32 px-5 py-2 text-right font-medium">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="truncate px-5 py-2.5">MS angle 50×50×6</td>
+        <td class="hidden px-5 py-2.5 text-right tabular-nums sm:table-cell">1,200 kg</td>
+        <td class="px-5 py-2.5 text-right tabular-nums">₹6,84,000</td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="truncate px-5 py-2.5">MS plate 8mm</td>
+        <td class="hidden px-5 py-2.5 text-right tabular-nums sm:table-cell">860 kg</td>
+        <td class="px-5 py-2.5 text-right tabular-nums">₹5,16,000</td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="truncate px-5 py-2.5">Channel 100×50</td>
+        <td class="hidden px-5 py-2.5 text-right tabular-nums sm:table-cell">440 kg</td>
+        <td class="px-5 py-2.5 text-right tabular-nums">₹3,08,000</td>
+      </tr>
+      <tr>
+        <td class="truncate px-5 py-2.5">Flat 40×6</td>
+        <td class="hidden px-5 py-2.5 text-right tabular-nums sm:table-cell">390 kg</td>
+        <td class="px-5 py-2.5 text-right tabular-nums">₹1,95,000</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="flex items-center justify-between border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+    <span class="text-[12px]/4 text-zinc-600">Subtotal, 4 of 9 lines</span>
+    <span class="text-[14px]/5 font-semibold tabular-nums">₹17,03,000</span>
+  </div>
+</div>` },
+
+      { id: 'clickable', name: 'The whole card is a link', code:
+`<!-- One anchor around the whole panel, so the target is the size of the card
+     rather than the size of its title.
+
+     It therefore contains no other link or button. A control nested inside an
+     anchor cannot be reached by keyboard and is ambiguous by mouse; if the card
+     needs a second action, the card stops being the link and the title becomes
+     one instead.
+
+     The chevron is aria-hidden — the accessible name is already the whole
+     card's text, and "chevron right" adds nothing to it. -->
+<div class="grid max-w-2xl items-start gap-3 sm:grid-cols-2">
+  <a href="#" class="group rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <h3 class="truncate text-[14px]/5 font-semibold tabular-nums">PO-24-1187</h3>
+        <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Gujarat Polymers Ltd</p>
+      </div>
+      <i data-lucide="chevron-right" class="size-4 shrink-0 text-zinc-500 transition group-hover:text-zinc-900" aria-hidden="true"></i>
+    </div>
+    <div class="mt-3 flex items-center justify-between gap-2">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+      </span>
+      <span class="text-[13px]/5 font-medium tabular-nums">₹4,82,000</span>
+    </div>
+  </a>
+
+  <a href="#" class="group rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <h3 class="truncate text-[14px]/5 font-semibold tabular-nums">PO-24-1186</h3>
+        <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Konkan Fabricators</p>
+      </div>
+      <i data-lucide="chevron-right" class="size-4 shrink-0 text-zinc-500 transition group-hover:text-zinc-900" aria-hidden="true"></i>
+    </div>
+    <div class="mt-3 flex items-center justify-between gap-2">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+      </span>
+      <span class="text-[13px]/5 font-medium tabular-nums">₹1,15,400</span>
+    </div>
+  </a>
+</div>` },
+
+      { id: 'grid', name: 'A row of cards', code:
+`<!-- items-start is the whole point. A grid stretches its children to the
+     tallest by default, which pads the short cards with dead space at the
+     bottom and makes them read as though data is missing.
+
+     Let them size to their content and the ragged bottom edge is honest. -->
+<div class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3.5">
+      <h3 class="text-[14px]/5 font-semibold">Vendor</h3>
+    </div>
+    <div class="px-5 py-4 text-[13px]/5">
+      <p class="font-medium">Gujarat Polymers Ltd</p>
+      <p class="mt-0.5 text-zinc-600">Vapi, Gujarat</p>
+      <p class="mt-2 text-zinc-600">GSTIN <span class="tabular-nums">24AABCG1234M1Z5</span></p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3.5">
+      <h3 class="text-[14px]/5 font-semibold">Delivery</h3>
+    </div>
+    <div class="px-5 py-4 text-[13px]/5">
+      <p>FOR Silvassa plant</p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3.5">
+      <h3 class="text-[14px]/5 font-semibold">Approvals</h3>
+    </div>
+    <div class="divide-y divide-zinc-100 text-[13px]/5">
+      <div class="flex items-center gap-3 px-5 py-2.5">
+        <span class="inline-flex size-7 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">NP</span>
+        <span class="min-w-0 flex-1 truncate">Nilesh Patil</span>
+        <span class="text-[12px]/4 tabular-nums text-zinc-500">14 Aug</span>
+      </div>
+      <div class="flex items-center gap-3 px-5 py-2.5">
+        <span class="inline-flex size-7 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">RD</span>
+        <span class="min-w-0 flex-1 truncate">Ritu Deshpande</span>
+        <span class="text-[12px]/4 tabular-nums text-zinc-500">15 Aug</span>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'empty', name: 'With nothing in it', code:
+`<!-- A card whose body is empty still keeps its header, because the header is
+     what the rest of the page refers to. What changes is the body: it says what
+     would be here and offers the one action that would put something in it.
+
+     No border and no fill on the inner block — a dashed box inside a bordered
+     card is a card inside a card. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white">
+  <div class="border-b border-zinc-200 px-5 py-3.5">
+    <h2 class="text-[14px]/5 font-semibold">Attached documents</h2>
+  </div>
+  <div class="px-5 py-10 text-center">
+    <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="paperclip" class="size-5 text-zinc-600"></i>
+    </span>
+    <p class="mt-3 text-[14px]/5 font-medium">No documents yet</p>
+    <p class="mx-auto mt-1 max-w-[34ch] text-[13px]/5 text-zinc-600">
+      The quotation and drawing are usually attached before the order goes to the vendor.
+    </p>
+    <button type="button" class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+      <i data-lucide="upload" class="size-4"></i>Attach a document
+    </button>
+  </div>
+</div>` },
+
+      { id: 'django', name: 'Django loop', code:
+`<!-- One card per record, and the empty case handled by {% empty %} rather than
+     by a separate {% if %} further up the template — the two get out of step
+     otherwise, and the page renders an empty grid with a heading over it.
+
+     get_absolute_url on the model, not a hard-coded path, so the card keeps
+     working when the URL conf moves. Nothing else in the card is a link. -->
+<div class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
+  {% for order in orders %}
+    <a href="{{ order.get_absolute_url }}"
+       class="group rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <h3 class="truncate text-[14px]/5 font-semibold tabular-nums">{{ order.number }}</h3>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">{{ order.vendor.name }}</p>
+        </div>
+        <i data-lucide="chevron-right" class="size-4 shrink-0 text-zinc-500 transition group-hover:text-zinc-900" aria-hidden="true"></i>
+      </div>
+      <div class="mt-3 flex items-center justify-between gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>{{ order.get_status_display }}
+        </span>
+        <span class="text-[13px]/5 font-medium tabular-nums">₹{{ order.value|intcomma }}</span>
+      </div>
+    </a>
+  {% empty %}
+    <div class="rounded-xl border border-zinc-200 bg-white px-5 py-10 text-center sm:col-span-2 lg:col-span-3">
+      <p class="text-[14px]/5 font-medium">No orders match this filter</p>
+      <p class="mx-auto mt-1 max-w-[38ch] text-[13px]/5 text-zinc-600">Clear the filters, or widen the date range.</p>
+    </div>
+  {% endfor %}
 </div>` }
     ]
   },
