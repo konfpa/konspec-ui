@@ -184,6 +184,7 @@ building anything, rather than reconstructing a component from its description.
 - **Sidebar nav** `sidebar-nav` — The vertical navigation list that lives inside an app shell. This is the list only — the shell, its header and the scroll container belong to the layout. Variants: expanded, rail, nested.
 - **Topbar** `topbar` — The application header above the page content: where you are, what you can search, and who you are signed in as. Variants: default, compact.
 - **Accordion** `accordion` — Sections of content that collapse to their heading. The heading is a button that toggles the panel below it. Variants: default, single, cards.
+- **Collapsible** `collapsible` — One trigger and one panel. The standalone disclosure — show more, an advanced section at the foot of a form, a filter bar that folds away. Variants: default, advanced, filters, native, card, controlled, states, django.
 - **Command palette** `command-palette` — A ⌘K overlay for jumping to a record or firing an action by typing. It is a shortcut over the navigation, never the only route to something. Variants: default.
 
 ### Layout

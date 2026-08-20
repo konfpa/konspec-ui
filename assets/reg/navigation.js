@@ -1164,7 +1164,7 @@ register(
       'Wrap the header in h3, or whichever level fits the page outline, so screen readers can jump between sections.',
       'The chevron is decorative and carries no label — the heading text alone says what the section is.'
     ],
-    related: ['tabs', 'card', 'drawer'],
+    related: ['collapsible', 'tabs', 'card'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<div class="rounded-xl border border-zinc-200 bg-white" x-data="{ open: true }">
@@ -1282,6 +1282,633 @@ register(
     </h3>
     <div id="acc-grn-3388" x-show="open === 'grn-3388'" x-cloak class="border-t border-zinc-100 px-4 py-3 text-[14px]/5 text-zinc-600">
       MS angle 50×50×6 — 12.4 t accepted, mill test certificates on file.
+    </div>
+  </div>
+</div>` }
+    ]
+  },
+
+  {
+    id: 'collapsible', name: 'Collapsible', category: 'navigation',
+    description: 'One trigger and one panel. The standalone disclosure — show more, an advanced section at the foot of a form, a filter bar that folds away.',
+    when: 'A single region worth hiding by default and cheap to open: extra fields under a summary, advanced options, a filter panel above a register, an audit trail nobody reads. The moment there are two or more of these stacked and their headings read as a set, it is an accordion — that component owns the group, the single-open rule and the heading outline, and a row of separate collapsibles pretending to be one is the thing it exists to stop. Never collapse something the user has to act on to finish the task in front of them.',
+    notes: [
+      'x-collapse comes from the Alpine collapse plugin, and the plugin has to be on the page before Alpine core. Without it the directive is not an error — it is ignored, and the panel toggles with the plain x-show underneath it, which snaps instead of animating. The failure looks like a styling problem and it is a script tag.',
+      'Never put padding or a border on the element x-collapse animates. box-sizing is border-box, so height:0 cannot go below padding-top + padding-bottom + the borders — the panel bottoms out at that height and x-show then removes it in one frame, which reads as a snap at the end of a smooth close. Padding, borders and background go on an inner div; the animated element carries nothing but the directive and its id.',
+      'That inner div takes padding, not margin. A margin on the first or last child collapses straight through the animated wrapper, so the height the plugin measures is short by the margin and the panel clips its own content until the next toggle.',
+      'A trigger inside a <form> needs type="button". The default is submit, so the first click on Advanced options posts a half-filled order instead of opening anything, and the bug only shows up once the collapsible is dropped into a real form.',
+      'The trigger goes above the panel and has a fixed height. Below the panel it is pushed down by the whole height of what just opened and the second click lands in the middle of the new content; growing when open it moves under a stationary cursor. h-9 or h-12 on the trigger and it stays where it was clicked.',
+      'The rotation binds to a wrapping <span>, never to the <i data-lucide>. createIcons() replaces that element with an <svg> and every binding on it dies with it. The span is flex because a transform needs a block-level box in Tailwind v4.',
+      'aria-expanded on the trigger, aria-controls carrying the panel id, and the panel actually carrying that id. Two out of three is the usual state of this component in the wild and it announces a button that expands nothing. When there is no panel in the DOM at all — a locked section — drop aria-controls rather than pointing it at an id that does not exist.',
+      'x-cloak on a panel that starts closed, and never on one that starts open. Alpine boots after the HTML paints: without it a closed panel is on screen for the first frames, and with it an open panel stays hidden until the script lands.',
+      '<details> and x-collapse do not combine. The browser owns the open attribute and drops the content to display:none the instant it changes, so there is no frame left to animate a height in and the two fight over the same element. Pick one: <details> for a panel that needs no script, Alpine for one that animates or is driven from elsewhere.',
+      'A collapsed panel is not a permission boundary. x-show renders the markup and hides it, so a cost breakup behind a trigger is in the page source of every user who can load the page. Gate it in the view — do not render what this user may not read.',
+      'A collapsed panel still submits. display:none inputs post exactly like visible ones, so anything typed into an advanced section and then folded away still reaches the server. That is usually what you want; it stops being what you want the moment the trigger is used to mean "these settings do not apply".',
+      'The closed state has to say what is inside it. A trigger reading Filters over a register showing 218 of 1,438 rows is how someone reports a missing order that was never missing — put the count of active filters on the trigger, or keep the applied chips outside the panel where folding it cannot hide them.',
+      'Find-in-page does not reach an x-show panel. Ctrl-F walks rendered text, and display:none is not rendered, so a term inside a closed Alpine panel simply does not exist as far as the browser is concerned. Chrome and Safari do open a closed <details> to reveal a match — which is the argument for the native variant whenever the panel holds reference text someone will search.',
+      'x-show writes display inline, so a plain class cannot override it. A panel that has to be open at md and up needs the important modifier — md:block!, with the bang at the end in Tailwind v4 — and that instance drops x-collapse, because the plugin writes an inline height too and the panel would sit at 0 on desktop.',
+      'One x-data for the pair. A trigger with its own x-data and a panel with another are two independent copies of open that never see each other; the state belongs on the nearest ancestor of both.',
+      'Seed the trigger label rather than leaving the x-text span empty. x-text overwrites whatever is inside the element, so <span x-text="open ? \'Show less\' : \'Show more\'">Show more</span> reads correctly on the first paint and the button is not a blank strip until Alpine boots.'
+    ],
+    anatomy: [
+      ['Root', 'One x-data holding open, on the nearest element that contains both the trigger and the panel.'],
+      ['Trigger', 'A real button at a fixed height, above the panel, carrying type="button", aria-expanded and aria-controls.'],
+      ['Summary', 'What the closed row still says — a count, an amount, how many filters are on. Without it the trigger is a door with nothing written on it.'],
+      ['Indicator', 'A chevron in a flex span, rotated by a class on the span. Optional when the trigger label already flips between Show and Hide — two indicators say the same thing twice.'],
+      ['Panel', 'The element x-collapse animates. It carries the id, x-show, x-cloak and nothing else: no padding, no border, no background.'],
+      ['Body', 'The inner div holding the padding, the divider and the content, so the panel can genuinely reach height 0.']
+    ],
+    behaviour: [
+      'The trigger toggles one panel and nothing else. There is no group, no single-open rule and no coordination with anything beside it — that is the accordion.',
+      'The trigger does not move between states. Its height is fixed and it sits above the panel, so a second click lands on the same control the first one did.',
+      'The panel animates its height over 200ms and finishes at height auto, so content that arrives afterwards — an htmx swap, a row added — reflows instead of being clipped.',
+      'A panel that starts closed carries x-cloak; one that starts open must not. The default state is a decision about what this record is for, not a habit.',
+      'Fields inside a collapsed panel are still in the form and still post. Closing the section hides it; it does not clear it.',
+      'A locked section shows its trigger disabled with a reason beside it, and its content is not in the document at all.',
+      'A section with nothing in it is not a collapsible. Render the one line that says so, rather than a control that opens onto nothing.'
+    ],
+    a11y: [
+      'The trigger is a button, never a div with a click handler, and inside a form it is type="button".',
+      'aria-expanded is bound to the state, not written once. aria-controls names the panel id, and the panel carries it.',
+      'Panel ids are unique on the page. Rendered in a loop they take the record key — col-lines-1187 — or the second trigger points at the first panel and both rows open the same thing.',
+      'An icon-only trigger is named for what it opens — "GST breakup" — not for what it does. Expand is what the aria-expanded state already says.',
+      'The chevron is decorative and carries no label. The trigger text is the accessible name.',
+      '<summary> is already exposed as a button with an expanded state. Adding role, aria-expanded or aria-controls to it overwrites something the browser keeps correct for free.',
+      'A disabled trigger uses the disabled attribute, so it leaves the Tab order, and the reason it is locked is text beside it rather than a title attribute.'
+    ],
+    related: ['accordion', 'card', 'tabs'],
+    variants: [
+      { id: 'default', name: 'Show more', code:
+`<!-- The trigger sits above the panel. Below it, opening pushes the trigger down
+     by the whole height of what appeared and the second click lands in the
+     middle of the content; at a fixed h-9 above it, the control does not move.
+
+     The animated div carries no padding and no border — border-box means
+     height:0 cannot go below them, so the close would bottom out at the padding
+     and then vanish in one frame. The dl inside takes both. -->
+<div class="max-w-xl rounded-xl border border-zinc-200 bg-white p-4" x-data="{ open: false }">
+  <div class="flex items-baseline justify-between gap-3">
+    <p class="min-w-0 truncate text-[14px]/5 font-medium tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</p>
+    <p class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</p>
+  </div>
+  <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Released 04/08/2026 · 6 lines · Vasai plant</p>
+
+  <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-po-1187"
+          class="mt-3 inline-flex h-9 items-center gap-1.5 text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">
+    <span x-text="open ? 'Show less' : 'Show 6 more fields'">Show 6 more fields</span>
+    <span class="flex transition-transform" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4"></i>
+    </span>
+  </button>
+
+  <div id="col-po-1187" x-show="open" x-cloak x-collapse.duration.200ms>
+    <dl class="grid gap-x-6 gap-y-2.5 border-t border-zinc-100 pt-3 text-[14px]/5 sm:grid-cols-2">
+      <div><dt class="text-[12px]/4 text-zinc-600">Deliver to</dt><dd>Site store — Vasai plant</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Promised date</dt><dd class="tabular-nums">22/08/2026</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Payment terms</dt><dd class="tabular-nums">45 days from GRN</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Freight</dt><dd class="tabular-nums">₹14,500 — to pay</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Vendor GSTIN</dt><dd class="tabular-nums">24AABCG1429P1ZK</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Buyer</dt><dd>R. Menon — Indirect materials</dd></div>
+    </dl>
+  </div>
+</div>` },
+
+      { id: 'advanced', name: 'Advanced options', code:
+`<!-- type="button" is load-bearing. A button inside a form defaults to submit,
+     so without it the first click on Advanced options posts a half-filled order
+     rather than opening anything.
+
+     The count on the trigger is what the closed row says about itself. Four
+     fields nobody can see is four fields nobody knows are there, and the ones
+     that already differ from the default are exactly the ones somebody has to
+     be told about.
+
+     Everything inside still posts. display:none inputs submit like any other,
+     so folding this section away hides it — it does not clear it. -->
+<form class="max-w-xl" x-data="{ open: false }">
+  <div class="space-y-4">
+    <div>
+      <label for="ao-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <input id="ao-vendor" name="vendor" value="Gujarat Polymers Ltd"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+      </div>
+    </div>
+    <div>
+      <label for="ao-date" class="mb-1.5 block text-[13px]/5 font-medium">Required by</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <input id="ao-date" name="required_by" type="date" value="2026-08-22"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5 rounded-xl border border-zinc-200 bg-white">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-advanced"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left">
+      <i data-lucide="sliders-horizontal" class="size-4 shrink-0 text-zinc-600"></i>
+      <span class="flex-1 text-[14px]/5 font-medium">Advanced options</span>
+      <span class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4 fields</span>
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+
+    <div id="col-advanced" x-show="open" x-cloak x-collapse.duration.200ms>
+      <div class="space-y-4 border-t border-zinc-100 px-4 py-4">
+        <div>
+          <label for="ao-freight" class="mb-1.5 block text-[13px]/5 font-medium">Freight terms</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+            <select id="ao-freight" name="freight" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              <option>To pay — vendor arranges</option>
+              <option selected>Paid — included in rate</option>
+              <option>Ex-works — we collect</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="ao-tol" class="mb-1.5 block text-[13px]/5 font-medium">Receipt tolerance</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+            <input id="ao-tol" name="tolerance" value="2" inputmode="decimal"
+                   class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+            <span class="pr-3 text-[14px]/5 text-zinc-600">%</span>
+          </div>
+          <p class="mt-1 text-[12px]/4 text-zinc-500">Over-receipt allowed against the ordered quantity.</p>
+        </div>
+        <label class="flex items-start gap-2.5 text-[14px]/5">
+          <input type="checkbox" name="inspection" value="1" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+          <span>Hold for inspection before the GRN is posted</span>
+        </label>
+        <div>
+          <label for="ao-note" class="mb-1.5 block text-[13px]/5 font-medium">Remarks printed on the order</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+            <textarea id="ao-note" name="remarks" rows="3"
+                      class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                      placeholder="Mill test certificate per heat number.">Mill test certificate per heat number.</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Release order</button>
+</form>` },
+
+      { id: 'filters', name: 'Filter panel', code:
+`<!-- Two things keep a folded filter panel honest. The count on the trigger, so
+     the closed row admits the register is filtered; and the applied chips
+     outside the panel, so folding it cannot hide what is applied. Without both,
+     someone reports a missing purchase order that was never missing — it was
+     three filters away.
+
+     The result count sits beside the trigger for the same reason: 218 of 1,438
+     is the sentence that stops the phone call. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: false,
+       active: [
+         { id: 'vendor', label: 'Vendor: Gujarat Polymers' },
+         { id: 'status', label: 'Status: Awaiting GRN' },
+         { id: 'value',  label: 'Value: above ₹5,00,000' }
+       ],
+       drop(id) { this.active = this.active.filter(f => f.id !== id); }
+     }">
+  <div class="flex h-12 items-center gap-3 px-4">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-filters"
+            class="-mx-2 flex h-9 items-center gap-2 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+      <i data-lucide="sliders-horizontal" class="size-4 shrink-0 text-zinc-600"></i>
+      Filters
+      <span x-show="active.length"
+            class="inline-flex items-center rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300"
+            x-text="active.length">3</span>
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+    <p class="ml-auto shrink-0 text-[13px]/5 tabular-nums text-zinc-600"
+       x-text="active.length ? '218 of 1,438 orders' : '1,438 orders'">218 of 1,438 orders</p>
+  </div>
+
+  <!-- outside the panel on purpose: closing the filters must not hide them -->
+  <div x-show="active.length" class="flex flex-wrap items-center gap-2 border-t border-zinc-100 px-4 py-2.5">
+    <template x-for="f in active" :key="f.id">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pl-2.5 pr-1 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span x-text="f.label"></span>
+        <button type="button" @click="drop(f.id)" :aria-label="'Remove filter ' + f.label"
+                class="flex size-4 items-center justify-center rounded-full hover:bg-zinc-300">
+          <i data-lucide="x" class="size-3"></i>
+        </button>
+      </span>
+    </template>
+    <button type="button" @click="active = []" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Clear all</button>
+  </div>
+
+  <div id="col-filters" x-show="open" x-cloak x-collapse.duration.200ms>
+    <div class="border-t border-zinc-100 px-4 py-4">
+      <div class="grid gap-4 sm:grid-cols-3">
+        <div>
+          <label for="fl-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+            <select id="fl-vendor" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              <option>All vendors</option>
+              <option selected>Gujarat Polymers Ltd</option>
+              <option>Sharma Extrusions</option>
+              <option>Nashik Steel Traders</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="fl-status" class="mb-1.5 block text-[13px]/5 font-medium">Status</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+            <select id="fl-status" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              <option>Any status</option>
+              <option>Open</option>
+              <option selected>Awaiting GRN</option>
+              <option>Closed</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="fl-value" class="mb-1.5 block text-[13px]/5 font-medium">Value above</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+            <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+            <input id="fl-value" value="5,00,000" inputmode="numeric"
+                   class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Apply filters</button>
+        <button type="button" @click="open = false" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'native', name: 'No JavaScript', code:
+`<!-- <details> and <summary>, and nothing else. What this buys:
+
+     It works before Alpine boots and with scripting off, so no x-cloak and no
+     first-paint flash. The summary is already exposed as a button with an
+     expanded state, so there is nothing to wire and nothing to keep in sync —
+     adding role, aria-expanded or aria-controls here overwrites something the
+     browser gets right for free. And Ctrl-F reaches inside it: Chrome and
+     Safari open a closed <details> to reveal a find-in-page match, which an
+     x-show panel can never do, because display:none text is not text as far as
+     the browser is concerned.
+
+     What it costs: no height animation. <details> and x-collapse do not
+     combine — the browser owns the open attribute and drops the content to
+     display:none the instant it changes, leaving no frame to animate in, and
+     the two end up fighting over the same element. The open state also cannot
+     be driven from anywhere else on the page without script, and anything
+     interactive inside the summary toggles the panel when it is clicked.
+
+     So: reference text somebody may search — an audit trail, terms, a policy
+     note. Use the Alpine version when the panel holds form controls, when the
+     trigger lives somewhere else, or when the movement is worth the plugin.
+
+     list-none plus the webkit pseudo removes the disclosure triangle; display
+     flex on the summary already does it in Chrome, and Safari needs the
+     pseudo. group-open on the wrapping span is what rotates the chevron —
+     still a span, never the <i>, because Lucide replaces that element. -->
+<details class="group max-w-xl rounded-xl border border-zinc-200 bg-white">
+  <summary class="flex h-12 list-none items-center gap-3 px-4 [&::-webkit-details-marker]:hidden">
+    <i data-lucide="history" class="size-4 shrink-0 text-zinc-600"></i>
+    <span class="flex-1 text-[14px]/5 font-medium">Audit trail</span>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">7 events</span>
+    <span class="flex shrink-0 transition-transform group-open:rotate-180">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </summary>
+
+  <div class="border-t border-zinc-100 px-4 py-3">
+    <ol class="space-y-3 text-[13px]/5">
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">11/08/2026</span>
+        <span class="min-w-0">GRN-3391 posted against 4 lines — <span class="text-zinc-600">S. Kulkarni, stores</span></span>
+      </li>
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">09/08/2026</span>
+        <span class="min-w-0">Delivery date moved to 22/08/2026 — <span class="text-zinc-600">vendor email</span></span>
+      </li>
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">04/08/2026</span>
+        <span class="min-w-0">Order released — <span class="text-zinc-600">R. Menon</span></span>
+      </li>
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">02/08/2026</span>
+        <span class="min-w-0">Approved at <span class="tabular-nums">₹18,42,000</span> — <span class="text-zinc-600">A. Deshmukh, plant head</span></span>
+      </li>
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">01/08/2026</span>
+        <span class="min-w-0">Raised from requisition REQ-24-0884 — <span class="text-zinc-600">R. Menon</span></span>
+      </li>
+    </ol>
+  </div>
+</details>` },
+
+      { id: 'card', name: 'Inside a card', code:
+`<!-- The header and the footer are outside the panel, so the number this card is
+     about is on screen in both states. Collapse the body and the row still says
+     which invoice it is and what it comes to — collapse the total with it and
+     the closed card is a label with no value.
+
+     This one starts open, so it must not carry x-cloak: x-cloak would hold it
+     hidden until Alpine boots and the card would assemble itself in front of
+     the user.
+
+     The trigger is icon-only, so its name says what it opens rather than what
+     it does — aria-expanded already announces expanded or collapsed, and a
+     button called "Expand" in a page with four of them names nothing. -->
+<div class="max-w-xl rounded-xl border border-zinc-200 bg-white" x-data="{ open: true }">
+  <div class="flex min-h-14 items-center gap-3 px-4 py-3">
+    <div class="min-w-0 flex-1">
+      <h3 class="truncate text-[16px]/6 font-semibold">GST breakup</h3>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Invoice INV-7741 · 12/08/2026 · Gujarat Polymers Ltd</p>
+    </div>
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-gst"
+            aria-label="GST breakup"
+            class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-zinc-100">
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+  </div>
+
+  <div id="col-gst" x-show="open" x-collapse.duration.200ms>
+    <dl class="divide-y divide-zinc-100 border-t border-zinc-100 px-4 text-[14px]/5">
+      <div class="flex items-center justify-between gap-3 py-2.5">
+        <dt class="text-zinc-600">Taxable value</dt><dd class="tabular-nums">₹18,42,000.00</dd>
+      </div>
+      <div class="flex items-center justify-between gap-3 py-2.5">
+        <dt class="text-zinc-600">CGST @ 9%</dt><dd class="tabular-nums">₹1,65,780.00</dd>
+      </div>
+      <div class="flex items-center justify-between gap-3 py-2.5">
+        <dt class="text-zinc-600">SGST @ 9%</dt><dd class="tabular-nums">₹1,65,780.00</dd>
+      </div>
+      <div class="flex items-center justify-between gap-3 py-2.5">
+        <dt class="text-zinc-600">Round off</dt><dd class="tabular-nums">₹0.40</dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="flex items-center justify-between gap-3 border-t border-zinc-200 px-4 py-3">
+    <span class="text-[13px]/5 font-medium">Invoice total</span>
+    <span class="text-[16px]/6 font-semibold tabular-nums">₹21,73,560</span>
+  </div>
+</div>` },
+
+      { id: 'controlled', name: 'Trigger outside the panel', code:
+`<!-- One x-data, on the nearest element that contains both. A trigger with its
+     own x-data and a panel with another are two copies of open that never see
+     each other — the button toggles a variable nothing is watching, and the
+     panel never moves.
+
+     No chevron here. The label already flips between Show and Hide, and a
+     rotating arrow beside it is the same fact twice.
+
+     With the trigger away from the panel, aria-controls is the only thing tying
+     them together and it is doing real work. Keep the panel after the trigger
+     in document order so Tab reaches it next. -->
+<div x-data="{ open: false }" class="space-y-4">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="min-w-0">
+      <h2 class="text-[20px]/7 font-semibold tracking-tight">GRN-3391</h2>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Gujarat Polymers Ltd · posted 11/08/2026</p>
+    </div>
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-lines"
+            class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">
+      <i data-lucide="list" class="size-4 shrink-0 text-zinc-600"></i>
+      <span x-text="open ? 'Hide line detail' : 'Show line detail'">Show line detail</span>
+    </button>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <dl class="grid grid-cols-2 gap-x-6 gap-y-3 px-4 py-3 sm:grid-cols-4">
+      <div><dt class="text-[12px]/4 text-zinc-600">Lines</dt><dd class="text-[14px]/5 tabular-nums">4</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Received</dt><dd class="text-[14px]/5 tabular-nums">8,400 kg</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Short</dt><dd class="text-[14px]/5 tabular-nums">200 kg</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Value</dt><dd class="text-[14px]/5 tabular-nums">₹6,18,400</dd></div>
+    </dl>
+
+    <div id="col-lines" x-show="open" x-cloak x-collapse.duration.200ms>
+      <ul class="divide-y divide-zinc-100 border-t border-zinc-100">
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">HDPE granules — grade M60075</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">8,400 kg</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹5,04,000</span>
+        </li>
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">Masterbatch — white 20%</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">300 kg</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹72,000</span>
+        </li>
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">Antioxidant additive</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">40 kg</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹28,400</span>
+        </li>
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">Packing — HDPE liner bags</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">168 nos</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹14,000</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'states', name: 'Locked, empty and open on desktop', code:
+`<div class="max-w-xl space-y-4">
+  <!-- Locked. The trigger is disabled, so it leaves the Tab order, and the
+       reason sits beside it as text rather than in a title attribute nobody on
+       a touchscreen will ever see. No chevron — a chevron promises something
+       opens.
+
+       There is no panel in the document at all, so there is no aria-controls
+       either: pointing it at an id that does not exist is worse than omitting
+       it. The content is absent because a collapsed panel is not a permission
+       boundary — x-show renders the markup and hides it, and a cost breakup
+       behind a trigger is in the page source of everyone who can load the
+       page. This one is gated in the view. -->
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <button type="button" disabled aria-expanded="false"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left text-zinc-500">
+      <i data-lucide="lock" class="size-4 shrink-0"></i>
+      <span class="flex-1 text-[14px]/5 font-medium">Cost breakup</span>
+    </button>
+    <p class="border-t border-zinc-100 px-4 py-2.5 text-[12px]/4 text-zinc-500">
+      Category managers and above. Raise a request with the buying desk.
+    </p>
+  </div>
+
+  <!-- Empty. A collapsible with nothing behind it is a control that opens onto
+       a blank panel, and the only way to find that out is to click it. Say the
+       answer on the closed row and drop the control. -->
+  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+    <p class="text-[14px]/5 font-medium">Amendments</p>
+    <p class="mt-1 flex items-center gap-2 text-[13px]/5 text-zinc-600">
+      <i data-lucide="minus" class="size-4 shrink-0 text-zinc-500"></i>
+      None since this order was released on 04/08/2026.
+    </p>
+  </div>
+
+  <!-- Collapsed on a phone, open at md and up, where there is room for it.
+       x-show writes display inline and a plain class cannot beat an inline
+       style, so the desktop override is the important modifier — md:block! in
+       Tailwind v4, where the bang goes on the end of the utility and not the
+       front.
+
+       That instance drops x-collapse. The plugin writes an inline height as
+       well, and md:block! would then show a panel sitting at height 0.
+
+       The trigger is md:hidden and a plain heading takes its place at md, so
+       desktop is not left with an unlabelled block of text. -->
+  <div class="rounded-xl border border-zinc-200 bg-white" x-data="{ open: false }">
+    <h3 class="hidden h-12 items-center px-4 text-[14px]/5 font-medium md:flex">Payment and freight terms</h3>
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-terms"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left md:hidden">
+      <span class="flex-1 text-[14px]/5 font-medium">Payment and freight terms</span>
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+    <div id="col-terms" x-show="open" x-cloak class="md:block!">
+      <div class="border-t border-zinc-100 px-4 py-3 text-[14px]/5 text-zinc-600 md:border-t-0 md:pt-0">
+        45 days from GRN posting, 2% early-payment discount inside 10 days.
+        Freight paid and included in the rate. Debit note raised on any short
+        receipt beyond the 2% tolerance.
+      </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'django', name: 'Server-rendered', code:
+`{# templates/orders/_collapsible.html
+
+   Three things the server decides that the browser cannot.
+
+   1. Whether the panel starts open. Rendered in the x-data, and the x-cloak
+      goes on only when it starts closed — a panel that starts open and carries
+      x-cloak stays hidden until Alpine boots, which is the exact flash x-cloak
+      exists to prevent.
+
+   2. Whether the panel exists at all. A collapsed panel is not a permission
+      boundary: x-show renders the markup and hides it, so a cost breakup behind
+      a trigger is in the page source of every user who can load the page. The
+      {% if perms %} is what actually withholds it.
+
+   3. The panel id. Rendered in a loop it takes the record key, or the second
+      trigger's aria-controls points at the first panel and both rows open the
+      same thing. #}
+
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{ open: {% if section_open %}true{% else %}false{% endif %} }">
+  <button type="button" @click="open = !open" :aria-expanded="open"
+          aria-controls="col-lines-{{ order.pk }}"
+          class="flex h-12 w-full items-center gap-3 px-4 text-left">
+    <span class="flex-1 text-[14px]/5 font-medium">Order lines</span>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500">{{ order.lines.count }} lines · ₹{{ order.total|floatformat:0 }}</span>
+    <span class="flex transition-transform" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </button>
+
+  <div id="col-lines-{{ order.pk }}" x-show="open"
+       {% if not section_open %}x-cloak{% endif %} x-collapse.duration.200ms>
+    <ul class="divide-y divide-zinc-100 border-t border-zinc-100">
+      {% for line in order.lines.all %}
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">{{ line.item }}</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">{{ line.qty }} {{ line.uom }}</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹{{ line.amount|floatformat:0 }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{# The panel a user may not read is not rendered, hidden or otherwise. #}
+{% if perms.purchasing.view_cost %}
+  <div class="mt-4 rounded-xl border border-zinc-200 bg-white" x-data="{ open: false }">
+    <button type="button" @click="open = !open" :aria-expanded="open"
+            aria-controls="col-cost-{{ order.pk }}"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left">
+      <span class="flex-1 text-[14px]/5 font-medium">Cost breakup</span>
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+    <div id="col-cost-{{ order.pk }}" x-show="open" x-cloak x-collapse.duration.200ms>
+      <div class="border-t border-zinc-100 px-4 py-3 text-[14px]/5">
+        {% include 'orders/_cost_breakup.html' %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{# A filter panel has to survive the reload its own Apply button causes, so the
+   open state is a GET parameter and not Alpine state — Alpine is reconstructed
+   from scratch on every page load and remembers nothing.
+
+   views.py
+       context['filters_open'] = bool(request.GET.get('f') or form.has_changed())
+
+   The hidden f=1 keeps the panel open through the submit; the count on the
+   trigger is what the closed row says, and without it a filtered register reads
+   as the whole register. #}
+<form method="get" class="mt-4 rounded-xl border border-zinc-200 bg-white"
+      x-data="{ open: {% if filters_open %}true{% else %}false{% endif %} }">
+  <input type="hidden" name="f" value="1">
+  <div class="flex h-12 items-center gap-3 px-4">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-filters"
+            class="-mx-2 flex h-9 items-center gap-2 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+      <i data-lucide="sliders-horizontal" class="size-4 shrink-0 text-zinc-600"></i>
+      Filters
+      {% if active_filters %}
+        <span class="inline-flex items-center rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">{{ active_filters|length }}</span>
+      {% endif %}
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+    <p class="ml-auto shrink-0 text-[13px]/5 tabular-nums text-zinc-600">{{ page_obj.paginator.count }} of {{ total_orders }} orders</p>
+  </div>
+  <div id="col-filters" x-show="open" {% if not filters_open %}x-cloak{% endif %} x-collapse.duration.200ms>
+    <div class="border-t border-zinc-100 px-4 py-4">
+      {{ form.as_div }}
+      <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Apply filters</button>
+    </div>
+  </div>
+</form>
+
+{# A panel expensive enough to be worth not rendering until it is opened.
+   Alpine does not fetch — htmx does. intersect fires the first time the element
+   is genuinely on screen, and a display:none element never intersects, so the
+   request goes out on the first open and once only.
+
+   urls.py
+       path('orders/<int:pk>/audit/', OrderAudit.as_view(), name='order-audit')
+
+   Keep the placeholder roughly the height of what replaces it. x-collapse
+   finishes the panel at height auto, so a swap landing after the animation
+   reflows correctly, but one landing inside those 200ms leaves the panel
+   measuring the placeholder. #}
+<div class="mt-4 rounded-xl border border-zinc-200 bg-white" x-data="{ open: false }">
+  <button type="button" @click="open = !open" :aria-expanded="open"
+          aria-controls="col-audit-{{ order.pk }}"
+          class="flex h-12 w-full items-center gap-3 px-4 text-left">
+    <span class="flex-1 text-[14px]/5 font-medium">Audit trail</span>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500">{{ order.events.count }} events</span>
+    <span class="flex transition-transform" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </button>
+  <div id="col-audit-{{ order.pk }}" x-show="open" x-cloak x-collapse.duration.200ms>
+    <div class="border-t border-zinc-100 px-4 py-3"
+         hx-get="{% url 'order-audit' order.pk %}" hx-trigger="intersect once" hx-swap="innerHTML">
+      <p class="text-[13px]/5 text-zinc-500">Loading the audit trail…</p>
     </div>
   </div>
 </div>` }
