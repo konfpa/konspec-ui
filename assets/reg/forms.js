@@ -84,7 +84,7 @@ register(
       'Units in a prefix or suffix are part of the field\'s description, so the value is not announced without them.',
       'type is set correctly — email, date, number — so the right keyboard appears on a phone.'
     ],
-    related: ['field', 'textarea', 'checkbox'],
+    related: ['field', 'textarea', 'combobox'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
@@ -2019,6 +2019,1280 @@ Test certificate follows by email.</textarea>
     </div>
   {% endfor %}
 </div>` }
+    ]
+  },
+
+  {
+    id: 'combobox', name: 'Combobox', category: 'forms',
+    description: 'A text box that filters a list of records and commits one of them. The typing is a search; what reaches the server is a hidden input under it.',
+    when: 'A field whose answer is one record out of more than about fifteen — a vendor, a cost centre, an item code. Below fifteen a native select costs no JavaScript and behaves correctly on a phone. For moving around the application rather than filling in a field, use the command palette: a palette navigates, a combobox posts.',
+    notes: [
+      'The visible box carries no name. It is a search field, not the value: name it vendor and the half-typed "guj" posts beside the vendor id, and request.POST[\'vendor\'] is whichever of the two the browser serialised last. One hidden input under the field is what submits, and in a multiselect it is one hidden input per value all sharing the name, read back with request.POST.getlist.',
+      'Closing without committing restores the query to the label of the value still selected. Without that somebody types "nash", clicks away, and the field reads Nashik over a hidden value of gujarat-polymers — a field lying about itself, which no server validation catches because the POST is internally consistent.',
+      'aria-activedescendant needs a real id on a real node. Inside template x-for the id is derived from the option — :id="\'cb-vendor-\' + o.id" — never from the loop index, because filtering renumbers the rows and the attribute then names whichever record moved into that slot. Key the loop on the same field or Alpine reuses nodes and the id and the row drift apart. The prefix belongs to the field, so a second combobox on the page needs a second prefix or both write the same ids.',
+      'The popup is x-show, never x-if. aria-activedescendant may only reference a node that exists; under x-if the listbox is not in the document until the first open, and the attribute dangles for anything that reads the field before then.',
+      'Never close on @blur. Blur fires on mousedown, before the click on the option is dispatched, so the row is hidden out from under the pointer and nothing is selectable by mouse at all — the defect reads as "clicking an option does nothing". Close on @click.outside on the root, which runs after the click has landed, and put @mousedown.prevent on the row so focus never leaves the input in the first place.',
+      'aria-selected marks what is committed, not what the arrow keys are on. Bind it to the selection and let aria-activedescendant carry the highlight. Bound to the active index instead, every row arrowed past is announced as selected, which in a multiselect cannot be told apart from having actually ticked it.',
+      'Alpine keeps aria-expanded and aria-selected when they are false and removes aria-activedescendant when it is null, which is what ARIA wants in both cases. So :aria-expanded="open" is correct and :aria-expanded="open ? \'true\' : \'false\'" is noise, and a getter returning null for the active id removes the attribute rather than leaving aria-activedescendant="" pointing at nothing.',
+      'Escape stops propagating only while the list is open. Unconditional, it swallows the keystroke the surrounding modal is waiting for and the dialog can no longer be dismissed from inside the field. First Escape closes the list, second Escape reaches the dialog.',
+      'Enter is prevented only while the list is open. An unconditional .prevent takes form submission away from the keyboard, and a two-field form whose first field is a combobox can then only be submitted by finding the button with a mouse.',
+      'Arrow keys clamp at both ends, they do not wrap. Wrapping hides the fact that the list ended, and with a create row pinned last it lands on "Add new vendor" every time somebody overshoots the bottom. Home and End jump to the ends of the list while it is open and belong to the caret while it is closed, so they are prevented conditionally too.',
+      'Focus alone does not open the list. Opening on @focus means tabbing through a form pops a listbox open at every combobox in it, and on a phone it fires as the keyboard slides up. Click, arrow keys and typing open it.',
+      'The active row is scrolled into view with scrollIntoView({ block: \'nearest\' }) inside $nextTick. Plain scrollIntoView() scrolls the page as well as the list and drags the whole document under the field; behavior: \'smooth\' animates one row at a time and falls behind a held-down arrow key until the highlight is somewhere nobody can see.',
+      'Zero matches renders an empty state naming the query, not an empty box. A popup that opens onto nothing reads as a component that broke rather than a search that found nothing.',
+      'The result count is a role="status" that is in the document from first paint, outside the popup. A live region inserted with its text already in it announces nothing — the region has to exist before the content changes — so a count rendered inside the x-show popup is silent on the one keystroke that mattered.',
+      'Disabling a combobox has to reach the hidden input. disabled on the search box only stops the typing; the hidden input has no appearance of its own and posts regardless, so a field somebody was told they could not change still submits its value. There is no read-only combobox either: readonly leaves the box focusable, the chevron still opens the list, and readonly means nothing at all on an option row. A value nobody may change is rendered as text with a hidden input beside it.',
+      'A disabled option is aria-disabled, and aria-disabled blocks nothing. The arrow keys have to step over it and the click handler has to return early, or the row is unreachable by keyboard and fully clickable by mouse. It keeps its place in the list rather than disappearing, so a locked vendor does not change the shape of a set people scan by position.',
+      'Select all takes what the filter is showing and the button says the number: "Select all 4 matching" with a query typed, "Select all 9" without one. A bulk control that quietly reaches past the rows on screen is the select-all-approves-4,312-orders problem again — people can only verify what they can see. Clear is deliberately not scoped the same way: it releases everything and its label carries the total, because a Clear that only released the matching rows would leave "3 selected" standing over a list with nothing ticked in it and no way back to the other three.',
+      'A multiselect field has to show what is in it. A count alone — 3 / 9 in the corner of the box — is a selection nobody can see without opening the popup first, and it reads as a control that did not register the click. Chips in the field are the answer, and select-all is the one control that can fill the field with them, so it shows one name and collapses everything past it into a "+8 more" pill that opens the list. Two chips is one too many: at 390px the field is 300px wide, two names and the search input do not fit on one line, and the box grew a row at exactly two selections and shrank again at three. The cap hides nothing from the keyboard: every option, listed or not, is a row in the popup with its own tick, and toggling it there is what releases it.',
+      'The search input inside a chip field needs a small minimum and a placeholder it never drops. flex-1 min-w-24 reserves 96px that the chips cannot leave room for, so the input is pushed onto a line of its own — and with the placeholder blanked out because there are chips to look at instead, that line renders as an empty row inside the box and reads as a rendering fault rather than a search field. min-w-16 plus a placeholder that never blanks is what keeps it a search field wherever it lands.',
+      'The popup is left-0 right-0 under the field, never a fixed width. w-96 on a field inside a 390px viewport hangs off the right edge with nothing to scroll it back. An ancestor carrying overflow-hidden clips the panel instead — a card, a table wrapper — so the field needs position: relative and no clipping ancestor between it and the popup.',
+      'Nothing inside role="option" may be focusable, so the tick on a multiselect row is a drawn square and not a real checkbox. A real box there is a tab stop inside a widget that is meant to have none, and if it carries a name it posts the value a second time beside the hidden input.',
+      'Lucide icons inside template x-for do not exist when createIcons() first runs, because Alpine renders the rows after DOMContentLoaded. The page needs the guarded re-hydration loop — a MutationObserver calling createIcons() only while document.querySelector("[data-lucide]:not(svg)") finds something — or the ticks and the chip crosses come up empty. Bind x-show on a wrapping span, never on the <i>.',
+      'htmx\'s trigger filter binds to the event name, not to the end of the spec: input[this.value.length > 1] changed delay:300ms. Written as input changed delay:300ms[…] it is parsed as part of the modifier and the floor never applies. And below that floor nothing fires at all, so deleting back to one character has to clear the rows in script or last search\'s answer stays on screen under a query that no longer produced it.',
+      'In Django the multiselect field needs a widget whose value_from_datadict calls getlist — forms.MultipleHiddenInput or forms.SelectMultiple. A ModelMultipleChoiceField handed a plain HiddenInput reads the POST with .get(), which returns the last hidden input and drops every other vendor the user picked. Seed the option list with json_script and never interpolate a queryset into an x-data attribute: one vendor called M/s D\'Souza Traders ends the attribute early and the component stops parsing.'
+    ],
+    anatomy: [
+      ['Field', 'The bordered box. It owns the focus ring through focus-within, as the input does, so the icon, the chips and the clear button sit inside the ring.'],
+      ['Search input', 'role="combobox" with aria-autocomplete="list", aria-controls, aria-expanded and aria-activedescendant. It has no name — it is the search, not the value.'],
+      ['Hidden input', 'What actually posts. One for a single select; one per value sharing a name for a multiselect.'],
+      ['Popup', 'An absolutely positioned panel pinned to both edges of the field, x-show and x-cloak, holding a scrolling listbox.'],
+      ['Option', 'role="option" with a stable id and aria-selected. The active row is tinted bg-zinc-100 and named by aria-activedescendant, which is a different fact from being selected.'],
+      ['Chip', 'A committed value in a multiselect field: the graphite pill with its ring, a truncating label, and a remove button whose accessible name says which vendor it removes.'],
+      ['Empty state', 'What the popup shows at zero matches — the query quoted back and the way out of it.'],
+      ['Live region', 'A sr-only role="status" outside the popup, in the document from first paint, carrying the number of matches.']
+    ],
+    behaviour: [
+      'Typing filters, and the first keystroke moves the highlight to the first match, so Enter always takes the row at the top of the list.',
+      'Opening does not filter to the value already in the box. The query counts as a filter only once the user has typed, or a committed vendor reopens to a list of exactly one row.',
+      'Arrow down and up move the highlight and clamp at the ends. Enter commits, Escape closes without committing and leaves focus in the input, Tab closes and moves on.',
+      'The highlight follows the mouse as well as the keyboard, so the row under the pointer and the row Enter would take are never two different rows.',
+      'A single select closes on commit and writes the label back into the box. A multiselect stays open, clears the query, and leaves the highlight on the row just toggled.',
+      'Backspace on an empty query removes the last chip. It fires only when the query is empty, so it never eats a character somebody was still deleting.',
+      'Select all applies to the rows the filter is showing and says how many that is; Clear releases everything and says how many that is.',
+      'Selected values are chips in the field, not a number beside it. Where a bulk control can select nine at once the field lists two and collapses past that to one name plus a pill, so the box holds a single row at every count instead of growing one the moment the pill appears. The popup is where the whole selection is legible and every row can be toggled off.',
+      'Remote options are fetched by htmx on a debounced input with a two-character floor. Alpine never fetches: it owns the open state and the keyboard, and because htmx replaced the rows without telling Alpine, the keyboard reads the option elements out of the DOM rather than out of an array.',
+      'A value that is not in the list is offered as the last row whenever there is a query and no exact match, and it posts as text in a second field rather than as an invented id.'
+    ],
+    a11y: [
+      'The input is role="combobox" with aria-expanded, aria-controls naming the listbox, aria-autocomplete="list" and aria-activedescendant naming the active option.',
+      'The popup is role="listbox" with an accessible name, every row is role="option" with aria-selected, and a multiselect listbox carries aria-multiselectable="true".',
+      'Focus never leaves the input. The highlight moves through aria-activedescendant, which is why every option needs a stable id and why no row is a tab stop.',
+      'The number of matches is announced from a role="status" that was in the document before the count changed.',
+      'Every chip remove button names its own option — "Remove Nashik Steel Traders" — because twelve buttons all called Remove say nothing about which one the cursor is on.',
+      'Grouped options sit in role="group" with an aria-label, and the visible sticky heading is aria-hidden: the group is already named, and a bare paragraph is not a permitted child of a listbox.',
+      'Escape closes the list and leaves focus in the input, and stops propagating only while the list is open, so a second Escape still reaches the dialog around it.',
+      'A disabled field disables the hidden input as well as the box. An invalid field sets aria-invalid="true" and points aria-describedby at real text under it, never at a title attribute.'
+    ],
+    related: ['input', 'checkbox', 'command-palette'],
+    variants: [
+      { id: 'default', name: 'Single select', code:
+`<!-- The box is a search field and carries no name. Name it vendor and the
+     half-typed "guj" posts beside the vendor id, and the server reads whichever
+     of the two came last. The hidden input is the field.
+
+     close() writes the committed label back into the box, so the field cannot
+     end up reading "nash" over a hidden value of gujarat-polymers.
+
+     Escape and Enter are both conditional. Escape stops propagating only while
+     the list is open, or it swallows the keystroke a surrounding dialog is
+     waiting for; Enter is prevented only while the list is open, or the field
+     takes form submission away from the keyboard. -->
+<div class="relative max-w-sm"
+     x-data="{
+       open: false, typed: false, q: 'Gujarat Polymers Ltd', sel: 'gujarat-polymers', ai: 0,
+       options: [
+         { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'VEN-0142' },
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'VEN-0187' },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'VEN-0203' },
+         { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', meta: 'VEN-0219' },
+         { id: 'silvassa-packaging', label: 'Silvassa Packaging and Allied Products', meta: 'VEN-0231' },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'VEN-0244' },
+         { id: 'baroda-fasteners', label: 'Baroda Fasteners', meta: 'VEN-0258' },
+         { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', meta: 'VEN-0266' }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       get chosen() { return this.options.find(o => o.id === this.sel) || null; },
+       rowId(o) { return 'cb-vendor-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(o => o.id === this.sel));
+         this.scroll();
+       },
+       close() { this.open = false; this.typed = false; this.q = this.chosen ? this.chosen.label : ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); },
+       clear() { this.sel = null; this.q = ''; this.typed = false; this.open = false; this.$refs.q.focus(); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+
+    <!-- no @focus handler: opening on focus pops a listbox at every combobox
+         somebody tabs through, and fires as the keyboard slides up on a phone.
+         Click, arrows and typing open it. -->
+    <input id="cb-vendor" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-vendor-list" aria-describedby="cb-vendor-help"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Search 248 approved vendors"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+
+    <button type="button" x-show="sel" x-cloak @click="clear()" aria-label="Clear the selected vendor"
+            class="mr-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+      <i data-lucide="x" class="size-4"></i>
+    </button>
+
+    <!-- the rotation goes on a wrapping span. createIcons() replaces the <i>
+         with an <svg> and takes any binding on it with it. -->
+    <button type="button" tabindex="-1" aria-hidden="true" @click="open ? close() : (show(), $refs.q.focus())"
+            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100">
+      <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </button>
+  </div>
+
+  <!-- what actually posts -->
+  <input type="hidden" name="vendor" :value="sel || ''">
+
+  <p id="cb-vendor-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Only vendors with a live rate contract are listed.</p>
+
+  <!-- outside the popup and in the document from first paint. A live region
+       inserted with its text already in it announces nothing. -->
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-vendor-list" role="listbox" aria-label="Approved vendors" class="max-h-64 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="o.id === sel"
+             @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+          <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.meta"></span>
+          <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+            <i data-lucide="check" class="size-4 text-zinc-600"></i>
+          </span>
+        </div>
+      </template>
+    </div>
+
+    <!-- an empty popup reads as a component that broke; this reads as a search
+         that found nothing -->
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Check the spelling, or search by vendor code — VEN-0142.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'multi', name: 'Multiselect with chips', code:
+`<!-- One hidden input per value, all sharing the name, which Django reads with
+     request.POST.getlist('vendor'). .get() returns the last one and drops every
+     other vendor the user picked.
+
+     The chips wrap inside the field and every label truncates, so a name like
+     Silvassa Packaging and Allied Products cannot push the box wider than the
+     390px viewport it is sitting in.
+
+     Each remove button names its own vendor: twelve buttons all called Remove
+     say nothing about which chip the cursor is on. They are real tab stops,
+     which is the price of being reachable at all — Backspace on an empty query
+     is the fast way out. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: '', ai: 0,
+       sel: ['gujarat-polymers', 'nashik-steel'],
+       options: [
+         { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'VEN-0142' },
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'VEN-0187' },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'VEN-0203' },
+         { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', meta: 'VEN-0219' },
+         { id: 'silvassa-packaging', label: 'Silvassa Packaging and Allied Products', meta: 'VEN-0231' },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'VEN-0244' },
+         { id: 'baroda-fasteners', label: 'Baroda Fasteners', meta: 'VEN-0258' },
+         { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', meta: 'VEN-0266' }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       has(id) { return this.sel.includes(id); },
+       label(id) { const o = this.options.find(x => x.id === id); return o ? o.label : id; },
+       rowId(o) { return 'cb-rfq-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { if (!this.open) { this.open = true; this.typed = false; this.ai = 0; this.scroll(); } },
+       close() { this.open = false; this.typed = false; this.q = ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       toggle(o) {
+         this.sel = this.has(o.id) ? this.sel.filter(v => v !== o.id) : [...this.sel, o.id];
+         this.q = ''; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(x => x.id === o.id));
+         this.$refs.q.focus();
+       },
+       drop(id) { this.sel = this.sel.filter(v => v !== id); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.toggle(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-rfq" class="mb-1.5 block text-[13px]/5 font-medium">Send this RFQ to</label>
+
+  <div @click="$refs.q.focus(); show()"
+       class="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+
+    <template x-for="id in sel" :key="id">
+      <span class="inline-flex max-w-full items-center gap-1 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 ring-1 ring-inset ring-zinc-300">
+        <span class="min-w-0 truncate" x-text="label(id)"></span>
+        <button type="button" :aria-label="'Remove ' + label(id)" @click.stop="drop(id)"
+                class="flex size-4 shrink-0 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900">
+          <i data-lucide="x" class="size-3"></i>
+        </button>
+      </span>
+    </template>
+
+    <input id="cb-rfq" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-rfq-list" aria-describedby="cb-rfq-count"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           :placeholder="sel.length ? 'Search' : 'Search vendors'"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.backspace="if (!q && sel.length) { $event.preventDefault(); sel = sel.slice(0, -1) }"
+           @keydown.tab="close()"
+           class="min-w-16 flex-1 bg-transparent px-1 py-1 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <!-- one hidden input per value, all sharing the name -->
+  <template x-for="id in sel" :key="'post-' + id">
+    <input type="hidden" name="vendor" :value="id">
+  </template>
+
+  <div class="mt-1.5 flex items-start justify-between gap-3">
+    <p id="cb-rfq-count" class="text-[12px]/4 tabular-nums text-zinc-500"
+       x-text="sel.length ? sel.length + ' of 8 vendors selected' : 'No vendor selected — the RFQ will not be sent'"></p>
+    <button type="button" x-show="sel.length" x-cloak @click="sel = []"
+            class="shrink-0 text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2">
+      Clear all <span x-text="sel.length"></span>
+    </button>
+  </div>
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-rfq-list" role="listbox" aria-multiselectable="true" aria-label="Approved vendors"
+         class="max-h-64 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <!-- the tick is a drawn square, not an input. Nothing inside
+             role="option" may be focusable, and a real checkbox carrying a name
+             here would post every ticked vendor a second time. -->
+        <div :id="rowId(o)" role="option" :aria-selected="has(o.id)"
+             @mousedown.prevent @click="toggle(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+          <span class="flex size-4 shrink-0 items-center justify-center rounded"
+                :class="has(o.id) ? 'bg-zinc-700 text-white' : 'bg-white ring-1 ring-inset ring-zinc-300'">
+            <span class="flex" x-show="has(o.id)" x-cloak><i data-lucide="check" class="size-3"></i></span>
+          </span>
+          <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.meta"></span>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Search by vendor code instead — VEN-0142.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'select-all', name: 'Select all, scoped to the filter', code:
+`<!-- Select all takes the rows the filter is showing, and the button says the
+     number out loud: "Select all 4 matching" with a query typed, "Select all 9"
+     without one. A bulk control that quietly reaches past what is on screen is
+     the same defect as a select-all that approves 4,312 orders when five are
+     visible — people can only verify what they can see.
+
+     Clear is deliberately not scoped the same way. It releases everything and
+     its label carries the total, because a Clear that only released the
+     matching rows would leave "3 selected" standing over a list with nothing
+     ticked in it, and no route back to the other three.
+
+     The line under the buttons only appears while a query is typed, so the
+     asymmetry is on screen rather than in the documentation. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: '', ai: 0,
+       sel: ['cc-1200', 'cc-3100'],
+       options: [
+         { id: 'cc-1100', label: 'Injection moulding', meta: 'CC-1100' },
+         { id: 'cc-1200', label: 'Extrusion', meta: 'CC-1200' },
+         { id: 'cc-1300', label: 'Blow moulding', meta: 'CC-1300' },
+         { id: 'cc-2100', label: 'Tool room', meta: 'CC-2100' },
+         { id: 'cc-2200', label: 'Maintenance', meta: 'CC-2200' },
+         { id: 'cc-3100', label: 'Quality lab', meta: 'CC-3100' },
+         { id: 'cc-3200', label: 'Stores', meta: 'CC-3200' },
+         { id: 'cc-4100', label: 'Dispatch', meta: 'CC-4100' },
+         { id: 'cc-5100', label: 'Plant administration', meta: 'CC-5100' }
+       ],
+       get filtering() { return this.typed && this.q.trim().length > 0; },
+       get list() {
+         if (!this.filtering) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       get allShown() { return this.list.length > 0 && this.list.every(o => this.sel.includes(o.id)); },
+       cap: 1,
+       get chips() { return this.sel.length > this.cap ? this.sel.slice(0, 1) : this.sel; },
+       get extra() { return this.sel.length - this.chips.length; },
+       has(id) { return this.sel.includes(id); },
+       label(id) { const o = this.options.find(x => x.id === id); return o ? o.label : id; },
+       drop(id) { this.sel = this.sel.filter(v => v !== id); this.$refs.q.focus(); },
+       rowId(o) { return 'cb-cc-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { if (!this.open) { this.open = true; this.typed = false; this.ai = 0; this.scroll(); } },
+       close() { this.open = false; this.typed = false; this.q = ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       toggle(o) {
+         this.sel = this.has(o.id) ? this.sel.filter(v => v !== o.id) : [...this.sel, o.id];
+         this.$refs.q.focus();
+       },
+       takeShown() { this.sel = [...new Set([...this.sel, ...this.list.map(o => o.id)])]; this.$refs.q.focus(); },
+       clearAll() { this.sel = []; this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.toggle(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-cc" class="mb-1.5 block text-[13px]/5 font-medium">Cost centres this expense is split across</label>
+
+  <!-- Select all is the control that produces a wall of chips, so the field
+       lists one name and collapses everything past it into a +N more pill
+       that opens the list. The cap is one, not two: a 390px viewport gives this
+       field 300px, and two names plus the search input do not fit on one line —
+       measured, the box stood at 42px with one selection, grew to 68px at two,
+       and dropped back to 42px at three, which reads as the field flinching. One
+       chip plus the pill holds one row at every count and every width here.
+
+       Nothing is hidden from the keyboard by the cap: every option, listed or
+       not, is a row in the popup with its own tick, and toggling it there is
+       what releases it. A field carrying only a count — 3 / 9 — is what this
+       replaced, and it left a selection nobody could see without opening the
+       popup first. -->
+  <div @click="$refs.q.focus(); show()"
+       class="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+
+    <template x-for="id in chips" :key="id">
+      <span class="inline-flex max-w-full items-center gap-1 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 ring-1 ring-inset ring-zinc-300">
+        <span class="min-w-0 truncate" x-text="label(id)"></span>
+        <button type="button" :aria-label="'Remove ' + label(id)" @click.stop="drop(id)"
+                class="flex size-4 shrink-0 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900">
+          <i data-lucide="x" class="size-3"></i>
+        </button>
+      </span>
+    </template>
+
+    <button type="button" x-show="extra" x-cloak @click.stop="$refs.q.focus(); show()"
+            :aria-label="extra + ' more selected — open the list to see all ' + sel.length"
+            class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span x-text="'+' + extra + ' more'"></span>
+    </button>
+
+    <input id="cb-cc" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-cc-list" aria-describedby="cb-cc-count"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           :placeholder="sel.length ? 'Search' : 'Search cost centres'"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.backspace="if (!q && sel.length) { $event.preventDefault(); sel = sel.slice(0, -1) }"
+           @keydown.tab="close()"
+           class="min-w-16 flex-1 bg-transparent px-1 py-1 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <template x-for="id in sel" :key="'post-' + id">
+    <input type="hidden" name="cost_centre" :value="id">
+  </template>
+
+  <p id="cb-cc-count" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500"
+     x-text="sel.length ? sel.length + ' of 9 cost centres selected' : 'No cost centre selected — the expense stays unallocated'"></p>
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 cost centre matches' : list.length + ' cost centres match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2">
+      <button type="button" @mousedown.prevent @click="takeShown()" :disabled="allShown"
+              class="text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline">
+        <span x-text="filtering ? 'Select all ' + list.length + ' matching' : 'Select all ' + options.length"></span>
+      </button>
+      <button type="button" @mousedown.prevent @click="clearAll()" :disabled="!sel.length"
+              class="text-[12px]/4 tabular-nums text-zinc-600 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline">
+        <span x-text="'Clear all ' + sel.length"></span>
+      </button>
+    </div>
+
+    <p x-show="filtering" x-cloak
+       class="border-b border-zinc-200 bg-zinc-100 px-3 py-1.5 text-[12px]/4 tabular-nums text-zinc-600"
+       x-text="'Select all takes the ' + list.length + ' rows shown. The other ' + (options.length - list.length) + ' are left as they are, and Clear releases all ' + sel.length + '.'"></p>
+
+    <div id="cb-cc-list" role="listbox" aria-multiselectable="true" aria-label="Cost centres"
+         class="max-h-64 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="has(o.id)"
+             @mousedown.prevent @click="toggle(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+          <span class="flex size-4 shrink-0 items-center justify-center rounded"
+                :class="has(o.id) ? 'bg-zinc-700 text-white' : 'bg-white ring-1 ring-inset ring-zinc-300'">
+            <span class="flex" x-show="has(o.id)" x-cloak><i data-lucide="check" class="size-3"></i></span>
+          </span>
+          <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.meta"></span>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No cost centre matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Cost centres run from CC-1100 upwards.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'groups', name: 'Grouped options', code:
+`<!-- The keyboard runs over one flattened list in the order the rows are drawn,
+     not group by group. Index within a group and arrow-down at the bottom of
+     Maharashtra has nowhere to go: the highlight sticks there and Gujarat is
+     unreachable without a mouse.
+
+     Each group is role="group" with an aria-label, because a listbox may only
+     contain options and groups. The visible heading is aria-hidden — the group
+     is already named, and the heading would otherwise be read as a row.
+
+     A sticky heading needs a background of its own. Left transparent, the rows
+     scroll straight through the text and neither is readable. A group whose
+     options are all filtered out goes with its heading. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: 'Nashik Steel Traders', sel: 'nashik-steel', ai: 0,
+       groups: [
+         { state: 'Maharashtra', options: [
+           { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'Nashik' },
+           { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'Nashik' },
+           { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', meta: 'Pune' },
+           { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'Ratnagiri' }
+         ] },
+         { state: 'Gujarat', options: [
+           { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'Vadodara' },
+           { id: 'baroda-fasteners', label: 'Baroda Fasteners', meta: 'Vadodara' },
+           { id: 'rajkot-forge', label: 'Rajkot Forge and Machining', meta: 'Rajkot' }
+         ] },
+         { state: 'Tamil Nadu', options: [
+           { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', meta: 'Coimbatore' },
+           { id: 'madurai-rubber', label: 'Madurai Rubber Works', meta: 'Madurai' }
+         ] }
+       ],
+       get all() { return this.groups.flatMap(g => g.options); },
+       match(g) {
+         if (!this.typed) return g.options;
+         const s = this.q.trim().toLowerCase();
+         return g.options.filter(o => (o.label + ' ' + o.meta + ' ' + g.state).toLowerCase().includes(s));
+       },
+       get list() { return this.groups.flatMap(g => this.match(g)); },
+       rowId(o) { return 'cb-state-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(o => o.id === this.sel));
+         this.scroll();
+       },
+       close() {
+         this.open = false; this.typed = false;
+         const o = this.all.find(x => x.id === this.sel);
+         this.q = o ? o.label : '';
+       },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-state" class="mb-1.5 block text-[13px]/5 font-medium">Ship-from vendor</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-state" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-state-list"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Search a vendor or a state"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <input type="hidden" name="vendor" :value="sel || ''">
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-state-list" role="listbox" aria-label="Vendors by state" class="max-h-72 overflow-y-auto pb-1">
+      <template x-for="g in groups" :key="g.state">
+        <div role="group" :aria-label="g.state" x-show="match(g).length">
+          <p aria-hidden="true"
+             class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+             x-text="g.state"></p>
+          <template x-for="o in match(g)" :key="o.id">
+            <div :id="rowId(o)" role="option" :aria-selected="o.id === sel"
+                 @mousedown.prevent @click="pick(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+                 :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+                 class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+              <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+              <span class="shrink-0 text-[12px]/4 text-zinc-500" x-text="o.meta"></span>
+              <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+                <i data-lucide="check" class="size-4 text-zinc-600"></i>
+              </span>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 text-zinc-500">Try a state — Maharashtra, Gujarat, Tamil Nadu.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'rich', name: 'Two-line options', code:
+`<!-- A second line is what makes two vendors called Sharma tell each other
+     apart. It carries the identifying facts — code, GSTIN, last order — and
+     nothing decorative.
+
+     Every row gets an explicit aria-label, because left alone a screen reader
+     reads the whole cell as one run: the name, then a GSTIN spelled out
+     character by character, then a date, then an amount. The label is the name
+     and the code; the rest is aria-hidden and stays on screen for the people
+     reading it.
+
+     Below sm the GSTIN is dropped rather than wrapped. Three facts on a 390px
+     row is one too many, and the vendor code is the one people search by. -->
+<div class="relative max-w-lg"
+     x-data="{
+       open: false, typed: false, q: 'Sharma Extrusions', sel: 'sharma-extrusions', ai: 0,
+       options: [
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', code: 'VEN-0187', gstin: '27AABCS9012K1Z5', last: '14 Aug 2026', spend: '₹18,42,000' },
+         { id: 'sharma-polymers', label: 'Sharma Polymers and Compounds', code: 'VEN-0192', gstin: '24AABCS4471D1ZM', last: '02 Aug 2026', spend: '₹6,90,400' },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', code: 'VEN-0203', gstin: '27AACCN4455P1ZR', last: '19 Aug 2026', spend: '₹4,68,500' },
+         { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', code: 'VEN-0219', gstin: '27AAECD7788M1ZT', last: '28 Jul 2026', spend: '₹96,750' },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', code: 'VEN-0244', gstin: '27AAGCK2266H1ZW', last: '11 Jun 2026', spend: '₹1,32,900' },
+         { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', code: 'VEN-0266', gstin: '33AAJCC8811N1ZD', last: '04 Mar 2026', spend: '₹27,10,400' }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.code + ' ' + o.gstin).toLowerCase().includes(s));
+       },
+       get chosen() { return this.options.find(o => o.id === this.sel) || null; },
+       rowId(o) { return 'cb-rich-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(o => o.id === this.sel));
+         this.scroll();
+       },
+       close() { this.open = false; this.typed = false; this.q = this.chosen ? this.chosen.label : ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-rich" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <i data-lucide="building-2" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-rich" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-rich-list"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Name, vendor code or GSTIN"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <input type="hidden" name="vendor" :value="sel || ''">
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-rich-list" role="listbox" aria-label="Vendors" class="max-h-80 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="o.id === sel" :aria-label="o.label + ', ' + o.code"
+             @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-start gap-3 px-3 py-2">
+          <span class="min-w-0 flex-1" aria-hidden="true">
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate text-[13px]/5 font-medium" x-text="o.label"></span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600" x-text="o.spend"></span>
+            </span>
+            <span class="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px]/4 tabular-nums text-zinc-500">
+              <span x-text="o.code"></span>
+              <span class="hidden sm:inline">·</span>
+              <span class="hidden font-mono sm:inline" x-text="o.gstin"></span>
+              <span>·</span>
+              <span x-text="'last order ' + o.last"></span>
+            </span>
+          </span>
+          <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+            <i data-lucide="check" class="size-4 text-zinc-600"></i>
+          </span>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">A GSTIN search needs all 15 characters.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'remote', name: 'Options fetched with htmx', code:
+`<!-- htmx makes the request; Alpine never fetches. Alpine owns open, the
+     highlight and the keyboard, htmx owns the rows.
+
+     Because htmx replaced the rows without telling Alpine, there is no array to
+     index into. The keyboard reads the option elements out of the DOM on every
+     move and paints the highlight itself; an Alpine array here goes stale the
+     moment the first response lands. That also means the ids come from the
+     server, and they still have to be unique — aria-activedescendant points at
+     one of them.
+
+     The filter binds to the event name, not to the end of the spec:
+     input[this.value.length > 1] changed delay:300ms. Written the other way
+     round it is parsed as part of the modifier and the two-character floor
+     never applies. delay is a debounce, not a throttle, and hx-sync
+     this:replace drops a request still in flight so two keystrokes inside
+     300ms cannot settle on the older reply.
+
+     Below the floor nothing fires at all, so deleting back to one character
+     clears the rows in script — otherwise last search's answer sits there under
+     a query that did not produce it.
+
+     The search box is named q, never vendor. The value is the hidden input, and
+     a Django form ignores a POST key it has no field for. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, loading: false, failed: false, searched: false, empty: false,
+       ai: 0, aid: null, sel: '', label: '', term: '',
+       rows() { return Array.from(this.$refs.list.querySelectorAll('[role=option]:not([aria-disabled=true])')); },
+       paint() {
+         const r = this.rows();
+         r.forEach((el, i) => el.classList.toggle('bg-zinc-100', i === this.ai));
+         const el = r[this.ai];
+         this.aid = el ? el.id : null;
+         if (el) el.scrollIntoView({ block: 'nearest' });
+       },
+       move(n) {
+         if (!this.open) { this.open = true; return; }
+         const r = this.rows();
+         if (!r.length) return;
+         this.ai = Math.min(r.length - 1, Math.max(0, this.ai + n));
+         this.paint();
+       },
+       take(el) {
+         if (!el) return;
+         this.sel = el.dataset.value; this.label = el.dataset.label; this.term = this.label;
+         this.rows().forEach(r => r.setAttribute('aria-selected', r === el));
+         this.$refs.q.value = this.label;
+         this.open = false; this.aid = null;
+         this.$refs.q.focus();
+       },
+       commit() { this.take(this.rows()[this.ai]); },
+       changed(v) {
+         this.term = v; this.open = true; this.failed = false;
+         if (v.trim().length < 2) { this.searched = false; this.empty = false; this.$refs.list.innerHTML = ''; }
+       },
+       close() { this.open = false; this.aid = null; this.term = this.label; this.$refs.q.value = this.label; }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }"
+     @htmx:before-request.camel="loading = true; failed = false; open = true"
+     @htmx:after-request.camel="loading = false; if (!$event.detail.successful) failed = true"
+     @htmx:after-swap.camel="searched = true; ai = 0; $nextTick(() => { empty = rows().length === 0; paint() })">
+
+  <label for="cb-remote" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-remote" x-ref="q" type="text" name="q" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-remote-list"
+           :aria-expanded="open" :aria-activedescendant="aid"
+           placeholder="Type two characters to search"
+           hx-get="/vendors/search/"
+           hx-trigger="input[this.value.length > 1] changed delay:300ms"
+           hx-target="#cb-remote-list" hx-swap="innerHTML" hx-sync="this:replace"
+           @click="open = true"
+           @input="changed($event.target.value)"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+    <span class="mr-3 flex size-4 shrink-0 items-center justify-center" x-show="loading" x-cloak>
+      <i data-lucide="loader-circle" class="size-4 animate-spin text-zinc-600"></i>
+    </span>
+  </div>
+
+  <input type="hidden" name="vendor" :value="sel">
+
+  <p role="status" class="sr-only"
+     x-text="loading ? 'Searching vendors' : (searched ? (empty ? 'No vendor matches' : 'Vendors listed') : '')"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <!-- htmx swaps the rows in here. One delegated handler, so the fragment the
+         server sends carries no behaviour of its own — only data-value and
+         data-label. -->
+    <div id="cb-remote-list" x-ref="list" role="listbox" aria-label="Vendors"
+         class="max-h-64 overflow-y-auto py-1 empty:hidden"
+         @click="take($event.target.closest('[role=option]'))"
+         @mousemove="const el = $event.target.closest('[role=option]'); if (el) { ai = rows().indexOf(el); paint() }"></div>
+
+    <div x-show="!searched && !loading" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">Type two characters to search 248 vendors.</p>
+    </div>
+
+    <div x-show="loading" x-cloak class="px-4 py-6 text-center">
+      <p class="flex items-center justify-center gap-2 text-[13px]/5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-4 shrink-0 animate-spin"></i>Searching
+      </p>
+    </div>
+
+    <div x-show="searched && empty && !loading && !failed" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="term"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">248 vendors searched by name, code and GSTIN.</p>
+    </div>
+
+    <div x-show="failed" x-cloak class="px-4 py-6 text-center">
+      <p class="flex items-center justify-center gap-1.5 text-[13px]/5 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>The vendor search did not answer
+      </p>
+      <p class="mt-1 text-[12px]/4 text-zinc-500">Type another character to try again.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'create', name: 'A value that is not in the list', code:
+`<!-- The create row is a real option: last in the list, reachable by arrow key,
+     committed by Enter. It appears only when there is a query and no exact
+     match, so it never sits under a list somebody is still reading.
+
+     It posts as text in a second field, never as an invented id. Send
+     vendor=new-konkan-industries and the server cannot tell a record that
+     exists from one that does not; send an empty vendor with vendor_new set and
+     the view knows to create one, and can put it behind whatever approval a new
+     vendor needs.
+
+     This is also why the arrows clamp rather than wrap. A list that wrapped
+     would land on Add new vendor every time somebody overshot the bottom. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: '', sel: '', fresh: '', ai: 0,
+       options: [
+         { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'VEN-0142' },
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'VEN-0187' },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'VEN-0203' },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'VEN-0244' }
+       ],
+       get term() { return this.q.trim(); },
+       get found() {
+         if (!this.typed) return this.options;
+         const s = this.term.toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       get creating() {
+         return this.term.length > 0 &&
+                !this.options.some(o => o.label.toLowerCase() === this.term.toLowerCase());
+       },
+       get list() {
+         return this.creating ? [...this.found, { id: '__new', label: this.term, isNew: true }] : this.found;
+       },
+       rowId(o) { return 'cb-new-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { if (!this.open) { this.open = true; this.typed = false; this.ai = 0; this.scroll(); } },
+       close() {
+         this.open = false; this.typed = false;
+         const o = this.options.find(x => x.id === this.sel);
+         this.q = o ? o.label : this.fresh;
+       },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) {
+         if (o.isNew) { this.sel = ''; this.fresh = o.label; }
+         else { this.sel = o.id; this.fresh = ''; }
+         this.close();
+         this.$refs.q.focus();
+       },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-new" class="mb-1.5 block text-[13px]/5 font-medium">Vendor on the quotation</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-new" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-new-list" aria-describedby="cb-new-help"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Search, or type a new vendor name"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <!-- an id for a record that exists, or the raw text for one that does not.
+       Never a made-up id. -->
+  <input type="hidden" name="vendor" :value="sel">
+  <input type="hidden" name="vendor_new" :value="fresh">
+
+  <p id="cb-new-help" class="mt-1.5 text-[12px]/4" :class="fresh ? 'text-amber-700' : 'text-zinc-500'"
+     x-text="fresh ? 'New vendor — this order cannot be released until purchase approves it.' : 'Pick an approved vendor, or add one and send it for approval.'"></p>
+
+  <p role="status" class="sr-only"
+     x-text="open ? (found.length === 1 ? '1 vendor matches' : found.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-new-list" role="listbox" aria-label="Vendors" class="max-h-64 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="!o.isNew && o.id === sel"
+             @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+             :class="[i === ai ? 'bg-zinc-100' : '', o.isNew ? 'border-t border-zinc-100' : '']"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+          <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.isNew" x-cloak>
+            <i data-lucide="plus" class="size-4 text-zinc-600"></i>
+          </span>
+          <span class="min-w-0 flex-1 truncate"
+                x-text="o.isNew ? 'Add new vendor: “' + o.label + '”' : o.label"></span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-show="!o.isNew" x-text="o.meta"></span>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'states', name: 'Disabled, locked, invalid', code:
+`<div class="max-w-md space-y-7">
+
+  <!-- Disabled reaches the hidden input too. disabled on the search box only
+       stops the typing; the hidden input has no appearance of its own and posts
+       whatever it holds, so a field somebody was told they cannot change still
+       submits its value. The three fields here carry different names only
+       because they sit in one example — in a real form all three are vendor. -->
+  <div>
+    <label for="cb-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Vendor</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-zinc-100">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-400"></i>
+      <!-- no aria-controls: there is no popup in the document to point it at,
+           and aria-controls naming an id that does not exist is worse than
+           leaving it off -->
+      <input id="cb-off" type="text" disabled value="Gujarat Polymers Ltd"
+             role="combobox" aria-expanded="false"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 text-zinc-400">
+      <span class="mr-3 flex size-4 shrink-0 items-center justify-center">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-400"></i>
+      </span>
+    </div>
+    <input type="hidden" name="vendor_disabled" value="gujarat-polymers" disabled>
+    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
+  </div>
+
+  <!-- A locked value is rendered, not made read-only. There is no read-only
+       combobox: readonly leaves the box focusable, the chevron still opens the
+       list, and readonly means nothing at all on an option row. The value still
+       has to reach the server, so a hidden input goes with the text. -->
+  <div>
+    <p class="text-[13px]/5 font-medium text-zinc-600">Vendor</p>
+    <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px]/5">
+      <i data-lucide="lock" class="size-4 shrink-0 text-zinc-600"></i>
+      Gujarat Polymers Ltd
+      <span class="text-[12px]/4 tabular-nums text-zinc-500">VEN-0142</span>
+    </p>
+    <input type="hidden" name="vendor_locked" value="gujarat-polymers">
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Fixed when GRN-24-0912 was posted against this order.</p>
+  </div>
+
+  <!-- Invalid, with two locked rows in the list. The red border is drawn;
+       aria-invalid and aria-describedby are what gets announced. -->
+  <div class="relative"
+       x-data="{
+         open: false, typed: false, q: 'Bhiwandi Traders', sel: '', ai: 0,
+         options: [
+           { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'VEN-0142', blocked: false },
+           { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'VEN-0187', blocked: false },
+           { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'VEN-0203', blocked: true },
+           { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'VEN-0244', blocked: true },
+           { id: 'baroda-fasteners', label: 'Baroda Fasteners', meta: 'VEN-0258', blocked: false }
+         ],
+         get list() {
+           if (!this.typed) return this.options;
+           const s = this.q.trim().toLowerCase();
+           return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+         },
+         get chosen() { return this.options.find(o => o.id === this.sel) || null; },
+         rowId(o) { return 'cb-bad-' + o.id; },
+         get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+         scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+         next(from, step) {
+           for (let i = from + step; i >= 0 && i < this.list.length; i += step) {
+             if (!this.list[i].blocked) return i;
+           }
+           return from < 0 ? 0 : from;
+         },
+         show() { if (!this.open) { this.open = true; this.typed = false; this.ai = this.next(-1, 1); this.scroll(); } },
+         close() { this.open = false; this.typed = false; this.q = this.chosen ? this.chosen.label : ''; },
+         move(step) {
+           if (!this.open) { this.show(); return; }
+           if (!this.list.length) return;
+           this.ai = this.next(this.ai, step);
+           this.scroll();
+         },
+         pick(o) { if (o.blocked) return; this.sel = o.id; this.close(); this.$refs.q.focus(); },
+         commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+       }"
+       @click.outside="close()"
+       @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+    <label for="cb-bad" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+
+    <div class="flex items-center rounded-lg border border-red-600 bg-white focus-within:ring-3 focus-within:ring-red-600/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input id="cb-bad" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+             aria-autocomplete="list" aria-controls="cb-bad-list"
+             aria-invalid="true" aria-describedby="cb-bad-err"
+             :aria-expanded="open" :aria-activedescendant="activeId"
+             @click="show()"
+             @input="typed = true; open = true; ai = 0"
+             @keydown.arrow-down.prevent="move(1)"
+             @keydown.arrow-up.prevent="move(-1)"
+             @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+             @keydown.tab="close()"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none">
+    </div>
+
+    <input type="hidden" name="vendor" :value="sel">
+
+    <p id="cb-bad-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
+      Pick a vendor from the list. Typed text is not a vendor.
+    </p>
+
+    <p role="status" class="sr-only"
+       x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+      <!-- aria-disabled announces the state and blocks nothing at all. next()
+           steps over the blocked rows and pick() returns early, or the row is
+           unreachable by keyboard and fully clickable by mouse. It keeps its
+           place in the list: dropping it changes the shape of a set people scan
+           by position. -->
+      <div id="cb-bad-list" role="listbox" aria-label="Vendors" class="max-h-64 overflow-y-auto py-1">
+        <template x-for="(o, i) in list" :key="o.id">
+          <div :id="rowId(o)" role="option" :aria-selected="o.id === sel" :aria-disabled="o.blocked"
+               @mousedown.prevent @click="pick(o)" @mousemove="if (!o.blocked) ai = i"
+               :class="[i === ai && !o.blocked ? 'bg-zinc-100' : '', o.blocked ? 'text-zinc-400' : '']"
+               class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+            <span class="shrink-0 text-[12px]/4 text-zinc-500" x-show="o.blocked" x-cloak>Rate contract expired</span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-show="!o.blocked" x-text="o.meta"></span>
+          </div>
+        </template>
+      </div>
+
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Two of these five are locked until their rate contract is renewed.</p>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'django', name: 'Django form field', code:
+`<!-- forms.py
+     class RfqForm(forms.Form):
+         # Single select. The widget is never rendered — the template below draws
+         # the field — but the field still validates the id against the queryset,
+         # which is the only thing between a hidden input and any primary key
+         # somebody cares to type into it with the dev tools open.
+         vendor = forms.ModelChoiceField(
+             queryset=Vendor.objects.filter(is_active=True),
+             widget=forms.HiddenInput,
+             label='Vendor')
+
+         # Multiselect. The widget matters here even unrendered, because it is
+         # what parses the POST. MultipleHiddenInput.value_from_datadict calls
+         # data.getlist(name); a plain HiddenInput calls data.get(name), which
+         # returns the last hidden input and drops every other vendor the user
+         # picked. SelectMultiple works, for the same reason.
+         recipients = forms.ModelMultipleChoiceField(
+             queryset=Vendor.objects.filter(is_active=True),
+             widget=forms.MultipleHiddenInput,
+             required=False,
+             label='Send this RFQ to')
+
+     views.py
+         def rfq_new(request):
+             form = RfqForm(request.POST or None)
+             vendors = list(Vendor.objects.filter(is_active=True)
+                                          .values('id', 'name', 'code'))
+             return render(request, 'rfq/new.html',
+                           {'form': form, 'vendors': vendors})
+
+         def vendor_search(request):
+             q = request.GET.get('q', '').strip()
+             hits = (Vendor.objects.filter(is_active=True)
+                     .filter(Q(name__icontains=q) | Q(code__icontains=q)
+                             | Q(gstin__icontains=q))[:20]
+                     if len(q) > 1 else Vendor.objects.none())
+             # the fragment only: no base template, no <html>
+             return render(request, 'rfq/_vendor_options.html', {'hits': hits})
+
+     urls.py
+         path('rfq/new/', views.rfq_new, name='rfq-new'),
+         path('vendors/search/', views.vendor_search, name='vendor-search'),
+
+     The options go through json_script. Never interpolate a queryset into an
+     x-data attribute: one vendor called M/s D'Souza Traders ends the attribute
+     early and the whole component stops parsing. json_script escapes for
+     exactly that and leaves the JSON somewhere Alpine can read it.
+
+     The search endpoint is a GET and needs no CSRF token. A combobox that has
+     to POST its search — a long query, a complex filter set — needs
+     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' on the input, or Django
+     answers 403. -->
+
+{{ vendors|json_script:"vendor-options" }}
+{{ form.recipients.value|default:''|json_script:"rfq-recipients" }}
+
+<form method="post" class="max-w-md">
+  {% csrf_token %}
+
+  <div class="relative"
+       x-data="{
+         open: false, typed: false, ai: 0, q: '',
+         sel: '{{ form.vendor.value|default:'' }}',
+         options: JSON.parse(document.getElementById('vendor-options').textContent),
+         get list() {
+           if (!this.typed) return this.options;
+           const s = this.q.trim().toLowerCase();
+           return this.options.filter(o => (o.name + ' ' + o.code).toLowerCase().includes(s));
+         },
+         get chosen() { return this.options.find(o => String(o.id) === String(this.sel)) || null; },
+         rowId(o) { return 'dj-vendor-' + o.id; },
+         get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+         scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+         show() {
+           if (this.open) return;
+           this.open = true; this.typed = false;
+           this.ai = Math.max(0, this.list.findIndex(o => String(o.id) === String(this.sel)));
+           this.scroll();
+         },
+         close() { this.open = false; this.typed = false; this.q = this.chosen ? this.chosen.name : ''; },
+         move(n) {
+           if (!this.open) { this.show(); return; }
+           if (!this.list.length) return;
+           this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+           this.scroll();
+         },
+         pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
+         commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+       }"
+       x-init="q = chosen ? chosen.name : ''"
+       @click.outside="close()"
+       @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+    <label for="{{ form.vendor.id_for_label }}-q" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.vendor.label }} <span class="text-red-600">*</span>
+    </label>
+
+    <div class="flex items-center rounded-lg bg-white {% if form.vendor.errors %}border border-red-600 focus-within:ring-3 focus-within:ring-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15{% endif %}">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <!-- the search box has no name. Give it the field's name and the typed
+           text posts beside the id, and the form cleans whichever came last. -->
+      <input id="{{ form.vendor.id_for_label }}-q" x-ref="q" x-model="q" type="text"
+             role="combobox" autocomplete="off" aria-autocomplete="list"
+             aria-controls="dj-vendor-list"
+             {% if form.vendor.errors %}aria-invalid="true" aria-describedby="dj-vendor-err"{% endif %}
+             :aria-expanded="open" :aria-activedescendant="activeId"
+             placeholder="Search vendors"
+             @click="show()"
+             @input="typed = true; open = true; ai = 0"
+             @keydown.arrow-down.prevent="move(1)"
+             @keydown.arrow-up.prevent="move(-1)"
+             @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+             @keydown.tab="close()"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+
+    <!-- the field itself: one hidden input, named for the bound field -->
+    <input type="hidden" name="{{ form.vendor.html_name }}" :value="sel">
+
+    {% if form.vendor.errors %}
+      <p id="dj-vendor-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.vendor.errors.0 }}
+      </p>
+    {% endif %}
+
+    <p role="status" class="sr-only"
+       x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+      <div id="dj-vendor-list" role="listbox" aria-label="{{ form.vendor.label }}" class="max-h-64 overflow-y-auto py-1">
+        <template x-for="(o, i) in list" :key="o.id">
+          <div :id="rowId(o)" role="option" :aria-selected="String(o.id) === String(sel)"
+               @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+               :class="i === ai ? 'bg-zinc-100' : ''"
+               class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="min-w-0 flex-1 truncate" x-text="o.name"></span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.code"></span>
+          </div>
+        </template>
+      </div>
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- The multiselect posts one hidden input per value, all sharing html_name,
+       which is what MultipleHiddenInput.value_from_datadict reads with getlist.
+       The initial selection comes out of the bound field through json_script
+       for the same escaping reason. The field and the popup are the multi
+       variant, unchanged. -->
+  <div class="mt-6" x-data="{ sel: JSON.parse(document.getElementById('rfq-recipients').textContent) || [] }">
+    <template x-for="id in sel" :key="id">
+      <input type="hidden" name="{{ form.recipients.html_name }}" :value="id">
+    </template>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="sel.length + ' vendors will receive this RFQ'"></p>
+  </div>
+
+  <button type="submit" class="mt-5 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Send RFQ</button>
+</form>
+
+<!-- rfq/_vendor_options.html — the whole response for the remote variant, and
+     nothing around it, because hx-swap is innerHTML. The ids come from the
+     server and still have to be unique: aria-activedescendant on the input
+     points at one of them. -->
+{% for v in hits %}
+  <div id="cb-remote-{{ v.pk }}" role="option" aria-selected="false"
+       data-value="{{ v.pk }}" data-label="{{ v.name }}"
+       class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+    <span class="min-w-0 flex-1 truncate">{{ v.name }}</span>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">{{ v.code }}</span>
+  </div>
+{% endfor %}` }
     ]
   },
 
