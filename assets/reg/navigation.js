@@ -1923,99 +1923,176 @@ register(
       'Everything reachable here must also be reachable by clicking. The palette is an accelerator, not a hiding place.',
       'Both ⌘K and Ctrl-K must work, and both need .prevent — the browser binds ⌘K to the address bar.',
       'x-cloak on the overlay, otherwise it paints over the page on first load.',
-      'Autofocus the input when it opens with $nextTick, and clear the query on close so the next open starts fresh.'
+      'A palette is a combobox, not a menu, because it has a text box. A menu moves real focus between its items; a combobox keeps real focus in the input and points at the active row with aria-activedescendant. So the rows are not buttons and not links: nothing inside role="option" may be focusable, and a row that is a tab stop puts the caret outside the search box the moment somebody presses Tab.',
+      'The input is focused in $nextTick and then requestAnimationFrame, not in $nextTick alone. x-show has not written display by the time $nextTick runs — measured on the dropdown in this library, the panel was still display none with offsetHeight 0 inside the callback — and focus() on a hidden input is a silent no-op. $nextTick alone fails a couple of times in ten, which reads as flake rather than as a bug; a bare requestAnimationFrame fails every time, because the frame beats Alpine\'s flush.',
+      'The row id is derived from the record — :id="\'cp-\' + o.id" — never from the loop index, because filtering renumbers the rows and aria-activedescendant then names whichever record moved into that slot. Key the loop on the same field or Alpine reuses nodes and the id and the row drift apart. The prefix belongs to the palette, so a second one on the page needs a second prefix or both write the same ids.',
+      'Closing returns focus to whatever opened the palette, which is not always the trigger — ⌘K fires from wherever the caret already was. Record document.activeElement on open and focus it again on close, or every dismissal drops a keyboard user at the top of the document.',
+      'The letters on the action rows are the application\'s own shortcuts, shown so people learn them. The palette does not listen for them, and must not: inside a search box, N types an N.'
     ],
     anatomy: [
       ['Overlay', 'A dimmed field with the panel near the top, not centred — the list grows downward.'],
-      ['Input', 'Autofocused on open, with the query cleared on close so the next open starts fresh.'],
-      ['Group', 'Results split by kind — records, actions, destinations — each under a small label.'],
-      ['Result', 'One row, with the active one tinted. The keyboard drives which is active.'],
+      ['Input', 'role="combobox", focused on open and holding real focus the whole time the palette is up. The query is cleared on close so the next open starts fresh.'],
+      ['Group', 'Results split by kind — actions, records — each under a small label. role="group" named by that label, and a group with no matches leaves with its heading.'],
+      ['Result', 'One row, role="option" and not a tab stop, with the active one tinted. The keyboard drives which is active.'],
+      ['Empty state', 'What the list shows at zero matches — the query quoted back, not an empty panel.'],
+      ['Live region', 'A sr-only role="status" outside the overlay, in the document from first paint, carrying the number of matches.'],
       ['Footer', 'The key legend. Nobody learns arrow keys and Enter from nothing.']
     ],
     behaviour: [
       'Everything reachable here is also reachable by clicking. The palette is an accelerator, never a hiding place.',
       'Both Cmd-K and Ctrl-K open it, and both need .prevent — the browser binds Cmd-K to the address bar.',
-      'The input is focused on open with $nextTick, because focusing an element that x-show has not revealed yet does nothing.',
-      'Arrow keys move the active result, Enter takes it, Escape closes.',
-      'Closing clears the query, so reopening does not present the previous search as if it were current.',
+      'The input is focused in $nextTick and then requestAnimationFrame. $nextTick alone runs before x-show has written display, and focus() on an element that is still display none does nothing at all.',
+      'Typing filters both groups at once, and every keystroke puts the highlight back on the first match, so Enter always takes the row at the top of the list.',
+      'Arrow down and up move the active row over the flattened list in the order the rows are drawn, not group by group, and clamp at both ends rather than wrapping. Enter takes the active row, Escape closes.',
+      'The highlight follows the mouse as well as the keyboard, so the row under the pointer and the row Enter would take are never two different rows.',
+      'A group whose rows are all filtered out goes with its heading, and when nothing matches at all the list is replaced by an empty state naming the query.',
+      'Closing clears the query, so reopening does not present the previous search as if it were current, and puts focus back on whatever opened the palette.',
       'On a three-page application, skip it entirely — nobody will learn the shortcut.'
     ],
     a11y: [
-      'The input is a combobox with aria-expanded and aria-controls pointing at the list.',
-      'The list is role="listbox" and each result role="option", with the active one marked aria-selected.',
-      'aria-activedescendant tracks the active row, so focus stays in the input while the highlight moves.',
-      'The result count is announced on change, or a keyboard user cannot tell that typing narrowed anything.',
-      'Escape closes and returns focus to whatever opened the palette.'
+      'The input is role="combobox" with aria-autocomplete="list", aria-expanded, aria-controls naming the list and aria-activedescendant naming the active row.',
+      'The list is role="listbox" with an accessible name and every row is role="option". No row carries aria-selected: a palette commits nothing — a row is fired and the palette closes — so the only state a row has is being the active one, and aria-activedescendant is what carries that.',
+      'Real focus never leaves the input. The highlight moves through aria-activedescendant, which is why every row needs a stable id derived from the record and why no row is a tab stop.',
+      'Each group is role="group" named by its heading, and the visible heading is aria-hidden — the group is already named, and a bare paragraph is not a permitted child of a listbox.',
+      'The number of matches is announced from a role="status" that sits outside the overlay and is in the document from first paint. A live region inserted with its text already in it announces nothing.',
+      'Escape closes and returns focus to whatever opened the palette, taken from document.activeElement at the moment it opened.'
     ],
-    related: ['dropdown', 'topbar', 'sidebar-nav'],
+    related: ['combobox', 'sidebar-nav', 'dropdown'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div x-data="{ open: false, q: '' }"
-     @keydown.window.meta.k.prevent="open = true; $nextTick(() => $refs.q.focus())"
-     @keydown.window.ctrl.k.prevent="open = true; $nextTick(() => $refs.q.focus())"
-     @keydown.escape.window="open = false; q = ''">
+`<!-- A palette has a text box, so it is a combobox and not a menu: real focus
+     stays in the input and the highlight is carried by aria-activedescendant.
+     That is why the rows are divs with role="option" rather than buttons —
+     nothing inside an option may be focusable.
 
-  <button @click="open = true; $nextTick(() => $refs.q.focus())"
+     Row ids come from the record, never from the loop index. Filtering
+     renumbers the rows, and an index-derived id leaves aria-activedescendant
+     naming whichever record moved into that slot.
+
+     The opening focus is moved in $nextTick and then requestAnimationFrame.
+     x-show has not written display by the time $nextTick runs — the panel is
+     still display none with offsetHeight 0 — and focus() on a hidden input is
+     a silent no-op that leaves the caret wherever it was. $nextTick alone
+     fails intermittently, which reads as flake; a bare frame fails every time.
+
+     opener is document.activeElement at the moment of opening, because ⌘K
+     fires from wherever the caret was and the trigger is not always what
+     opened the palette.
+
+     The letters on the action rows are the application's own shortcuts, shown
+     so people learn them. The palette does not listen for them: inside a
+     search box, N has to type an N. -->
+<div x-data="{
+       open: false, q: '', ai: 0, opener: null,
+       groups: [
+         { name: 'Actions', items: [
+           { id: 'new-po',    label: 'New purchase order', icon: 'plus',          key: 'N' },
+           { id: 'post-grn',  label: 'Post goods receipt', icon: 'package-check', key: 'G' },
+           { id: 'approvals', label: 'Go to my approvals', icon: 'check-check',   key: 'A' }
+         ] },
+         { name: 'Recent records', items: [
+           { id: 'po-1187', label: 'PO-24-1187 — Gujarat Polymers Ltd', sub: 'HDPE granules · 14 lines', icon: 'file-text', amount: '₹18,42,000' },
+           { id: 'po-1179', label: 'PO-24-1179 — Sharma Steel Traders', sub: 'MS angle 50×50×6', flag: 'overdue 9 days', icon: 'file-text', amount: '₹2,74,900' },
+           { id: 'ven-deccan', label: 'Deccan Fasteners Pvt Ltd', sub: 'Vendor · rate contract to 31 March 2027', icon: 'building-2' }
+         ] }
+       ],
+       match(g) {
+         const s = this.q.trim().toLowerCase();
+         if (!s) return g.items;
+         return g.items.filter(o => (o.label + ' ' + (o.sub || '') + ' ' + (o.flag || '') + ' ' + g.name).toLowerCase().includes(s));
+       },
+       get list() { return this.groups.flatMap(g => this.match(g)); },
+       rowId(o) { return 'cp-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.opener = document.activeElement;
+         this.open = true; this.q = ''; this.ai = 0;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs.q.focus()));
+       },
+       hide() {
+         if (!this.open) return;
+         this.open = false; this.q = ''; this.ai = 0;
+         if (this.opener) this.opener.focus();
+       },
+       move(n) {
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { this.hide(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @keydown.window.meta.k.prevent="show()"
+     @keydown.window.ctrl.k.prevent="show()"
+     @keydown.escape.window="hide()">
+
+  <button type="button" x-ref="trigger" @click="show()"
           class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-100">
     <i data-lucide="search" class="size-4 text-zinc-600"></i>
     <span class="flex-1 text-left">Search Konspec Operations</span>
     <kbd class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
   </button>
 
+  <!-- outside the overlay and in the document from first paint. A live region
+       inserted with its text already in it announces nothing. -->
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 result' : list.length + ' results') : ''"></p>
+
   <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/30 px-3 pt-16 sm:pt-24">
-    <div @click.outside="open = false; q = ''"
+    <div @click.outside="hide()"
          class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
 
       <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
         <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
         <label for="cp-q" class="sr-only">Search orders, vendors and actions</label>
-        <input id="cp-q" x-ref="q" x-model="q" placeholder="Search orders, vendors, actions…"
-               class="w-full bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
-        <button @click="open = false; q = ''" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">Esc</button>
+        <input id="cp-q" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+               aria-autocomplete="list" aria-controls="cp-list"
+               :aria-expanded="open" :aria-activedescendant="activeId"
+               placeholder="Search orders, vendors, actions…"
+               @input="ai = 0"
+               @keydown.arrow-down.prevent="move(1)"
+               @keydown.arrow-up.prevent="move(-1)"
+               @keydown.enter.prevent="commit()"
+               class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        <button type="button" @click="hide()" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">Esc</button>
       </div>
 
-      <div class="max-h-80 overflow-y-auto py-1">
-        <p class="px-3 pt-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Actions</p>
-        <button class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
-          <i data-lucide="plus" class="size-4 text-zinc-600"></i>
-          <span class="flex-1">New purchase order</span>
-          <kbd class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">N</kbd>
-        </button>
-        <button class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
-          <i data-lucide="package-check" class="size-4 text-zinc-600"></i>
-          <span class="flex-1">Post goods receipt</span>
-          <kbd class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">G</kbd>
-        </button>
-        <button class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
-          <i data-lucide="check-check" class="size-4 text-zinc-600"></i>
-          <span class="flex-1">Go to my approvals</span>
-          <kbd class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">A</kbd>
-        </button>
+      <div id="cp-list" role="listbox" aria-label="Results" class="max-h-80 overflow-y-auto pb-1">
+        <template x-for="g in groups" :key="g.name">
+          <div role="group" :aria-label="g.name" x-show="match(g).length">
+            <!-- a sticky heading with no background of its own lets the rows
+                 scroll through the text and neither is readable -->
+            <p aria-hidden="true"
+               class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+               x-text="g.name"></p>
+            <template x-for="o in match(g)" :key="o.id">
+              <div :id="rowId(o)" role="option"
+                   @mousedown.prevent @click="pick(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+                   :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+                   class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+                <span class="flex size-4 shrink-0 items-center justify-center text-zinc-600">
+                  <i :data-lucide="o.icon" class="size-4"></i>
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate" x-text="o.label"></span>
+                  <span x-show="o.sub" class="block truncate text-[12px]/4 text-zinc-500"><span x-text="o.sub"></span><span
+                        x-show="o.flag" class="font-medium text-red-600"> · <span x-text="o.flag"></span></span></span>
+                </span>
+                <span x-show="o.amount" class="hidden shrink-0 text-[12px]/4 tabular-nums text-zinc-600 sm:block" x-text="o.amount"></span>
+                <kbd x-show="o.key" class="shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500" x-text="o.key"></kbd>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
 
-        <p class="px-3 pt-3 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Recent orders</p>
-        <button class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
-          <i data-lucide="file-text" class="size-4 shrink-0 text-zinc-600"></i>
-          <span class="min-w-0 flex-1">
-            <span class="block truncate">PO-24-1187 — Gujarat Polymers Ltd</span>
-            <span class="block truncate text-[12px]/4 text-zinc-500">HDPE granules · 14 lines</span>
-          </span>
-          <span class="hidden shrink-0 text-[12px]/4 tabular-nums text-zinc-600 sm:block">₹18,42,000</span>
-        </button>
-        <button class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
-          <i data-lucide="file-text" class="size-4 shrink-0 text-zinc-600"></i>
-          <span class="min-w-0 flex-1">
-            <span class="block truncate">PO-24-1179 — Sharma Steel Traders</span>
-            <span class="block truncate text-[12px]/4 text-zinc-500">MS angle 50×50×6 · <span class="font-medium text-red-600">overdue 9 days</span></span>
-          </span>
-          <span class="hidden shrink-0 text-[12px]/4 tabular-nums text-zinc-600 sm:block">₹2,74,900</span>
-        </button>
-        <button class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
-          <i data-lucide="building-2" class="size-4 shrink-0 text-zinc-600"></i>
-          <span class="min-w-0 flex-1">
-            <span class="block truncate">Deccan Fasteners Pvt Ltd</span>
-            <span class="block truncate text-[12px]/4 text-zinc-500">Vendor · rate contract to 31 March 2027</span>
-          </span>
-        </button>
+      <!-- an empty panel reads as a component that broke; this reads as a
+           search that found nothing -->
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">Nothing matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Try an order number — PO-24-1187 — or a vendor name.</p>
       </div>
 
       <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
