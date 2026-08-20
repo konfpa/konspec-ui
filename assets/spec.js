@@ -17,6 +17,7 @@ window.SPEC = {
     css:   'Tailwind CSS v4 — utility classes only. No component CSS, no @apply, no custom colour tokens.',
     js:    'Alpine.js 3 for local UI state, plus two official plugins — @alpinejs/collapse for animated panels and @alpinejs/focus for dialog focus traps. Both load before Alpine core. State lives on the component root, never in a global store.',
     server:'htmx for partial swaps. Alpine does not fetch.',
+    charts:'Chart.js 4 via CDN, pinned, and only on pages that plot something. Colours are read out of the DOM at init, never written as hex: series from the HTML legend swatches, grid from the card border.',
     icons: 'Lucide via CDN — <i data-lucide="name"></i>, hydrated by lucide.createIcons().',
     build: 'None. Snippets are plain HTML and paste into Django, Flask or a static file unchanged.'
   },

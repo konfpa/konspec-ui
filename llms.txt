@@ -22,6 +22,7 @@ registry.json and copy component HTML from it verbatim.
 - **css**: Tailwind CSS v4 — utility classes only. No component CSS, no @apply, no custom colour tokens.
 - **js**: Alpine.js 3 for local UI state, plus two official plugins — @alpinejs/collapse for animated panels and @alpinejs/focus for dialog focus traps. Both load before Alpine core. State lives on the component root, never in a global store.
 - **server**: htmx for partial swaps. Alpine does not fetch.
+- **charts**: Chart.js 4 via CDN, pinned, and only on pages that plot something. Colours are read out of the DOM at init, never written as hex: series from the HTML legend swatches, grid from the card border.
 - **icons**: Lucide via CDN — <i data-lucide="name"></i>, hydrated by lucide.createIcons().
 - **build**: None. Snippets are plain HTML and paste into Django, Flask or a static file unchanged.
 
@@ -156,6 +157,7 @@ building anything, rather than reconstructing a component from its description.
 - **Table** `table` — Rows of records with a sortable header. The workhorse of every register screen — order lists, GRN lists, ledgers. Variants: default, selection, dense, responsive.
 - **Pagination** `pagination` — Moves through a long register a page at a time, and says where you are in it. Variants: simple, numbered, page-size.
 - **Stat card** `stat-card` — One number that matters, with the label above it and the change since last period below. Variants: default, sparkline, grid.
+- **Chart** `chart` — Chart.js on a canvas, wearing this system's colours. The legend is HTML and doubles as the palette the canvas paints from, so a swatch and the line it names cannot drift apart. Variants: setup, line, bar, horizontal, stacked, donut, sparkline, empty, django.
 - **Progress** `progress` — How far along something is — receipt against an order, a step in a workflow, a fill level in a row. Variants: bar, steps, inline.
 - **Empty state** `empty-state` — What a list shows when it has nothing in it. Says why it is empty and what to do next. Variants: no-results, nothing-yet, error.
 - **Skeleton** `skeleton` — Grey blocks in the shape of the content that is loading. Variants: text, table, card.

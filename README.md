@@ -41,7 +41,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**36 components · 147 variants · 12 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
+**37 components · 156 variants · 13 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
 
 ### Actions
 
@@ -68,6 +68,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Table | `table` | 4 | — |
 | Pagination | `pagination` | 3 | — |
 | Stat card | `stat-card` | 3 | — |
+| Chart | `chart` | 9 | [open](https://konfpa.github.io/konspec-ui/components/chart.html) |
 | Progress | `progress` | 3 | — |
 | Empty state | `empty-state` | 3 | — |
 | Skeleton | `skeleton` | 3 | — |
