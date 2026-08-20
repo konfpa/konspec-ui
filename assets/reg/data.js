@@ -1150,7 +1150,7 @@ register(
       'The segmented form uses a list, so the number of stages is announced.',
       'Colour never carries the state by itself; the label says which stage the work is at.'
     ],
-    related: ['stat-card', 'attachment', 'skeleton'],
+    related: ['stat-card', 'spinner', 'skeleton'],
     variants: [
       { id: 'bar', name: 'Bar with label', code:
 `<div class="rounded-xl border border-zinc-200 bg-white p-4">
@@ -1333,7 +1333,7 @@ register(
       'Nothing in the skeleton is focusable — a Tab landing on a grey rectangle is a dead end.',
       'The animation respects prefers-reduced-motion, since a pulsing page is a problem for some readers.'
     ],
-    related: ['empty-state', 'table', 'progress'],
+    related: ['empty-state', 'spinner', 'progress'],
     variants: [
       { id: 'text', name: 'Text lines', code:
 `<div class="animate-pulse rounded-xl border border-zinc-200 bg-white p-4" aria-busy="true" aria-label="Loading order details">
@@ -1388,6 +1388,506 @@ register(
     <div class="h-8 w-24 rounded-lg bg-zinc-200"></div>
     <div class="h-8 w-20 rounded-lg bg-zinc-200"></div>
   </div>
+</div>` }
+    ]
+  },
+
+  {
+    id: 'spinner', name: 'Spinner', category: 'data',
+    description: 'The indeterminate wait. A graphite ring that turns while work of unknown length is in flight, and a line of text that says what the work is.',
+    when: 'Work whose length you cannot predict and whose answer you cannot draw — a report the server is still assembling, a save you are waiting on, a filter that may return four rows or four thousand. It is the wrong answer twice over: if you know the total, a progress bar can say how far along it is, and if you know the layout coming back, a skeleton can hold its shape so the page does not jump. A spinner over a register you have rendered a thousand times is a skeleton nobody wrote.',
+    notes: [
+      'The ring is borders, not a Lucide icon. Measured: loader-circle is a 2-unit stroke on a 24-unit viewBox, so it paints 1.33px inside size-4 and 3.33px inside size-10 — the same glyph two and a half times heavier — and a size scale built on it thickens as it grows, while a border width is chosen per size. The second reason matters more. An <i data-lucide> is an empty inline element with no box at all until createIcons() has run over it, and a spinner arriving inside an htmx swap is exactly the case that cannot count on that.',
+      'The ring is aria-hidden and the words are the announcement. A turning shape resolves to nothing worth reading, so a spinner that is only a shape is a wait nobody was told about. Real text goes in a role="status" beside it — sr-only where the panel already names what is loading, visible where it does not.',
+      'aria-label on a role="status" is a name, not content, and a live region announces content. Resolved in the accessibility tree, a role="status" carrying aria-label="Loading orders" and no children comes back as a status named "Loading orders" with nothing inside it: it appears, nothing within it changed, and nothing is said. The same string as a text node comes back as status: Loading orders, which is the part that gets read.',
+      'The live region has to be in the document before the text lands, the same way the combobox match count is. A role="status" that arrives inside an htmx fragment with its message already in it never changed. Put the status on the panel that survives the swap and let the fragment replace only the rows under it.',
+      'Never motion-reduce:animate-none on a spinner. Measured under prefers-reduced-motion: reduce, animation-name computes to none and the ring stops as a zinc-200 circle with one graphite quarter — a static broken ring that reads as a rendering fault, and the only sign that anything is still happening is gone. A 20px ring turning once a second is not the large-area motion the preference exists for. The accommodation is the label beside it, which is there for everybody.',
+      'Graphite, always. Colour means data state and a wait has no state yet, so a green ring claims success before the server has answered and an amber one raises a warning nobody filed. There is no success spinner and no danger spinner. There is a spinner, and then there is what it resolved into.',
+      'Keep the zinc-200 track. It is one step off white and one step off the zinc-100 page, so the circle is visible on both, and it is what makes the graphite quarter read as a position on a ring rather than a stray mark. Three transparent sides leave a bare arc that at 16px looks like a comma somebody typed by accident.',
+      'Size and stroke move together: size-4 with border-2, size-5 with border-2, size-8 with border-[3px] — measured 16, 20 and 32px carrying 2, 2 and 3px. border-4 inside size-8 is a ring an eighth of its own diameter and reads as a donut chart rather than a spinner.',
+      'The ring is shrink-0 and the label is what wraps. Measured at 390px beside a two-line sentence: a size-8 ring came back 32.0px wide with shrink-0 and 24.5px without it, and a size-4 ring 16.0px against 12.9px. Neither is a smaller spinner — height is untouched, so what you get is an ellipse turning on its long axis. Flex takes width out of whatever will give it, and a circle will.',
+      'A spinner never replaces content that is already on screen. Swapping a rendered table for a centred ring throws away the scroll position and the row somebody was reading, and the panel collapses to the height of a ring and a caption, so everything below it jumps up under the cursor. Cover it instead: a bg-white/70 scrim with the ring on top and the rows still legible underneath. Measured across a full idle-busy-idle cycle of the overlay variant, the panel held 218px at every step.',
+      'Covering content is not blocking it. A scrim stops the mouse and nothing else — Tab still walks into the stale rows underneath and Enter still fires a row action against data that is being replaced. The content wrapper takes :inert="busy". Verified in Alpine 3.16: inert is on the boolean-attribute list, so a false value removes the attribute rather than writing inert="false", which is a truthy string and would leave the region permanently inert.',
+      'aria-busy belongs to the region that is waiting, not to the ring. The ring is what is drawn; the panel is what is busy. Alpine preserves only aria-pressed, aria-checked, aria-expanded and aria-selected when they are false, so :aria-busy="false" removes the attribute outright — correct here, because aria-busy defaults to false, but not a thing to assume of any other aria-* binding.',
+      'Below about 300ms a spinner is noise. The request answers before the eye has resolved the shape and all anyone sees is a flicker where the number was. Give every spinner a 500ms floor and most of them never paint at all.',
+      'The floor is opacity, not x-show. opacity-0 keeps the box, so nothing moves when the ring arrives; display does not, and a spinner that appears 500ms after the click widens the row and takes the button out from under the cursor at exactly the moment somebody is going for a second one.',
+      'The delay belongs in the bound class, not the base class. Left in the base it delays the fade out as well — measured, a spinner written opacity-0 transition-opacity delay-500 with :class="busy && \'opacity-100\'" was still at full opacity 520ms after a 1.6s request had already landed its content, which reads as a panel still loading something it has finished drawing. Base delay-0, bound opacity-100 delay-500, and the same spinner was gone 196ms after the work stopped.',
+      'The CSS floor cannot reach the live region. x-text fires the instant the flag flips, so a 120ms request that never painted a ring is still announced as a wait. Holding the announcement back needs a real 500ms timer alongside the class binding.',
+      'Do not rebuild a button\'s busy state here. The button entry already holds the label width with a grid overlay so the row cannot reflow mid-click, and keeps the disabled attribute alongside aria-busy so a second click cannot post twice. Inside a button the loader also stays a Lucide icon at size-4: the button owns an icon slot already, and at 16px nobody sees the difference between a 1.33px svg stroke and a 2px border. Above 16px, the ring.',
+      'One spinner per region, at the region\'s root. Four rings turning on one screen do not say that four things are loading, they say the page is broken. If the whole screen is waiting, spin the panel that matters and leave the rest alone.',
+      'Never cover the whole app shell. A spinner over the topbar and the sidebar takes away the navigation somebody could have used to leave a request that is not coming back. Scope it to the panel doing the work.',
+      'A spinner has to resolve. Every one needs a branch that replaces it when the request fails — the error variant of empty-state is what goes in its place. A ring still turning at forty seconds is indistinguishable from a hung page, and the only move left is a reload, which on a form means posting it twice.',
+      'Past about ten seconds, say something. The second line goes inside the role="status" that is already there, so the change is what gets announced; a new region beside it is a second thing announcing itself while the first still has nothing new to say.',
+      'The label names the work, not the fact of waiting. "Loading" is the message the ring already carries. "Loading purchase orders" is what tells somebody which of the four panels on the screen is the one holding them up.',
+      'x-cloak on any spinner hidden at first paint. This is the one component where the flash reads as real: a ring that shows for a frame or two on every page load looks like a load that failed and retried, not like Alpine booting.',
+      'Do not reach for htmx\'s .htmx-indicator class to get the floor. htmx injects its own stylesheet, and .htmx-request .htmx-indicator sets the transition shorthand at two classes of specificity, which resets transition-delay to zero. Measured on an element carrying both delay-500 and duration-150: computed transition-delay came back 0s and duration 0.2s — htmx\'s values, not Tailwind\'s. The floor vanishes silently and the indicator flashes on every fast request.'
+    ],
+    anatomy: [
+      ['Ring', 'size-5 rounded-full border-2 border-zinc-200 border-t-zinc-700 animate-spin. The track is the whole circle in zinc-200; border-t-zinc-700 repaints one quarter of it graphite, and animate-spin turns the box at 1s linear. Always shrink-0, always aria-hidden.'],
+      ['Label', 'Real text naming the work — "Loading purchase orders", not "Loading". Visible where the panel does not already say it, sr-only where it does.'],
+      ['Status region', 'The role="status" the label lives in, in the document before the wait begins, on the element that survives the swap. This is the announcement; the ring contributes nothing to it.'],
+      ['Busy region', 'The panel carrying aria-busy="true" while it waits, and :inert="busy" on its content while a scrim covers it.'],
+      ['Slot', 'The fixed box the spinner occupies. opacity-0 with the delay in the bound class, never display, so a 500ms floor costs no layout movement.'],
+      ['Scrim', 'bg-white/70 over content that stays on screen through a refresh, so the rows underneath read as stale rather than gone.'],
+      ['Escalation', 'The second line that appears past about ten seconds, inside the same status region, saying why this one is slow.']
+    ],
+    behaviour: [
+      'It is graphite whatever it is waiting for. Colour describes what a record is doing, and a request in flight has not done anything yet.',
+      'It appears at 500ms, not at zero. Most requests answer first and the ring is never painted, which is the point — the floor is what stops a register flickering on every filter change.',
+      'It holds its box while it is invisible, so the row does not widen when it arrives and does not narrow when it goes.',
+      'It resolves. Content replaces it, or an error replaces it, and past about ten seconds it grows a line saying why it is taking so long. It does not turn forever.',
+      'Content already on screen is covered, not replaced, and the covered content goes inert so the keyboard cannot reach rows that are being swapped out.',
+      'One per region. A screen with four rings on it reads as broken rather than busy.',
+      'The animation keeps running under prefers-reduced-motion, because stopping it removes the only signal. The label beside it is what carries the state without motion.',
+      'Inside a button, the button\'s own busy state does the work — the ring starts at size-5 and above, where a button\'s size-4 icon slot has run out.'
+    ],
+    a11y: [
+      'The ring is aria-hidden="true". It is a shape, and a shape announces nothing worth hearing.',
+      'The announcement is the text content of a role="status", never an aria-label on the ring — a live region reports what changed inside it, and a name is not content.',
+      'The status region exists before the message does. A region that arrives with its text already in it has nothing to announce.',
+      'aria-busy="true" sits on the region that is waiting, so the state is known and not merely drawn.',
+      'Content under a scrim takes inert, so Tab cannot walk into rows that are about to be replaced and Enter cannot fire an action against them.',
+      'The animation is not disabled under prefers-reduced-motion, because a frozen ring is a spinner that has stopped saying anything. The visible or sr-only label is the non-motion signal.',
+      'The ten-second escalation is written into the same status region, so the change is announced rather than only rendered.',
+      'Nothing inside a spinner is focusable. A Tab landing on a turning ring is a dead end, and there is no action there to take.'
+    ],
+    related: ['skeleton', 'progress', 'button'],
+    variants: [
+      { id: 'default', name: 'The spinner', code:
+`<!-- The whole component. A zinc-200 track with one quarter repainted graphite by
+     border-t-zinc-700, turned by animate-spin at 1s linear.
+
+     It is borders and not a Lucide loader on purpose. A lucide glyph is a 2-unit
+     stroke on a 24-unit viewBox, so it paints 1.33px inside size-4 and 3.33px
+     inside size-10 — a size scale built on it grows heavier as it grows — and an
+     <i data-lucide> has no box at all until createIcons() has run over it, which
+     is exactly what a spinner arriving in an htmx swap cannot count on.
+
+     The ring is aria-hidden: a turning shape resolves to nothing worth reading.
+     What gets announced is the text inside the role="status", and it is text
+     content rather than an aria-label because a live region reports what changed
+     inside it and a name is not content. Here it is sr-only, because the panel
+     around it already says what is loading. -->
+<div class="flex items-center gap-3">
+  <span class="size-5 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+  <p role="status" class="sr-only">Loading purchase orders</p>
+</div>` },
+
+      { id: 'sizes', name: 'Sizes', code:
+`<!-- Three, and the stroke moves with the box, because the stroke is what keeps
+     them looking like one object. 16/2, 20/2 and 32/3 sit between one eleventh
+     and one eighth of the diameter; border-4 inside size-8 is one eighth at four
+     times the area and reads as a donut chart.
+
+     Each ring here is aria-hidden with no status beside it, because this is a
+     picture of three sizes rather than three things loading. In use, every one of
+     them carries its own label. -->
+<div class="flex flex-wrap items-end gap-x-10 gap-y-6">
+  <div class="flex flex-col items-center gap-2.5">
+    <span class="flex h-8 items-center">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    </span>
+    <span class="text-[12px]/4 text-zinc-500">size-4 · in a row or beside a control</span>
+  </div>
+  <div class="flex flex-col items-center gap-2.5">
+    <span class="flex h-8 items-center">
+      <span class="size-5 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    </span>
+    <span class="text-[12px]/4 text-zinc-500">size-5 · the default, beside a label</span>
+  </div>
+  <div class="flex flex-col items-center gap-2.5">
+    <span class="flex h-8 items-center">
+      <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    </span>
+    <span class="text-[12px]/4 text-zinc-500">size-8 · centred in a panel</span>
+  </div>
+</div>` },
+
+      { id: 'label', name: 'With a label', code:
+`<!-- With a visible label the role="status" moves to the row and the label is its
+     content. The ring stays aria-hidden and contributes nothing, and there is no
+     sr-only copy underneath — the region would then hold both strings and the
+     wait would be read out twice.
+
+     Do not name the ring with aria-label instead. Resolved, a role="status" with
+     aria-label and no children is a status *named* "Loading orders" whose content
+     is empty: it appears, nothing inside it changed, and nothing is said.
+
+     The label names the work. "Loading" is the message the ring already carries;
+     "Loading purchase orders" says which of the four panels on the screen is the
+     one holding somebody up.
+
+     The ring is shrink-0 and the paragraph is what wraps. Without it, flex takes
+     the width out of the circle instead of the sentence — measured at 390px, the
+     size-4 ring in the second row came back 12.9px wide against 16px of height,
+     which is not a smaller spinner but an ellipse. -->
+<div class="space-y-6">
+  <div class="flex items-center gap-3" role="status">
+    <span class="size-5 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <span class="text-[13px]/5 text-zinc-600">Loading purchase orders</span>
+  </div>
+
+  <div class="flex items-start gap-3" role="status">
+    <span class="mt-0.5 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <p class="text-[13px]/5 text-zinc-600">Assembling the GRN reconciliation for 01 Apr to 12 Aug. That is 14 months of receipts across five plants, so it takes a while.</p>
+  </div>
+</div>` },
+
+      { id: 'panel', name: 'Centred in a panel', code:
+`<!-- A region with nothing in it yet. The box is already the height the loaded
+     panel will be, so the rows land without the page shuffling itself — a
+     spinner in a box that collapses to its content is why a dashboard reflows
+     twice on every load.
+
+     aria-busy is on the panel. The panel is the thing that is waiting; the ring
+     is only what is drawn. -->
+<div class="flex min-h-64 items-center justify-center rounded-xl border border-zinc-200 bg-white p-6" aria-busy="true">
+  <div class="flex flex-col items-center gap-3 text-center">
+    <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <p role="status" class="text-[13px]/5 text-zinc-600">Loading the order register</p>
+  </div>
+</div>` },
+
+      { id: 'inline', name: 'Beside a control', code:
+`<!-- size-4 next to anything control-height, because a 20px ring beside a 36px
+     input is louder than the input.
+
+     None of these is a button, and that is deliberate: a button's busy state is
+     already specified in the button entry, which holds the label width with a
+     grid overlay so the row cannot reflow mid-click and keeps the disabled
+     attribute alongside aria-busy so a second click cannot post twice. Copy that
+     one rather than dropping a bare ring into a <button>.
+
+     Each of the three has its own role="status", because each names a different
+     piece of work. One region for the page would have them overwriting each
+     other, and the last one to finish would be the only one ever announced. -->
+<div class="max-w-md space-y-6 rounded-xl border border-zinc-200 bg-white p-4">
+
+  <!-- inside the field's ring, where the input entry puts its icons -->
+  <div>
+    <label for="sp-gstin" class="mb-1.5 block text-[13px]/5 font-medium">Vendor GSTIN</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+      <input id="sp-gstin" value="27AABCS1429B1ZX" class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 outline-none">
+      <span class="mr-3 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    </div>
+    <p role="status" class="mt-1.5 text-[12px]/4 text-zinc-500">Checking this GSTIN against the GST portal</p>
+  </div>
+
+  <!-- in a cell, where the figure will be. Right-aligned into the same column
+       the number lands in, so the row does not shift when it arrives. -->
+  <div class="border-t border-zinc-100 pt-4">
+    <div class="flex items-baseline justify-between gap-4">
+      <span class="text-[13px]/5 text-zinc-600">Committed value, all plants</span>
+      <span class="flex h-5 items-center">
+        <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      </span>
+    </div>
+    <p role="status" class="mt-1 text-[12px]/4 text-zinc-500">Recalculating committed value</p>
+  </div>
+
+  <!-- a background refresh of something already shown. The stale figure stays
+       legible; the ring says a newer one is on its way. -->
+  <div class="border-t border-zinc-100 pt-4">
+    <p class="text-[20px]/7 font-semibold tracking-tight tabular-nums">1,842</p>
+    <div class="mt-1 flex items-center gap-2">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <span role="status" class="text-[12px]/4 text-zinc-500">Refreshing open orders, last read 11:04</span>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'overlay', name: 'Over content already on screen', code:
+`<!-- A refresh of rows somebody is already reading. Replacing them with a centred
+     ring would throw away the scroll position and collapse the panel, so the rows
+     stay and a bg-white/70 scrim goes over them.
+
+     The scrim stops the mouse and nothing else, which is why the content wrapper
+     takes :inert="busy" — without it Tab walks straight into rows that are being
+     replaced and Enter fires their actions against data on the way out. inert is
+     a boolean attribute Alpine knows about, so a false value removes it rather
+     than writing inert="false", which is a truthy string.
+
+     aria-busy is on the panel, and the sr-only status is outside the scrim so it
+     stays in the document across the whole cycle and reports both ends of it.
+
+     busy starts true so the scrim is already there at first paint rather than
+     appearing over rows somebody has begun reading, and x-init runs the cycle
+     once so it resolves. In an application the swap is what clears it. -->
+<div class="relative overflow-hidden rounded-xl border border-zinc-200 bg-white"
+     x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 2400) } }"
+     x-init="run()"
+     :aria-busy="busy">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
+    <p class="text-[14px]/5 font-semibold">Order register</p>
+    <button type="button" @click="run()" :disabled="busy"
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 disabled:text-zinc-400">
+      <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Refresh
+    </button>
+  </div>
+
+  <div :inert="busy">
+    <table class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+          <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+          <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
+          <td class="px-4 py-2.5">Sharma Extrusions</td>
+          <td class="px-4 py-2.5 text-right tabular-nums">₹18,42,000</td>
+        </tr>
+        <tr class="border-b border-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194</td>
+          <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
+          <td class="px-4 py-2.5 text-right tabular-nums">₹4,16,500</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1203</td>
+          <td class="px-4 py-2.5">Nashik Steel Traders</td>
+          <td class="px-4 py-2.5 text-right tabular-nums">₹9,07,250</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div x-show="busy" x-cloak class="absolute inset-0 z-10 flex items-center justify-center bg-white/70 px-4">
+    <span class="flex items-center gap-2.5 rounded-full border border-zinc-200 bg-white px-3.5 py-2 shadow-sm">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <span class="text-[12px]/4 font-medium text-zinc-600">Refreshing 24 orders</span>
+    </span>
+  </div>
+
+  <p role="status" class="sr-only" x-text="busy ? 'Refreshing the order register' : 'Order register updated'"></p>
+</div>` },
+
+      { id: 'delayed', name: 'The 500ms floor', code:
+`<!-- Both buttons run the same request; only one of them is slow enough to be
+     worth a spinner. Below about 300ms the ring answers before the eye has
+     resolved it and all anyone sees is a flicker where the number was.
+
+     The floor needs no timer. The ring sits at opacity-0 and picks up
+     transition-opacity delay-500 only while the flag is on, so the fade does not
+     begin until 500ms after the click. A request that answers in 120ms turns the
+     flag off again during the delay, the computed opacity goes from 0 to 0, and
+     nothing was ever painted. Measured: opacity never left 0 on the fast button
+     and reached 1 at 683ms on the slow one.
+
+     The delay is in the bound class, not the base class. Left in the base it
+     delays the fade *out* too — measured, the ring was still at full opacity
+     520ms after a 1.6s request had landed its content, which reads as a panel
+     still loading something it has finished drawing. Written this way it was
+     gone 196ms after the work stopped.
+
+     opacity and not x-show, because opacity keeps the box. A spinner that
+     appears with display widens the row 500ms after the click and moves the
+     button out from under the cursor.
+
+     The floor cannot reach the live region: x-text fires the moment the flag
+     flips, so the announcement gets its own 500ms timer. Without it a 120ms
+     request that never painted a ring is still announced as a wait. -->
+<div class="rounded-xl border border-zinc-200 bg-white p-4"
+     x-data="{
+       busy: false, late: false, timer: null,
+       run(ms) {
+         this.busy = true; this.late = false;
+         clearTimeout(this.timer);
+         this.timer = setTimeout(() => { this.late = this.busy }, 500);
+         setTimeout(() => { this.busy = false; this.late = false; clearTimeout(this.timer) }, ms);
+       }
+     }">
+  <p class="text-[13px]/5 font-medium">Recalculate committed value</p>
+  <p class="mt-1 text-[12px]/4 text-zinc-500">One plant answers in 120ms and never shows a ring. All five take 1.6s and do.</p>
+
+  <div class="mt-3 flex flex-wrap items-center gap-3">
+    <button type="button" @click="run(120)"
+            class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Nashik only</button>
+    <button type="button" @click="run(1600)"
+            class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">All five plants</button>
+
+    <span class="flex items-center gap-2 opacity-0 transition-opacity delay-0 duration-150"
+          :class="busy && 'opacity-100 delay-500'">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <span class="text-[13px]/5 text-zinc-600">Recalculating</span>
+    </span>
+  </div>
+
+  <p role="status" class="sr-only" x-text="late ? 'Recalculating committed value' : ''"></p>
+</div>` },
+
+      { id: 'states', name: 'Running, slow, failed', code:
+`<!-- A spinner has to resolve. These are the three ends of one wait.
+
+     Past about ten seconds the second line goes *inside* the role="status" that
+     is already there, so what gets announced is the change. A second region
+     beside it would be a new thing announcing itself while the first still has
+     nothing new to say.
+
+     The failure is not a spinner in a different colour — there is no danger
+     spinner. The ring is gone and the error variant of empty-state is what
+     stands in its place, at the size the panel already was, because a ring still
+     turning at forty seconds is indistinguishable from a hung page. -->
+<div class="grid gap-4 sm:grid-cols-3">
+
+  <div class="flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white p-5 text-center" aria-busy="true">
+    <span class="size-6 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <p role="status" class="text-[13px]/5 text-zinc-600">Loading the order register</p>
+  </div>
+
+  <div class="flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white p-5 text-center" aria-busy="true">
+    <span class="size-6 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <div role="status">
+      <p class="text-[13px]/5 text-zinc-600">Loading the order register</p>
+      <p class="mt-1 text-[12px]/4 text-zinc-500">Still working. 14 months of receipts is a wide range.</p>
+    </div>
+  </div>
+
+  <div class="flex min-h-44 flex-col items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white p-5 text-center">
+    <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="alert-circle" class="size-4 text-red-600"></i>
+    </span>
+    <p class="mt-1 text-[13px]/5 font-medium">The register did not load</p>
+    <p class="text-[12px]/4 text-zinc-500">Timed out after 30 seconds. Nothing was changed.</p>
+    <button type="button" class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
+      <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry
+    </button>
+  </div>
+</div>` },
+
+      { id: 'django', name: 'Django and htmx', code:
+`<!-- views.py
+     def order_register(request):
+         # the page answers immediately with a spinner in the panel, and the
+         # panel fetches itself. Nothing on this path waits on the query.
+         return render(request, 'orders/register.html')
+
+     def order_register_rows(request):
+         try:
+             orders = (PurchaseOrder.objects
+                       .select_related('vendor')
+                       .filter(plant=request.user.plant)
+                       .order_by('-raised_on')[:50])
+         except DatabaseError:
+             # the failure renders the same fragment slot, so the swap always
+             # replaces the spinner with something. A view that 500s leaves the
+             # ring turning until somebody reloads.
+             return render(request, 'orders/_register_failed.html', status=200)
+         # the fragment only: no base template, no <html>
+         return render(request, 'orders/_register_rows.html', {'orders': orders})
+
+     urls.py
+         path('orders/', views.order_register, name='order-register'),
+         path('orders/rows/', views.order_register_rows, name='order-register-rows'),
+
+     A deferred load needs no indicator machinery at all. The spinner is what the
+     server rendered into the panel and hx-swap="outerHTML" is what removes it, so
+     there is nothing to delay: the reason the panel is deferred is that the query
+     is slow.
+
+     Do not reach for htmx's .htmx-indicator class for the 500ms floor on the
+     refresh. htmx injects its own stylesheet, and .htmx-request .htmx-indicator
+     sets the transition shorthand at two classes of specificity, which resets
+     transition-delay to zero. Measured on an element carrying both delay-500 and
+     duration-150: computed transition-delay came back 0s and duration 0.2s —
+     htmx's values, not Tailwind's, and the floor is gone without a warning. Drive
+     the opacity off an Alpine flag instead, as below.
+
+     Bind htmx events in kebab case. htmx fires both htmx:beforeRequest and
+     htmx:before-request, but the HTML parser lowercases attribute names, so
+     @htmx:beforeRequest is stored as @htmx:beforerequest and listens for an event
+     nothing dispatches. Verified: with both spellings on one element, only the
+     kebab listener ran.
+
+     The listeners sit on the header, not on the panel root, so only requests that
+     started at the Refresh button bubble through them. On the root they would also
+     catch the deferred first load and put the refresh scrim over the spinner that
+     is already there.
+
+     role="status" is on the panel, which survives the swap. A status region that
+     arrives inside a fragment with its message already in it never changed, so
+     there is nothing for a screen reader to report. -->
+
+{# orders/register.html #}
+<div id="register" class="relative overflow-hidden rounded-xl border border-zinc-200 bg-white"
+     x-data="{ busy: false }" :aria-busy="busy">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3"
+       @htmx:before-request="busy = true"
+       @htmx:after-request="busy = false">
+    <h2 class="text-[14px]/5 font-semibold">Order register</h2>
+    <button type="button"
+            hx-get="{% url 'order-register-rows' %}"
+            hx-target="#register-rows" hx-swap="outerHTML"
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
+      <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Refresh
+    </button>
+  </div>
+
+  <!-- the deferred first load. This div is the spinner and it is also what
+       hx-swap="outerHTML" replaces, so nothing has to remove it. -->
+  <div id="register-rows"
+       hx-get="{% url 'order-register-rows' %}"
+       hx-trigger="load"
+       hx-swap="outerHTML"
+       class="flex min-h-64 items-center justify-center p-6">
+    <div class="flex flex-col items-center gap-3 text-center">
+      <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <p class="text-[13px]/5 text-zinc-600">Loading the order register</p>
+    </div>
+  </div>
+
+  <!-- the refresh scrim, over rows that are already on screen -->
+  <div x-show="busy" x-cloak class="absolute inset-0 z-10 flex items-center justify-center bg-white/70 px-4">
+    <span class="flex items-center gap-2.5 rounded-full border border-zinc-200 bg-white px-3.5 py-2 shadow-sm">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <span class="text-[12px]/4 font-medium text-zinc-600">Refreshing</span>
+    </span>
+  </div>
+
+  <p role="status" class="sr-only"
+     x-text="busy ? 'Refreshing the order register' : ''"></p>
+</div>
+
+{# orders/_register_rows.html — the whole response and nothing around it,
+   keeping the id so the next Refresh still has a target #}
+<div id="register-rows" :inert="busy">
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+        <tr class="border-b border-zinc-100 last:border-0">
+          <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
+          <td class="px-4 py-2.5">{{ o.vendor.name }}</td>
+          <td class="px-4 py-2.5 text-right tabular-nums">₹{{ o.amount|intcomma }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{# orders/_register_failed.html — the spinner resolved into an error, in the
+   same slot and at the same height, so the panel does not change size #}
+<div id="register-rows" class="flex min-h-64 flex-col items-center justify-center gap-2 p-6 text-center">
+  <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+    <i data-lucide="alert-circle" class="size-4 text-red-600"></i>
+  </span>
+  <p class="mt-1 text-[13px]/5 font-medium">The register did not load</p>
+  <p class="text-[12px]/4 text-zinc-500">Nothing was changed.</p>
+  <button type="button" hx-get="{% url 'order-register-rows' %}"
+          hx-target="#register-rows" hx-swap="outerHTML"
+          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
+    <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry
+  </button>
 </div>` }
     ]
   }

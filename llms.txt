@@ -165,6 +165,7 @@ building anything, rather than reconstructing a component from its description.
 - **Progress** `progress` — How far along something is — receipt against an order, a step in a workflow, a fill level in a row. Variants: bar, steps, inline.
 - **Empty state** `empty-state` — What a list shows when it has nothing in it. Says why it is empty and what to do next. Variants: no-results, nothing-yet, error.
 - **Skeleton** `skeleton` — Grey blocks in the shape of the content that is loading. Variants: text, table, card.
+- **Spinner** `spinner` — The indeterminate wait. A graphite ring that turns while work of unknown length is in flight, and a line of text that says what the work is. Variants: default, sizes, label, panel, inline, overlay, delayed, states, django.
 
 ### Feedback
 
