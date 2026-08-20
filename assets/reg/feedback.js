@@ -498,27 +498,32 @@ register(
     notes: [
       'Close on escape and on a backdrop click with @click.self. A modal with no way out except the button is a trap.',
       'x-cloak on the overlay, otherwise it flashes over the page on load.',
+      'x-trap.noscroll on the backdrop, exactly as the alert dialog uses it: Tab stays inside the panel, focus returns to the trigger on close, and the page behind stops scrolling. @click.self sits on the same element and still fires — the focus plugin runs with allowOutsideClick, and a click on the backdrop is inside the trap anyway.',
+      'x-trap opens focus on the first element inside the panel carrying autofocus, and on the first focusable element when there is none. Put autofocus on the first field when the panel exists to be typed into; leave it off when the panel is only read, and focus lands on the close button, which is the safe one.',
       'A modal is dismissible by definition. The moment a stray backdrop click would lose the user something, it is an alert dialog and it belongs in that component instead.'
     ],
-    related: ['alert-dialog', 'drawer', 'form-page'],
     anatomy: [
-      ['Backdrop', 'A zinc-900/40 field that dims the page and carries @click.self to dismiss.'],
-      ['Panel', 'Centred, rounded-xl, max-w-md for a form and max-w-lg when the body scrolls.'],
+      ['Backdrop', 'A zinc-900/40 field that dims the page and carries @click.self to dismiss, plus x-trap.noscroll to hold focus and lock the page behind.'],
+      ['Panel', 'Centred, rounded-xl, max-w-md for a form and max-w-lg when the body scrolls. Capped at 80vh in every variant.'],
       ['Header', 'The title and a close button, on a bordered strip that does not scroll.'],
       ['Body', 'The fields, or the content. This is the only part that scrolls.'],
       ['Footer', 'Cancel and the primary action, right-aligned on a zinc-100 strip that does not scroll.']
     ],
     behaviour: [
       'Escape closes, a backdrop click closes, and the close button closes. All three, always.',
+      'Opening moves focus into the panel: onto the first field where there is one to fill in, otherwise onto the close button.',
+      'Tab and Shift+Tab cycle inside the panel only. Nothing behind it is reachable while it is open.',
+      'Closing returns focus to the control that opened it, so the keyboard does not lose its place.',
       'In the scrolling variant only the body moves; the header and footer stay, so the primary action never scrolls out of reach.',
-      'The panel is capped at 80vh so it never grows past the viewport on a laptop.',
-      'Opening does not shift the page behind it.',
+      'Every panel is capped at 80vh with the body scrolling inside it, so a modal never grows past the viewport on a laptop or in landscape on a phone.',
+      'The page behind does not scroll while the modal is open, and it does not jump sideways when its scrollbar goes — x-trap.noscroll pads for the width it removes.',
       'A form longer than about six fields belongs on a page. A modal that scrolls a long form is a page in a costume.'
     ],
     a11y: [
       'role="dialog" with aria-modal="true" and aria-labelledby pointing at the heading.',
-      'Focus moves into the panel on open and returns to the trigger on close.',
-      'Focus is trapped inside while it is open — use x-trap from @alpinejs/focus, the same as the alert dialog.',
+      'Focus moves into the panel on open and returns to the trigger on close — x-trap from @alpinejs/focus does both, the same as the alert dialog.',
+      'Focus is trapped inside while it is open, so Tab cannot walk out into the page underneath, which is still fully rendered.',
+      'A form modal opens on its first field, marked with autofocus, which x-trap honours. A read-only one opens on the close button.',
       'The close button carries aria-label="Close".',
       'Escape works from anywhere inside the panel, including from within a focused input.'
     ],
@@ -531,11 +536,11 @@ register(
     <i data-lucide="plus" class="size-4"></i>Record GRN
   </button>
 
-  <div x-show="open" x-cloak @keydown.escape.window="open = false" @click.self="open = false"
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="dialog" aria-modal="true" aria-labelledby="grn-title"
-         class="w-full max-w-md overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
-      <div class="flex items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+         class="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <div class="min-w-0">
           <h2 id="grn-title" class="text-[16px]/6 font-semibold">Record GRN</h2>
           <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">PO-24-1187 · Sharma Extrusions</p>
@@ -546,11 +551,12 @@ register(
         </button>
       </div>
 
-      <div class="px-5 py-4">
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
         <div>
           <label for="grn-qty" class="mb-1.5 block text-[13px]/5 font-medium">Quantity received <span class="text-red-600">*</span></label>
           <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
-            <input id="grn-qty" value="4,200" class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+            <!-- x-trap opens focus on [autofocus] if the panel has one, otherwise on the close button -->
+            <input id="grn-qty" autofocus value="4,200" class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
             <span class="pr-3 text-[13px]/5 text-zinc-600">kg</span>
           </div>
           <p class="mt-1.5 text-[12px]/4 text-zinc-500">Ordered 12,000 kg, received 7,800 kg so far.</p>
@@ -564,7 +570,7 @@ register(
         </div>
       </div>
 
-      <div class="flex flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+      <div class="flex shrink-0 flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
         <button type="button" @click="open = false"
                 class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
         <button type="button" @click="open = false"
@@ -581,7 +587,7 @@ register(
   <button type="button" @click="open = true"
           class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Review 6 lines</button>
 
-  <div x-show="open" x-cloak @keydown.escape.window="open = false" @click.self="open = false"
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="dialog" aria-modal="true" aria-labelledby="lines-title"
          class="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
@@ -640,18 +646,18 @@ register(
     <i data-lucide="keyboard" class="size-4"></i>Shortcuts
   </button>
 
-  <div x-show="open" x-cloak @keydown.escape.window="open = false" @click.self="open = false"
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="dialog" aria-modal="true" aria-labelledby="keys-title"
-         class="w-full max-w-sm overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
-      <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+         class="flex max-h-[80vh] w-full max-w-sm flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+      <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <h2 id="keys-title" class="text-[16px]/6 font-semibold">Keyboard shortcuts</h2>
         <button type="button" @click="open = false" aria-label="Close"
                 class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
-      <dl class="px-5 py-2">
+      <dl class="min-h-0 flex-1 overflow-y-auto px-5 py-2">
         <div class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
           <dt class="text-[13px]/5 text-zinc-600">Search orders</dt>
           <dd><kbd class="rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600">/</kbd></dd>
@@ -682,10 +688,12 @@ register(
     notes: [
       'Full width below sm, fixed width above it. A 448px drawer on a 390px phone is a horizontal scrollbar.',
       'The body scrolls, the header and footer do not. overflow-y-auto goes on the middle section only.',
-      'Escape and backdrop both close it, same as a modal.'
+      'Escape and backdrop both close it, same as a modal.',
+      'x-trap.noscroll on the backdrop, the same as the modal and the alert dialog: Tab stays inside the panel, focus returns to the row that opened it on close, and the list behind stops scrolling.',
+      'motion-reduce:transition-none and motion-reduce:duration-0 ride along on both x-transition class lists. Alpine puts the panel in its final position by removing translate-x-full itself rather than waiting on a transitionend, so killing the transition still lands the drawer open — it just gets there in one frame. duration-0 is the second half of it: Alpine reads the computed transition-duration to decide how long to hold the element before hiding it, so without it the backdrop would sit on screen for another 150ms after the panel had already gone.'
     ],
     anatomy: [
-      ['Backdrop', 'The same dimmed field as a modal, dismissing on @click.self.'],
+      ['Backdrop', 'The same dimmed field as a modal, dismissing on @click.self and carrying x-trap.noscroll to hold focus and lock the list behind.'],
       ['Panel', 'Anchored right, full height, full width below sm and a fixed width above it.'],
       ['Header', 'The record\'s name and a close button. Fixed.'],
       ['Body', 'The only scrolling section — overflow-y-auto goes here and nowhere else.'],
@@ -696,14 +704,17 @@ register(
       'Full width below sm. A 448px panel on a 390px phone is a horizontal scrollbar.',
       'Escape and a backdrop click both close it, the same as a modal.',
       'The body scrolls independently; the header and footer do not move.',
+      'Tab stays inside the panel while it is open. The list behind is visible but not reachable, and it does not scroll.',
+      'Under prefers-reduced-motion the panel appears in place instead of sliding across.',
       'For heavy editing, send the user to a page. A drawer is too narrow for a long form and they will fight the width.'
     ],
     a11y: [
       'role="dialog" with aria-modal="true", labelled by the record name in the header.',
-      'Focus enters the panel on open and returns to the row that opened it on close.',
+      'Focus enters the panel on open and returns to the row that opened it on close — x-trap does both.',
       'Focus is trapped while open, or Tab walks into the list behind and the user is lost.',
+      'Focus lands on the close button, the first focusable element in the panel and the one that costs nothing to press.',
       'The close button carries aria-label="Close".',
-      'The slide transition respects prefers-reduced-motion.'
+      'The slide transition respects prefers-reduced-motion, through motion-reduce:transition-none and motion-reduce:duration-0 on both x-transition class lists. The panel still ends up open and in place; it just does not travel.'
     ],
     related: ['modal', 'list-detail', 'table'],
     variants: [
@@ -712,13 +723,13 @@ register(
   <button type="button" @click="open = true"
           class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Open PO-24-1187</button>
 
-  <div x-show="open" x-cloak @keydown.escape.window="open = false" @click.self="open = false"
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex justify-end bg-zinc-900/40">
     <div role="dialog" aria-modal="true" aria-labelledby="drawer-title"
          x-show="open"
-         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
          x-transition:enter-start="translate-x-full"
-         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
          x-transition:leave-end="translate-x-full"
          class="flex h-full w-full flex-col border-l border-zinc-200 bg-white shadow-lg sm:w-[28rem]">
 
@@ -786,13 +797,13 @@ register(
     <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 text-[11px]/4 font-medium tabular-nums">2</span>
   </button>
 
-  <div x-show="open" x-cloak @keydown.escape.window="open = false" @click.self="open = false"
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex justify-end bg-zinc-900/40">
     <div role="dialog" aria-modal="true" aria-labelledby="filters-title"
          x-show="open"
-         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
          x-transition:enter-start="translate-x-full"
-         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
          x-transition:leave-end="translate-x-full"
          class="flex h-full w-full flex-col border-l border-zinc-200 bg-white shadow-lg sm:w-96">
 
