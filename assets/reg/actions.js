@@ -462,46 +462,108 @@ register(
     id: 'dropdown', name: 'Dropdown menu', category: 'actions',
     description: 'A menu of actions anchored to a trigger. Destructive items sit last, below a divider.',
     when: 'Row actions, export options, account menus. More than about seven items means you want a page, not a menu.',
-    notes: ['@click.stop on the trigger and the panel stops the document-level handler that closes other menus.'],
+    notes: ['@click.outside on the root closes the panel, so no document-level handler and no global store is needed to keep one menu open at a time. It fires on a click anywhere else, including on another menu\'s trigger, which is what opens that one and closes this one in the same gesture.'],
     anatomy: [
       ['Trigger', 'A button carrying a chevron, which is the only signal that anything is hidden behind it.'],
       ['Panel', 'Absolutely positioned, z-40, opening below and aligned to the trigger\'s edge.'],
       ['Item', 'A full-width button with the icon left of the label, so the labels form a single reading column.'],
-      ['Divider', 'A top border separating destructive items from the rest.'],
+      ['Divider', 'Its own <div role="separator" class="my-1 h-px bg-zinc-100">, full bleed inside the panel padding. Not a border-t on the item below it: that rule belongs to the item, so it follows it to the top of the panel when whatever sat above is hidden.'],
       ['Destructive item', 'Last, below the divider, in red-600 — never adjacent to an item someone reaches for often.']
     ],
     behaviour: [
-      'Clicking the trigger toggles the panel; clicking outside it closes, via @click.outside on the root.',
+      'Clicking the trigger toggles the panel and clicking outside closes it. Down or Up on the trigger also opens it, landing on the first or the last item, so the menu can be reached without a pointer at all.',
       'Escape closes the panel and returns focus to the trigger.',
-      'Choosing an item closes the menu — a menu that stays open after a choice reads as though the click was missed.',
+      'Choosing an item closes the menu and hands focus back to the trigger — a menu that stays open after a choice reads as though the click was missed, and one that closes onto nothing loses the keyboard its place.',
       'Only one menu is open at a time. @click.outside handles this without a global store.',
       'Past about seven items this is the wrong control; the answer is a page with search, not a longer menu.'
     ],
     a11y: [
       'The trigger carries aria-haspopup="menu" and aria-expanded bound to the open state.',
       'The panel is role="menu" and each item role="menuitem".',
-      'Arrow keys move between items and Escape closes — a mouse-only menu excludes the keyboard entirely.',
-      'Focus moves into the panel on open and returns to the trigger on close.',
+      'Down and Up move between items and wrap, Home and End jump to the ends, Escape closes and Tab closes without swallowing the tab. The separator is skipped because the walk queries [role=menuitem] rather than stepping through child elements, so it never lands on a line.',
+      'Focus is real focus, moved item to item with tabindex="-1" on each. This is where a menu and a combobox part company: a combobox keeps focus in its text box and points at a row with aria-activedescendant, but a menuitem is the thing being operated, so it has to be the thing focused. Down on the trigger opens onto the first item, Up onto the last, and Escape or a choice returns focus to the trigger. Clicking outside closes without moving focus, because the user has already put it somewhere else.',
       'The destructive item is distinguished by its label as well as its colour, since colour alone is not a signal.'
     ],
     related: ['button', 'command-palette', 'separator'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div class="relative" x-data="{ open: false }" @click.outside="open = false">
-  <button @click="open = !open"
+`<!-- The divider is its own element, not a border-t on the Delete button.
+     Hung off the button it belongs to the button, so an item above it that is
+     hidden by a permission check takes the rule to the top of the panel where
+     it introduces nothing. As its own element it drops out with the same
+     {% if %} as the item it introduces.
+
+     zinc-100, not zinc-200: the panel edge is the zinc-200, and a rule inside
+     an already bordered surface is a step lighter. role="separator" is real
+     here because the panel is a role="menu" and a menu is a list of peers.
+
+     A menu moves real focus between its items, one tabindex="-1" at a time.
+     That is the opposite of the combobox next door, which keeps focus in the
+     text box and points at a row with aria-activedescendant, and the two are
+     not interchangeable: a menuitem is the thing being operated, so it has to
+     be the thing focused. items() reads the buttons out of the DOM on every
+     keystroke rather than off a list, so a permission check that drops an item
+     drops it from the keyboard order too, and the separator is skipped for
+     free because it is not a menuitem. The focused item takes a tint and an
+     inset outline rather than outline-none plus a tint: the panel is
+     overflow-hidden so a positive offset would be clipped, and in forced
+     colours the tint is dropped and the outline is all that is left.
+
+     The opening focus is moved on the next animation frame, not in $nextTick.
+     x-show has not written display yet when $nextTick runs: measured, the panel
+     was still display none with offsetHeight 0 inside the callback, and
+     focus() on a hidden button is a silent no-op that leaves the caret on the
+     trigger. It only shows up when the trigger already had focus, because
+     otherwise there is nothing to notice: a menu that opens with focus still
+     outside it is a menu the arrow keys do not drive. -->
+<div class="relative"
+     x-data="{
+       open: false,
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         i[(at + step + i.length) % i.length]?.focus();
+       },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+          :aria-expanded="open" aria-haspopup="menu"
           class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="download" class="size-4"></i>Export
     <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
   </button>
-  <div x-show="open" x-cloak
+  <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Export options"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+       @keydown.tab="close(false)"
        class="absolute left-0 z-40 mt-1 w-52 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
-    <button class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
       <i data-lucide="sheet" class="size-4 text-zinc-600"></i>Excel (.xlsx)
     </button>
-    <button class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
       <i data-lucide="file-text" class="size-4 text-zinc-600"></i>CSV
     </button>
-    <button class="flex w-full items-center gap-2.5 border-t border-zinc-200 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100">
+
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
       <i data-lucide="trash-2" class="size-4"></i>Delete
     </button>
   </div>
