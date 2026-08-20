@@ -41,7 +41,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**37 components · 156 variants · 13 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
+**38 components · 164 variants · 14 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
 
 ### Actions
 
@@ -57,6 +57,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 |---|---|--:|---|
 | Field | `field` | 2 | — |
 | Input | `input` | 3 | — |
+| Textarea | `textarea` | 8 | [open](https://konfpa.github.io/konspec-ui/components/textarea.html) |
 | Checkbox, radio, toggle | `choice` | 2 | — |
 | Attachment | `attachment` | 8 | [open](https://konfpa.github.io/konspec-ui/components/attachment.html) |
 | Calendar | `calendar` | 8 | [open](https://konfpa.github.io/konspec-ui/components/calendar.html) |
