@@ -194,8 +194,14 @@ const llmsOut = L.join('\n');
 /* which component pages actually exist on disk, so the index cannot advertise
    a page that has not been built yet */
 const pagesDir = path.join(root, 'components');
+/* only a page named after a component counts — a scratch file dropped in here
+   should not turn up in the README as documentation */
+const ids = new Set(R.components.map(c => c.id));
 const built = fs.existsSync(pagesDir)
-  ? fs.readdirSync(pagesDir).filter(f => f.endsWith('.html')).map(f => f.replace(/\.html$/, ''))
+  ? fs.readdirSync(pagesDir)
+      .filter(f => f.endsWith('.html'))
+      .map(f => f.replace(/\.html$/, ''))
+      .filter(id => ids.has(id))
   : [];
 
 const countsOut =

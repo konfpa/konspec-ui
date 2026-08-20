@@ -39,7 +39,9 @@
 <script src="../assets/reg/layout.js"></script>
 <script src="../assets/component-page.js"></script>
 <script src="https://unpkg.com/chart.js@4.4.7/dist/chart.umd.js"></script>
-<script>
+<!-- id so the 390px preview frame can copy these into its own document; a frame
+     is a whole page and inherits none of this -->
+<script id="chart-defaults">
   Chart.defaults.font.size = 12;
   Chart.defaults.plugins.legend.display = false;
   Chart.defaults.plugins.tooltip.displayColors = false;
@@ -126,17 +128,31 @@
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
         <h2 class="text-[24px]/7 font-bold tracking-tight">Variants</h2>
-        <p class="mt-2 text-[14px]/5 text-zinc-600">Each preview is rendered from the exact string shown under Code. They cannot drift.</p>
+        <p class="mt-2 max-w-[62ch] text-[14px]/5 text-zinc-600">Each preview is rendered from the exact string shown under Code. They cannot drift. The background starts on the surface this component actually lives on; flip it to check the other.</p>
       </div>
-      <div class="flex items-center gap-1 rounded-xl border border-zinc-200 p-1">
-        <button @click="width = 'full'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
-                :class="width === 'full' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
-          Full width
-        </button>
-        <button @click="width = 'mobile'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
-                :class="width === 'mobile' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
-          390px
-        </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex items-center gap-1 rounded-xl border border-zinc-200 p-1"
+             role="group" aria-label="Preview background">
+          <button @click="surfaceChoice = 'white'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
+                  :class="surface === 'white' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
+            Surface
+          </button>
+          <button @click="surfaceChoice = 'page'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
+                  :class="surface === 'page' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
+            Page
+          </button>
+        </div>
+        <div class="flex items-center gap-1 rounded-xl border border-zinc-200 p-1"
+             role="group" aria-label="Preview width">
+          <button @click="width = 'full'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
+                  :class="width === 'full' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
+            Full width
+          </button>
+          <button @click="width = 'mobile'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
+                  :class="width === 'mobile' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
+            390px
+          </button>
+        </div>
       </div>
     </div>
 
@@ -161,9 +177,17 @@
             </div>
           </div>
 
-          <div x-show="mode(v) === 'preview'" class="rounded-b-2xl bg-zinc-100 p-6 lg:p-10">
-            <div class="mx-auto transition-all" :class="width === 'mobile' ? 'max-w-[390px]' : 'max-w-full'">
-              <div x-html="mode(v) === 'preview' ? v.code : ''"></div>
+          <div x-show="mode(v) === 'preview'" class="rounded-b-2xl p-6 lg:p-10" :class="previewBg">
+            <div class="mx-auto transition-all" :class="width === 'mobile' ? 'w-[390px] max-w-full' : 'max-w-full'">
+              <template x-if="width === 'full'">
+                <div x-html="mode(v) === 'preview' ? v.code : ''"></div>
+              </template>
+              <!-- the mode check is not redundant with the x-show above: x-show only
+                   sets display:none, so without it a variant parked on the Code tab
+                   still builds a frame and still runs its script -->
+              <template x-if="width === 'mobile' && mode(v) === 'preview'">
+                <iframe x-init="frame($el, v.code)" title="Preview at 390px" class="block w-full" scrolling="no"></iframe>
+              </template>
             </div>
           </div>
 

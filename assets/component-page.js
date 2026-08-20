@@ -7,6 +7,20 @@ function componentPage() {
     copied: null,
     tab: {},                 // variant id -> 'preview' | 'code'
     width: 'full',           // 'full' | 'mobile'
+    surfaceChoice: null,     // null = follow the category, else 'white' | 'page'
+
+    /* Which background a preview sits on, by category, because a component
+       demoed on the wrong surface is a lie about where it lives. A card, a
+       table, an alert and a page shell all sit on the zinc-100 page; a field, a
+       button and a tab row sit on a white surface inside it. Getting this wrong
+       is not cosmetic: a zinc-100 pill track on a zinc-100 panel measures 1.00
+       against its background, which is not faint but identical, and the control
+       vanishes. The toggle is there so both can be checked on purpose. */
+    surfaceByCategory: { data: 'page', feedback: 'page', layout: 'page' },
+    get surface() {
+      return this.surfaceChoice || this.surfaceByCategory[this.c.category] || 'white';
+    },
+    get previewBg() { return this.surface === 'page' ? 'bg-zinc-100' : 'bg-white'; },
 
     get c() { return window.REGISTRY.components.find(x => x.id === this.id); },
     get category() { return this.spec.categories.find(k => k.id === this.c.category); },
@@ -21,6 +35,65 @@ function componentPage() {
 
     mode(v) { return this.tab[v.id] || (v.id === 'django' || v.id === 'setup' ? 'code' : 'preview'); },
     setMode(v, m) { this.tab[v.id] = m; },
+
+    /* Renders one variant inside a 390px-wide iframe.
+       Clamping a wrapper to 390px is not a mobile preview: Tailwind's sm:/md:/lg:
+       variants are viewport media queries, so a narrowed wrapper still got the
+       desktop layout — a grid where the markup asks for a scrolling strip. An
+       iframe is the only element that gives the markup a viewport of its own. */
+    frame(el, code) {
+      const abs = p => new URL(p, document.baseURI).href;
+      const theme = document.querySelector('style[type="text/tailwindcss"]');
+      /* A frame is a whole document, so it does not inherit the page's Chart.js
+         or its defaults. Copy both in, but only for a variant that draws, so
+         nothing else pays for a library it never calls. */
+      const defaults = document.getElementById('chart-defaults');
+      const chartDefaults = defaults ? '<script>' + defaults.textContent + '<\/script>' : '';
+      el.srcdoc = `<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="${abs('../assets/fonts.css')}">
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">${theme ? theme.textContent : ''}</style>
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+${/<canvas/.test(code) ? '<script src="https://unpkg.com/chart.js@4.4.7/dist/chart.umd.js"><\/script>' + chartDefaults : ''}
+</head>
+<body class="${this.previewBg} font-sans text-[14px]/5 text-zinc-900 antialiased">
+${code}
+<script>
+(function () {
+  let queued = false;
+  const draw = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      if (window.lucide && document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+    });
+  };
+  document.addEventListener('DOMContentLoaded', draw);
+  document.addEventListener('alpine:initialized', () => {
+    draw();
+    new MutationObserver(draw).observe(document.body, { childList: true, subtree: true });
+  });
+})();
+</script>
+</body></html>`;
+
+      el.addEventListener('load', () => {
+        const win = el.contentWindow, body = win.document.body;
+        const fit = () => { el.style.height = Math.ceil(body.getBoundingClientRect().height) + 'px'; };
+        fit();
+        new win.ResizeObserver(fit).observe(body);
+        win.addEventListener('resize', fit);
+        /* Tailwind's browser build compiles after load; nothing resizes the body
+           when the sheet lands, so measure again once it has. */
+        [60, 300, 900].forEach(t => win.setTimeout(fit, t));
+      }, { once: true });
+    },
 
     async copy(text, key) {
       try { await navigator.clipboard.writeText(text); }
