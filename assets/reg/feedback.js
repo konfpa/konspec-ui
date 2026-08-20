@@ -217,11 +217,11 @@ register(
     when: 'Saves, posts, exports — anything the user triggered and does not need to act on. Never put an error the user must read in a toast; it will disappear before they get to it.',
     notes: [
       'Auto-hide only works when the toast is dismissable and repeatable. If losing the message costs the user something, use an alert.',
-      'Bottom-left keeps it clear of the right-hand drawer and the row action menus.',
+      'Bottom-left keeps it clear of the right-hand sheet and the row action menus.',
       'A toast with an Undo action must not auto-hide faster than the undo window on the server.'
     ],
     anatomy: [
-      ['Region', 'A fixed container at the bottom-left, clear of the right-hand drawer and the row action menus.'],
+      ['Region', 'A fixed container at the bottom-left, clear of the right-hand sheet and the row action menus.'],
       ['Icon', 'The severity, at size-4. The same palette as an alert, for the same reason.'],
       ['Message', 'One line, past tense, naming what happened. "GRN 1142 posted", not "Success".'],
       ['Action', 'Optional, and almost always Undo. Anything else usually belongs in an alert instead.'],
@@ -286,10 +286,10 @@ register(
 
   {
     id: 'alert-dialog', name: 'Alert dialog', category: 'feedback',
-    description: 'A dialog that interrupts to ask one question with two answers. Unlike a modal it does not dismiss on a backdrop click — the user has to choose.',
+    description: 'A dialog that interrupts to ask one question with two answers. Unlike a plain dialog it does not dismiss on a backdrop click — the user has to choose.',
     when: 'Anything destructive, irreversible, or expensive to undo: deleting a record, closing an order, discarding unsaved work, acting on a selection. If the answer does not matter much, do not interrupt at all.',
     notes: [
-      'No @click.self on the backdrop. A modal dismisses on a stray backdrop click; an alert dialog must not — the user is being asked a question and a misplaced click is not an answer.',
+      'No @click.self on the backdrop. A dialog dismisses on a stray backdrop click; an alert dialog must not — the user is being asked a question and a misplaced click is not an answer.',
       'Escape still closes, and it means cancel. Taking that away makes the dialog a trap, which is a worse failure than an accidental dismissal.',
       'role="alertdialog", not role="dialog". It tells a screen reader to announce the body immediately instead of waiting for the user to navigate to it — which only works if aria-describedby points at that body.',
       'x-trap.noscroll does three jobs: it traps Tab inside the dialog, it returns focus to the trigger on close, and it locks the page behind. Without it Tab walks straight out into the page underneath, which is still fully interactive.',
@@ -299,7 +299,7 @@ register(
       'The confirm button repeats the verb — "Delete order", never "OK". Someone who reads only the buttons still knows what is about to happen.'
     ],
     anatomy: [
-      ['Backdrop', 'Dims the page and centres the panel. It carries no click handler at all — that is the whole difference from a modal.'],
+      ['Backdrop', 'Dims the page and centres the panel. It carries no click handler at all — that is the whole difference from a dialog.'],
       ['Container', 'role="alertdialog" and aria-modal="true", labelled by the heading and described by the consequence line.'],
       ['Heading', 'The verb and the record, in one line. "Delete PO-24-1187", not "Confirm deletion".'],
       ['Consequence', 'What else changes, and whether it can be undone. The only place colour appears in the dialog.'],
@@ -321,7 +321,7 @@ register(
       'Escape closes the dialog from anywhere inside it.',
       'A blocked confirm is a real disabled button, so the keyboard skips it and a screen reader says it is unavailable, rather than it silently doing nothing.'
     ],
-    related: ['modal', 'alert', 'drawer'],
+    related: ['dialog', 'alert', 'sheet'],
     variants: [
       { id: 'confirm', name: 'Confirm', code:
 `<div x-data="{ open: false }">
@@ -492,15 +492,15 @@ register(
   },
 
   {
-    id: 'modal', name: 'Modal', category: 'feedback',
-    description: 'A centred, dismissible dialog over a dimmed page. Use it to take a handful of fields without leaving the list.',
-    when: 'Short forms and anything the user can walk away from. A form longer than about six fields belongs on its own page; a record to read belongs in a drawer; a question that must be answered belongs in an alert dialog.',
+    id: 'dialog', name: 'Dialog', category: 'feedback',
+    description: 'A centred, dismissible panel over a dimmed page. Use it to take a handful of fields without leaving the list.',
+    when: 'Short forms and anything the user can walk away from. A form longer than about six fields belongs on its own page; a record to read belongs in a sheet; a question that must be answered belongs in an alert dialog.',
     notes: [
-      'Close on escape and on a backdrop click with @click.self. A modal with no way out except the button is a trap.',
+      'Close on escape and on a backdrop click with @click.self. A dialog with no way out except the button is a trap.',
       'x-cloak on the overlay, otherwise it flashes over the page on load.',
       'x-trap.noscroll on the backdrop, exactly as the alert dialog uses it: Tab stays inside the panel, focus returns to the trigger on close, and the page behind stops scrolling. @click.self sits on the same element and still fires — the focus plugin runs with allowOutsideClick, and a click on the backdrop is inside the trap anyway.',
       'x-trap opens focus on the first element inside the panel carrying autofocus, and on the first focusable element when there is none. Put autofocus on the first field when the panel exists to be typed into; leave it off when the panel is only read, and focus lands on the close button, which is the safe one.',
-      'A modal is dismissible by definition. The moment a stray backdrop click would lose the user something, it is an alert dialog and it belongs in that component instead.'
+      'A dialog is dismissible by definition. The moment a stray backdrop click would lose the user something, it is an alert dialog and it belongs in that component instead.'
     ],
     anatomy: [
       ['Backdrop', 'A zinc-900/40 field that dims the page and carries @click.self to dismiss, plus x-trap.noscroll to hold focus and lock the page behind.'],
@@ -515,21 +515,21 @@ register(
       'Tab and Shift+Tab cycle inside the panel only. Nothing behind it is reachable while it is open.',
       'Closing returns focus to the control that opened it, so the keyboard does not lose its place.',
       'In the scrolling variant only the body moves; the header and footer stay, so the primary action never scrolls out of reach.',
-      'Every panel is capped at 80vh with the body scrolling inside it, so a modal never grows past the viewport on a laptop or in landscape on a phone.',
-      'The page behind does not scroll while the modal is open, and it does not jump sideways when its scrollbar goes — x-trap.noscroll pads for the width it removes.',
-      'A form longer than about six fields belongs on a page. A modal that scrolls a long form is a page in a costume.'
+      'Every panel is capped at 80vh with the body scrolling inside it, so a dialog never grows past the viewport on a laptop or in landscape on a phone.',
+      'The page behind does not scroll while the dialog is open, and it does not jump sideways when its scrollbar goes — x-trap.noscroll pads for the width it removes.',
+      'A form longer than about six fields belongs on a page. A dialog that scrolls a long form is a page in a costume.'
     ],
     a11y: [
       'role="dialog" with aria-modal="true" and aria-labelledby pointing at the heading.',
       'Focus moves into the panel on open and returns to the trigger on close — x-trap from @alpinejs/focus does both, the same as the alert dialog.',
       'Focus is trapped inside while it is open, so Tab cannot walk out into the page underneath, which is still fully rendered.',
-      'A form modal opens on its first field, marked with autofocus, which x-trap honours. A read-only one opens on the close button.',
+      'A form dialog opens on its first field, marked with autofocus, which x-trap honours. A read-only one opens on the close button.',
       'The close button carries aria-label="Close".',
       'Escape works from anywhere inside the panel, including from within a focused input.'
     ],
-    related: ['alert-dialog', 'drawer', 'form-page'],
+    related: ['alert-dialog', 'sheet', 'form-page'],
     variants: [
-      { id: 'form', name: 'Form modal', code:
+      { id: 'form', name: 'Form dialog', code:
 `<div x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
@@ -638,7 +638,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'reference', name: 'Reference sheet', code:
+      { id: 'reference', name: 'Reference panel', code:
 `<!-- Read-only, nothing to submit, so the only control is a close button. -->
 <div x-data="{ open: false }">
   <button type="button" @click="open = true"
@@ -682,32 +682,32 @@ register(
   },
 
   {
-    id: 'drawer', name: 'Drawer', category: 'feedback',
+    id: 'sheet', name: 'Sheet', category: 'feedback',
     description: 'A panel that slides in from the right over the page. Shows a record, or the filters for a list, without losing the user\'s place in it.',
-    when: 'Reading or filtering while the list stays behind. If the user has to edit a lot, send them to a page instead — a drawer is too narrow for a long form.',
+    when: 'Reading or filtering while the list stays behind. If the user has to edit a lot, send them to a page instead — a sheet is too narrow for a long form.',
     notes: [
-      'Full width below sm, fixed width above it. A 448px drawer on a 390px phone is a horizontal scrollbar.',
+      'Full width below sm, fixed width above it. A 448px sheet on a 390px phone is a horizontal scrollbar.',
       'The body scrolls, the header and footer do not. overflow-y-auto goes on the middle section only.',
-      'Escape and backdrop both close it, same as a modal.',
-      'x-trap.noscroll on the backdrop, the same as the modal and the alert dialog: Tab stays inside the panel, focus returns to the row that opened it on close, and the list behind stops scrolling.',
-      'motion-reduce:transition-none and motion-reduce:duration-0 ride along on both x-transition class lists. Alpine puts the panel in its final position by removing translate-x-full itself rather than waiting on a transitionend, so killing the transition still lands the drawer open — it just gets there in one frame. duration-0 is the second half of it: Alpine reads the computed transition-duration to decide how long to hold the element before hiding it, so without it the backdrop would sit on screen for another 150ms after the panel had already gone.',
+      'Escape and backdrop both close it, same as a dialog.',
+      'x-trap.noscroll on the backdrop, the same as the dialog and the alert dialog: Tab stays inside the panel, focus returns to the row that opened it on close, and the list behind stops scrolling.',
+      'motion-reduce:transition-none and motion-reduce:duration-0 ride along on both x-transition class lists. Alpine puts the panel in its final position by removing translate-x-full itself rather than waiting on a transitionend, so killing the transition still lands the sheet open — it just gets there in one frame. duration-0 is the second half of it: Alpine reads the computed transition-duration to decide how long to hold the element before hiding it, so without it the backdrop would sit on screen for another 150ms after the panel had already gone.',
       'None of the transition classes are in the stylesheet when the page first paints, because they live in x-transition attributes and the browser build scans class attributes only. That is not a defect and it does not want a safelist. Tailwind compiles a class when Alpine writes it onto the element, and Alpine holds translate-x-full on the panel for a frame before taking it off again, which is long enough for the rule to exist before the start style is read. Measured on this page: ten eased frames between 100% and 0 with motion allowed, and two values with nothing in between under prefers-reduced-motion. Check it by reading the translate property and not transform, because Tailwind v4 compiles translate-x-full to the independent translate property and transform stays none the whole way, which reads as a dead animation when it is nothing of the sort.'
     ],
     anatomy: [
-      ['Backdrop', 'The same dimmed field as a modal, dismissing on @click.self and carrying x-trap.noscroll to hold focus and lock the list behind.'],
+      ['Backdrop', 'The same dimmed field as a dialog, dismissing on @click.self and carrying x-trap.noscroll to hold focus and lock the list behind.'],
       ['Panel', 'Anchored right, full height, full width below sm and a fixed width above it.'],
       ['Header', 'The record\'s name and a close button. Fixed.'],
       ['Body', 'The only scrolling section — overflow-y-auto goes here and nowhere else.'],
       ['Footer', 'The actions for the record. Fixed, so they are reachable from anywhere in a long body.']
     ],
     behaviour: [
-      'It slides in from the right and the list stays visible behind it, which is the whole point of choosing a drawer.',
+      'It slides in from the right and the list stays visible behind it, which is the whole point of choosing a sheet.',
       'Full width below sm. A 448px panel on a 390px phone is a horizontal scrollbar.',
-      'Escape and a backdrop click both close it, the same as a modal.',
+      'Escape and a backdrop click both close it, the same as a dialog.',
       'The body scrolls independently; the header and footer do not move.',
       'Tab stays inside the panel while it is open. The list behind is visible but not reachable, and it does not scroll.',
       'Under prefers-reduced-motion the panel appears in place instead of sliding across.',
-      'For heavy editing, send the user to a page. A drawer is too narrow for a long form and they will fight the width.'
+      'For heavy editing, send the user to a page. A sheet is too narrow for a long form and they will fight the width.'
     ],
     a11y: [
       'role="dialog" with aria-modal="true", labelled by the record name in the header.',
@@ -717,7 +717,7 @@ register(
       'The close button carries aria-label="Close".',
       'The slide transition respects prefers-reduced-motion, through motion-reduce:transition-none and motion-reduce:duration-0 on both x-transition class lists. The panel still ends up open and in place; it just does not travel.'
     ],
-    related: ['modal', 'list-detail', 'table'],
+    related: ['dialog', 'list-detail', 'table'],
     variants: [
       { id: 'record', name: 'Record detail', code:
 `<div x-data="{ open: false }">
@@ -726,7 +726,7 @@ register(
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex justify-end bg-zinc-900/40">
-    <div role="dialog" aria-modal="true" aria-labelledby="drawer-title"
+    <div role="dialog" aria-modal="true" aria-labelledby="sheet-title"
          x-show="open"
          x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
          x-transition:enter-start="translate-x-full"
@@ -737,7 +737,7 @@ register(
       <div class="flex items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <div class="min-w-0">
           <p class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">PO-24-1187</p>
-          <h2 id="drawer-title" class="mt-0.5 truncate text-[16px]/6 font-semibold">MS angles and plates — August lot</h2>
+          <h2 id="sheet-title" class="mt-0.5 truncate text-[16px]/6 font-semibold">MS angles and plates — August lot</h2>
           <p class="mt-1 truncate text-[12px]/4 text-zinc-600">Sharma Extrusions · raised 04 Aug 2024 by Ritu Deshpande</p>
         </div>
         <button type="button" @click="open = false" aria-label="Close"
@@ -866,6 +866,238 @@ register(
         <button type="button" class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-white">Reset</button>
         <button type="button" @click="open = false"
                 class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Apply filters</button>
+      </div>
+    </div>
+  </div>
+</div>` }
+    ]
+  },
+
+  {
+    id: 'drawer', name: 'Drawer', category: 'feedback',
+    description: 'A panel that rises from the bottom edge, sized to its content and capped short of the viewport. The phone-shaped place to put a short action list or a quick filter, because the bottom of the screen is where the thumb already is.',
+    when: 'Mobile-first screens that need a few actions, a quick filter, or a short list picked from. On a desktop reach for a sheet, which comes in from the right, or a dialog, which centres — a bar across the bottom of a wide window is not a panel, it is a shelf.',
+    notes: [
+      'The grab handle is a visual affordance and nothing more. There is no drag or swipe handler in this markup: the panel closes on a backdrop click, on Escape, or on a control inside it. Ship it as decoration or ship a real gesture, but do not tell the user to pull something that does not move.',
+      'Cap the height with max-h-[calc(100dvh-6rem)] and let the body scroll inside via min-h-0 flex-1 overflow-y-auto. A panel that reaches the top of the screen has stopped being a panel, and a page deserves a URL.',
+      'dvh, not vh. On a phone the browser chrome comes and goes and vh does not notice, so a vh-capped panel spends half its life under the address bar.',
+      'The same backdrop idiom as dialog and sheet — x-trap.noscroll for the focus trap, the return of focus and the scroll lock, @click.self to dismiss, escape on the window. There is nothing special about being at the bottom.',
+      'translate-y-full is the start and the end state, and motion-reduce:transition-none plus motion-reduce:duration-0 ride along on both x-transition class lists. The second one matters as much as the first: Alpine reads the computed transition-duration to decide how long to keep the element on screen before hiding it, so without it the backdrop lingers after the panel has gone.',
+      'Full width and flush to the bottom edge, rounded on the top two corners only, with sm:max-w-md so it does not stretch into a stripe on a laptop. The bottom corners are square because there is nothing behind them.',
+      'Rows in an action list are buttons at py-3, not py-1.5 menu items. This is being tapped by a thumb, not clicked by a mouse.'
+    ],
+    anatomy: [
+      ['Backdrop', 'The same dimmed field as a dialog, dismissing on @click.self and carrying x-trap.noscroll. items-end is the only difference — it parks the panel on the bottom edge.'],
+      ['Handle', 'A 36×4 zinc-300 bar centred above the header, aria-hidden. It says "this thing came from the bottom"; it does not do anything.'],
+      ['Panel', 'Full width, rounded-t-2xl, as tall as its content and never taller than calc(100dvh-6rem).'],
+      ['Header', 'The record or the question, and a close button. Does not scroll.'],
+      ['Body', 'The actions or the fields. The only scrolling section, and only once the content outgrows the cap.'],
+      ['Footer', 'Present when there is something to apply or cancel. Fixed, so the primary action never scrolls out from under the thumb.']
+    ],
+    behaviour: [
+      'It rises from the bottom edge, and the page it came from stays visible above it.',
+      'The panel is as tall as its content. Past calc(100dvh-6rem) it stops growing and the body scrolls inside, with the handle, header and footer staying put.',
+      'Escape closes it, a backdrop click closes it, and the controls inside close it. Dragging the handle does not, because nothing is bound to a drag.',
+      'Opening moves focus into the panel: onto the control marked autofocus where there is one, otherwise onto the close button.',
+      'Tab and Shift+Tab cycle inside the panel only, and the page behind does not scroll while it is open.',
+      'Closing returns focus to the control that opened it.',
+      'Under prefers-reduced-motion the panel appears in place instead of rising.',
+      'Above sm the panel stops at max-w-md and centres, still on the bottom edge. If that looks wrong on the screen you are building, the screen wanted a sheet or a dialog.'
+    ],
+    a11y: [
+      'role="dialog" with aria-modal="true" and aria-labelledby pointing at the heading.',
+      'x-trap.noscroll moves focus into the panel on open, keeps Tab inside it, and returns focus to the trigger on close.',
+      'The filter panel opens on its first control through autofocus, which x-trap honours. The action list has nothing to type into, so focus lands on the close button, which is the one that costs nothing to press.',
+      'The close button carries aria-label="Close".',
+      'The handle is aria-hidden="true". Announcing it would promise a gesture that is not implemented.',
+      'Escape closes the panel from anywhere inside it, including from within a focused field.',
+      'The rise respects prefers-reduced-motion through motion-reduce:transition-none and motion-reduce:duration-0 on both x-transition class lists. The panel still ends up open and in place; it just does not travel.'
+    ],
+    related: ['sheet', 'dialog', 'dropdown'],
+    variants: [
+      { id: 'actions', name: 'Action list', code:
+`<div x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="ellipsis" class="size-4"></i>PO-24-1187
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-end justify-center bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="po-actions-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-y-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-y-full"
+         class="flex max-h-[calc(100dvh-6rem)] w-full flex-col rounded-t-2xl border-t border-zinc-200 bg-white shadow-lg sm:max-w-md">
+
+      <div class="flex shrink-0 justify-center pt-2.5 pb-1">
+        <div class="h-1 w-9 rounded-full bg-zinc-300" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-100 px-5 pt-2 pb-3">
+        <div class="min-w-0">
+          <h2 id="po-actions-title" class="text-[16px]/6 font-semibold">PO-24-1187</h2>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Sharma Extrusions · <span class="tabular-nums">₹18,42,000</span> · Approved</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto p-2">
+        <button type="button" @click="open = false"
+                class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[14px]/5 hover:bg-zinc-100">
+          <i data-lucide="package-check" class="size-4 shrink-0 text-zinc-500"></i>Record GRN
+        </button>
+        <button type="button" @click="open = false"
+                class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[14px]/5 hover:bg-zinc-100">
+          <i data-lucide="printer" class="size-4 shrink-0 text-zinc-500"></i>Print order
+        </button>
+        <button type="button" @click="open = false"
+                class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[14px]/5 hover:bg-zinc-100">
+          <i data-lucide="send" class="size-4 shrink-0 text-zinc-500"></i>Email to vendor
+        </button>
+        <button type="button" @click="open = false"
+                class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[14px]/5 hover:bg-zinc-100">
+          <i data-lucide="copy" class="size-4 shrink-0 text-zinc-500"></i>Duplicate as new order
+        </button>
+        <div class="my-1 border-t border-zinc-100"></div>
+        <button type="button" @click="open = false"
+                class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[14px]/5 text-red-700 hover:bg-red-50">
+          <i data-lucide="ban" class="size-4 shrink-0"></i>Cancel order
+        </button>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'filter', name: 'Quick filter', code:
+`<div x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
+    <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 text-[11px]/4 font-medium tabular-nums">1</span>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-end justify-center bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="quick-filter-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-y-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-y-full"
+         class="flex max-h-[calc(100dvh-6rem)] w-full flex-col rounded-t-2xl border-t border-zinc-200 bg-white shadow-lg sm:max-w-md">
+
+      <div class="flex shrink-0 justify-center pt-2.5 pb-1">
+        <div class="h-1 w-9 rounded-full bg-zinc-300" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 px-5 pt-2 pb-3">
+        <h2 id="quick-filter-title" class="text-[16px]/6 font-semibold">Filter orders</h2>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <div>
+          <label for="bs-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+            <select id="bs-vendor" autofocus class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 outline-none">
+              <option>All vendors</option>
+              <option selected>Sharma Extrusions</option>
+              <option>Nashik Steel Traders</option>
+              <option>Gujarat Polymers Ltd</option>
+            </select>
+          </div>
+        </div>
+
+        <fieldset class="mt-4">
+          <legend class="mb-2 text-[13px]/5 font-medium">Status</legend>
+          <label class="flex items-center gap-3 py-2 text-[14px]/5"><input type="radio" name="bs-status" checked class="size-4 accent-zinc-700">Any status</label>
+          <label class="flex items-center gap-3 py-2 text-[14px]/5"><input type="radio" name="bs-status" class="size-4 accent-zinc-700">Open</label>
+          <label class="flex items-center gap-3 py-2 text-[14px]/5"><input type="radio" name="bs-status" class="size-4 accent-zinc-700">Awaiting approval</label>
+          <label class="flex items-center gap-3 py-2 text-[14px]/5"><input type="radio" name="bs-status" class="size-4 accent-zinc-700">Overdue</label>
+        </fieldset>
+
+        <label class="mt-2 flex items-center gap-3 py-2 text-[14px]/5">
+          <input type="checkbox" checked class="size-4 rounded accent-zinc-700">Only orders raised by me
+        </label>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" class="rounded-lg px-4 py-2.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-white">Reset</button>
+        <button type="button" @click="open = false"
+                class="flex-1 rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Show 24 orders</button>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'long', name: 'Longer than the cap', code:
+`<!-- More rows than the cap allows, so the body scrolls and everything else holds still. -->
+<div x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="plus" class="size-4"></i>Add a line
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-end justify-center bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="material-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-y-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-y-full"
+         class="flex max-h-[calc(100dvh-6rem)] w-full flex-col rounded-t-2xl border-t border-zinc-200 bg-white shadow-lg sm:max-w-md">
+
+      <div class="flex shrink-0 justify-center pt-2.5 pb-1">
+        <div class="h-1 w-9 rounded-full bg-zinc-300" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-100 px-5 pt-2 pb-3">
+        <div class="min-w-0">
+          <h2 id="material-title" class="text-[16px]/6 font-semibold">Choose a material</h2>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Rates from the Sharma Extrusions contract</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto p-2">
+        <template x-for="m in [
+          { name: 'MS angle 50×50×6', rate: '₹57.00' },
+          { name: 'MS angle 65×65×6', rate: '₹58.50' },
+          { name: 'MS plate 10 mm', rate: '₹78.00' },
+          { name: 'MS plate 12 mm', rate: '₹78.40' },
+          { name: 'MS channel 100×50', rate: '₹67.85' },
+          { name: 'MS channel 125×65', rate: '₹69.10' },
+          { name: 'MS flat 40×6', rate: '₹70.00' },
+          { name: 'MS flat 50×8', rate: '₹70.60' },
+          { name: 'MS round bar 20 mm', rate: '₹70.00' },
+          { name: 'MS round bar 25 mm', rate: '₹70.90' },
+          { name: 'MS square tube 40×40', rate: '₹37.80' },
+          { name: 'MS square tube 50×50', rate: '₹38.40' }
+        ]" :key="m.name">
+          <button type="button" @click="open = false"
+                  class="flex w-full items-center justify-between gap-4 rounded-lg px-3 py-3 text-left hover:bg-zinc-100">
+            <span class="min-w-0 truncate text-[14px]/5" x-text="m.name"></span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600"><span x-text="m.rate"></span> / kg</span>
+          </button>
+        </template>
+      </div>
+
+      <div class="flex shrink-0 justify-end border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
       </div>
     </div>
   </div>

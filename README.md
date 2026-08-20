@@ -41,7 +41,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**45 components · 232 variants · 26 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
+**47 components · 239 variants · 29 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
 
 ### Actions
 
@@ -69,7 +69,8 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 
 | Component | id | Variants | Page |
 |---|---|--:|---|
-| Table | `table` | 4 | — |
+| Table | `table` | 5 | [open](https://konfpa.github.io/konspec-ui/components/table.html) |
+| Data table | `data-table` | 3 | [open](https://konfpa.github.io/konspec-ui/components/data-table.html) |
 | Pagination | `pagination` | 3 | — |
 | Stat card | `stat-card` | 3 | — |
 | Chart | `chart` | 9 | [open](https://konfpa.github.io/konspec-ui/components/chart.html) |
@@ -85,8 +86,9 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Alert | `alert` | 9 | [open](https://konfpa.github.io/konspec-ui/components/alert.html) |
 | Toast | `toast` | 2 | — |
 | Alert dialog | `alert-dialog` | 5 | [open](https://konfpa.github.io/konspec-ui/components/alert-dialog.html) |
-| Modal | `modal` | 3 | [open](https://konfpa.github.io/konspec-ui/components/modal.html) |
-| Drawer | `drawer` | 2 | [open](https://konfpa.github.io/konspec-ui/components/drawer.html) |
+| Dialog | `dialog` | 3 | [open](https://konfpa.github.io/konspec-ui/components/dialog.html) |
+| Sheet | `sheet` | 2 | [open](https://konfpa.github.io/konspec-ui/components/sheet.html) |
+| Drawer | `drawer` | 3 | [open](https://konfpa.github.io/konspec-ui/components/drawer.html) |
 | Badge | `badge` | 9 | [open](https://konfpa.github.io/konspec-ui/components/badge.html) |
 | Tooltip | `tooltip` | 2 | — |
 | Hovercard | `hovercard` | 9 | [open](https://konfpa.github.io/konspec-ui/components/hovercard.html) |

@@ -158,7 +158,8 @@ building anything, rather than reconstructing a component from its description.
 
 ### Data display
 
-- **Table** `table` — Rows of records with a sortable header. The workhorse of every register screen — order lists, GRN lists, ledgers. Variants: default, selection, dense, responsive.
+- **Table** `table` — Rows of records with a sortable header. The workhorse of every register screen — order lists, GRN lists, ledgers. Variants: default, selection, row-actions, dense, responsive.
+- **Data table** `data-table` — The register screen assembled: a table with a search box, sortable headers, column visibility, row selection and a pager, all running off one array of records. Variants: default, compact, server.
 - **Pagination** `pagination` — Moves through a long register a page at a time, and says where you are in it. Variants: simple, numbered, page-size.
 - **Stat card** `stat-card` — One number that matters, with the label above it and the change since last period below. Variants: default, sparkline, grid.
 - **Chart** `chart` — Chart.js on a canvas, wearing this system's colours. The legend is HTML and doubles as the palette the canvas paints from, so a swatch and the line it names cannot drift apart. Variants: setup, line, bar, horizontal, stacked, donut, sparkline, empty, django.
@@ -171,9 +172,10 @@ building anything, rather than reconstructing a component from its description.
 
 - **Alert** `alert` — An inline notice about the page or the record in front of the user. White card, zinc border, and the only colour is the icon. Variants: tags, compact, dismissible, action, records, progress, banner, form-errors, django.
 - **Toast** `toast` — A short confirmation that something finished, pinned to the bottom-left and gone a few seconds later. Variants: default, undo.
-- **Alert dialog** `alert-dialog` — A dialog that interrupts to ask one question with two answers. Unlike a modal it does not dismiss on a backdrop click — the user has to choose. Variants: confirm, destructive, typed, bulk, unsaved.
-- **Modal** `modal` — A centred, dismissible dialog over a dimmed page. Use it to take a handful of fields without leaving the list. Variants: form, scrolling, reference.
-- **Drawer** `drawer` — A panel that slides in from the right over the page. Shows a record, or the filters for a list, without losing the user's place in it. Variants: record, filters.
+- **Alert dialog** `alert-dialog` — A dialog that interrupts to ask one question with two answers. Unlike a plain dialog it does not dismiss on a backdrop click — the user has to choose. Variants: confirm, destructive, typed, bulk, unsaved.
+- **Dialog** `dialog` — A centred, dismissible panel over a dimmed page. Use it to take a handful of fields without leaving the list. Variants: form, scrolling, reference.
+- **Sheet** `sheet` — A panel that slides in from the right over the page. Shows a record, or the filters for a list, without losing the user's place in it. Variants: record, filters.
+- **Drawer** `drawer` — A panel that rises from the bottom edge, sized to its content and capped short of the viewport. The phone-shaped place to put a short action list or a quick filter, because the bottom of the screen is where the thumb already is. Variants: actions, filter, long.
 - **Badge** `badge` — A small pill that labels a record — status, tag or count. Every pill is the same graphite shape; a 6px dot carries the colour. Variants: status, inline, sizes, icon, filter, removable, count, table, django.
 - **Tooltip** `tooltip` — A dark bubble on hover, done with group-hover alone — no JS, no Alpine. Variants: icon, truncated.
 - **Hovercard** `hovercard` — A card of record detail that opens under a link on hover or focus, after a deliberate delay, and stays open long enough to be read and clicked. Variants: default, vendor, user, placement, htmx, loading, error, mobile, django.

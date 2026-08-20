@@ -2,117 +2,110 @@ register(
   {
     id: 'table', name: 'Table', category: 'data',
     description: 'Rows of records with a sortable header. The workhorse of every register screen — order lists, GRN lists, ledgers.',
-    when: 'More than about five records with more than two attributes each. For two or three fields per record a definition list reads better.',
+    when: 'More than about five records with more than two attributes each. For two or three fields per record a definition list reads better. This is the table itself; when the screen wants a search box, paging and a selection around it, that assembled register is data-table.',
     notes: [
       'Money and quantity cells get tabular-nums and text-right so digits line up. Text cells stay left.',
       'Status pills use the locked mapping: Open graphite, Approved amber, Overdue red, Closed emerald, Draft muted zinc. Do not reinterpret it per screen.',
       'Below md the table must not scroll sideways — render the same rows as stacked cards instead.',
       'The sort indicator belongs inside the <th> button, not beside the table. Only one column is sorted at a time.',
-      'Selection state is an array of PO numbers on the component root. Nothing outside the snippet is read.'
+      'Selection state is an array of PO numbers on the component root. Nothing outside the snippet is read.',
+      'The sort chevron is a plain icon inside a span, and the span is what carries the state. createIcons() replaces the <i> with an <svg>, and any binding written on the icon goes with it.',
+      'A panel holding a row menu cannot be overflow-hidden, or the menu on the bottom row is cut off at the panel edge. Once the clipping is gone the hover tint has to move onto the cells, because a tinted <tr> fills the rounded corners back in with a square.'
     ],
     anatomy: [
-      ['Header cell', 'A button inside the <th>, carrying the label and the sort indicator. The button is what is clickable, not the cell.'],
-      ['Row', 'One record. Hover tints it zinc-50; selection tints it zinc-100 so the two states stay distinguishable.'],
+      ['Header cell', 'A button inside the <th>. The button carries the label and the sort chevron and is the thing clicked; the <th> carries scope and aria-sort.'],
+      ['Row', 'One record. Where rows can be selected the selected tint is zinc-100 and hover a step lighter, so the two states never read as one.'],
       ['Numeric cell', 'tabular-nums and text-right, so digits stack into a readable column.'],
       ['Status cell', 'A pill from the locked mapping, and the only colour in the row.'],
-      ['Action cell', 'Right-aligned, shrink-0, holding the row menu. Never wider than it needs to be.'],
+      ['Action cell', 'Right-aligned and no wider than it needs to be, holding the row menu trigger.'],
+      ['Row menu', 'A real menu on a real button: it opens on click, its items take focus one at a time, and Escape closes it back onto the trigger.'],
       ['Stacked card', 'The same record rendered as a card below md, because a table that scrolls sideways on a phone is unusable.']
     ],
     behaviour: [
+      'Sorting lives in the default variant. Clicking a header sorts by that column ascending, clicking the sorted header reverses it, and the rows are really reordered. The other four variants carry no sort at all: take the state out of the default and put it where the screen needs it.',
       'One column is sorted at a time, and the indicator sits in that column\'s header, never floating beside the table.',
-      'Clicking a sorted header reverses it; clicking a different header moves the sort and resets to ascending.',
       'Selection lives as an array of record ids on the component root, so nothing outside the snippet has to be wired up.',
-      'The header checkbox reflects three states — none, some, all — and \'some\' is indeterminate, not unchecked.',
+      'The header checkbox reflects three states — none, some, all — and \'some\' is indeterminate, not unchecked. indeterminate is a property, so it is written with x-effect on the box itself.',
+      'The row menu opens on click rather than on hover, moves real focus between its items with the arrow keys, and closes on Escape or on a choice, handing focus back to the trigger.',
       'Below md the table becomes stacked cards showing the same fields in the same order. It does not scroll sideways and columns are not hidden silently.',
-      'Row hover and row selection are visually distinct, because a user scanning a selection needs to tell them apart.'
+      'Where rows can be selected, hover and selection are different tints, because a user scanning a selection needs to tell them apart.'
     ],
     a11y: [
       'Header cells are <th scope="col">, so a screen reader can name the column when reading a cell.',
-      'The sortable header is a real button inside the <th>, and the <th> carries aria-sort reflecting the current direction.',
+      'A sortable header is a real button inside the <th>, and that <th> carries aria-sort — ascending or descending on the sorted column, none on the other sortable ones. A column that does not sort is a plain <th> and carries no aria-sort at all.',
+      'The chevron is decorative: Lucide marks the svg it generates aria-hidden, so the direction is announced from aria-sort and from nowhere else.',
       'Each row checkbox has a label naming its record — twelve checkboxes all labelled "Select" are useless.',
       'The stacked-card layout carries the same information, not a reduced subset, so a phone user is not given less data.',
-      'Row actions are reachable by keyboard; a menu that only appears on hover is invisible to anyone who cannot hover.'
+      'Row actions are reachable by keyboard: the trigger is a button with aria-haspopup and aria-expanded, the panel is a role="menu" whose items take real focus, and nothing here appears only on hover, which would be invisible to anyone who cannot hover.'
     ],
-    related: ['pagination', 'empty-state', 'skeleton'],
+    related: ['data-table', 'empty-state', 'skeleton'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+`<!-- The chevron is a static Lucide icon inside a span, and the span is what
+     carries the state: createIcons() replaces the <i> with an <svg>, so a
+     binding written on the icon itself is thrown away on hydration. It is
+     invisible rather than absent on the unsorted columns, so the header labels
+     do not shift when the sort moves. -->
+<div x-data="{
+       col: 'po', dir: 'asc',
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', dept: 'Fabrication', amount: 1842000, status: 'Open', due: '12 Aug' },
+         { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', dept: 'Dispatch', amount: 468500, status: 'Approved', due: '19 Aug' },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', dept: 'Compounding', amount: 2710400, status: 'Overdue', due: '02 Aug' },
+         { po: 'PO-24-1203', vendor: 'Sharma Extrusions', dept: 'Tooling', amount: 96750, status: 'Closed', due: '28 Jul' },
+         { po: 'PO-24-1206', vendor: 'Nashik Steel Traders', dept: 'Maintenance', amount: 132900, status: 'Draft', due: '—' }
+       ],
+       dot: { Open: 'bg-zinc-700', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       sortBy(c) { this.dir = this.col === c && this.dir === 'asc' ? 'desc' : 'asc'; this.col = c },
+       ariaSort(c) { return this.col === c ? (this.dir === 'asc' ? 'ascending' : 'descending') : 'none' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get sorted() {
+         const c = this.col, s = this.dir === 'asc' ? 1 : -1;
+         return [...this.rows].sort((a, b) => s * (typeof a[c] === 'number' ? a[c] - b[c] : String(a[c]).localeCompare(b[c])));
+       }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
   <table class="w-full text-[13px]/5">
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
-        <th scope="col" class="px-4 py-2.5">
-          <button class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider text-zinc-900 uppercase">
-            PO number <i data-lucide="chevron-up" class="size-3.5"></i>
+        <th scope="col" :aria-sort="ariaSort('po')" class="px-4 py-2.5">
+          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'po' && 'text-zinc-900'">
+            PO number
+            <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
-        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" :aria-sort="ariaSort('vendor')" class="px-4 py-2.5">
+          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'vendor' && 'text-zinc-900'">
+            Vendor
+            <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
         <th scope="col" class="px-4 py-2.5 font-medium">Department</th>
-        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" :aria-sort="ariaSort('amount')" class="px-4 py-2.5">
+          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'amount' && 'text-zinc-900'">
+            Amount
+            <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
         <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
         <th scope="col" class="px-4 py-2.5 text-right font-medium">Due</th>
       </tr>
     </thead>
     <tbody>
-      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
-        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
-        <td class="px-4 py-2.5">Sharma Extrusions</td>
-        <td class="px-4 py-2.5 text-zinc-600">Fabrication</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹18,42,000</td>
-        <td class="px-4 py-2.5">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-900">
-            <span class="size-1.5 rounded-full bg-zinc-700"></span>Open
-          </span>
-        </td>
-        <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums">12 Aug</td>
-      </tr>
-      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
-        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1191</td>
-        <td class="px-4 py-2.5">Nashik Steel Traders</td>
-        <td class="px-4 py-2.5 text-zinc-600">Dispatch</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹4,68,500</td>
-        <td class="px-4 py-2.5">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-700">
-            <span class="size-1.5 rounded-full bg-amber-500"></span>Approved
-          </span>
-        </td>
-        <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums">19 Aug</td>
-      </tr>
-      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
-        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194</td>
-        <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
-        <td class="px-4 py-2.5 text-zinc-600">Compounding</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹27,10,400</td>
-        <td class="px-4 py-2.5">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-700">
-            <span class="size-1.5 rounded-full bg-red-600"></span>Overdue
-          </span>
-        </td>
-        <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums">02 Aug</td>
-      </tr>
-      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
-        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1203</td>
-        <td class="px-4 py-2.5">Sharma Extrusions</td>
-        <td class="px-4 py-2.5 text-zinc-600">Tooling</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹96,750</td>
-        <td class="px-4 py-2.5">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-700">
-            <span class="size-1.5 rounded-full bg-emerald-600"></span>Closed
-          </span>
-        </td>
-        <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums">28 Jul</td>
-      </tr>
-      <tr class="hover:bg-zinc-100">
-        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1206</td>
-        <td class="px-4 py-2.5">Nashik Steel Traders</td>
-        <td class="px-4 py-2.5 text-zinc-600">Maintenance</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹1,32,900</td>
-        <td class="px-4 py-2.5">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-600">
-            <span class="size-1.5 rounded-full bg-zinc-400" aria-hidden="true"></span>Draft
-          </span>
-        </td>
-        <td class="px-4 py-2.5 text-right text-zinc-500 tabular-nums">—</td>
-      </tr>
+      <template x-for="r in sorted" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="px-4 py-2.5" x-text="r.vendor"></td>
+          <td class="px-4 py-2.5 text-zinc-600" x-text="r.dept"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums" x-text="r.due"></td>
+        </tr>
+      </template>
     </tbody>
   </table>
 </div>` },
@@ -134,8 +127,9 @@ register(
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="w-10 px-4 py-2.5">
-          <input type="checkbox" aria-label="Select all orders" class="size-4 rounded accent-zinc-700"
+          <input type="checkbox" aria-label="Select all three orders" class="size-4 rounded accent-zinc-700"
                  :checked="sel.length === all.length"
+                 x-effect="$el.indeterminate = sel.length > 0 && sel.length < all.length"
                  @change="sel = $event.target.checked ? [...all] : []">
         </th>
         <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
@@ -145,7 +139,7 @@ register(
       </tr>
     </thead>
     <tbody>
-      <tr class="border-b border-zinc-100" :class="sel.includes('PO-24-1187') ? 'bg-zinc-100' : 'hover:bg-zinc-100'">
+      <tr class="border-b border-zinc-100" :class="sel.includes('PO-24-1187') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
         <td class="px-4 py-2.5">
           <input type="checkbox" value="PO-24-1187" x-model="sel" aria-label="Select PO-24-1187" class="size-4 rounded accent-zinc-700">
         </td>
@@ -158,7 +152,7 @@ register(
           </span>
         </td>
       </tr>
-      <tr class="border-b border-zinc-100" :class="sel.includes('PO-24-1191') ? 'bg-zinc-100' : 'hover:bg-zinc-100'">
+      <tr class="border-b border-zinc-100" :class="sel.includes('PO-24-1191') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
         <td class="px-4 py-2.5">
           <input type="checkbox" value="PO-24-1191" x-model="sel" aria-label="Select PO-24-1191" class="size-4 rounded accent-zinc-700">
         </td>
@@ -171,7 +165,7 @@ register(
           </span>
         </td>
       </tr>
-      <tr :class="sel.includes('PO-24-1194') ? 'bg-zinc-100' : 'hover:bg-zinc-100'">
+      <tr :class="sel.includes('PO-24-1194') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
         <td class="px-4 py-2.5">
           <input type="checkbox" value="PO-24-1194" x-model="sel" aria-label="Select PO-24-1194" class="size-4 rounded accent-zinc-700">
         </td>
@@ -184,6 +178,104 @@ register(
           </span>
         </td>
       </tr>
+    </tbody>
+  </table>
+</div>` },
+
+      { id: 'row-actions', name: 'Row actions', code:
+`<!-- The panel is not overflow-hidden, because a row menu opening out of the
+     last row has to be allowed to leave it. That leaves the corners to the
+     rows: the hover tint is painted on the cells rather than on the <tr>, and
+     the two cells at the bottom take the panel radius, or the last row fills
+     the rounded corners in with a square of zinc-100.
+
+     Each row owns its menu state, and the menu moves real focus between its
+     items one tabindex="-1" at a time — the same idiom as the dropdown
+     component. items() is read out of the DOM on every keystroke, so a row
+     whose Approve is hidden by a permission check drops out of the keyboard
+     order with it. -->
+<div x-data="{
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '₹18,42,000', status: 'Open', dot: 'bg-zinc-700' },
+         { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: '₹4,68,500', status: 'Approved', dot: 'bg-amber-500' },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: '₹27,10,400', status: 'Overdue', dot: 'bg-red-600' }
+       ]
+     }"
+     class="rounded-xl border border-zinc-200 bg-white">
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+        <th scope="col" class="w-12 px-4 py-2.5"><span class="sr-only">Row actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in rows" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0 hover:[&>td]:bg-zinc-100 [&:last-child>td:first-child]:rounded-bl-xl [&:last-child>td:last-child]:rounded-br-xl">
+          <td class="px-4 py-2 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="px-4 py-2" x-text="r.vendor"></td>
+          <td class="px-4 py-2 text-right tabular-nums" x-text="r.amount"></td>
+          <td class="px-4 py-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="r.dot" aria-hidden="true"></span><span x-text="r.status"></span>
+            </span>
+          </td>
+          <td class="w-12 px-4 py-2 text-right">
+            <div class="relative"
+                 x-data="{
+                   open: false,
+                   items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+                   show(last = false) {
+                     this.open = true;
+                     this.$nextTick(() => requestAnimationFrame(() => {
+                       const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+                     }));
+                   },
+                   close(toTrigger = true) {
+                     if (!this.open) return;
+                     this.open = false;
+                     if (toTrigger) this.$refs.trigger.focus();
+                   },
+                   move(step) {
+                     const i = this.items(), at = i.indexOf(document.activeElement);
+                     i[(at + step + i.length) % i.length]?.focus();
+                   }
+                 }"
+                 @click.outside="close(false)"
+                 @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+              <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+                      @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+                      :aria-expanded="open" aria-haspopup="menu" :aria-label="'Actions for ' + r.po"
+                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+                <i data-lucide="more-horizontal" class="size-4"></i>
+              </button>
+              <div x-show="open" x-cloak x-ref="menu" role="menu" :aria-label="'Actions for ' + r.po"
+                   @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+                   @keydown.tab="close(false)"
+                   class="absolute right-0 z-40 mt-1 w-44 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 text-left shadow-lg">
+                <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                        class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                  <i data-lucide="eye" class="size-4 text-zinc-600"></i>Open order
+                </button>
+                <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                        class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                  <i data-lucide="check" class="size-4 text-zinc-600"></i>Approve
+                </button>
+
+                <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+                <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                        class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                  <i data-lucide="x" class="size-4"></i>Cancel order
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </template>
     </tbody>
   </table>
 </div>` },
@@ -303,6 +395,449 @@ register(
   },
 
   {
+    id: 'data-table', name: 'Data table', category: 'data',
+    description: 'The register screen assembled: a table with a search box, sortable headers, column visibility, row selection and a pager, all running off one array of records.',
+    when: 'The main list screen of a module — the order register, the GRN register, the vendor list. If all you want is rows on a page, use table; this is table with working state around it, and every control it shows is one you then have to point at something real.',
+    notes: [
+      'Where the register holds its own data, every control is real state on the component root: the search filters the array, the column boxes hide cells, the headers reorder rows and the footer cuts the page out of the result. A toolbar whose controls do nothing is worse than no toolbar.',
+      'The footer states the range and the total. "Next" with no count tells the user nothing.',
+      'A filter that matches nothing has to say so. A register that filters to zero rows and shows a bare header reads as broken.',
+      'indeterminate is a property with no matching attribute, so a select-all cannot be rendered mixed by the server. Bind it with x-effect on the box itself, not on the component root where $refs is not populated yet.',
+      'The select-all covers the rows on the page in front of you and nothing beyond it. Say so in its label — "Select all" over a paged register is a promise the box does not keep.',
+      'The panel cannot be overflow-hidden while the toolbar holds a menu, or the menu is clipped at the panel edge. The footer strip is what keeps the tinted rows off the rounded corners.',
+      'Sort the filtered set and then cut the page out of it, in that order. Paging a sorted copy of the unfiltered array is how a register ends up showing rows that do not match the search.'
+    ],
+    anatomy: [
+      ['Toolbar', 'The strip above the header row: search on the left, column visibility on the right. Filters live here, inside the panel, never floating above it.'],
+      ['Search box', 'Filters the records as they are typed and returns to page one, because page 4 of a two-row result shows nothing.'],
+      ['Column menu', 'A popover of checkboxes rather than a role="menu", because its items are settings and not commands. Hiding a column drops its header, its cells and the same field from the card layout.'],
+      ['Bulk bar', 'Appears only when something is selected, carrying the count and the actions that apply to it, between the toolbar and the header row.'],
+      ['Select-all', 'A box with no name and no value. It reads none, some or all off the rows on this page and writes indeterminate back through script.'],
+      ['Sortable header', 'A button inside a <th>, and the <th> is what carries aria-sort. The chevron marks the sorted column and points the way the sort runs.'],
+      ['Footer', 'The range, the total and the page position, with the ends disabled rather than removed so the control keeps its width.'],
+      ['Empty state', 'What fills the panel when the filter matches nothing: what was searched for, and the way back out of it.']
+    ],
+    behaviour: [
+      'The full register carries all of it — search, sort, column visibility, selection and paging. The compact one drops selection and the column menu and keeps search, sort and paging. The server-paged one holds no state at all: its search is a GET form, its headers and pager are links carrying q, sort and page, and htmx swaps the same panel back in.',
+      'The search filters on every keystroke and resets to page one. The rows are filtered first, then sorted, then sliced into a page, so the pager can never disagree with the filter.',
+      'Clicking a header sorts by that column ascending; clicking the sorted header reverses it. One column is sorted at a time and the rows are genuinely reordered.',
+      'Hiding a column from the menu removes its header and its cells, and drops the same field from the card layout below md.',
+      'Selection is an array of record ids on the root. It survives sorting, filtering and paging, so the count in the bulk bar is the whole selection while the header checkbox speaks only for the page in front of you.',
+      'The header checkbox reads none, some or all off the rows on this page, and \'some\' is indeterminate rather than unchecked. Ticking it adds that page to the selection; unticking it releases only that page.',
+      'When the filter matches nothing the rows are replaced by an empty state that names what was searched for and offers a control that clears it.',
+      'The footer states the range and the total, and its ends disable rather than disappear so the buttons stay under the cursor.',
+      'Below md the full register renders its rows as cards carrying the same fields and the same checkbox, while the compact and server-paged tables are three columns and stand at 390px as they are. The select-all stays in the table header, so at that width rows are selected one at a time.'
+    ],
+    a11y: [
+      'The search box carries an aria-label saying what it searches. A magnifier icon is not a label.',
+      'Sortable headers are buttons inside <th scope="col">, and the <th> carries aria-sort — ascending or descending on the sorted column, none on the rest.',
+      'The column menu trigger carries aria-haspopup and aria-expanded, and Escape closes the popover and puts focus back on the trigger. The popover is a labelled group of checkboxes, not a role="menu".',
+      'Every row checkbox is labelled with its PO number, and the select-all says how many rows on this page it covers.',
+      'The select-all is a native box carrying the indeterminate property, which is already mapped to mixed. Nothing here writes aria-checked.',
+      'The footer is a <nav> with a label, its range is real text rather than a title attribute, and the ends are real disabled buttons that Tab skips.',
+      'Below md each card in the full register is one label wrapped round its checkbox, so the whole card is the target, and the box keeps an explicit aria-label so its name stays the PO number instead of the whole card.'
+    ],
+    related: ['table', 'pagination', 'dropdown'],
+    variants: [
+      { id: 'default', name: 'Full register', code:
+`<!-- Everything the toolbar claims to do, it does: the search filters the array,
+     the column boxes hide cells, the headers sort the rows and the footer pages
+     what is left. Nothing outside this snippet is read or written.
+
+     indeterminate is a property with no matching attribute, so the select-all
+     cannot be rendered mixed by a server and is bound with x-effect on the
+     element itself. It speaks for the rows on this page only, which is what
+     its label says; the count in the bulk bar is the whole selection, which
+     survives paging and filtering.
+
+     The panel is not overflow-hidden: the column menu opens out of it. -->
+<div x-data="{
+       q: '', col: 'po', dir: 'asc', page: 1, size: 5, sel: [],
+       cols: { dept: true, status: true, due: true },
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', dept: 'Fabrication', amount: 1842000, status: 'Open', due: '12 Aug' },
+         { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', dept: 'Dispatch', amount: 468500, status: 'Approved', due: '19 Aug' },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', dept: 'Compounding', amount: 2710400, status: 'Overdue', due: '02 Aug' },
+         { po: 'PO-24-1199', vendor: 'Nashik Steel Traders', dept: 'Maintenance', amount: 132900, status: 'Open', due: '22 Aug' },
+         { po: 'PO-24-1203', vendor: 'Sharma Extrusions', dept: 'Tooling', amount: 96750, status: 'Closed', due: '28 Jul' },
+         { po: 'PO-24-1207', vendor: 'Gujarat Polymers Ltd', dept: 'Compounding', amount: 5460000, status: 'Approved', due: '30 Aug' },
+         { po: 'PO-24-1211', vendor: 'Sharma Extrusions', dept: 'Fabrication', amount: 214300, status: 'Overdue', due: '05 Aug' },
+         { po: 'PO-24-1214', vendor: 'Nashik Steel Traders', dept: 'Dispatch', amount: 78900, status: 'Draft', due: '—' },
+         { po: 'PO-24-1218', vendor: 'Gujarat Polymers Ltd', dept: 'Tooling', amount: 1290500, status: 'Open', due: '08 Sep' },
+         { po: 'PO-24-1221', vendor: 'Sharma Extrusions', dept: 'Maintenance', amount: 43200, status: 'Closed', due: '31 Jul' }
+       ],
+       dot: { Open: 'bg-zinc-700', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       sortBy(c) { this.dir = this.col === c && this.dir === 'asc' ? 'desc' : 'asc'; this.col = c; this.page = 1 },
+       ariaSort(c) { return this.col === c ? (this.dir === 'asc' ? 'ascending' : 'descending') : 'none' },
+       get filtered() {
+         const q = this.q.trim().toLowerCase(), c = this.col, s = this.dir === 'asc' ? 1 : -1;
+         return this.rows
+           .filter(r => !q || (r.po + ' ' + r.vendor + ' ' + r.dept).toLowerCase().includes(q))
+           .sort((a, b) => s * (typeof a[c] === 'number' ? a[c] - b[c] : String(a[c]).localeCompare(b[c])));
+       },
+       get pages() { return Math.max(1, Math.ceil(this.filtered.length / this.size)) },
+       get shown() { return this.filtered.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return this.filtered.length ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.filtered.length) },
+       get every() { return this.shown.length > 0 && this.shown.every(r => this.sel.includes(r.po)) },
+       get some() { return !this.every && this.shown.some(r => this.sel.includes(r.po)) },
+       toggleAll(on) {
+         const ids = this.shown.map(r => r.po);
+         this.sel = on ? [...new Set([...this.sel, ...ids])] : this.sel.filter(id => !ids.includes(id));
+       }
+     }"
+     class="rounded-xl border border-zinc-200 bg-white">
+
+  <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" x-model="q" @input="page = 1" aria-label="Search the order register"
+             placeholder="Search PO, vendor or department"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+
+    <div class="relative" x-data="{ open: false }" @click.outside="open = false"
+         @keydown.escape="if (open) { open = false; $refs.colTrigger.focus() }">
+      <button type="button" x-ref="colTrigger" @click="open = !open" :aria-expanded="open" aria-haspopup="true"
+              class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+        <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
+        <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+      </button>
+      <div x-show="open" x-cloak role="group" aria-label="Columns shown"
+           class="absolute right-0 z-40 mt-1 w-44 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-100">
+          <input type="checkbox" x-model="cols.dept" class="size-4 shrink-0 accent-zinc-700">Department
+        </label>
+        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-100">
+          <input type="checkbox" x-model="cols.status" class="size-4 shrink-0 accent-zinc-700">Status
+        </label>
+        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-100">
+          <input type="checkbox" x-model="cols.due" class="size-4 shrink-0 accent-zinc-700">Due
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div x-show="sel.length" x-cloak class="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-zinc-100 px-4 py-2">
+    <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
+      <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-50">Export</button>
+    </div>
+    <button type="button" @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2">Clear</button>
+  </div>
+
+  <table x-show="filtered.length" class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-10 px-4 py-2.5">
+          <input type="checkbox" :aria-label="'Select the ' + shown.length + ' orders on this page'"
+                 :checked="every" x-effect="$el.indeterminate = some" @change="toggleAll($event.target.checked)"
+                 class="size-4 shrink-0 accent-zinc-700">
+        </th>
+        <th scope="col" :aria-sort="ariaSort('po')" class="px-4 py-2.5">
+          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'po' && 'text-zinc-900'">
+            PO number
+            <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
+        <th scope="col" :aria-sort="ariaSort('vendor')" class="px-4 py-2.5">
+          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'vendor' && 'text-zinc-900'">
+            Vendor
+            <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
+        <th x-show="cols.dept" scope="col" class="px-4 py-2.5 font-medium">Department</th>
+        <th scope="col" :aria-sort="ariaSort('amount')" class="px-4 py-2.5">
+          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'amount' && 'text-zinc-900'">
+            Amount
+            <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
+        <th x-show="cols.status" scope="col" class="px-4 py-2.5 font-medium">Status</th>
+        <th x-show="cols.due" scope="col" class="px-4 py-2.5 text-right font-medium">Due</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in shown" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0" :class="sel.includes(r.po) ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+          <td class="px-4 py-2.5">
+            <input type="checkbox" :value="r.po" x-model="sel" :aria-label="'Select ' + r.po" class="size-4 shrink-0 accent-zinc-700">
+          </td>
+          <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="px-4 py-2.5" x-text="r.vendor"></td>
+          <td x-show="cols.dept" class="px-4 py-2.5 text-zinc-600" x-text="r.dept"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+          <td x-show="cols.status" class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+            </span>
+          </td>
+          <td x-show="cols.due" class="px-4 py-2.5 text-right text-zinc-600 tabular-nums" x-text="r.due"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <ul x-show="filtered.length" class="divide-y divide-zinc-100 md:hidden">
+    <template x-for="r in shown" :key="r.po">
+      <li class="px-4 py-3" :class="sel.includes(r.po) && 'bg-zinc-100'">
+        <label class="flex items-start gap-3">
+          <input type="checkbox" :value="r.po" x-model="sel" :aria-label="'Select ' + r.po" class="mt-1 size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="text-[14px]/5 font-medium tabular-nums" x-text="r.po"></span>
+              <span class="text-[14px]/5 tabular-nums" x-text="money(r.amount)"></span>
+            </span>
+            <span class="mt-0.5 block text-[13px]/5 text-zinc-600" x-text="cols.dept ? r.vendor + ' · ' + r.dept : r.vendor"></span>
+            <span class="mt-2 flex flex-wrap items-center gap-2">
+              <span x-show="cols.status" class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+              </span>
+              <span x-show="cols.due" class="text-[12px]/4 text-zinc-500 tabular-nums" x-text="'Due ' + r.due"></span>
+            </span>
+          </span>
+        </label>
+      </li>
+    </template>
+  </ul>
+
+  <div x-show="!filtered.length" x-cloak class="px-6 py-12 text-center">
+    <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
+    </span>
+    <p class="mt-3 text-[16px]/6 font-semibold">No orders match this search</p>
+    <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">Nothing in the register matches <span class="font-medium text-zinc-900" x-text="q"></span>. Search on a PO number, a vendor or a department.</p>
+    <button type="button" @click="q = ''; page = 1" class="mt-4 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Clear the search</button>
+  </div>
+
+  <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[13px]/5 text-zinc-600 tabular-nums"
+       x-text="filtered.length ? from + '–' + to + ' of ' + filtered.length + ' orders' : 'No orders to show'"></p>
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
+      <button type="button" @click="page--" :disabled="page === 1"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" @click="page++" :disabled="page === pages"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>` },
+
+      { id: 'compact', name: 'Compact', code:
+`<div x-data="{
+       q: '', col: 'vendor', dir: 'asc', page: 1, size: 4,
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: 1842000 },
+         { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: 468500 },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: 2710400 },
+         { po: 'PO-24-1199', vendor: 'Nashik Steel Traders', amount: 132900 },
+         { po: 'PO-24-1203', vendor: 'Sharma Extrusions', amount: 96750 },
+         { po: 'PO-24-1207', vendor: 'Gujarat Polymers Ltd', amount: 5460000 }
+       ],
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       sortBy(c) { this.dir = this.col === c && this.dir === 'asc' ? 'desc' : 'asc'; this.col = c; this.page = 1 },
+       ariaSort(c) { return this.col === c ? (this.dir === 'asc' ? 'ascending' : 'descending') : 'none' },
+       get filtered() {
+         const q = this.q.trim().toLowerCase(), c = this.col, s = this.dir === 'asc' ? 1 : -1;
+         return this.rows
+           .filter(r => !q || (r.po + ' ' + r.vendor).toLowerCase().includes(q))
+           .sort((a, b) => s * (typeof a[c] === 'number' ? a[c] - b[c] : String(a[c]).localeCompare(b[c])));
+       },
+       get pages() { return Math.max(1, Math.ceil(this.filtered.length / this.size)) },
+       get shown() { return this.filtered.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return this.filtered.length ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.filtered.length) }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+
+  <div class="border-b border-zinc-200 px-3 py-2.5">
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" x-model="q" @input="page = 1" aria-label="Search orders" placeholder="Search PO or vendor"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+  </div>
+
+  <table x-show="filtered.length" class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" :aria-sort="ariaSort('po')" class="px-3 py-1.5">
+          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'po' && 'text-zinc-900'">
+            PO number
+            <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
+        <th scope="col" :aria-sort="ariaSort('vendor')" class="px-3 py-1.5">
+          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'vendor' && 'text-zinc-900'">
+            Vendor
+            <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
+        <th scope="col" :aria-sort="ariaSort('amount')" class="px-3 py-1.5">
+          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'amount' && 'text-zinc-900'">
+            Amount
+            <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in shown" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-3 py-1.5 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="px-3 py-1.5" x-text="r.vendor"></td>
+          <td class="px-3 py-1.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <p x-show="!filtered.length" x-cloak class="px-3 py-8 text-center text-[13px]/5 text-zinc-600">
+    No orders match <span class="font-medium text-zinc-900" x-text="q"></span>.
+  </p>
+
+  <nav aria-label="Register pages" class="flex items-center justify-between gap-3 border-t border-zinc-200 px-3 py-2">
+    <p class="text-[13px]/5 text-zinc-600 tabular-nums"
+       x-text="filtered.length ? from + '–' + to + ' of ' + filtered.length : '0 of 0'"></p>
+    <div class="flex items-center gap-1">
+      <button type="button" @click="page--" :disabled="page === 1" aria-label="Previous page"
+              class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+      <button type="button" @click="page++" :disabled="page === pages" aria-label="Next page"
+              class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>` },
+
+      { id: 'server', name: 'Server-paged', code:
+`<!-- Nothing here filters or sorts. The register is the server's, and this is
+     only the controls and where they are wired: every one of them is a GET
+     carrying q, sort and page, and htmx swaps the same #register div back in.
+     They are links and a real form first, so the screen still works with the
+     swap turned off, which is also what makes the browser Back button behave.
+
+     The view hands the template one entry per sortable column — its aria value
+     and the query string that would sort by it next — because working that out
+     in the template means writing the same comparison three times and getting
+     aria-sort and the chevron out of step with each other.
+
+     Selection is deliberately absent: which rows are ticked is client state and
+     does not survive a swap. Reach for the full register when you need it. -->
+
+{# orders/register.html #}
+<div id="register" class="rounded-xl border border-zinc-200 bg-white">
+
+  <form method="get" action="{% url 'order-register' %}"
+        class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" name="q" value="{{ q }}" aria-label="Search the order register"
+             placeholder="Search PO, vendor or department"
+             hx-get="{% url 'order-register' %}" hx-trigger="input changed delay:300ms, search"
+             hx-include="closest form" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+    <input type="hidden" name="sort" value="{{ sort }}">
+    <button type="submit" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Search</button>
+  </form>
+
+  {% if page_obj %}
+    <table class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          {% for c in columns %}
+            <th scope="col" aria-sort="{{ c.aria }}" class="px-4 py-2.5 {% if c.numeric %}text-right{% endif %}">
+              <a href="?{{ c.query }}" hx-get="?{{ c.query }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+                 class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 {% if c.numeric %}justify-end{% endif %} {% if c.aria != 'none' %}text-zinc-900{% endif %}">
+                {{ c.label }}
+                {% if c.aria != 'none' %}
+                  <span class="{% if c.aria == 'descending' %}rotate-180{% endif %}"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+                {% endif %}
+              </a>
+            </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in page_obj %}
+          <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+            <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
+            <td class="px-4 py-2.5">{{ o.vendor.name }}</td>
+            <td class="px-4 py-2.5 text-right tabular-nums">₹{{ o.amount|intcomma }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+      <p class="text-[13px]/5 text-zinc-600 tabular-nums">
+        {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} orders
+      </p>
+      <div class="flex items-center gap-2">
+        <span class="text-[13px]/5 text-zinc-600 tabular-nums">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_previous %}
+          <a href="?{{ prev_query }}" hx-get="?{{ prev_query }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+             class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+            <i data-lucide="chevron-left" class="size-4"></i>Previous
+          </a>
+        {% else %}
+          <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+            <i data-lucide="chevron-left" class="size-4"></i>Previous
+          </button>
+        {% endif %}
+        {% if page_obj.has_next %}
+          <a href="?{{ next_query }}" hx-get="?{{ next_query }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+             class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+            Next<i data-lucide="chevron-right" class="size-4"></i>
+          </a>
+        {% else %}
+          <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+            Next<i data-lucide="chevron-right" class="size-4"></i>
+          </button>
+        {% endif %}
+      </div>
+    </nav>
+  {% else %}
+    <div class="px-6 py-12 text-center">
+      <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
+      </span>
+      <p class="mt-3 text-[16px]/6 font-semibold">No orders match this search</p>
+      <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">Nothing in the register matches <span class="font-medium text-zinc-900">{{ q }}</span>. Search on a PO number, a vendor or a department.</p>
+      <a href="{% url 'order-register' %}" hx-get="{% url 'order-register' %}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+         class="mt-4 inline-block rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Clear the search</a>
+    </div>
+  {% endif %}
+</div>
+
+{# orders/views.py — the three query strings the template renders, built once
+
+   def register(request):
+       q = request.GET.get('q', '')
+       sort = request.GET.get('sort', 'number')
+       orders = Order.objects.filter(...).order_by(sort)
+       page_obj = Paginator(orders, 25).get_page(request.GET.get('page'))
+       columns = [column('number', 'PO number', sort, q),
+                  column('vendor__name', 'Vendor', sort, q),
+                  column('amount', 'Amount', sort, q, numeric=True)]
+       ...
+
+   where column() returns {'label', 'query', 'aria', 'numeric'} — query being
+   urlencode({'q': q, 'sort': '-field' if already ascending on it else 'field'}),
+   and aria being 'ascending', 'descending' or 'none'. #}` }
+    ]
+  },
+
+  {
     id: 'pagination', name: 'Pagination', category: 'data',
     description: 'Moves through a long register a page at a time, and says where you are in it.',
     when: 'Any list the server pages. Always show the range and the total — "Next" with no count tells the user nothing.',
@@ -331,7 +866,7 @@ register(
       'Every number is a link or button with an accessible name of the form "Page 4", never a bare digit.',
       'The range line is real text, not a title attribute, so it is read out with the rest of the page.'
     ],
-    related: ['table', 'empty-state', 'dropdown'],
+    related: ['data-table', 'table', 'empty-state'],
     variants: [
       { id: 'simple', name: 'Simple', code:
 `<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">

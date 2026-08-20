@@ -1672,7 +1672,7 @@ register(
       'The Back button is a real button with a text label, not a bare chevron.',
       'The detail pane is a labelled region so it can be jumped to directly.'
     ],
-    related: ['table', 'drawer', 'app-shell'],
+    related: ['table', 'sheet', 'app-shell'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white"
@@ -1780,7 +1780,7 @@ register(
   {
     id: 'form-page', name: 'Form page', category: 'layout',
     description: 'The layout a create or edit screen uses: fields in a card, and the Save and Cancel actions where the user can always reach them.',
-    when: 'Any create or edit screen with more than about four fields. A short form belongs in a modal instead.',
+    when: 'Any create or edit screen with more than about four fields. A short form belongs in a dialog instead.',
     notes: [
       'Save is on the right, Cancel to its left. Never put a destructive action in the same cluster — delete lives on the record, not in the editor.',
       'The sticky footer needs a solid bg-white and a top border, otherwise fields scroll under it and read as clipped.',
@@ -1808,7 +1808,7 @@ register(
       'The sticky footer does not overlap the last field when focused, or keyboard users cannot see what they are typing.',
       'Required fields are marked in the label and backed by the required attribute.'
     ],
-    related: ['field', 'modal', 'page-header'],
+    related: ['field', 'dialog', 'page-header'],
     variants: [
       { id: 'two-column', name: 'Two columns with sticky actions', code:
 `<form class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
