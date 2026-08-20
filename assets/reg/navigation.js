@@ -1924,24 +1924,25 @@ register(
       'Both ⌘K and Ctrl-K must work, and both need .prevent — the browser binds ⌘K to the address bar.',
       'x-cloak on the overlay, otherwise it paints over the page on first load.',
       'A palette is a combobox, not a menu, because it has a text box. A menu moves real focus between its items; a combobox keeps real focus in the input and points at the active row with aria-activedescendant. So the rows are not buttons and not links: nothing inside role="option" may be focusable, and a row that is a tab stop puts the caret outside the search box the moment somebody presses Tab.',
-      'The input is focused in $nextTick and then requestAnimationFrame, not in $nextTick alone. x-show has not written display by the time $nextTick runs — measured on the dropdown in this library, the panel was still display none with offsetHeight 0 inside the callback — and focus() on a hidden input is a silent no-op. $nextTick alone fails a couple of times in ten, which reads as flake rather than as a bug; a bare requestAnimationFrame fails every time, because the frame beats Alpine\'s flush.',
+      'The palette is a dialog as well as a combobox. It covers the page with a dimmed overlay, so it takes role="dialog", aria-modal="true" and a name, and it has to hold focus to earn them: aria-modal on a panel Tab can walk out of tells a screen reader the page behind is inert while the keyboard proves it is not. The two go in together or neither does.',
+      'x-trap.noscroll on the overlay does the focusing, the returning and the scroll lock, so show() sets three fields and focuses nothing itself. The trap opens on [autofocus], which is why the query input carries one: without it the trap lands on the first tabbable node, which is the Esc button. Do not also focus by hand. x-show has not written display when $nextTick runs, so focus() on the input is a silent no-op, and a bare requestAnimationFrame beats Alpine\'s flush, so a hand-rolled call would be racing the trap for the same element and losing on its own terms.',
       'The row id is derived from the record — :id="\'cp-\' + o.id" — never from the loop index, because filtering renumbers the rows and aria-activedescendant then names whichever record moved into that slot. Key the loop on the same field or Alpine reuses nodes and the id and the row drift apart. The prefix belongs to the palette, so a second one on the page needs a second prefix or both write the same ids.',
-      'Closing returns focus to whatever opened the palette, which is not always the trigger — ⌘K fires from wherever the caret already was. Record document.activeElement on open and focus it again on close, or every dismissal drops a keyboard user at the top of the document.',
+      'Closing returns focus to whatever opened the palette, which is not always the trigger — ⌘K fires from wherever the caret already was. x-trap captures document.activeElement when it activates and puts it back on close, so this needs no bookkeeping of its own. Without that, every dismissal drops a keyboard user at the top of the document.',
       'The letters on the action rows are the application\'s own shortcuts, shown so people learn them. The palette does not listen for them, and must not: inside a search box, N types an N.'
     ],
     anatomy: [
-      ['Overlay', 'A dimmed field with the panel near the top, not centred — the list grows downward.'],
+      ['Overlay', 'A dimmed field with the panel near the top, not centred — the list grows downward. It carries x-trap.noscroll, so it is what holds focus and locks the page behind.'],
       ['Input', 'role="combobox", focused on open and holding real focus the whole time the palette is up. The query is cleared on close so the next open starts fresh.'],
       ['Group', 'Results split by kind — actions, records — each under a small label. role="group" named by that label, and a group with no matches leaves with its heading.'],
       ['Result', 'One row, role="option" and not a tab stop, with the active one tinted. The keyboard drives which is active.'],
       ['Empty state', 'What the list shows at zero matches — the query quoted back, not an empty panel.'],
-      ['Live region', 'A sr-only role="status" outside the overlay, in the document from first paint, carrying the number of matches.'],
+      ['Live region', 'A sr-only role="status" inside the dialog, carrying the number of matches. It sits inside because aria-modal hides everything outside the dialog from a screen reader.'],
       ['Footer', 'The key legend. Nobody learns arrow keys and Enter from nothing.']
     ],
     behaviour: [
       'Everything reachable here is also reachable by clicking. The palette is an accelerator, never a hiding place.',
       'Both Cmd-K and Ctrl-K open it, and both need .prevent — the browser binds Cmd-K to the address bar.',
-      'The input is focused in $nextTick and then requestAnimationFrame. $nextTick alone runs before x-show has written display, and focus() on an element that is still display none does nothing at all.',
+      'Opening moves focus into the query input, and Tab stays inside the panel, so nothing behind the overlay is reachable until it closes.',
       'Typing filters both groups at once, and every keystroke puts the highlight back on the first match, so Enter always takes the row at the top of the list.',
       'Arrow down and up move the active row over the flattened list in the order the rows are drawn, not group by group, and clamp at both ends rather than wrapping. Enter takes the active row, Escape closes.',
       'The highlight follows the mouse as well as the keyboard, so the row under the pointer and the row Enter would take are never two different rows.',
@@ -1954,8 +1955,10 @@ register(
       'The list is role="listbox" with an accessible name and every row is role="option". No row carries aria-selected: a palette commits nothing — a row is fired and the palette closes — so the only state a row has is being the active one, and aria-activedescendant is what carries that.',
       'Real focus never leaves the input. The highlight moves through aria-activedescendant, which is why every row needs a stable id derived from the record and why no row is a tab stop.',
       'Each group is role="group" named by its heading, and the visible heading is aria-hidden — the group is already named, and a bare paragraph is not a permitted child of a listbox.',
-      'The number of matches is announced from a role="status" that sits outside the overlay and is in the document from first paint. A live region inserted with its text already in it announces nothing.',
-      'Escape closes and returns focus to whatever opened the palette, taken from document.activeElement at the moment it opened.'
+      'The number of matches is announced from a role="status" inside the dialog. Outside it the announcement would never arrive, because aria-modal="true" takes everything outside the dialog out of the accessibility tree.',
+      'The overlay is role="dialog" with aria-modal="true", named "Command palette", so the rest of the page is out of the accessibility tree while it is open.',
+      'Focus is trapped in the panel and cannot reach the page behind. The trap opens on the query input because it carries autofocus, rather than on the Esc button, which is the first tabbable node.',
+      'Escape closes and returns focus to whatever opened the palette, captured by x-trap at the moment it activated.',
     ],
     related: ['combobox', 'sidebar-nav', 'dropdown'],
     variants: [
@@ -1969,21 +1972,20 @@ register(
      renumbers the rows, and an index-derived id leaves aria-activedescendant
      naming whichever record moved into that slot.
 
-     The opening focus is moved in $nextTick and then requestAnimationFrame.
-     x-show has not written display by the time $nextTick runs — the panel is
-     still display none with offsetHeight 0 — and focus() on a hidden input is
-     a silent no-op that leaves the caret wherever it was. $nextTick alone
-     fails intermittently, which reads as flake; a bare frame fails every time.
-
-     opener is document.activeElement at the moment of opening, because ⌘K
-     fires from wherever the caret was and the trigger is not always what
-     opened the palette.
+     x-trap does the focusing and the returning, which is why show() sets
+     three fields and nothing else. It opens focus on [autofocus], so the
+     caret lands in the query rather than on the Esc button, and it restores
+     document.activeElement on close, which matters because ⌘K fires from
+     wherever the caret already was and the trigger is not always what opened
+     the palette. Focusing by hand here would race the trap: x-show has not
+     written display when $nextTick runs, so focus() on the input is a silent
+     no-op.
 
      The letters on the action rows are the application's own shortcuts, shown
      so people learn them. The palette does not listen for them: inside a
      search box, N has to type an N. -->
 <div x-data="{
-       open: false, q: '', ai: 0, opener: null,
+       open: false, q: '', ai: 0,
        groups: [
          { name: 'Actions', items: [
            { id: 'new-po',    label: 'New purchase order', icon: 'plus',          key: 'N' },
@@ -2005,17 +2007,8 @@ register(
        rowId(o) { return 'cp-' + o.id; },
        get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
        scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
-       show() {
-         if (this.open) return;
-         this.opener = document.activeElement;
-         this.open = true; this.q = ''; this.ai = 0;
-         this.$nextTick(() => requestAnimationFrame(() => this.$refs.q.focus()));
-       },
-       hide() {
-         if (!this.open) return;
-         this.open = false; this.q = ''; this.ai = 0;
-         if (this.opener) this.opener.focus();
-       },
+       show() { this.open = true; this.q = ''; this.ai = 0; },
+       hide() { this.open = false; this.q = ''; this.ai = 0; },
        move(n) {
          if (!this.list.length) return;
          this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
@@ -2028,26 +2021,22 @@ register(
      @keydown.window.ctrl.k.prevent="show()"
      @keydown.escape.window="hide()">
 
-  <button type="button" x-ref="trigger" @click="show()"
+  <button type="button" @click="show()"
           class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-100">
     <i data-lucide="search" class="size-4 text-zinc-600"></i>
     <span class="flex-1 text-left">Search Konspec Operations</span>
     <kbd class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
   </button>
 
-  <!-- outside the overlay and in the document from first paint. A live region
-       inserted with its text already in it announces nothing. -->
-  <p role="status" class="sr-only"
-     x-text="open ? (list.length === 1 ? '1 result' : list.length + ' results') : ''"></p>
-
-  <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/30 px-3 pt-16 sm:pt-24">
-    <div @click.outside="hide()"
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/30 px-3 pt-16 sm:pt-24">
+    <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
          class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
 
       <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
         <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
         <label for="cp-q" class="sr-only">Search orders, vendors and actions</label>
-        <input id="cp-q" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+        <input id="cp-q" x-model="q" type="text" role="combobox" autocomplete="off" autofocus
                aria-autocomplete="list" aria-controls="cp-list"
                :aria-expanded="open" :aria-activedescendant="activeId"
                placeholder="Search orders, vendors, actions…"
@@ -2100,6 +2089,12 @@ register(
         <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
         <span class="ml-auto">Konspec Operations</span>
       </div>
+
+      <!-- inside the dialog, because aria-modal hides everything outside it
+           from a screen reader, and a live region it cannot see announces
+           nothing at all. -->
+      <p role="status" class="sr-only"
+         x-text="open ? (list.length === 1 ? '1 result' : list.length + ' results') : ''"></p>
     </div>
   </div>
 </div>` }
