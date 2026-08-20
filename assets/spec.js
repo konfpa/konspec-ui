@@ -60,7 +60,7 @@ window.SPEC = {
     { t: 'One shade per meaning',
       d: 'Info is zinc-400, success emerald-600, warning amber-700, danger red-600 — and a warning is amber-700 in a component and amber-500 only when it is a dot, because a 1.5px stroke and a 6px disc need different weights of the same colour. Nothing takes a -50 tint or a -200 ring: a coloured icon well is still bg-zinc-200 with ring-zinc-300. Pick the shade from the token table, never by eye.' },
     { t: 'Survive 390px',
-      d: 'Tables become stacked cards. Nothing scrolls sideways on a phone.' },
+      d: 'Tables become stacked cards. Nothing scrolls sideways on a phone, with one exception: a carousel, where the sideways scroll is the component itself, and which snaps and peeks so it never looks like a layout that broke.' },
     { t: 'No template x-for inside svg',
       d: 'It is parsed in the SVG namespace and has no .content. Use divs, or a conic-gradient for donuts.' },
     { t: 'x-cloak on anything hidden at first paint',
