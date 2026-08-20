@@ -153,7 +153,7 @@
 
           <div x-show="mode(v) === 'preview'" class="rounded-b-2xl bg-zinc-100 p-6 lg:p-10">
             <div class="mx-auto transition-all" :class="width === 'mobile' ? 'max-w-[390px]' : 'max-w-full'">
-              <div x-html="v.code"></div>
+              <div x-html="mode(v) === 'preview' ? v.code : ''"></div>
             </div>
           </div>
 

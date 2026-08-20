@@ -19,7 +19,7 @@ function componentPage() {
         .map(r => ({ ...r, href: (index.find(i => i.id === r.id) || {}).page ? r.id + '.html' : null }));
     },
 
-    mode(v) { return this.tab[v.id] || 'preview'; },
+    mode(v) { return this.tab[v.id] || (v.id === 'django' ? 'code' : 'preview'); },
     setMode(v, m) { this.tab[v.id] = m; },
 
     async copy(text, key) {
