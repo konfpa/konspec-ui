@@ -484,7 +484,7 @@ register(
       'Focus moves into the panel on open and returns to the trigger on close.',
       'The destructive item is distinguished by its label as well as its colour, since colour alone is not a signal.'
     ],
-    related: ['button', 'command-palette', 'modal'],
+    related: ['button', 'command-palette', 'separator'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<div class="relative" x-data="{ open: false }" @click.outside="open = false">

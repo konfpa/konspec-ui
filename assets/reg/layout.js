@@ -358,7 +358,7 @@ register(
       'Dividers are borders, not <hr>, so they are not announced as separators inside a list of fields.',
       'Footer actions sit inside the card in the DOM as well as visually, so their context is clear when read out of order.'
     ],
-    related: ['stat-card', 'table', 'page-header'],
+    related: ['stat-card', 'table', 'separator'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
@@ -674,6 +674,318 @@ register(
     </div>
   {% endfor %}
 </div>` }
+    ]
+  },
+
+  {
+    id: 'separator', name: 'Separator', category: 'layout',
+    description: 'The rule that divides content. Almost always a border on the thing beside it rather than an element of its own, and almost always silent to a screen reader.',
+    when: 'Between two blocks of the same weight and the same width where nothing else says one has ended — the rows of a list, a footer that totals what is above it, the destructive item at the foot of a menu. Not between a heading and its body, and not between sections that already sit in separate cards: those are already separated, and a line there is decoration pretending to be structure.',
+    notes: [
+      'Most of the time the right separator is no separator. Whitespace groups content perfectly well and costs nothing to read — a card title and its body are told apart by mt-1 and a weight change, with no rule between them. A line earns its place only when two blocks are the same size, the same width and adjacent, which is why the ones in this library are nearly all inside a card. Rule off every paragraph and the page reads as a form from 1998; by the fourth rule none of them means anything.',
+      'The common divider is decorative and carries no role. There is nothing to announce and nothing to hide: a border is not an element at all, and a bare div is not a separator. Measured in Chrome\'s accessibility tree, divide-y, border-t and <div class="h-px bg-zinc-200"> all resolve to a generic node with no name, which is exactly right. aria-hidden on a border is noise for the same reason. The semantic cases are two, and both are narrow: a menu, where role="separator" is what tells a screen reader the destructive item is in a group of its own, and running prose where the subject genuinely changes, which is <hr>.',
+      '<hr> is already the whole component under this stack, and is still the wrong tag for a list. Preflight zeroes its margins and gives it height 0 with border-top-width 1px, so <hr class="border-zinc-200"> measures exactly 1px tall and full width with no margin, and resolves to role="separator" with orientation horizontal — there is no h-px, no border-t and no role left to add. What it is wrong for is rows: forty <hr>s down a table of order lines announce forty separators nobody asked for, which is what the card entry means when it says dividers are borders.',
+      'divide-y on the parent is the default, and it has exactly one failure. Tailwind v4 compiles divide-y to a border-bottom on & > :not(:last-child) — a DOM position, not a visibility. Hiding a middle row or the first row is therefore correct: measured, a four-row card went from 181px to 136px with the middle row x-shown away and the two remaining rules landed between the visible rows. Hiding the LAST row is not: the row above it is still not :last-child, keeps its border, and the card ends on a rule with nothing under it — measured 137px against 136px, and the extra pixel is the stray line. x-if is no better, because Alpine leaves the <template> in the DOM and the template takes the :last-child slot; measured, two visible rows still drew two rules. So put anything conditional outside the divided group with a border of its own, or render it server-side where {% if %} really does remove the node.',
+      'A border on each child fails at the other end, and a border on a group member is worse. Per-child border-t survives a hidden last row and breaks on a hidden first one — measured 92px against 91px, the extra pixel being a rule across the top of the panel with nothing above it. It also does not survive being pasted anywhere else: the rule belongs to the row, so the row takes a line with it into whatever container it lands in, which divide-y never does. The sharpest version of this is the dropdown menu, which currently hangs its divider off the destructive button: measured with the two items above it conditionally hidden, the border still paints 5px below the panel\'s top edge — a rule introducing nothing. A separator that belongs to a group is its own element, not a border on one of the members.',
+      'A standalone element between rows is the worst of the three. It needs the same condition as the row it introduces and nobody remembers to give it one: measured, hiding the row between two standalone rules left both in the document one pixel apart, at y 558 and y 559, which paints as a 2px band. Standalone is for a menu or a toolbar, where the separator is semantic and belongs to the group rather than to a row.',
+      'Two shades and the rule is the length of the line. A horizontal rule inside a card that already has a zinc-200 border is divide-zinc-100 or border-zinc-100 — the registry does this in 15 of 15 divide-y uses. A full-width strip that changes what the region is — a card header, a footer that totals, a sticky action bar — is border-zinc-200, because it is an edge and not a divider. Every vertical rule is zinc-200 regardless: a horizontal rule is 300px of ink and zinc-100 carries it, a vertical one is 16px and zinc-100 vanishes. Never a zinc-100 rule on the zinc-100 page ground — measured, the line and the surface compute to the identical colour, so it is not low contrast, it is absent. On white at devicePixelRatio 1 a zinc-100 rule paints rgb(244,244,245) against rgb(255,255,255) and a zinc-200 rule paints rgb(228,228,231); that first one is already at the floor, which is why it only ever sits on white.',
+      'A rule is not a tinted shape, so it takes no ring. The ring exists to hold the edge of a filled shape against the surface behind it, and a line one pixel tall is entirely edge. Measured: ring-1 ring-inset ring-zinc-300 on a 1px rule adds no height at all and simply repaints the whole line zinc-300, so the only thing it changed was the shade you already chose; without ring-inset it paints a 3px sandwich of zinc-300, zinc-200, zinc-300 where a 1px divider was wanted.',
+      'A vertical rule has no height of its own. In flex items-center — every toolbar and meta line here — a bare w-px div measured 0px tall and painted nothing at all. h-5 is the answer beside controls: a fixed 20px whatever the neighbours do, so a row holding a 13px label and a 24px figure does not grow a rule as tall as the figure. self-stretch is the answer when the rule should run the whole row: measured 28px in a row whose tallest item was 28px, which means it tracks whichever neighbour got taller. Add shrink-0 either way, or flex takes the pixel back when the row is tight. For a fixed set of columns, divide-x on the grid is simpler than any of this and cannot be left behind by a hidden child.',
+      'A labelled rule is a heading with decoration, not a separator with a label. Put the text in the h2 or h3 the page outline already wants and make the two lines aria-hidden spans with flex-1 — measured, the label then appears in the accessibility tree as a level-3 heading and the lines appear nowhere, which is what somebody skimming by heading needs. A role="separator" carrying aria-label reads the same words out but adds nothing to the outline. The exception is a label that names a choice rather than a section — the "or" between two ways of signing in — which is plain text between two hidden lines and no role at all.',
+      'A 1px rule is 1 CSS pixel at every density, and only fractional densities soften it. Measured off the rendered pixels: at devicePixelRatio 1 every form — h-px, border-t and <hr> alike — paints one device row at full strength; at 2 it paints two device rows at full strength; at 1.5 it paints one full row plus one half-strength row, and which side gets the soft row depends on where the rule landed in the layout, so two rules in the same card can blur on opposite edges. Nothing disappears and nothing needs a fix. It is one more reason zinc-100 only ever sits on white: at 1.5 its soft row measured rgb(249,249,250), six values off the background.'
+    ],
+    anatomy: [
+      ['Rule', 'One CSS pixel of colour and nothing else — border-t border-zinc-100 on the block below it, or h-px bg-zinc-100 as an element where the line has to stand alone.'],
+      ['Divided group', 'divide-y divide-zinc-100 on the parent of a set of rows. The rule belongs to the list, so a row carries no line out with it.'],
+      ['Strip', 'border-t border-zinc-200 on a block that ends a region — a totals bar, a footer, a conditional summary. Darker than a divider because it is an edge.'],
+      ['Vertical rule', 'h-5 w-px shrink-0 bg-zinc-200 between clusters in a toolbar, or divide-x divide-zinc-200 across a fixed grid of columns.'],
+      ['Label', 'The middle of a labelled rule: a real heading, with flex-1 aria-hidden spans either side carrying the line.'],
+      ['Menu separator', 'The one that is semantic. role="separator" as its own element inside role="menu", my-1 h-px bg-zinc-100, sitting above the destructive item.']
+    ],
+    behaviour: [
+      'A rule is 1px at every zoom and every density. It never scales with the text around it and never carries a second weight for emphasis.',
+      'A horizontal rule inside a card runs the full width of the card, which means the padding belongs to the rows and not to the group holding them. Put the padding on the parent and every rule is inset by it, which reads as a crack in the card rather than a divider across it.',
+      'A divided group\'s rules are on the parent, so hiding a row moves the remaining lines and does not leave one behind — except at the last row, which is why a conditional block sits outside the group with its own border.',
+      'A vertical rule takes its height from a utility, never from its neighbours. Given none, it renders at zero and disappears.',
+      'Nothing is focusable, nothing responds to hover, and nothing animates. A separator that can be dragged is a splitter, which is a different control and not one this library has.',
+      'At 390px every form here holds without scrolling sideways: the toolbar rule stays 20px, the three-column divide-x grid stays three columns, and a labelled rule keeps a visible line on both sides of the label.'
+    ],
+    a11y: [
+      'The default divider has no role at all. It is a border, or a div with a background and no name, and it resolves to a generic node — silent, which is correct for a line that only groups things visually.',
+      'Never put aria-hidden on a border. There is no element to hide, and on a bare div it is redundant with having no name.',
+      'role="separator" is for a menu or a toolbar, where a screen reader has no other way to learn that the items above and below it are different groups. Verified in the tree: the menu exposes menuitem, menuitem, separator, menuitem.',
+      'A vertical separator that is genuinely semantic adds aria-orientation="vertical", which resolves as orientation vertical. A decorative one adds nothing.',
+      'The label on a labelled rule is a heading, so it lands in the page outline; the lines beside it are aria-hidden and land nowhere.',
+      'Do not put a separator inside a list. role="list" permits listitem children, and an <li role="separator"> is exposed by Chrome as a separator sitting among the items — divide the list with divide-y and leave the list a list.',
+      '<hr> already carries role="separator" with a horizontal orientation, which is why it belongs where the subject changes and not between forty rows.'
+    ],
+    related: ['card', 'dropdown', 'button-group'],
+    variants: [
+      { id: 'default', name: 'Horizontal rule', code:
+`<!-- The common divider is a border on the block below it, and it carries no
+     role. A line between two paragraphs of the same section groups them for the
+     eye; announced as a separator it is one more thing to step over. Measured,
+     this rule resolves to a generic node with no name, which is right, and
+     needs no aria-hidden because there is no element to hide.
+
+     zinc-100 because the card around it is already zinc-200. On the page ground
+     the two would be the identical colour and the line would not be faint, it
+     would be missing.
+
+     The <hr> is the other case and the rarer one: the subject changes. Under
+     preflight it is already a 1px full-width rule with no margins and already
+     role="separator" — border-zinc-200 sets its colour and there is nothing
+     else to add. Use it where you would start a new heading, never between the
+     rows of a list. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+  <h2 class="text-[16px]/6 font-semibold">Payment terms</h2>
+  <p class="mt-1 text-[13px]/5 text-zinc-600">45 days from GRN, against a clean receipt note.</p>
+
+  <div class="mt-4 border-t border-zinc-100 pt-4">
+    <p class="text-[13px]/5 text-zinc-600">Retention of 5% is released after the trial run is signed off.</p>
+  </div>
+
+  <hr class="my-5 border-zinc-200">
+
+  <h3 class="text-[13px]/5 font-medium">Amendment history</h3>
+  <p class="mt-1 text-[12px]/4 text-zinc-500">Two revisions since release, both to the delivery date.</p>
+</div>` },
+
+      { id: 'rows', name: 'Rows in a card', code:
+`<!-- divide-y on the parent, not a border on each row. The rule then belongs to
+     the list rather than to the row, so a row pasted into another container
+     does not take a stray line with it.
+
+     Tailwind v4 compiles divide-y to a border-bottom on & > :not(:last-child),
+     which is a DOM position and not a visibility. Hiding a middle row is
+     therefore fine — measured, the container went 181px to 136px and the
+     remaining rules landed between the visible rows. Hiding the last row is
+     not: the row above it is still not :last-child, so it keeps its border and
+     the card ends on a rule with nothing under it. Measured 137px against
+     136px, and the extra pixel is that line. An x-if does not help either,
+     because Alpine leaves the <template> in the DOM and the template takes the
+     :last-child slot.
+
+     So the conditional block sits outside the divided group and brings its own
+     border. It is border-zinc-200 rather than zinc-100 because it is a strip
+     that ends the card, the same weight as the header above it, not another
+     row. x-cloak because it is hidden at first paint. -->
+<div class="max-w-md overflow-hidden rounded-xl border border-zinc-200 bg-white" x-data="{ cancelled: false }">
+  <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+    <h2 class="text-[14px]/5 font-semibold">Order lines</h2>
+    <button type="button" @click="cancelled = !cancelled"
+            class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2"
+            x-text="cancelled ? 'Hide cancelled' : 'Show cancelled'">Show cancelled</button>
+  </div>
+
+  <dl class="divide-y divide-zinc-100 text-[13px]/5">
+    <div class="flex items-center justify-between gap-4 px-5 py-2.5">
+      <dt class="min-w-0 truncate text-zinc-600">MS angle 50×50×6</dt>
+      <dd class="shrink-0 tabular-nums">₹6,84,000</dd>
+    </div>
+    <div class="flex items-center justify-between gap-4 px-5 py-2.5">
+      <dt class="min-w-0 truncate text-zinc-600">MS plate 8mm</dt>
+      <dd class="shrink-0 tabular-nums">₹5,16,000</dd>
+    </div>
+    <div class="flex items-center justify-between gap-4 px-5 py-2.5">
+      <dt class="min-w-0 truncate text-zinc-600">Channel 100×50</dt>
+      <dd class="shrink-0 tabular-nums">₹3,08,000</dd>
+    </div>
+  </dl>
+
+  <div x-show="cancelled" x-cloak
+       class="border-t border-zinc-200 bg-zinc-100 px-5 py-2.5 text-[12px]/4 text-zinc-600">
+    2 cancelled lines worth <span class="tabular-nums">₹1,04,000</span>, not counted above.
+  </div>
+</div>` },
+
+      { id: 'vertical', name: 'Vertical', code:
+`<!-- A vertical rule has no height of its own. In flex items-center a bare
+     w-px div measured 0px tall and painted nothing; h-5 gives it a fixed 20px
+     that does not grow when a neighbour does. shrink-0 keeps flex from taking
+     the pixel back when the row is tight.
+
+     zinc-200, not zinc-100. This line is 20px long against a horizontal rule's
+     300px, and zinc-100 at that length is invisible.
+
+     Neither rule carries a role. The clusters either side are already named by
+     role="group" and an aria-label, which tells a screen reader far more than a
+     separator between them would; the line is what the eye uses to see the
+     grouping the label already states.
+
+     For a fixed set of columns, divide-x on the grid is the whole job — no
+     heights to manage and no element that can be left behind by a hidden
+     child. -->
+<div class="space-y-3">
+  <div class="flex max-w-md flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white p-2">
+    <div role="group" aria-label="Row height" class="flex items-center gap-1">
+      <button type="button" aria-label="Compact rows" aria-pressed="true"
+              class="flex size-8 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="align-justify" class="size-4 text-zinc-700"></i>
+      </button>
+      <button type="button" aria-label="Comfortable rows" aria-pressed="false"
+              class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+        <i data-lucide="menu" class="size-4"></i>
+      </button>
+    </div>
+
+    <div class="h-5 w-px shrink-0 bg-zinc-200"></div>
+
+    <div role="group" aria-label="Export" class="flex items-center gap-1">
+      <button type="button" aria-label="Download CSV"
+              class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+        <i data-lucide="download" class="size-4"></i>
+      </button>
+      <button type="button" aria-label="Print"
+              class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+        <i data-lucide="printer" class="size-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="grid max-w-md grid-cols-3 divide-x divide-zinc-200 rounded-xl border border-zinc-200 bg-white text-center">
+    <div class="px-3 py-3">
+      <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Received</p>
+      <p class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹11,42,040</p>
+    </div>
+    <div class="px-3 py-3">
+      <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Invoiced</p>
+      <p class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹9,80,000</p>
+    </div>
+    <div class="px-3 py-3">
+      <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Balance</p>
+      <p class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹6,99,960</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'labelled', name: 'With a label', code:
+`<!-- The label is a heading, not a separator with a name. It says what follows,
+     which is what a heading is for, and it then appears in the page outline for
+     anyone skimming by heading — measured, this one resolves as a level-3
+     heading while the two lines beside it resolve to nothing at all. Wrapping
+     the row in role="separator" with an aria-label reads the same words out and
+     leaves the outline empty.
+
+     flex-1 on the lines and shrink-0 on the label: the label keeps its width
+     and the lines take whatever is left, so at 390px there is still a visible
+     rule on both sides rather than one line and a stub.
+
+     The second one is the exception — a label that names a choice rather than a
+     section. "or" is plain text with no role, because that is exactly what it
+     is; only the lines are hidden. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+  <p class="text-[13px]/5 text-zinc-600">Nine lines released to the vendor on 04 Aug 2026.</p>
+
+  <div class="mt-5 flex items-center gap-3">
+    <span class="h-px flex-1 bg-zinc-200" aria-hidden="true"></span>
+    <h3 class="shrink-0 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Amendments</h3>
+    <span class="h-px flex-1 bg-zinc-200" aria-hidden="true"></span>
+  </div>
+
+  <p class="mt-3 text-[13px]/5 text-zinc-600">Rev C moved the delivery date to 28 Aug 2026.</p>
+
+  <div class="mt-5 flex items-center gap-3">
+    <span class="h-px flex-1 bg-zinc-200" aria-hidden="true"></span>
+    <span class="shrink-0 text-[12px]/4 text-zinc-500">or</span>
+    <span class="h-px flex-1 bg-zinc-200" aria-hidden="true"></span>
+  </div>
+</div>` },
+
+      { id: 'menu', name: 'Inside a menu', code:
+`<!-- The one place the separator is real. A menu is a list of peers, and the
+     only thing saying Cancel order is not another Print is the line above it —
+     so that line has to be in the accessibility tree too. Measured, the panel
+     exposes menuitem, menuitem, separator, menuitem.
+
+     It is its own element, not a border-t on the destructive button. Hang it
+     off the button and it belongs to the button: measured with the items above
+     it conditionally hidden, the border still painted 5px below the panel's top
+     edge, introducing nothing. As its own element it can be dropped in the same
+     {% if %} as the item it introduces.
+
+     zinc-100 and full bleed, my-1 for the breathing room the items already have
+     through their padding. The panel is the zinc-200 edge; the divider inside
+     it is a step lighter, the same as in any card. -->
+<div class="relative max-w-xs" x-data="{ open: false }" @click.outside="open = false">
+  <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="menu"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="ellipsis" class="size-4 text-zinc-600"></i>Actions
+  </button>
+
+  <div x-show="open" x-cloak role="menu" aria-label="Order actions"
+       class="absolute left-0 z-40 mt-1 w-52 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+      <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Amend
+    </button>
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+      <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+    </button>
+
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100">
+      <i data-lucide="trash-2" class="size-4"></i>Cancel order
+    </button>
+  </div>
+</div>` },
+
+      { id: 'django', name: 'Django partial', code:
+`<!-- Two shapes, one file. What is worth centralising is not the div — it is
+     the shade rule, that a horizontal rule inside a bordered panel is zinc-100
+     and a vertical one is zinc-200. The fortieth template to need a divider is
+     the one that gets it wrong.
+
+     The tag is for the standalone cases only: a menu, a toolbar. A divided list
+     needs no tag at all, because there is nothing to repeat — it is one class
+     on the wrapper.
+
+     And the server is the only place divide-y is safe on a list that can
+     change. {% if %} removes the node, so :last-child lands on the last row
+     that actually rendered. Alpine cannot do this: x-show leaves the row in the
+     DOM and x-if leaves the <template> in the DOM, and either way the rule
+     above the hidden row is stranded at the bottom of the card.
+
+     # templatetags/ui.py
+     @register.inclusion_tag('ui/_separator.html')
+     def separator(orientation='horizontal'):
+         return {'vertical': orientation == 'vertical'}
+
+     # templates/ui/_separator.html
+     {% if vertical %}
+       <div role="separator" aria-orientation="vertical" class="h-5 w-px shrink-0 bg-zinc-200"></div>
+     {% else %}
+       <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+     {% endif %} -->
+{% load humanize ui %}
+
+<div role="menu" aria-label="Order actions"
+     class="w-52 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+  {% for action in order.menu_actions %}
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+      <i data-lucide="{{ action.icon }}" class="size-4 text-zinc-600"></i>{{ action.label }}
+    </button>
+  {% endfor %}
+
+  {# the separator sits in the same if-block as the item it introduces #}
+  {% if order.can_cancel %}
+    {% separator %}
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100">
+      <i data-lucide="trash-2" class="size-4"></i>Cancel order
+    </button>
+  {% endif %}
+</div>
+
+<dl class="mt-4 divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200 bg-white text-[13px]/5">
+  {% for line in order.active_lines %}
+    <div class="flex items-center justify-between gap-4 px-5 py-2.5">
+      <dt class="min-w-0 truncate text-zinc-600">{{ line.item }}</dt>
+      <dd class="shrink-0 tabular-nums">₹{{ line.value|intcomma }}</dd>
+    </div>
+  {% empty %}
+    <p class="py-4 text-center text-[13px]/5 text-zinc-500">No open lines on this order.</p>
+  {% endfor %}
+</dl>` }
     ]
   },
 
