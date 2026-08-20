@@ -149,7 +149,9 @@ building anything, rather than reconstructing a component from its description.
 - **Field** `field` — Label, control, help text and error in one block. This is the unit every form is built from. Variants: default, error.
 - **Input** `input` — Single-line text entry. The border lives on the wrapper so icons and prefixes sit inside the focus ring. Variants: default, icon, disabled.
 - **Textarea** `textarea` — Multi-line text entry. Same bordered wrapper as the input, a height measured in rows, and a counter when there is a limit worth showing. Variants: default, sizes, counter, autogrow, toolbar, error, disabled, django.
-- **Checkbox, radio, toggle** `choice` — Boolean and single-choice controls. accent-zinc-700 keeps native controls on-theme without custom CSS. Variants: checkbox, toggle.
+- **Checkbox** `checkbox` — An independent on or off — one flag, a set of options, or the row selection a register's bulk actions run on. A real native box wearing accent-zinc-700. Variants: default, group, indeterminate, cards, filters, table, states, django.
+- **Radio** `radio` — One of a set, and exactly one. Real native radios wearing accent-zinc-700, where the shared name is the group and the only way to mean none is an option that says so. Variants: default, descriptions, cards, inline, none, table, states, django.
+- **Toggle** `toggle` — A setting that takes effect the moment it is touched. A real checkbox carrying role="switch", with the track and the thumb beside it painted by peer-checked utilities. Variants: default, sizes, list, group, inline, states, htmx, django.
 - **Attachment** `attachment` — The documents hanging off a record — a drop zone over the list of what is already there. Every file shows its type, size, who attached it and when. Variants: default, empty, uploading, rejected, readonly, single, images, django.
 - **Calendar** `calendar` — A month grid for picking a date or a range. Monday-first, tabular figures, and the same graphite selection the rest of the system uses. Variants: month, picker, range, jump, constrained, presets, native, django.
 
