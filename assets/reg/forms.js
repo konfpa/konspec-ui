@@ -2070,7 +2070,7 @@ Test certificate follows by email.</textarea>
       'A single select closes on commit and writes the label back into the box. A multiselect stays open, clears the query, and leaves the highlight on the row just toggled.',
       'Backspace on an empty query removes the last chip. It fires only when the query is empty, so it never eats a character somebody was still deleting.',
       'Select all applies to the rows the filter is showing and says how many that is; Clear releases everything and says how many that is.',
-      'Selected values are chips in the field, not a number beside it. Where a bulk control can select nine at once the field lists two and collapses past that to one name plus a pill, so the box holds a single row at every count instead of growing one the moment the pill appears. The popup is where the whole selection is legible and every row can be toggled off.',
+      'Selected values are chips in the field, not a number beside it. Where a bulk control can select nine at once the field shows one name and collapses everything past it into a pill, so the box holds a single row at every count and every width rather than growing one when the pill appears. The popup is where the whole selection is legible and every row can be toggled off.',
       'Remote options are fetched by htmx on a debounced input with a two-character floor. Alpine never fetches: it owns the open state and the keyboard, and because htmx replaced the rows without telling Alpine, the keyboard reads the option elements out of the DOM rather than out of an array.',
       'A value that is not in the list is offered as the last row whenever there is a query and no exact match, and it posts as text in a second field rather than as an invented id.'
     ],
