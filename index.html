@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konspec UI — a component library written for agents</title>
+<meta name="description" content="Copy-paste HTML components for internal data applications. Tailwind, Alpine, htmx, Lucide. Written to be read by AI agents first.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2318181b'/%3E%3Ctext x='16' y='22' font-family='Inter,sans-serif' font-size='17' font-weight='700' fill='white' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/fonts.css">
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+  @theme {
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  [x-cloak] { display: none !important; }
+
+  button:not(:disabled), summary, select:not(:disabled), [role="button"],
+  [\@click]:not(body), [x-on\:click]:not(body) { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+
+  html { scroll-behavior: smooth; }
+  [id] { scroll-margin-top: 88px; }
+
+  /* hero field — a faint engineering grid, not decoration for its own sake */
+  .grid-field {
+    background-image:
+      radial-gradient(circle at 1px 1px, rgb(212 212 216 / .8) 1px, transparent 0);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 40%, transparent 100%);
+            mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+  ::selection { background: #18181b; color: #fff; }
+</style>
+<script src="assets/spec.js"></script>
+<script src="assets/counts.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+  function site() {
+    return {
+      copied: null,
+      spec: window.SPEC,
+      counts: window.COUNTS,
+      index: window.INDEX,
+      get grouped() {
+        return this.spec.categories.map(cat => ({
+          ...cat,
+          items: this.index.filter(c => c.category === cat.id)
+        })).filter(g => g.items.length);
+      },
+      get origin() { return location.origin + location.pathname.replace(/index\.html$/, ''); },
+      /* spec.js is an external script, so the browser build never sees these
+         class names to generate them. Render the sample from the numbers. */
+      fillOf(tone) {
+        const row = this.spec.tokens.semanticFill.find(f => f[0] === tone);
+        return row ? row[1] : '';
+      },
+      typeStyle(token) {
+        const px = token.match(/\[(\d+)px\]/);
+        const lh = token.split('/')[1];
+        return 'font-size:' + (px ? px[1] : 14) + 'px; line-height:' + (lh ? lh * 4 : 20) + 'px';
+      },
+      get prompt() {
+        return [
+          'This project uses Konspec UI. Before you write any markup:',
+          '',
+          '1. Read ' + this.origin + 'llms.txt — stack, tokens and hard rules.',
+          '2. Fetch ' + this.origin + 'registry.json and copy component HTML verbatim.',
+          '',
+          'Do not add a CSS file, a component library, an icon package, or a dark theme.',
+          'Do not invent colours, spacing or patterns. If it is not in the registry, ask.'
+        ].join('\n');
+      },
+      async copy(text, id) {
+        try { await navigator.clipboard.writeText(text); }
+        catch (e) {
+          const t = document.createElement('textarea');
+          t.value = text; document.body.appendChild(t); t.select();
+          document.execCommand('copy'); t.remove();
+        }
+        this.copied = id;
+        setTimeout(() => { if (this.copied === id) this.copied = null; }, 1800);
+      }
+    };
+  }
+</script>
+</head>
+
+<body class="min-h-screen bg-white font-sans text-[14px]/5 text-zinc-900 antialiased" x-data="site()">
+
+<!-- ── header ─────────────────────────────────────────────────────────────── -->
+<header class="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/85 backdrop-blur">
+  <div class="mx-auto flex h-16 max-w-6xl items-center gap-4 px-5 lg:px-8">
+    <a href="#top" class="flex shrink-0 items-center gap-2.5">
+      <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-900 text-[13px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec UI</span>
+    </a>
+    <span class="rounded-full border border-zinc-200 px-2 py-0.5 font-mono text-[11px]/4 text-zinc-600">v0.1.0</span>
+
+    <nav class="ml-auto flex items-center gap-1 text-[13px]/5">
+      <a href="#components" class="hidden rounded-lg px-3 py-2 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 sm:block">Components</a>
+      <a href="#instructions" class="hidden rounded-lg px-3 py-2 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 md:block">Instructions</a>
+      <a href="#rules" class="hidden rounded-lg px-3 py-2 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 sm:block">Rules</a>
+      <a href="#tokens" class="hidden rounded-lg px-3 py-2 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 md:block">Tokens</a>
+      <button @click="copy(prompt, 'nav')"
+              class="ml-2 flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-zinc-900 px-3.5 py-2 text-[13px]/5 font-medium text-white transition hover:bg-zinc-700">
+        <i :data-lucide="copied === 'nav' ? 'check' : 'clipboard'" class="size-3.5 shrink-0"></i>
+        <span class="sm:hidden" x-text="copied === 'nav' ? 'Copied' : 'Copy'"></span>
+        <span class="hidden sm:inline" x-text="copied === 'nav' ? 'Copied' : 'Copy for agent'"></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- ── hero ───────────────────────────────────────────────────────────────── -->
+<section id="top" class="relative overflow-hidden">
+  <div class="grid-field absolute inset-0 -z-10"></div>
+
+  <div class="mx-auto max-w-6xl px-5 pb-16 pt-20 lg:px-8 lg:pb-24 lg:pt-28">
+    <div class="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)]">
+
+      <div>
+        <div class="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-[12px]/4 text-zinc-600">
+          <span class="size-1.5 rounded-full bg-emerald-600"></span>
+          Internal tools · light theme only
+        </div>
+
+        <h1 class="mt-6 max-w-[15ch] text-[clamp(2.1rem,4.7vw,3.5rem)]/[1.02] font-extrabold tracking-tight">
+          A component library<br>
+          <span class="text-zinc-500">written for the agent</span><br>
+          building your app.
+        </h1>
+
+        <p class="mt-7 max-w-[54ch] text-[16px]/7 text-zinc-600">
+          Plain HTML you copy and paste. Tailwind for styling, Alpine for state, htmx for server
+          swaps, Lucide for icons. No package, no build step — and every screen across every internal
+          tool ends up looking like one person built it.
+        </p>
+
+        <div class="mt-9 flex flex-wrap items-center gap-3">
+          <a href="#instructions"
+             class="flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-[14px]/5 font-medium text-white transition hover:bg-zinc-700">
+            Read the instructions<i data-lucide="arrow-down" class="size-4"></i>
+          </a>
+          <a href="#rules"
+             class="rounded-xl border border-zinc-300 bg-white px-5 py-3 text-[14px]/5 font-medium transition hover:bg-zinc-100">
+            The rules
+          </a>
+        </div>
+
+        <dl class="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-zinc-200 pt-7">
+          <div>
+            <dt class="text-[12px]/4 uppercase tracking-wider text-zinc-500">Components</dt>
+            <dd class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="counts.components"></dd>
+          </div>
+          <div>
+            <dt class="text-[12px]/4 uppercase tracking-wider text-zinc-500">Variants</dt>
+            <dd class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="counts.variants"></dd>
+          </div>
+          <div>
+            <dt class="text-[12px]/4 uppercase tracking-wider text-zinc-500">Dependencies</dt>
+            <dd class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="counts.dependencies"></dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- the handoff card -->
+      <div class="relative">
+        <div class="absolute -inset-3 -z-10 rounded-3xl bg-zinc-100"></div>
+        <div class="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+          <div class="flex items-center gap-2 border-b border-zinc-200 bg-zinc-50 px-4 py-3">
+            <span class="flex size-6 items-center justify-center rounded-md bg-zinc-900"><i data-lucide="bot" class="size-3.5 text-white"></i></span>
+            <span class="text-[13px]/5 font-semibold">Paste this into your agent</span>
+            <span class="ml-auto font-mono text-[11px]/4 text-zinc-500">the whole onboarding</span>
+          </div>
+          <pre class="max-h-80 overflow-y-auto whitespace-pre-wrap break-words px-4 py-4 font-mono text-[12px]/5 text-zinc-700"><code x-text="prompt"></code></pre>
+          <div class="border-t border-zinc-200 p-3">
+            <button @click="copy(prompt, 'hero')"
+                    class="flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-[13px]/5 font-medium text-white transition hover:bg-zinc-700">
+              <i :data-lucide="copied === 'hero' ? 'check' : 'clipboard'" class="size-4"></i>
+              <span x-text="copied === 'hero' ? 'Copied to clipboard' : 'Copy agent instructions'"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── why ────────────────────────────────────────────────────────────────── -->
+<section class="border-y border-zinc-200 bg-zinc-50">
+  <div class="mx-auto grid max-w-6xl gap-px bg-zinc-200 px-0 sm:grid-cols-2 lg:grid-cols-4">
+    <template x-for="f in [
+      ['file-json','One source of truth','Every component exists once, as data. This site, llms.txt and registry.json are generated from it — what an agent copies is exactly what you see.'],
+      ['scan-line','Nothing left to taste','A fixed palette, a fixed type scale, a fixed status mapping. An agent that follows the rules cannot produce something off-brand.'],
+      ['package-x','Nothing to install','No npm package, no imports, no versions. Snippets paste into Django, Flask or a static file unchanged.'],
+      ['bug-off','Traps written down','The gotchas that actually break things — Lucide destroying Alpine bindings, Tailwind v4 dropping cursor:pointer — are documented, not rediscovered.']
+    ]" :key="f[1]">
+      <div class="bg-zinc-50 p-7 transition hover:bg-white">
+        <span class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white">
+          <i :data-lucide="f[0]" class="size-[18px] text-zinc-700"></i>
+        </span>
+        <p class="mt-4 text-[16px]/6 font-semibold" x-text="f[1]"></p>
+        <p class="mt-2 text-[13px]/5 text-zinc-600" x-text="f[2]"></p>
+      </div>
+    </template>
+  </div>
+</section>
+
+<!-- ── instructions ───────────────────────────────────────────────────────── -->
+<section id="instructions" class="mx-auto max-w-6xl px-5 py-20 lg:px-8 lg:py-28">
+  <div class="max-w-2xl">
+    <p class="font-mono text-[12px]/4 uppercase tracking-wider text-zinc-500">For agents</p>
+    <h2 class="mt-4 text-[clamp(1.9rem,3.6vw,2.7rem)]/[1.1] font-bold tracking-tight">
+      What to do before you write a single line
+    </h2>
+    <p class="mt-5 text-[16px]/6 text-zinc-600">
+      This is the whole protocol. Four steps, in order. Skipping step one is how you end up
+      inventing a blue button that exists nowhere else in the company.
+    </p>
+  </div>
+
+  <ol class="mt-12 space-y-4">
+    <template x-for="(s, i) in spec.protocol" :key="s.t">
+      <li class="group grid gap-5 rounded-2xl border border-zinc-200 bg-white p-6 transition hover:border-zinc-300 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,260px)] sm:items-center sm:p-7">
+        <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 font-mono text-[14px]/5 font-semibold text-white" x-text="i + 1"></span>
+        <div class="min-w-0">
+          <p class="text-[16px]/6 font-semibold" x-text="s.t"></p>
+          <p class="mt-1.5 text-[14px]/6 text-zinc-600" x-text="s.d"></p>
+        </div>
+        <code class="block overflow-x-auto rounded-lg bg-zinc-100 px-3 py-2 font-mono text-[12px]/4 text-zinc-600" x-text="s.code"></code>
+      </li>
+    </template>
+  </ol>
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-2">
+    <a href="llms.txt"
+       class="group flex items-start gap-4 rounded-2xl border border-zinc-200 bg-white p-6 transition hover:border-zinc-300 hover:bg-zinc-50">
+      <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100">
+        <i data-lucide="file-text" class="size-[18px] text-zinc-700"></i>
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="flex items-center gap-2">
+          <span class="font-mono text-[14px]/5 font-semibold">llms.txt</span>
+          <i data-lucide="arrow-up-right" class="size-3.5 text-zinc-500 transition group-hover:text-zinc-900"></i>
+        </span>
+        <span class="mt-1.5 block text-[13px]/5 text-zinc-600">
+          Protocol, stack, every rule, tokens, the status mapping, and a one-line index of
+          every component. Read this first.
+        </span>
+        <span class="mt-2 block font-mono text-[11px]/4 text-zinc-500">11 KB · 147 lines</span>
+      </span>
+    </a>
+
+    <a href="registry.json"
+       class="group flex items-start gap-4 rounded-2xl border border-zinc-200 bg-white p-6 transition hover:border-zinc-300 hover:bg-zinc-50">
+      <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100">
+        <i data-lucide="braces" class="size-[18px] text-zinc-700"></i>
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="flex items-center gap-2">
+          <span class="font-mono text-[14px]/5 font-semibold">registry.json</span>
+          <i data-lucide="arrow-up-right" class="size-3.5 text-zinc-500 transition group-hover:text-zinc-900"></i>
+        </span>
+        <span class="mt-1.5 block text-[13px]/5 text-zinc-600">
+          Exact HTML for every variant, plus when-to-use notes and per-component rules.
+          Copy the strings; do not reconstruct markup from prose.
+        </span>
+        <span class="mt-2 block font-mono text-[11px]/4 text-zinc-500">
+          186 KB · <span x-text="counts.components"></span> components · <span x-text="counts.variants"></span> variants
+        </span>
+      </span>
+    </a>
+  </div>
+
+  <div class="mt-3 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 px-6 py-5">
+    <p class="text-[14px]/5 font-semibold">Still to come on this site</p>
+    <p class="mt-1.5 max-w-[80ch] text-[13px]/5 text-zinc-600">
+      The component browser and the reference application, one at a time. Both files above are
+      generated by <code class="rounded bg-white px-1.5 py-0.5 font-mono text-[12px]/4 ring-1 ring-zinc-200">node tools/build.js</code>
+      from <code class="rounded bg-white px-1.5 py-0.5 font-mono text-[12px]/4 ring-1 ring-zinc-200">assets/spec.js</code>,
+      which is also what renders the rules, tokens and status mapping further down this page — so the
+      three can never drift apart.
+    </p>
+  </div>
+</section>
+
+<!-- ── rules ──────────────────────────────────────────────────────────────── -->
+<section id="rules" class="border-y border-zinc-200 bg-zinc-50">
+  <div class="mx-auto max-w-6xl px-5 py-20 lg:px-8 lg:py-28">
+    <div class="max-w-2xl">
+      <p class="font-mono text-[12px]/4 uppercase tracking-wider text-zinc-500">Non-negotiable</p>
+      <h2 class="mt-4 text-[clamp(1.9rem,3.6vw,2.7rem)]/[1.1] font-bold tracking-tight"><span x-text="spec.rules.length"></span> rules, none optional</h2>
+      <p class="mt-5 text-[16px]/6 text-zinc-600">
+        Every one of these is here because breaking it produced a visible defect at least once.
+        They are not style preferences.
+      </p>
+    </div>
+
+    <div class="mt-12 grid items-start gap-3 lg:grid-cols-2">
+      <template x-for="(r, i) in spec.rules" :key="r.t">
+        <div class="flex gap-4 rounded-2xl border border-zinc-200 bg-white p-5 transition hover:border-zinc-300">
+          <span class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100 font-mono text-[12px]/4 font-semibold text-zinc-600" x-text="String(i + 1).padStart(2, '0')"></span>
+          <div class="min-w-0">
+            <p class="text-[14px]/5 font-semibold" x-text="r.t"></p>
+            <p class="mt-1 text-[13px]/5 text-zinc-600" x-text="r.d"></p>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+</section>
+
+<!-- ── tokens ─────────────────────────────────────────────────────────────── -->
+<section id="tokens" class="mx-auto max-w-6xl px-5 py-20 lg:px-8 lg:py-28">
+  <div class="max-w-2xl">
+    <p class="font-mono text-[12px]/4 uppercase tracking-wider text-zinc-500">Palette</p>
+    <h2 class="mt-4 text-[clamp(1.9rem,3.6vw,2.7rem)]/[1.1] font-bold tracking-tight">The class name is the token</h2>
+    <p class="mt-5 text-[16px]/6 text-zinc-600">
+      Stock Tailwind. There is no theme file to import and no variable to look up. Graphite carries
+      every interaction, which is what leaves red, amber and green free to mean something.
+    </p>
+  </div>
+
+  <div class="mt-12 grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+    <div class="rounded-2xl border border-zinc-200 bg-white p-7">
+      <p class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Neutral &amp; accent</p>
+      <div class="mt-5 grid grid-cols-4 gap-3 sm:grid-cols-7">
+        <template x-for="t in spec.tokens.ramp" :key="t[0]">
+          <div>
+            <div class="h-16 rounded-xl" :class="t[1]"></div>
+            <p class="mt-2 font-mono text-[11px]/4 text-zinc-600" x-text="t[0]"></p>
+          </div>
+        </template>
+      </div>
+      <div class="mt-7 border-t border-zinc-200 pt-6">
+        <p class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Shape</p>
+        <ul class="mt-2.5 grid gap-x-8 gap-y-1 font-mono text-[12px]/4 text-zinc-600 sm:grid-cols-2">
+          <template x-for="t in spec.tokens.shape" :key="t[0]">
+            <li><span class="text-zinc-900" x-text="t[0]"></span> <span x-text="t[1]"></span></li>
+          </template>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-zinc-200 bg-white p-7">
+      <p class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Reserved for record state</p>
+      <div class="mt-5 space-y-2.5">
+        <template x-for="s in spec.status" :key="s.s">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex w-[104px] shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px]/4 font-medium" :class="s.pill">
+              <span class="size-1.5 rounded-full" :class="s.dot"></span><span x-text="s.s"></span>
+            </span>
+            <span class="text-[13px]/5 text-zinc-600" x-text="s.why"></span>
+          </div>
+        </template>
+      </div>
+      <p class="mt-6 border-t border-zinc-200 pt-5 text-[13px]/5 text-zinc-600">
+        This mapping is fixed. Three separate agents asked to build components each invented their own
+        version of it, and one of them put <span class="font-medium text-zinc-900">Overdue in amber</span> —
+        which is exactly the ambiguity the rule exists to prevent.
+      </p>
+    </div>
+  </div>
+  <div class="mt-4 rounded-2xl border border-zinc-200 bg-white p-7">
+    <div class="flex flex-wrap items-start justify-between gap-x-8 gap-y-2">
+      <p class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Semantic colour</p>
+      <p class="max-w-[60ch] text-[13px]/5 text-zinc-600">
+        Four tones, one shade each, the same shade in every component. A mark you read takes the
+        text class; a dot or a bar takes the fill. Nothing takes a
+        <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-900">-50</code> tint —
+        a coloured icon well is still <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-900">bg-zinc-200</code>.
+      </p>
+    </div>
+
+    <div class="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <template x-for="t in spec.tokens.semantic" :key="t[0]">
+        <div class="rounded-xl border border-zinc-200 p-4">
+          <div class="flex items-center gap-2.5">
+            <!-- colour on the wrapper, never on the <i> — createIcons() replaces it -->
+            <span class="flex shrink-0" :class="t[2]"><i :data-lucide="t[1]" class="size-4"></i></span>
+            <span class="text-[13px]/5 font-medium" x-text="t[0]"></span>
+            <span class="ml-auto size-2.5 shrink-0 rounded-full" :class="fillOf(t[0]) || 'hidden'"></span>
+          </div>
+          <p class="mt-3 font-mono text-[11px]/4 text-zinc-600" x-text="t[2]"></p>
+          <p class="font-mono text-[11px]/4 text-zinc-500" x-text="fillOf(t[0]) || 'no fill — info is never a dot'"></p>
+          <p class="mt-2.5 text-[12px]/4 text-zinc-600" x-text="t[3]"></p>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <div class="mt-4 rounded-2xl border border-zinc-200 bg-white p-7">
+    <div class="flex flex-wrap items-start justify-between gap-x-8 gap-y-2">
+      <p class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Typography</p>
+      <p class="max-w-[60ch] text-[13px]/5 text-zinc-600">
+        Inter and JetBrains Mono, self-hosted — no request leaves the network. Every size states its
+        leading: <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-900">text-[13px]/5</code>,
+        never bare <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-900">text-[13px]</code>,
+        which compiles to a font-size with no line-height at all.
+      </p>
+    </div>
+
+    <div class="mt-7 grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+      <div>
+        <template x-for="t in spec.tokens.type" :key="t[0]">
+          <div class="flex items-baseline gap-4 border-b border-zinc-100 py-2.5 last:border-0">
+            <code class="w-[112px] shrink-0 font-mono text-[12px]/4 text-zinc-500" x-text="t[0]"></code>
+            <span class="min-w-0 flex-1 truncate font-medium tabular-nums text-zinc-900"
+                  :style="typeStyle(t[0])">Purchase orders ₹1,84,20,000</span>
+            <span class="hidden shrink-0 text-[12px]/4 text-zinc-500 lg:block" x-text="t[1]"></span>
+          </div>
+        </template>
+      </div>
+
+      <div class="grid gap-7 sm:grid-cols-2 lg:grid-cols-1">
+        <div>
+          <p class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Weight — three, no more</p>
+          <ul class="mt-3 space-y-2">
+            <template x-for="w in spec.tokens.weight" :key="w[0]">
+              <li class="flex items-baseline gap-3">
+                <span class="w-[52px] shrink-0 text-[14px]/5 text-zinc-900" :style="'font-weight:' + w[1]" x-text="w[1]"></span>
+                <code class="shrink-0 font-mono text-[12px]/4 text-zinc-500" x-text="w[0]"></code>
+                <span class="min-w-0 text-[12px]/4 text-zinc-600" x-text="w[2]"></span>
+              </li>
+            </template>
+          </ul>
+        </div>
+        <div>
+          <p class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Tracking — two, no more</p>
+          <ul class="mt-3 space-y-2">
+            <template x-for="t in spec.tokens.tracking" :key="t[0]">
+              <li class="flex items-baseline gap-3">
+                <code class="w-[112px] shrink-0 font-mono text-[12px]/4 text-zinc-500" x-text="t[0]"></code>
+                <span class="min-w-0 text-[12px]/4 text-zinc-600" x-text="t[1]"></span>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── components ─────────────────────────────────────────────────────────── -->
+<section id="components" class="border-t border-zinc-200 bg-zinc-50">
+  <div class="mx-auto max-w-6xl px-5 py-20 lg:px-8 lg:py-28">
+    <div class="flex flex-wrap items-end justify-between gap-5">
+      <div class="max-w-2xl">
+        <p class="font-mono text-[12px]/4 uppercase tracking-wider text-zinc-500">The library</p>
+        <h2 class="mt-4 text-[clamp(1.9rem,3.6vw,2.7rem)]/[1.1] font-bold tracking-tight">
+          <span x-text="counts.components"></span> components
+        </h2>
+        <p class="mt-5 text-[16px]/6 text-zinc-600">
+          Documentation pages are written one at a time, each reviewed before the next begins.
+          Every component below already exists in
+          <a href="registry.json" class="font-medium text-zinc-900 underline underline-offset-2">registry.json</a>
+          with its full markup — the page is where the anatomy, behaviour and accessibility notes live.
+        </p>
+      </div>
+      <p class="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px]/5 text-zinc-600">
+        <span class="font-semibold text-zinc-900 tabular-nums" x-text="counts.pages"></span>
+        of <span class="tabular-nums" x-text="counts.components"></span> pages written
+      </p>
+    </div>
+
+    <div class="mt-12 space-y-10">
+      <template x-for="g in grouped" :key="g.id">
+        <div>
+          <div class="flex items-baseline gap-3 border-b border-zinc-200 pb-3">
+            <h3 class="text-[16px]/6 font-semibold" x-text="g.label"></h3>
+            <span class="font-mono text-[11px]/4 text-zinc-500" x-text="g.items.length"></span>
+          </div>
+          <div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <template x-for="c in g.items" :key="c.id">
+              <div>
+                <!-- written up: a real link -->
+                <template x-if="c.page">
+                  <a :href="c.page"
+                     class="group flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 transition hover:border-zinc-400">
+                    <span class="min-w-0 flex-1">
+                      <span class="block text-[14px]/5 font-medium" x-text="c.name"></span>
+                      <span class="mt-0.5 block font-mono text-[11px]/4 text-zinc-500" x-text="c.id"></span>
+                    </span>
+                    <span class="shrink-0 rounded-full bg-zinc-200 px-2 py-0.5 font-mono text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="c.variants"></span>
+                    <i data-lucide="arrow-up-right" class="size-4 shrink-0 text-zinc-500 transition group-hover:text-zinc-900"></i>
+                  </a>
+                </template>
+                <!-- not written up yet: plainly said so, not a dead link -->
+                <template x-if="!c.page">
+                  <div class="flex items-center gap-3 rounded-xl border border-dashed border-zinc-200 px-4 py-3">
+                    <span class="min-w-0 flex-1">
+                      <span class="block text-[14px]/5 text-zinc-600" x-text="c.name"></span>
+                      <span class="mt-0.5 block font-mono text-[11px]/4 text-zinc-500" x-text="c.id"></span>
+                    </span>
+                    <span class="shrink-0 rounded-full bg-zinc-200 px-2 py-0.5 font-mono text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="c.variants"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+</section>
+
+<!-- ── closing ────────────────────────────────────────────────────────────── -->
+<section class="border-t border-zinc-200 bg-zinc-900">
+  <div class="mx-auto max-w-6xl px-5 py-20 lg:px-8 lg:py-24">
+    <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <div>
+        <h2 class="text-[clamp(1.8rem,3.4vw,2.5rem)]/[1.1] font-bold tracking-tight text-white">
+          Hand it the instructions once.
+        </h2>
+        <p class="mt-4 max-w-[52ch] text-[16px]/7 text-zinc-400">
+          Every screen it builds after that will match every screen built before it — including the ones
+          built by a different agent, six months from now.
+        </p>
+      </div>
+      <button @click="copy(prompt, 'foot')"
+              class="flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[14px]/5 font-medium text-zinc-900 transition hover:bg-zinc-200">
+        <i :data-lucide="copied === 'foot' ? 'check' : 'clipboard'" class="size-4"></i>
+        <span x-text="copied === 'foot' ? 'Copied to clipboard' : 'Copy agent instructions'"></span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-zinc-900">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 border-t border-zinc-800 px-5 py-7 text-[12px]/4 text-zinc-400 lg:px-8">
+    <span>Konspec UI — Tailwind CSS v4 · Alpine.js · htmx · Lucide</span>
+    <span class="font-mono">konspec/ui</span>
+  </div>
+</footer>
+
+<script>
+/* Lucide hydration.
+   createIcons() leaves data-lucide on the <svg> it produces, so a naive
+   "re-run on every mutation" observer re-renders every icon forever and the
+   DOM never settles — which stutters any animation running at the time.
+   Guard on there being an un-hydrated element, and the loop terminates. */
+(function () {
+  let queued = false;
+  const pending = () => document.querySelector('[data-lucide]:not(svg)');
+  const draw = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      if (window.lucide && pending()) lucide.createIcons();
+    });
+  };
+  document.addEventListener('DOMContentLoaded', draw);
+  document.addEventListener('alpine:initialized', () => {
+    draw();
+    new MutationObserver(draw).observe(document.body, { childList: true, subtree: true });
+  });
+})();
+</script>
+</body>
+</html>

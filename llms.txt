@@ -1,0 +1,195 @@
+# Konspec UI
+
+> Copy-paste HTML components for internal data applications. Light theme only. A component library written for the agent building your app.
+
+You are reading the entry point for this design system. It is written for agents.
+Read all of it before writing markup for a Konspec application, then fetch
+registry.json and copy component HTML from it verbatim.
+
+## Protocol
+
+1. **Read llms.txt** — The stack, the tokens and the hard rules in one file, generated from the same source as this page. It is short. Read all of it.
+   `GET /llms.txt`
+2. **Fetch registry.json and copy verbatim** — Every component and every variant, with exact HTML. Copy the string. Do not paraphrase markup you have already been handed, and do not reformat it into your own idiom.
+   `GET /registry.json  →  components[].variants[].html`
+3. **Match the reference implementation** — A complete procurement dashboard built only from these components. When the docs and a real screen disagree about spacing or hierarchy, the screen wins.
+   `GET /reference/`
+4. **Ask rather than choose** — If a colour, size or pattern is not defined here, it does not exist yet. Adding one is a decision for a person, not a default you pick because the page looked empty.
+   `// no new tokens without a human`
+
+## Stack
+
+- **css**: Tailwind CSS v4 — utility classes only. No component CSS, no @apply, no custom colour tokens.
+- **js**: Alpine.js 3 for local UI state, plus two official plugins — @alpinejs/collapse for animated panels and @alpinejs/focus for dialog focus traps. Both load before Alpine core. State lives on the component root, never in a global store.
+- **server**: htmx for partial swaps. Alpine does not fetch.
+- **icons**: Lucide via CDN — <i data-lucide="name"></i>, hydrated by lucide.createIcons().
+- **build**: None. Snippets are plain HTML and paste into Django, Flask or a static file unchanged.
+
+## Rules
+
+Every one of these exists because breaking it produced a visible defect at
+least once. They are not style preferences.
+
+1. **Stock Tailwind only.** No custom CSS, no @theme colours, no arbitrary hex. Arbitrary values are for one-off sizes, never for colour.
+2. **Light theme only.** There is no dark mode and none is planned. A second theme doubles the review surface for no benefit in an office tool.
+3. **Never bind Alpine on a Lucide icon.** createIcons() replaces the <i> with an <svg>, destroying any :class on it. Bind on a wrapping span instead.
+4. **Never add cursor-pointer.** Tailwind v4 preflight drops it from buttons. One base rule fixes every element; 300 utility classes do not.
+5. **Colour means data state.** Red, amber and green describe what a record is doing. Never decoration, never a brand accent. They appear as a dot or an icon, never as a field of colour behind text.
+6. **The accent is graphite.** zinc-700. Interactive text is zinc-900 plus an underline, not a colour.
+7. **Alerts are neutral.** White card, zinc border, colour only in the icon. A full-width red field shouts louder than the overdue rows it describes.
+8. **Every tinted shape carries its ring.** A tinted shape is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 — pills, chips, avatars, icon wells, all of them. A tinted surface is bg-zinc-100 — the page, selected rows, active nav, table headers. Give a shape the surface fill and it measures 1.00 contrast against the surface it sits on, which is not low contrast but the identical colour, and it disappears. One step of fill separates them and the ring holds the edge. Solid shapes need no ring, and it is ring rather than border so adding it reflows nothing.
+9. **Status colour lives in the dot.** Every status pill is the same graphite shape — bg-zinc-200, ring-zinc-300, zinc-700 text, the same fill an avatar takes. What separates Open from Overdue is a 6px dot. A column of tinted pills reads as a traffic light and stops meaning anything by the twelfth row; a column of identical pills with one red dot in it reads at a glance. This is the alert rule — colour only in the marker — applied to a pill.
+10. **One shade per meaning.** Info is zinc-400, success emerald-600, warning amber-700, danger red-600 — and a warning is amber-700 in a component and amber-500 only when it is a dot, because a 1.5px stroke and a 6px disc need different weights of the same colour. Nothing takes a -50 tint or a -200 ring: a coloured icon well is still bg-zinc-200 with ring-zinc-300. Pick the shade from the token table, never by eye.
+11. **Survive 390px.** Tables become stacked cards. Nothing scrolls sideways on a phone.
+12. **No template x-for inside svg.** It is parsed in the SVG namespace and has no .content. Use divs, or a conic-gradient for donuts.
+13. **x-cloak on anything hidden at first paint.** Alpine boots after the HTML renders. Without it, every dropdown flashes on load.
+14. **Every text size carries its leading.** text-[13px] compiles to font-size alone — arbitrary sizes emit no line-height, so the element silently inherits whatever an ancestor left. Always write the slash form, text-[13px]/5. Sizes come from the seven steps; only prose may take a looser leading than the default pairing.
+15. **Guard the Lucide re-hydration loop.** createIcons() leaves data-lucide on the <svg> it generates, so re-running it on every DOM mutation re-renders every icon forever. Guard on document.querySelector("[data-lucide]:not(svg)") or animations stutter while the DOM never settles.
+
+## Tokens
+
+Stock Tailwind. The class name is the token — there is no theme file to import.
+
+### Surfaces
+
+- **Page** `bg-zinc-100` — The scrolling page behind everything.
+- **Surface** `bg-white` — Cards, panels, sidebar, topbar, table bodies.
+- **Border** `border-zinc-200` — Card edges, table rules, input borders.
+- **Divider** `border-zinc-100` — Rows inside a card that is already bordered.
+
+### Text
+
+- **Primary** `text-zinc-900` — Headings, values, anything you read first.
+- **Secondary** `text-zinc-600` — Labels, descriptions, secondary copy.
+- **Tertiary** `text-zinc-500` — Timestamps, hints, placeholder text.
+- **On dark** `text-zinc-400` — The scale inverts on a zinc-900 band — the footer, the agent handoff. Darkening secondary text there makes it less readable, not more.
+
+### Accent
+
+- **Solid** `bg-zinc-700` — Primary buttons, progress fills, chart bars, the active nav marker.
+- **Hover** `bg-zinc-800` — Hover state of anything accent-filled.
+- **Tint** `bg-zinc-100` — Selected rows, active nav, table headers — surfaces, never shapes.
+- **Chip** `bg-zinc-200` — Every tinted shape sitting on the page: badges, avatars, icon wells. One step deeper than the page so it has a fill of its own, and one step deeper again for its ring.
+- **Link** `text-zinc-900 underline underline-offset-2` — Interactive text. Colour is not the signal — the underline is.
+
+### Semantic colour
+
+One shade per meaning, and the same shade in every component. Pick from this
+table rather than by eye. No -50 tints, no coloured rings — a coloured icon
+well is still bg-zinc-200 with ring-zinc-300.
+
+| tone | icon | mark you read | dot or bar | means |
+| --- | --- | --- | --- | --- |
+| Info | `info` | `text-zinc-500` | — | Neutral notice. Grey, because nothing is wrong. |
+| Success | `check-circle-2` | `text-emerald-600` | `bg-emerald-600` | Finished, posted, sent. Same green as the Closed dot. |
+| Warning | `alert-triangle` | `text-amber-700` | `bg-amber-500` | Waiting, expiring, over a limit. 700 for marks you read — a 1.5px amber-500 stroke on white is illegible. |
+| Danger | `alert-circle` | `text-red-600` | `bg-red-600` | Overdue, failed, destructive. Same red as the Overdue dot. |
+
+### Typography
+
+Inter and JetBrains Mono, self-hosted at assets/fonts.css. Nothing is fetched
+from a font CDN at runtime.
+
+Arbitrary font sizes compile to a font-size with no line-height, so every size
+is written in the slash form and the pairing below is the default.
+
+- `text-[11px]/4` — uppercase labels, counts, badge text
+- `text-[12px]/4` — help text, timestamps, secondary lines
+- `text-[13px]/5` — buttons, table cells, default component text
+- `text-[14px]/5` — body copy, inputs, prose
+- `text-[16px]/6` — card, dialog and panel titles
+- `text-[20px]/7` — section headings, error page titles
+- `text-[24px]/7` — page titles, KPI figures
+
+Three weights, and no others:
+
+- `font-normal` (400) — body copy, table cells, anything you read as a sentence
+- `font-medium` (500) — anything that labels or acts — buttons, table headers, alert titles, nav items
+- `font-semibold` (600) — headings, KPI figures, panel titles
+
+Two tracking values, plus the default:
+
+- `tracking-wider` — 11px uppercase labels only
+- `tracking-tight` — headings at 20px and above
+- `normal` — everywhere else. No arbitrary em values.
+
+### Shape
+
+- rounded-lg controls; rounded-xl panels; rounded-full pills; 36–44px control height.
+- Every number gets tabular-nums, without exception. Columns of figures that do not line up are a bug.
+
+## Status colours
+
+Fixed. Do not reinterpret per screen. Colour describes what the record is
+doing; the accent is graphite precisely so these stay meaningful.
+
+| status | pill | dot | meaning |
+|---|---|---|---|
+| Open | `bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300` | `bg-zinc-500` | The ordinary case |
+| Approved | `bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300` | `bg-amber-500` | Waiting on someone |
+| Overdue | `bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300` | `bg-red-600` | The alarm state |
+| Closed | `bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300` | `bg-emerald-600` | Finished |
+| Draft | `bg-zinc-200 text-zinc-600 ring-1 ring-inset ring-zinc-300` | `bg-zinc-400` | Not real yet |
+
+## Components
+
+One line each. When-to-use notes, per-component rules and the exact markup for
+every variant are in registry.json under the matching id — fetch that before
+building anything, rather than reconstructing a component from its description.
+
+### Actions
+
+- **Button** `button` — The standard action control. Exactly one primary button per view; everything else is secondary, ghost or a link. Variants: variants, sizes, icons, states, link, full-width, toolbar, django.
+- **Button group** `button-group` — Several controls joined into one object. Two shapes only: a tinted track for choosing one of a set, and a bordered strip for actions that belong together. Variants: segmented, attached, icon-toolbar, split, input, vertical, responsive, django.
+- **Dropdown menu** `dropdown` — A menu of actions anchored to a trigger. Destructive items sit last, below a divider. Variants: default.
+
+### Forms
+
+- **Field** `field` — Label, control, help text and error in one block. This is the unit every form is built from. Variants: default, error.
+- **Input** `input` — Single-line text entry. The border lives on the wrapper so icons and prefixes sit inside the focus ring. Variants: default, icon, disabled.
+- **Checkbox, radio, toggle** `choice` — Boolean and single-choice controls. accent-zinc-700 keeps native controls on-theme without custom CSS. Variants: checkbox, toggle.
+- **Attachment** `attachment` — The documents hanging off a record — a drop zone over the list of what is already there. Every file shows its type, size, who attached it and when. Variants: default, empty, uploading, rejected, readonly, single, images, django.
+- **Calendar** `calendar` — A month grid for picking a date or a range. Monday-first, tabular figures, and the same graphite selection the rest of the system uses. Variants: month, picker, range, jump, constrained, presets, native, django.
+
+### Data display
+
+- **Table** `table` — Rows of records with a sortable header. The workhorse of every register screen — order lists, GRN lists, ledgers. Variants: default, selection, dense, responsive.
+- **Pagination** `pagination` — Moves through a long register a page at a time, and says where you are in it. Variants: simple, numbered, page-size.
+- **Stat card** `stat-card` — One number that matters, with the label above it and the change since last period below. Variants: default, sparkline, grid.
+- **Progress** `progress` — How far along something is — receipt against an order, a step in a workflow, a fill level in a row. Variants: bar, steps, inline.
+- **Empty state** `empty-state` — What a list shows when it has nothing in it. Says why it is empty and what to do next. Variants: no-results, nothing-yet, error.
+- **Skeleton** `skeleton` — Grey blocks in the shape of the content that is loading. Variants: text, table, card.
+
+### Feedback
+
+- **Alert** `alert` — An inline notice about the page or the record in front of the user. White card, zinc border, and the only colour is the icon. Variants: tags, compact, dismissible, action, records, progress, banner, form-errors, django.
+- **Toast** `toast` — A short confirmation that something finished, pinned to the bottom-left and gone a few seconds later. Variants: default, undo.
+- **Alert dialog** `alert-dialog` — A dialog that interrupts to ask one question with two answers. Unlike a modal it does not dismiss on a backdrop click — the user has to choose. Variants: confirm, destructive, typed, bulk, unsaved.
+- **Modal** `modal` — A centred, dismissible dialog over a dimmed page. Use it to take a handful of fields without leaving the list. Variants: form, scrolling, reference.
+- **Drawer** `drawer` — A panel that slides in from the right over the page. Shows a record, or the filters for a list, without losing the user's place in it. Variants: record, filters.
+- **Badge** `badge` — A small pill that labels a record — status, tag or count. Every pill is the same graphite shape; a 6px dot carries the colour. Variants: status, inline, sizes, icon, filter, removable, count, table, django.
+- **Tooltip** `tooltip` — A dark bubble on hover, done with group-hover alone — no JS, no Alpine. Variants: icon, truncated.
+- **Avatar** `avatar` — Initials in a circle standing in for a person. There are no photographs in this system, so a zinc tint and two letters is the whole thing. Variants: sizes, self, with-name, stacked, in-row, presence, menu, placeholder.
+
+### Navigation
+
+- **Tabs** `tabs` — Switches between views of the same record without leaving the page. The panel below changes; the URL and the page title do not have to. Variants: underline, pill, scrollable.
+- **Breadcrumbs** `breadcrumbs` — The path from the section root down to the record on screen. The last crumb says where you are and is not a link. Variants: default, record, truncated, overflow, responsive, page-header, back, django.
+- **Sidebar nav** `sidebar-nav` — The vertical navigation list that lives inside an app shell. This is the list only — the shell, its header and the scroll container belong to the layout. Variants: expanded, rail, nested.
+- **Topbar** `topbar` — The application header above the page content: where you are, what you can search, and who you are signed in as. Variants: default, compact.
+- **Accordion** `accordion` — Sections of content that collapse to their heading. The heading is a button that toggles the panel below it. Variants: default, single, cards.
+- **Command palette** `command-palette` — A ⌘K overlay for jumping to a record or firing an action by typing. It is a shortcut over the navigation, never the only route to something. Variants: default.
+
+### Layout
+
+- **App shell** `app-shell` — The page skeleton: collapsible sidebar, topbar, and a single scrolling main column. Everything else in the app is rendered inside the main column. Variants: default.
+- **Page header** `page-header` — The top block of a page: where it sits in the app, what it is, and what you can do to it. One h1 per page and it lives here. Variants: default, tabs, filters.
+- **Card** `card` — A bordered white panel that groups one thing. A header row names it, the body holds the content, and an optional footer carries totals or actions. Variants: default, actions, stats, section.
+- **List and detail** `list-detail` — A scrolling list on the left and the selected record on the right. Picking a row swaps the right pane without leaving the page. Variants: default.
+- **Form page** `form-page` — The layout a create or edit screen uses: fields in a card, and the Save and Cancel actions where the user can always reach them. Variants: two-column, side-rail.
+- **Auth page** `auth-page` — The signed-out screen: one centred card, the fewest fields that will do, and nothing else on the page. Variants: signin.
+- **Error page** `error-page` — What the user sees when the page cannot be shown. Says what happened, what it means for them, and gives one way back. Variants: 404, 403, 500.
+
+## Machine-readable
+
+- [registry.json](registry.json) — every component, every variant, exact HTML.

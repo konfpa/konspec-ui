@@ -1,0 +1,12 @@
+# throwaway design comparisons — kept locally, not published
+lab/
+
+# editor and OS noise
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# playwright / tooling scratch
+.playwright-mcp/
+node_modules/
