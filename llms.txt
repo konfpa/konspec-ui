@@ -176,7 +176,7 @@ building anything, rather than reconstructing a component from its description.
 
 ### Navigation
 
-- **Tabs** `tabs` — Switches between views of the same record without leaving the page. The panel below changes; the URL and the page title do not have to. Variants: underline, pill, scrollable.
+- **Tabs** `tabs` — Switches between views of the same record without leaving the page. The panel below changes; the row above is a widget, not a menu, and the keyboard has to know the difference. Variants: underline, pill, scrollable, vertical, url, lazy, states, django.
 - **Breadcrumbs** `breadcrumbs` — The path from the section root down to the record on screen. The last crumb says where you are and is not a link. Variants: default, record, truncated, overflow, responsive, page-header, back, django.
 - **Sidebar nav** `sidebar-nav` — The vertical navigation list that lives inside an app shell. This is the list only — the shell, its header and the scroll container belong to the layout. Variants: expanded, rail, nested.
 - **Topbar** `topbar` — The application header above the page content: where you are, what you can search, and who you are signed in as. Variants: default, compact.

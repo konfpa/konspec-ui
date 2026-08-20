@@ -1,127 +1,607 @@
 register(
   {
     id: 'tabs', name: 'Tabs', category: 'navigation',
-    description: 'Switches between views of the same record without leaving the page. The panel below changes; the URL and the page title do not have to.',
-    when: 'Two to seven sibling views of one thing — an order and its lines, receipts and history. If the views are unrelated, use the sidebar instead.',
+    description: 'Switches between views of the same record without leaving the page. The panel below changes; the row above is a widget, not a menu, and the keyboard has to know the difference.',
+    when: 'Two to seven sibling views of one thing — an order and its lines, receipts and history. If the views are unrelated, use the sidebar instead. If each view is its own URL, this is navigation and belongs in the django variant.',
     notes: [
-      'The active tab is the only one carrying weight. Do not colour the inactive tabs — they are text-zinc-600 and nothing else.',
-      'Counts belong in a pill on the tab, not in the label text. Keep them tabular-nums so the row does not jitter when a number changes.',
-      'On a narrow screen tabs scroll sideways. Never wrap them onto a second line — the second line reads as a different control.'
+      'role="tab" only when the panel is in this document. If each tab is a URL, it is a nav of links with aria-current="page", and nothing else. Putting role="tab" on a link promises a screen reader that arrows will switch panels and Tab will jump into one, and then neither happens.',
+      'A tab carries aria-selected, not aria-current. They look interchangeable and are not: aria-current marks where you are in a set of destinations, aria-selected marks which of several panels is showing.',
+      'Exactly one tab in the tab order — the selected one gets tabindex 0, the rest get -1. Without this roving tabindex, Tab walks every tab in the row and the panel is seven presses away, which is the opposite of what the pattern exists to do.',
+      'Bind the arrow keys. A tablist without them is a row of buttons that only works with a mouse, whatever the roles say.',
+      'Activate automatically only when the panels are already in the page. A tab that fetches uses manual activation, or arrowing from the first tab to the seventh fires seven requests and the user reads whichever one lands last.',
+      'Generate the ids with $id(). Static ids look fine until a second copy of the same tab set lands on one page, and then two tabs point aria-controls at one panel and nothing reports an error.',
+      'Never wrap the row onto a second line. It scrolls sideways, with the next tab peeking, because a second line of tabs reads as a different control.',
+      'Do not colour the inactive tabs. They are text-zinc-600 and nothing else; the active one is the only one carrying weight.',
+      'Counts go in a pill on the tab, not in the label, and the pill is tabular-nums so the row does not jitter when a number changes.',
+      'x-cloak on every panel that is not the one showing at first paint, or all of them are visible for the moment before Alpine boots.'
     ],
     anatomy: [
-      ['Tablist', 'The row itself, with a bottom border that the active tab\'s marker sits on.'],
-      ['Tab', 'A button, not a link, when the panel is on the same page.'],
-      ['Active marker', 'A 2px zinc-900 underline plus the weight change. The inactive tabs are text-zinc-600 and nothing else.'],
-      ['Count', 'A pill on the tab, tabular-nums, so the row does not jitter when a number changes.'],
-      ['Panel', 'The region below, tied to its tab by id.']
+      ['Tablist', 'The row itself, holding the arrow-key bindings and a label that says what the set is for.'],
+      ['Tab', 'A button when the panel is in this document, a link when the tab is a URL. The two are not interchangeable.'],
+      ['Active marker', 'A 2px zinc-900 underline plus the weight change, and nothing else. Inactive tabs are text-zinc-600.'],
+      ['Count or dot', 'A tabular-nums pill for a number, a 6px dot for a state. Colour on the dot only, per the status rule.'],
+      ['Panel', 'The region below, tied to its tab by id in both directions, and focusable so it can be reached when it holds no controls.'],
+      ['Overflow', 'The scrolling strip a long row becomes on a narrow screen, with the active tab scrolled into view rather than left off the edge.']
     ],
     behaviour: [
-      'Only the active tab carries weight and colour. Tinting the inactive ones destroys the distinction the control exists to make.',
-      'Two to seven tabs. Past that the row stops being scannable and the views are probably unrelated.',
-      'On a narrow screen the row scrolls sideways. It never wraps — a second line reads as a different control.',
-      'Counts live in a pill rather than in the label text, so the label stays a stable width.',
-      'Switching tabs does not reload the page and does not lose scroll position in the panel below.'
+      'Only the active tab carries weight and colour. Tinting the inactive ones destroys the one distinction the control exists to make.',
+      'Two to seven tabs. Past that the row stops being scannable, and views that numerous are usually unrelated, which makes them sidebar entries.',
+      'Left and right arrows move between tabs, Home and End jump to the ends, and Tab leaves the row entirely and lands in the panel. That last one is the whole point of the pattern: seven tabs cost one Tab press, not seven.',
+      'Activation is automatic when the panels are local, so an arrow both moves and switches. When a tab fetches its panel, the arrow moves focus only and Enter or Space commits, which a native button already does.',
+      'The row scrolls rather than wraps, and moving by keyboard brings the tab into view. A focused tab off the edge of the strip is a focus ring nobody can see.',
+      'Switching does not reload and does not lose the panel scroll position. Where the tab is part of the record\'s address it goes in the query string with replaceState, not pushState, so Back leaves the record instead of undoing a tab.'
     ],
     a11y: [
-      'role="tablist" on the row, role="tab" on each control, role="tabpanel" on the region.',
-      'Each tab carries aria-selected and aria-controls pointing at its panel.',
-      'Left and right arrows move between tabs; Tab moves out of the row entirely, which is the whole point of the pattern.',
-      'Only the active tab is in the tab order — the others are reached with the arrows.',
-      'The panel is labelled by its tab with aria-labelledby, so its context is announced.'
+      'role="tablist" on the row, role="tab" on each control, role="tabpanel" on each region, and an aria-label on the tablist naming the set.',
+      'Each tab carries aria-selected and aria-controls; each panel carries aria-labelledby pointing back. Both directions, or the panel is announced without its name.',
+      'Roving tabindex: the selected tab is 0, every other tab is -1, so Tab enters the row once and leaves into the panel.',
+      'Arrow keys move, Home and End jump, and every one of them calls preventDefault so the page does not scroll underneath.',
+      'The panel takes tabindex="0" so it is reachable when it contains nothing focusable, which is most panels made of text.',
+      'Ids come from $id(), so two tab sets on one page cannot cross-wire their aria-controls.'
     ],
     related: ['page-header', 'accordion', 'sidebar-nav'],
     variants: [
       { id: 'underline', name: 'Underline', code:
-`<div x-data="{ tab: 'lines' }">
+`<!-- The default. Automatic activation, because all four panels are already in
+     the page and there is nothing to wait for.
+
+     tabEls() filters on [role=tab] rather than reading children: x-for leaves a
+     <template> in the DOM and it counts as an element child. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'lines',
+       items: [
+         { id: 'summary',  label: 'Summary' },
+         { id: 'lines',    label: 'Lines',    count: 14 },
+         { id: 'receipts', label: 'Receipts', count: 3 },
+         { id: 'history',  label: 'History' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }">
   <div class="border-b border-zinc-200">
-    <nav class="-mb-px flex gap-6" aria-label="Purchase order sections">
-      <button @click="tab = 'summary'" :aria-current="tab === 'summary' ? 'page' : false"
-              class="border-b-2 pb-2.5 text-[13px]/5"
-              :class="tab === 'summary' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
-        Summary
-      </button>
-      <button @click="tab = 'lines'" :aria-current="tab === 'lines' ? 'page' : false"
-              class="flex items-center gap-2 border-b-2 pb-2.5 text-[13px]/5"
-              :class="tab === 'lines' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
-        Lines
-        <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700">14</span>
-      </button>
-      <button @click="tab = 'receipts'" :aria-current="tab === 'receipts' ? 'page' : false"
-              class="flex items-center gap-2 border-b-2 pb-2.5 text-[13px]/5"
-              :class="tab === 'receipts' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
-        Receipts
-        <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700">3</span>
-      </button>
-      <button @click="tab = 'history'" :aria-current="tab === 'history' ? 'page' : false"
-              class="border-b-2 pb-2.5 text-[13px]/5"
-              :class="tab === 'history' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
-        History
-      </button>
-    </nav>
+    <div x-ref="list" role="tablist" aria-label="Purchase order sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="pick(items[0].id)"
+         @keydown.end.prevent="pick(items[items.length - 1].id)"
+         class="-mb-px flex gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :tabindex="tab === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+                :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
+          <span x-text="t.label"></span>
+          <template x-if="t.count">
+            <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="t.count"></span>
+          </template>
+        </button>
+      </template>
+    </div>
   </div>
 
   <div class="pt-4 text-[14px]/5">
-    <div x-show="tab === 'summary'" x-cloak>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'summary')" :aria-labelledby="$id('tab', 'summary')"
+         x-show="tab === 'summary'" x-cloak
+         class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
       <p class="text-zinc-600">PO-24-1187 raised for Gujarat Polymers Ltd on 4 August, payment 45 days from GRN.</p>
     </div>
-    <div x-show="tab === 'lines'">
-      <p>14 lines, <span class="tabular-nums font-medium">₹18,42,000</span> before tax.</p>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'lines')" :aria-labelledby="$id('tab', 'lines')"
+         x-show="tab === 'lines'"
+         class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <p>14 lines, <span class="font-medium tabular-nums">₹18,42,000</span> before tax.</p>
     </div>
-    <div x-show="tab === 'receipts'" x-cloak>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'receipts')" :aria-labelledby="$id('tab', 'receipts')"
+         x-show="tab === 'receipts'" x-cloak
+         class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
       <p class="text-zinc-600">3 GRNs posted, 2 lines still short.</p>
     </div>
-    <div x-show="tab === 'history'" x-cloak>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'history')" :aria-labelledby="$id('tab', 'history')"
+         x-show="tab === 'history'" x-cloak
+         class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
       <p class="text-zinc-600">Approved by R. Menon on 5 August, revised once.</p>
     </div>
   </div>
 </div>` },
+
       { id: 'pill', name: 'Pill', code:
-`<div x-data="{ tab: 'open' }">
-  <div class="inline-flex rounded-lg bg-zinc-100 p-1" role="tablist" aria-label="Order status">
-    <button @click="tab = 'open'" :aria-current="tab === 'open' ? 'page' : false"
-            class="rounded-md px-3 py-1.5 text-[13px]/5"
-            :class="tab === 'open' ? 'bg-white font-medium text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
-      Open
-    </button>
-    <button @click="tab = 'awaiting'" :aria-current="tab === 'awaiting' ? 'page' : false"
-            class="rounded-md px-3 py-1.5 text-[13px]/5"
-            :class="tab === 'awaiting' ? 'bg-white font-medium text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
-      Awaiting GRN
-    </button>
-    <button @click="tab = 'closed'" :aria-current="tab === 'closed' ? 'page' : false"
-            class="rounded-md px-3 py-1.5 text-[13px]/5"
-            :class="tab === 'closed' ? 'bg-white font-medium text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
-      Closed
-    </button>
+`<!-- Same widget, different marker: a white pill on a zinc-100 track instead of
+     an underline. Reach for it when the tabs filter a list rather than section a
+     record, and when the row has to sit beside other controls without a rule
+     running under it. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'open',
+       items: [
+         { id: 'open',     label: 'Open' },
+         { id: 'awaiting', label: 'Awaiting GRN' },
+         { id: 'closed',   label: 'Closed' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }">
+  <div x-ref="list" role="tablist" aria-label="Order status"
+       @keydown.arrow-right.prevent="move(1)"
+       @keydown.arrow-left.prevent="move(-1)"
+       @keydown.home.prevent="pick(items[0].id)"
+       @keydown.end.prevent="pick(items[items.length - 1].id)"
+       class="inline-flex rounded-lg bg-zinc-100 p-1">
+    <template x-for="t in items" :key="t.id">
+      <button type="button" role="tab" :data-tab="t.id"
+              :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+              :aria-selected="tab === t.id ? 'true' : 'false'"
+              :tabindex="tab === t.id ? 0 : -1"
+              @click="pick(t.id)"
+              class="rounded-md px-3 py-1.5 text-[13px]/5 whitespace-nowrap focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+              :class="tab === t.id ? 'bg-white font-medium text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'"
+              x-text="t.label"></button>
+    </template>
   </div>
 
   <div class="pt-4 text-[14px]/5">
-    <p x-show="tab === 'open'">48 orders open, <span class="tabular-nums">₹4,12,60,000</span> committed.</p>
-    <p x-show="tab === 'awaiting'" x-cloak class="text-zinc-600">27 orders delivered but not yet receipted.</p>
-    <p x-show="tab === 'closed'" x-cloak class="text-zinc-600">73 orders closed this quarter.</p>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'open')" :aria-labelledby="$id('tab', 'open')"
+         x-show="tab === 'open'" class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <p>48 orders open, <span class="tabular-nums">₹4,12,60,000</span> committed.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'awaiting')" :aria-labelledby="$id('tab', 'awaiting')"
+         x-show="tab === 'awaiting'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <p class="text-zinc-600">27 orders delivered but not yet receipted.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'closed')" :aria-labelledby="$id('tab', 'closed')"
+         x-show="tab === 'closed'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <p class="text-zinc-600">73 orders closed this quarter.</p>
+    </div>
   </div>
 </div>` },
+
       { id: 'scrollable', name: 'Scrollable', code:
-`<div x-data="{ tab: 'grn' }">
-  <div class="overflow-x-auto border-b border-zinc-200">
-    <nav class="-mb-px flex w-max gap-6" aria-label="Procurement sections">
-      <template x-for="t in [
-        { id: 'overview', label: 'Overview' },
-        { id: 'po', label: 'Purchase orders' },
-        { id: 'req', label: 'Requisitions' },
-        { id: 'grn', label: 'Goods receipt' },
-        { id: 'inv', label: 'Invoices' },
-        { id: 'vendors', label: 'Vendors' },
-        { id: 'rc', label: 'Rate contracts' }
-      ]" :key="t.id">
-        <button @click="tab = t.id" :aria-current="tab === t.id ? 'page' : false"
-                class="shrink-0 border-b-2 pb-2.5 text-[13px]/5 whitespace-nowrap"
+`<!-- Seven tabs on a phone. The strip scrolls and the next tab peeks, which is
+     what stops it reading as a row that broke.
+
+     focus() scrolls a hidden element into view on both axes, which on a long
+     page means the whole document jumps to the tab strip. So focus with
+     preventScroll and do the horizontal scroll by hand, on the strip only. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'grn',
+       items: [
+         { id: 'overview', label: 'Overview' },
+         { id: 'po',       label: 'Purchase orders' },
+         { id: 'req',      label: 'Requisitions' },
+         { id: 'grn',      label: 'Goods receipt' },
+         { id: 'inv',      label: 'Invoices' },
+         { id: 'vendors',  label: 'Vendors' },
+         { id: 'rc',       label: 'Rate contracts' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       init() { this.$nextTick(() => this.reveal(this.tab)); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus({ preventScroll: true });
+           this.reveal(id);
+         });
+       },
+       /* scrollIntoView by hand, so only the strip moves and the neighbour
+          still peeks by 16px */
+       reveal(id) {
+         const s = this.$refs.strip, el = this.tabEls().find(e => e.dataset.tab === id);
+         if (!el) return;
+         const a = el.getBoundingClientRect(), b = s.getBoundingClientRect();
+         if (a.left < b.left + 16) s.scrollBy({ left: a.left - b.left - 16 });
+         else if (a.right > b.right - 16) s.scrollBy({ left: a.right - b.right + 16 });
+       }
+     }">
+  <div x-ref="strip" class="overflow-x-auto border-b border-zinc-200 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div x-ref="list" role="tablist" aria-label="Procurement sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="pick(items[0].id)"
+         @keydown.end.prevent="pick(items[items.length - 1].id)"
+         class="-mb-px flex w-max gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="$id('tab', t.id)" :aria-controls="$id('panel', 'all')"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :tabindex="tab === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                class="shrink-0 whitespace-nowrap rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
                 :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
                 x-text="t.label"></button>
       </template>
-    </nav>
+    </div>
   </div>
-  <p class="pt-4 text-[14px]/5 text-zinc-600">Showing <span class="font-medium text-zinc-900" x-text="tab"></span> — swipe the tab strip on a narrow screen.</p>
+
+  <!-- one panel whose contents change, so aria-labelledby follows the selection -->
+  <div role="tabpanel" tabindex="0" :id="$id('panel', 'all')" :aria-labelledby="$id('tab', tab)"
+       class="rounded-lg pt-4 text-[14px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+    <p class="text-zinc-600">Showing
+      <span class="font-medium text-zinc-900" x-text="items.find(t => t.id === tab).label"></span>.
+      On a narrow screen, drag the strip or use the arrow keys.</p>
+  </div>
+</div>` },
+
+      { id: 'vertical', name: 'Vertical', code:
+`<!-- For a settings page, where the labels are phrases rather than nouns and the
+     list is long enough that a row would scroll. Up and down arrows instead of
+     left and right, and aria-orientation says so.
+
+     The marker is the same 2px zinc-900 rule the horizontal variants use, only
+     turned on its side. The zinc-100 fill is the second half of the statement
+     and never the whole of it: drop these tabs onto the zinc-100 page surface
+     and a fill-only marker measures 1.00 against its background, which is not
+     faint but invisible. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'approvals',
+       items: [
+         { id: 'general',   label: 'General' },
+         { id: 'approvals', label: 'Approval limits' },
+         { id: 'numbering', label: 'Document numbering' },
+         { id: 'tax',       label: 'Tax and HSN' },
+         { id: 'users',     label: 'Users and roles' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }"
+     class="grid gap-6 sm:grid-cols-[190px_minmax(0,1fr)]">
+  <div x-ref="list" role="tablist" aria-orientation="vertical" aria-label="Settings sections"
+       @keydown.arrow-down.prevent="move(1)"
+       @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="pick(items[0].id)"
+       @keydown.end.prevent="pick(items[items.length - 1].id)"
+       class="flex flex-col gap-0.5">
+    <template x-for="t in items" :key="t.id">
+      <button type="button" role="tab" :data-tab="t.id"
+              :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+              :aria-selected="tab === t.id ? 'true' : 'false'"
+              :tabindex="tab === t.id ? 0 : -1"
+              @click="pick(t.id)"
+              class="rounded-r-lg border-l-2 px-3 py-2 text-left text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+              :class="tab === t.id ? 'border-zinc-900 bg-zinc-100 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'"
+              x-text="t.label"></button>
+    </template>
+  </div>
+
+  <div class="min-w-0 text-[14px]/5">
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'general')" :aria-labelledby="$id('tab', 'general')"
+         x-show="tab === 'general'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">General</h3>
+      <p class="mt-1.5 text-zinc-600">Company name, registered address and the financial year start.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'approvals')" :aria-labelledby="$id('tab', 'approvals')"
+         x-show="tab === 'approvals'" class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">Approval limits</h3>
+      <p class="mt-1.5 text-zinc-600">Orders above <span class="font-medium tabular-nums text-zinc-900">₹5,00,000</span> need a second approval.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'numbering')" :aria-labelledby="$id('tab', 'numbering')"
+         x-show="tab === 'numbering'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">Document numbering</h3>
+      <p class="mt-1.5 text-zinc-600">PO-YY-nnnn, reset every financial year.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'tax')" :aria-labelledby="$id('tab', 'tax')"
+         x-show="tab === 'tax'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">Tax and HSN</h3>
+      <p class="mt-1.5 text-zinc-600">Default GST rate per HSN code, applied when a line has none of its own.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'users')" :aria-labelledby="$id('tab', 'users')"
+         x-show="tab === 'users'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">Users and roles</h3>
+      <p class="mt-1.5 text-zinc-600">14 users, 4 roles. Buyers cannot approve their own orders.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'url', name: 'Linkable', code:
+`<!-- The tab becomes part of the record's address, so a link to "the receipts of
+     PO-24-1187" exists and a reload lands where you left.
+
+     replaceState, not pushState. With pushState, Back walks the user through
+     every tab they touched before it finally leaves the record, which is not
+     what Back means to anyone. If a tab genuinely is a place you can go back
+     to, it is a page, and that is the django variant. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'lines',
+       items: [
+         { id: 'lines',    label: 'Lines' },
+         { id: 'receipts', label: 'Receipts' },
+         { id: 'history',  label: 'History' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       init() {
+         const q = new URLSearchParams(location.search).get('tab');
+         if (this.items.some(t => t.id === q)) this.tab = q;
+       },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         const u = new URL(location.href);
+         u.searchParams.set('tab', id);
+         history.replaceState(null, '', u);
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }">
+  <div class="border-b border-zinc-200">
+    <div x-ref="list" role="tablist" aria-label="Purchase order sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="pick(items[0].id)"
+         @keydown.end.prevent="pick(items[items.length - 1].id)"
+         class="-mb-px flex gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :tabindex="tab === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+                :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
+                x-text="t.label"></button>
+      </template>
+    </div>
+  </div>
+
+  <div class="pt-4 text-[14px]/5">
+    <template x-for="t in items" :key="t.id">
+      <div role="tabpanel" tabindex="0" :id="$id('panel', t.id)" :aria-labelledby="$id('tab', t.id)"
+           x-show="tab === t.id" x-cloak
+           class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+        <p class="text-zinc-600">
+          <span class="font-medium text-zinc-900" x-text="t.label"></span> of PO-24-1187.
+          The address now ends <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600" x-text="'?tab=' + t.id"></code>.
+        </p>
+      </div>
+    </template>
+  </div>
+</div>` },
+
+      { id: 'lazy', name: 'Server-loaded panels', code:
+`<!-- Manual activation, because each tab is a request. With automatic
+     activation, arrowing from the first tab to the fourth fires four fetches
+     and the user reads whichever one happens to land last. So the arrows move
+     focus only, and Enter or Space commits — which a real <button> already does
+     for free, so there is nothing to bind.
+
+     cursor is where focus is, tab is what is showing. Only in automatic
+     activation are those the same thing, which is why the other variants can
+     get away with one variable.
+
+     The hx- attributes and the panel id are written out rather than generated
+     with $id(): htmx reads them when it processes the element, and that is not
+     guaranteed to be after Alpine has bound them. Two of these on one page need
+     their ids changed by hand. -->
+<div x-data="{
+       tab: 'summary',
+       cursor: 'summary',
+       items: [
+         { id: 'summary',  label: 'Summary' },
+         { id: 'lines',    label: 'Lines' },
+         { id: 'receipts', label: 'Receipts' },
+         { id: 'history',  label: 'History' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.cursor);
+         this.focusTab(this.items[(i + step + n) % n].id);
+       },
+       focusTab(id) {
+         this.cursor = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       },
+       pick(id) { this.tab = id; this.cursor = id; }
+     }">
+  <div class="border-b border-zinc-200">
+    <div x-ref="list" role="tablist" aria-label="Purchase order sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="focusTab(items[0].id)"
+         @keydown.end.prevent="focusTab(items[items.length - 1].id)"
+         class="-mb-px flex gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="'po-tab-' + t.id" aria-controls="po-panel"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :tabindex="cursor === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                :hx-get="'/orders/1187/' + t.id + '/'"
+                hx-target="#po-panel" hx-swap="innerHTML" hx-indicator="#po-panel"
+                class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+                :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
+                x-text="t.label"></button>
+      </template>
+    </div>
+  </div>
+
+  <!-- hx-indicator puts .htmx-request on this panel for the length of the
+       request, which is enough to fade it without any custom CSS -->
+  <div id="po-panel" role="tabpanel" tabindex="0" :aria-labelledby="'po-tab-' + tab" aria-live="polite"
+       class="rounded-lg pt-4 text-[14px]/5 transition-opacity [&.htmx-request]:opacity-40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+    <p class="text-zinc-600">Summary renders with the page. Every other tab is fetched from
+      <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4">/orders/1187/&lt;tab&gt;/</code>
+      and swapped in here.</p>
+  </div>
+</div>` },
+
+      { id: 'states', name: 'Count, flag and unavailable', code:
+`<!-- Three things a tab has to be able to say: how many, something needs you,
+     and not yet.
+
+     The red dot follows the status rule — colour lives in a 6px marker, never
+     in a field of colour behind the label. The unavailable tab keeps
+     aria-disabled so it is still announced and still explains itself, but the
+     arrows skip it, because arrowing onto something you cannot open is a dead
+     end with no way to know why. It also drops aria-controls: there is no panel
+     to point at, and a reference to an id that is not in the document is worse
+     than no reference at all. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'lines',
+       items: [
+         { id: 'lines',    label: 'Lines',    count: 14 },
+         { id: 'receipts', label: 'Receipts', count: 3, flag: '2 lines short' },
+         { id: 'invoices', label: 'Invoices', off: 'No invoice until a GRN is posted' }
+       ],
+       open() { return this.items.filter(t => !t.off); },
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const list = this.open(), n = list.length;
+         const i = list.findIndex(t => t.id === this.tab);
+         this.pick(list[(i + step + n) % n].id);
+       },
+       pick(id) {
+         if (this.items.find(t => t.id === id).off) return;
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }">
+  <div class="border-b border-zinc-200">
+    <div x-ref="list" role="tablist" aria-label="Purchase order sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="pick(open()[0].id)"
+         @keydown.end.prevent="pick(open()[open().length - 1].id)"
+         class="-mb-px flex gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="$id('tab', t.id)"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :aria-disabled="t.off ? 'true' : null"
+                :aria-controls="t.off ? null : $id('panel', t.id)"
+                :tabindex="tab === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+                :class="t.off ? 'cursor-not-allowed border-transparent text-zinc-400'
+                              : tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900'
+                                             : 'border-transparent text-zinc-600 hover:text-zinc-900'">
+          <span x-text="t.label"></span>
+          <template x-if="t.count">
+            <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="t.count"></span>
+          </template>
+          <template x-if="t.flag">
+            <span class="flex items-center gap-1.5">
+              <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>
+              <span class="sr-only" x-text="t.flag"></span>
+            </span>
+          </template>
+          <template x-if="t.off">
+            <i data-lucide="lock" class="size-3.5 text-zinc-400"></i>
+          </template>
+        </button>
+      </template>
+    </div>
+  </div>
+
+  <div class="pt-4 text-[14px]/5">
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'lines')" :aria-labelledby="$id('tab', 'lines')"
+         x-show="tab === 'lines'" class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <p>14 lines, <span class="font-medium tabular-nums">₹18,42,000</span> before tax.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'receipts')" :aria-labelledby="$id('tab', 'receipts')"
+         x-show="tab === 'receipts'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+      <p class="text-zinc-600">3 GRNs posted. Two lines are short against the ordered quantity.</p>
+    </div>
+  </div>
+
+  <p class="mt-3 flex items-center gap-1.5 text-[12px]/4 text-zinc-500">
+    <i data-lucide="lock" class="size-3.5 shrink-0"></i>Invoices opens once a GRN is posted.
+  </p>
+</div>` },
+
+      { id: 'django', name: 'Tabs that are pages', code:
+`<!-- When each tab is its own URL and its own view, this is not a tablist at
+     all. It is a nav of links that happens to be drawn as tabs, and the
+     difference is not cosmetic: role="tab" would promise a screen reader that
+     the arrows move between panels in this document and that Tab jumps into
+     one, and then neither is true, because every click is a page load.
+
+     So: <a> not <button>, aria-current="page" not aria-selected, no roles, no
+     roving tabindex, no key bindings. The browser already knows how to move
+     between links.
+
+     Choose this over the Alpine variants when the panel is expensive, when the
+     tab has to be bookmarkable and back-navigable, or when the server already
+     has a view per section. Choose the Alpine ones when the panels are cheap
+     and the record is one thing.
+
+     # urls.py
+     path('orders/<int:pk>/<slug:section>/', OrderDetail.as_view(), name='order-detail')
+
+     # views.py — section comes straight out of the URL, so the template needs
+     # no if-chain to work out which tab is on
+     class OrderDetail(DetailView):
+         def get_context_data(self, **kw):
+             return super().get_context_data(**kw) | {'section': self.kwargs['section']} -->
+<nav aria-label="Purchase order sections" class="border-b border-zinc-200">
+  <div class="-mb-px flex gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    {% for key, label in sections %}
+      <a href="{% url 'order-detail' order.pk key %}"
+         {% if key == section %}aria-current="page"{% endif %}
+         class="shrink-0 whitespace-nowrap rounded-t border-b-2 pb-2.5 text-[13px]/5 {% if key == section %}border-zinc-900 font-semibold text-zinc-900{% else %}border-transparent text-zinc-600 hover:text-zinc-900{% endif %}">
+        {{ label }}
+      </a>
+    {% endfor %}
+  </div>
+</nav>
+
+<div class="pt-4 text-[14px]/5">
+  {% block section %}{% endblock %}
 </div>` }
     ]
   },
