@@ -364,10 +364,16 @@ const countsOut =
     llmsLines: L.length,
     registryKB: kb(registryOut)
   }) + ';\n' +
+  /* description rides along so the landing page can search on what a component
+     is for, not only what it is called: somebody looking for a date picker
+     types "date", and calendar is the answer whether or not the word is in the
+     name. It costs ~9 KB, the one field worth carrying on every page. Variant
+     ids are deliberately left out: another ~18 KB for terms nobody searches. */
   'window.INDEX = ' + JSON.stringify(R.components.map(c => ({
     id: c.id,
     name: c.name,
     category: c.category,
+    description: c.description,
     variants: c.variants.length,
     page: built.includes(c.id) ? 'components/' + c.id + '.html' : null
   }))) + ';\n';

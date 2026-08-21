@@ -43,11 +43,32 @@
       spec: window.SPEC,
       counts: window.COUNTS,
       index: window.INDEX,
+
+      /* Client-side filter over the 55 components already in the page. Every
+         term has to match, so "form date" narrows rather than widens, and a
+         term matches the name, the id, the category or the description: a
+         person looking for a date picker types "date", and calendar is the
+         right answer whether or not the word is in its name. */
+      q: '',
+      match(c, cat) {
+        const alias = (this.spec.searchAliases || {})[c.id] || '';
+        const hay = (c.name + ' ' + c.id + ' ' + cat.label + ' ' +
+                     c.description + ' ' + alias).toLowerCase();
+        return this.terms.every(t => hay.includes(t));
+      },
+      get terms() {
+        return this.q.toLowerCase().split(/\s+/).filter(Boolean);
+      },
       get grouped() {
         return this.spec.categories.map(cat => ({
           ...cat,
-          items: this.index.filter(c => c.category === cat.id)
+          items: this.index
+            .filter(c => c.category === cat.id)
+            .filter(c => !this.terms.length || this.match(c, cat))
         })).filter(g => g.items.length);
+      },
+      get shown() {
+        return this.grouped.reduce((a, g) => a + g.items.length, 0);
       },
       get origin() { return location.origin + location.pathname.replace(/index\.html$/, ''); },
       /* spec.js is an external script, so the browser build never sees these
@@ -97,7 +118,9 @@
 </script>
 </head>
 
-<body class="min-h-screen bg-white font-sans text-[14px]/5 text-zinc-900 antialiased" x-data="site()">
+<body class="min-h-screen bg-white font-sans text-[14px]/5 text-zinc-900 antialiased" x-data="site()"
+      @keydown.window="if ($event.key === '/' && !/^(input|textarea|select)$/i.test($event.target.tagName)) { $event.preventDefault(); $refs.cq.focus() }"
+      @keydown.escape.window="if (q) { q = ''; }">
 
 <!-- ── header ─────────────────────────────────────────────────────────────── -->
 <header class="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/85 backdrop-blur">
@@ -480,7 +503,34 @@
       </p>
     </div>
 
-    <div class="mt-12 space-y-10">
+    <!-- Filters the list already in the page: no request, no index to build,
+         and the result is on screen by the time the key is up. -->
+    <div class="mt-10 flex flex-wrap items-center gap-3">
+      <div class="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 sm:max-w-md">
+        <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+        <label for="cq" class="sr-only">Search components</label>
+        <input id="cq" x-model="q" x-ref="cq" type="search" autocomplete="off"
+               placeholder="Search name, id or what it is for"
+               aria-describedby="cq-count"
+               class="w-full min-w-0 bg-transparent text-[14px]/5 outline-none placeholder:text-zinc-500">
+        <button type="button" x-show="q" x-cloak @click="q = ''; $refs.cq.focus()"
+                aria-label="Clear search"
+                class="shrink-0 rounded-md p-1 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+        <kbd x-show="!q" class="hidden shrink-0 rounded border border-zinc-200 px-1.5 text-[11px]/4 text-zinc-500 sm:block">/</kbd>
+      </div>
+      <p id="cq-count" role="status" class="text-[13px]/5 tabular-nums text-zinc-600">
+        <template x-if="terms.length">
+          <span><span class="font-medium text-zinc-900" x-text="shown"></span> of <span x-text="counts.components"></span></span>
+        </template>
+        <template x-if="!terms.length">
+          <span x-text="counts.components + ' components'"></span>
+        </template>
+      </p>
+    </div>
+
+    <div class="mt-8 space-y-10">
       <template x-for="g in grouped" :key="g.id">
         <div>
           <div class="flex items-baseline gap-3 border-b border-zinc-200 pb-3">
@@ -515,6 +565,21 @@
               </div>
             </template>
           </div>
+        </div>
+      </template>
+
+      <template x-if="terms.length && !shown">
+        <div class="rounded-xl border border-dashed border-zinc-300 px-6 py-12 text-center">
+          <p class="text-[14px]/5 font-medium">Nothing matches &ldquo;<span x-text="q"></span>&rdquo;</p>
+          <p class="mx-auto mt-2 max-w-md text-[13px]/5 text-zinc-600">
+            The list is a closed set of <span class="tabular-nums" x-text="counts.components"></span> components.
+            If what you need is genuinely not here, it does not exist yet: say what it is
+            and what it has to do, rather than building an approximation of it.
+          </p>
+          <button type="button" @click="q = ''; $refs.cq.focus()"
+                  class="mt-4 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Clear the search
+          </button>
         </div>
       </template>
     </div>

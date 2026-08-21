@@ -22,6 +22,62 @@ window.SPEC = {
     build: 'None. Snippets are plain HTML and paste into Django, Flask or a static file unchanged.'
   },
 
+  /* Search synonyms for the landing page only. Not part of the specification
+     and not emitted into llms.txt or the registry: this is what a person types
+     into the filter box before they know what the library calls the thing.
+     Someone looking for a "snackbar" has to land on toast, or the search says
+     the component does not exist when it plainly does. Edit freely; a wrong
+     entry here costs a confusing search result, nothing more. */
+  searchAliases: {
+    dialog:      'modal popup overlay confirm',
+    'alert-dialog': 'modal confirm destructive are you sure',
+    popover:     'popup flyout',
+    tooltip:     'popup hint title',
+    dropdown:    'menu popup contextmenu',
+    toast:       'snackbar notification flash message',
+    alert:       'notification banner callout notice',
+    badge:       'chip tag pill label status',
+    calendar:    'date picker datepicker day month',
+    combobox:    'autocomplete typeahead search select',
+    select:      'picker choose option',
+    spinner:     'loading loader busy wait',
+    skeleton:    'loading placeholder shimmer',
+    progress:    'loading bar percent',
+    'form-page': 'stepper wizard steps create edit',
+    'list-detail': 'queue inbox master detail split',
+    'app-shell': 'layout chrome frame sidebar topbar navigation',
+    'data-table': 'grid datagrid rows sorting',
+    sheet:       'slideover panel drawer',
+    drawer:      'bottomsheet sheet slideup',
+    avatar:      'profile picture initials user',
+    marker:      'dot indicator status',
+    separator:   'divider rule hr line',
+    'empty-state': 'blank nothing zero no results',
+    'error-page': '404 403 500 not found permission',
+    'auth-page': 'login signin sign in password',
+    attachment:  'file upload document',
+    questionnaire: 'survey form questions',
+    menubar:     'menu bar application menu',
+    'navigation-menu': 'megamenu nav links',
+    breadcrumbs: 'trail path where am i',
+    'command-palette': 'cmdk quick open jump to search',
+    'stat-card': 'kpi metric figure number',
+    carousel:    'slider swipe gallery',
+    collapsible: 'disclosure expand show more',
+    accordion:   'faq expand collapse sections',
+    toggle:      'switch on off',
+    checkbox:    'tickbox multiple choice',
+    radio:       'option single choice',
+    textarea:    'multiline long text notes',
+    'input-group': 'prefix suffix addon unit',
+    'button-group': 'segmented toggle group',
+    pagination:  'pager paging next previous',
+    hovercard:   'preview peek',
+    topbar:      'header appbar navbar',
+    sidebar:     'nav rail drawer navigation',
+    'page-header': 'title heading actions'
+  },
+
   /* what an agent does, in order, before writing markup */
   protocol: [
     { t: 'Read llms.txt',
