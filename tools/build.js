@@ -157,6 +157,14 @@ const varSizes = json.components.flatMap(c => c.variants.map(v => ({
 const compMed = median(compSizes.map(x => x.bytes));
 const varMed = median(varSizes.map(x => x.bytes));
 const compMax = compSizes.reduce((a, b) => (b.bytes > a.bytes ? b : a));
+/* The worked example is taken from a real component and its first real
+   variant, never written as a literal. A hand-typed example is a URL nobody
+   builds and nobody tests: the last one said button/primary, which has never
+   existed, and it sat in the paragraph telling agents they can construct
+   URLs, so it was the one line a model would pattern-match on. */
+const ex = json.components.find(c => c.id === 'button') || json.components[0];
+const exUrl = ex.id + '/' + ex.variants[0].id;
+const withDefault = json.components.filter(c => c.variants.some(v => v.id === 'default')).length;
 const varMax = varSizes.reduce((a, b) => (b.bytes > a.bytes ? b : a));
 
 /* ── llms.txt ──────────────────────────────────────────────────────────────── */
@@ -318,8 +326,14 @@ P('| [registry.json](registry.json) | ' + fmtSize(registryBytes) + ' | ~' + fmtT
 P('');
 P('The component list above prints every variant id, so once you have read this');
 P('file you can build a variant URL yourself and skip r/index.json entirely:');
-P('`GET /r/button/primary.html` returns the markup for button/primary and nothing');
+P('`GET /r/' + exUrl + '.html` returns the markup for ' + exUrl + ' and nothing');
 P('else. That is the common path — one read of llms.txt, then a few small ones.');
+P('');
+P('Read the ids; do not guess them. Only ' + withDefault + ' of the ' + json.components.length +
+  ' components have a variant');
+P('called `default`, and ' + (json.components.length - withDefault) + ' do not, so a guessed URL is a 404 rather');
+P('than a fallback. The ids are listed above precisely because they are not');
+P('predictable from the component name.');
 P('');
 
 const llmsOut = L.join('\n');
@@ -415,6 +429,27 @@ for (const c of R.components) for (const v of c.variants) {
       focusProblems.push(c.id + '/' + v.id + ': outline-none cancels this element\'s own focus outline');
   }
 }
+/* ── endpoint lint ─────────────────────────────────────────────────────────
+   Every concrete /r/ URL printed in llms.txt has to resolve to a file this
+   build actually emits. A worked example that 404s is worse than none: it sits
+   in the paragraph telling agents they can construct URLs, so it is the line
+   they pattern-match on, and variant ids are not guessable (23 of 55
+   components have no `default`). Placeholders like <id> are skipped. */
+const badLinks = [];
+for (const m of llmsOut.matchAll(/\/r\/([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)\.html/g)) {
+  const rel = 'r/' + m[1] + '/' + m[2] + '.html';
+  if (!rFiles.has(rel)) badLinks.push(m[0] + ' — no such endpoint');
+}
+for (const m of llmsOut.matchAll(/\/r\/([a-z0-9][a-z0-9-]*)\.json/g)) {
+  const rel = 'r/' + m[1] + '.json';
+  if (m[1] !== 'index' && !rFiles.has(rel)) badLinks.push(m[0] + ' — no such endpoint');
+}
+if (badLinks.length) {
+  console.error('ENDPOINT LINT failed — llms.txt points at URLs this build does not emit:');
+  [...new Set(badLinks)].forEach(f => console.error('  ' + f));
+  process.exit(1);
+}
+
 if (focusProblems.length) {
   console.error('FOCUS LINT failed:');
   [...new Set(focusProblems)].forEach(f => console.error('  ' + f));

@@ -252,5 +252,10 @@ thing that answers the question.
 
 The component list above prints every variant id, so once you have read this
 file you can build a variant URL yourself and skip r/index.json entirely:
-`GET /r/button/primary.html` returns the markup for button/primary and nothing
+`GET /r/button/variants.html` returns the markup for button/variants and nothing
 else. That is the common path — one read of llms.txt, then a few small ones.
+
+Read the ids; do not guess them. Only 32 of the 55 components have a variant
+called `default`, and 23 do not, so a guessed URL is a 404 rather
+than a fallback. The ids are listed above precisely because they are not
+predictable from the component name.
