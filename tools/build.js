@@ -172,6 +172,23 @@ P('One line each. When-to-use notes, per-component rules and the exact markup fo
 P('every variant are in registry.json under the matching id — fetch that before');
 P('building anything, rather than reconstructing a component from its description.');
 P('');
+P('This list is a closed set, not a starting point. If what you are about to build');
+P('is on it, you must build it from the registry entry rather than from scratch.');
+P('That applies hardest to Layout: those entries are whole screens, and a screen');
+P('that is one of them is assembled from that entry, not redrawn.');
+P('');
+P('If what you need is not on this list, it does not exist yet. Stop and flag it —');
+P('name the thing and what it has to do, and let a person add it to the framework.');
+P('Do not invent a component or a layout, and do not approximate one out of the');
+P('parts of another. Handing back a screen with a gap and a question is correct;');
+P('handing back a screen with an invented component in it is not.');
+P('');
+P('Variants work the same way. Each entry below lists the variant ids it has, and');
+P('that list is closed too. Editing the labels, figures and records inside a');
+P('variant is expected. Reshaping one into a state, density or arrangement that is');
+P('not listed is a new variant, so flag it and let a person add it rather than');
+P('keeping it to yourself in one screen.');
+P('');
 S.categories.forEach(cat => {
   const items = R.components.filter(c => c.category === cat.id);
   if (!items.length) return;

@@ -14,8 +14,8 @@ registry.json and copy component HTML from it verbatim.
    `GET /registry.json  →  components[].variants[].html`
 3. **Match the reference implementation** — A complete procurement dashboard built only from these components. When the docs and a real screen disagree about spacing or hierarchy, the screen wins.
    `GET /reference/`
-4. **Ask rather than choose** — If a colour, size or pattern is not defined here, it does not exist yet. Adding one is a decision for a person, not a default you pick because the page looked empty.
-   `// no new tokens without a human`
+4. **Ask rather than choose** — If a colour, size, pattern, component or layout is not defined here, it does not exist yet. Stop and flag it rather than filling the gap yourself: name what is missing and what it has to do, and let a person add it to the framework. Adding one is a decision for a person, not a default you pick because the page looked empty. An invented component is worse than a blocked screen, because it ships, gets copied, and never gets the accessibility work. This covers missing variants of components that do exist, not just missing components.
+   `// no new tokens, components or layouts without a human`
 
 ## Stack
 
@@ -31,22 +31,23 @@ registry.json and copy component HTML from it verbatim.
 Every one of these exists because breaking it produced a visible defect at
 least once. They are not style preferences.
 
-1. **Stock Tailwind only.** No custom CSS, no @theme colours, no arbitrary hex. Arbitrary values are for one-off sizes, never for colour.
-2. **Light theme only.** There is no dark mode and none is planned. A second theme doubles the review surface for no benefit in an office tool.
-3. **Never bind Alpine on a Lucide icon.** createIcons() replaces the <i> with an <svg>, destroying any :class on it. Bind on a wrapping span instead.
-4. **Never add cursor-pointer.** Tailwind v4 preflight drops it from buttons. One base rule fixes every element; 300 utility classes do not.
-5. **Colour means data state.** Red, amber and green describe what a record is doing. Never decoration, never a brand accent. They appear as a dot or an icon, never as a field of colour behind text.
-6. **The accent is graphite.** zinc-700. Interactive text is zinc-900 plus an underline, not a colour.
-7. **Alerts are neutral.** White card, zinc border, colour only in the icon. A full-width red field shouts louder than the overdue rows it describes.
-8. **Focus is an outline, never a ring.** ring-* compiles to box-shadow, and forced-colours mode drops every box-shadow, so a ring is the one focus style guaranteed to vanish for the users who most need it. Write focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15, and take the negative offset when the control sits flush inside a scroller that would clip it. outline-none is allowed only on a field whose wrapper draws the outline for it, because Tailwind resolves outline-style through a variable: outline-none on the same element kills its own focus outline while leaving the width and colour set, which measures as styled and renders as nothing.
-9. **Every tinted shape carries its ring.** A tinted shape is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 — pills, chips, avatars, icon wells, all of them. A tinted surface is bg-zinc-100 — the page, selected rows, active nav, table headers. Give a shape the surface fill and it measures 1.00 contrast against the surface it sits on, which is not low contrast but the identical colour, and it disappears. One step of fill separates them and the ring holds the edge. Solid shapes need no ring, and it is ring rather than border so adding it reflows nothing.
-10. **Status colour lives in the dot.** Every status pill is the same graphite shape — bg-zinc-200, ring-zinc-300, zinc-700 text, the same fill an avatar takes. What separates Open from Overdue is a 6px dot. A column of tinted pills reads as a traffic light and stops meaning anything by the twelfth row; a column of identical pills with one red dot in it reads at a glance. This is the alert rule — colour only in the marker — applied to a pill.
-11. **One shade per meaning.** Info is zinc-400, success emerald-600, warning amber-700, danger red-600 — and a warning is amber-700 in a component and amber-500 only when it is a dot, because a 1.5px stroke and a 6px disc need different weights of the same colour. Nothing takes a -50 tint or a -200 ring: a coloured icon well is still bg-zinc-200 with ring-zinc-300. Pick the shade from the token table, never by eye.
-12. **Survive 390px.** Tables become stacked cards. Nothing scrolls sideways on a phone, with one exception: a carousel, where the sideways scroll is the component itself, and which snaps and peeks so it never looks like a layout that broke.
-13. **No template x-for inside svg.** It is parsed in the SVG namespace and has no .content. Use divs, or a conic-gradient for donuts.
-14. **x-cloak on anything hidden at first paint.** Alpine boots after the HTML renders. Without it, every dropdown flashes on load.
-15. **Every text size carries its leading.** text-[13px] compiles to font-size alone — arbitrary sizes emit no line-height, so the element silently inherits whatever an ancestor left. Always write the slash form, text-[13px]/5. Sizes come from the seven steps; only prose may take a looser leading than the default pairing.
-16. **Guard the Lucide re-hydration loop.** createIcons() leaves data-lucide on the <svg> it generates, so re-running it on every DOM mutation re-renders every icon forever. Guard on document.querySelector("[data-lucide]:not(svg)") or animations stutter while the DOM never settles.
+1. **Use what is already here.** Before writing any markup, look for it in registry.json. If a component or a page layout is already defined, copy it from there — writing your own version of something the registry defines is the defect this rule exists to prevent, because two implementations of one thing drift apart and only one of them ever gets the accessibility work. The layout entries are mandatory, not examples: a signed-in screen is app-shell, a screen with a title and actions is page-header, a create-or-edit screen is form-page, a queue worked one record at a time is list-detail, and the two screens that sit outside the shell are auth-page and error-page. If what you need is not here, stop and flag it: name the thing, say what it has to do, and let a person add it to the framework. Do not invent a component, a layout or a pattern to fill the gap, and do not ship a one-off approximation of one under another name. A missing entry is a decision for a person; an invented one is a defect that ships and then gets copied. The same applies one level down, to variants: if the component is here but the variant you need is not, flag that too. Changing the labels, figures and records inside a variant is expected and is what copying it is for; reshaping one into a state, density or arrangement the registry does not list is a new variant, and a new variant is an addition to the framework rather than a local edit.
+2. **Stock Tailwind only.** No custom CSS, no @theme colours, no arbitrary hex. Arbitrary values are for one-off sizes, never for colour.
+3. **Light theme only.** There is no dark mode and none is planned. A second theme doubles the review surface for no benefit in an office tool.
+4. **Never bind Alpine on a Lucide icon.** createIcons() replaces the <i> with an <svg>, destroying any :class on it. Bind on a wrapping span instead.
+5. **Never add cursor-pointer.** Tailwind v4 preflight drops it from buttons. One base rule fixes every element; 300 utility classes do not.
+6. **Colour means data state.** Red, amber and green describe what a record is doing. Never decoration, never a brand accent. They appear as a dot or an icon, never as a field of colour behind text.
+7. **The accent is graphite.** zinc-700. Interactive text is zinc-900 plus an underline, not a colour.
+8. **Alerts are neutral.** White card, zinc border, colour only in the icon. A full-width red field shouts louder than the overdue rows it describes.
+9. **Focus is an outline, never a ring.** ring-* compiles to box-shadow, and forced-colours mode drops every box-shadow, so a ring is the one focus style guaranteed to vanish for the users who most need it. Write focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15, and take the negative offset when the control sits flush inside a scroller that would clip it. outline-none is allowed only on a field whose wrapper draws the outline for it, because Tailwind resolves outline-style through a variable: outline-none on the same element kills its own focus outline while leaving the width and colour set, which measures as styled and renders as nothing.
+10. **Every tinted shape carries its ring.** A tinted shape is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 — pills, chips, avatars, icon wells, all of them. A tinted surface is bg-zinc-100 — the page, selected rows, active nav, table headers. Give a shape the surface fill and it measures 1.00 contrast against the surface it sits on, which is not low contrast but the identical colour, and it disappears. One step of fill separates them and the ring holds the edge. Solid shapes need no ring, and it is ring rather than border so adding it reflows nothing.
+11. **Status colour lives in the dot.** Every status pill is the same graphite shape — bg-zinc-200, ring-zinc-300, zinc-700 text, the same fill an avatar takes. What separates Open from Overdue is a 6px dot. A column of tinted pills reads as a traffic light and stops meaning anything by the twelfth row; a column of identical pills with one red dot in it reads at a glance. This is the alert rule — colour only in the marker — applied to a pill.
+12. **One shade per meaning.** Info is zinc-400, success emerald-600, warning amber-700, danger red-600 — and a warning is amber-700 in a component and amber-500 only when it is a dot, because a 1.5px stroke and a 6px disc need different weights of the same colour. Nothing takes a -50 tint or a -200 ring: a coloured icon well is still bg-zinc-200 with ring-zinc-300. Pick the shade from the token table, never by eye.
+13. **Survive 390px.** Tables become stacked cards. Nothing scrolls sideways on a phone, with one exception: a carousel, where the sideways scroll is the component itself, and which snaps and peeks so it never looks like a layout that broke.
+14. **No template x-for inside svg.** It is parsed in the SVG namespace and has no .content. Use divs, or a conic-gradient for donuts.
+15. **x-cloak on anything hidden at first paint.** Alpine boots after the HTML renders. Without it, every dropdown flashes on load.
+16. **Every text size carries its leading.** text-[13px] compiles to font-size alone — arbitrary sizes emit no line-height, so the element silently inherits whatever an ancestor left. Always write the slash form, text-[13px]/5. Sizes come from the seven steps; only prose may take a looser leading than the default pairing.
+17. **Guard the Lucide re-hydration loop.** createIcons() leaves data-lucide on the <svg> it generates, so re-running it on every DOM mutation re-renders every icon forever. Guard on document.querySelector("[data-lucide]:not(svg)") or animations stutter while the DOM never settles.
 
 ## Tokens
 
@@ -138,6 +139,23 @@ doing; the accent is graphite precisely so these stay meaningful.
 One line each. When-to-use notes, per-component rules and the exact markup for
 every variant are in registry.json under the matching id — fetch that before
 building anything, rather than reconstructing a component from its description.
+
+This list is a closed set, not a starting point. If what you are about to build
+is on it, you must build it from the registry entry rather than from scratch.
+That applies hardest to Layout: those entries are whole screens, and a screen
+that is one of them is assembled from that entry, not redrawn.
+
+If what you need is not on this list, it does not exist yet. Stop and flag it —
+name the thing and what it has to do, and let a person add it to the framework.
+Do not invent a component or a layout, and do not approximate one out of the
+parts of another. Handing back a screen with a gap and a question is correct;
+handing back a screen with an invented component in it is not.
+
+Variants work the same way. Each entry below lists the variant ids it has, and
+that list is closed too. Editing the labels, figures and records inside a
+variant is expected. Reshaping one into a state, density or arrangement that is
+not listed is a new variant, so flag it and let a person add it rather than
+keeping it to yourself in one screen.
 
 ### Actions
 

@@ -34,12 +34,14 @@ window.SPEC = {
       d: 'A complete procurement dashboard built only from these components. When the docs and a real screen disagree about spacing or hierarchy, the screen wins.',
       code: 'GET /reference/' },
     { t: 'Ask rather than choose',
-      d: 'If a colour, size or pattern is not defined here, it does not exist yet. Adding one is a decision for a person, not a default you pick because the page looked empty.',
-      code: '// no new tokens without a human' }
+      d: 'If a colour, size, pattern, component or layout is not defined here, it does not exist yet. Stop and flag it rather than filling the gap yourself: name what is missing and what it has to do, and let a person add it to the framework. Adding one is a decision for a person, not a default you pick because the page looked empty. An invented component is worse than a blocked screen, because it ships, gets copied, and never gets the accessibility work. This covers missing variants of components that do exist, not just missing components.',
+      code: '// no new tokens, components or layouts without a human' }
   ],
 
   /* every one of these exists because breaking it produced a visible defect */
   rules: [
+    { t: 'Use what is already here',
+      d: 'Before writing any markup, look for it in registry.json. If a component or a page layout is already defined, copy it from there — writing your own version of something the registry defines is the defect this rule exists to prevent, because two implementations of one thing drift apart and only one of them ever gets the accessibility work. The layout entries are mandatory, not examples: a signed-in screen is app-shell, a screen with a title and actions is page-header, a create-or-edit screen is form-page, a queue worked one record at a time is list-detail, and the two screens that sit outside the shell are auth-page and error-page. If what you need is not here, stop and flag it: name the thing, say what it has to do, and let a person add it to the framework. Do not invent a component, a layout or a pattern to fill the gap, and do not ship a one-off approximation of one under another name. A missing entry is a decision for a person; an invented one is a defect that ships and then gets copied. The same applies one level down, to variants: if the component is here but the variant you need is not, flag that too. Changing the labels, figures and records inside a variant is expected and is what copying it is for; reshaping one into a state, density or arrangement the registry does not list is a new variant, and a new variant is an addition to the framework rather than a local edit.' },
     { t: 'Stock Tailwind only',
       d: 'No custom CSS, no @theme colours, no arbitrary hex. Arbitrary values are for one-off sizes, never for colour.' },
     { t: 'Light theme only',
