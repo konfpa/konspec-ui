@@ -106,7 +106,10 @@
       <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-900 text-[13px]/5 font-semibold text-white">K</span>
       <span class="text-[16px]/6 font-semibold">Konspec UI</span>
     </a>
-    <span class="rounded-full border border-zinc-200 px-2 py-0.5 font-mono text-[11px]/4 text-zinc-600">v0.1.0</span>
+    <!-- bound, not typed: this read v0.1.0 through the v0.1.1 release because
+         nothing tied it to the version it was claiming -->
+    <span class="rounded-full border border-zinc-200 px-2 py-0.5 font-mono text-[11px]/4 text-zinc-600"
+          x-text="'v' + spec.meta.version"></span>
 
     <nav class="ml-auto flex items-center gap-1 text-[13px]/5">
       <a href="#components" class="hidden rounded-lg px-3 py-2 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 sm:block">Components</a>
