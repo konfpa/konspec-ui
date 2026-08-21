@@ -211,7 +211,7 @@ const countsOut =
   'window.COUNTS = ' + JSON.stringify({
     components: R.components.length,
     variants: R.components.reduce((a, c) => a + c.variants.length, 0),
-    dependencies: 0,
+    buildSteps: 0,
     pages: built.length,
     llmsKB,
     llmsLines: L.length,
