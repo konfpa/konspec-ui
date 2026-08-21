@@ -4500,87 +4500,797 @@ register(
 
   {
     id: 'topbar', name: 'Topbar', category: 'navigation',
-    description: 'The application header above the page content: where you are, what you can search, and who you are signed in as.',
-    when: 'Every screen in the console. The page title and the primary action for the record belong in the page header below it, not here.',
+    description: 'The application header above the page content: the sidebar trigger, the context you are working in, what you can search and who you are signed in as. A real <header> holding a named <nav>, sticky over the column and out of the way of everything that opens above it.',
+    when: 'Every signed-in screen in the console, as the top row of app-shell. It answers four questions and no others: which application and context you are in, where in it you are, what you can search, and who you are signed in as. The page title, the record\'s actions and the tabs across a record belong to page-header in the column below. A File / Edit / View command set for a document is a menubar, which sits inside the editor and never merges into this bar. A route map of sections that open panels of pages is navigation-menu, and it lives up here only on an application that has no sidebar at all. This entry is the row; the skeleton that holds it above the single scrolling main column is app-shell.',
     notes: [
-      'The hamburger is lg:hidden and only ever opens the sidebar. It is not a second menu with its own items.',
-      'Sticky needs an explicit background — sticky top-0 bg-white — or the content scrolls through it.',
-      'A notification dot means unread, not a count. If the number matters, show the number.',
-      'Below lg the search field collapses to an icon button. Do not shrink the input instead; it stops being usable around 200px.'
+      'The sidebar owns the workspace mark and the application name; the topbar shows them only below lg, where the sidebar is off-canvas and nothing else on screen says which application this is. The collapse trigger — 256px down to the 68px rail — belongs to the sidebar\'s own footer strip and exists only at lg and up. The hamburger that opens the off-canvas sheet belongs to the topbar and is lg:hidden. They are two controls with two states at two breakpoints, not one control rendered in two places: wire the hamburger to the collapse state and a phone gets a 68px rail with no room for a flyout beside it, while a laptop gets a modal sheet over a sidebar that was already on screen. The two components agree on one thing only — which of them is visible at which width.',
+      'z-30, and the number is decided by what has to pass over the bar rather than by taste. sticky with a z-index makes the header a stacking context, so the z-40 on the account panel inside it only orders that panel against its siblings in the header — against the page, the panel inherits the header\'s 30. That is why the header\'s own value is the one that has to clear content: sticky table heads sit at z-10 and z-20 and everything else in the main column is auto. It must equally not clear a dialog. Every overlay in this system is z-50, and a header at z-50 in a document that renders the dialog before it wins the tie on DOM order and pokes a white strip through the dim. And never put overflow-hidden on the header to tidy a corner: every dropdown in it is then clipped to 56px and opens as a sliver that reads as a script that failed to load.',
+      'sticky top-0 only does something when the document scrolls, and inside app-shell it does not. The shell is a fixed-height flex frame where only <main> scrolls, so the header never moves in the first place and sticky, z-30 and the scrolled border are all inert there. Two layouts, and the bar has to know which one it is in: a flex row above a min-h-0 scrolling column inside the shell, a sticky element with a background of its own on a document-scroll page. Nothing breaks visibly when the wrong one ships, which is how a dead scroll listener stays on the page for a year — bind it to the element that actually scrolls, never to window, or the border simply never appears.',
+      'Sticky needs an explicit opaque background, and a translucent one is bg-white plus supports-[backdrop-filter]:bg-white/80 backdrop-blur, in that order, never bg-white/80 alone. Where backdrop-filter is off — Firefox with the pref disabled, a reduced-transparency setting, forced colours — the /80 survives and the blur does not, so the register underneath shows through as legible text sliding under legible text. The opaque colour is the base and the translucent one is the enhancement. backdrop-filter also creates a stacking context and a containing block for fixed descendants, which is the second reason the header\'s own z-index is what clears the page, and it costs a composited layer repainted on every scroll frame — so it goes on the header and nowhere else.',
+      'A page with a sticky bar needs one base rule: [id] { scroll-margin-top: 88px } — the 56px bar plus a gap. Without it the browser scrolls an anchor target flush to the top of the viewport, which is underneath the header, so following #line-14 out of a form error summary lands on a row the user cannot see and the link reads as broken. It is a rule on [id] rather than scroll-mt-22 sprinkled onto the elements that happen to be link targets today, because the next id somebody adds is a target too and nobody will remember. This is the one line of CSS the system carries, and it is carried precisely because there is no utility that can be put on an element that has not been written yet.',
+      'The skip link is the first focusable thing in the document, before the hamburger and before anything else in the bar. It is what makes a twenty-destination sidebar tolerable for a keyboard user, and it is the reason the nav is allowed to stay a plain list of links instead of being rewritten as a menu widget. It needs a target that can take focus: #main carries tabindex="-1", or Chrome and Safari scroll the page and leave focus behind at the top of the document, so the next Tab starts again from the skip link and the user is in a loop. sr-only until focused, then visible — a skip link hidden with display:none is not focusable and is not a skip link.',
+      'The search in the bar is navigation and the search over a register is a filter, and one screen carrying both has to make the difference obvious or it becomes the most reliable support call in the application. The bar crosses records and takes you to one; the box above the table narrows the rows in front of you and never leaves the page. Give them the same placeholder and somebody types a PO number into the wrong one and reports the order missing. Placeholder the bar with what it crosses — Search orders, vendors, materials — and the register box with what it filters — Filter 1,438 orders. The moment the bar\'s field starts showing hits under itself it has stopped being a text input and become a combobox, with an owned listbox, aria-activedescendant and rows that are not focusable; that is a different component and it is combobox.',
+      'Below lg the field becomes an icon button, not a narrower field. An input under about 200px shows four characters of a placeholder and none of what has been typed into it, and what is being typed is usually a document number somebody is copying off a printout. The button opens either the command palette or a full-width search row that replaces the bar contents while it is open. Both are defensible; using both in one application is not. And if the palette is on the page, only one of the two may claim ⌘K — bind it in both and the browser fires whichever listener registered last, which changes with script order and therefore changes between environments.',
+      'Unread is not a data state, so the marker is graphite. The dot on the bell is a solid bg-zinc-700 disc with ring-2 ring-white so it separates from the icon behind it, and red-600 is spent only when what is waiting is genuinely the alarm state — an approval already past its date. Paint the bell red for eleven ordinary notifications and it is red every morning, and on the morning something is actually overdue the mark says nothing it was not already saying. Where the quantity is the thing being acted on, show the figure instead of the dot, cap it at 99+ and set it tabular-nums so the bar does not jitter as it changes. Either way the state belongs in the accessible name — aria-label="Notifications, 3 unread" — because a dot announces nothing at all.',
+      'A context switcher changes what every number on the screen means, which is what makes it the opposite of a filter and the reason it sits up here rather than beside them. Company, plant and financial year are read by the server on the next request, so changing one is a page load and not a client-side swap that leaves half the screen showing the previous plant\'s stock. Two consequences follow. A context that is not the default has to be readable without opening anything — a pill in the bar reading FY 2024-25 with an amber dot, permanently — because a financial-year switcher left on last year is how somebody posts a receipt into a closed period and finds out at audit. And a non-production tenant says so in the same slot for the same reason: the sandbox looks exactly like production, which is the whole point of it and the whole danger of it.',
+      'The page title and the record\'s primary action live in page-header, in the scrolling column. One h1 per page and it is down there, not up here. The bar is the application — where you are in it, what you can search, which context you are in, who you are — and the column is the record. The single exception is a full-height editor with no page-header at all, a BOM sheet or a rate-contract editor, where the bar carries the document name and its Save; on that screen page-header does not exist. Carry the title in both and the user reads the record name twice and spends 56px of a laptop on the repetition.',
+      'Exactly one nav in the document is called Main and it is the sidebar\'s. The nav inside this header is the trail and is called Breadcrumb. A topbar that carries the whole route map because the application has no sidebar takes Main instead, and then there is no sidebar to argue with. Never both — a console with a sidebar of destinations and a navigation-menu of the same destinations across the header is two route maps that drift apart in the first sprint. The trail has the same rule: it belongs to the topbar or to page-header, decided once for the application, because rendered in both it is on screen twice and the second one is the one that is stale.'
     ],
     anatomy: [
-      ['Menu button', 'lg:hidden. The only way to open the sidebar on a phone, so it is never hidden there.'],
-      ['Search', 'A wide input above lg, collapsing to an icon button below it.'],
-      ['Notifications', 'A bell with a dot for unread. A dot means unread; if the number matters, show the number.'],
-      ['Account', 'The avatar and the menu behind it.'],
-      ['Surface', 'sticky top-0 with an explicit bg-white, or content scrolls straight through it.']
+      ['Surface', 'A real <header> at h-14, bg-white over a border-zinc-200 bottom rule. sticky top-0 z-30 on a document-scroll page, a plain flex row inside app-shell. Never overflow-hidden, or every panel it opens is clipped to its own height.'],
+      ['Skip link', 'The first focusable element in the document. sr-only until focused, then a graphite chip in the top-left, pointing at the #main that carries tabindex="-1".'],
+      ['Sidebar trigger', 'The hamburger. lg:hidden, wired to the off-canvas sheet and to nothing else — it is not a second menu, and it does not toggle the rail.'],
+      ['Context', 'Company, plant and financial year, as one switcher plus a permanent pill for any context that is not the default. Left of the trail, because it qualifies everything to the right of it.'],
+      ['Trail or title', 'Either the breadcrumb <nav aria-label="Breadcrumb">, truncating its middle and never its last crumb, or the document name on an editor screen that has no page-header. One of the two, never both.'],
+      ['Search', 'A <form role="search"> holding one labelled input, wide at lg and an icon button below it. It searches the application, not the list underneath, and its placeholder has to say so.'],
+      ['Notifications', 'A bell carrying a graphite unread dot, or a capped tabular figure when the count is what gets acted on. The dot is aria-hidden and the state lives in the button\'s name.'],
+      ['Account', 'The avatar as the trigger for the account menu. The signed-in email is the first line of the panel, because on a system with a sandbox tenant that is the only question this menu is opened to answer.']
     ],
     behaviour: [
-      'The hamburger only ever opens the sidebar. It is not a second menu with its own items.',
-      'Sticky positioning needs an explicit background. Without one the topbar is transparent and content scrolls through it.',
-      'Below lg the search collapses to an icon button rather than shrinking — an input stops being usable around 200px.',
-      'The page title and the record\'s primary action belong in the page header below, not up here.',
-      'The notification dot indicates unread state only. A count replaces it when the quantity is actionable.'
+      'The bar is one fixed-height row and its contents never wrap. Below lg pieces are dropped or collapsed to a button — the search, the trail\'s middle, the context label — and nothing is shrunk to fit or scrolled sideways.',
+      'Below lg the hamburger opens the sidebar as a modal sheet and focus returns to it on close. At lg and up it is not on screen, and the sidebar\'s own strip owns the collapse.',
+      'On a document-scroll page the bar is sticky with an opaque background of its own. Inside app-shell it is a flex row that never moves, and the sticky classes do nothing there.',
+      'The scrolled border is drawn from the first frame as border-transparent and only its colour changes. Adding a border on scroll moves every row below it down a pixel and the page twitches under the cursor.',
+      'The search crosses records and navigates; it never filters the list below it. Enter submits the form, so the field works with no JavaScript at all.',
+      'One panel is open in the bar at a time. The switcher, the notifications and the account menu share a single open key, so opening one closes the others rather than stacking two panels over each other.',
+      'Changing company, plant or financial year is a page load. The bar shows the new context because the server rendered it, not because a click updated a label.',
+      'The unread mark is a dot when the fact of a queue is the point and a capped figure when the size of it is. It is never both, and it is never red for ordinary traffic.',
+      'Nothing in the bar navigates or switches on hover. Hover reveals a name; a click is what changes the page.'
     ],
     a11y: [
-      'The topbar is a <header> landmark, distinct from the sidebar\'s <nav>.',
-      'The menu button has aria-label and aria-expanded reflecting the sidebar state.',
-      'Search is a real labelled input inside a form, so Enter submits it.',
-      'The unread dot is backed by text in the button\'s accessible name — "Notifications, unread" — since a dot announces nothing.',
-      'The account menu follows the dropdown pattern: aria-haspopup, arrow keys and Escape.'
+      'The bar is a <header> at the top level of the document, which makes it the banner landmark. There is one per page and it is never nested inside <main> — a header inside main is a section header and stops being announced as the page banner.',
+      'The skip link is first in the DOM and first in the tab order, and its target carries tabindex="-1" so focus actually moves. Without that the browser scrolls and leaves focus at the top of the document, and the next Tab starts the whole nav again.',
+      'The <nav> inside the header has an accessible name of its own — Breadcrumb — and it differs from the sidebar\'s Main. Two navs called the same thing produce a landmark list with two identical rows and no way to tell them apart.',
+      'The hamburger is a real button with aria-label, aria-expanded bound to the sheet state and aria-controls naming the panel. It is hidden with lg:hidden, which takes it out of the accessibility tree at widths where the state it toggles does not exist.',
+      'The search is a <form role="search"> with a real label — sr-only is fine, absent is not — so Enter submits and the field is reachable as a landmark. Its collapsed form is a button named Search, not an unlabelled magnifier.',
+      'The notification state is in the button\'s accessible name and the dot is aria-hidden, because a coloured disc announces nothing. A count in the name reads as "Notifications, 3 unread" rather than as a stray "3".',
+      'The account menu follows the dropdown pattern exactly: aria-haspopup="menu", aria-expanded, real focus moved item to item with tabindex="-1" on the items, Escape closing back to the trigger. The name-and-email block is not a menu item and sits outside the role="menu" element.',
+      'The context switcher\'s options are role="menuitemradio" with aria-checked bound, wrapped in a role="group" that names the choice — Plant, Financial year. The selected one is marked with a check rather than a tint, because a permanently tinted row in a menu reads as permanently hovered.',
+      'Focus is an outline, never a ring, and the bar\'s bottom edge is a real border. Both survive forced-colours mode, where every box-shadow is dropped and a shadow-drawn header edge disappears along with a ring-drawn focus indicator.'
     ],
-    related: ['app-shell', 'sidebar', 'dropdown'],
+    related: ['app-shell', 'sidebar', 'breadcrumbs', 'command-palette', 'dropdown', 'page-header'],
     variants: [
-      { id: 'default', name: 'Default', code:
-`<header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
-  <button class="flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-zinc-100 lg:hidden" aria-label="Open navigation">
-    <i data-lucide="menu" class="size-4"></i>
+      { id: 'default', name: 'Application bar', code:
+`<!-- The bar is a real <header> and the trail inside it is a real <nav> with a
+     name, so the landmark list reads Banner, Navigation "Breadcrumb", Main
+     instead of three unlabelled regions. The sidebar's nav is the one called
+     Main; two navs with the same name in one document give a landmark list two
+     identical rows and no way to choose between them.
+
+     The skip link is first in the DOM and first in the tab order, and #main
+     carries tabindex="-1" because a link to a plain div scrolls the page and
+     leaves focus at the top of the document — the next Tab then starts at the
+     skip link again and the keyboard user is in a loop.
+
+     z-30 is not a guess. sticky with a z-index makes this element a stacking
+     context, so the z-40 on the account panel below only orders it against its
+     siblings inside the header; against the page it inherits this 30. So this
+     number has to clear the content — sticky table heads at z-10 and z-20 — and
+     has to stay under the z-50 that every dialog, sheet and drawer overlay
+     takes, or an open dialog is pierced by a white strip.
+
+     Add one base rule to the page while you are here:
+       [id] { scroll-margin-top: 88px }
+     Without it, following #line-14 out of an error summary scrolls the row to
+     the top of the viewport, which is underneath this bar. -->
+<div class="relative min-h-64 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
+    <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="tb-nav"
+            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+      <i data-lucide="menu" class="size-5"></i>
+    </button>
+
+    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white lg:hidden">K</span>
+
+    <nav aria-label="Breadcrumb" class="min-w-0">
+      <ol class="flex items-center gap-1.5 text-[13px]/5">
+        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
+        <li aria-hidden="true" class="hidden text-zinc-400 sm:block">/</li>
+        <li class="min-w-0"><span aria-current="page" class="block truncate font-medium">Purchase orders</span></li>
+      </ol>
+    </nav>
+
+    <div class="ml-auto flex shrink-0 items-center gap-1">
+      <button type="button" aria-label="Notifications, 3 unread"
+              class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="bell" class="size-[18px]"></i>
+        <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
+      </button>
+      <button type="button" aria-label="Account — Rajesh Menon" aria-haspopup="menu" aria-expanded="false"
+              class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        RM
+      </button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1" class="p-4">
+    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · promised 22 Aug 2026</p>
+    </div>
+  </main>
+</div>` },
+
+      { id: 'search', name: 'Global search', code:
+`<!-- This field crosses records and takes you to one. The box above the register
+     narrows the rows already on screen and never leaves the page. They are two
+     different things and the placeholder is what tells them apart: this one
+     names what it crosses, the register's one names what it filters —
+     "Filter 1,438 orders". Give both the word Search and somebody types a PO
+     number into the wrong one and reports the order missing.
+
+     It is a real <form role="search"> with a real label, so Enter submits and
+     the field works with the script off. The border lives on the wrapper and
+     the input carries outline-none, so the icon and the ⌘K hint sit inside one
+     focus outline instead of beside it. outline-none is only safe because this
+     element has no focus outline of its own to silence — put it on the same
+     element as a focus-visible:outline-* and Tailwind resolves outline-style
+     through a variable and kills the outline while leaving its width set.
+
+     Below lg it becomes a button, not a narrower field. An input under about
+     200px shows four characters of a placeholder and none of what was typed,
+     and what is typed here is a document number copied off a printout.
+
+     Show hits under the field and this stops being an input: it is a combobox,
+     with an owned listbox, aria-activedescendant and rows that cannot be tab
+     stops. That is a different component. If the command palette is also on
+     this page, only one of the two may bind ⌘K — bind it twice and the winner
+     depends on script order. -->
+<header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+        x-data="{ q: '' }"
+        @keydown.window.meta.k.prevent="$refs.q.focus()" @keydown.window.ctrl.k.prevent="$refs.q.focus()">
+
+  <p class="min-w-0 shrink truncate text-[13px]/5 font-medium">Purchase orders</p>
+
+  <button type="button" aria-label="Search the application"
+          class="ml-auto flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+    <i data-lucide="search" class="size-[18px]"></i>
   </button>
 
-  <nav aria-label="Breadcrumb" class="min-w-0">
-    <ol class="flex items-center gap-1.5 text-[13px]/5">
-      <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
-      <li aria-hidden="true" class="hidden text-zinc-500 sm:block">/</li>
-      <li><span aria-current="page" class="truncate font-medium">Purchase orders</span></li>
-    </ol>
-  </nav>
-
-  <div class="ml-auto flex items-center gap-2">
-    <button class="flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100 lg:hidden" aria-label="Search">
-      <i data-lucide="search" class="size-4 text-zinc-600"></i>
-    </button>
-    <div class="hidden w-64 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 lg:flex">
-      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
-      <label for="topbar-search" class="sr-only">Search orders, vendors and materials</label>
-      <input id="topbar-search" placeholder="Search orders, vendors…"
-             class="w-full bg-transparent px-2 py-1.5 text-[14px]/5 outline-none placeholder:text-zinc-500">
-      <kbd class="mr-2 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">⌘K</kbd>
+  <form role="search" action="#" class="ml-auto hidden lg:block">
+    <label for="tb-search" class="sr-only">Search orders, vendors and materials</label>
+    <div class="flex w-80 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-2.5 size-4 shrink-0 text-zinc-500"></i>
+      <input id="tb-search" x-ref="q" x-model="q" name="q" type="search" autocomplete="off"
+             placeholder="Search orders, vendors, materials"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500">
+      <button type="button" x-show="q" x-cloak @click="q = ''; $refs.q.focus()" aria-label="Clear search"
+              class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="x" class="size-3.5"></i>
+      </button>
+      <kbd x-show="!q" aria-hidden="true" class="mr-2 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-600">⌘K</kbd>
     </div>
+  </form>
 
-    <span class="hidden items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 sm:flex">
-      <span class="size-1.5 rounded-full bg-emerald-600"></span>Synced 2 min ago
-    </span>
+  <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RM</span>
+</header>` },
 
-    <button class="relative flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100" aria-label="Notifications, unread">
-      <i data-lucide="bell" class="size-4 text-zinc-600"></i>
-      <span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-600 ring-2 ring-white"></span>
+      { id: 'account', name: 'Notifications and account menu', code:
+`<!-- One open key, not two booleans. Two independent flags let both panels sit
+     open at once, stacked over each other, and the click that should have
+     closed the first one opens the second.
+
+     The two panels are different kinds of thing and are marked up differently.
+     Notifications is a list of links to records, so it is a plain div holding a
+     <ul> of anchors — role="menu" on it would strip the link role, which is the
+     one word the user needed, and promise arrow keys that do not exist. The
+     account panel is a set of commands, so it gets role="menu" with real focus
+     moved item to item — but the name-and-email block is not a permitted child
+     of a menu, so the panel is a plain div and role="menu" starts at the list
+     below it.
+
+     The email is why the header block is there. On a tenant that has a sandbox
+     twin, the only question this menu is ever opened to answer is which account
+     is signed in, and a name alone does not answer it.
+
+     Unread is not a data state, so the dot is graphite. Red is spent on
+     overdue, failed and destructive; a bell that is red every morning has
+     nothing left to say on the morning something is genuinely late. The dot is
+     aria-hidden and the state is in the button's name — a disc announces
+     nothing. -->
+<header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+        x-data="{
+          open: '',
+          items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+          show() {
+            this.open = 'account';
+            this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus()));
+          },
+          close(toTrigger = true) {
+            if (!this.open) return;
+            const was = this.open; this.open = '';
+            if (toTrigger && was === 'account') this.$refs.account.focus();
+          },
+          move(step) {
+            const i = this.items(), at = i.indexOf(document.activeElement);
+            i[(at + step + i.length) % i.length]?.focus();
+          }
+        }"
+        @click.outside="close(false)"
+        @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <p class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">Goods receipt</p>
+
+  <div class="relative shrink-0">
+    <button type="button" @click="open = open === 'bell' ? '' : 'bell'"
+            :aria-expanded="open === 'bell'" aria-controls="tb-alerts" aria-label="Notifications, 3 unread"
+            class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            :class="open === 'bell' && 'bg-zinc-100 text-zinc-900'">
+      <i data-lucide="bell" class="size-[18px]"></i>
+      <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
     </button>
 
-    <button class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[12px]/4 font-medium" aria-label="Account — Rajesh Menon">
+    <div id="tb-alerts" x-show="open === 'bell'" x-cloak
+         class="absolute right-0 z-40 mt-1 w-80 max-w-[calc(100vw-1.5rem)] rounded-xl border border-zinc-200 bg-white shadow-lg">
+      <div class="flex items-center justify-between gap-2 border-b border-zinc-100 px-3 py-2">
+        <p class="text-[13px]/5 font-medium">Notifications</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">3 unread</p>
+      </div>
+      <ul role="list" class="max-h-72 overflow-y-auto overscroll-contain py-1">
+        <li>
+          <a href="#" class="flex gap-2.5 px-3 py-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span aria-hidden="true" class="mt-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="alert-circle" class="size-3.5 text-red-600"></i></span>
+            <span class="min-w-0">
+              <span class="block text-[13px]/5 tabular-nums">PO-24-1187 is 4 days past its promised date</span>
+              <span class="block text-[12px]/4 tabular-nums text-zinc-500">Gujarat Polymers Ltd · 2 h ago</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex gap-2.5 px-3 py-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span aria-hidden="true" class="mt-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="alert-triangle" class="size-3.5 text-amber-700"></i></span>
+            <span class="min-w-0">
+              <span class="block text-[13px]/5 tabular-nums">GRN-8842 is waiting on your approval</span>
+              <span class="block text-[12px]/4 tabular-nums text-zinc-500">Vasai plant · 5 h ago</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex gap-2.5 px-3 py-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span aria-hidden="true" class="mt-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="check-circle-2" class="size-3.5 text-emerald-600"></i></span>
+            <span class="min-w-0">
+              <span class="block text-[13px]/5 tabular-nums">Invoice INV-24-0912 posted to the ledger</span>
+              <span class="block text-[12px]/4 tabular-nums text-zinc-500">Sharma Extrusions · yesterday</span>
+            </span>
+          </a>
+        </li>
+      </ul>
+      <div class="border-t border-zinc-100 px-3 py-2">
+        <a href="#" class="text-[13px]/5 text-zinc-900 underline underline-offset-2">All notifications</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative shrink-0">
+    <button type="button" x-ref="account" @click="open === 'account' ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()"
+            :aria-expanded="open === 'account'" aria-haspopup="menu" aria-label="Account — Rajesh Menon"
+            class="flex size-9 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       RM
+    </button>
+
+    <div x-show="open === 'account'" x-cloak
+         @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.tab="close(false)"
+         class="absolute right-0 z-40 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+      <div class="px-3 py-2">
+        <p class="truncate text-[13px]/5 font-medium">Rajesh Menon</p>
+        <p class="truncate text-[12px]/4 text-zinc-500">rajesh.menon@konspec.com</p>
+        <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500">Vasai plant · Procurement</p>
+      </div>
+      <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+      <div x-ref="menu" role="menu" aria-label="Account">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="user" class="size-4 text-zinc-600"></i>Your profile
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Preferences
+        </button>
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
+        </button>
+      </div>
+    </div>
+  </div>
+</header>` },
+
+      { id: 'toggle', name: 'Sidebar trigger below lg', code:
+`<!-- Two controls, two breakpoints, and they are not versions of each other.
+     The hamburger lives here, is lg:hidden, and opens the sidebar as a modal
+     sheet. The collapse control — 256px to the 68px rail — lives in the
+     sidebar's own footer strip and exists only at lg and up. Wire the hamburger
+     to the collapse state instead and a phone gets a 68px rail with no room for
+     a flyout beside it, while a laptop gets a modal sheet over a sidebar that
+     was already on screen.
+
+     The workspace mark follows the same line. The sidebar header owns it, so
+     the bar shows it only below lg, where the sidebar is off the screen and
+     nothing else says which application this is. Show it in both and the name
+     is on screen twice at 1280px.
+
+     The sheet is modal, so it behaves like one: x-trap.noscroll holds Tab
+     inside it and stops the register scrolling under the thumb, Escape closes
+     it, focus goes back to the hamburger, and it closes on any link inside it
+     — a nav still sitting open over the page it just navigated to looks like
+     the tap did nothing.
+
+     Inside app-shell this header does not scroll, so it needs no sticky and no
+     z-index. The overlay is absolute here because the preview box owns the
+     frame; in the real shell it is fixed inset-0. -->
+<div class="relative flex h-[420px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+     x-data="{ nav: false }" @keydown.escape.window="nav = false">
+
+  <aside class="hidden w-64 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
+    <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+      <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+    </div>
+    <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
+      <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>Overview</a>
+      <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
+      <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="truck" class="size-[18px] shrink-0"></i>Goods receipt</a>
+    </nav>
+    <div class="shrink-0 border-t border-zinc-200 px-3 py-2 text-[11px]/4 text-zinc-500">The collapse control lives here, lg and up.</div>
+  </aside>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="flex h-14 shrink-0 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
+      <button type="button" x-ref="burger" @click="nav = true" :aria-expanded="nav" aria-controls="tb-sheet" aria-label="Open navigation"
+              class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+        <i data-lucide="menu" class="size-5"></i>
+      </button>
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white lg:hidden">K</span>
+      <nav aria-label="Breadcrumb" class="min-w-0">
+        <ol class="flex items-center gap-1.5 text-[13px]/5">
+          <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
+          <li aria-hidden="true" class="hidden text-zinc-400 sm:block">/</li>
+          <li class="min-w-0"><span aria-current="page" class="block truncate font-medium">Purchase orders</span></li>
+        </ol>
+      </nav>
+      <span aria-hidden="true" class="ml-auto flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RM</span>
+    </header>
+
+    <main class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+      <div class="rounded-xl border border-zinc-200 bg-white p-4">
+        <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · promised 22 Aug 2026</p>
+      </div>
+      <div class="rounded-xl border border-zinc-200 bg-white p-4">
+        <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1191 · Sharma Extrusions</p>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹4,26,500 · promised 28 Aug 2026</p>
+      </div>
+    </main>
+  </div>
+
+  <div x-show="nav" x-cloak x-trap.noscroll="nav" @click.self="nav = false; $refs.burger.focus()"
+       class="absolute inset-0 z-40 flex bg-zinc-900/40 lg:hidden">
+    <div id="tb-sheet" role="dialog" aria-modal="true" aria-label="Main navigation"
+         @click="if ($event.target.closest('a[href]')) { nav = false; $refs.burger.focus() }"
+         class="flex h-full w-72 flex-col border-r border-zinc-200 bg-white shadow-lg">
+      <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+        <button type="button" @click="nav = false; $refs.burger.focus()" aria-label="Close navigation"
+                class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+      <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+        <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>Overview</a>
+        <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
+        <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="truck" class="size-[18px] shrink-0"></i>Goods receipt</a>
+      </nav>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'context', name: 'Company, plant and financial year', code:
+`<!-- This control changes what every number on the screen means, which is what
+     makes it the opposite of a filter and the reason it sits up here rather
+     than beside them. The server reads company, plant and financial year on the
+     next request, so choosing one is a page load — swap it client-side and half
+     the screen is still showing the previous plant's stock.
+
+     Two things therefore have to be readable without opening anything. A
+     financial year that is not the current one gets a permanent pill with an
+     amber dot, because an FY switcher left on last year is how a receipt gets
+     posted into a closed period and nobody finds out until audit. And a
+     non-production tenant says so in the same slot, because the sandbox looks
+     exactly like production — which is the point of it and the danger of it.
+
+     Colour stays in the dot. The pills are the same graphite shape everything
+     else in this system uses, and what separates "sandbox" from "last year" is
+     which 6px disc is in it.
+
+     The selected option is marked with a check, not a tint: a permanently
+     tinted row in a menu reads as permanently hovered. Each set is a
+     role="group" with a name, and its rows are role="menuitemradio" with
+     aria-checked bound — a screen reader then announces "Vasai plant, 1 of 3,
+     selected" rather than three unrelated buttons. -->
+<header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+        x-data="{
+          open: false,
+          plant: 'Vasai',
+          fy: '2024-25',
+          items() { return [...this.$refs.menu.querySelectorAll('[role=menuitemradio]')] },
+          show() { this.open = true; this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus())) },
+          close(toTrigger = true) { if (!this.open) return; this.open = false; if (toTrigger) this.$refs.trigger.focus() },
+          move(step) { const i = this.items(), at = i.indexOf(document.activeElement); i[(at + step + i.length) % i.length]?.focus() }
+        }"
+        @click.outside="close(false)"
+        @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <div class="relative min-w-0">
+    <button type="button" x-ref="trigger" @click="open ? close(false) : show()" @keydown.arrow-down.prevent="show()"
+            :aria-expanded="open" aria-haspopup="menu" aria-controls="tb-ctx"
+            class="flex max-w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            :class="open && 'bg-zinc-100'">
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+      <span class="min-w-0">
+        <span class="block truncate text-[13px]/5 font-medium">Konspec Polymers Pvt Ltd</span>
+        <span class="block truncate text-[11px]/4 tabular-nums text-zinc-500" x-text="plant + ' plant · FY ' + fy">Vasai plant · FY 2024-25</span>
+      </span>
+      <i data-lucide="chevrons-up-down" class="size-3.5 shrink-0 text-zinc-500"></i>
+    </button>
+
+    <div id="tb-ctx" x-show="open" x-cloak
+         @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.tab="close(false)"
+         class="absolute left-0 z-40 mt-1 w-72 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+      <p class="px-3 pt-1.5 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Company</p>
+      <div x-ref="menu">
+        <div role="group" aria-label="Company">
+          <button type="button" role="menuitemradio" aria-checked="true" tabindex="-1" @click="close()"
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="check" class="size-4 shrink-0 text-zinc-700"></i><span class="min-w-0 flex-1 truncate">Konspec Polymers Pvt Ltd</span>
+          </button>
+          <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" @click="close()"
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span aria-hidden="true" class="size-4 shrink-0"></span><span class="min-w-0 flex-1 truncate">Konspec Compounds LLP</span>
+          </button>
+        </div>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <p class="px-3 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase" aria-hidden="true">Plant</p>
+        <div role="group" aria-label="Plant">
+          <template x-for="p in ['Vasai', 'Nashik', 'Silvassa']" :key="p">
+            <button type="button" role="menuitemradio" :aria-checked="plant === p" tabindex="-1" @click="plant = p; close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span class="flex size-4 shrink-0 items-center justify-center" x-show="plant === p"><i data-lucide="check" class="size-4 text-zinc-700"></i></span>
+              <span class="min-w-0 flex-1 truncate" x-text="p + ' plant'">Vasai plant</span>
+            </button>
+          </template>
+        </div>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <p class="px-3 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase" aria-hidden="true">Financial year</p>
+        <div role="group" aria-label="Financial year">
+          <template x-for="y in ['2026-27', '2025-26', '2024-25']" :key="y">
+            <button type="button" role="menuitemradio" :aria-checked="fy === y" tabindex="-1" @click="fy = y; close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 tabular-nums hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span class="flex size-4 shrink-0 items-center justify-center" x-show="fy === y"><i data-lucide="check" class="size-4 text-zinc-700"></i></span>
+              <span class="min-w-0 flex-1 truncate" x-text="'FY ' + y">FY 2026-27</span>
+              <span class="shrink-0 text-[11px]/4 text-zinc-500" x-show="y === '2026-27'">Current</span>
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+      <p class="px-3 py-1.5 text-[12px]/4 text-zinc-500">Changing any of these reloads the page.</p>
+    </div>
+  </div>
+
+  <span class="ml-auto hidden shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 sm:inline-flex">
+    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>Sandbox
+  </span>
+
+  <span x-show="fy !== '2026-27'"
+        class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span><span x-text="'FY ' + fy">FY 2024-25</span>
+  </span>
+
+  <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RM</span>
+</header>` },
+
+      { id: 'compact', name: 'Document title and actions', code:
+`<!-- This is the one bar allowed to carry a title, and it is allowed because
+     the screen underneath has no page-header: a full-height editor — a BOM
+     sheet, a rate-contract editor — where the document fills the column and
+     there is nowhere else for its name and its Save to go. On a register or a
+     dashboard the title and the primary action belong to page-header in the
+     scrolling column, and putting them here as well shows the record name twice
+     and spends 56px of a laptop saying it.
+
+     h-12 rather than h-14, because an editor is a screen somebody sits inside
+     for an hour and every row above the document is a row not spent on it. The
+     h1 is here only when it is here and not below; two h1 elements on one page
+     is a document with two titles as far as a heading outline is concerned.
+
+     Exactly one primary button. The saved state is text, not a toast — a toast
+     for an autosave is a notification of nothing, fired forty times an hour.
+     Below sm the button keeps its icon and drops its label; it does not shrink
+     and the row does not wrap. -->
+<header class="flex h-12 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4">
+  <a href="#" aria-label="Back to rate contracts"
+     class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="arrow-left" class="size-4"></i>
+  </a>
+
+  <h1 class="min-w-0 flex-1 truncate text-[16px]/6 font-semibold tabular-nums">RC-26-0043 — Gujarat Polymers Ltd</h1>
+
+  <p class="hidden shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500 sm:flex">
+    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Saved 2 min ago
+  </p>
+
+  <div class="flex shrink-0 items-center gap-2">
+    <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Preview
+    </button>
+    <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="check" class="size-4"></i><span class="hidden sm:inline">Submit for approval</span>
     </button>
   </div>
 </header>` },
-      { id: 'compact', name: 'Compact', code:
-`<header class="flex h-12 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
-  <h1 class="truncate text-[16px]/6 font-semibold">Konspec Operations</h1>
-  <div class="ml-auto flex items-center gap-2">
-    <button class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
-    <button class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
-      <i data-lucide="plus" class="size-4"></i><span class="hidden sm:inline">New order</span>
-    </button>
+
+      { id: 'sticky', name: 'Sticky, with a scrolled border', code:
+`<!-- The border exists from the first frame as border-transparent and only its
+     colour changes. Add the border on scroll and every row below it moves down
+     a pixel the moment the page leaves zero, and the whole page twitches under
+     the cursor.
+
+     The listener is on the element that scrolls. In this preview and inside
+     app-shell that is a div — the shell is a fixed-height flex frame where only
+     <main> scrolls, so window.scrollY is always zero there and a @scroll.window
+     handler never fires. On a document-scroll page it is the window instead:
+     @scroll.window="scrolled = window.scrollY > 0". Nothing looks broken when
+     the wrong one ships, which is how the dead listener survives review.
+
+     The translucent surface is bg-white first and
+     supports-[backdrop-filter]:bg-white/80 backdrop-blur after it, never
+     bg-white/80 on its own: where backdrop-filter is off the /80 stays and the
+     blur does not, so the table underneath scrolls through the bar as legible
+     text over legible text. backdrop-filter also makes a stacking context and
+     costs a composited layer repainted on every scroll frame, so it goes on the
+     header and on nothing else.
+
+     Pair this with one base rule on the page:
+       [id] { scroll-margin-top: 88px }
+     A sticky bar hides the anchor it has just scrolled to, so following
+     #line-14 out of an error summary lands on a row underneath this header and
+     the link reads as broken. One rule on [id] rather than scroll-mt-22 on the
+     elements that happen to be targets today. -->
+<div class="h-[420px] overflow-y-auto overscroll-contain rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+     x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0">
+
+  <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-transparent bg-white px-3 backdrop-blur transition-colors supports-[backdrop-filter]:bg-white/80 sm:px-4"
+          :class="scrolled && 'border-zinc-200'">
+    <nav aria-label="Breadcrumb" class="min-w-0">
+      <ol class="flex items-center gap-1.5 text-[13px]/5">
+        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Inventory</a></li>
+        <li aria-hidden="true" class="hidden text-zinc-400 sm:block">/</li>
+        <li class="min-w-0"><span aria-current="page" class="block truncate font-medium">Batch ledger</span></li>
+      </ol>
+    </nav>
+    <span aria-hidden="true" class="ml-auto flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RM</span>
+  </header>
+
+  <div class="space-y-2 p-4">
+    <div id="line-11" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0411 · LDPE 24FS040</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">1,250.000 kg · received 04/08/2026</p>
+    </div>
+    <div id="line-12" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0412 · LDPE 24FS040</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">980.500 kg · received 06/08/2026</p>
+    </div>
+    <div id="line-13" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0413 · HDPE 26HD110</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">2,400.000 kg · received 09/08/2026</p>
+    </div>
+    <div id="line-14" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0414 · HDPE 26HD110</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">1,875.250 kg · received 11/08/2026</p>
+    </div>
+    <div id="line-15" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0415 · PP 26PP220</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">640.000 kg · received 12/08/2026</p>
+    </div>
+    <div id="line-16" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0416 · PP 26PP220</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">1,120.750 kg · received 14/08/2026</p>
+    </div>
+    <p class="pt-2 text-[12px]/4 text-zinc-500">Scroll: the bottom edge appears only once there is something behind it.</p>
   </div>
-</header>` }
+</div>` },
+
+      { id: 'phone', name: 'At 390px', code:
+`<!-- Nothing shrinks and nothing scrolls sideways. Pieces are dropped whole:
+     the search becomes a button, the trail keeps its last crumb only, the
+     context label goes and the plant survives as a pill under the bar where
+     there is room for it. Squeeze the same five things into 390px instead and
+     the search field is four characters wide and the avatar is 24px.
+
+     Three things keep their full 40px hit target at this width and are all
+     shrink-0: the hamburger, the search button and the avatar. They are the
+     controls a thumb aims at, and a 32px target beside a 32px target is two
+     mistaps a day.
+
+     The bar stays h-14. It is the anchor for [id] { scroll-margin-top: 88px },
+     and a phone-only height means every anchor target on a phone lands under
+     the bar by the difference.
+
+     The trail is the parent and the current page, never four crumbs. Four
+     crumbs at 390px either wrap onto a second line or push the page sideways,
+     and both are worse than showing two. The last crumb is the one that is
+     never truncated — it is the one that says where you are. -->
+<div class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-2">
+    <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="tb-ph-nav"
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="menu" class="size-5"></i>
+    </button>
+
+    <nav aria-label="Breadcrumb" class="min-w-0 flex-1">
+      <ol class="flex items-center gap-1.5 text-[13px]/5">
+        <li class="min-w-0"><span aria-current="page" class="block truncate font-medium">Goods receipt</span></li>
+      </ol>
+    </nav>
+
+    <button type="button" aria-label="Search the application"
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="search" class="size-[18px]"></i>
+    </button>
+
+    <button type="button" aria-label="Notifications, 3 unread"
+            class="relative flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="bell" class="size-[18px]"></i>
+      <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
+    </button>
+
+    <button type="button" aria-label="Account — Rajesh Menon" aria-haspopup="menu" aria-expanded="false"
+            class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      RM
+    </button>
+  </header>
+
+  <div class="flex flex-wrap items-center gap-1.5 border-b border-zinc-200 bg-white px-3 pb-2">
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">Vasai plant</span>
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>FY 2024-25
+    </span>
+  </div>
+
+  <div class="space-y-2 p-3">
+    <div class="rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+      <p class="text-[13px]/5 font-medium tabular-nums">GRN-8842 · Gujarat Polymers Ltd</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">4 lines · posted 11/08/2026</p>
+    </div>
+    <div class="rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+      <p class="text-[13px]/5 font-medium tabular-nums">GRN-8843 · Sharma Extrusions</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">2 lines · awaiting QC</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'assembled', name: 'Procurement console header', code:
+`<!-- Everything at once, in the order a person reads it: who am I working as
+     and in what context, where am I, what can I search, what is waiting for me,
+     who am I. Left to right, and nothing in the middle competes with the
+     record underneath.
+
+     The bar owns none of the record. There is no page title and no New order
+     button up here — page-header carries both, in the column below, and one h1
+     per page lives there.
+
+     The sidebar owns the application name at lg and up, so this bar shows the
+     mark only below lg. The hamburger is lg:hidden and opens the sheet; the
+     collapse control is the sidebar's and never appears here.
+
+     The FY pill is permanent because the year is not the current one. The
+     colour is in the 6px dot and the pill is the same graphite shape as every
+     other pill in the system — a column of amber pills reads as a warning
+     about the page rather than a fact about the context.
+
+     Add to the page around it:
+       [id] { scroll-margin-top: 88px } -->
+<div class="relative bg-zinc-100 text-[14px]/5 text-zinc-900" x-data="{ open: '' }" @keydown.escape.window="open = ''">
+  <a href="#main-console" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-3 sm:px-4"
+          @click.outside="open = ''">
+    <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="console-nav"
+            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+      <i data-lucide="menu" class="size-5"></i>
+    </button>
+    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white lg:hidden">K</span>
+
+    <span class="hidden shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 md:inline-flex">Vasai plant</span>
+    <span class="hidden shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 md:inline-flex">
+      <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>FY 2024-25
+    </span>
+
+    <nav aria-label="Breadcrumb" class="min-w-0 flex-1">
+      <ol class="flex items-center gap-1.5 text-[13px]/5">
+        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
+        <li aria-hidden="true" class="hidden text-zinc-400 sm:block">/</li>
+        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Purchase orders</a></li>
+        <li aria-hidden="true" class="hidden text-zinc-400 sm:block">/</li>
+        <li class="min-w-0"><span aria-current="page" class="block truncate font-medium tabular-nums">PO-24-1187</span></li>
+      </ol>
+    </nav>
+
+    <button type="button" aria-label="Search the application"
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+      <i data-lucide="search" class="size-[18px]"></i>
+    </button>
+
+    <form role="search" action="#" class="hidden shrink-0 lg:block">
+      <label for="console-search" class="sr-only">Search orders, vendors and materials</label>
+      <div class="flex w-64 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <i data-lucide="search" class="ml-2.5 size-4 shrink-0 text-zinc-500"></i>
+        <input id="console-search" name="q" type="search" autocomplete="off" placeholder="Search orders, vendors, materials"
+               class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500">
+        <kbd aria-hidden="true" class="mr-2 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-600">⌘K</kbd>
+      </div>
+    </form>
+
+    <button type="button" aria-label="Approvals, 3 waiting on you"
+            class="relative flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="bell" class="size-[18px]"></i>
+      <span aria-hidden="true" class="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">3</span>
+    </button>
+
+    <div class="relative shrink-0">
+      <button type="button" @click="open = open === 'account' ? '' : 'account'"
+              :aria-expanded="open === 'account'" aria-haspopup="menu" aria-label="Account — Rajesh Menon"
+              class="flex size-9 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        RM
+      </button>
+      <div x-show="open === 'account'" x-cloak
+           class="absolute right-0 z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <div class="px-3 py-2">
+          <p class="truncate text-[13px]/5 font-medium">Rajesh Menon</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">rajesh.menon@konspec.com</p>
+        </div>
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <div role="menu" aria-label="Account">
+          <button type="button" role="menuitem" tabindex="-1" @click="open = ''"
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="user" class="size-4 text-zinc-600"></i>Your profile
+          </button>
+          <button type="button" role="menuitem" tabindex="-1" @click="open = ''"
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-console" tabindex="-1" class="space-y-4 p-4">
+    <div class="flex flex-wrap items-end justify-between gap-3">
+      <div class="min-w-0">
+        <h1 class="truncate text-[24px]/7 font-semibold tracking-tight tabular-nums">PO-24-1187</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Gujarat Polymers Ltd · ₹18,42,000 · 6 lines</p>
+      </div>
+      <div class="flex shrink-0 items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>Overdue
+        </span>
+        <button type="button" class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Record receipt
+        </button>
+      </div>
+    </div>
+    <p class="text-[12px]/4 text-zinc-500">The title and the primary action are page-header's, in this column. The bar above carries none of them.</p>
+  </main>
+</div>` }
     ]
   },
 

@@ -213,73 +213,762 @@ register(
 
   {
     id: 'toast', name: 'Toast', category: 'feedback',
-    description: 'A short confirmation that something finished, pinned to the bottom-left and gone a few seconds later.',
-    when: 'Saves, posts, exports — anything the user triggered and does not need to act on. Never put an error the user must read in a toast; it will disappear before they get to it.',
+    description: 'A short confirmation that an action the user just took has finished, pushed into a live region pinned to the bottom-left and gone a few seconds later. It reports an outcome; it is never where the outcome is recorded.',
+    when: 'The user pressed something, it worked, and there is nothing further to do about it — saved, posted, exported, emailed, a line removed with an undo window. The line against an alert is not severity and it is not length: an alert belongs to the page and states a condition that is still true when you look away — three invoices unmatched, a contract expiring, an import running — so it stays until the condition or the user removes it, and it lives in the page next to the thing it is about. A toast belongs to an action that has already completed and states something that was true for one moment, so it can leave on a timer without taking anything with it. Ask what the message is attached to: if it is attached to a record or a screen, it is an alert; if it is attached to a keypress, it is a toast. Anything the user has to read, act on or copy down — a failure, a validation summary, a reference number they need — is an alert even when it was a keypress that produced it, because a timer must never be the thing that decides they have finished reading. And a decision to take is neither: that is an alert dialog.',
     notes: [
-      'Auto-hide only works when the toast is dismissable and repeatable. If losing the message costs the user something, use an alert.',
-      'Bottom-left keeps it clear of the right-hand sheet and the row action menus.',
-      'A toast with an Undo action must not auto-hide faster than the undo window on the server.'
+      'The live region has to be in the DOM before the first toast is appended, empty, from first paint. This is the defect the component exists to prevent. Assistive technology monitors a region from the moment it exists, so a div carrying role="status" that is created in the same frame as its first message is treated as content that was always there and announces nothing at all — it renders perfectly, it passes every visual review, and it is silent for the people it is for. Render the empty region in the base template, last thing before </body>, and push into it.',
+      'Two regions, both empty at first paint: role="status" aria-live="polite" for ordinary confirmations and a second one carrying role="alert" aria-live="assertive" for failures. Do not rewrite aria-live on one region per message — the value is read when the region is registered, so the change lands after the announcement it was meant to change. And never point everything at the assertive region: assertive interrupts whatever is being read, so a save confirmation cuts off the sentence the user was listening to.',
+      'An error or a destructive outcome never auto-dismisses. A message that reports a failure is a message somebody has to act on, and a timer that removes it is a timer deciding they finished reading. Hard-code it in the push handler — ms: 0 for the danger tone whatever the caller passed — rather than trusting every call site.',
+      'The region box is pointer-events-none and each toast inside it is pointer-events-auto. Without it the empty region is an invisible strip across the bottom of the page that swallows every click landing on it, and the bug reads as "the footer links stopped working".',
+      'The timer pauses on hover and on focus-within, and restarts from full when the pointer or focus leaves. Resuming with 400ms left is not a resume — the user looked away mid-sentence and the toast is gone before they look back.',
+      'Under prefers-reduced-motion the timer does not run at all, for anything with words in it. It is the only signal the browser gives you that content vanishing on its own is unwelcome, and WCAG 2.2.1 wants a way to turn a time limit off. The toast stays until the user dismisses it, which costs nothing because dismiss is already there. Put motion-reduce:transition-none and motion-reduce:duration-0 on both x-transition class lists as well, so it arrives in place instead of travelling.',
+      'A toast is never the only place an outcome is reported, because it disappears. The durable copy is the thing that changed — the row now showing Posted, the status pill on the record, the line in the activity log, the GRN that now exists. Write the toast last, after the screen behind it already says the same thing, and check the screen still makes sense with the toast deleted.',
+      'Cap the stack at three and drop the oldest. Six toasts cover the bottom-left corner of the page, nobody reads past the second, and the region announces all six in a queue that outlasts the reason for it. If six things happened, one toast should say so and link to the list.',
+      'One toast per action, not one per row the action wrote. Approving eleven orders raises "11 orders approved" with a link, never eleven confirmations racing each other out of the corner.',
+      'A toast is appended after lucide.createIcons() has already run, so its <i> hydrates into nothing. Re-run createIcons() in $nextTick after the push, guarded on document.querySelector("[data-lucide]:not(svg)") — the generated <svg> keeps its data-lucide attribute, so an unguarded call repaints every icon on the page. Give the wrapping span its own size-4 box so the toast does not reflow when the glyph arrives, and put the tone colour on that span: createIcons() replaces the <i>, taking any :class bound on it. A spinner inside a toast is the border ring, never a Lucide loader, for the same reason.',
+      'An undo toast lives exactly as long as the server will accept the undo, and not a second either side. Longer and the button is a lie by the time it is pressed; shorter and the offer expires while the user is still looking at it. Eight seconds is the usual pairing, and Undo posts to a real endpoint — it is not a client-side rollback of what the server already wrote.',
+      'Bottom-left, and nothing else. Bottom-right collides with the sheet, the drawer handle and the row action menus that open downward; top-right is where the browser puts its own notifications. Below sm the region is inset-x-4 and the toast is one full-width card, so nothing scrolls sideways at 390px. A confirmation that has to survive a full page load is not a toast at all — it is the Django messages block rendered by the server into the next page.'
     ],
     anatomy: [
-      ['Region', 'A fixed container at the bottom-left, clear of the right-hand sheet and the row action menus.'],
-      ['Icon', 'The severity, at size-4. The same palette as an alert, for the same reason.'],
-      ['Message', 'One line, past tense, naming what happened. "GRN 1142 posted", not "Success".'],
-      ['Action', 'Optional, and almost always Undo. Anything else usually belongs in an alert instead.'],
-      ['Dismiss', 'Always present, so a toast can be got rid of before its timer runs out.']
+      ['Polite region', 'A fixed, empty, pointer-events-none flex column at the bottom-left, carrying role="status" aria-live="polite". It ships in the base template and is never created on demand. Ordinary toasts are appended into it.'],
+      ['Assertive region', 'A second empty region beside the first, carrying role="alert" aria-live="assertive". Failures only. It exists at first paint too, because the error case is the one where a silent region costs the most.'],
+      ['Toast', 'pointer-events-auto, rounded-xl, white, border-zinc-200, shadow-lg. One per outcome, appended at the end so the stack grows upward from the bottom edge.'],
+      ['Icon', 'size-4, the only colour in the component, on a wrapping span that owns both the colour class and the box. The same four tones as an alert, from the same table — a toast is an alert with a timer, not a different language.'],
+      ['Message', 'One line, past tense, naming the record: "GRN 4417 posted", never "Success". It is text content inside the region, which is what gets announced.'],
+      ['Meta', 'Optional second line — vendor, quantity, value, who did it. text-[12px]/4 text-zinc-600, tabular-nums on the figures.'],
+      ['Action', 'At most one, and almost always Undo or a link to the record that was just created. A real button or a real anchor, and whatever it does is reachable somewhere permanent as well.'],
+      ['Dismiss', 'A 28px icon button with aria-label="Dismiss". Always present, because every toast has to be removable before its timer runs and the error toast has no timer at all.']
     ],
     behaviour: [
-      'It appears after the action it reports, never before, and auto-hides a few seconds later.',
-      'An error the user must read never goes in a toast — it will disappear before they reach it. That is an alert.',
-      'A toast carrying Undo must not auto-hide sooner than the server\'s undo window, or the offer expires while it is still on screen.',
-      'Toasts stack upward, newest at the bottom, and older ones are pushed rather than replaced.',
-      'Hovering a toast pauses its timer, because a user reading it is not a user ignoring it.'
+      'A toast appears after the action it reports has finished, never before, and never as a promise that something is about to happen.',
+      'It auto-dismisses after about five seconds; an undo toast holds for eight, matching the server window; an error toast has no timer and waits for the user.',
+      'Hover or focus inside a toast clears its timer, and leaving restarts it from full rather than resuming what was left.',
+      'Under prefers-reduced-motion no timer is set at all and the toast arrives in place rather than travelling up from the edge.',
+      'Toasts stack in one column from the bottom edge, newest nearest the bottom, so DOM order is the order things happened and that is the order the region reads them.',
+      'The stack is capped at three. A fourth push removes the oldest, and the count of what was dropped points at the durable list.',
+      'A pending toast is patched in place when the request settles — same id, same node, text and icon swapped — so the stack does not reshuffle under the pointer and the region announces the change rather than a second toast.',
+      'Dismiss all appears once more than one toast is open. It sits above the stack and outside the live region, so its own arrival is not announced as a message.',
+      'Nothing about a toast blocks the page: no backdrop, no focus move, no pointer events outside the cards themselves.'
     ],
     a11y: [
-      'The region is aria-live="polite" so a new toast is announced without interrupting.',
-      'An error toast — if one is unavoidable — is role="alert", which interrupts, and should be an alert instead.',
-      'The dismiss button has aria-label="Dismiss", since its only content is an icon.',
-      'Auto-hide is paused on hover and on focus, so a keyboard user has time to reach the Undo.',
-      'Nothing in a toast is the only path to an action. If it matters, it exists somewhere permanent too.'
+      'The region is in the document at page load with nothing in it. A region created together with its first message announces nothing, which is the single most common way a toast is shipped broken — it looks right on every screen and is silent on every screen reader.',
+      'Ordinary toasts go into role="status" aria-live="polite" and are announced at the next pause. Failures go into a separate role="alert" aria-live="assertive" region and interrupt, which is the only case that earns an interruption.',
+      'The message is text content inside the region, not an aria-label on the toast. A live region reports the content that changed inside it, and a name is not content. The default aria-relevant covers additions and text and not removals, which is what makes a toast expiring silent and an in-place update announced.',
+      'The tone icon is decorative and unlabelled. The wording says what happened and how it went, so nothing depends on telling amber from red.',
+      'Focus never moves to a toast when it appears. The user is usually still in the form that raised it, and a stolen caret loses their place; the toast is reached by Tab, which is why the region is the last thing in the body.',
+      'The timer pauses on focusin as well as on hover, so a keyboard user tabbing towards Undo does not watch it vanish on the way, and it does not run at all under prefers-reduced-motion.',
+      'Dismissing a toast destroys the element focus is on, which drops focus to <body>. The handler checks $event.detail === 0 — a click event with detail 0 came from Enter or Space, not a pointer — and only then returns focus to the control that raised the toast, so a mouse click does not cause a focus jump nobody asked for.',
+      'The dismiss button carries aria-label="Dismiss" and the dismiss-all button carries its count in its text, because both are otherwise an icon or a bare number.',
+      'Nothing in a toast is the only route to anything. Undo also exists on the record, the link also exists in the register, and the outcome is on the screen behind the toast before the toast is raised.'
     ],
-    related: ['alert', 'alert-dialog', 'badge'],
+    related: ['alert', 'alert-dialog', 'spinner'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div x-data="{ show: true }" x-init="setTimeout(() => show = false, 2600)"
-     x-show="show" x-cloak
-     x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="opacity-0 translate-y-2"
-     x-transition:leave="transition ease-in duration-150"
-     x-transition:leave-end="opacity-0 translate-y-2"
-     class="fixed bottom-4 left-4 z-50 flex w-[calc(100vw-2rem)] max-w-sm items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg">
-  <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-    <i data-lucide="check" class="size-4 text-emerald-600"></i>
-  </span>
-  <div class="min-w-0 flex-1">
-    <p class="truncate text-[13px]/5 font-medium">PO-24-1187 saved</p>
-    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Just now</p>
-  </div>
-  <button type="button" @click="show = false" aria-label="Dismiss"
-          class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
-    <i data-lucide="x" class="size-4"></i>
+`<!-- The region is in the page before anything is pushed into it, and that is
+     the whole component. A role="status" div created in the same frame as its
+     first toast announces nothing: the region is only monitored from the moment
+     it exists, and content present when it appears counts as content that was
+     always there. Render this empty div once in the base template, last thing
+     before </body>, and push into it from anywhere.
+
+     pointer-events-none on the region, pointer-events-auto on the card. Without
+     it the empty region is an invisible strip across the bottom of the page that
+     eats every click that lands on it.
+
+     Lucide has already run by the time a toast is pushed, so the new <i> is
+     hydrated in $nextTick, guarded on the un-hydrated selector — the generated
+     <svg> keeps its data-lucide, so an unguarded call repaints every icon on the
+     page. The span around it carries the size-4 box and the colour: createIcons()
+     replaces the <i> and anything bound on it goes with it. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, ms: 5000, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+         return n.id;
+       },
+       start(t) {
+         if (!t || !t.ms || this.still) return;
+         clearTimeout(t.timer);
+         t.timer = setTimeout(() => this.close(t.id), t.ms);
+       },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }">
+
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'PO-24-1187 saved', meta: '6 lines · ₹4,82,000' })"
+          class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Save order
   </button>
-</div>` },
-      { id: 'undo', name: 'With undo action', code:
-`<div x-data="{ show: true }" x-init="setTimeout(() => show = false, 6000)"
-     x-show="show" x-cloak
-     x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="opacity-0 translate-y-2"
-     x-transition:leave="transition ease-in duration-150"
-     x-transition:leave-end="opacity-0 translate-y-2"
-     class="fixed bottom-4 left-4 z-50 flex w-[calc(100vw-2rem)] max-w-sm items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg">
-  <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-    <i data-lucide="trash-2" class="size-4 text-zinc-600"></i>
-  </span>
-  <div class="min-w-0 flex-1">
-    <p class="truncate text-[13px]/5 font-medium">Line 4 removed from PO-24-1187</p>
-    <p class="mt-0.5 text-[12px]/4 text-zinc-500">MS plate 10 mm · <span class="tabular-nums">₹1,08,400</span></p>
+
+  <!-- ships empty, at page load, exactly like this -->
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           @mouseenter="pause(t)" @mouseleave="start(t)"
+           @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+        </div>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
   </div>
-  <button type="button" @click="show = false"
-          class="shrink-0 text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">Undo</button>
+</div>` },
+
+      { id: 'tones', name: 'Four tones, two regions', code:
+`<!-- The same four tones as an alert, from the same table: info zinc-500,
+     success emerald-600, warning amber-700, danger red-600. The tone is the
+     icon and nothing else — no tinted card, no coloured border.
+
+     Two regions, both empty at first paint. Ordinary toasts go into the polite
+     one and wait for a pause; danger goes into the assertive one and interrupts.
+     Rewriting aria-live on a single region per message does not work, because
+     the value is read when the region is registered — the change lands after the
+     announcement it was meant to change. Routing everything through assertive is
+     the same mistake in reverse: a save confirmation cutting off the sentence
+     someone was listening to.
+
+     push() forces ms: 0 on the danger tone whatever the call site asked for. A
+     failure is not removed by a timer. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       icon: { info: 'info', success: 'check-circle-2', warning: 'alert-triangle', danger: 'alert-circle' },
+       hue: { info: 'text-zinc-500', success: 'text-emerald-600', warning: 'text-amber-700', danger: 'text-red-600' },
+       push(t) {
+         const n = { id: ++this.seq, tone: 'info', ms: 5000, timer: 0, ...t };
+         if (n.tone === 'danger') n.ms = 0;
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       },
+       bucket(name) { return this.toasts.filter(t => (t.tone === 'danger') === (name === 'danger')); }
+     }">
+
+  <div class="flex flex-wrap gap-2">
+    <button type="button" x-ref="fire" @click="push({ tone: 'info', text: 'Rate card refreshed', meta: 'August 2024 · 3,100 rows' })"
+            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Info</button>
+    <button type="button" @click="push({ tone: 'success', text: 'PO-24-1187 emailed to Sharma Extrusions', meta: 'Sent 11:42' })"
+            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Success</button>
+    <button type="button" @click="push({ tone: 'warning', text: 'Saved, but 2 lines are over the rate contract', meta: 'MS plate 10 mm · MS angle 50×50' })"
+            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Warning</button>
+    <button type="button" @click="push({ tone: 'danger', text: 'PO-24-1187 could not be emailed', meta: 'The vendor has no contact address on file' })"
+            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
+  </div>
+
+  <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <!-- both regions are in the DOM from first paint, both empty -->
+    <div role="alert" aria-live="assertive" class="flex flex-col gap-2">
+      <template x-for="t in bucket('danger')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+             @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0" :class="hue[t.tone]"><i :data-lucide="icon[t.tone]" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+          </div>
+          <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div role="status" aria-live="polite" class="flex flex-col gap-2">
+      <template x-for="t in bucket('polite')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+             @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0" :class="hue[t.tone]"><i :data-lucide="icon[t.tone]" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+          </div>
+          <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'undo', name: 'With undo action', code:
+`<!-- Eight seconds, because that is how long the server will accept the undo.
+     The two numbers are one number: hold the toast longer than the window and
+     the button is a lie by the time it is pressed; shorter and the offer expires
+     while it is still on the screen.
+
+     Undo posts to a real endpoint — hx-post="/orders/1187/lines/4/restore/" —
+     it is not a client-side rollback of something the server already wrote. And
+     it is a shortcut, not the only route: the removed line is still on the
+     order's history page after the toast has gone.
+
+     The timer clears on focusin as well as on hover, so tabbing towards Undo
+     does not make it disappear on the way, and it never runs at all under
+     prefers-reduced-motion. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, ms: 8000, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }">
+
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'Line 4 removed from PO-24-1187', meta: 'MS plate 10 mm · 4.200 MT · ₹1,08,400' })"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="trash-2" class="size-4 text-zinc-600"></i>Remove line
+  </button>
+
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           @mouseenter="pause(t)" @mouseleave="start(t)"
+           @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-zinc-500"><i data-lucide="trash-2" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+        </div>
+        <button type="button"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="shrink-0 rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Undo
+        </button>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>` },
+
+      { id: 'link', name: 'Link to the record', code:
+`<!-- The record was created somewhere the user is not. The toast says so and
+     offers the way there, as a real anchor: middle-click, ctrl-click and open
+     in new tab all have to work, which is the whole reason it is not a button
+     with a location.href handler on it.
+
+     The link is a shortcut, never the only route. The GRN is in the register
+     the moment it exists, so a toast that expires unread costs nothing — which
+     is exactly the test for whether a message may be a toast at all.
+
+     Ten seconds rather than five, because the user has to read the number,
+     decide, and travel to a target that is not under the pointer. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, ms: 10000, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }">
+
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'GRN 4417 created', meta: 'Against PO-24-1187 · Nashik Steel Traders', href: '/grn/4417/', cta: 'Open GRN 4417' })"
+          class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Create GRN
+  </button>
+
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           @mouseenter="pause(t)" @mouseleave="start(t)"
+           @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600" x-text="t.meta"></p>
+          <a :href="t.href" x-text="t.cta"
+             class="mt-1.5 inline-block rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></a>
+        </div>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>` },
+
+      { id: 'error', name: 'Error, no timer', code:
+`<!-- ms: 0, and it is forced in push() rather than left to the call site. A
+     message reporting a failure is a message somebody has to act on, and a
+     timer removing it is a timer deciding they have finished reading.
+
+     role="alert" aria-live="assertive" on a region that was already in the DOM.
+     This is the case where a region created on demand costs the most: it renders
+     perfectly and announces nothing, and the person who most needed to hear that
+     the export failed is the one who does not.
+
+     Even so, a toast is not where a failure is recorded. The export row behind
+     this says Failed with the reason on it, and this toast is the fact that it
+     happened while the user was looking somewhere else. Anything the user has to
+     copy down or work from belongs in an alert on the page. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       push(t) {
+         this.toasts.push({ id: ++this.seq, ms: 0, ...t });
+         this.$nextTick(() => { if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons(); });
+       },
+       close(id) { this.toasts = this.toasts.filter(x => x.id !== id); }
+     }">
+
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'The August ledger export failed', meta: 'Row 1,842 · posting date is outside the open period' })"
+          class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Export ledger
+  </button>
+
+  <div role="alert" aria-live="assertive"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-red-600"><i data-lucide="alert-circle" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+          <a href="/exports/" class="mt-1.5 inline-block rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Open the export log
+          </a>
+        </div>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>` },
+
+      { id: 'stack', name: 'Stack, capped at three', code:
+`<!-- Three, and a fourth push drops the oldest. Six toasts cover the corner of
+     the page, nobody reads past the second, and the region queues six
+     announcements that outlast the reason for any of them.
+
+     Dropping is not losing. Every confirmation is also a line in the activity
+     log, so the counter above the stack points at the durable copy rather than
+     pretending the cap has no cost. If six things really happened, one toast
+     saying "6 orders approved" with a link is the better message.
+
+     Newest is appended last and sits nearest the bottom edge, so DOM order is
+     the order things happened, which is the order the region reads them.
+
+     start() is handed the object that was just pushed, never toasts.at(-1).
+     Two pushes in the same tick queue two $nextTick callbacks that both run
+     after both pushes, so both would look at the same last element: one toast
+     gets its timer set twice and the other never gets one at all, and it sits
+     in the corner until the page is reloaded. -->
+
+<div x-data="{
+       toasts: [], seq: 0, cap: 3, dropped: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, ms: 5000, timer: 0, ...t };
+         this.toasts.push(n);
+         while (this.toasts.length > this.cap) { this.dropped++; this.close(this.toasts[0].id); }
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }">
+
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'PO-24-1' + (180 + seq) + ' approved', meta: '₹' + (3 + seq) + ',26,500 · Nashik Steel Traders' })"
+          class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Approve next order
+  </button>
+
+  <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <!-- outside the live region: a counter is not a message, and announcing it
+         on every push would read the same sentence four times -->
+    <p x-show="dropped" x-cloak class="pointer-events-auto self-start rounded-lg bg-zinc-200 px-2.5 py-1 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span class="tabular-nums" x-text="dropped"></span> more in the
+      <a href="/activity/" class="rounded-sm font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">activity log</a>
+    </p>
+
+    <div role="status" aria-live="polite" class="flex flex-col gap-2">
+      <template x-for="t in toasts" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+             @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+          </div>
+          <button type="button" aria-label="Dismiss"
+                  @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'pending', name: 'Pending, then resolved', code:
+`<!-- One toast, patched in place. The same id and the same node: the text and
+     the icon are swapped when the request settles, so the stack does not
+     reshuffle under the pointer and the region announces the change rather than
+     a second message. The default aria-relevant covers text changes, which is
+     what makes updating in place work at all.
+
+     No timer while it is pending — a toast that expires with the request still
+     in flight leaves the user with no answer either way. The timer is set when
+     the reply lands, and only if the reply is good news.
+
+     The spinner is the border ring, not a Lucide loader. An <i data-lucide> has
+     no box until createIcons() has run over it, which is exactly what an element
+     appended after page load cannot count on.
+
+     Two seconds of waiting belongs here. A job that outlives the request belongs
+     in an alert on the page with a progress bar, because the user will navigate
+     away and the toast will not survive it. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, tone: 'pending', ms: 0, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => { if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons(); });
+         return n.id;
+       },
+       settle(id, patch) {
+         const t = this.toasts.find(x => x.id === id);
+         if (!t) return;
+         Object.assign(t, patch);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(t);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       },
+       post() {
+         const id = this.push({ text: 'Posting GRN 4417', meta: 'Against PO-24-1187' });
+         setTimeout(() => this.settle(id, { tone: 'success', text: 'GRN 4417 posted', meta: '12.480 MT received · ₹4,26,500', ms: 5000 }), 2000);
+       }
+     }">
+
+  <button type="button" x-ref="fire" @click="post()"
+          class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Post GRN
+  </button>
+
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <template x-if="t.tone === 'pending'">
+          <span class="mt-0.5 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+        </template>
+        <template x-if="t.tone === 'success'">
+          <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        </template>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+        </div>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>` },
+
+      { id: 'dismiss-all', name: 'Dismiss all', code:
+`<!-- The control appears at two toasts and sits above the stack, outside the
+     live region. Inside it, its own arrival would be announced as a message and
+     the count changing would be announced again on every push.
+
+     Escape is bound on window, not on the region. Nothing inside a toast holds
+     focus unless the user tabbed into it, so a region-scoped keydown would only
+     work in the one case that needed it least. It removes toasts and nothing
+     else, so a dialog closing on the same keypress loses nothing.
+
+     Clearing the stack destroys the element focus is on. $event.detail === 0
+     means the click came from Enter or Space rather than a pointer, and only
+     then is focus put back on the control that raised the toasts — a mouse user
+     gets no focus jump they did not ask for. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, ms: 6000, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       },
+       closeAll() { this.toasts.forEach(t => clearTimeout(t.timer)); this.toasts = []; }
+     }"
+     @keydown.escape.window="closeAll()">
+
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'Batch B-2411' + seq + ' released', meta: 'QC passed · 480 kg' })"
+          class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Release batch
+  </button>
+
+  <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <button type="button" x-show="toasts.length > 1" x-cloak
+            @click="closeAll(); if ($event.detail === 0) $refs.fire.focus()"
+            class="pointer-events-auto self-start rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Dismiss all <span class="tabular-nums" x-text="toasts.length"></span>
+    </button>
+
+    <div role="status" aria-live="polite" class="flex flex-col gap-2">
+      <template x-for="t in toasts" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+             @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+          </div>
+          <button type="button" aria-label="Dismiss"
+                  @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'posting', name: 'Posting a GRN', code:
+`<!-- The assembled case. Post the receipt, the toast confirms it, Undo reverses
+     it inside the window the server allows.
+
+     The card behind the toast is the point. Posting flips the row to Closed with
+     the GRN number on it before the toast is raised, and undoing flips it back,
+     so the toast is a convenience over a screen that is already correct. Delete
+     the toast from this snippet and nothing is lost except the shortcut — that
+     is the test for whether an outcome may be reported in a toast at all.
+
+     Eight seconds, matching the server's undo window. Hovering or tabbing into
+     the toast clears the timer; under prefers-reduced-motion no timer is set and
+     it waits to be dismissed.
+
+     Status colour is the locked mapping and lives in the dot: zinc-500 Open,
+     emerald-600 Closed. The pill around it never changes. -->
+<div class="max-w-xl"
+     x-data="{
+       posted: false, grn: null, toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       post() {
+         this.posted = true; this.grn = 4417;
+         this.push({ text: 'GRN ' + this.grn + ' posted against PO-24-1187', meta: 'Nashik Steel Traders · 12.480 MT · ₹4,26,500' });
+       },
+       undo(id) {
+         this.posted = false; this.grn = null;
+         this.close(id);
+       },
+       push(t) {
+         const n = { id: ++this.seq, ms: 8000, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+      <div class="min-w-0 flex-1">
+        <h3 class="text-[16px]/6 font-semibold">Receipt against PO-24-1187</h3>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-600">Nashik Steel Traders · gate entry 20 Aug 2024, 09:15</p>
+      </div>
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full" :class="posted ? 'bg-emerald-600' : 'bg-zinc-500'" aria-hidden="true"></span>
+        <span x-text="posted ? 'Closed' : 'Open'"></span>
+      </span>
+    </div>
+
+    <dl class="divide-y divide-zinc-100 text-[13px]/5">
+      <div class="flex items-center justify-between gap-4 px-4 py-2.5">
+        <dt class="text-zinc-600">MS plate 10 mm</dt>
+        <dd class="shrink-0 tabular-nums">12.480 MT</dd>
+      </div>
+      <div class="flex items-center justify-between gap-4 px-4 py-2.5">
+        <dt class="text-zinc-600">Receipt value</dt>
+        <dd class="shrink-0 tabular-nums">₹4,26,500</dd>
+      </div>
+      <div class="flex items-center justify-between gap-4 px-4 py-2.5">
+        <dt class="text-zinc-600">GRN</dt>
+        <dd class="shrink-0">
+          <a x-show="posted" x-cloak :href="'/grn/' + grn + '/'" class="rounded-sm tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="grn"></a>
+          <span x-show="!posted" class="text-zinc-500">Not posted</span>
+        </dd>
+      </div>
+    </dl>
+
+    <div class="flex justify-end gap-2 border-t border-zinc-200 px-4 py-3">
+      <button type="button" x-ref="fire" @click="post()" :disabled="posted"
+              class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Post GRN
+      </button>
+    </div>
+  </div>
+
+  <!-- empty at first paint, and never created on demand -->
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           @mouseenter="pause(t)" @mouseleave="start(t)"
+           @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+        </div>
+        <button type="button"
+                @click="undo(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="shrink-0 rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Undo
+        </button>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
 </div>` }
     ]
   },
@@ -1393,77 +2082,742 @@ register(
 
   {
     id: 'tooltip', name: 'Tooltip', category: 'feedback',
-    description: 'A dark bubble on hover, done with group-hover alone — no JS, no Alpine.',
-    when: 'Naming an icon-only button, or showing the full text of a cell that had to be truncated. Never put anything the user must read in a tooltip; it is invisible on touch and to keyboard users.',
+    description: 'A short dark bubble that names the control under the pointer or under the keyboard. It carries a label and nothing else — no controls, no facts that are not already somewhere the user can reach without hovering.',
+    when: 'A control that has no visible text and needs one word saying what it does: an icon button in a row of them, a rail item, an abbreviated column header, a cell whose text had to be truncated. The three neighbours draw the boundary and it is worth being exact about, because all three are a small floating panel and only one of them is this. A tooltip is the name of a control — hover or focus, text only, nothing in it to reach, and it may hold nothing the user cannot get another way. A hovercard is hover as well but it is a preview of a record: a white panel, several facts, one link, and it pays for being reachable with an open delay, a close delay and a pointer bridge. A popover is click, and it contains focusable, operable things — a filter, a column list, an inline edit. A tooltip that holds a button is a popover drawn wrong; a tooltip that holds four figures about a record is a hovercard drawn wrong; and a hovercard used to name an icon button is a tooltip drawn at four times the weight, which then cannot be dismissed with Escape because nobody built that for a label. The sidebar rail is the largest single consumer of this component and its icon items are the canonical case.',
     notes: [
-      'The tooltip is not a label. Keep aria-label on the button as well, or screen readers get nothing.',
-      'pointer-events-none on the bubble, otherwise it eats the hover of whatever sits under it.',
-      'The wrapper needs relative and group; the bubble positions against it.'
+      'Never the native title attribute. It has no keyboard route at all — a title never appears on focus, so every icon button labelled that way is unnamed for anyone driving with a keyboard. Its delay is roughly a second and cannot be shortened, it self-destructs after about five while the user is still reading it, it is invisible on touch, it cannot be styled or positioned, and it renders under the pointer where it covers the next control along. It is also read three different ways by three screen readers — as the name when nothing else supplies one, as a description when something does, and skipped entirely by readers configured to ignore it. Write the bubble.',
+      'Which naming attribute you use depends on whether the trigger already has a name, and getting it backwards is the defect this component exists to prevent. The trigger has no visible text and the bubble text is its name: aria-labelledby at the bubble id, or aria-label on the trigger with the bubble aria-hidden. The trigger already has a name — visible text, or an aria-label saying something the bubble does not repeat — and the bubble adds to it: aria-describedby. aria-describedby on a bare icon button gives a control announced as "button", with its actual name arriving late as a description or not at all; an aria-label plus a bubble the name is also computed from gives a control announced twice.',
+      'Do not add and remove the naming attribute as the bubble shows and hides. Name and description computation reaches referenced elements that are display:none on purpose, so aria-labelledby at a hidden bubble names the button for the whole session, which is what you want — the button is not nameless between hovers. Toggling the attribute instead makes some readers re-announce the control every time the pointer crosses it.',
+      'Nothing in a tooltip may be interactive, and pointer-events-none on the bubble is what enforces it rather than decorates it. Without it the bubble eats the hover of whatever it covers and flickers as the pointer crosses; with it, a link inside is unclickable and a screen reader user has been told about something that does not work. This is also why a tooltip needs none of the hovercard\'s machinery — no open bridge, no close delay, no hoverable panel — because nothing in it can be reached, and the moment something can, it stopped being a tooltip.',
+      'It opens on focus-visible, not on focus. Bound to plain focus, every click on an icon button leaves a bubble hanging over the toolbar until the pointer moves somewhere else, because a click focuses the button. Test $event.target.matches(\':focus-visible\') in the handler; the pseudo-class is the browser\'s own judgement about whether the user is driving by keyboard, and reimplementing it from key events is how you end up with a tooltip that appears after a drag.',
+      'It must open on the keyboard at all. A tooltip wired to hover alone is a name that only exists for people using a mouse, and on a bare icon button that means the control has no name for anyone else. This is the half of the sidebar rail that gets forgotten, because it is invisible to anyone testing with a pointer.',
+      'Escape hides it and focus stays exactly where it was. Bind it on window and do not stopPropagation. The window scope is needed because a tooltip opened by the pointer has no focus inside it, so a root-scoped keydown never fires and there is nothing to dismiss it with — WCAG 1.4.13 dismissible. Not stopping it is the deliberate difference from a popover: a tooltip is a label, not a layer, so an Escape that hides the bubble and also closes the dialog around it is one press doing what the user meant, while swallowing it at the tooltip makes the dialog undismissable whenever the pointer happens to rest on a toolbar icon.',
+      'Delay opening by about 150ms and close immediately. The delay stops a pointer crossing a toolbar on its way somewhere else from firing five bubbles; no close delay is correct here precisely because there is nothing to travel into. A row of controls shares one delay group: once any tooltip in the group has opened, the next one opens at once, and the group goes cold again a second or so after the pointer leaves it. Without the group, moving one button along a toolbar re-pays the 150ms every time and the labels lag behind the pointer.',
+      'Handlers go on the trigger, not on a wrapper. The hovercard watches its wrapper because the pointer is meant to be allowed into the panel and mouseleave has to mean "left both"; here the bubble cannot be entered, so the trigger is the whole surface worth tracking and mouseenter, mouseleave, focus and blur bind straight to it. The one exception is a disabled control, which fires no pointer events at all, and there the wrapper takes them back.',
+      'The bubble is absolutely positioned inside the trigger\'s own wrapper and never portalled or position:fixed. That makes an overflow-hidden ancestor the standing trap — the card wrapper around a table clips every bubble at the row it opens on, and truncate on the cell clips the bubble as well as the text. Round the header cells instead of clipping the card, and put the bubble on a side that fits rather than reaching for fixed. Fixed brings the containing-block problem with it, and it also has to be repositioned on every scroll, which is a lot of machinery for a label.',
+      'On touch it never appears, and no scroll pins it. The bubble travels with its row and goes with it, and there is no pinned state and no dismiss button. Everything that follows from that is one rule: a tooltip may not be the only place a fact lives. The spec limit, the shortcut, the reason a button is disabled — each of them is in the tooltip as a shortcut to something already on the page or one click away, never as its home.',
+      'Keep it to a few words on one line, whitespace-nowrap. If it wants a sentence it is help text under the field; if it wants a heading and figures it is a hovercard; if it wants a link it is a popover. A tooltip that wraps to three lines is covering the controls either side of the one it names.'
     ],
     anatomy: [
-      ['Wrapper', 'relative and group. The bubble positions against this, so it has to exist.'],
-      ['Trigger', 'The icon button or the truncated cell the tooltip belongs to.'],
-      ['Bubble', 'A zinc-900 panel appearing on group-hover, pointer-events-none so it does not eat the hover beneath it.'],
-      ['Arrow', 'Optional. A rotated square tucked under the bubble\'s edge.']
+      ['Wrapper', 'relative inline-flex around the trigger and the bubble. It owns the Alpine state and the window Escape binding, and it is deliberately not what the pointer is tracked on — the trigger is.'],
+      ['Trigger', 'The real button, link or header control. It carries the pointer and focus handlers, the naming attribute, and aria-keyshortcuts when the bubble shows a key. It works with the bubble never appearing.'],
+      ['Bubble', 'bg-zinc-900, rounded-lg, px-2 py-1, text-[12px]/4 white, whitespace-nowrap, pointer-events-none, z-40, x-cloak. role="tooltip" when it is exposed, aria-hidden when the trigger already carries the same string.'],
+      ['Gap', 'A plain mb-1.5 or ml-1.5 on the bubble. Unlike the hovercard\'s pt-2 bridge this is an ordinary margin, because the pointer never has to cross it — the moment it does, the component is the wrong one.'],
+      ['Arrow', 'Optional. A size-2 square rotated 45 degrees in the same zinc-900, tucked half under the bubble edge. It lives inside the bubble so pointer-events-none covers it, and it is dropped whenever the bubble has been shifted independently of the trigger.'],
+      ['Shortcut', 'A kbd inside the bubble, aria-hidden, in the same plain wording the dropdown uses — Ctrl D, not a glyph. The machine form goes in aria-keyshortcuts on the trigger.'],
+      ['Delay group', 'One x-data on a toolbar or a table holding the open id and a warm flag, so the first label in a row costs 150ms and the rest are instant.'],
+      ['Clip probe', 'An x-ref on the truncated text and a scrollWidth against clientWidth read at hover time, so a cell that fits shows no bubble at all.']
     ],
     behaviour: [
-      'Hover only, with no JavaScript at all — group-hover does the whole job.',
-      'It is invisible on touch and to the keyboard, which is why nothing the user must read may live in one.',
-      'The bubble never intercepts the pointer; without pointer-events-none it flickers as the cursor crosses it.',
-      'It appears above the trigger by default and flips below only when there is no room.',
-      'A tooltip on a truncated cell shows the full text, which means the text must exist in the markup rather than being fetched.'
+      'The pointer arriving on the trigger opens it after about 150ms; the pointer leaving closes it at once. There is no close delay and no way to keep it open, because there is nothing in it to reach.',
+      'Focus-visible opens it immediately and blur closes it. A click that happens to focus the button does not open it, so pressing an icon button does not leave a label sitting over the toolbar.',
+      'Escape hides it from anywhere on the page and leaves focus on the trigger. The user can carry on tabbing without having lost their place, and pressing Escape again does whatever the page would have done anyway.',
+      'The bubble never takes the pointer. Hovering the space it occupies hovers whatever is underneath, which is usually the row behind it.',
+      'Within a delay group the first label waits out the delay and every label after it appears the instant the pointer arrives, until the pointer has been off the group for about a second.',
+      'Two bubbles can be on screen at once — one where focus is and one under the pointer — and that is correct rather than a bug to serialise away. They are answering two different questions.',
+      'A truncated cell opens a bubble only when the text is actually clipped, and the measurement is taken at hover rather than at init, because column widths change with the viewport and a flag computed once goes stale on the first resize.',
+      'On a touch device nothing opens: there is no hover, and a tap goes to the control. The label is the same one that is in the accessible name, so the tap target is still named.',
+      'Nothing pins it. It is not sticky on scroll, it has no close button, and it disappears the moment the pointer or focus moves — which is the whole reason it may not hold anything that has to be read.'
     ],
     a11y: [
-      'The tooltip is not a label. The button keeps its aria-label, or a screen reader gets nothing at all.',
-      'The bubble is aria-hidden, because its text is already available through the trigger\'s accessible name.',
-      'No essential information lives only in a tooltip — it cannot be reached by touch or by keyboard.',
-      'The trigger stays a real button, so it is focusable even though the bubble will not appear on focus.',
-      'Truncated text remains available to a screen reader in full, since truncation is visual only.'
+      'aria-describedby when the trigger already has an accessible name and the bubble adds to it; aria-labelledby, or an aria-label with the bubble aria-hidden, when the bubble is the name. Backwards, the first case produces a control whose name is read twice and the second a control announced as "button" with no name at all.',
+      'The naming attribute is written once in the markup and left there. A reference resolves through an element that x-show has at display:none, so the button is named while the bubble is invisible; toggling the attribute with the visibility makes readers re-announce the control on every pass of the pointer.',
+      'The bubble carries role="tooltip" when it is the thing being referenced, and aria-hidden="true" when the trigger already holds the same string. It is never both exposed and duplicated.',
+      'The bubble is never focusable and holds nothing focusable. It adds no tab stops, so a toolbar of eight tooltipped icon buttons is still eight tab stops, and a register of fifty rows adds none at all.',
+      'It opens on focus-visible as well as hover. Content available only on hover does not exist for a keyboard user, and when that content is the name of an icon button, neither does the button. The single exception is a truncated cell, where the bubble is a second copy of a string the reader already has in full, and adding a tab stop per row to reveal it costs more than it returns.',
+      'Escape dismisses it without moving the pointer and without moving focus; it does not vanish on a timer; and it does not obscure the control it names, since it sits clear of the trigger and takes no pointer events. Those are the three halves of WCAG 1.4.13 for content shown on hover, met by a component small enough that the third one costs nothing.',
+      'A shortcut in the bubble is aria-hidden and the key goes in aria-keyshortcuts on the trigger, the same split the dropdown uses. Glyphs left in an accessible name are read literally — a name ending in "place of interest sign" is a riddle, not a label.',
+      'A truncated cell already contains its full text in the DOM, because truncation is visual only. The bubble repeating it is aria-hidden and there is no aria-describedby: a reader gets the whole string once, from the cell.',
+      'A control that is genuinely disabled is out of the tab order, so a tooltip on it can never be reached by keyboard. Where the reason matters, keep the button focusable with aria-disabled="true" and neutralise the click; where it does not, put the reason in help text rather than behind a hover.'
     ],
-    related: ['button', 'badge', 'table'],
+    related: ['hovercard', 'popover', 'button'],
     variants: [
       { id: 'icon', name: 'On an icon button', code:
-`<div class="group relative inline-flex">
-  <button type="button" aria-label="Duplicate order"
-          class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100">
-    <i data-lucide="copy" class="size-4"></i>
-  </button>
-  <span class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-2 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100">
-    Duplicate order
+`<!-- Two icon buttons, two naming recipes, and they are not interchangeable.
+
+     Left: the bubble is the name. aria-labelledby points at the bubble id and
+     the button carries no aria-label of its own, so there is exactly one copy
+     of the string. A referenced element is read even while x-show has it at
+     display:none — name computation reaches hidden nodes deliberately — so the
+     button is named all session, not only while the bubble is up.
+
+     Right: the name lives in aria-label and the bubble is aria-hidden. Two
+     copies of one string, which is what the sidebar rail does and is right
+     while the string is short and static.
+
+     What is wrong is one button wearing an aria-label AND a bubble its name is
+     computed from: that control is announced twice. Equally wrong is
+     aria-describedby on a button with no other name — it reads as "button",
+     and the name turns up late as a description or not at all.
+
+     The handlers sit on the button, not on the wrapper. A hovercard watches
+     its wrapper because the pointer is meant to get into the panel; nothing
+     here can be entered, so the trigger is the whole surface being tracked.
+     Escape is bound on window, because a tooltip opened by the pointer has no
+     focus inside it and a root-scoped keydown would never fire. -->
+<div class="flex items-center gap-3">
+
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @keydown.escape.window="hide()">
+    <button type="button" aria-labelledby="tt-duplicate"
+            @mouseenter="show()" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="copy" class="size-4"></i>
+    </button>
+    <span id="tt-duplicate" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Duplicate order</span>
   </span>
+
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @keydown.escape.window="hide()">
+    <button type="button" aria-label="Print order"
+            @mouseenter="show()" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="printer" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Print order</span>
+  </span>
+
 </div>` },
-      { id: 'truncated', name: 'On a truncated table cell', code:
-`<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
-  <table class="w-full text-left text-[13px]/5">
+
+      { id: 'placement', name: 'Four placements', code:
+`<!-- Top is the default and the other three are answers to a specific
+     obstruction, not a taste.
+
+     Top — the resting cursor and the hand holding the mouse cover what is
+     below and to the right of the hotspot, so a bubble under the trigger is
+     the one place it is least readable.
+
+     Right — a vertical icon rail. There is nothing above or below an item but
+     the next item, so a top bubble covers the thing the pointer is travelling
+     towards. This is what the sidebar rail uses.
+
+     Bottom — a control in the top row of a card or a topbar, where above the
+     trigger is off the card and behind the page header.
+
+     Left — the last button of a right-aligned action column, where a centred
+     bubble runs past the edge of the card and takes the page sideways with it.
+
+     One x-data for all four, because a pointer is only ever in one place and
+     an open id is cheaper than four booleans. Escape is bound once, on the
+     root, with .window so it fires whether or not anything here has focus. -->
+<div class="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white p-10"
+     x-data="{
+       open: null, timer: 0,
+       show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
+       hide() { clearTimeout(this.timer); this.open = null }
+     }"
+     @keydown.escape.window="hide()">
+
+  <span class="relative inline-flex">
+    <button type="button" aria-labelledby="tt-place-top"
+            @mouseenter="show('top')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('top', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="arrow-up" class="size-4"></i>
+    </button>
+    <span id="tt-place-top" role="tooltip" x-show="open === 'top'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Top — the default</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-labelledby="tt-place-right"
+            @mouseenter="show('right')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('right', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="arrow-right" class="size-4"></i>
+    </button>
+    <span id="tt-place-right" role="tooltip" x-show="open === 'right'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Right — icon rails</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-labelledby="tt-place-bottom"
+            @mouseenter="show('bottom')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('bottom', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="arrow-down" class="size-4"></i>
+    </button>
+    <span id="tt-place-bottom" role="tooltip" x-show="open === 'bottom'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute top-full left-1/2 z-40 mt-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Bottom — topbars</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-labelledby="tt-place-left"
+            @mouseenter="show('left')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('left', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="arrow-left" class="size-4"></i>
+    </button>
+    <span id="tt-place-left" role="tooltip" x-show="open === 'left'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute top-1/2 right-full z-40 mr-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Left — the last column</span>
+  </span>
+
+</div>` },
+
+      { id: 'truncated', name: 'Only when the text is clipped', code:
+`<!-- A tooltip on every cell in the column is a column that flashes at the
+     pointer for no reason. Measure the text at hover — scrollWidth against
+     clientWidth on the truncating element — and open nothing when it fits.
+     The second row here fits and never shows a bubble.
+
+     Measure at hover and not at x-init. Column widths change with the
+     viewport, with the sidebar collapsing and with the user dragging a column,
+     so a flag computed once is wrong by the first resize. The comparison
+     carries a one-pixel tolerance because both properties are rounded to
+     integers and a cell that fits exactly measures as clipped often enough to
+     matter.
+
+     No aria-describedby and the bubble is aria-hidden. Truncation is a
+     CSS effect: the whole string is in the DOM and a screen reader already
+     reads all of it. Wiring the bubble into the name would read it twice.
+
+     This is the one tooltip here with no keyboard route, and deliberately so.
+     A tabindex="0" on the cell text would put a tab stop on every row of the
+     register — fifty stops on something that is not a control — to reveal a
+     string a reader was already given in full. Everywhere else the bubble is
+     the only copy of a name, so focus has to open it; here it is a second
+     copy, so the pointer is enough.
+
+     The card is not overflow-hidden — that is what clips a bubble at the row
+     it opens on — so the header cells are rounded instead. truncate on the
+     cell itself would clip it too, which is why the ellipsis lives on an inner
+     span and the positioned wrapper around it does no clipping of its own. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, timer: 0,
+       show(id, el, d = 150) {
+         clearTimeout(this.timer);
+         if (el.scrollWidth <= el.clientWidth + 1) return;
+         this.timer = setTimeout(() => this.open = id, d);
+       },
+       hide() { clearTimeout(this.timer); this.open = null }
+     }"
+     @keydown.escape.window="hide()">
+  <table class="w-full table-fixed text-left text-[13px]/5">
     <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
-        <th scope="col" class="px-4 py-2 font-medium">Order</th>
-        <th scope="col" class="px-4 py-2 font-medium">Description</th>
+        <th scope="col" class="rounded-tl-xl px-4 py-2 font-medium sm:w-32">Order</th>
+        <th scope="col" class="rounded-tr-xl px-4 py-2 font-medium">Line description</th>
       </tr>
     </thead>
     <tbody>
       <tr class="border-b border-zinc-100">
         <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
-        <td class="max-w-[14rem] px-4 py-2.5">
-          <span class="group relative block">
-            <span class="block truncate text-zinc-600">MS angles 50×50×6 and plates 10 mm — Waluj plant, August lot</span>
-            <span class="pointer-events-none absolute top-full left-0 z-40 mt-1 max-w-xs rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white opacity-0 transition-opacity group-hover:opacity-100">
-              MS angles 50×50×6 and plates 10 mm — Waluj plant, August lot
-            </span>
+        <td class="px-4 py-2.5">
+          <span class="relative block">
+            <span x-ref="long"
+                  @mouseenter="show('long', $refs.long)" @mouseleave="hide()"
+                  class="block truncate text-zinc-600">MS angles 50×50×6 and plates 10 mm, IS 2062 E250 BR, Waluj plant August lot</span>
+            <span aria-hidden="true" x-show="open === 'long'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute top-full left-0 z-40 mt-1.5 max-w-sm rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white">MS angles 50×50×6 and plates 10 mm, IS 2062 E250 BR, Waluj plant August lot</span>
           </span>
         </td>
       </tr>
       <tr>
         <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1163</td>
-        <td class="max-w-[14rem] px-4 py-2.5">
-          <span class="group relative block">
-            <span class="block truncate text-zinc-600">HR coil 2.5 mm × 1250 mm — Nashik Steel Traders, part shipment</span>
-            <span class="pointer-events-none absolute top-full left-0 z-40 mt-1 max-w-xs rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white opacity-0 transition-opacity group-hover:opacity-100">
-              HR coil 2.5 mm × 1250 mm — Nashik Steel Traders, part shipment
-            </span>
+        <td class="px-4 py-2.5">
+          <span class="relative block">
+            <span x-ref="short"
+                  @mouseenter="show('short', $refs.short)" @mouseleave="hide()"
+                  class="block truncate text-zinc-600">HR coil 2.5 mm</span>
+            <span aria-hidden="true" x-show="open === 'short'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute top-full left-0 z-40 mt-1.5 max-w-sm rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white">HR coil 2.5 mm</span>
           </span>
         </td>
       </tr>
+    </tbody>
+  </table>
+</div>` },
+
+      { id: 'shortcut', name: 'With a keyboard shortcut', code:
+`<!-- These buttons already have names — "Save draft" is written on one and in
+     the aria-label of the other — so the bubble is a description and not a
+     label. It is aria-hidden in full, and the key goes in aria-keyshortcuts on
+     the trigger, which is the same split the dropdown's shortcut hints use.
+     Glyphs are the reason: a screen reader reads ⌘ as "place of interest sign",
+     so a key left in the accessible name turns Save draft into a riddle.
+     aria-keyshortcuts takes the machine form and the platform words it.
+
+     Ctrl and not ⌘, because these are Windows desktops in a plant office.
+
+     Do not hint a shortcut nothing is bound to. The window handler is the
+     promise this bubble makes:
+
+       @keydown.window.ctrl.s.prevent="save()"
+
+     And the tooltip is not where a shortcut is discovered — it cannot be
+     reached on a phone and nobody hovers a button hunting for keys. The same
+     accelerators belong in the record's action menu, which is where people
+     actually read them. -->
+<div class="flex flex-wrap items-center gap-3"
+     x-data="{
+       open: null, timer: 0,
+       show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
+       hide() { clearTimeout(this.timer); this.open = null }
+     }"
+     @keydown.escape.window="hide()">
+
+  <span class="relative inline-flex">
+    <button type="button" aria-describedby="tt-save" aria-keyshortcuts="Control+S"
+            @mouseenter="show('save')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('save', 0)" @blur="hide()"
+            class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="save" class="size-4"></i>Save draft
+    </button>
+    <span id="tt-save" role="tooltip" x-show="open === 'save'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">
+      Save without posting
+      <kbd aria-hidden="true" class="rounded border border-zinc-700 px-1 text-[11px]/4 text-zinc-400">Ctrl S</kbd>
+    </span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Search orders" aria-describedby="tt-search" aria-keyshortcuts="Control+K"
+            @mouseenter="show('search')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('search', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="search" class="size-4"></i>
+    </button>
+    <span id="tt-search" role="tooltip" x-show="open === 'search'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">
+      Search orders
+      <kbd aria-hidden="true" class="rounded border border-zinc-700 px-1 text-[11px]/4 text-zinc-400">Ctrl K</kbd>
+    </span>
+  </span>
+
+</div>` },
+
+      { id: 'disabled', name: 'On a disabled control', code:
+`<!-- A disabled button fires no pointer events, so mouseenter on it never
+     happens and a tooltip bound to the button is dead markup. Two ways out,
+     and they are not equal.
+
+     Left, the wrapper trick: the handlers move to the span around the button,
+     which is not disabled and does see the pointer. The button stays properly
+     disabled. Do not put tabindex="0" on that span to "fix" the keyboard — it
+     adds a tab stop announced as nothing, in front of a control that cannot be
+     operated. This form is pointer-only by construction, which is fine when
+     the reason is a reminder rather than news.
+
+     Right, and the better answer whenever the reason actually matters: leave
+     the button enabled in the DOM, mark it aria-disabled="true" and neutralise
+     the click. It keeps its tab stop, it is announced as dimmed, the tooltip
+     opens on focus like any other, and aria-describedby carries the reason
+     into the name computation. The disabled: variants do not apply to it, so
+     the flat look is written as plain classes.
+
+     Either way the reason is on the page as well. A rule that decides whether
+     somebody can post a receipt is not something to hide behind a hover. -->
+<div class="flex flex-wrap items-center gap-3">
+
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @mouseenter="show()" @mouseleave="hide()"
+        @keydown.escape.window="hide()">
+    <button type="button" disabled aria-describedby="tt-void"
+            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 disabled:pointer-events-none">
+      <i data-lucide="ban" class="size-4"></i>Void GRN
+    </button>
+    <span id="tt-void" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Already invoiced — voiding is closed</span>
+  </span>
+
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @keydown.escape.window="hide()">
+    <button type="button" aria-disabled="true" aria-describedby="tt-post"
+            @click.prevent
+            @mouseenter="show()" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
+            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="check-circle-2" class="size-4"></i>Post to stock
+    </button>
+    <span id="tt-post" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Needs a Level 2 approver</span>
+  </span>
+
+</div>` },
+
+      { id: 'table', name: 'In a dense table cell', code:
+`<!-- Abbreviated column headers are the one place a tooltip earns its keep in
+     a register: MFI and Ash mean nothing to a new joiner and spelling them out
+     would make the header three lines deep on a table that already has eight
+     columns.
+
+     The trigger is a real button, not a span with a dotted underline. Anything
+     that shows content on hover has to be reachable on focus, and only a real
+     control is. The underline is decoration-dotted rather than solid so it does
+     not read as a link — this one does not navigate.
+
+     Each header button already has a name, the abbreviation itself, so the
+     bubble is a description: aria-describedby, never aria-labelledby, or the
+     header is announced as the whole method sentence in every row summary.
+
+     Bubbles hang below the header because there is nothing above it but the
+     card edge, and the card is not overflow-hidden — rounded header cells
+     instead — or every one of them is clipped at the top row.
+
+     The spec limits are printed under the table, which is what makes the
+     tooltip on the failing result legal. It is a shortcut to something already
+     on the page, not the only copy of it. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, timer: 0,
+       show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
+       hide() { clearTimeout(this.timer); this.open = null }
+     }"
+     @keydown.escape.window="hide()">
+  <table class="w-full text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="rounded-tl-xl px-3 py-2 font-medium">Batch</th>
+        <th scope="col" class="px-3 py-2 text-right font-medium">
+          <span class="relative inline-flex">
+            <button type="button" aria-describedby="tt-mfi"
+                    @mouseenter="show('mfi')" @mouseleave="hide()"
+                    @focus="if ($event.target.matches(':focus-visible')) show('mfi', 0)" @blur="hide()"
+                    class="underline decoration-dotted underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MFI</button>
+            <span id="tt-mfi" role="tooltip" x-show="open === 'mfi'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute top-full right-0 z-40 mt-1.5 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tracking-normal whitespace-nowrap text-white normal-case">Melt flow index, g/10 min at 190 °C</span>
+          </span>
+        </th>
+        <th scope="col" class="px-3 py-2 text-right font-medium">
+          <span class="relative inline-flex">
+            <button type="button" aria-describedby="tt-ash"
+                    @mouseenter="show('ash')" @mouseleave="hide()"
+                    @focus="if ($event.target.matches(':focus-visible')) show('ash', 0)" @blur="hide()"
+                    class="underline decoration-dotted underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Ash</button>
+            <span id="tt-ash" role="tooltip" x-show="open === 'ash'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute top-full right-0 z-40 mt-1.5 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tracking-normal whitespace-nowrap text-white normal-case">Residue on ignition, % by mass</span>
+          </span>
+        </th>
+        <th scope="col" class="rounded-tr-xl px-3 py-2 font-medium">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5 font-medium tabular-nums">B-2608-14</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">2.41</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">0.62</td>
+        <td class="px-3 py-1.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Pass
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5 font-medium tabular-nums">B-2608-15</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">3.18</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">0.71</td>
+        <td class="px-3 py-1.5">
+          <span class="relative inline-flex">
+            <button type="button" aria-label="Failed" aria-describedby="tt-fail"
+                    @mouseenter="show('fail')" @mouseleave="hide()"
+                    @focus="if ($event.target.matches(':focus-visible')) show('fail', 0)" @blur="hide()"
+                    class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Fail
+            </button>
+            <span id="tt-fail" role="tooltip" x-show="open === 'fail'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute bottom-full left-0 z-40 mb-1.5 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white">MFI 3.18 is over the 3.00 limit</span>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-3 py-1.5 font-medium tabular-nums">B-2608-16</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">2.87</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">0.58</td>
+        <td class="px-3 py-1.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Pass
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="border-t border-zinc-100 px-3 py-2 text-[12px]/4 tabular-nums text-zinc-500">Spec: MFI 2.00–3.00 g/10 min · Ash 0.80 % max</p>
+</div>` },
+
+      { id: 'arrow', name: 'With an arrow', code:
+`<!-- The arrow is a size-2 square in the same zinc-900, rotated 45 degrees and
+     pulled half under the bubble edge so only its point shows. It lives inside
+     the bubble, which is what makes pointer-events-none cover it as well.
+
+     Two things it does not survive. The bubble may not be overflow-hidden —
+     that clips the half that is showing, and a bubble with a flat nub on it
+     looks like a rendering fault. And it only holds while the bubble is
+     centred on the trigger: the moment the bubble is shifted sideways to clear
+     a viewport edge, the arrow is pointing at nothing and the honest fix is to
+     drop it, not to reposition it. That is the same rule the popover follows.
+
+     Use it where the trigger is one of several close together and the bubble
+     could plausibly belong to a neighbour. On a lone button it is 8px of
+     decoration on a component whose entire job is to be read and gone. -->
+<div class="flex items-center justify-center rounded-xl border border-zinc-200 bg-white p-10">
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @keydown.escape.window="hide()">
+    <button type="button" aria-labelledby="tt-arrow"
+            @mouseenter="show()" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="paperclip" class="size-4"></i>
+    </button>
+    <span id="tt-arrow" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-2 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">
+      Attach a document
+      <span aria-hidden="true" class="absolute top-full left-1/2 -mt-1 size-2 -translate-x-1/2 rotate-45 bg-zinc-900"></span>
+    </span>
+  </span>
+</div>` },
+
+      { id: 'delay-group', name: 'Delay group along a toolbar', code:
+`<!-- One x-data for the whole toolbar, holding the open id and a warm flag.
+
+     The first label costs 400ms, which is what stops a pointer crossing the
+     toolbar on its way to the scrollbar from firing five bubbles. Every label
+     after it opens at once, because the user has already asked this row of
+     buttons a question and re-paying the delay on each one leaves the labels
+     trailing the pointer by half a step. The group goes cold 800ms after the
+     pointer leaves, so coming back to it later pays the delay again.
+
+     This is the case a per-button x-data cannot serve. The warm flag has to be
+     shared, and sharing it by writing to a parent scope from a nested x-data
+     silently creates a shadowing own property on the child instead. One
+     component over the whole toolbar, and open holds an id rather than each
+     button holding a boolean.
+
+     Focus opens with no delay and warms the group too: a Tab lands on one
+     button deliberately and waiting 400ms after a keypress reads as lag.
+
+     The five buttons are written out rather than looped with x-for, because
+     the icon name would have to become :data-lucide — a binding on the one
+     node createIcons() is about to replace with an svg. -->
+
+<div class="inline-flex items-center gap-1 rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null, warm: false, timer: 0, cool: 0,
+       show(id, now = false) {
+         clearTimeout(this.timer); clearTimeout(this.cool);
+         if (now || this.warm) { this.open = id; this.warm = true; return }
+         this.timer = setTimeout(() => { this.open = id; this.warm = true }, 400);
+       },
+       hide() {
+         clearTimeout(this.timer);
+         this.open = null;
+         this.cool = setTimeout(() => this.warm = false, 800);
+       }
+     }"
+     @keydown.escape.window="hide()">
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Bold"
+            @mouseenter="show('bold')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('bold', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="bold" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'bold'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Bold</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Italic"
+            @mouseenter="show('italic')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('italic', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="italic" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'italic'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Italic</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Bulleted list"
+            @mouseenter="show('list')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('list', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="list" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'list'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Bulleted list</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Insert link"
+            @mouseenter="show('link')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('link', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="link" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'link'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Insert link</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Clear formatting"
+            @mouseenter="show('clear')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('clear', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="eraser" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'clear'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Clear formatting</span>
+  </span>
+
+</div>` },
+
+      { id: 'row-actions', name: 'A row action bar', code:
+`<!-- The assembled case: a GRN register whose rows each end in four icon
+     buttons, and the tooltips are the only thing naming them.
+
+     One delay group over the whole table, not one per row. The pointer travels
+     down a column of action bars as readily as along one, and a group that
+     ends at the row boundary re-pays the delay on every row.
+
+     The open id is composite — the GRN number and the action — because the
+     same four actions repeat on every row and a bare action id would light up
+     four bubbles at once.
+
+     Placement changes on the last button in the bar. The first three take the
+     default top; the last one would put a centred bubble past the right edge
+     of the card, so it goes left instead. Nothing here is position:fixed and
+     nothing measures the viewport: in a fixed-width action column the overflow
+     is known at build time, and a placement chosen once beats a clamp computed
+     on every open.
+
+     The card is not overflow-hidden. Header cells are rounded instead, or the
+     top row's bubbles are cut off at the header rule.
+
+     Below sm the action bar folds to a single menu button. Four 36px targets
+     and a value column do not fit in 390px, and the answer is never a table
+     that scrolls sideways — the dropdown behind that button carries the same
+     four actions with their names written out, which is also the touch route
+     to everything these tooltips say. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, warm: false, timer: 0, cool: 0,
+       show(id, now = false) {
+         clearTimeout(this.timer); clearTimeout(this.cool);
+         if (now || this.warm) { this.open = id; this.warm = true; return }
+         this.timer = setTimeout(() => { this.open = id; this.warm = true }, 400);
+       },
+       hide() {
+         clearTimeout(this.timer);
+         this.open = null;
+         this.cool = setTimeout(() => this.warm = false, 800);
+       },
+       rows: [
+         { id: 'GRN-2608-041', po: 'PO-24-1187', vendor: 'Gujarat Polymers Ltd', value: '₹18,42,000', dot: 'bg-emerald-600', status: 'Closed' },
+         { id: 'GRN-2608-040', po: 'PO-24-1186', vendor: 'Konkan Fabricators', value: '₹1,15,400', dot: 'bg-zinc-500', status: 'Open' },
+         { id: 'GRN-2608-039', po: 'PO-24-1185', vendor: 'Deshpande Traders', value: '₹96,750', dot: 'bg-amber-500', status: 'Approved' }
+       ]
+     }"
+     @keydown.escape.window="hide()">
+  <table class="w-full text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="rounded-tl-xl px-4 py-2 font-medium">Receipt</th>
+        <th scope="col" class="hidden px-4 py-2 font-medium md:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2 font-medium">Status</th>
+        <th scope="col" class="hidden px-4 py-2 text-right font-medium sm:table-cell">Value</th>
+        <th scope="col" class="rounded-tr-xl px-4 py-2 text-right font-medium"><span class="sr-only">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in rows" :key="r.id">
+        <tr class="border-b border-zinc-100 last:border-0">
+          <td class="px-4 py-2 font-medium tabular-nums" x-text="r.id"></td>
+          <td class="hidden px-4 py-2 text-zinc-600 md:table-cell" x-text="r.vendor"></td>
+          <td class="px-4 py-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full" :class="r.dot" aria-hidden="true"></span><span x-text="r.status"></span>
+            </span>
+          </td>
+          <td class="hidden px-4 py-2 text-right tabular-nums sm:table-cell" x-text="r.value"></td>
+          <td class="px-4 py-2">
+            <div class="hidden items-center justify-end gap-0.5 sm:flex">
+
+              <span class="relative inline-flex">
+                <button type="button" :aria-label="'Open ' + r.id"
+                        @mouseenter="show(r.id + ':open')" @mouseleave="hide()"
+                        @focus="if ($event.target.matches(':focus-visible')) show(r.id + ':open', true)" @blur="hide()"
+                        class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="eye" class="size-4"></i>
+                </button>
+                <span aria-hidden="true" x-show="open === r.id + ':open'" x-cloak x-transition.opacity.duration.100ms
+                      class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Open receipt</span>
+              </span>
+
+              <span class="relative inline-flex">
+                <button type="button" :aria-label="'Print ' + r.id"
+                        @mouseenter="show(r.id + ':print')" @mouseleave="hide()"
+                        @focus="if ($event.target.matches(':focus-visible')) show(r.id + ':print', true)" @blur="hide()"
+                        class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="printer" class="size-4"></i>
+                </button>
+                <span aria-hidden="true" x-show="open === r.id + ':print'" x-cloak x-transition.opacity.duration.100ms
+                      class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Print gate pass</span>
+              </span>
+
+              <span class="relative inline-flex">
+                <button type="button" :aria-label="'Attach a document to ' + r.id"
+                        @mouseenter="show(r.id + ':attach')" @mouseleave="hide()"
+                        @focus="if ($event.target.matches(':focus-visible')) show(r.id + ':attach', true)" @blur="hide()"
+                        class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="paperclip" class="size-4"></i>
+                </button>
+                <span aria-hidden="true" x-show="open === r.id + ':attach'" x-cloak x-transition.opacity.duration.100ms
+                      class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Attach a document</span>
+              </span>
+
+              <span class="relative inline-flex">
+                <button type="button" :aria-label="'More actions on ' + r.id"
+                        @mouseenter="show(r.id + ':more')" @mouseleave="hide()"
+                        @focus="if ($event.target.matches(':focus-visible')) show(r.id + ':more', true)" @blur="hide()"
+                        class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="more-horizontal" class="size-4"></i>
+                </button>
+                <span aria-hidden="true" x-show="open === r.id + ':more'" x-cloak x-transition.opacity.duration.100ms
+                      class="pointer-events-none absolute top-1/2 right-full z-40 mr-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">More actions</span>
+              </span>
+
+            </div>
+
+            <div class="flex justify-end sm:hidden">
+              <button type="button" :aria-label="'Actions on ' + r.id"
+                      class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="more-vertical" class="size-4"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </template>
     </tbody>
   </table>
 </div>` }
