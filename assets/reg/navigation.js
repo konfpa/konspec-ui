@@ -4237,7 +4237,7 @@ register(
          x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
          x-transition:leave-end="-translate-x-full"
          @click="if ($event.target.closest('a[href]')) nav = false"
-         class="flex h-full w-72 flex-col border-r border-zinc-200 bg-white shadow-lg">
+         class="flex h-full w-full flex-col border-r border-zinc-200 bg-white shadow-lg sm:w-72">
 
       <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
         <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
@@ -4871,7 +4871,7 @@ register(
        class="absolute inset-0 z-40 flex bg-zinc-900/40 lg:hidden">
     <div id="tb-sheet" role="dialog" aria-modal="true" aria-label="Main navigation"
          @click="if ($event.target.closest('a[href]')) { nav = false; $refs.burger.focus() }"
-         class="flex h-full w-72 flex-col border-r border-zinc-200 bg-white shadow-lg">
+         class="flex h-full w-full flex-col border-r border-zinc-200 bg-white shadow-lg sm:w-72">
       <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
         <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
         <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>

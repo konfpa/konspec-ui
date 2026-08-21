@@ -36,12 +36,30 @@ function componentPage() {
     mode(v) { return this.tab[v.id] || (v.id === 'django' || v.id === 'setup' ? 'code' : 'preview'); },
     setMode(v, m) { this.tab[v.id] = m; },
 
-    /* Renders one variant inside a 390px-wide iframe.
-       Clamping a wrapper to 390px is not a mobile preview: Tailwind's sm:/md:/lg:
-       variants are viewport media queries, so a narrowed wrapper still got the
-       desktop layout — a grid where the markup asks for a scrolling strip. An
-       iframe is the only element that gives the markup a viewport of its own. */
-    frame(el, code) {
+    /* Undo the preview boxing on the root element only, so the markup gets a
+       real viewport instead of a card. Every later class="" in the snippet is
+       left alone; only the first one is the wrapper. */
+    fullPageCode(code) {
+      return code.replace(/class="([^"]*)"/, (m, cls) => 'class="' + cls
+        .replace(/\bmin-h-\[\d+px\]/g, 'min-h-screen')
+        .replace(/\bh-\[\d+px\]/g, 'h-screen')
+        .replace(/\brounded-xl\b/g, '')
+        .replace(/\bborder border-zinc-200\b/g, '')
+        .replace(/\s+/g, ' ').trim() + '"');
+    },
+
+    /* Opened as a blob rather than a written file: the page has no build step,
+       and the document is the same one the 390px frame uses, so the two can
+       never drift into showing different things. */
+    openFullPage(v) {
+      const html = this.previewDoc(this.fullPageCode(v.code));
+      const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+      window.open(url, '_blank', 'noopener');
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    },
+    /* The standalone document a preview runs in. Shared by the 390px frame and
+       by the full-page view so the two can never render different things. */
+    previewDoc(code) {
       const abs = p => new URL(p, document.baseURI).href;
       const theme = document.querySelector('style[type="text/tailwindcss"]');
       /* A frame is a whole document, so it does not inherit the page's Chart.js
@@ -49,7 +67,7 @@ function componentPage() {
          nothing else pays for a library it never calls. */
       const defaults = document.getElementById('chart-defaults');
       const chartDefaults = defaults ? '<script>' + defaults.textContent + '<\/script>' : '';
-      el.srcdoc = `<!doctype html>
+      return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="${abs('../assets/fonts.css')}">
@@ -82,6 +100,15 @@ ${code}
 })();
 </script>
 </body></html>`;
+    },
+
+    /* Renders one variant inside a 390px-wide iframe.
+       Clamping a wrapper to 390px is not a mobile preview: Tailwind's sm:/md:/lg:
+       variants are viewport media queries, so a narrowed wrapper still got the
+       desktop layout - a grid where the markup asks for a scrolling strip. An
+       iframe is the only element that gives the markup a viewport of its own. */
+    frame(el, code) {
+      el.srcdoc = this.previewDoc(code);
 
       el.addEventListener('load', () => {
         const win = el.contentWindow, body = win.document.body;

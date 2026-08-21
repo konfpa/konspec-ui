@@ -220,7 +220,7 @@ keeping it to yourself in one screen.
 
 ### Layout
 
-- **App shell** `app-shell` — The page skeleton: collapsible sidebar, topbar, and a single scrolling main column. Everything else in the app is rendered inside the main column. Variants: default.
+- **App shell** `app-shell` — The page skeleton: an icon rail that expands to a labelled sidebar, a topbar carrying the hamburger, breadcrumb, command palette and account menu, and a single scrolling main column. Everything else in the app renders inside the main column. Variants: default.
 - **Page header** `page-header` — The top block of a page: where it sits in the app, what it is, what state it is in, and what you can do to it. One h1 per page and it lives here. Variants: default, trail, record, tabs, filters, back, sticky, overflow.
 - **Card** `card` — A bordered white panel that groups one thing. A header names it, the body holds the content, and an optional footer carries totals or actions. Variants: default, actions, stats, section, table, clickable, grid, empty, django.
 - **Separator** `separator` — The rule that divides content. Almost always a border on the thing beside it rather than an element of its own, and almost always silent to a screen reader. Variants: default, rows, vertical, labelled, menu, django.

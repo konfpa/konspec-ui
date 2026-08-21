@@ -1,175 +1,450 @@
 register(
   {
     id: 'app-shell', name: 'App shell', category: 'layout',
-    description: 'The page skeleton: collapsible sidebar, topbar, and a single scrolling main column. Everything else in the app is rendered inside the main column.',
+    description: 'The page skeleton: an icon rail that expands to a labelled sidebar, a topbar carrying the hamburger, breadcrumb, command palette and account menu, and a single scrolling main column. Everything else in the app renders inside the main column.',
     when: 'Every signed-in page. Auth and error pages are the only screens that do not use it.',
     notes: [
-      'The collapse control puts its icon in a fixed 68px box at the left of a full-width strip, so the icon centre is at the same coordinates expanded and collapsed. Do not centre the icon in the strip — the second click misses when the sidebar narrows.',
-      'The collapsed rail is 68px so a 40px hit area still has 14px of padding either side. Labels hide with lg:hidden, they are not removed from the DOM.',
-      'Rotation goes on a wrapping <span>, never on <i data-lucide>. Lucide replaces the <i> with an <svg> and any binding on it dies.',
-      'Sidebar state persists under the localStorage key kon-sidebar. The [ shortcut is ignored while focus is in an input, textarea or select.',
-      'Only the <main> scrolls. The shell root is h-[640px] here so it previews in a box — as a real page put h-screen overflow-hidden on <body> and drop the wrapper border.',
-      'Below lg the sidebar is off-canvas with a backdrop; the topbar menu button is the only way to open it, so never hide that button on mobile.'
+      'Nothing inside the sidebar changes class when the rail narrows. Each row is a fixed 32px icon box at a fixed offset followed by a label the row clips, so collapsing is a width transition and nothing else. Switching rows to lg:justify-center lg:px-0 on collapse — the obvious way to write it — relays out every row on the first frame while the sidebar is still 256px wide, and the create button visibly flashes full width before it shrinks.',
+      'The geometry is what makes that work: the nav container is px-3 and every row is px-1.5, so a 32px icon box starts at 18px and centres at 34px — the centre of the 68px rail. The icon lands in the same place expanded and collapsed without a single conditional class.',
+      'One hamburger does both jobs. Below lg it opens the off-canvas sheet; above lg it collapses the rail. It is never hidden, and its accessible name and aria-expanded follow whichever job it is currently doing, which is why the breakpoint is tracked in state via matchMedia rather than assumed.',
+      'Labels and counts fade with opacity, never with lg:hidden. Opacity does not affect layout, so the fade runs alongside the width transition instead of snapping the row before it.',
+      'The off-canvas transform is scoped with max-lg:, not cancelled with lg:translate-x-0. Both work, but the cancelling form depends on Tailwind emitting the lg variant after the unvariant class, so it fails silently and completely the moment the class string is rewritten and the cancel is dropped — the sidebar slides off the desktop while lg:static still reserves its column, which looks like the sidebar vanishing rather than like a transform. Scoped, the transform cannot reach the desktop at all.',
+      'The mobile sheet is full-bleed below sm and a 288px drawer above it, and sidebar\'s off-canvas variant and topbar\'s trigger variant carry the same two widths. A shell that answered this differently from the sidebar component would leave the framework contradicting itself at the one width where the answer matters most.',
+      'The server clock seeds from a timestamp the server rendered and ticks from that seed, never from new Date(). It exists to show the clock a posting date and a period cut-off are judged against, and a row that quietly displays the workstation\'s clock instead is worse than no row at all — it is confidently wrong on exactly the machine whose time was set incorrectly. Reseed it from an X-Server-Time header on htmx swaps so a tab left open overnight cannot drift.',
+      'The rail tooltip is one shared element positioned from the hovered row\'s own rect, not a tooltip inside each row. Rows clip their labels and the nav is a scroll container, so a tooltip rendered inside a row is clipped twice over and never appears. It is fixed-positioned outside the sidebar, and the sidebar is the only ancestor with a transform, which is what keeps fixed meaning fixed.',
+      'Rail tooltips fire on focus as well as hover. A collapsed rail is a column of icons, and a label that only a mouse can reach is not a label.',
+      'The topbar search is the command palette trigger, not a second search. One search on the page means ⌘K and the click reach the same thing.',
+      'Rotation and other bindings go on a wrapping <span>, never on <i data-lucide>. Lucide replaces the <i> with an <svg> and any binding on it dies.',
+      'Sidebar state persists under the localStorage key kon-sidebar. The [ shortcut drives the same toggle() as the hamburger and is ignored while focus is in an input, textarea or select.',
+      'Only the <main> scrolls. The shell root is h-[720px] here so it previews in a box — as a real page put h-screen overflow-hidden on <body> and drop the wrapper border.',
+      'x-cloak on the sidebar, or it renders at its expanded width for one frame before Alpine reads kon-sidebar and the rail jumps shut on every load.'
     ],
     anatomy: [
-      ['Sidebar', '255px expanded, a 68px rail collapsed. Off-canvas with a backdrop below lg.'],
-      ['Collapse control', 'A full-width strip whose icon sits in a fixed 68px box at the left, so the aim point does not move between states.'],
-      ['Topbar', 'Search, notifications, account, and the menu button that is the only way to open the sidebar on a phone.'],
+      ['Icon rail', 'The 68px column the sidebar collapses to. Always visible above lg; it is the sidebar, narrowed, not a separate component.'],
+      ['Sidebar', '256px expanded on the desktop. Below lg it leaves the flow: a full-bleed sheet under sm, a 288px drawer between sm and lg.'],
+      ['Rail tooltip', 'One shared element, shown on hover and on focus while the rail is collapsed, carrying the label the row is clipping.'],
+      ['Hamburger', 'In the topbar. Opens the off-canvas sheet below lg, collapses the rail above it. Never hidden.'],
+      ['Breadcrumb', 'In the topbar, left of the search. The trail to the current page, with the leaf carrying aria-current.'],
+      ['Command palette', 'The topbar search field is its trigger and shows the ⌘K hint on its face.'],
+      ['Account menu', 'The avatar opens a real menu carrying the signed-in identity, settings and Sign out.'],
+      ['Server clock', 'The foot of the sidebar. The server\'s date and time, on the same icon-box geometry as every nav row, so it collapses to a clock icon in the rail rather than to an empty strip.'],
       ['Main', 'The single scrolling column. Everything else in the application renders inside it.'],
-      ['Backdrop', 'Below lg only, dimming the main column while the off-canvas sidebar is open.']
+      ['Backdrop', 'Between sm and lg only. Below sm the sheet covers the page, so there is nothing left to dim and it is hidden rather than drawn under an opaque sheet.']
     ],
     behaviour: [
-      'Only <main> scrolls. The shell itself is a fixed-height flex frame, so the sidebar and topbar never move.',
-      'The collapse control keeps its icon at identical coordinates in both states — a control that moves out from under the cursor feels broken even when every click lands.',
-      'Collapsed labels hide with lg:hidden rather than being removed, so the DOM and the tab order do not change shape.',
-      'Sidebar state persists under the localStorage key kon-sidebar, so it survives a reload.',
-      'The [ shortcut toggles the sidebar, and is ignored while focus is in an input, textarea or select.',
-      'Below lg the sidebar is off-canvas over a backdrop, which is why the topbar menu button must never be hidden on mobile.'
+      'Only <main> scrolls. The shell itself is a fixed-height flex frame, so the rail and topbar never move.',
+      'Collapsing animates width alone. No row changes its padding, its justification or its display, so nothing reflows mid-transition.',
+      'The hamburger toggles the rail above lg and the off-canvas sheet below it, and reports the state of whichever it is driving.',
+      'Sidebar state persists under kon-sidebar, so it survives a reload.',
+      '[ toggles the sidebar, and is ignored while focus is in an input, textarea or select.',
+      '⌘K and Ctrl+K open the command palette from anywhere; Escape closes it and returns focus where it came from.',
+      'Crossing the lg breakpoint closes the off-canvas sheet, so the page never lands wide with a mobile drawer still open.',
+      'Below sm the sheet is full-bleed and no backdrop remains to tap, so the close button and Escape are the only ways out. Between sm and lg it is a 288px drawer over a backdrop that still dismisses on tap.'
     ],
     a11y: [
+      'A skip link to <main> comes first in the DOM, so the keyboard is not walked through the whole nav on every page.',
       'The sidebar is a <nav> with an accessible name, so it can be skipped as a landmark.',
-      'The collapse control is a real button with aria-expanded reflecting the state.',
-      'Collapsed items keep an accessible name even with the label visually hidden, or the rail becomes a column of unnamed icons.',
-      'The off-canvas sidebar traps focus while open on mobile and returns it to the menu button on close.',
-      'A skip link to <main> comes first in the DOM, so the keyboard is not walked through the whole nav on every page.'
+      'The hamburger is a real button whose aria-expanded and aria-label describe the job it is doing at the current width, not a fixed label that is wrong half the time.',
+      'Collapsed labels are clipped, not removed, so the DOM and the tab order do not change shape and every rail item keeps its accessible name.',
+      'The palette is a combobox: focus stays in the input and the highlight is carried by aria-activedescendant. The account menu is a menu: real focus moves between its items.',
+      'The off-canvas sidebar is a real dialog while it is open below lg. x-trap.noscroll holds focus inside it and returns it to the hamburger on close, and role=dialog with aria-modal is bound rather than static, so the same element is a plain nav landmark on the desktop where it is not modal and must not claim to be.',
+      'Below sm the close button is the only pointer route out, so it is a 36px target rather than an icon with padding around it.'
     ],
-    related: ['sidebar', 'topbar', 'page-header'],
+    related: ['sidebar', 'topbar', 'command-palette', 'dropdown', 'page-header'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div class="relative flex h-[640px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
-     x-data="{ sidebar: true, nav: false }"
-     x-init="sidebar = localStorage.getItem('kon-sidebar') !== '0';
-             $watch('sidebar', v => localStorage.setItem('kon-sidebar', v ? '1' : '0'))"
+`<div class="relative flex h-[720px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+     x-data="{
+       sidebar: true, nav: false, wide: false,
+       init() {
+         this.sidebar = localStorage.getItem('kon-sidebar') !== '0';
+         const mq = window.matchMedia('(min-width: 1024px)');
+         this.wide = mq.matches;
+         mq.addEventListener('change', e => { this.wide = e.matches; if (e.matches) this.nav = false });
+         this.$watch('sidebar', v => localStorage.setItem('kon-sidebar', v ? '1' : '0'));
+       },
+       toggle() { this.wide ? this.sidebar = !this.sidebar : this.nav = !this.nav },
+       // one shared tooltip, positioned from the row's own rect. The rail clips
+       // its labels and the nav is a scroll container, so a tooltip rendered
+       // inside a row is clipped by both — this one lives outside the sidebar.
+       tip: '', tipX: 0, tipY: 0, tipOn: false,
+       showTip(el, label) {
+         if (this.sidebar || !this.wide) return;
+         const r = el.getBoundingClientRect();
+         // anchor to the rail's edge, not the row's, so the gap does not depend
+         // on the row's own padding
+         this.tip = label; this.tipX = this.$refs.rail.getBoundingClientRect().right + 8;
+         this.tipY = r.top + r.height / 2;
+         this.tipOn = true;
+       },
+       hideTip() { this.tipOn = false }
+     }"
      @keydown.escape.window="nav = false"
-     @keydown.window="if ($event.key === '[' && !/^(input|textarea|select)$/i.test($event.target.tagName)) sidebar = !sidebar">
+     @keydown.window="if ($event.key === '[' && !/^(input|textarea|select)$/i.test($event.target.tagName)) toggle()">
 
-  <!-- sidebar -->
-  <aside class="absolute inset-y-0 left-0 z-40 flex shrink-0 flex-col border-r border-zinc-200 bg-white transition-all duration-200 lg:static lg:translate-x-0"
-         :class="[ sidebar ? 'w-64' : 'w-64 lg:w-[68px]', nav ? 'translate-x-0' : '-translate-x-full' ]">
+  <a href="#kon-main" class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-60 focus:rounded-lg focus:bg-white focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Skip to content</a>
 
-    <div class="flex h-14 shrink-0 items-center gap-2.5 px-4">
-      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-      <span class="min-w-0 flex-1 truncate text-[16px]/6 font-semibold" :class="!sidebar && 'lg:hidden'">Konspec Operations</span>
-      <button @click="nav = false" aria-label="Close navigation" class="rounded-md p-1 text-zinc-600 hover:bg-zinc-100 lg:hidden">
-        <i data-lucide="x" class="size-4"></i>
+  <!-- ── sidebar ──────────────────────────────────────────────────────────
+       Nothing inside here changes class when the rail narrows. Every row is
+       a fixed 32px icon box at a fixed offset followed by a label that the
+       row's own overflow-hidden clips, so collapsing is a width transition
+       and nothing else. Switching a row to justify-center and px-0 on
+       collapse — the obvious way to write this — relays out the row on the
+       first frame while the sidebar is still 256px wide, which is why the
+       create button used to flash full width before it shrank. -->
+  <aside x-cloak x-ref="rail"
+         aria-label="Sections"
+         x-trap.noscroll="!wide && nav"
+         :role="wide ? null : 'dialog'"
+         :aria-modal="!wide && nav ? 'true' : null"
+         class="absolute inset-y-0 left-0 z-40 flex w-full shrink-0 sm:w-72 flex-col overflow-hidden border-r border-zinc-200 bg-white shadow-lg transition-[width,transform] duration-200 ease-out lg:static lg:shadow-none"
+         :class="[ sidebar ? 'lg:w-64' : 'lg:w-[68px]', nav ? 'translate-x-0' : 'max-lg:-translate-x-full' ]">
+
+    <div class="flex h-14 shrink-0 items-center gap-2.5 overflow-hidden px-3">
+      <span class="flex w-8 shrink-0 items-center justify-center">
+        <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+      </span>
+      <span class="min-w-0 flex-1 truncate text-[16px]/6 font-semibold transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Konspec Operations</span>
+      <button type="button" @click="nav = false" aria-label="Close navigation"
+              class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+        <i data-lucide="x" class="size-5"></i>
       </button>
     </div>
 
     <div class="px-3 pb-3">
-      <button class="flex w-full items-center gap-2.5 rounded-lg bg-zinc-700 px-3 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800"
-              :class="!sidebar && 'lg:justify-center lg:px-0'">
-        <i data-lucide="plus" class="size-4 shrink-0"></i><span :class="!sidebar && 'lg:hidden'">New purchase order</span>
+      <button @mouseenter="showTip($el, 'New purchase order')" @mouseleave="hideTip()" @focus="showTip($el, 'New purchase order')" @blur="hideTip()" type="button"
+              class="flex h-10 w-full items-center gap-2.5 overflow-hidden rounded-lg bg-zinc-700 px-1.5 text-[13px]/5 font-medium whitespace-nowrap text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="plus" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate text-left transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">New purchase order</span>
       </button>
     </div>
 
-    <nav class="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-3">
-      <p class="px-2 pb-1 pt-2 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500" :class="!sidebar && 'lg:hidden'">Procurement</p>
+    <nav aria-label="Procurement" class="min-h-0 flex-1 space-y-0.5 overflow-x-hidden overflow-y-auto px-3 pb-3">
+      <p class="overflow-hidden px-1.5 pt-2 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Procurement</p>
 
-      <a href="#" aria-current="page" class="group relative flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900"
-         :class="!sidebar && 'lg:justify-center lg:px-0'">
-        <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>
-        <span class="flex-1 truncate" :class="!sidebar && 'lg:hidden'">Overview</span>
-        <span x-show="!sidebar" class="pointer-events-none absolute left-14 z-50 hidden whitespace-nowrap rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 text-white group-hover:lg:block">Overview</span>
+      <a @mouseenter="showTip($el, 'Overview')" @mouseleave="hideTip()" @focus="showTip($el, 'Overview')" @blur="hideTip()" href="#" aria-current="page"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg bg-zinc-100 px-1.5 text-[13px]/5 font-medium whitespace-nowrap text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="layout-dashboard" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Overview</span>
       </a>
-      <a href="#" class="group relative flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-         :class="!sidebar && 'lg:justify-center lg:px-0'">
-        <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
-        <span class="flex-1 truncate" :class="!sidebar && 'lg:hidden'">Purchase orders</span>
-        <span class="rounded-full bg-white px-1.5 text-[11px]/4 tabular-nums text-zinc-600 ring-1 ring-zinc-200" :class="!sidebar && 'lg:hidden'">148</span>
-        <span x-show="!sidebar" class="pointer-events-none absolute left-14 z-50 hidden whitespace-nowrap rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 text-white group-hover:lg:block">Purchase orders</span>
+      <a @mouseenter="showTip($el, 'Purchase orders')" @mouseleave="hideTip()" @focus="showTip($el, 'Purchase orders')" @blur="hideTip()" href="#"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="file-text" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Purchase orders</span>
+        <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">148</span>
       </a>
-      <a href="#" class="group relative flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-         :class="!sidebar && 'lg:justify-center lg:px-0'">
-        <i data-lucide="clipboard-list" class="size-[18px] shrink-0"></i>
-        <span class="flex-1 truncate" :class="!sidebar && 'lg:hidden'">Requisitions</span>
-        <span class="rounded-full bg-white px-1.5 text-[11px]/4 tabular-nums text-zinc-600 ring-1 ring-zinc-200" :class="!sidebar && 'lg:hidden'">62</span>
-        <span x-show="!sidebar" class="pointer-events-none absolute left-14 z-50 hidden whitespace-nowrap rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 text-white group-hover:lg:block">Requisitions</span>
+      <a @mouseenter="showTip($el, 'Requisitions')" @mouseleave="hideTip()" @focus="showTip($el, 'Requisitions')" @blur="hideTip()" href="#"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="clipboard-list" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Requisitions</span>
+        <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">62</span>
       </a>
-      <a href="#" class="group relative flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-         :class="!sidebar && 'lg:justify-center lg:px-0'">
-        <i data-lucide="truck" class="size-[18px] shrink-0"></i>
-        <span class="flex-1 truncate" :class="!sidebar && 'lg:hidden'">Goods receipt</span>
-        <span class="rounded-full bg-white px-1.5 text-[11px]/4 tabular-nums text-zinc-600 ring-1 ring-zinc-200" :class="!sidebar && 'lg:hidden'">27</span>
-        <span x-show="!sidebar" class="pointer-events-none absolute left-14 z-50 hidden whitespace-nowrap rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 text-white group-hover:lg:block">Goods receipt</span>
+      <a @mouseenter="showTip($el, 'Goods receipt')" @mouseleave="hideTip()" @focus="showTip($el, 'Goods receipt')" @blur="hideTip()" href="#"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="truck" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Goods receipt</span>
+        <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">27</span>
+      </a>
+      <a @mouseenter="showTip($el, 'Approvals')" @mouseleave="hideTip()" @focus="showTip($el, 'Approvals')" @blur="hideTip()" href="#"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="check-square" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Approvals</span>
+        <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">4</span>
       </a>
 
-      <p class="px-2 pb-1 pt-4 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500" :class="!sidebar && 'lg:hidden'">Master data</p>
+      <p class="overflow-hidden px-1.5 pt-4 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Master data</p>
 
-      <a href="#" class="group relative flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-         :class="!sidebar && 'lg:justify-center lg:px-0'">
-        <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
-        <span class="flex-1 truncate" :class="!sidebar && 'lg:hidden'">Vendors</span>
-        <span class="rounded-full bg-white px-1.5 text-[11px]/4 tabular-nums text-zinc-600 ring-1 ring-zinc-200" :class="!sidebar && 'lg:hidden'">187</span>
-        <span x-show="!sidebar" class="pointer-events-none absolute left-14 z-50 hidden whitespace-nowrap rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 text-white group-hover:lg:block">Vendors</span>
+      <a @mouseenter="showTip($el, 'Vendors')" @mouseleave="hideTip()" @focus="showTip($el, 'Vendors')" @blur="hideTip()" href="#"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="building-2" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Vendors</span>
+        <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">187</span>
       </a>
-      <a href="#" class="group relative flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-         :class="!sidebar && 'lg:justify-center lg:px-0'">
-        <i data-lucide="package" class="size-[18px] shrink-0"></i>
-        <span class="flex-1 truncate" :class="!sidebar && 'lg:hidden'">Materials</span>
-        <span x-show="!sidebar" class="pointer-events-none absolute left-14 z-50 hidden whitespace-nowrap rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 text-white group-hover:lg:block">Materials</span>
+      <a @mouseenter="showTip($el, 'Materials')" @mouseleave="hideTip()" @focus="showTip($el, 'Materials')" @blur="hideTip()" href="#"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="package" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Materials</span>
       </a>
-      <a href="#" class="group relative flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-         :class="!sidebar && 'lg:justify-center lg:px-0'">
-        <i data-lucide="scale" class="size-[18px] shrink-0"></i>
-        <span class="flex-1 truncate" :class="!sidebar && 'lg:hidden'">Rate contracts</span>
-        <span x-show="!sidebar" class="pointer-events-none absolute left-14 z-50 hidden whitespace-nowrap rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 text-white group-hover:lg:block">Rate contracts</span>
+      <a @mouseenter="showTip($el, 'Rate contracts')" @mouseleave="hideTip()" @focus="showTip($el, 'Rate contracts')" @blur="hideTip()" href="#"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="scale" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Rate contracts</span>
       </a>
     </nav>
 
-    <div class="shrink-0 border-t border-zinc-200">
-      <button class="flex w-full items-center gap-2.5 px-3 py-3 text-left hover:bg-zinc-100" :class="!sidebar && 'lg:justify-center lg:px-0'">
-        <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[11px]/4 font-semibold text-zinc-900">AP</span>
-        <span class="min-w-0 flex-1" :class="!sidebar && 'lg:hidden'">
-          <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
-          <span class="block truncate text-[11px]/4 text-zinc-500">Level 2 approver</span>
+    <!-- Server clock. It seeds from a timestamp the server rendered and ticks
+         from that, never from new Date() — the point of the row is the clock
+         the posting date and the period cut-off are judged against, and the
+         browser's clock is the one thing that must not decide it. Replace the
+         seed with the server's own ISO stamp: Django {{ now|date:"c" }}.
+         Reseed it on htmx swaps so a tab left open overnight cannot drift. -->
+    <div class="shrink-0 overflow-hidden border-t border-zinc-200 px-3 py-2"
+         x-data="{
+           t: new Date('2026-08-21T14:35:09+05:30'),
+           timer: null,
+           init() { this.timer = setInterval(() => this.t = new Date(this.t.getTime() + 1000), 1000) },
+           destroy() { clearInterval(this.timer) },
+           seed(iso) { this.t = new Date(iso) },
+           get day() { return this.t.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' }) },
+           get clock() { return this.t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) }
+         }"
+         @htmx:after-swap.camel.window="if ($event.detail.xhr) { const h = $event.detail.xhr.getResponseHeader('X-Server-Time'); if (h) seed(h) }">
+      <div @mouseenter="showTip($el, 'Server time')" @mouseleave="hideTip()"
+           class="flex items-center gap-2.5 overflow-hidden rounded-lg px-1.5 py-1 whitespace-nowrap">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="clock" class="size-[18px] text-zinc-500"></i></span>
+        <span class="min-w-0 flex-1 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">
+          <span class="block truncate text-[12px]/4 tabular-nums text-zinc-600"><span x-text="day"></span> · <span x-text="clock"></span></span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Server time</span>
         </span>
-      </button>
-
-      <!-- the icon sits in a 68px box, so its centre does not move when the rail narrows -->
-      <button @click="sidebar = !sidebar" aria-label="Toggle sidebar"
-              :title="sidebar ? 'Collapse sidebar  [' : 'Expand sidebar  ['"
-              class="hidden h-11 w-full items-center border-t border-zinc-200 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 lg:flex">
-        <span class="flex h-11 w-[68px] shrink-0 items-center justify-center">
-          <span class="flex transition-transform" :class="!sidebar && 'rotate-180'"><i data-lucide="chevrons-left" class="size-4"></i></span>
-        </span>
-        <span class="flex-1 text-left" :class="!sidebar && 'lg:hidden'">Collapse</span>
-        <kbd class="mr-3 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-600" :class="!sidebar && 'lg:hidden'">[</kbd>
-      </button>
+      </div>
     </div>
   </aside>
 
-  <div x-show="nav" x-cloak @click="nav = false" class="absolute inset-0 z-30 bg-zinc-900/40 lg:hidden"></div>
+  <div x-show="tipOn" x-cloak aria-hidden="true"
+       :style="'left:' + tipX + 'px; top:' + tipY + 'px'"
+       class="pointer-events-none fixed z-50 -translate-y-1/2 rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 whitespace-nowrap text-white"
+       x-text="tip"></div>
 
-  <!-- main column -->
+  <div x-show="nav" x-cloak @click="nav = false" class="absolute inset-0 z-30 hidden bg-zinc-900/40 sm:block lg:hidden"></div>
+
+  <!-- ── main column ──────────────────────────────────────────────────── -->
   <div class="flex min-w-0 flex-1 flex-col">
-    <header class="flex h-14 shrink-0 items-center gap-3 border-b border-zinc-200 bg-white px-3 lg:px-5">
-      <button @click="nav = true" aria-label="Open navigation"
-              class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 lg:hidden">
+    <header class="flex h-14 shrink-0 items-center gap-2 border-b border-zinc-200 bg-white px-3 lg:gap-3 lg:px-5">
+
+      <!-- one control, two jobs: it opens the off-canvas sheet below lg and
+           collapses the rail above it, which is why it is never hidden -->
+      <button type="button" @click="toggle()" x-ref="ham"
+              :aria-expanded="wide ? sidebar : nav"
+              aria-controls="kon-sidebar"
+              :aria-label="wide ? (sidebar ? 'Collapse sidebar' : 'Expand sidebar') : 'Open navigation'"
+              :title="wide ? 'Collapse sidebar  [' : 'Open navigation  ['"
+              class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="menu" class="size-5"></i>
       </button>
-      <nav aria-label="Breadcrumb" class="hidden items-center gap-1.5 text-[13px]/5 text-zinc-600 sm:flex">
-        <a href="#" class="hover:text-zinc-900">Procurement</a><span class="text-zinc-500">/</span><span class="font-medium text-zinc-900">Overview</span>
+
+      <nav aria-label="Breadcrumb" class="hidden min-w-0 items-center gap-1.5 text-[13px]/5 text-zinc-600 sm:flex">
+        <a href="#" class="truncate hover:text-zinc-900">Procurement</a>
+        <span aria-hidden="true" class="text-zinc-400">/</span>
+        <span class="truncate font-medium text-zinc-900" aria-current="page">Overview</span>
       </nav>
-      <div class="ml-auto flex items-center gap-2">
-        <div class="hidden items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 md:flex">
-          <i data-lucide="search" class="size-4 text-zinc-600"></i>
-          <input aria-label="Search" placeholder="Search orders, vendors, materials" class="w-40 bg-transparent text-[13px]/5 outline-none placeholder:text-zinc-500 xl:w-64">
+
+      <div class="ml-auto flex items-center gap-1.5 lg:gap-2">
+
+        <!-- command palette — the topbar search is the palette's trigger, so
+             there is one search on the page and ⌘K and the click reach it -->
+        <div x-data="{
+               open: false, q: '', ai: 0,
+               groups: [
+                 { name: 'Actions', items: [
+                   { id: 'new-po',    label: 'New purchase order', icon: 'plus',          key: 'N' },
+                   { id: 'post-grn',  label: 'Post goods receipt', icon: 'package-check', key: 'G' },
+                   { id: 'approvals', label: 'Go to my approvals', icon: 'check-check',   key: 'A' }
+                 ] },
+                 { name: 'Recent records', items: [
+                   { id: 'po-0451', label: 'PO-2026-0451 — Sudarshan Chemicals', sub: 'Methyl ethyl ketone · 4 lines', icon: 'file-text', amount: '₹18,42,000' },
+                   { id: 'po-0431', label: 'PO-2026-0431 — Privi Speciality', sub: 'Isopropyl alcohol', flag: 'overdue 6 days', icon: 'file-text', amount: '₹6,48,900' },
+                   { id: 'ven-aarti', label: 'Aarti Industries', sub: 'Vendor · rate contract to 31 March 2027', icon: 'building-2' }
+                 ] }
+               ],
+               match(g) {
+                 const s = this.q.trim().toLowerCase();
+                 if (!s) return g.items;
+                 return g.items.filter(o => (o.label + ' ' + (o.sub || '') + ' ' + (o.flag || '') + ' ' + g.name).toLowerCase().includes(s));
+               },
+               get list() { return this.groups.flatMap(g => this.match(g)); },
+               rowId(o) { return 'cp-' + o.id; },
+               get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+               scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+               show() { this.open = true; this.q = ''; this.ai = 0; },
+               hide() { this.open = false; this.q = ''; this.ai = 0; },
+               move(n) {
+                 if (!this.list.length) return;
+                 this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+                 this.scroll();
+               },
+               pick(o) { this.hide(); },
+               commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+             }"
+             @keydown.window.meta.k.prevent="show()"
+             @keydown.window.ctrl.k.prevent="show()"
+             @keydown.escape.window="hide()">
+
+          <button type="button" @click="show()" aria-label="Search Konspec Operations"
+                  class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:w-56 md:px-3 xl:w-72">
+            <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+            <span class="hidden flex-1 text-left md:block">Search or jump to</span>
+            <kbd class="hidden rounded border border-zinc-200 px-1.5 text-[11px]/4 md:block">⌘K</kbd>
+          </button>
+
+          <div x-show="open" x-cloak x-trap.noscroll="open"
+               class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/30 px-3 pt-16 sm:pt-24">
+            <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
+                 class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+              <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
+                <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+                <label for="cp-q" class="sr-only">Search orders, vendors and actions</label>
+                <input id="cp-q" x-model="q" type="text" role="combobox" autocomplete="off" autofocus
+                       aria-autocomplete="list" aria-controls="cp-list"
+                       :aria-expanded="open" :aria-activedescendant="activeId"
+                       placeholder="Search orders, vendors, actions…"
+                       @input="ai = 0"
+                       @keydown.arrow-down.prevent="move(1)"
+                       @keydown.arrow-up.prevent="move(-1)"
+                       @keydown.enter.prevent="commit()"
+                       class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
+                <button type="button" @click="hide()" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">Esc</button>
+              </div>
+
+              <div id="cp-list" role="listbox" aria-label="Results" class="max-h-80 overflow-y-auto pb-1">
+                <template x-for="g in groups" :key="g.name">
+                  <div role="group" :aria-label="g.name" x-show="match(g).length">
+                    <p aria-hidden="true"
+                       class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+                       x-text="g.name"></p>
+                    <template x-for="o in match(g)" :key="o.id">
+                      <div :id="rowId(o)" role="option"
+                           @mousedown.prevent @click="pick(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+                           :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+                           class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+                        <span class="flex size-4 shrink-0 items-center justify-center text-zinc-600">
+                          <i :data-lucide="o.icon" class="size-4"></i>
+                        </span>
+                        <span class="min-w-0 flex-1">
+                          <span class="block truncate" x-text="o.label"></span>
+                          <span x-show="o.sub" class="block truncate text-[12px]/4 text-zinc-500"><span x-text="o.sub"></span><span
+                                x-show="o.flag" class="font-medium text-red-600"> · <span x-text="o.flag"></span></span></span>
+                        </span>
+                        <span x-show="o.amount" class="hidden shrink-0 text-[12px]/4 tabular-nums text-zinc-600 sm:block" x-text="o.amount"></span>
+                        <kbd x-show="o.key" class="shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500" x-text="o.key"></kbd>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+
+              <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+                <p class="text-[13px]/5 font-medium">Nothing matches “<span x-text="q"></span>”</p>
+                <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Try an order number — PO-2026-0451 — or a vendor name.</p>
+              </div>
+
+              <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
+                <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
+                <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
+                <span class="ml-auto">Konspec Operations</span>
+              </div>
+
+              <p role="status" class="sr-only"
+                 x-text="open ? (list.length === 1 ? '1 result' : list.length + ' results') : ''"></p>
+            </div>
+          </div>
         </div>
-        <button aria-label="Notifications" class="relative rounded-lg p-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+
+        <button type="button" aria-label="Notifications, 3 unread"
+                class="relative rounded-lg p-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="bell" class="size-[18px]"></i>
-          <span class="absolute right-1.5 top-1.5 size-2 rounded-full bg-red-600 ring-2 ring-white"></span>
+          <span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-600 ring-2 ring-white"></span>
         </button>
-        <button class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[11px]/4 font-semibold text-zinc-900">AP</button>
+
+        <!-- account menu -->
+        <div class="relative"
+             x-data="{
+               open: false,
+               items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+               show(last = false) {
+                 this.open = true;
+                 this.$nextTick(() => requestAnimationFrame(() => {
+                   const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+                 }));
+               },
+               close(toTrigger = true) {
+                 if (!this.open) return;
+                 this.open = false;
+                 if (toTrigger) this.$refs.trigger.focus();
+               },
+               move(step) {
+                 const i = this.items(), at = i.indexOf(document.activeElement);
+                 i[(at + step + i.length) % i.length]?.focus();
+               },
+               edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+             }"
+             @click.outside="close(false)"
+             @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+          <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+                  @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+                  :aria-expanded="open" aria-haspopup="true" aria-label="Account — Akshay Prabhu"
+                  class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">AP</button>
+
+          <div x-ref="panel" x-show="open" x-cloak
+               @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+               @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+               @keydown.tab="close(false)"
+               class="absolute right-0 z-40 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+            <div class="flex items-start gap-2.5 px-3 py-2">
+              <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">AP</span>
+              <div class="min-w-0">
+                <p class="truncate text-[13px]/5 font-medium">Akshay Prabhu</p>
+                <p class="truncate text-[12px]/4 text-zinc-500">akshay.prabhu@konspec.com</p>
+                <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500">Ambernath plant · Level 2 approver</p>
+              </div>
+            </div>
+
+            <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+            <div x-ref="menu" role="menu" aria-label="Account">
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="user" class="size-4 text-zinc-600"></i>Your profile
+              </button>
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="bell" class="size-4 text-zinc-600"></i>Notification settings
+              </button>
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="building-2" class="size-4 text-zinc-600"></i>Switch plant
+                <span class="ml-auto shrink-0 text-[12px]/4 text-zinc-500">Ambernath</span>
+              </button>
+
+              <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="life-buoy" class="size-4 text-zinc-600"></i>Help and support
+              </button>
+
+              <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
-    <main class="min-h-0 flex-1 overflow-auto">
+    <main id="kon-main" class="min-h-0 flex-1 overflow-auto">
       <div class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
-        <div>
-          <h1 class="text-[24px]/7 font-semibold tracking-tight">Procurement overview</h1>
-          <p class="mt-1 text-[13px]/5 text-zinc-600">Live commitments, receipts and vendor performance · FY 2026–27</p>
+
+        <!-- the actions take their own line below sm; side by side at 390px the
+             title is squeezed to a third of the width and wraps under them -->
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start">
+          <div class="min-w-0 sm:flex-1">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Procurement overview</h1>
+            <p class="mt-1 text-[13px]/5 text-zinc-600">Live commitments, receipts and vendor performance · FY 2026–27</p>
+          </div>
+          <div class="flex shrink-0 items-center gap-2">
+            <button type="button" disabled
+                    class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400">Export</button>
+            <button type="button"
+                    class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">New purchase order</button>
+          </div>
         </div>
-        <div class="grid gap-3 sm:grid-cols-3">
+
+        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div class="rounded-xl border border-zinc-200 bg-white p-4">
             <p class="text-[13px]/5 text-zinc-600">Open commitment</p>
             <p class="mt-2 text-[24px]/7 font-semibold tracking-tight tabular-nums">₹1,66,40,000</p>
@@ -178,12 +453,202 @@ register(
           <div class="rounded-xl border border-zinc-200 bg-white p-4">
             <p class="text-[13px]/5 text-zinc-600">Awaiting GRN</p>
             <p class="mt-2 text-[24px]/7 font-semibold tracking-tight tabular-nums">27</p>
-            <p class="mt-2 text-[12px]/4 text-zinc-500">9 past the promised date</p>
+            <p class="mt-2 flex items-center gap-1.5 text-[12px]/4 text-zinc-500"><span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>9 past the promised date</p>
           </div>
           <div class="rounded-xl border border-zinc-200 bg-white p-4">
             <p class="text-[13px]/5 text-zinc-600">Pending my approval</p>
             <p class="mt-2 text-[24px]/7 font-semibold tracking-tight tabular-nums">4</p>
             <p class="mt-2 text-[12px]/4 text-zinc-500">Oldest raised 3 days ago</p>
+          </div>
+          <div class="rounded-xl border border-zinc-200 bg-white p-4">
+            <p class="text-[13px]/5 text-zinc-600">Vendors on hold</p>
+            <p class="mt-2 text-[24px]/7 font-semibold tracking-tight tabular-nums">3</p>
+            <p class="mt-2 flex items-center gap-1.5 text-[12px]/4 text-zinc-500"><span aria-hidden="true" class="size-1.5 rounded-full bg-red-600"></span>2 for expired documents</p>
+          </div>
+        </div>
+
+        <div class="grid gap-4 xl:grid-cols-3">
+
+          <div class="rounded-xl border border-zinc-200 bg-white xl:col-span-2">
+            <div class="flex items-center gap-3 border-b border-zinc-200 px-4 py-3">
+              <h2 class="text-[16px]/6 font-semibold">Recent purchase orders</h2>
+              <a href="#" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2">All 148</a>
+            </div>
+
+            <table class="hidden w-full text-[13px]/5 md:table">
+              <thead>
+                <tr class="border-b border-zinc-200 bg-zinc-100 text-left text-zinc-600">
+                  <th scope="col" class="px-4 py-2 font-medium">PO</th>
+                  <th scope="col" class="px-4 py-2 font-medium">Vendor</th>
+                  <th scope="col" class="px-4 py-2 font-medium">Promised</th>
+                  <th scope="col" class="px-4 py-2 text-right font-medium">Value</th>
+                  <th scope="col" class="px-4 py-2 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-zinc-100">
+                <tr class="hover:bg-zinc-50">
+                  <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0451</a></td>
+                  <td class="px-4 py-2.5 text-zinc-600">Sudarshan Chemicals</td>
+                  <td class="px-4 py-2.5 tabular-nums text-zinc-600">02 Sep 2026</td>
+                  <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹18,42,000</td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span></td>
+                </tr>
+                <tr class="hover:bg-zinc-50">
+                  <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0450</a></td>
+                  <td class="px-4 py-2.5 text-zinc-600">Deepak Nitrite</td>
+                  <td class="px-4 py-2.5 tabular-nums text-zinc-600">29 Aug 2026</td>
+                  <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹7,15,500</td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>Awaiting approval</span></td>
+                </tr>
+                <tr class="hover:bg-zinc-50">
+                  <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0448</a></td>
+                  <td class="px-4 py-2.5 text-zinc-600">Aarti Industries</td>
+                  <td class="px-4 py-2.5 tabular-nums text-zinc-600">26 Aug 2026</td>
+                  <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹24,90,000</td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-emerald-600"></span>Received</span></td>
+                </tr>
+                <tr class="hover:bg-zinc-50">
+                  <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0445</a></td>
+                  <td class="px-4 py-2.5 text-zinc-600">Navin Fluorine</td>
+                  <td class="px-4 py-2.5 tabular-nums text-zinc-600">21 Aug 2026</td>
+                  <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹11,08,750</td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>Part received</span></td>
+                </tr>
+                <tr class="hover:bg-zinc-50">
+                  <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0443</a></td>
+                  <td class="px-4 py-2.5 text-zinc-600">Clean Science</td>
+                  <td class="px-4 py-2.5 tabular-nums text-zinc-600">20 Aug 2026</td>
+                  <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹5,94,000</td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span></td>
+                </tr>
+                <tr class="hover:bg-zinc-50">
+                  <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0441</a></td>
+                  <td class="px-4 py-2.5 text-zinc-600">Atul Ltd</td>
+                  <td class="px-4 py-2.5 tabular-nums text-zinc-600">19 Aug 2026</td>
+                  <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹9,30,000</td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>Awaiting approval</span></td>
+                </tr>
+                <tr class="hover:bg-zinc-50">
+                  <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0438</a></td>
+                  <td class="px-4 py-2.5 text-zinc-600">Fine Organics</td>
+                  <td class="px-4 py-2.5 tabular-nums text-zinc-600">18 Aug 2026</td>
+                  <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹2,17,600</td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-emerald-600"></span>Received</span></td>
+                </tr>
+                <tr class="hover:bg-zinc-50">
+                  <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0431</a></td>
+                  <td class="px-4 py-2.5 text-zinc-600">Privi Speciality</td>
+                  <td class="px-4 py-2.5 tabular-nums text-zinc-600">15 Aug 2026 <span class="text-red-600">· 6 days late</span></td>
+                  <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹6,48,900</td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-red-600"></span>Overdue</span></td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- 390px: the table becomes one card per order -->
+            <ul class="divide-y divide-zinc-100 md:hidden">
+              <li class="flex items-start gap-3 px-4 py-3">
+                <span class="min-w-0 flex-1">
+                  <a href="#" class="block truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">PO-2026-0451</a>
+                  <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">Sudarshan Chemicals · 02 Sep 2026</span>
+                </span>
+                <span class="shrink-0 text-right">
+                  <span class="block text-[13px]/5 font-medium tabular-nums">₹18,42,000</span>
+                  <span class="mt-1 inline-flex items-center gap-1.5 text-[11px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span>
+                </span>
+              </li>
+              <li class="flex items-start gap-3 px-4 py-3">
+                <span class="min-w-0 flex-1">
+                  <a href="#" class="block truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">PO-2026-0450</a>
+                  <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">Deepak Nitrite · 29 Aug 2026</span>
+                </span>
+                <span class="shrink-0 text-right">
+                  <span class="block text-[13px]/5 font-medium tabular-nums">₹7,15,500</span>
+                  <span class="mt-1 inline-flex items-center gap-1.5 text-[11px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>Awaiting approval</span>
+                </span>
+              </li>
+              <li class="flex items-start gap-3 px-4 py-3">
+                <span class="min-w-0 flex-1">
+                  <a href="#" class="block truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">PO-2026-0431</a>
+                  <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">Privi Speciality · 15 Aug 2026</span>
+                </span>
+                <span class="shrink-0 text-right">
+                  <span class="block text-[13px]/5 font-medium tabular-nums">₹6,48,900</span>
+                  <span class="mt-1 inline-flex items-center gap-1.5 text-[11px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 rounded-full bg-red-600"></span>Overdue</span>
+                </span>
+              </li>
+            </ul>
+
+            <div class="flex items-center gap-3 border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 text-zinc-500">
+              <span class="tabular-nums">Showing 8 of 148</span>
+              <a href="#" class="ml-auto text-zinc-900 underline underline-offset-2">Open the register</a>
+            </div>
+
+          </div>
+
+          <div class="space-y-4">
+            <div class="rounded-xl border border-zinc-200 bg-white">
+              <div class="flex items-center gap-3 border-b border-zinc-200 px-4 py-3">
+                <h2 class="text-[16px]/6 font-semibold">Waiting on you</h2>
+                <span class="ml-auto rounded-full bg-zinc-200 px-2 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4</span>
+              </div>
+              <ul class="divide-y divide-zinc-100">
+                <li class="px-4 py-3">
+                  <div class="flex items-start gap-3">
+                    <span class="min-w-0 flex-1">
+                      <a href="#" class="block truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">PO-2026-0450</a>
+                      <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">Deepak Nitrite · raised 3 days ago</span>
+                    </span>
+                    <span class="shrink-0 text-[13px]/5 font-medium tabular-nums">₹7,15,500</span>
+                  </div>
+                  <div class="mt-2 flex gap-2">
+                    <button type="button" class="rounded-lg bg-zinc-700 px-2.5 py-1.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
+                    <button type="button" class="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-[12px]/4 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Return</button>
+                  </div>
+                </li>
+                <li class="px-4 py-3">
+                  <div class="flex items-start gap-3">
+                    <span class="min-w-0 flex-1">
+                      <a href="#" class="block truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">PO-2026-0441</a>
+                      <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">Atul Ltd · raised 5 days ago</span>
+                    </span>
+                    <span class="shrink-0 text-[13px]/5 font-medium tabular-nums">₹9,30,000</span>
+                  </div>
+                  <div class="mt-2 flex gap-2">
+                    <button type="button" class="rounded-lg bg-zinc-700 px-2.5 py-1.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
+                    <button type="button" class="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-[12px]/4 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Return</button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="rounded-xl border border-zinc-200 bg-white">
+              <div class="border-b border-zinc-200 px-4 py-3">
+                <h2 class="text-[16px]/6 font-semibold">Latest activity</h2>
+              </div>
+              <ul class="divide-y divide-zinc-100">
+                <li class="flex gap-2.5 px-4 py-3">
+                  <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                  <span class="min-w-0">
+                    <span class="block text-[13px]/5">Sudarshan Chemicals raised the rate on MEK by 4%</span>
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">12 minutes ago</span>
+                  </span>
+                </li>
+                <li class="flex gap-2.5 px-4 py-3">
+                  <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
+                  <span class="min-w-0">
+                    <span class="block text-[13px]/5">PO-2026-0448 fully received against GRN-3391</span>
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">1 hour ago</span>
+                  </span>
+                </li>
+                <li class="flex gap-2.5 px-4 py-3">
+                  <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+                  <span class="min-w-0">
+                    <span class="block text-[13px]/5">PO-2026-0431 is 6 days past its promised date</span>
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Yesterday, 17:20</span>
+                  </span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
