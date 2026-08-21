@@ -5,6 +5,66 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-08-21
+
+### Added
+
+- **`data-kui` on every variant.** Each variant's root element now carries
+  `data-kui="<component>/<variant>"`, so markup pasted into an application
+  stops being anonymous: `grep -r data-kui` lists every copied component and
+  each one names the entry it came from. Inert, and carried through to
+  `registry.json` and every `/r/` endpoint. No version is stamped into it, so
+  a release does not churn all 417 snippets.
+- **How to update a pasted component**, stated as a rule rather than left to
+  guesswork. Grep the ids, fetch `/r/<component>/<variant>.html`, diff, and
+  carry across the class list and structure only. It says plainly what an
+  update must not touch: the labels, template tags, `hx-*` attributes, Alpine
+  state, ids and form field names that make a pasted block a real screen.
+- **The Konspec mark in the app shell.** The sidebar header names the app it
+  is, with an icon tile and the app name; the company mark signs the sidebar
+  footer with the running version beside it. Collapsed, the rail keeps the
+  icon tile and the version, and drops the mark, which is a 4:1 lockup and
+  cannot read at 43px. The mark is inlined as a data URI so a snippet stays
+  self-contained in a blob preview, under a project path, and in a consuming
+  application alike.
+- **CI that fails when generated files drift.** `node tools/build.js --check`
+  regenerates nothing and fails if `registry.json`, `llms.txt`,
+  `assets/counts.js`, the README table or any `/r/` endpoint no longer match
+  `assets/reg/*.js`. Issue and pull request templates alongside it.
+- `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` and `SECURITY.md`. The contributing
+  guide leads with what the library refuses to do, since most rejected changes
+  are rejected on principle rather than on quality.
+
+### Changed
+
+- **The neutral ramp no longer uses one value for two jobs.** `bg-zinc-100`
+  was the page, the table header, the zebra row and the control track at once,
+  so a header inside a white card measured 1.00 against the page behind that
+  card: not low contrast, the identical colour. On a washed-out panel the
+  stripes read as holes in the card and a graphite pill sank into its row.
+  Table headers and zebra rows drop to `bg-zinc-50`; the outer edge of
+  anything sitting on the page steps up to `border-zinc-300`; control tracks,
+  selected nav items and open menu triggers move to `bg-zinc-200`, which reads
+  on white and on the page alike. Dividers are untouched: the two-shade rule,
+  `border-zinc-100` inside a bordered card against `border-zinc-200` for an
+  edge, is deliberate and is now three shades rather than two.
+- The token table documents the ramp as `Page`, `Surface`, `Recessed`, `Edge`,
+  `Border` and `Divider`, and `zinc-300` joins the ramp swatches.
+- The nav components follow the shell: sidebar, topbar, navigation-menu and
+  command-palette name the app rather than the company. `auth-page` and
+  `error-page` still carry the full name, since a visitor who has not signed
+  in does need telling whose system this is.
+- The README component and variant badges are derived from the registry
+  instead of hand-kept.
+
+### Removed
+
+- **The server clock at the foot of the sidebar**, and the note and anatomy
+  entry that documented it. It existed to show the clock a posting date and a
+  period cut-off are judged against, seeded from the server so a browser with
+  a wrong clock could never decide it. If you rely on that, it now has no home
+  in the shell.
+
 ## [0.2.0] - 2026-08-21
 
 ### Added
