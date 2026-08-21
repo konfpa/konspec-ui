@@ -3233,7 +3233,7 @@ register(
 <div data-kui="navigation-menu/phone" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ nav: false, open: { proc: true, inv: false, rep: false } }">
   <div class="flex h-12 items-center justify-between gap-3 px-3">
-    <span class="text-[13px]/5 font-medium">Konspec Operations</span>
+    <span class="text-[13px]/5 font-medium">Operations</span>
     <button type="button" @click="nav = !nav" :aria-expanded="nav" aria-controls="nmph-list"
             class="flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
             :aria-label="nav ? 'Close navigation' : 'Open navigation'">
@@ -3501,9 +3501,9 @@ register(
 
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-transparent px-4 transition-colors"
        :class="scrolled && 'border-zinc-200'">
-    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
     <span class="min-w-0 flex-1">
-      <span class="block truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+      <span class="block truncate text-[14px]/5 font-semibold">Operations</span>
       <span class="block truncate text-[11px]/4 text-zinc-500">Vasai plant</span>
     </span>
   </div>
@@ -3634,8 +3634,8 @@ register(
      lands on a button that paints nothing. -->
 <div data-kui="sidebar/counts" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
-    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
   </div>
 
   <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
@@ -3748,8 +3748,8 @@ register(
 <div data-kui="sidebar/nested" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ open: { orders: true, vendors: false, quality: false } }">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
-    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
   </div>
 
   <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
@@ -3869,7 +3869,7 @@ register(
      destinations than fit needs the flyout variant. -->
 <div data-kui="sidebar/rail" class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
-    <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+    <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-white" aria-hidden="true"><i data-lucide="package" class="size-[18px]"></i></span>
   </div>
 
   <nav aria-label="Main" class="min-h-0 flex-1 space-y-1 py-2">
@@ -3978,7 +3978,7 @@ register(
      and clip every panel at the rail edge. -->
 <div data-kui="sidebar/flyout" class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
-    <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+    <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-white" aria-hidden="true"><i data-lucide="package" class="size-[18px]"></i></span>
   </div>
 
   <nav aria-label="Main" class="min-h-0 flex-1 py-2">
@@ -4110,8 +4110,8 @@ register(
      :class="[ expanded ? 'w-64' : 'w-[68px]', ready && 'transition-all duration-200 motion-reduce:transition-none' ]">
 
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200" :class="expanded ? 'px-4' : 'justify-center'">
-    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold" :class="!expanded && 'hidden'">Konspec Operations</span>
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold" :class="!expanded && 'hidden'">Operations</span>
   </div>
 
   <nav id="sb6-nav" aria-label="Main" class="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain py-2" :class="expanded ? 'px-3' : 'px-3.5'">
@@ -4240,8 +4240,8 @@ register(
          class="flex h-full w-full flex-col border-r border-zinc-200 bg-white shadow-lg sm:w-72">
 
       <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
-        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
         <button type="button" @click="nav = false" aria-label="Close navigation"
                 class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
@@ -4338,9 +4338,9 @@ register(
       <button type="button" @click="menu = menu === 'plant' ? '' : 'plant'"
               :aria-expanded="menu === 'plant'" aria-haspopup="true" aria-controls="sb8-plant"
               class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
-        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
         <span class="min-w-0 flex-1">
-          <span class="block truncate text-[13px]/5 font-medium">Konspec Operations</span>
+          <span class="block truncate text-[13px]/5 font-medium">Operations</span>
           <span class="block truncate text-[11px]/4 text-zinc-500">Vasai plant · FY 2026–27</span>
         </span>
         <i data-lucide="chevrons-up-down" class="size-4 shrink-0 text-zinc-500"></i>
@@ -4439,8 +4439,8 @@ register(
      to the footer rather than landing on a grey rectangle. -->
 <div data-kui="sidebar/skeleton" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
-    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
   </div>
 
   <div class="min-h-0 flex-1 overflow-y-auto px-3 py-2" aria-busy="true"
@@ -4582,7 +4582,7 @@ register(
       <i data-lucide="menu" class="size-5"></i>
     </button>
 
-    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white lg:hidden">K</span>
+    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white lg:hidden"><i data-lucide="package" class="size-[18px]"></i></span>
 
     <nav aria-label="Breadcrumb" class="min-w-0">
       <ol class="flex items-center gap-1.5 text-[13px]/5">
@@ -4827,8 +4827,8 @@ register(
 
   <aside class="hidden w-64 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
     <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
-      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-      <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+      <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
     </div>
     <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
       <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>Overview</a>
@@ -4844,7 +4844,7 @@ register(
               class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
         <i data-lucide="menu" class="size-5"></i>
       </button>
-      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white lg:hidden">K</span>
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white lg:hidden"><i data-lucide="package" class="size-[18px]"></i></span>
       <nav aria-label="Breadcrumb" class="min-w-0">
         <ol class="flex items-center gap-1.5 text-[13px]/5">
           <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
@@ -4873,8 +4873,8 @@ register(
          @click="if ($event.target.closest('a[href]')) { nav = false; $refs.burger.focus() }"
          class="flex h-full w-full flex-col border-r border-zinc-200 bg-white shadow-lg sm:w-72">
       <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
-        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
         <button type="button" @click="nav = false; $refs.burger.focus()" aria-label="Close navigation"
                 class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
@@ -4930,7 +4930,7 @@ register(
             :aria-expanded="open" aria-haspopup="menu" aria-controls="tb-ctx"
             class="flex max-w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
             :class="open && 'bg-zinc-200'">
-      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
       <span class="min-w-0">
         <span class="block truncate text-[13px]/5 font-medium">Konspec Polymers Pvt Ltd</span>
         <span class="block truncate text-[11px]/4 tabular-nums text-zinc-500" x-text="plant + ' plant · FY ' + fy">Vasai plant · FY 2024-25</span>
@@ -5208,7 +5208,7 @@ register(
             class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
       <i data-lucide="menu" class="size-5"></i>
     </button>
-    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white lg:hidden">K</span>
+    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white lg:hidden"><i data-lucide="package" class="size-[18px]"></i></span>
 
     <span class="hidden shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 md:inline-flex">Vasai plant</span>
     <span class="hidden shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 md:inline-flex">
@@ -6186,7 +6186,7 @@ register(
   <button type="button" @click="show()"
           class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-100">
     <i data-lucide="search" class="size-4 text-zinc-600"></i>
-    <span class="flex-1 text-left">Search Konspec Operations</span>
+    <span class="flex-1 text-left">Search Operations</span>
     <kbd class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
   </button>
 
@@ -6249,7 +6249,7 @@ register(
       <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
         <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
         <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
-        <span class="ml-auto">Konspec Operations</span>
+        <span class="ml-auto">Operations</span>
       </div>
 
       <!-- inside the dialog, because aria-modal hides everything outside it

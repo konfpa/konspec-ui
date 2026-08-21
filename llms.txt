@@ -250,8 +250,8 @@ thing that answers the question.
 |---|---|--:|---|
 | [r/index.json](r/index.json) | 74 KB | ~21k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
 | `r/<id>.json` | median 43 KB, largest 144 KB (`form-page`) | ~12k tokens / ~41k tokens | One component: rules, anatomy, behaviour, accessibility, and every variant with its html. |
-| `r/<id>/<variant>.html` | median 4 KB, largest 48 KB (`app-shell/default`) | ~1k tokens / ~14k tokens | The markup, raw. No JSON envelope, no escaping, paste as-is. |
-| [registry.json](registry.json) | 2.5 MB | ~730k tokens | Everything at once. **Do not fetch this.** It is roughly 4× a 200k context window and exists only so older integrations do not break. |
+| `r/<id>/<variant>.html` | median 4 KB, largest 47 KB (`app-shell/default`) | ~1k tokens / ~13k tokens | The markup, raw. No JSON envelope, no escaping, paste as-is. |
+| [registry.json](registry.json) | 2.5 MB | ~729k tokens | Everything at once. **Do not fetch this.** It is roughly 4× a 200k context window and exists only so older integrations do not break. |
 
 The component list above prints every variant id, so once you have read this
 file you can build a variant URL yourself and skip r/index.json entirely:

@@ -25,8 +25,8 @@
 
   <aside class="hidden w-64 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
     <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
-      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-      <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+      <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
     </div>
     <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
       <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>Overview</a>
@@ -42,7 +42,7 @@
               class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
         <i data-lucide="menu" class="size-5"></i>
       </button>
-      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white lg:hidden">K</span>
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white lg:hidden"><i data-lucide="package" class="size-[18px]"></i></span>
       <nav aria-label="Breadcrumb" class="min-w-0">
         <ol class="flex items-center gap-1.5 text-[13px]/5">
           <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
@@ -71,8 +71,8 @@
          @click="if ($event.target.closest('a[href]')) { nav = false; $refs.burger.focus() }"
          class="flex h-full w-full flex-col border-r border-zinc-200 bg-white shadow-lg sm:w-72">
       <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
-        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
-        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
         <button type="button" @click="nav = false; $refs.burger.focus()" aria-label="Close navigation"
                 class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>

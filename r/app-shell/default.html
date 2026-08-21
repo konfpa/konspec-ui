@@ -46,17 +46,12 @@
          :class="[ sidebar ? 'lg:w-64' : 'lg:w-[68px]', nav ? 'translate-x-0' : 'max-lg:-translate-x-full' ]">
 
     <div class="flex h-14 shrink-0 items-center gap-2.5 overflow-hidden px-3">
-      <span class="hidden w-full shrink-0 items-center justify-center lg:flex" :class="sidebar && 'lg:hidden'">
-        <span class="flex h-10 w-full items-center justify-center rounded-lg bg-zinc-700 text-[14px]/5 font-semibold text-white">K</span>
+      <span class="flex shrink-0 items-center justify-center" :class="!sidebar && 'lg:w-full'">
+        <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-white" :class="!sidebar && 'lg:h-10 lg:w-full'">
+          <i data-lucide="package" class="size-[18px]"></i>
+        </span>
       </span>
-      <span class="min-w-0 flex-1 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">
-        <!-- The mark is inlined as a data URI so the snippet is self-contained: a
-             preview renders in a blob document, which has no path to resolve a
-             src against, and the published site sits under a project path. In an
-             application swap it for the static URL, {% static 'img/logo.png' %}. -->
-        <img src="data:image/png;base64,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"
-             alt="Konspec Operations" width="121" height="28" class="h-7 w-auto">
-      </span>
+      <span class="min-w-0 flex-1 truncate text-[15px]/6 font-semibold tracking-tight transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Operations</span>
       <button type="button" @click="nav = false" aria-label="Close navigation"
               class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
         <i data-lucide="x" class="size-5"></i>
@@ -124,30 +119,17 @@
       </a>
     </nav>
 
-    <!-- Server clock. It seeds from a timestamp the server rendered and ticks
-         from that, never from new Date() — the point of the row is the clock
-         the posting date and the period cut-off are judged against, and the
-         browser's clock is the one thing that must not decide it. Replace the
-         seed with the server's own ISO stamp: Django {{ now|date:"c" }}.
-         Reseed it on htmx swaps so a tab left open overnight cannot drift. -->
-    <div class="shrink-0 overflow-hidden border-t border-zinc-200 px-3 py-2"
-         x-data="{
-           t: new Date('2026-08-21T14:35:09+05:30'),
-           timer: null,
-           init() { this.timer = setInterval(() => this.t = new Date(this.t.getTime() + 1000), 1000) },
-           destroy() { clearInterval(this.timer) },
-           seed(iso) { this.t = new Date(iso) },
-           get day() { return this.t.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' }) },
-           get clock() { return this.t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) }
-         }"
-         @htmx:after-swap.camel.window="if ($event.detail.xhr) { const h = $event.detail.xhr.getResponseHeader('X-Server-Time'); if (h) seed(h) }">
-      <div @mouseenter="showTip($el, 'Server time')" @mouseleave="hideTip()"
-           class="flex items-center gap-2.5 overflow-hidden rounded-lg px-1.5 py-1 whitespace-nowrap">
-        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="clock" class="size-[18px] text-zinc-500"></i></span>
-        <span class="min-w-0 flex-1 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">
-          <span class="block truncate text-[12px]/4 tabular-nums text-zinc-600"><span x-text="day"></span> · <span x-text="clock"></span></span>
-          <span class="block truncate text-[11px]/4 text-zinc-500">Server time</span>
-        </span>
+    <!-- The company mark sits here rather than in the header: an internal user
+         knows who they work for, and what needs naming at a glance is which
+         system they are in. A signature at the foot says it once. The version
+         is beside it because the two questions a bug report has to answer,
+         which app and which build, are then both on one screenshot. Collapsed,
+         only the version survives: the mark is 4:1 and cannot read at 43px. -->
+    <div class="shrink-0 overflow-hidden border-t border-zinc-200 px-3 py-2.5">
+      <div class="flex items-center justify-between gap-2" :class="!sidebar && 'lg:justify-center'">
+        <img src="data:image/png;base64,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"
+             alt="Konspec" width="121" height="28" class="h-7 w-auto shrink-0" :class="!sidebar && 'lg:hidden'">
+        <span class="font-mono text-[11px]/4 tabular-nums text-zinc-400">v2.4.0</span>
       </div>
     </div>
   </aside>
@@ -221,7 +203,7 @@
              @keydown.window.ctrl.k.prevent="show()"
              @keydown.escape.window="hide()">
 
-          <button type="button" @click="show()" aria-label="Search Konspec Operations"
+          <button type="button" @click="show()" aria-label="Search Operations"
                   class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:w-56 md:px-3 xl:w-72">
             <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
             <span class="hidden flex-1 text-left md:block">Search or jump to</span>
@@ -283,7 +265,7 @@
               <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
                 <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
                 <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
-                <span class="ml-auto">Konspec Operations</span>
+                <span class="ml-auto">Operations</span>
               </div>
 
               <p role="status" class="sr-only"
