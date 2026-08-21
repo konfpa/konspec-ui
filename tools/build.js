@@ -435,6 +435,83 @@ for (const c of R.components) for (const v of c.variants) {
       focusProblems.push(c.id + '/' + v.id + ': outline-none cancels this element\'s own focus outline');
   }
 }
+/* ── hover lint ────────────────────────────────────────────────────────────
+   A hover fill equal to the fill behind it is not a subtle hover, it is no
+   hover: the control loses its surface and the one thing the cursor is on
+   reads as less present than the things it is not on. Caught in the wild as a
+   white toolbar button on the zinc-100 page hovering to zinc-100, which left
+   a hairline border with a hole in it.
+
+   The model, and the same split the tinted-shape rule draws:
+
+     solid fill of its own  one step deeper, always. zinc-700 to zinc-800,
+                            red-600 to red-700, zinc-200 to zinc-300.
+     shape                  self-sized, rounded on every corner — a button, an
+                            icon button, a trigger, a chip. Takes the chip fill
+                            zinc-200 wherever it sits, because it has to read
+                            against whatever it is dropped onto. White on white
+                            is the exception that stays zinc-100, and a shape
+                            already on a zinc-200 track steps to zinc-300.
+     surface                a full-bleed band — a table row, a menu item, a
+                            sidebar link, a strip member whose corners are
+                            shared with its wrapper. Steps once off the band it
+                            crosses: zinc-100 in a white panel, zinc-200 on the
+                            page. */
+const STEP = { 'bg-white': 'bg-zinc-100', 'bg-zinc-50': 'bg-zinc-100',
+               'bg-zinc-100': 'bg-zinc-200', 'bg-zinc-200': 'bg-zinc-300',
+               'bg-zinc-300': 'bg-zinc-400', 'bg-zinc-700': 'bg-zinc-800',
+               'bg-zinc-800': 'bg-zinc-900', 'bg-zinc-900': 'bg-zinc-800',
+               'bg-red-600': 'bg-red-700' };
+const wantHover = (surface, resting, isShape) => {
+  if (resting && resting !== 'bg-white') return STEP[resting] || null;
+  if (!isShape) return STEP[surface || 'bg-zinc-100'] || null;
+  if (resting === 'bg-white')
+    return surface === 'bg-white' ? 'bg-zinc-100' : (STEP[surface] || 'bg-zinc-200');
+  if (surface === 'bg-zinc-200') return 'bg-zinc-300';
+  if (surface === 'bg-zinc-900' || surface === 'bg-zinc-800') return 'bg-zinc-800';
+  return 'bg-zinc-200';
+};
+/* Comments carry stray tags, so they come out before the tag stack is walked;
+   left in, one </div> inside a comment pops a surface that is still open and
+   every element after it is measured against the wrong background. */
+const VOIDT = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr|path|circle|rect|line|polyline|polygon|ellipse|use|stop)$/i;
+const hoverProblems = [];
+for (const c of R.components) for (const v of c.variants) {
+  const src = v.code.replace(/<!--[\s\S]*?-->/g, '');
+  const stack = [], ctx = [];
+  const re = /<(\/?)([a-z0-9-]+)((?:"[^"]*"|'[^']*'|[^>'"])*?)(\/?)>/gi;
+  let m;
+  while ((m = re.exec(src))) {
+    const [, close, tag, attrs, self] = m;
+    if (close) { stack.pop(); ctx.pop(); continue; }
+    const cls = (attrs.match(/(?<![:\w-])class="([^"]*)"/) || [])[1] || '';
+    const resting = (cls.match(/(?:^|\s)(bg-(?:white|zinc-\d+|red-\d+))(?:\s|$)/) || [])[1] || null;
+    const hov = (cls.match(/(?:^|\s)(?:enabled:)?hover:(bg-(?:white|zinc-\d+|red-\d+))/) || [])[1];
+    const surface = [...stack].reverse().find(Boolean) || 'bg-zinc-100';
+    /* rounded on one side only means the other corners belong to a wrapper */
+    const partial = /\brounded-[lrtbse]-/.test(cls) || /\brounded-[lrtb][lrtb]-/.test(cls);
+    const isShape = /\brounded-/.test(cls) && !partial && !/\bw-full\b/.test(cls)
+                    && !/^(tr|li)$/i.test(tag) && !ctx.some(Boolean);
+    if (hov) {
+      const id = c.id + '/' + v.id;
+      if (hov === surface)
+        hoverProblems.push(id + ': hover:' + hov + ' is the fill behind it — the control dissolves');
+      else {
+        const want = wantHover(surface, resting, isShape);
+        if (want && want !== hov)
+          hoverProblems.push(id + ': ' + (isShape ? 'shape' : 'row') + ' on ' + surface +
+                             ' resting ' + (resting || 'none') + ' hovers to ' + hov +
+                             ', model says ' + want);
+      }
+    }
+    if (!self && !VOIDT.test(tag)) {
+      stack.push(resting);
+      ctx.push(/role="(menu|menubar|listbox|list|tablist|radiogroup)"/.test(attrs)
+               || /^(nav|ul|ol|tbody|table|menu)$/i.test(tag));
+    }
+  }
+}
+
 /* ── endpoint lint ─────────────────────────────────────────────────────────
    Every concrete /r/ URL printed in llms.txt has to resolve to a file this
    build actually emits. A worked example that 404s is worse than none: it sits
@@ -459,6 +536,12 @@ if (badLinks.length) {
 if (focusProblems.length) {
   console.error('FOCUS LINT failed:');
   [...new Set(focusProblems)].forEach(f => console.error('  ' + f));
+  process.exit(1);
+}
+
+if (hoverProblems.length) {
+  console.error('HOVER LINT failed — a hover fill must never equal the fill behind it:');
+  [...new Set(hoverProblems)].forEach(f => console.error('  ' + f));
   process.exit(1);
 }
 

@@ -41,7 +41,7 @@ Arrived without reading llms.txt:         /r/index.json
 Never fetch /registry.json — the whole system in one file, ~725k tokens.
 ```
 
-`llms.txt` is 36 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
+`llms.txt` is 37 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 
