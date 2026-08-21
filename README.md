@@ -18,7 +18,7 @@ Three steps, in order. Do not skip the first.
 3. Copy  registry.json → components[id].variants[].html        verbatim, then change the copy
 ```
 
-`llms.txt` is 16 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, and the locked status mapping. `registry.json` carries the markup.
+`llms.txt` is 21 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, and the locked status mapping. `registry.json` carries the markup.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 
