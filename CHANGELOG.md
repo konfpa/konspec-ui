@@ -5,6 +5,25 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-08-21
+
+### Fixed
+
+- The one worked variant URL in `llms.txt` pointed at `/r/button/primary.html`,
+  which has never existed: `button`'s variants are `variants`, `sizes`, `icons`,
+  `states`, `link`, `full-width`, `toolbar` and `django`. It sat in the
+  paragraph telling agents they can construct URLs without fetching an index,
+  so it was the example most likely to be copied. It is now derived from a real
+  component and its first real variant instead of written by hand.
+
+### Added
+
+- `llms.txt` now says to read variant ids rather than guess them, with the
+  reason: 32 of 55 components have a `default` variant and 23 do not, so a
+  guessed URL is a 404 and not a fallback.
+- A build-time endpoint lint fails the build if any concrete `/r/` URL printed
+  in `llms.txt` does not resolve to a file the build emits.
+
 ## [0.1.0] - 2026-08-21
 
 First release. Everything below is new, so there is nothing to change or
@@ -54,4 +73,5 @@ remove yet.
   a tinted pill, so a column of twelve rows still means something at the
   twelfth.
 
+[0.1.1]: https://github.com/konfpa/konspec-ui/releases/tag/v0.1.1
 [0.1.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.1.0
