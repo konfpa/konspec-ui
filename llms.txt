@@ -203,14 +203,14 @@ building anything, rather than reconstructing a component from its description.
 ### Layout
 
 - **App shell** `app-shell` — The page skeleton: collapsible sidebar, topbar, and a single scrolling main column. Everything else in the app is rendered inside the main column. Variants: default.
-- **Page header** `page-header` — The top block of a page: where it sits in the app, what it is, and what you can do to it. One h1 per page and it lives here. Variants: default, tabs, filters.
+- **Page header** `page-header` — The top block of a page: where it sits in the app, what it is, what state it is in, and what you can do to it. One h1 per page and it lives here. Variants: default, trail, record, tabs, filters, back, sticky, overflow.
 - **Card** `card` — A bordered white panel that groups one thing. A header names it, the body holds the content, and an optional footer carries totals or actions. Variants: default, actions, stats, section, table, clickable, grid, empty, django.
 - **Separator** `separator` — The rule that divides content. Almost always a border on the thing beside it rather than an element of its own, and almost always silent to a screen reader. Variants: default, rows, vertical, labelled, menu, django.
 - **Carousel** `carousel` — A horizontal rail of items that snaps one item at a time. CSS scroll snap does the moving; the arrows and the counter are the only JavaScript. Variants: default, peek, dots, photo, thumbnails, stats, empty, django.
-- **List and detail** `list-detail` — A scrolling list on the left and the selected record on the right. Picking a row swaps the right pane without leaving the page. Variants: default.
-- **Form page** `form-page` — The layout a create or edit screen uses: fields in a card, and the Save and Cancel actions where the user can always reach them. Variants: two-column, side-rail.
-- **Auth page** `auth-page` — The signed-out screen: one centred card, the fewest fields that will do, and nothing else on the page. Variants: signin.
-- **Error page** `error-page` — What the user sees when the page cannot be shown. Says what happened, what it means for them, and gives one way back. Variants: 404, 403, 500.
+- **List and detail** `list-detail` — A queue on the left and the record being worked on beside it. Arrow keys walk the list, Enter opens the record into the detail pane, and only the two panes scroll — the page behind them does not move. Variants: default, nothing-selected, responsive, search, three-pane, loading, qc-hold.
+- **Form page** `form-page` — The layout a create or edit screen uses: one h1, the fields grouped in cards, a validation summary that links to every field that failed, and Save and Cancel where the user can always reach them. Variants: two-column, side-rail, sections, invalid, sticky-actions, line-items, wizard, readonly.
+- **Auth page** `auth-page` — The signed-out screen: one centred card, the fewest fields that will do, and nothing else on the page. Sign in, the second factor after it, and every screen the user lands on when one of the two fails. Variants: signin, failed, forgot, sent, reset, otp, sso, locked.
+- **Error page** `error-page` — The whole screen the user gets when the page could not be produced at all. It says what failed in their own terms, whether anything they did was saved, and gives one way back into an application whose navigation is not on this page. Variants: 404, 403, 500, maintenance, offline, expired, django.
 
 ## Machine-readable
 

@@ -18,7 +18,7 @@ Three steps, in order. Do not skip the first.
 3. Copy  registry.json → components[id].variants[].html        verbatim, then change the copy
 ```
 
-`llms.txt` is 25 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, and the locked status mapping. `registry.json` carries the markup.
+`llms.txt` is 26 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, and the locked status mapping. `registry.json` carries the markup.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 
@@ -41,7 +41,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**55 components · 389 variants · 49 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
+**55 components · 417 variants · 54 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
 
 ### Actions
 
@@ -119,14 +119,14 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Component | id | Variants | Page |
 |---|---|--:|---|
 | App shell | `app-shell` | 1 | — |
-| Page header | `page-header` | 3 | — |
+| Page header | `page-header` | 8 | [open](https://konfpa.github.io/konspec-ui/components/page-header.html) |
 | Card | `card` | 9 | [open](https://konfpa.github.io/konspec-ui/components/card.html) |
 | Separator | `separator` | 6 | [open](https://konfpa.github.io/konspec-ui/components/separator.html) |
 | Carousel | `carousel` | 8 | [open](https://konfpa.github.io/konspec-ui/components/carousel.html) |
-| List and detail | `list-detail` | 1 | — |
-| Form page | `form-page` | 2 | — |
-| Auth page | `auth-page` | 1 | — |
-| Error page | `error-page` | 3 | — |
+| List and detail | `list-detail` | 7 | [open](https://konfpa.github.io/konspec-ui/components/list-detail.html) |
+| Form page | `form-page` | 8 | [open](https://konfpa.github.io/konspec-ui/components/form-page.html) |
+| Auth page | `auth-page` | 8 | [open](https://konfpa.github.io/konspec-ui/components/auth-page.html) |
+| Error page | `error-page` | 7 | [open](https://konfpa.github.io/konspec-ui/components/error-page.html) |
 
 <!-- components:end -->
 
