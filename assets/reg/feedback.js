@@ -401,7 +401,7 @@ register(
         <label for="wipe-code" class="mb-1.5 block text-[13px]/5 font-medium">
           Type <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4" x-text="target"></code> to confirm
         </label>
-        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <input id="wipe-code" x-model="typed" :placeholder="target" autocomplete="off" spellcheck="false"
                  class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 outline-none placeholder:text-zinc-500">
         </div>
@@ -554,7 +554,7 @@ register(
       <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
         <div>
           <label for="grn-qty" class="mb-1.5 block text-[13px]/5 font-medium">Quantity received <span class="text-red-600">*</span></label>
-          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <!-- x-trap opens focus on [autofocus] if the panel has one, otherwise on the close button -->
             <input id="grn-qty" autofocus value="4,200" class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
             <span class="pr-3 text-[13px]/5 text-zinc-600">kg</span>
@@ -564,7 +564,7 @@ register(
 
         <div class="mt-4">
           <label for="grn-date" class="mb-1.5 block text-[13px]/5 font-medium">Receipt date <span class="text-red-600">*</span></label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <input id="grn-date" type="date" value="2024-08-19" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
           </div>
         </div>
@@ -819,7 +819,7 @@ register(
       <div class="flex-1 overflow-y-auto px-5 py-4">
         <div>
           <label for="f-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <select id="f-vendor" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
               <option>All vendors</option>
               <option selected>Sharma Extrusions</option>
@@ -839,11 +839,11 @@ register(
         <div class="mt-4">
           <label for="f-from" class="mb-1.5 block text-[13px]/5 font-medium">Raised between</label>
           <div class="flex flex-wrap items-center gap-2">
-            <div class="min-w-[8rem] flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+            <div class="min-w-[8rem] flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
               <input id="f-from" type="date" value="2024-08-01" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
             </div>
             <span class="text-[13px]/5 text-zinc-500">to</span>
-            <div class="min-w-[8rem] flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+            <div class="min-w-[8rem] flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
               <input id="f-to" aria-label="Raised to" type="date" value="2024-08-31" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
             </div>
           </div>
@@ -851,7 +851,7 @@ register(
 
         <div class="mt-4">
           <label for="f-min" class="mb-1.5 block text-[13px]/5 font-medium">Minimum value</label>
-          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
             <input id="f-min" value="1,00,000" class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
           </div>
@@ -1007,7 +1007,7 @@ register(
       <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
         <div>
           <label for="bs-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <select id="bs-vendor" autofocus class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 outline-none">
               <option>All vendors</option>
               <option selected>Sharma Extrusions</option>
@@ -1768,7 +1768,7 @@ register(
         @keydown.escape.window="shut()"
         @hovercard-open.window="if ($event.detail !== $root) shut()">
 
-    <a href="/people/ritu-deshpande/" class="inline-flex items-center gap-2 rounded-lg py-0.5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+    <a href="/people/ritu-deshpande/" class="inline-flex items-center gap-2 rounded-lg py-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <span class="flex size-6 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">RD</span>
       <span class="font-medium text-zinc-900 underline underline-offset-2">Ritu Deshpande</span>
     </a>

@@ -261,6 +261,27 @@ if (readmeOnDisk.includes(START) && readmeOnDisk.includes(END)) {
               readmeOnDisk.slice(readmeOnDisk.indexOf(END));
 }
 
+/* ── focus lint ────────────────────────────────────────────────────────────
+   Two failures that both measure as styled and render as nothing. A ring is a
+   box-shadow and forced-colours mode drops every box-shadow; and Tailwind
+   resolves outline-style through a variable, so outline-none on an element
+   silences its own focus outline while leaving width and colour set. */
+const focusProblems = [];
+for (const c of R.components) for (const v of c.variants) {
+  const halo = v.code.match(/(?:peer-|group-)?focus(?:-visible|-within)?:ring-\d/g);
+  if (halo) focusProblems.push(c.id + '/' + v.id + ': focus ring (' + [...new Set(halo)].join(' ') + '), use outline-*');
+  for (const m of v.code.matchAll(/class="([^"]*)"/g)) {
+    const cls = m[1];
+    if (/(?:^|\s)outline-none(?:\s|$)/.test(cls) && /focus[a-z-]*:-?outline-\d/.test(cls))
+      focusProblems.push(c.id + '/' + v.id + ': outline-none cancels this element\'s own focus outline');
+  }
+}
+if (focusProblems.length) {
+  console.error('FOCUS LINT failed:');
+  [...new Set(focusProblems)].forEach(f => console.error('  ' + f));
+  process.exit(1);
+}
+
 const outputs = [
   ['README.md',         readmeOut],
   ['registry.json',     registryOut],

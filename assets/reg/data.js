@@ -490,7 +490,7 @@ register(
      class="rounded-xl border border-zinc-200 bg-white">
 
   <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
-    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
       <input type="search" x-model="q" @input="page = 1" aria-label="Search the order register"
              placeholder="Search PO, vendor or department"
@@ -657,7 +657,7 @@ register(
      class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
 
   <div class="border-b border-zinc-200 px-3 py-2.5">
-    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
       <input type="search" x-model="q" @input="page = 1" aria-label="Search orders" placeholder="Search PO or vendor"
              class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
@@ -738,7 +738,7 @@ register(
 
   <form method="get" action="{% url 'order-register' %}"
         class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
-    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
       <input type="search" name="q" value="{{ q }}" aria-label="Search the order register"
              placeholder="Search PO, vendor or department"
@@ -905,7 +905,7 @@ register(
 `<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
   <div class="flex items-center gap-2">
     <label for="page-size" class="text-[13px]/5 text-zinc-600">Rows per page</label>
-    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <select id="page-size" class="bg-transparent px-2 py-1.5 text-[13px]/5 tabular-nums outline-none">
         <option>10</option>
         <option selected>25</option>
@@ -2101,7 +2101,7 @@ register(
   <!-- inside the field's ring, where the input entry puts its icons -->
   <div>
     <label for="sp-gstin" class="mb-1.5 block text-[13px]/5 font-medium">Vendor GSTIN</label>
-    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <input id="sp-gstin" value="27AABCS1429B1ZX" class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 outline-none">
       <span class="mr-3 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
     </div>

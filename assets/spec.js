@@ -54,6 +54,8 @@ window.SPEC = {
       d: 'zinc-700. Interactive text is zinc-900 plus an underline, not a colour.' },
     { t: 'Alerts are neutral',
       d: 'White card, zinc border, colour only in the icon. A full-width red field shouts louder than the overdue rows it describes.' },
+    { t: 'Focus is an outline, never a ring',
+      d: 'ring-* compiles to box-shadow, and forced-colours mode drops every box-shadow, so a ring is the one focus style guaranteed to vanish for the users who most need it. Write focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15, and take the negative offset when the control sits flush inside a scroller that would clip it. outline-none is allowed only on a field whose wrapper draws the outline for it, because Tailwind resolves outline-style through a variable: outline-none on the same element kills its own focus outline while leaving the width and colour set, which measures as styled and renders as nothing.' },
     { t: 'Every tinted shape carries its ring',
       d: 'A tinted shape is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 — pills, chips, avatars, icon wells, all of them. A tinted surface is bg-zinc-100 — the page, selected rows, active nav, table headers. Give a shape the surface fill and it measures 1.00 contrast against the surface it sits on, which is not low contrast but the identical colour, and it disappears. One step of fill separates them and the ring holds the edge. Solid shapes need no ring, and it is ring rather than border so adding it reflows nothing.' },
     { t: 'Status colour lives in the dot',

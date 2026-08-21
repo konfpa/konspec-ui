@@ -83,7 +83,7 @@ register(
                 :aria-selected="tab === t.id ? 'true' : 'false'"
                 :tabindex="tab === t.id ? 0 : -1"
                 @click="pick(t.id)"
-                class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+                class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                 :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
           <span x-text="t.label"></span>
           <template x-if="t.count">
@@ -97,22 +97,22 @@ register(
   <div class="pt-4 text-[14px]/5">
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'summary')" :aria-labelledby="$id('tab', 'summary')"
          x-show="tab === 'summary'" x-cloak
-         class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p class="text-zinc-600">PO-24-1187 raised for Gujarat Polymers Ltd on 4 August, payment 45 days from GRN.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'lines')" :aria-labelledby="$id('tab', 'lines')"
          x-show="tab === 'lines'"
-         class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p>14 lines, <span class="font-medium tabular-nums">₹18,42,000</span> before tax.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'receipts')" :aria-labelledby="$id('tab', 'receipts')"
          x-show="tab === 'receipts'" x-cloak
-         class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p class="text-zinc-600">3 GRNs posted, 2 lines still short.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'history')" :aria-labelledby="$id('tab', 'history')"
          x-show="tab === 'history'" x-cloak
-         class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p class="text-zinc-600">Approved by R. Menon on 5 August, revised once.</p>
     </div>
   </div>
@@ -157,7 +157,7 @@ register(
               :aria-selected="tab === t.id ? 'true' : 'false'"
               :tabindex="tab === t.id ? 0 : -1"
               @click="pick(t.id)"
-              class="rounded-md px-3 py-1.5 text-[13px]/5 whitespace-nowrap focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+              class="rounded-md px-3 py-1.5 text-[13px]/5 whitespace-nowrap focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               :class="tab === t.id ? 'bg-white font-medium text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'"
               x-text="t.label"></button>
     </template>
@@ -165,15 +165,15 @@ register(
 
   <div class="pt-4 text-[14px]/5">
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'open')" :aria-labelledby="$id('tab', 'open')"
-         x-show="tab === 'open'" class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'open'" class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p>48 orders open, <span class="tabular-nums">₹4,12,60,000</span> committed.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'awaiting')" :aria-labelledby="$id('tab', 'awaiting')"
-         x-show="tab === 'awaiting'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'awaiting'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p class="text-zinc-600">27 orders delivered but not yet receipted.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'closed')" :aria-labelledby="$id('tab', 'closed')"
-         x-show="tab === 'closed'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'closed'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p class="text-zinc-600">73 orders closed this quarter.</p>
     </div>
   </div>
@@ -236,7 +236,7 @@ register(
                 :aria-selected="tab === t.id ? 'true' : 'false'"
                 :tabindex="tab === t.id ? 0 : -1"
                 @click="pick(t.id)"
-                class="shrink-0 whitespace-nowrap rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+                class="shrink-0 whitespace-nowrap rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15"
                 :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
                 x-text="t.label"></button>
       </template>
@@ -245,7 +245,7 @@ register(
 
   <!-- one panel whose contents change, so aria-labelledby follows the selection -->
   <div role="tabpanel" tabindex="0" :id="$id('panel', 'all')" :aria-labelledby="$id('tab', tab)"
-       class="rounded-lg pt-4 text-[14px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+       class="rounded-lg pt-4 text-[14px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <p class="text-zinc-600">Showing
       <span class="font-medium text-zinc-900" x-text="items.find(t => t.id === tab).label"></span>.
       On a narrow screen, drag the strip or use the arrow keys.</p>
@@ -299,7 +299,7 @@ register(
               :aria-selected="tab === t.id ? 'true' : 'false'"
               :tabindex="tab === t.id ? 0 : -1"
               @click="pick(t.id)"
-              class="rounded-r-lg border-l-2 px-3 py-2 text-left text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+              class="rounded-r-lg border-l-2 px-3 py-2 text-left text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               :class="tab === t.id ? 'border-zinc-900 bg-zinc-100 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'"
               x-text="t.label"></button>
     </template>
@@ -307,27 +307,27 @@ register(
 
   <div class="min-w-0 text-[14px]/5">
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'general')" :aria-labelledby="$id('tab', 'general')"
-         x-show="tab === 'general'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'general'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <h3 class="text-[14px]/5 font-semibold">General</h3>
       <p class="mt-1.5 text-zinc-600">Company name, registered address and the financial year start.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'approvals')" :aria-labelledby="$id('tab', 'approvals')"
-         x-show="tab === 'approvals'" class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'approvals'" class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <h3 class="text-[14px]/5 font-semibold">Approval limits</h3>
       <p class="mt-1.5 text-zinc-600">Orders above <span class="font-medium tabular-nums text-zinc-900">₹5,00,000</span> need a second approval.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'numbering')" :aria-labelledby="$id('tab', 'numbering')"
-         x-show="tab === 'numbering'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'numbering'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <h3 class="text-[14px]/5 font-semibold">Document numbering</h3>
       <p class="mt-1.5 text-zinc-600">PO-YY-nnnn, reset every financial year.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'tax')" :aria-labelledby="$id('tab', 'tax')"
-         x-show="tab === 'tax'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'tax'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <h3 class="text-[14px]/5 font-semibold">Tax and HSN</h3>
       <p class="mt-1.5 text-zinc-600">Default GST rate per HSN code, applied when a line has none of its own.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'users')" :aria-labelledby="$id('tab', 'users')"
-         x-show="tab === 'users'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'users'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <h3 class="text-[14px]/5 font-semibold">Users and roles</h3>
       <p class="mt-1.5 text-zinc-600">14 users, 4 roles. Buyers cannot approve their own orders.</p>
     </div>
@@ -384,7 +384,7 @@ register(
                 :aria-selected="tab === t.id ? 'true' : 'false'"
                 :tabindex="tab === t.id ? 0 : -1"
                 @click="pick(t.id)"
-                class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+                class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                 :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
                 x-text="t.label"></button>
       </template>
@@ -395,7 +395,7 @@ register(
     <template x-for="t in items" :key="t.id">
       <div role="tabpanel" tabindex="0" :id="$id('panel', t.id)" :aria-labelledby="$id('tab', t.id)"
            x-show="tab === t.id" x-cloak
-           class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+           class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <p class="text-zinc-600">
           <span class="font-medium text-zinc-900" x-text="t.label"></span> of PO-24-1187.
           The address now ends <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600" x-text="'?tab=' + t.id"></code>.
@@ -459,7 +459,7 @@ register(
                 @click="pick(t.id)"
                 :hx-get="'/orders/1187/' + t.id + '/'"
                 hx-target="#po-panel" hx-swap="innerHTML" hx-indicator="#po-panel"
-                class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+                class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                 :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
                 x-text="t.label"></button>
       </template>
@@ -469,7 +469,7 @@ register(
   <!-- hx-indicator puts .htmx-request on this panel for the length of the
        request, which is enough to fade it without any custom CSS -->
   <div id="po-panel" role="tabpanel" tabindex="0" :aria-labelledby="'po-tab-' + tab" aria-live="polite"
-       class="rounded-lg pt-4 text-[14px]/5 transition-opacity [&.htmx-request]:opacity-40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+       class="rounded-lg pt-4 text-[14px]/5 transition-opacity [&.htmx-request]:opacity-40 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <p class="text-zinc-600">Summary renders with the page. Every other tab is fetched from
       <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4">/orders/1187/&lt;tab&gt;/</code>
       and swapped in here.</p>
@@ -526,7 +526,7 @@ register(
                 :aria-controls="t.off ? null : $id('panel', t.id)"
                 :tabindex="tab === t.id ? 0 : -1"
                 @click="pick(t.id)"
-                class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+                class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                 :class="t.off ? 'cursor-not-allowed border-transparent text-zinc-400'
                               : tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900'
                                              : 'border-transparent text-zinc-600 hover:text-zinc-900'">
@@ -550,11 +550,11 @@ register(
 
   <div class="pt-4 text-[14px]/5">
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'lines')" :aria-labelledby="$id('tab', 'lines')"
-         x-show="tab === 'lines'" class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'lines'" class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p>14 lines, <span class="font-medium tabular-nums">₹18,42,000</span> before tax.</p>
     </div>
     <div role="tabpanel" tabindex="0" :id="$id('panel', 'receipts')" :aria-labelledby="$id('tab', 'receipts')"
-         x-show="tab === 'receipts'" x-cloak class="rounded-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+         x-show="tab === 'receipts'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p class="text-zinc-600">3 GRNs posted. Two lines are short against the ordered quantity.</p>
     </div>
   </div>
@@ -1097,7 +1097,7 @@ register(
     <button class="flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100 lg:hidden" aria-label="Search">
       <i data-lucide="search" class="size-4 text-zinc-600"></i>
     </button>
-    <div class="hidden w-64 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15 lg:flex">
+    <div class="hidden w-64 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 lg:flex">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
       <label for="topbar-search" class="sr-only">Search orders, vendors and materials</label>
       <input id="topbar-search" placeholder="Search orders, vendors…"
@@ -1389,14 +1389,14 @@ register(
   <div class="space-y-4">
     <div>
       <label for="ao-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
-      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
         <input id="ao-vendor" name="vendor" value="Gujarat Polymers Ltd"
                class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
       </div>
     </div>
     <div>
       <label for="ao-date" class="mb-1.5 block text-[13px]/5 font-medium">Required by</label>
-      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
         <input id="ao-date" name="required_by" type="date" value="2026-08-22"
                class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
       </div>
@@ -1418,7 +1418,7 @@ register(
       <div class="space-y-4 border-t border-zinc-100 px-4 py-4">
         <div>
           <label for="ao-freight" class="mb-1.5 block text-[13px]/5 font-medium">Freight terms</label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <select id="ao-freight" name="freight" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
               <option>To pay — vendor arranges</option>
               <option selected>Paid — included in rate</option>
@@ -1428,7 +1428,7 @@ register(
         </div>
         <div>
           <label for="ao-tol" class="mb-1.5 block text-[13px]/5 font-medium">Receipt tolerance</label>
-          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <input id="ao-tol" name="tolerance" value="2" inputmode="decimal"
                    class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
             <span class="pr-3 text-[14px]/5 text-zinc-600">%</span>
@@ -1441,7 +1441,7 @@ register(
         </label>
         <div>
           <label for="ao-note" class="mb-1.5 block text-[13px]/5 font-medium">Remarks printed on the order</label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <textarea id="ao-note" name="remarks" rows="3"
                       class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
                       placeholder="Mill test certificate per heat number.">Mill test certificate per heat number.</textarea>
@@ -1508,7 +1508,7 @@ register(
       <div class="grid gap-4 sm:grid-cols-3">
         <div>
           <label for="fl-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <select id="fl-vendor" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
               <option>All vendors</option>
               <option selected>Gujarat Polymers Ltd</option>
@@ -1519,7 +1519,7 @@ register(
         </div>
         <div>
           <label for="fl-status" class="mb-1.5 block text-[13px]/5 font-medium">Status</label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <select id="fl-status" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
               <option>Any status</option>
               <option>Open</option>
@@ -1530,7 +1530,7 @@ register(
         </div>
         <div>
           <label for="fl-value" class="mb-1.5 block text-[13px]/5 font-medium">Value above</label>
-          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
             <input id="fl-value" value="5,00,000" inputmode="numeric"
                    class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">

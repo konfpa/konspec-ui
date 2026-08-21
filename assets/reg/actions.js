@@ -178,7 +178,7 @@ register(
   {% csrf_token %}
   <label for="id_remarks" class="mb-1.5 block text-[13px]/5 font-medium">Approval remarks</label>
   <textarea name="remarks" id="id_remarks" rows="3"
-            class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[14px]/5 outline-none focus:border-zinc-700 focus:ring-3 focus:ring-zinc-700/15"></textarea>
+            class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[14px]/5 focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15"></textarea>
 
   <div class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
     <button type="submit" name="action" value="draft"
@@ -365,7 +365,7 @@ register(
      around the pair instead of two abutting ones. The input is transparent and
      borderless inside it, and focus-within moves the ring to the wrapper — put
      it on the input and the ring is drawn inside the border it shares. -->
-<div class="flex max-w-md items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+<div class="flex max-w-md items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
   <label for="add-part" class="sr-only">Part number</label>
   <input id="add-part" type="text" placeholder="Part number"
          class="w-full min-w-0 rounded-l-lg bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
@@ -412,7 +412,7 @@ register(
      }">
   <label for="range-sm" class="sr-only">Date range</label>
   <select id="range-sm" x-model="v"
-          class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium outline-none focus:border-zinc-700 focus:ring-3 focus:ring-zinc-700/15 sm:hidden">
+          class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:hidden">
     <template x-for="o in opts" :key="o"><option :value="o" x-text="o"></option></template>
   </select>
 
@@ -449,7 +449,7 @@ register(
              {% if value == selected %}checked{% endif %}
              onchange="this.form.submit()" class="peer sr-only">
       <label for="range-{{ value }}"
-             class="block rounded-md px-3 py-1.5 text-[13px]/5 font-medium text-zinc-600 transition hover:text-zinc-900 peer-checked:bg-white peer-checked:text-zinc-900 peer-checked:shadow-sm peer-focus-visible:ring-3 peer-focus-visible:ring-zinc-700/15">
+             class="block rounded-md px-3 py-1.5 text-[13px]/5 font-medium text-zinc-600 transition hover:text-zinc-900 peer-checked:bg-white peer-checked:text-zinc-900 peer-checked:shadow-sm peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
         {{ label }}
       </label>
     </div>

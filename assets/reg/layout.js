@@ -151,7 +151,7 @@ register(
         <a href="#" class="hover:text-zinc-900">Procurement</a><span class="text-zinc-500">/</span><span class="font-medium text-zinc-900">Overview</span>
       </nav>
       <div class="ml-auto flex items-center gap-2">
-        <div class="hidden items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15 md:flex">
+        <div class="hidden items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 md:flex">
           <i data-lucide="search" class="size-4 text-zinc-600"></i>
           <input aria-label="Search" placeholder="Search orders, vendors, materials" class="w-40 bg-transparent text-[13px]/5 outline-none placeholder:text-zinc-500 xl:w-64">
         </div>
@@ -1060,11 +1060,11 @@ register(
     <h3 class="text-[14px]/5 font-semibold">Orders awaiting approval</h3>
     <div class="hidden items-center gap-1 md:flex">
       <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous orders"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
       <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="More orders"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>
     </div>
@@ -1073,7 +1073,7 @@ register(
   <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Orders awaiting approval"
        @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
        @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
-       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
     <article class="w-72 shrink-0 snap-start rounded-xl border border-zinc-200 bg-white p-4">
       <div class="flex items-start justify-between gap-3">
@@ -1216,11 +1216,11 @@ register(
     </div>
     <div class="hidden shrink-0 items-center gap-1 md:flex">
       <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous orders"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
       <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="More orders"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>
     </div>
@@ -1229,7 +1229,7 @@ register(
   <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Other orders on Gujarat Polymers Ltd"
        @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
        @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
-       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
     <a href="#" class="group shrink-0 basis-[86%] snap-start rounded-xl border border-zinc-200 bg-white p-4 hover:border-zinc-300 hover:bg-zinc-50 sm:basis-1/2 xl:basis-1/3">
       <p class="text-[14px]/5 font-semibold group-hover:underline group-hover:underline-offset-2">PO-24-1163</p>
@@ -1294,7 +1294,7 @@ register(
   <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Plant notices"
        @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
        @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
-       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
     <article class="flex shrink-0 basis-full snap-start gap-3 rounded-xl border border-zinc-200 bg-white p-4">
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
@@ -1332,15 +1332,15 @@ register(
 
   <div class="mt-3 flex items-center justify-center gap-1">
     <button type="button" @click="go(0)" :aria-current="i === 0 ? 'true' : 'false'" aria-label="Notice 1, extruder line 2 shutdown"
-            class="flex size-6 items-center justify-center rounded-md focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+            class="flex size-6 items-center justify-center rounded-md focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
       <span class="h-1.5 rounded-full transition-all" :class="i === 0 ? 'w-4 bg-zinc-700' : 'w-1.5 bg-zinc-300'"></span>
     </button>
     <button type="button" @click="go(1)" :aria-current="i === 1 ? 'true' : 'false'" aria-label="Notice 2, second approval limit"
-            class="flex size-6 items-center justify-center rounded-md focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+            class="flex size-6 items-center justify-center rounded-md focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
       <span class="h-1.5 rounded-full transition-all" :class="i === 1 ? 'w-4 bg-zinc-700' : 'w-1.5 bg-zinc-300'"></span>
     </button>
     <button type="button" @click="go(2)" :aria-current="i === 2 ? 'true' : 'false'" aria-label="Notice 3, gate timings"
-            class="flex size-6 items-center justify-center rounded-md focus-visible:ring-3 focus-visible:ring-zinc-700/15">
+            class="flex size-6 items-center justify-center rounded-md focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
       <span class="h-1.5 rounded-full transition-all" :class="i === 2 ? 'w-4 bg-zinc-700' : 'w-1.5 bg-zinc-300'"></span>
     </button>
   </div>
@@ -1373,7 +1373,7 @@ register(
     <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Photographs on inspection QC-24-0412"
          @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
          @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
-         class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+         class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
       <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
         <div class="flex aspect-video items-center justify-center bg-zinc-100">
@@ -1417,11 +1417,11 @@ register(
     </div>
 
     <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous photograph"
-            class="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
+            class="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
     <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="Next photograph"
-            class="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
+            class="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
@@ -1466,7 +1466,7 @@ register(
   <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Drawing sheets on JOB-24-0338"
        @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
        @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
-       class="flex snap-x snap-mandatory overflow-x-auto focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+       class="flex snap-x snap-mandatory overflow-x-auto focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
     <div class="flex aspect-video shrink-0 basis-full snap-start items-center justify-center bg-zinc-100">
       <i data-lucide="file-text" class="size-6 text-zinc-500"></i>
     </div>
@@ -1483,31 +1483,31 @@ register(
 
   <div class="flex items-center gap-2 border-t border-zinc-200 px-3 py-3">
     <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous sheet"
-            class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-40 md:flex">
+            class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40 md:flex">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
 
     <div class="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <button type="button" @click="go(0)" :aria-current="i === 0 ? 'true' : 'false'"
-              class="shrink-0 rounded-lg border p-1 text-left focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+              class="shrink-0 rounded-lg border p-1 text-left focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               :class="i === 0 ? 'border-zinc-700 bg-zinc-100' : 'border-zinc-200 bg-white hover:bg-zinc-50'">
         <span class="flex h-10 w-16 items-center justify-center rounded bg-zinc-200"><i data-lucide="file-text" class="size-3.5 text-zinc-600"></i></span>
         <span class="mt-1 block w-16 truncate text-[11px]/4 text-zinc-600">GA-01</span>
       </button>
       <button type="button" @click="go(1)" :aria-current="i === 1 ? 'true' : 'false'"
-              class="shrink-0 rounded-lg border p-1 text-left focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+              class="shrink-0 rounded-lg border p-1 text-left focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               :class="i === 1 ? 'border-zinc-700 bg-zinc-100' : 'border-zinc-200 bg-white hover:bg-zinc-50'">
         <span class="flex h-10 w-16 items-center justify-center rounded bg-zinc-200"><i data-lucide="file-text" class="size-3.5 text-zinc-600"></i></span>
         <span class="mt-1 block w-16 truncate text-[11px]/4 text-zinc-600">GA-02</span>
       </button>
       <button type="button" @click="go(2)" :aria-current="i === 2 ? 'true' : 'false'"
-              class="shrink-0 rounded-lg border p-1 text-left focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+              class="shrink-0 rounded-lg border p-1 text-left focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               :class="i === 2 ? 'border-zinc-700 bg-zinc-100' : 'border-zinc-200 bg-white hover:bg-zinc-50'">
         <span class="flex h-10 w-16 items-center justify-center rounded bg-zinc-200"><i data-lucide="file-text" class="size-3.5 text-zinc-600"></i></span>
         <span class="mt-1 block w-16 truncate text-[11px]/4 text-zinc-600">DET-01</span>
       </button>
       <button type="button" @click="go(3)" :aria-current="i === 3 ? 'true' : 'false'"
-              class="shrink-0 rounded-lg border p-1 text-left focus-visible:ring-3 focus-visible:ring-zinc-700/15"
+              class="shrink-0 rounded-lg border p-1 text-left focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               :class="i === 3 ? 'border-zinc-700 bg-zinc-100' : 'border-zinc-200 bg-white hover:bg-zinc-50'">
         <span class="flex h-10 w-16 items-center justify-center rounded bg-zinc-200"><i data-lucide="file-text" class="size-3.5 text-zinc-600"></i></span>
         <span class="mt-1 block w-16 truncate text-[11px]/4 text-zinc-600">BOM-01</span>
@@ -1515,7 +1515,7 @@ register(
     </div>
 
     <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="Next sheet"
-            class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-40 md:flex">
+            class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40 md:flex">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
@@ -1523,7 +1523,7 @@ register(
       { id: 'stats', name: 'Strip on mobile, grid on desktop', code:
 `<!-- no JavaScript: below sm it is a snapped strip, from sm up it is an ordinary grid -->
 <div role="group" aria-label="This month at Silvassa" tabindex="0"
-     class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible lg:grid-cols-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+     class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible lg:grid-cols-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
   <div class="shrink-0 basis-[78%] snap-start rounded-xl border border-zinc-200 bg-white p-4 sm:basis-auto">
     <p class="text-[11px]/4 uppercase tracking-wider text-zinc-500">Orders raised</p>
@@ -1563,7 +1563,7 @@ register(
     <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
       Photos taken at the gate appear here in the order they were uploaded, newest last.
     </p>
-    <button type="button" class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:ring-3 focus-visible:ring-zinc-700/30">
+    <button type="button" class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
       <i data-lucide="upload" class="size-4"></i>Add photographs
     </button>
   </div>
@@ -1599,11 +1599,11 @@ register(
       <p class="text-[12px]/4 tabular-nums text-zinc-500"><span x-text="i + 1"></span> of <span x-text="n"></span></p>
       <div class="hidden items-center gap-1 md:flex">
         <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous photograph"
-                class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+                class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
           <i data-lucide="chevron-left" class="size-4"></i>
         </button>
         <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="Next photograph"
-                class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-3 focus-visible:ring-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+                class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
           <i data-lucide="chevron-right" class="size-4"></i>
         </button>
       </div>
@@ -1614,7 +1614,7 @@ register(
   <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Photographs on inspection {{ inspection.reference }}"
        @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
        @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
-       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
     {% for photo in inspection.photos.all %}
       <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
         <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" loading="lazy" decoding="async"
@@ -1691,7 +1691,7 @@ register(
     <!-- list pane -->
     <div class="min-w-0 border-zinc-200 lg:border-r" :class="detail ? 'hidden lg:block' : 'block'">
       <div class="flex items-center gap-2 border-b border-zinc-200 px-4 py-3">
-        <div class="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
           <input aria-label="Search orders" placeholder="Search orders or vendors" class="w-full bg-transparent text-[13px]/5 outline-none placeholder:text-zinc-500">
         </div>
@@ -1821,7 +1821,7 @@ register(
     <div class="grid gap-4 sm:grid-cols-2">
       <div>
         <label for="fp-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
-        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <select id="fp-vendor" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
             <option>Sharma Steel &amp; Alloys</option>
             <option>Gujarat Polymers Ltd</option>
@@ -1831,7 +1831,7 @@ register(
       </div>
       <div>
         <label for="fp-dept" class="mb-1.5 block text-[13px]/5 font-medium">Cost centre <span class="text-red-600">*</span></label>
-        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <select id="fp-dept" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
             <option>Fabrication — Silvassa</option>
             <option>Moulding — Silvassa</option>
@@ -1841,13 +1841,13 @@ register(
       </div>
       <div>
         <label for="fp-need" class="mb-1.5 block text-[13px]/5 font-medium">Required by <span class="text-red-600">*</span></label>
-        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <input id="fp-need" type="date" value="2026-09-04" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
         </div>
       </div>
       <div>
         <label for="fp-value" class="mb-1.5 block text-[13px]/5 font-medium">Estimated value</label>
-        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
           <input id="fp-value" value="18,42,000" class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
         </div>
@@ -1855,13 +1855,13 @@ register(
       </div>
       <div class="sm:col-span-2">
         <label for="fp-title" class="mb-1.5 block text-[13px]/5 font-medium">Order title <span class="text-red-600">*</span></label>
-        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <input id="fp-title" value="MS angles and plates — August lot" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
         </div>
       </div>
       <div class="sm:col-span-2">
         <label for="fp-ship" class="mb-1.5 block text-[13px]/5 font-medium">Delivery address</label>
-        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <textarea id="fp-ship" rows="3" class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none">Konspec Industries, Plot 214, Silvassa Industrial Estate, Dadra &amp; Nagar Haveli 396230</textarea>
         </div>
       </div>
@@ -1895,7 +1895,7 @@ register(
     <div class="space-y-4 px-5 py-5">
       <div>
         <label for="rc-material" class="mb-1.5 block text-[13px]/5 font-medium">Material <span class="text-red-600">*</span></label>
-        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <select id="rc-material" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
             <option>HDPE granules — natural</option>
             <option>PP copolymer — black</option>
@@ -1905,33 +1905,33 @@ register(
       <div class="grid gap-4 sm:grid-cols-2">
         <div>
           <label for="rc-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per kg <span class="text-red-600">*</span></label>
-          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
             <input id="rc-rate" value="118.40" class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
           </div>
         </div>
         <div>
           <label for="rc-qty" class="mb-1.5 block text-[13px]/5 font-medium">Committed quantity</label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <input id="rc-qty" value="45,000 kg" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
           </div>
         </div>
         <div>
           <label for="rc-from" class="mb-1.5 block text-[13px]/5 font-medium">Valid from</label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <input id="rc-from" type="date" value="2026-09-01" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
           </div>
         </div>
         <div>
           <label for="rc-to" class="mb-1.5 block text-[13px]/5 font-medium">Valid to</label>
-          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
             <input id="rc-to" type="date" value="2027-03-31" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
           </div>
         </div>
       </div>
       <div>
         <label for="rc-notes" class="mb-1.5 block text-[13px]/5 font-medium">Notes for the buyer</label>
-        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <textarea id="rc-notes" rows="3" class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500" placeholder="Escalation contact, packing requirement, test certificate"></textarea>
         </div>
       </div>
@@ -2027,7 +2027,7 @@ register(
 
       <div class="mt-4">
         <label for="auth-email" class="mb-1.5 block text-[13px]/5 font-medium">Work email</label>
-        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <input id="auth-email" type="email" autocomplete="email" autofocus value="akshay.prabhu@konspec.com"
                  class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
         </div>
@@ -2038,7 +2038,7 @@ register(
           <label for="auth-password" class="text-[13px]/5 font-medium">Password</label>
           <a href="#" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Forgot password</a>
         </div>
-        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15"
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
              x-data="{ show: false }">
           <input id="auth-password" :type="show ? 'text' : 'password'" autocomplete="current-password" value="0000000000"
                  class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">

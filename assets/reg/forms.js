@@ -34,7 +34,7 @@ register(
       { id: 'default', name: 'With help text', code:
 `<div>
   <label for="title" class="mb-1.5 block text-[13px]/5 font-medium">Order title <span class="text-red-600">*</span></label>
-  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <input id="title" value="MS angles and plates — August lot"
            class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
   </div>
@@ -43,7 +43,7 @@ register(
       { id: 'error', name: 'With error', code:
 `<div>
   <label for="vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
-  <div class="rounded-lg border border-red-600 bg-white focus-within:ring-3 focus-within:ring-red-600/15">
+  <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
     <select id="vendor" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
       <option>Gujarat Polymers Ltd</option>
     </select>
@@ -87,16 +87,16 @@ register(
     related: ['field', 'textarea', 'combobox'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+`<div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
   <input placeholder="Placeholder" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
 </div>` },
       { id: 'icon', name: 'With icon and prefix', code:
-`<div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+`<div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
   <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
   <input placeholder="Search orders" class="w-full bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
 </div>
 
-<div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+<div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
   <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
   <input value="18,42,000" class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
 </div>` },
@@ -134,7 +134,7 @@ register(
       'Give the control block. A textarea is inline-block by default, so it sits on a text baseline and leaves a 5px strip of wrapper below it that looks like a rendering bug.',
       'Set the height with rows, never with an h- class. h-[100px] against a 20px leading is 4.2 lines, and the fifth line is sliced in half along its x-height.',
       'Preflight already sets resize: vertical, so resize-y is redundant and resize-x is a layout bug waiting to happen. The only resize class worth writing is resize-none, on a box whose height is owned by script.',
-      'Never leave a read-only box white, bordered and ringed. It is then pixel for pixel an editable field, and the only way to find out otherwise is to click into it and get nothing back. Read-only takes bg-zinc-100 and drops the focus ring, the same locked surface disabled uses.',
+      'Never leave a read-only box white, bordered and ringed. It is then pixel for pixel an editable field, and the only way to find out otherwise is to click into it and get nothing back. Read-only takes bg-zinc-100, the same locked surface disabled uses, and drops the resting ring. It keeps a focus outline: read-only is still in the tab order precisely so the value can be copied, and a keyboard user has to see where they have landed.',
       'Enter inserts a newline. Never bind Enter to submit — the one key someone needs to write a second line must not post the form.',
       'maxlength truncates a paste in silence. Use it only when the limit is the column width, and say the number in the help text before it is reached; otherwise count past the limit and block the submit, so the user can see what has to go.',
       'Set the height back to auto before reading scrollHeight, or an auto-growing box grows and never shrinks — scrollHeight cannot report less than the height already set.',
@@ -155,7 +155,7 @@ register(
       'The counter counts down, not up: what is left is the number the writer is deciding against. It turns amber inside the last 20 characters and red once it is over, and the submit disables while it is over.',
       'An auto-growing box grows with its content up to a ceiling, then stops and scrolls. Without the ceiling a long paste pushes the submit button off the screen.',
       'Resize is vertical only, so a textarea can never be dragged wider than the form it sits in. An auto-growing box drops the handle entirely, because script and the drag would fight over the same height.',
-      'Read-only and disabled share one locked surface, bg-zinc-100 with no focus ring, because both are boxes you cannot type into. The text is what separates them: zinc-900 for read-only, whose value still matters and still has to be copyable, zinc-400 for disabled, whose value does not. A read-only field left white, bordered and ringed says nothing at all until someone clicks into it and nothing happens.'
+      'Read-only and disabled share one locked surface, bg-zinc-100 with no resting ring, because both are boxes you cannot type into. Only read-only takes a focus outline, because only read-only is focusable. The text is what separates them: zinc-900 for read-only, whose value still matters and still has to be copyable, zinc-400 for disabled, whose value does not. A read-only field left white, bordered and ringed says nothing at all until someone clicks into it and nothing happens.'
     ],
     a11y: [
       'A real label bound with for/id. A placeholder is not a label, and in a box this size it disappears the moment anyone starts typing.',
@@ -170,7 +170,7 @@ register(
       { id: 'default', name: 'Default', code:
 `<div class="max-w-xl">
   <label for="ta-notes" class="mb-1.5 block text-[13px]/5 font-medium">Delivery instructions</label>
-  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <textarea id="ta-notes" name="notes" rows="4"
               placeholder="Gate timings, unloading contact, anything the driver needs to know"
               aria-describedby="ta-notes-help"
@@ -185,14 +185,14 @@ register(
 <div class="max-w-xl space-y-5">
   <div>
     <label for="ta-2" class="mb-1.5 block text-[13px]/5 font-medium">Two rows — a remark inside a table row or a dialog</label>
-    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <textarea id="ta-2" rows="2" class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">Short shipped by 40 kg, balance promised Friday.</textarea>
     </div>
   </div>
 
   <div>
     <label for="ta-4" class="mb-1.5 block text-[13px]/5 font-medium">Four rows — the default for a form field</label>
-    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <textarea id="ta-4" rows="4" class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">Konspec Industries
 Plot 214, Silvassa Industrial Estate
 Dadra &amp; Nagar Haveli 396230</textarea>
@@ -201,7 +201,7 @@ Dadra &amp; Nagar Haveli 396230</textarea>
 
   <div>
     <label for="ta-10" class="mb-1.5 block text-[13px]/5 font-medium">Ten rows — the page is the field</label>
-    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <textarea id="ta-10" rows="10" class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none" placeholder="Scope of work"></textarea>
     </div>
   </div>
@@ -230,8 +230,8 @@ Dadra &amp; Nagar Haveli 396230</textarea>
   </div>
 
   <div class="rounded-lg bg-white border"
-       :class="over ? 'border-red-600 focus-within:ring-3 focus-within:ring-red-600/15'
-                    : 'border-zinc-200 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15'">
+       :class="over ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
+                    : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
     <textarea id="ta-reason" name="reason" rows="4" x-model="text"
               :aria-invalid="over ? 'true' : null"
               aria-describedby="ta-reason-help ta-reason-count"
@@ -270,7 +270,7 @@ Dadra &amp; Nagar Haveli 396230</textarea>
      x-init="$nextTick(() => grow())"
      @resize.window.debounce="grow()">
   <label for="ta-grow" class="mb-1.5 block text-[13px]/5 font-medium">Inspection remarks</label>
-  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <textarea id="ta-grow" name="remarks" x-ref="ta" rows="2" @input="grow()"
               placeholder="Type — the box follows"
               class="block max-h-54 w-full resize-none overflow-y-auto bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">Material received against GRN-24-0912.
@@ -285,7 +285,7 @@ Held pending the test certificate.</textarea>
      the wrapper and not on the control. Ctrl or Cmd plus Enter posts; a bare
      Enter writes a newline, because that is what the key is for. -->
 <div class="max-w-xl" x-data="{ text: '' }">
-  <div class="rounded-xl border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="rounded-xl border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <label for="ta-note" class="sr-only">Add a note to this order</label>
     <textarea id="ta-note" name="body" rows="3" x-model="text"
               @keydown.ctrl.enter="if (text.trim()) $refs.post.click()"
@@ -313,7 +313,7 @@ Held pending the test certificate.</textarea>
       { id: 'error', name: 'With error', code:
 `<div class="max-w-xl">
   <label for="ta-bad" class="mb-1.5 block text-[13px]/5 font-medium">Rejection reason <span class="text-red-600">*</span></label>
-  <div class="rounded-lg border border-red-600 bg-white focus-within:ring-3 focus-within:ring-red-600/15">
+  <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
     <textarea id="ta-bad" name="reason" rows="4" aria-invalid="true" aria-describedby="ta-bad-err"
               class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none"></textarea>
   </div>
@@ -343,7 +343,7 @@ Held pending the test certificate.</textarea>
     <label for="ta-ro" class="mb-1.5 block text-[13px]/5 font-medium">Vendor reply</label>
     <div class="rounded-lg border border-zinc-200 bg-zinc-100">
       <textarea id="ta-ro" rows="3" readonly
-                class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 outline-none">Balance 40 kg dispatched on 18 August by Gati, LR 4471029.
+                class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Balance 40 kg dispatched on 18 August by Gati, LR 4471029.
 Test certificate follows by email.</textarea>
     </div>
   </div>
@@ -380,7 +380,7 @@ Test certificate follows by email.</textarea>
       {{ form.body.label }}{% if form.body.field.required %} <span class="text-red-600">*</span>{% endif %}
     </label>
 
-    <div class="rounded-lg bg-white {% if form.body.errors %}border border-red-600 focus-within:ring-3 focus-within:ring-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15{% endif %}">
+    <div class="rounded-lg bg-white {% if form.body.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
       {{ form.body }}
     </div>
 
@@ -2143,7 +2143,7 @@ Test certificate follows by email.</textarea>
 
   <label for="cb-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
 
-  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
 
     <!-- no @focus handler: opening on focus pops a listbox at every combobox
@@ -2276,7 +2276,7 @@ Test certificate follows by email.</textarea>
   <label for="cb-rfq" class="mb-1.5 block text-[13px]/5 font-medium">Send this RFQ to</label>
 
   <div @click="$refs.q.focus(); show()"
-       class="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+       class="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
 
     <template x-for="id in sel" :key="id">
       <span class="inline-flex max-w-full items-center gap-1 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 ring-1 ring-inset ring-zinc-300">
@@ -2430,7 +2430,7 @@ Test certificate follows by email.</textarea>
        replaced, and it left a selection nobody could see without opening the
        popup first. -->
   <div @click="$refs.q.focus(); show()"
-       class="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+       class="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
 
     <template x-for="id in chips" :key="id">
       <span class="inline-flex max-w-full items-center gap-1 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 ring-1 ring-inset ring-zinc-300">
@@ -2581,7 +2581,7 @@ Test certificate follows by email.</textarea>
 
   <label for="cb-state" class="mb-1.5 block text-[13px]/5 font-medium">Ship-from vendor</label>
 
-  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
     <input id="cb-state" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
            aria-autocomplete="list" aria-controls="cb-state-list"
@@ -2687,7 +2687,7 @@ Test certificate follows by email.</textarea>
 
   <label for="cb-rich" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
 
-  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <i data-lucide="building-2" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
     <input id="cb-rich" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
            aria-autocomplete="list" aria-controls="cb-rich-list"
@@ -2809,7 +2809,7 @@ Test certificate follows by email.</textarea>
 
   <label for="cb-remote" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
 
-  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
     <input id="cb-remote" x-ref="q" type="text" name="q" role="combobox" autocomplete="off"
            aria-autocomplete="list" aria-controls="cb-remote-list"
@@ -2933,7 +2933,7 @@ Test certificate follows by email.</textarea>
 
   <label for="cb-new" class="mb-1.5 block text-[13px]/5 font-medium">Vendor on the quotation</label>
 
-  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
     <input id="cb-new" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
            aria-autocomplete="list" aria-controls="cb-new-list" aria-describedby="cb-new-help"
@@ -3064,7 +3064,7 @@ Test certificate follows by email.</textarea>
 
     <label for="cb-bad" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
 
-    <div class="flex items-center rounded-lg border border-red-600 bg-white focus-within:ring-3 focus-within:ring-red-600/15">
+    <div class="flex items-center rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
       <input id="cb-bad" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
              aria-autocomplete="list" aria-controls="cb-bad-list"
@@ -3216,7 +3216,7 @@ Test certificate follows by email.</textarea>
       {{ form.vendor.label }} <span class="text-red-600">*</span>
     </label>
 
-    <div class="flex items-center rounded-lg bg-white {% if form.vendor.errors %}border border-red-600 focus-within:ring-3 focus-within:ring-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15{% endif %}">
+    <div class="flex items-center rounded-lg bg-white {% if form.vendor.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
       <!-- the search box has no name. Give it the field's name and the typed
            text posts beside the id, and the form cleans whichever came last. -->
@@ -3348,7 +3348,7 @@ Test certificate follows by email.</textarea>
       <span class="text-[13px]/5 text-zinc-600">Drag files here or</span>
       <input type="file" id="po-files" name="attachments" multiple class="peer sr-only">
       <label for="po-files"
-             class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:ring-3 peer-focus-visible:ring-zinc-700/15">
+             class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
         Browse files
       </label>
       <span class="text-[12px]/4 text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</span>
@@ -3403,7 +3403,7 @@ Test certificate follows by email.</textarea>
     </p>
     <input type="file" id="empty-files" name="attachments" multiple class="peer sr-only">
     <label for="empty-files"
-           class="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 peer-focus-visible:ring-3 peer-focus-visible:ring-zinc-700/30">
+           class="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/30">
       <i data-lucide="upload" class="size-4"></i>Attach a document
     </label>
     <p class="mt-3 text-[12px]/4 text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</p>
@@ -3515,7 +3515,7 @@ Test certificate follows by email.</textarea>
     </div>
     <input type="file" id="grn-scan" name="grn_scan" class="peer sr-only">
     <label for="grn-scan"
-           class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:ring-3 peer-focus-visible:ring-zinc-700/15">
+           class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
       Replace
     </label>
   </div>
@@ -3557,7 +3557,7 @@ Test certificate follows by email.</textarea>
     <div>
       <input type="file" id="photo-add" name="photos" accept="image/*" multiple class="peer sr-only">
       <label for="photo-add"
-             class="flex aspect-4/3 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-200 bg-zinc-100 text-zinc-600 hover:border-zinc-700 hover:bg-zinc-50 peer-focus-visible:border-zinc-700 peer-focus-visible:ring-3 peer-focus-visible:ring-zinc-700/15">
+             class="flex aspect-4/3 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-200 bg-zinc-100 text-zinc-600 hover:border-zinc-700 hover:bg-zinc-50 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
         <i data-lucide="plus" class="size-5"></i>
         <span class="text-[12px]/4 font-medium">Add photo</span>
       </label>
@@ -3580,7 +3580,7 @@ Test certificate follows by email.</textarea>
     <a href="/media/po/quotation-sharma-aug.pdf" class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-900 underline underline-offset-2">quotation-sharma-aug.pdf</a>
     <label class="flex shrink-0 items-center gap-2 text-[12px]/4 text-zinc-600">
       <input type="checkbox" name="attachment-clear" id="attachment-clear_id"
-             class="size-4 rounded border-zinc-200 text-zinc-700 focus:ring-zinc-700/15">
+             class="size-4 rounded border-zinc-200 text-zinc-700">
       Clear
     </label>
   </div>
@@ -3588,7 +3588,7 @@ Test certificate follows by email.</textarea>
   <div class="mt-2">
     <input type="file" name="attachment" id="id_attachment" class="peer sr-only">
     <label for="id_attachment"
-           class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:ring-3 peer-focus-visible:ring-zinc-700/15">
+           class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
       <i data-lucide="upload" class="size-4"></i>Choose a replacement
     </label>
   </div>
@@ -4068,7 +4068,7 @@ Test certificate follows by email.</textarea>
 
     <label for="cal-month" class="sr-only">Month</label>
     <select id="cal-month" x-model.number="vm" @change="$nextTick(() => clamp())"
-            class="h-8 min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-2 text-[13px]/5 font-medium outline-none focus:border-zinc-700 focus:ring-3 focus:ring-zinc-700/15">
+            class="h-8 min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
       <template x-for="(m, i) in months" :key="m">
         <option :value="i" x-text="m"></option>
       </template>
@@ -4076,7 +4076,7 @@ Test certificate follows by email.</textarea>
 
     <label for="cal-year" class="sr-only">Year</label>
     <select id="cal-year" x-model.number="vy" @change="$nextTick(() => clamp())"
-            class="h-8 shrink-0 rounded-lg border border-zinc-200 bg-white px-2 text-[13px]/5 font-medium tabular-nums outline-none focus:border-zinc-700 focus:ring-3 focus:ring-zinc-700/15">
+            class="h-8 shrink-0 rounded-lg border border-zinc-200 bg-white px-2 text-[13px]/5 font-medium tabular-nums focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
       <template x-for="y in years" :key="y">
         <option :value="y" x-text="y"></option>
       </template>
@@ -4415,7 +4415,7 @@ Test certificate follows by email.</textarea>
      when the user already knows the date. -->
 <div class="max-w-xs">
   <label for="grn-date" class="mb-1.5 block text-[13px]/5 font-medium">GRN date</label>
-  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <input type="date" id="grn-date" name="grn_date" value="2026-08-14" max="2026-12-31"
            class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
   </div>
@@ -4451,13 +4451,13 @@ Test certificate follows by email.</textarea>
     <legend class="mb-1.5 text-[13px]/5 font-medium">Reporting period</legend>
 
     <div class="flex items-center gap-2">
-      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
         <label for="id_start" class="sr-only">Start date</label>
         <input type="date" id="id_start" name="start" x-model="start"
                class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
       </div>
       <span class="text-[13px]/5 text-zinc-500" aria-hidden="true">to</span>
-      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:ring-3 focus-within:ring-zinc-700/15">
+      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
         <label for="id_end" class="sr-only">End date</label>
         <input type="date" id="id_end" name="end" x-model="end" :min="start"
                class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
