@@ -1,0 +1,58 @@
+name: Missing component or variant
+description: Something you needed is not in the registry
+title: "[missing] "
+labels: ["missing-component"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the wanted path. `llms.txt` tells agents to stop and flag a gap
+        rather than invent something to fill it, and this is where that flag goes.
+        A missing entry is a decision for a person; an invented one is a defect
+        that ships and then gets copied.
+
+  - type: input
+    id: name
+    attributes:
+      label: What would you call it?
+      placeholder: Tree table
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Is this a new component, or a variant of one that exists?
+      options:
+        - New component
+        - New variant of an existing component
+    validations:
+      required: true
+
+  - type: input
+    id: existing
+    attributes:
+      label: If a variant — which component?
+      placeholder: table
+
+  - type: textarea
+    id: does
+    attributes:
+      label: What does it have to do?
+      description: Behaviour, not appearance. What can a user do with it that nothing here supports?
+    validations:
+      required: true
+
+  - type: textarea
+    id: screen
+    attributes:
+      label: What screen were you building when you needed it?
+      description: The real one. "BOM explosion on the item master" is more useful than "a data view".
+    validations:
+      required: true
+
+  - type: textarea
+    id: nearest
+    attributes:
+      label: What did you look at first, and why did it not fit?
+      description: The nearest existing component. This is how we tell a new entry from a variant.

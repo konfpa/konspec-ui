@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Component index
+    url: https://konfpa.github.io/konspec-ui/#components
+    about: Every component with its variants rendered live beside the markup that produced it.
+  - name: llms.txt
+    url: https://konfpa.github.io/konspec-ui/llms.txt
+    about: The rules, tokens and status mapping. Read this before filing anything about how a component should look.

@@ -1,0 +1,38 @@
+name: Bug
+description: A component renders, behaves or reads wrong
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: component
+    attributes:
+      label: Component and variant
+      placeholder: select/cascade
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens, and what should happen instead
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where does it show up?
+      multiple: true
+      options:
+        - Desktop
+        - 390px / phone
+        - Keyboard only
+        - Screen reader
+        - Forced colours / high contrast
+        - Print
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Browser and OS
+      placeholder: Firefox 128, Ubuntu 24.04

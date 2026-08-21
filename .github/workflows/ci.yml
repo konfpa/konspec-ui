@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Generated files are current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Regenerates nothing — fails if registry.json, llms.txt, assets/counts.js,
+      # the README table or any r/ endpoint drifted from assets/reg/*.js. Also runs
+      # the focus and endpoint lints, which fail the build rather than warn.
+      - name: node tools/build.js --check
+        run: node tools/build.js --check
