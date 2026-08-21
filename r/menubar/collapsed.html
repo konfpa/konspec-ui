@@ -130,7 +130,7 @@
       <button type="button" x-ref="sTrigger" aria-haspopup="menu" :aria-expanded="sheet"
               @click="sheet ? sClose(false) : sShow()"
               @keydown.arrow-down.prevent="sShow()" @keydown.arrow-up.prevent="sShow(true)"
-              class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               :class="sheet && 'bg-zinc-200 text-zinc-900'">
         <i data-lucide="menu" class="size-4"></i>Menu
       </button>

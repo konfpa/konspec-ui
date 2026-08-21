@@ -38,13 +38,13 @@
 
   <div class="flex flex-wrap gap-2">
     <button type="button" x-ref="fire" @click="push({ tone: 'info', text: 'Rate card refreshed', meta: 'August 2024 · 3,100 rows' })"
-            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Info</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Info</button>
     <button type="button" @click="push({ tone: 'success', text: 'PO-24-1187 emailed to Sharma Extrusions', meta: 'Sent 11:42' })"
-            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Success</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Success</button>
     <button type="button" @click="push({ tone: 'warning', text: 'Saved, but 2 lines are over the rate contract', meta: 'MS plate 10 mm · MS angle 50×50' })"
-            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Warning</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Warning</button>
     <button type="button" @click="push({ tone: 'danger', text: 'PO-24-1187 could not be emailed', meta: 'The vendor has no contact address on file' })"
-            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
   </div>
 
   <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
@@ -63,7 +63,7 @@
             <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
           </div>
           <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <i data-lucide="x" class="size-4"></i>
           </button>
         </div>
@@ -84,7 +84,7 @@
             <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
           </div>
           <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <i data-lucide="x" class="size-4"></i>
           </button>
         </div>

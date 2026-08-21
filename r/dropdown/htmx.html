@@ -1,0 +1,118 @@
+<!-- Who a purchase order can be assigned to depends on the plant, the approval
+     limit and who is on leave this week, so the list is not in the template. It
+     is fetched, and the two words that matter in hx-trigger are "click once":
+     on the click that opens the menu, so nothing is requested for a menu nobody
+     opens, and once, so the eleventh open of the same menu is not the eleventh
+     request. In a register of forty rows the difference is forty round trips
+     against however many menus somebody actually pressed.
+
+     Alpine does not fetch. It owns open, the roving walk and the two flags the
+     panel paints from; htmx owns the request, the target and the swap. The
+     moment a component reaches for fetch() inside x-data, both halves start
+     needing to know about the other one.
+
+     Focus is the part that goes wrong. show() runs a frame after the click and
+     finds no menuitems, because the response has not landed, so it leaves the
+     caret on the trigger — correctly, since focus() on nothing does nothing.
+     The after-swap handler is what moves it in, and it is guarded twice: only
+     if the menu is still open, and only if focus is still exactly where show()
+     left it. Without those guards a slow response yanks focus out of a menu the
+     user has already arrowed into, or into one they have already closed.
+
+     The skeleton is the shape of the answer — three rows the height of three
+     items — so the panel does not resize under the pointer when the list
+     arrives. It is aria-hidden, because a div is not a permitted child of
+     role="menu"; hidden from the tree the menu is briefly empty rather than
+     briefly wrong, and the role="status" outside the menu is what actually says
+     something is loading. The status lives outside for the same reason the
+     account header does.
+
+     A failure leaves a retry item rather than an empty panel, and the retry
+     carries its own hx-get because hx-trigger="click once" has already spent
+     the trigger's one request. It is behind x-show, which is why items() filters
+     on offsetParent — focus() on a display:none button is a silent no-op and the
+     arrow key looks ignored.
+
+     The server returns menu items and nothing else, each one already wearing its
+     role and its handler, and Alpine initialises them because they are swapped
+     inside this component's root:
+
+       <button type="button" role="menuitem" tabindex="-1" @click="close()"
+               class="flex w-full items-center gap-2.5 px-3 py-2 …">Ritu Deshpande</button> -->
+<div data-kui="dropdown/htmx" class="relative inline-block"
+     x-data="{
+       open: false, loaded: false, failed: false,
+       items() {
+         return [...this.$refs.menu.querySelectorAll('[role=menuitem]')].filter(el => el.offsetParent !== null);
+       },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         i[(at + step + i.length) % i.length]?.focus();
+       },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       landed() {
+         this.loaded = true; this.failed = false;
+         if (this.open && document.activeElement === this.$refs.trigger) {
+           this.$nextTick(() => this.items()[0]?.focus());
+         }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }"
+     @htmx:after-swap="landed()"
+     @htmx:response-error="failed = true"
+     @htmx:send-error="failed = true">
+
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+          :aria-expanded="open" aria-haspopup="menu"
+          hx-get="/orders/PO-24-1187/assignees/" hx-target="#dd-assignees" hx-swap="outerHTML" hx-trigger="click once"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="user-plus" class="size-4 text-zinc-600"></i>Assign to
+    <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </span>
+  </button>
+
+  <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Assign PO-24-1187 to"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+       @keydown.tab="close(false)"
+       class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+
+    <!-- three rows the height of three items, so the panel does not resize when
+         the answer lands. aria-hidden, because a div is not a permitted child
+         of a menu — the role="status" below is what announces the wait -->
+    <div id="dd-assignees" aria-hidden="true" class="animate-pulse motion-reduce:animate-none">
+      <div class="flex items-center gap-2.5 px-3 py-2"><span class="size-4 rounded-full bg-zinc-100"></span><span class="h-3 w-32 rounded bg-zinc-100"></span></div>
+      <div class="flex items-center gap-2.5 px-3 py-2"><span class="size-4 rounded-full bg-zinc-100"></span><span class="h-3 w-40 rounded bg-zinc-100"></span></div>
+      <div class="flex items-center gap-2.5 px-3 py-2"><span class="size-4 rounded-full bg-zinc-100"></span><span class="h-3 w-28 rounded bg-zinc-100"></span></div>
+    </div>
+
+    <!-- the trigger has spent its one request, so the retry carries its own -->
+    <button type="button" role="menuitem" tabindex="-1" x-show="failed" x-cloak
+            hx-get="/orders/PO-24-1187/assignees/" hx-target="#dd-assignees" hx-swap="outerHTML"
+            class="flex w-full items-start gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="rotate-ccw" class="mt-0.5 size-4 shrink-0 text-zinc-600"></i>
+      <span class="min-w-0">Could not load the list
+        <span class="block text-[12px]/4 text-zinc-500">Press to try again.</span>
+      </span>
+    </button>
+  </div>
+
+  <!-- outside the role="menu": a status is not a permitted child of one, and a
+       skeleton with no text announces nothing at all -->
+  <p role="status" class="sr-only"
+     x-text="open && !loaded && !failed ? 'Loading the people this order can be assigned to' : ''"></p>
+</div>

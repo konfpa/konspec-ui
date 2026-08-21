@@ -61,7 +61,7 @@
 
   <button type="button" x-ref="trigger" @click="open = !open"
           aria-labelledby="due-label" :aria-expanded="open" aria-haspopup="dialog"
-          class="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 hover:bg-zinc-100">
+          class="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 hover:bg-zinc-200">
     <span class="tabular-nums" :class="sel ? 'text-zinc-900' : 'text-zinc-500'" x-text="sel ? fmt(sel) : 'Select a date'"></span>
     <i data-lucide="calendar" class="size-4 shrink-0 text-zinc-600"></i>
   </button>

@@ -1,6 +1,6 @@
 <div data-kui="drawer/filter" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
     <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 text-[11px]/4 font-medium tabular-nums">1</span>
   </button>
@@ -22,7 +22,7 @@
       <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 px-5 pt-2 pb-3">
         <h2 id="quick-filter-title" class="text-[16px]/6 font-semibold">Filter orders</h2>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -54,7 +54,7 @@
       </div>
 
       <div class="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
-        <button type="button" class="rounded-lg px-4 py-2.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-white">Reset</button>
+        <button type="button" class="rounded-lg px-4 py-2.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Reset</button>
         <button type="button" @click="open = false"
                 class="flex-1 rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Show 24 orders</button>
       </div>

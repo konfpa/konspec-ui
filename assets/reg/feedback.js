@@ -87,7 +87,7 @@ register(
     <p class="mt-0.5 text-[12px]/4 text-zinc-600">Payments to Nashik Steel Traders now go to HDFC ••4471.</p>
   </div>
   <button type="button" @click="show = false" aria-label="Dismiss"
-          class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+          class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
     <i data-lucide="x" class="size-4"></i>
   </button>
 </div>` },
@@ -204,7 +204,7 @@ register(
   <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
   <p class="min-w-0 flex-1 text-[13px]/5 font-medium">GRN 1142 posted against PO-24-1187.</p>
   <button type="button" @click="show = false" aria-label="Dismiss"
-          class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+          class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
     <i data-lucide="x" class="size-4"></i>
   </button>
 </div>` }
@@ -329,7 +329,7 @@ register(
         </div>
         <button type="button" aria-label="Dismiss"
                 @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -378,13 +378,13 @@ register(
 
   <div class="flex flex-wrap gap-2">
     <button type="button" x-ref="fire" @click="push({ tone: 'info', text: 'Rate card refreshed', meta: 'August 2024 · 3,100 rows' })"
-            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Info</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Info</button>
     <button type="button" @click="push({ tone: 'success', text: 'PO-24-1187 emailed to Sharma Extrusions', meta: 'Sent 11:42' })"
-            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Success</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Success</button>
     <button type="button" @click="push({ tone: 'warning', text: 'Saved, but 2 lines are over the rate contract', meta: 'MS plate 10 mm · MS angle 50×50' })"
-            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Warning</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Warning</button>
     <button type="button" @click="push({ tone: 'danger', text: 'PO-24-1187 could not be emailed', meta: 'The vendor has no contact address on file' })"
-            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
   </div>
 
   <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
@@ -403,7 +403,7 @@ register(
             <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
           </div>
           <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <i data-lucide="x" class="size-4"></i>
           </button>
         </div>
@@ -424,7 +424,7 @@ register(
             <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
           </div>
           <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <i data-lucide="x" class="size-4"></i>
           </button>
         </div>
@@ -469,7 +469,7 @@ register(
 
   <button type="button" x-ref="fire"
           @click="push({ text: 'Line 4 removed from PO-24-1187', meta: 'MS plate 10 mm · 4.200 MT · ₹1,08,400' })"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="trash-2" class="size-4 text-zinc-600"></i>Remove line
   </button>
 
@@ -495,7 +495,7 @@ register(
         </button>
         <button type="button" aria-label="Dismiss"
                 @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -560,7 +560,7 @@ register(
         </div>
         <button type="button" aria-label="Dismiss"
                 @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -593,7 +593,7 @@ register(
 
   <button type="button" x-ref="fire"
           @click="push({ text: 'The August ledger export failed', meta: 'Row 1,842 · posting date is outside the open period' })"
-          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Export ledger
   </button>
 
@@ -615,7 +615,7 @@ register(
         </div>
         <button type="button" aria-label="Dismiss"
                 @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -665,7 +665,7 @@ register(
 
   <button type="button" x-ref="fire"
           @click="push({ text: 'PO-24-1' + (180 + seq) + ' approved', meta: '₹' + (3 + seq) + ',26,500 · Nashik Steel Traders' })"
-          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Approve next order
   </button>
 
@@ -692,7 +692,7 @@ register(
           </div>
           <button type="button" aria-label="Dismiss"
                   @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <i data-lucide="x" class="size-4"></i>
           </button>
         </div>
@@ -776,7 +776,7 @@ register(
         </div>
         <button type="button" aria-label="Dismiss"
                 @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -822,14 +822,14 @@ register(
 
   <button type="button" x-ref="fire"
           @click="push({ text: 'Batch B-2411' + seq + ' released', meta: 'QC passed · 480 kg' })"
-          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Release batch
   </button>
 
   <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
     <button type="button" x-show="toasts.length > 1" x-cloak
             @click="closeAll(); if ($event.detail === 0) $refs.fire.focus()"
-            class="pointer-events-auto self-start rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="pointer-events-auto self-start rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium text-zinc-600 shadow-sm hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       Dismiss all <span class="tabular-nums" x-text="toasts.length"></span>
     </button>
 
@@ -848,7 +848,7 @@ register(
           </div>
           <button type="button" aria-label="Dismiss"
                   @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <i data-lucide="x" class="size-4"></i>
           </button>
         </div>
@@ -963,7 +963,7 @@ register(
         </button>
         <button type="button" aria-label="Dismiss"
                 @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -1015,7 +1015,7 @@ register(
       { id: 'confirm', name: 'Confirm', code:
 `<div data-kui="alert-dialog/confirm" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Close order</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Close order</button>
 
   <!-- no @click.self here, and that is deliberate: the backdrop does not answer for the user -->
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
@@ -1040,7 +1040,7 @@ register(
       { id: 'destructive', name: 'Destructive', code:
 `<div data-kui="alert-dialog/destructive" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete order</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Delete order</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
@@ -1074,7 +1074,7 @@ register(
      people learn to type without reading. -->
 <div data-kui="alert-dialog/typed" x-data="{ open: false, typed: '', target: 'SHARMA-EXT' }">
   <button type="button" @click="open = true; typed = ''"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete vendor</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Delete vendor</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
@@ -1156,7 +1156,7 @@ register(
      a two-way choice makes people pick the destructive one to get out. -->
 <div data-kui="alert-dialog/unsaved" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Leave page</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Leave page</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
@@ -1170,7 +1170,7 @@ register(
         <button type="button" @click="open = false"
                 class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Keep editing</button>
         <button type="button" @click="open = false"
-                class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Discard changes</button>
+                class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Discard changes</button>
         <button type="button" @click="open = false"
                 class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save and leave</button>
       </div>
@@ -1236,7 +1236,7 @@ register(
           <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">PO-24-1187 · Sharma Extrusions</p>
         </div>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -1262,7 +1262,7 @@ register(
 
       <div class="flex shrink-0 flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Cancel</button>
         <button type="button" @click="open = false"
                 class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save</button>
       </div>
@@ -1275,7 +1275,7 @@ register(
      overflow-y on the body, and min-h-0 so the flex child is allowed to shrink. -->
 <div data-kui="dialog/scrolling" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Review 6 lines</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Review 6 lines</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
@@ -1287,7 +1287,7 @@ register(
           <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">PO-24-1187 · Sharma Extrusions · 6 lines</p>
         </div>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -1332,7 +1332,7 @@ register(
 `<!-- Read-only, nothing to submit, so the only control is a close button. -->
 <div data-kui="dialog/reference" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="keyboard" class="size-4"></i>Shortcuts
   </button>
 
@@ -1343,7 +1343,7 @@ register(
       <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <h2 id="keys-title" class="text-[16px]/6 font-semibold">Keyboard shortcuts</h2>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -1412,7 +1412,7 @@ register(
       { id: 'record', name: 'Record detail', code:
 `<div data-kui="sheet/record" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Open PO-24-1187</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Open PO-24-1187</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex justify-end bg-zinc-900/40">
@@ -1431,7 +1431,7 @@ register(
           <p class="mt-1 truncate text-[12px]/4 text-zinc-600">Sharma Extrusions · raised 04 Aug 2024 by Ritu Deshpande</p>
         </div>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -1474,7 +1474,7 @@ register(
 
       <div class="flex flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Print order</button>
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Print order</button>
         <button type="button" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Record GRN</button>
       </div>
     </div>
@@ -1483,7 +1483,7 @@ register(
       { id: 'filters', name: 'Filters', code:
 `<div data-kui="sheet/filters" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
     <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 text-[11px]/4 font-medium tabular-nums">2</span>
   </button>
@@ -1501,7 +1501,7 @@ register(
       <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <h2 id="filters-title" class="text-[16px]/6 font-semibold">Filter orders</h2>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -1553,7 +1553,7 @@ register(
       </div>
 
       <div class="flex flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
-        <button type="button" class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-white">Reset</button>
+        <button type="button" class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Reset</button>
         <button type="button" @click="open = false"
                 class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Apply filters</button>
       </div>
@@ -1608,7 +1608,7 @@ register(
       { id: 'actions', name: 'Action list', code:
 `<div data-kui="drawer/actions" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="ellipsis" class="size-4"></i>PO-24-1187
   </button>
 
@@ -1632,7 +1632,7 @@ register(
           <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Sharma Extrusions · <span class="tabular-nums">₹18,42,000</span> · Approved</p>
         </div>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -1656,7 +1656,7 @@ register(
         </button>
         <div class="my-1 border-t border-zinc-100"></div>
         <button type="button" @click="open = false"
-                class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[14px]/5 text-red-700 hover:bg-red-50">
+                class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[14px]/5 text-red-700 hover:bg-zinc-100">
           <i data-lucide="ban" class="size-4 shrink-0"></i>Cancel order
         </button>
       </div>
@@ -1667,7 +1667,7 @@ register(
       { id: 'filter', name: 'Quick filter', code:
 `<div data-kui="drawer/filter" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
     <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 text-[11px]/4 font-medium tabular-nums">1</span>
   </button>
@@ -1689,7 +1689,7 @@ register(
       <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 px-5 pt-2 pb-3">
         <h2 id="quick-filter-title" class="text-[16px]/6 font-semibold">Filter orders</h2>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -1721,7 +1721,7 @@ register(
       </div>
 
       <div class="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
-        <button type="button" class="rounded-lg px-4 py-2.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-white">Reset</button>
+        <button type="button" class="rounded-lg px-4 py-2.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Reset</button>
         <button type="button" @click="open = false"
                 class="flex-1 rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Show 24 orders</button>
       </div>
@@ -1733,7 +1733,7 @@ register(
 `<!-- More rows than the cap allows, so the body scrolls and everything else holds still. -->
 <div data-kui="drawer/long" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="plus" class="size-4"></i>Add a line
   </button>
 
@@ -1757,7 +1757,7 @@ register(
           <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Rates from the Sharma Extrusions contract</p>
         </div>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -1787,7 +1787,7 @@ register(
 
       <div class="flex shrink-0 justify-end border-t border-zinc-200 bg-zinc-100 px-5 py-3">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-200">Cancel</button>
       </div>
     </div>
   </div>
@@ -1933,7 +1933,7 @@ register(
             class="rounded-full px-2.5 py-1 text-[12px]/4 font-medium"
             :class="on.includes(f.id)
               ? 'bg-zinc-700 text-white hover:bg-zinc-800'
-              : 'bg-white text-zinc-600 ring-1 ring-inset ring-zinc-200 hover:bg-zinc-100'">
+              : 'bg-white text-zinc-600 ring-1 ring-inset ring-zinc-200 hover:bg-zinc-200'">
       <span x-text="f.label"></span>
     </button>
   </template>
@@ -1950,7 +1950,7 @@ register(
     <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium ring-1 ring-inset ring-zinc-300">
       <span x-text="tag"></span>
       <button type="button" @click="tags = tags.filter(t => t !== tag)" :aria-label="'Remove ' + tag"
-              class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+              class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900">
         <i data-lucide="x" class="size-3"></i>
       </button>
     </span>
@@ -1969,18 +1969,18 @@ register(
      says "Overdue". Solid graphite is for the one badge that must be seen from
      across the toolbar, and solid shapes take no ring. -->
 <div data-kui="badge/count" class="flex flex-wrap items-center gap-4">
-  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">
     Pending approval
     <span class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tabular-nums ring-1 ring-inset ring-zinc-300">12</span>
   </button>
 
-  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">
     Overdue
     <span class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">3</span>
   </button>
 
   <button type="button" aria-label="Notifications, 99 or more unread"
-          class="relative flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white hover:bg-zinc-100">
+          class="relative flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white hover:bg-zinc-200">
     <i data-lucide="bell" class="size-4"></i>
     <span class="absolute -top-1.5 -right-1.5 rounded-full bg-zinc-700 px-1.5 text-[11px]/4 font-medium tabular-nums text-white">99+</span>
   </button>
@@ -2167,7 +2167,7 @@ register(
     <button type="button" aria-labelledby="tt-duplicate"
             @mouseenter="show()" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="copy" class="size-4"></i>
     </button>
     <span id="tt-duplicate" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
@@ -2184,7 +2184,7 @@ register(
     <button type="button" aria-label="Print order"
             @mouseenter="show()" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="printer" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open" x-cloak x-transition.opacity.duration.100ms
@@ -2389,7 +2389,7 @@ register(
     <button type="button" aria-label="Search orders" aria-describedby="tt-search" aria-keyshortcuts="Control+K"
             @mouseenter="show('search')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('search', 0)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="search" class="size-4"></i>
     </button>
     <span id="tt-search" role="tooltip" x-show="open === 'search'" x-cloak x-transition.opacity.duration.100ms
@@ -2639,7 +2639,7 @@ register(
     <button type="button" aria-label="Bold"
             @mouseenter="show('bold')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('bold', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="bold" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'bold'" x-cloak x-transition.opacity.duration.100ms
@@ -2650,7 +2650,7 @@ register(
     <button type="button" aria-label="Italic"
             @mouseenter="show('italic')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('italic', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="italic" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'italic'" x-cloak x-transition.opacity.duration.100ms
@@ -2661,7 +2661,7 @@ register(
     <button type="button" aria-label="Bulleted list"
             @mouseenter="show('list')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('list', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="list" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'list'" x-cloak x-transition.opacity.duration.100ms
@@ -2672,7 +2672,7 @@ register(
     <button type="button" aria-label="Insert link"
             @mouseenter="show('link')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('link', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="link" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'link'" x-cloak x-transition.opacity.duration.100ms
@@ -2683,7 +2683,7 @@ register(
     <button type="button" aria-label="Clear formatting"
             @mouseenter="show('clear')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('clear', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="eraser" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'clear'" x-cloak x-transition.opacity.duration.100ms
@@ -3650,7 +3650,7 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-det"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="building-2" class="size-4 text-zinc-600"></i>Gujarat Polymers Ltd
     <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
       <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -3755,7 +3755,7 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-flt"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="filter" class="size-4 text-zinc-600"></i>Filters
     <span x-show="count() > 0" x-cloak
           class="inline-flex min-w-5 items-center justify-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300"
@@ -3902,7 +3902,7 @@ register(
          @keydown.escape="if (open) { $event.stopPropagation(); close() }">
       <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
               :aria-expanded="open" aria-controls="pop-col"
-              class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
         <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="shown() + ' of ' + cols.length"></span>
       </button>
@@ -3924,7 +3924,7 @@ register(
 
         <div class="mt-2 space-y-0.5">
           <template x-for="c in list()" :key="c.key">
-            <label class="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-[13px]/5 hover:bg-zinc-100 has-[:disabled]:text-zinc-500">
+            <label class="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-[13px]/5 hover:bg-zinc-200 has-[:disabled]:text-zinc-500">
               <input type="checkbox" x-model="c.on" :disabled="c.on && shown() === 1" class="size-4 shrink-0 accent-zinc-700">
               <span x-text="c.label"></span>
             </label>
@@ -4028,7 +4028,7 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-dt"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="calendar" class="size-4 text-zinc-600"></i>
     <span x-text="applied.label">01 Aug 2026 – 31 Aug 2026</span>
   </button>
@@ -4302,7 +4302,7 @@ register(
 
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
             :aria-expanded="open" aria-controls="pop-arw"
-            class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       ₹6,98,400
       <i data-lucide="info" class="size-3.5 text-zinc-500"></i>
     </button>
@@ -4401,7 +4401,7 @@ register(
 
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
             :aria-expanded="open" aria-controls="pop-plc-a"
-            class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="align-left" class="size-4 text-zinc-600"></i>Aligned to the start
     </button>
 
@@ -4442,7 +4442,7 @@ register(
 
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
             :aria-expanded="open" aria-controls="pop-plc-b"
-            class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="align-right" class="size-4 text-zinc-600"></i>Aligned to the end
     </button>
 
@@ -4503,7 +4503,7 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-sh"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Narrow the GRN list
   </button>
 
@@ -4545,7 +4545,7 @@ register(
 
     <div class="flex flex-col-reverse gap-2 border-t border-zinc-200 bg-zinc-100 px-4 py-3 pb-4 sm:flex-row sm:items-center sm:justify-between sm:py-2.5">
       <button type="button" @click="close()"
-              class="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px]/4 sm:underline sm:underline-offset-2 sm:hover:bg-transparent">Cancel</button>
+              class="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px]/4 sm:underline sm:underline-offset-2 sm:hover:bg-transparent">Cancel</button>
       <button type="button" @click="close()"
               class="w-full rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:px-3.5 sm:py-1.5">Apply</button>
     </div>
@@ -4602,7 +4602,7 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-hx"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="git-compare" class="size-4 text-zinc-600"></i>Three-way match
     <span class="text-[12px]/4 tabular-nums text-zinc-500">GRN-24-4471</span>
   </button>
@@ -4817,7 +4817,7 @@ register(
 <div data-kui="avatar/menu" class="flex justify-end">
   <div class="relative inline-block" x-data="{ open: false }" @click.outside="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="menu"
-          class="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 hover:bg-zinc-200">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[12px]/4 font-medium text-white" aria-hidden="true">RD</span>
     <span class="hidden text-[13px]/5 font-medium sm:block">Ritu Deshpande</span>
     <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -4855,7 +4855,7 @@ register(
       <p class="truncate text-[12px]/4 text-zinc-500">PO-24-1191 · raised 18 Aug</p>
     </div>
   </div>
-  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="user-plus" class="size-4 text-zinc-600"></i>Assign approver
   </button>
 </div>` }

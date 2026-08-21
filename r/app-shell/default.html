@@ -53,7 +53,7 @@
       </span>
       <span class="min-w-0 flex-1 truncate text-[15px]/6 font-semibold tracking-tight transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Operations</span>
       <button type="button" @click="nav = false" aria-label="Close navigation"
-              class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+              class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
         <i data-lucide="x" class="size-5"></i>
       </button>
     </div>
@@ -152,7 +152,7 @@
               aria-controls="kon-sidebar"
               :aria-label="wide ? (sidebar ? 'Collapse sidebar' : 'Expand sidebar') : 'Open navigation'"
               :title="wide ? 'Collapse sidebar  [' : 'Open navigation  ['"
-              class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="menu" class="size-5"></i>
       </button>
 
@@ -275,7 +275,7 @@
         </div>
 
         <button type="button" aria-label="Notifications, 3 unread"
-                class="relative rounded-lg p-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="relative rounded-lg p-2 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="bell" class="size-[18px]"></i>
           <span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-600 ring-2 ring-white"></span>
         </button>
@@ -420,56 +420,56 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-zinc-100">
-                <tr class="hover:bg-zinc-50">
+                <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0451</a></td>
                   <td class="px-4 py-2.5 text-zinc-600">Sudarshan Chemicals</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">02 Sep 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹18,42,000</td>
                   <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span></td>
                 </tr>
-                <tr class="hover:bg-zinc-50">
+                <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0450</a></td>
                   <td class="px-4 py-2.5 text-zinc-600">Deepak Nitrite</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">29 Aug 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹7,15,500</td>
                   <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>Awaiting approval</span></td>
                 </tr>
-                <tr class="hover:bg-zinc-50">
+                <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0448</a></td>
                   <td class="px-4 py-2.5 text-zinc-600">Aarti Industries</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">26 Aug 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹24,90,000</td>
                   <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-emerald-600"></span>Received</span></td>
                 </tr>
-                <tr class="hover:bg-zinc-50">
+                <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0445</a></td>
                   <td class="px-4 py-2.5 text-zinc-600">Navin Fluorine</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">21 Aug 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹11,08,750</td>
                   <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>Part received</span></td>
                 </tr>
-                <tr class="hover:bg-zinc-50">
+                <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0443</a></td>
                   <td class="px-4 py-2.5 text-zinc-600">Clean Science</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">20 Aug 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹5,94,000</td>
                   <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span></td>
                 </tr>
-                <tr class="hover:bg-zinc-50">
+                <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0441</a></td>
                   <td class="px-4 py-2.5 text-zinc-600">Atul Ltd</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">19 Aug 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹9,30,000</td>
                   <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>Awaiting approval</span></td>
                 </tr>
-                <tr class="hover:bg-zinc-50">
+                <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0438</a></td>
                   <td class="px-4 py-2.5 text-zinc-600">Fine Organics</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">18 Aug 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹2,17,600</td>
                   <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-emerald-600"></span>Received</span></td>
                 </tr>
-                <tr class="hover:bg-zinc-50">
+                <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0431</a></td>
                   <td class="px-4 py-2.5 text-zinc-600">Privi Speciality</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">15 Aug 2026 <span class="text-red-600">· 6 days late</span></td>

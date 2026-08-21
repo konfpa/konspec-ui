@@ -28,7 +28,7 @@
 <div data-kui="input-group/button" class="max-w-xl space-y-5">
   <div>
     <label for="ig3-grn" class="mb-1.5 block text-[13px]/5 font-medium">GRN number</label>
-    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-100 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-200 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
          x-data="{ done: false, t: null,
                    copy() { navigator.clipboard?.writeText(this.$refs.grn.value);
                             this.done = true;
@@ -37,7 +37,7 @@
       <input id="ig3-grn" x-ref="grn" readonly value="GRN-24-0912"
              class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
       <button type="button" @click="copy()" :aria-label="done ? 'GRN number copied' : 'Copy GRN number'"
-              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 hover:bg-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 hover:bg-zinc-300 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
         <span x-show="!done"><i data-lucide="copy" class="size-4 text-zinc-600"></i></span>
         <span x-show="done" x-cloak><i data-lucide="check" class="size-4 text-emerald-600"></i></span>
       </button>

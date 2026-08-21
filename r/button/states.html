@@ -4,20 +4,39 @@
      the cell is as wide as the longer of the two. Without that the row shifts
      under the cursor the instant it is clicked.
 
+     Neither string takes aria-hidden, and that is deliberate rather than an
+     omission. invisible is visibility:hidden, which drops the string from the
+     accessibility tree as well as from the screen, so the button is named by
+     whichever one is showing. Mark the visible one aria-hidden and the button
+     has no accessible name at all for the length of the request.
+
+     x-show is on wrapping spans, never on the <i>. createIcons() replaces that
+     node with an <svg> and takes every binding on it with it, so an x-show
+     written on the icon works until Lucide hydrates and then silently does not.
+
      Busy keeps disabled as well as aria-busy — aria-busy announces the wait,
-     disabled is what actually stops the second click. -->
+     disabled is what actually stops the second click. The fill does not go grey
+     while it waits: the only thing that ever disables this button is its own
+     request, and a greyed-out button says "you cannot do this" when the truth
+     is that you already have.
+
+     Disabled that is not busy is the chip fill, so it takes the chip edge —
+     bg-zinc-200 with border-zinc-300, the same pair every tinted shape in the
+     system carries. With border-transparent it is a tinted shape with no edge,
+     which on the zinc-100 page is one step of fill holding a 36px block on its
+     own. -->
 <div data-kui="button/states" class="flex flex-wrap items-center gap-3" x-data="{ busy: false }">
   <button type="button" @click="busy = true; setTimeout(() => busy = false, 2200)"
-          :disabled="busy" :aria-busy="busy"
-          class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:hover:bg-zinc-700">
-    <i x-show="!busy" data-lucide="check" class="size-4"></i>
-    <i x-show="busy" x-cloak data-lucide="loader-circle" class="size-4 animate-spin"></i>
+          :disabled="busy" :aria-busy="busy" aria-live="polite"
+          class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:hover:bg-zinc-700">
+    <span x-show="!busy"><i data-lucide="check" class="size-4"></i></span>
+    <span x-show="busy" x-cloak><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
     <span class="grid">
       <span class="col-start-1 row-start-1" :class="busy && 'invisible'">Approve</span>
-      <span class="col-start-1 row-start-1" :class="!busy && 'invisible'" aria-hidden="true">Approving…</span>
+      <span class="col-start-1 row-start-1" :class="!busy && 'invisible'">Approving…</span>
     </span>
   </button>
 
-  <button type="button" disabled class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-200 px-4 text-[13px]/5 font-medium text-zinc-400">Disabled</button>
+  <button type="button" disabled class="inline-flex h-9 items-center rounded-lg border border-zinc-300 bg-zinc-200 px-4 text-[13px]/5 font-medium text-zinc-400">Disabled</button>
   <button type="button" disabled class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium text-zinc-400">Disabled secondary</button>
 </div>

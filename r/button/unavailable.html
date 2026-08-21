@@ -1,0 +1,50 @@
+<!-- Why the button is off, said where the user is already looking. A greyed
+     button with no reason beside it is the most-reported fault in every
+     internal application there has ever been, and the report is always the same
+     sentence: "the Approve button does not work."
+
+     Two shapes, and which one you use is decided by whether there is anything
+     to say.
+
+     A control that is off because the form has not been filled in yet takes a
+     real disabled attribute. Nothing needs explaining — the empty field is the
+     explanation — and disabled keeps it out of the tab order where it cannot
+     waste a keyboard user's time.
+
+     A control that is off because of who you are or what state the record is in
+     takes aria-disabled instead, and that is not a softer version of the same
+     thing. A disabled element cannot be focused, cannot be described by
+     aria-describedby that anyone will ever reach, and fires no pointer events
+     at all — so a tooltip on it never opens and a reason inside a title
+     attribute reaches nobody. aria-disabled announces the same unavailability
+     while leaving the button reachable, which is the entire point: the reason
+     is one tab stop away instead of nowhere.
+
+     Because it is reachable it keeps its focus outline and it does not take the
+     disabled text colour. zinc-400 is legible only under the exemption disabled
+     controls get from the contrast rules, and an aria-disabled button is not
+     covered by it.
+
+     aria-disabled does not stop the click, so the handler must. @click.prevent
+     and nothing behind it here — which is why the wrapper carries a bare
+     x-data, since Alpine only reads directives inside one. A real submit needs
+     the same refusal in the view as well, because the attribute is advice to a
+     screen reader and the POST is not obliged to take it. -->
+<div data-kui="button/unavailable" x-data class="max-w-md divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+  <div class="p-5">
+    <button type="button" aria-disabled="true" aria-describedby="po-approve-why" @click.prevent
+            class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-300 bg-zinc-200 px-4 text-[13px]/5 font-medium text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="check" class="size-4"></i>Approve order
+    </button>
+    <p id="po-approve-why" class="mt-2 flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+      <i data-lucide="lock" class="size-3.5 shrink-0 translate-y-px text-zinc-500"></i>
+      <span class="tabular-nums">Orders above ₹5,00,000 are approved by the plant head. Ritu Deshpande was notified on 16 Aug 2026.</span>
+    </p>
+  </div>
+
+  <div class="p-5">
+    <button type="button" disabled
+            class="inline-flex h-9 items-center rounded-lg border border-zinc-300 bg-zinc-200 px-4 text-[13px]/5 font-medium text-zinc-400">Save changes</button>
+    <p class="mt-2 text-[12px]/4 text-zinc-500">Nothing has been edited yet.</p>
+  </div>
+</div>

@@ -4,7 +4,17 @@
      for would be invisible to the keyboard — with nothing anywhere saying why.
      The reason is written on the item, under the label, because a tooltip on
      something nobody can hover on a phone explains nothing. aria-disabled does
-     not stop the click either, so the handler has to return early itself.
+     not stop the click either, so the handler has to answer for it: @click.prevent
+     with no expression is the whole handler, and it is deliberate — the item
+     stays focusable, stays announced, and does nothing when pressed. It also
+     drops hover:bg-zinc-100 while keeping focus:bg-zinc-100, because a tint that
+     follows the pointer is a promise the click will do something, while the
+     keyboard still needs to see where it is.
+
+     Cancel order is red text on the same zinc-100 hover as everything else.
+     No red tint sits behind a menu item in this system: the red is the word and
+     the icon, and a coloured field behind them would be the only block of
+     colour on a register whose actual alarms are 6px dots.
 
      The destructive item does not delete anything. It closes the menu, and the
      order of those two steps is the whole trick: close(true) puts focus back on
@@ -19,7 +29,7 @@
      cannot close itself out from under the dialog it opened. Escape is bound
      .window on the dialog and unbound-but-stopped on the menu, so exactly one
      of them answers whichever is up. -->
-<div data-kui="dropdown/destructive" class="relative"
+<div data-kui="dropdown/destructive" class="relative inline-block"
      x-data="{
        open: false, confirm: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
@@ -46,16 +56,18 @@
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
           :aria-expanded="open" aria-haspopup="menu"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Actions
-    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </span>
   </button>
 
   <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Actions on PO-24-1187"
        @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
        @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
        @keydown.tab="close(false)"
-       class="absolute left-0 z-40 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+       class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
 
     <button type="button" role="menuitem" tabindex="-1" @click="close()"
             class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
@@ -96,7 +108,7 @@
   <div x-show="confirm" x-cloak x-trap.noscroll="confirm" @keydown.escape.window="confirm = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="dd-cancel-title" aria-describedby="dd-cancel-body"
-         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <div class="flex items-start gap-3">
         <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
         <div class="min-w-0">
@@ -109,9 +121,9 @@
       </div>
       <div class="mt-5 flex flex-wrap justify-end gap-2">
         <button type="button" @click="confirm = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Keep the order</button>
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Keep the order</button>
         <button type="button" @click="confirm = false"
-                class="rounded-lg bg-red-600 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-red-700">Cancel order</button>
+                class="rounded-lg bg-red-600 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel order</button>
       </div>
     </div>
   </div>

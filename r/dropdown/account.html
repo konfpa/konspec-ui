@@ -8,6 +8,11 @@
      x-ref="menu", which is the inner list, so the header is outside the walk
      without anything being excluded by hand.
 
+     The avatar in the header is a tinted shape, so it carries its ring:
+     bg-zinc-200 with ring-1 ring-inset ring-zinc-300. The one in the trigger is
+     solid zinc-700 and needs none — a solid shape has its own edge. Both are
+     aria-hidden, because the initials are the name written twice.
+
      The email is the point of the header. On an application with a test tenant
      and a live one, the only question anybody asks this menu is which account
      they are signed into, and a name alone does not answer it. truncate rather
@@ -51,17 +56,19 @@
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
             @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
             :aria-expanded="open" aria-haspopup="menu"
-            class="flex items-center gap-2 rounded-lg py-1 pr-2 pl-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="inline-flex items-center gap-2 rounded-lg py-1 pr-2 pl-1 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[12px]/4 font-medium text-white">RD</span>
       <span class="text-[13px]/5 font-medium">Ritu Deshpande</span>
-      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+      <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+        <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+      </span>
     </button>
 
     <div x-show="open" x-cloak
          @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
          @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
          @keydown.tab="close(false)"
-         class="absolute right-0 z-40 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+         class="absolute top-full right-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
 
       <div class="flex items-start gap-2.5 px-3 py-2">
         <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RD</span>

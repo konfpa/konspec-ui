@@ -85,7 +85,7 @@
        tap(s) { this.preset = null; this.pick(s); }
      }" @click.outside="open = false" @keydown.escape.window="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="dialog"
-          class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="calendar-range" class="size-4 text-zinc-600"></i>
     <span class="tabular-nums" x-text="preset || (start ? fmt(start) + ' – ' + fmt(end) : 'Select period')"></span>
     <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>

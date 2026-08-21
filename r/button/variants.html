@@ -1,10 +1,15 @@
 <!-- Five, and no others. Primary is the one thing this screen is for; secondary
      is everything else that acts; ghost is for actions dense enough that a
-     border each would draw a grid; danger cannot be undone; link navigates. -->
+     border each would draw a grid; danger cannot be undone; link navigates.
+
+     Every one of them declares the focus outline. The ghost is the reason it is
+     declared rather than inherited: it has no border to thicken and no fill to
+     darken, so with the outline dropped there is nothing on screen at all to
+     say where the keyboard is. -->
 <div data-kui="button/variants" class="flex flex-wrap items-center gap-3">
-  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Primary</button>
-  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Secondary</button>
-  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Ghost</button>
-  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-red-600 px-4 text-[13px]/5 font-medium text-white hover:bg-red-700">Danger</button>
-  <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">Link</a>
+  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Primary</button>
+  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Secondary</button>
+  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Ghost</button>
+  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-red-600 px-4 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
+  <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Link</a>
 </div>

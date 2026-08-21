@@ -170,9 +170,9 @@ keeping it to yourself in one screen.
 
 ### Actions
 
-- **Button** `button` — The standard action control. Exactly one primary button per view; everything else is secondary, ghost or a link. Variants: variants, sizes, icons, states, link, full-width, toolbar, django.
-- **Button group** `button-group` — Several controls joined into one object. Two shapes only: a tinted track for choosing one of a set, and a bordered strip for actions that belong together. Variants: segmented, attached, icon-toolbar, split, input, vertical, responsive, django.
-- **Dropdown menu** `dropdown` — A menu of actions anchored to a trigger. Real focus walks the items one tabindex="-1" at a time; destructive items sit last, below a divider. Variants: default, row-actions, groups, checkbox-items, radio-items, shortcuts, submenu, destructive, account.
+- **Button** `button` — The standard action control. Exactly one primary button per view; everything else is secondary, ghost or a link. Variants: variants, sizes, icons, states, link, full-width, toolbar, destructive, confirm, toggle, async, unavailable, upload, django.
+- **Button group** `button-group` — Several controls joined into one object. Two shapes only: a tinted track for choosing one of a set, and a bordered strip for actions that belong together — or, latched, for filters that can be on at once. Variants: segmented, attached, icon-toolbar, split, input, vertical, responsive, counts, toggle-group, sizes, disabled, stepper, row-actions, htmx, django.
+- **Dropdown menu** `dropdown` — A menu of actions anchored to a trigger. Real focus walks the items one tabindex="-1" at a time; destructive items sit last, below a divider. Variants: default, row-actions, groups, checkbox-items, radio-items, shortcuts, submenu, destructive, account, split, descriptions, scrolling, context-menu, responsive, htmx.
 
 ### Forms
 
@@ -248,10 +248,10 @@ thing that answers the question.
 
 | endpoint | size | cost | what it is |
 |---|---|--:|---|
-| [r/index.json](r/index.json) | 74 KB | ~21k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
-| `r/<id>.json` | median 43 KB, largest 144 KB (`form-page`) | ~12k tokens / ~41k tokens | One component: rules, anatomy, behaviour, accessibility, and every variant with its html. |
+| [r/index.json](r/index.json) | 75 KB | ~21k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
+| `r/<id>.json` | median 45 KB, largest 144 KB (`form-page`) | ~13k tokens / ~41k tokens | One component: rules, anatomy, behaviour, accessibility, and every variant with its html. |
 | `r/<id>/<variant>.html` | median 4 KB, largest 47 KB (`app-shell/default`) | ~1k tokens / ~13k tokens | The markup, raw. No JSON envelope, no escaping, paste as-is. |
-| [registry.json](registry.json) | 2.5 MB | ~729k tokens | Everything at once. **Do not fetch this.** It is roughly 4× a 200k context window and exists only so older integrations do not break. |
+| [registry.json](registry.json) | 2.6 MB | ~767k tokens | Everything at once. **Do not fetch this.** It is roughly 4× a 200k context window and exists only so older integrations do not break. |
 
 The component list above prints every variant id, so once you have read this
 file you can build a variant URL yourself and skip r/index.json entirely:

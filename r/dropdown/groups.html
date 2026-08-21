@@ -12,8 +12,16 @@
      boundary, and a rule as well is two separators for one edge — the panel
      starts to look like a form. The rule is kept for the one place a label
      would be wrong: above the destructive item, where the point is distance,
-     not a name. -->
-<div data-kui="dropdown/groups" class="relative"
+     not a name.
+
+     The walk does not know the groups exist. items() collects every menuitem in
+     the panel in DOM order, so Down runs straight from Print order into Send
+     for approval, and Home and End reach the first and last items in the panel
+     rather than the ends of a section. That is correct: the groups are there to
+     be read, not to be navigated between, and a keyboard model that stopped at
+     each heading would make an eleven-item menu longer to cross than the flat
+     one it replaced. -->
+<div data-kui="dropdown/groups" class="relative inline-block"
      x-data="{
        open: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
@@ -39,16 +47,18 @@
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
           :aria-expanded="open" aria-haspopup="menu"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Actions
-    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </span>
   </button>
 
   <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Actions on PO-24-1187"
        @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
        @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
        @keydown.tab="close(false)"
-       class="absolute left-0 z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+       class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
 
     <div role="group" aria-label="Order">
       <div aria-hidden="true" class="px-3 pt-1.5 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Order</div>

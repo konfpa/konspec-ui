@@ -1,18 +1,26 @@
 <!-- For a narrow column where a horizontal strip would not fit. Same rules
-     rotated: one border outside, border-t between, radii on the ends. Buttons
-     are left-aligned rather than centred, so the labels form a reading column
-     the way a menu does. -->
+     rotated: one border-zinc-300 outside, border-t between, radii on the ends.
+     Buttons are left-aligned rather than centred, so the labels form a reading
+     column the way a menu does.
+
+     The dimension that has to match something outside the group is width here,
+     not height, so w-56 goes on the wrapper and each member declares its own
+     h-9. A stacked group is beside nothing, so there is no 36px total to hit.
+
+     Cancel order is red text on the ordinary zinc hover, like every other
+     destructive item in the library. A red-50 fill would put the loudest thing
+     on the panel at the bottom of a list of routine actions. -->
 <div data-kui="button-group/vertical" role="group" aria-label="Record actions" class="inline-flex w-56 flex-col rounded-lg border border-zinc-300 bg-white">
-  <button type="button" class="flex h-9 items-center gap-2.5 rounded-t-lg px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="flex h-9 items-center gap-2.5 rounded-t-[7px] px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
     <i data-lucide="file-check-2" class="size-4 text-zinc-600"></i>Record GRN
   </button>
-  <button type="button" class="flex h-9 items-center gap-2.5 border-t border-zinc-200 px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="flex h-9 items-center gap-2.5 border-t border-zinc-200 px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
     <i data-lucide="receipt" class="size-4 text-zinc-600"></i>Attach invoice
   </button>
-  <button type="button" class="flex h-9 items-center gap-2.5 border-t border-zinc-200 px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="flex h-9 items-center gap-2.5 border-t border-zinc-200 px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
     <i data-lucide="history" class="size-4 text-zinc-600"></i>Amendment history
   </button>
-  <button type="button" class="flex h-9 items-center gap-2.5 rounded-b-lg border-t border-zinc-200 px-3 text-left text-[13px]/5 font-medium text-red-600 hover:bg-red-50">
+  <button type="button" class="flex h-9 items-center gap-2.5 rounded-b-[7px] border-t border-zinc-200 px-3 text-left text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
     <i data-lucide="circle-x" class="size-4"></i>Cancel order
   </button>
 </div>

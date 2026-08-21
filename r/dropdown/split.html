@@ -1,0 +1,90 @@
+<!-- One control, two halves, and the split is the point: the left half does the
+     thing 90% of the time and never opens anything, so the common path is one
+     click rather than a click, a read and a second click. Fold it into a plain
+     dropdown and Approve — the action this screen exists for — becomes an item
+     in a list of three. Make the whole thing act on click instead and the
+     chevron is a lie.
+
+     The chevron half carries the menu's ARIA on its own: aria-haspopup,
+     aria-expanded and an aria-label, because "Approve" is already the
+     accessible name of the button touching it and two buttons cannot share one.
+     Down and Up open it onto the first or last item exactly as any other
+     trigger, so the keyboard never has to find the 32px half.
+
+     button-group/split draws this shape and stops there — one x-data, one
+     open flag, no roving focus. This is the same object with the menu the
+     dropdown entry owes it: tabindex="-1" items, a walk that reads the DOM,
+     Home and End, Escape back to the chevron. Copy this one when the menu has
+     more than a label in it; copy that one when you only want the geometry.
+
+     Both halves declare h-9 rather than sizing from padding, because a join is
+     visible to the pixel: measured, a padded label half and a padded icon half
+     came out 38 against 36 and the seam showed. The divider is border-zinc-600,
+     one step lighter than the fill — a zinc-300 rule on a dark button reads as
+     a crack rather than a join, which is the opposite of the zinc-300 the panel
+     below it takes against the page. -->
+<div data-kui="dropdown/split" class="relative inline-flex"
+     x-data="{
+       open: false,
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         i[(at + step + i.length) % i.length]?.focus();
+       },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <button type="button"
+          class="inline-flex h-9 items-center gap-2 rounded-l-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="check-check" class="size-4"></i>Approve
+  </button>
+
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+          aria-label="More approval options" :aria-expanded="open" aria-haspopup="menu"
+          class="inline-flex h-9 items-center rounded-r-lg border-l border-zinc-600 bg-zinc-700 px-2 text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+      <i data-lucide="chevron-down" class="size-4"></i>
+    </span>
+  </button>
+
+  <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="More approval options"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+       @keydown.tab="close(false)"
+       class="absolute top-full right-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="check-check" class="size-4 text-zinc-600"></i>Approve and close
+    </button>
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="user-round-plus" class="size-4 text-zinc-600"></i>Approve and forward
+    </button>
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="calendar-clock" class="size-4 text-zinc-600"></i>Approve on the due date
+    </button>
+
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="circle-x" class="size-4"></i>Reject with a reason
+    </button>
+  </div>
+</div>

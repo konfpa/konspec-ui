@@ -1,0 +1,74 @@
+<!-- The chosen scope is server state, so the server has to be the thing that
+     draws the chosen pill. That is why the target is the whole panel and not
+     just the rows: swap only the table and the group keeps showing whatever it
+     showed before, which is merely stale until two clicks land close together
+     and the responses come back out of order — at which point the pill and the
+     rows disagree and the pill is the one the user believes.
+
+     Real radios rather than buttons, for the same reason the Django variant
+     uses them: arrow keys, the radiogroup semantics and the roving tabindex
+     all come free from the browser, and htmx wants a change event anyway. The
+     fieldset and its sr-only legend are what name the group — aria-label on a
+     form names nothing, because a form is not a radiogroup.
+
+     Arrowing across the group fires a request per option, which is correct and
+     wasteful in equal measure. delay:200ms means a held arrow key sends one
+     request rather than four, and hx-sync="this:replace" abandons whichever
+     one is still in flight.
+
+     Every radio carries a stable id. htmx restores focus after a swap by
+     matching the id of the element that had it, so without one, arrowing to
+     the third option lands the caret on the body and the next arrow key does
+     nothing at all.
+
+     The count line is role="status", so the result of the filter is announced
+     rather than merely redrawn.
+
+     # views.py
+     scope = request.GET.get('scope', 'open')
+     rows = GoodsReceipt.objects.for_scope(scope)
+     tpl = 'grn/_panel.html' if request.htmx else 'grn/register.html' -->
+<div data-kui="button-group/htmx" id="grn-panel" class="max-w-2xl rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <h2 class="text-[14px]/5 font-semibold">Goods receipts</h2>
+      <p role="status" class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ rows|length }} receipts · {{ scope_label }}</p>
+    </div>
+
+    <form class="ml-auto" hx-get="{% url 'grn-register' %}" hx-trigger="change delay:200ms"
+          hx-target="#grn-panel" hx-swap="outerHTML" hx-push-url="true" hx-sync="this:replace">
+      <fieldset class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+        <legend class="sr-only">Receipt scope</legend>
+        {% for value, label in scopes %}
+          <div>
+            <input type="radio" name="scope" id="grn-scope-{{ value }}" value="{{ value }}"
+                   {% if value == scope %}checked{% endif %} class="peer sr-only">
+            <label for="grn-scope-{{ value }}"
+                   class="flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium text-zinc-600 transition hover:text-zinc-900 peer-checked:bg-white peer-checked:text-zinc-900 peer-checked:shadow-sm peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+              {{ label }}
+            </label>
+          </div>
+        {% endfor %}
+      </fieldset>
+    </form>
+  </div>
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">GRN</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+        <tr class="border-b border-zinc-100 last:border-0">
+          <th scope="row" class="px-4 py-2 text-left font-medium tabular-nums">{{ r.number }}</th>
+          <td class="px-4 py-2">{{ r.vendor }}</td>
+          <td class="px-4 py-2 text-right tabular-nums">{{ r.quantity }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

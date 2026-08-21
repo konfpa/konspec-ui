@@ -24,11 +24,11 @@
     <h3 class="text-[14px]/5 font-semibold">Orders awaiting approval</h3>
     <div class="hidden items-center gap-1 md:flex">
       <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous orders"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
       <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="More orders"
-              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>
     </div>

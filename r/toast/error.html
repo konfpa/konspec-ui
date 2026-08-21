@@ -22,7 +22,7 @@
 
   <button type="button" x-ref="fire"
           @click="push({ text: 'The August ledger export failed', meta: 'Row 1,842 · posting date is outside the open period' })"
-          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Export ledger
   </button>
 
@@ -44,7 +44,7 @@
         </div>
         <button type="button" aria-label="Dismiss"
                 @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
-                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>

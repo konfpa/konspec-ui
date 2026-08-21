@@ -15,10 +15,14 @@
      you do serve both, swap the label from navigator.platform at boot rather
      than printing both — a hint showing two keys teaches neither.
 
+     The kbd is border-zinc-200: it sits inside the panel, so it takes the
+     Border token, one step in from the panel's own zinc-300 edge. It is also
+     shrink-0, because the label beside it is the part allowed to wrap.
+
      Do not label a shortcut nobody has bound yet. A menu is the only place
      most people will ever read them, so a hint here is a promise the window
      handler has to keep. -->
-<div data-kui="dropdown/shortcuts" class="relative"
+<div data-kui="dropdown/shortcuts" class="relative inline-block"
      x-data="{
        open: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
@@ -44,16 +48,18 @@
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
           :aria-expanded="open" aria-haspopup="menu"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
-    <i data-lucide="file-text" class="size-4"></i>PO-24-1187
-    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="file-text" class="size-4 text-zinc-600"></i>PO-24-1187
+    <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </span>
   </button>
 
   <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Actions on PO-24-1187"
        @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
        @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
        @keydown.tab="close(false)"
-       class="absolute left-0 z-40 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+       class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
 
     <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+P" @click="close()"
             class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">

@@ -1,0 +1,49 @@
+<!-- A file picker is a <label> for a real <input type="file">, never a button
+     that calls .click() on a hidden input. The label is what the browser itself
+     wires to the picker; a button doing it by script loses the association the
+     moment the script does not run, and gains nothing while it does.
+
+     The input is sr-only rather than hidden or display:none, and this is the
+     part that is always wrong when it is wrong. A display:none input cannot be
+     focused, so the control leaves the tab order entirely and the only way to
+     attach a file is with a mouse — a defect that is invisible on the screen it
+     was written on. sr-only keeps the input focusable and off the screen, and
+     peer-focus-visible paints the outline on the label, which is the part that
+     can be seen.
+
+     Each input and its label are wrapped together. peer-* compiles to a general
+     sibling combinator, so two pickers left as flat siblings would share one
+     peer state and focusing the first input would light up both labels — the
+     kind of fault that only shows itself once there are two of something.
+
+     The label carries cursor-pointer, and this is the one place the
+     no-cursor-pointer rule does not apply: preflight drops it from <button>,
+     and the base rule puts it back for buttons and for click handlers. A
+     <label> is neither, so it never had one to lose.
+
+     accept narrows the picker rather than validating anything. It is a hint the
+     dialog uses, trivially bypassed, and the view still has to check the type
+     and the size of what actually arrived.
+
+     One button is all this is. The list of what is already attached, the drop
+     zone, the progress and the rejected file are the attachment component. -->
+<div data-kui="button/upload" class="flex flex-wrap items-center gap-4">
+  <div class="flex items-center gap-3">
+    <input type="file" id="btn-grn-scan" name="grn_scan" accept=".pdf,image/*"
+           aria-describedby="btn-grn-scan-hint" class="peer sr-only">
+    <label for="btn-grn-scan"
+           class="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+      <i data-lucide="paperclip" class="size-4 text-zinc-600"></i>Attach signed GRN
+    </label>
+    <p id="btn-grn-scan-hint" class="text-[12px]/4 tabular-nums text-zinc-500">PDF or photo, up to 10 MB.</p>
+  </div>
+
+  <div>
+    <input type="file" id="btn-po-photos" name="photos" accept="image/*" multiple class="peer sr-only">
+    <label for="btn-po-photos"
+           class="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+      <i data-lucide="camera" class="size-4"></i>
+      <span class="sr-only">Add unloading photos</span>
+    </label>
+  </div>
+</div>

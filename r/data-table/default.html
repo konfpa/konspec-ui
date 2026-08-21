@@ -64,13 +64,13 @@
       </button>
       <div x-show="open" x-cloak role="group" aria-label="Columns shown"
            class="absolute right-0 z-40 mt-1 w-44 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
-        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-100">
+        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
           <input type="checkbox" x-model="cols.dept" class="size-4 shrink-0 accent-zinc-700">Department
         </label>
-        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-100">
+        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
           <input type="checkbox" x-model="cols.status" class="size-4 shrink-0 accent-zinc-700">Status
         </label>
-        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-100">
+        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
           <input type="checkbox" x-model="cols.due" class="size-4 shrink-0 accent-zinc-700">Due
         </label>
       </div>
@@ -81,7 +81,7 @@
     <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
     <div class="flex flex-wrap items-center gap-2">
       <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-50">Export</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">Export</button>
     </div>
     <button type="button" @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2">Clear</button>
   </div>

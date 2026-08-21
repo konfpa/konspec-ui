@@ -211,7 +211,10 @@
       "related": [
         "button-group",
         "dropdown",
-        "alert-dialog"
+        "alert-dialog",
+        "toggle",
+        "attachment",
+        "badge"
       ],
       "variants": [
         {
@@ -243,6 +246,30 @@
           "name": "In a page header"
         },
         {
+          "id": "destructive",
+          "name": "Three weights of destroy"
+        },
+        {
+          "id": "confirm",
+          "name": "Confirm in place"
+        },
+        {
+          "id": "toggle",
+          "name": "Pressed"
+        },
+        {
+          "id": "async",
+          "name": "Submitting to the server"
+        },
+        {
+          "id": "unavailable",
+          "name": "Off, and why"
+        },
+        {
+          "id": "upload",
+          "name": "Opening the file picker"
+        },
+        {
           "id": "django",
           "name": "Django form submits"
         }
@@ -253,11 +280,12 @@
       "id": "button-group",
       "name": "Button group",
       "category": "actions",
-      "description": "Several controls joined into one object. Two shapes only: a tinted track for choosing one of a set, and a bordered strip for actions that belong together.",
+      "description": "Several controls joined into one object. Two shapes only: a tinted track for choosing one of a set, and a bordered strip for actions that belong together — or, latched, for filters that can be on at once.",
       "related": [
         "button",
         "dropdown",
-        "tabs"
+        "tabs",
+        "input-group"
       ],
       "variants": [
         {
@@ -289,6 +317,34 @@
           "name": "On a phone"
         },
         {
+          "id": "counts",
+          "name": "Segmented control with counts"
+        },
+        {
+          "id": "toggle-group",
+          "name": "Filters that can be on at once"
+        },
+        {
+          "id": "sizes",
+          "name": "Sizes"
+        },
+        {
+          "id": "disabled",
+          "name": "A member that is not available"
+        },
+        {
+          "id": "stepper",
+          "name": "Stepper"
+        },
+        {
+          "id": "row-actions",
+          "name": "Compact actions in a table row"
+        },
+        {
+          "id": "htmx",
+          "name": "Server-driven filter group"
+        },
+        {
           "id": "django",
           "name": "Django filter group"
         }
@@ -302,6 +358,8 @@
       "description": "A menu of actions anchored to a trigger. Real focus walks the items one tabindex=\"-1\" at a time; destructive items sit last, below a divider.",
       "related": [
         "button",
+        "button-group",
+        "popover",
         "command-palette",
         "separator"
       ],
@@ -341,6 +399,30 @@
         {
           "id": "account",
           "name": "Account menu"
+        },
+        {
+          "id": "split",
+          "name": "Split button trigger"
+        },
+        {
+          "id": "descriptions",
+          "name": "Items with descriptions"
+        },
+        {
+          "id": "scrolling",
+          "name": "Long list, capped and scrolled"
+        },
+        {
+          "id": "context-menu",
+          "name": "Right-click on a row"
+        },
+        {
+          "id": "responsive",
+          "name": "Sheet below sm"
+        },
+        {
+          "id": "htmx",
+          "name": "Fetched on first open"
         }
       ],
       "detail": "r/dropdown.json"

@@ -1,0 +1,41 @@
+<!-- Minus, a value, plus. It is one object rather than three controls sitting
+     near each other, so it is a strip and takes the strip's border, dividers
+     and inner radii.
+
+     The value is a display and not a field. The moment it can be typed into,
+     the enclosure is an input-group and the focus outline moves to the
+     wrapper — this variant is for the case where the only two ways to change
+     the number are the two buttons.
+
+     The value cell reserves its width with min-w-14 and tabular-nums. Without
+     it, 200% is wider than 75% and the plus button walks left under the cursor
+     between one click and the next, which is exactly the control people click
+     four times in a row.
+
+     aria-live="polite" on the cell, because what is focused is a button and
+     what changed is the figure beside it. Nothing else in the group announces
+     the new value.
+
+     The buttons take the real disabled attribute at the limits. A live minus
+     at the floor is a button that does nothing and says nothing about why. -->
+<div data-kui="button-group/stepper" role="group" aria-label="Drawing zoom"
+     x-data="{
+       steps: [50, 75, 100, 125, 150, 200],
+       z: 100,
+       step(d) {
+         const next = this.steps[this.steps.indexOf(this.z) + d];
+         if (next !== undefined) this.z = next;
+       }
+     }"
+     class="inline-flex h-9 items-stretch rounded-lg border border-zinc-300 bg-white">
+  <button type="button" @click="step(-1)" :disabled="z === steps[0]" aria-label="Zoom out"
+          class="flex w-9 items-center justify-center rounded-l-[7px] text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700 disabled:text-zinc-400 disabled:hover:bg-transparent">
+    <i data-lucide="minus" class="size-4"></i>
+  </button>
+  <span aria-live="polite" class="flex min-w-14 items-center justify-center border-l border-zinc-200 px-2 text-[13px]/5 font-medium tabular-nums"
+        x-text="z + '%'">100%</span>
+  <button type="button" @click="step(1)" :disabled="z === steps[steps.length - 1]" aria-label="Zoom in"
+          class="flex w-9 items-center justify-center rounded-r-[7px] border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700 disabled:text-zinc-400 disabled:hover:bg-transparent">
+    <i data-lucide="plus" class="size-4"></i>
+  </button>
+</div>

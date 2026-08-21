@@ -1,0 +1,67 @@
+<!-- Two mechanisms, because the two shapes are two different controls.
+
+     In the strip it is the real disabled attribute. The action cannot be
+     taken, so the button leaves the tab order and the browser announces it as
+     unavailable — a class that only looks disabled still fires its handler.
+     It keeps its place in the strip: drop it from the markup instead and the
+     member beside it inherits the end radius, so the group changes shape while
+     the user is looking at it.
+
+     In the track it is aria-disabled and the arrow walk steps over it. This is
+     the opposite of the dropdown rule, and for a reason: in a radiogroup the
+     arrows move focus and selection together, so arrowing onto a disabled
+     option would check it, which is the one thing that must not happen. It is
+     still drawn, still greyed and still in the reading order, so nobody is
+     hunting for an option that silently vanished.
+
+     Either way the reason is text under the group, not a title attribute.
+     There is nothing to hover on a phone, and a tooltip that never opens is
+     an explanation nobody receives. -->
+<div data-kui="button-group/disabled" class="flex flex-col gap-4">
+  <div>
+    <div role="group" aria-label="Receipt actions" class="inline-flex h-9 items-stretch rounded-lg border border-zinc-300 bg-white">
+      <button type="button" class="inline-flex items-center gap-2 rounded-l-[7px] px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+        <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Edit
+      </button>
+      <button type="button" class="inline-flex items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+        <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+      </button>
+      <button type="button" disabled aria-describedby="post-why"
+              class="inline-flex items-center gap-2 rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium text-zinc-400 disabled:hover:bg-transparent">
+        <i data-lucide="file-check-2" class="size-4"></i>Post to ledger
+      </button>
+    </div>
+    <p id="post-why" class="mt-2 text-[12px]/4 text-zinc-500">Posting needs a QC result against GRN-26-0442.</p>
+  </div>
+
+  <div x-data="{
+         v: 'Week',
+         opts: [
+           { id: 'Day',     off: false },
+           { id: 'Week',    off: false },
+           { id: 'Month',   off: false },
+           { id: 'Quarter', off: true }
+         ],
+         move(step) {
+           const live = this.opts.filter(o => !o.off);
+           const at = live.findIndex(o => o.id === this.v);
+           this.v = live[(at + step + live.length) % live.length].id;
+           this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());
+         }
+       }">
+    <div role="radiogroup" aria-label="Date range" aria-describedby="range-why" x-ref="grp"
+         @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+         class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+      <template x-for="o in opts" :key="o.id">
+        <button type="button" role="radio" :aria-checked="v === o.id" :aria-disabled="o.off"
+                :tabindex="v === o.id ? 0 : -1" @click="if (!o.off) v = o.id"
+                class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="o.off ? 'text-zinc-400' : (v === o.id ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900')">
+          <span x-text="o.id"></span>
+        </button>
+      </template>
+    </div>
+    <p id="range-why" class="mt-2 text-[12px]/4 text-zinc-500">Quarterly figures open from 1 October, once Q2 is closed.</p>
+  </div>
+</div>

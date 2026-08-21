@@ -1,0 +1,129 @@
+<!-- Seven items is the ceiling for a menu you wrote. This is the exception,
+     and the exception is narrow: a list the user generates and then keeps. Two
+     shared views ship with the register and everything under My views is
+     somebody's own saved filter, so the length is not a design decision you get
+     to make — it is however many views this buyer has saved since March. Cap it
+     and scroll it. Past about a dozen it has stopped being a menu again and
+     wants the views page, and the honest fix is that page, not a taller cap.
+
+     The panel is the scroller, so it takes max-h-72 with overflow-y-auto
+     instead of overflow-hidden, and the roving walk scrolls what it focuses:
+     put() calls scrollIntoView with block "nearest", which moves the list only
+     when the item is actually out of view and never re-centres a row that was
+     already on screen. Without it, Down past the eighth view moves focus to
+     something nobody can see and the panel sits still.
+
+     The item outline is already focus:-outline-offset-2, negative, and this is
+     the variant that proves why: a positive offset on an item flush against a
+     scroller is clipped along the edge, so the top and bottom rows would show
+     three sides of a focus ring.
+
+     Type-ahead earns its place at this length and only at this length. A
+     five-item menu is read faster than it is guessed at, and the handler is one
+     more thing to get wrong; twelve views deep, N is the only quick way to
+     "Nashik — overdue". The buffer clears after half a second, the search
+     starts at the item after the focused one so pressing N twice cycles, and
+     Space is let through untouched — it is a printable key like any other and
+     swallowing it stops the focused item being activated from the keyboard.
+
+     The group headings are sticky with a background of their own. A sticky
+     heading that is transparent lets the rows scroll through the text and
+     neither is legible; this is the same fix the command palette makes for the
+     same reason.
+
+     These are menuitemradios and they do close the menu, which the column
+     picker does not. The rule is about runs, not roles: columns are ticked four
+     at a time, a view is one exclusive choice with nothing to follow it, and a
+     panel left standing over the register hides the only confirmation that the
+     view changed. Save current view is a command below the rule, so it closes
+     too, and it is the one item here that is not a choice. -->
+<div data-kui="dropdown/scrolling" class="relative inline-block"
+     x-data="{
+       open: false, buf: '', bt: null,
+       view: 'overdue',
+       labels: {
+         all: 'All open orders', approvals: 'Awaiting my approval', overdue: 'Overdue receipts', quarter: 'This quarter',
+         nashik: 'Nashik — overdue', vapi: 'Vapi — raw material', capex: 'Capex above ₹5,00,000', fasteners: 'Fasteners rate contract',
+         imports: 'Imports awaiting BOE', drafts: 'My drafts', gst: 'GSTIN missing', quality: 'Held at QC'
+       },
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitemradio],[role=menuitem]')] },
+       put(el) { if (!el) return; el.focus(); el.scrollIntoView({ block: 'nearest' }) },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); this.put(last ? i[i.length - 1] : i[0]);
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false; this.buf = '';
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         this.put(i[(at + step + i.length) % i.length]);
+       },
+       edge(last) { const i = this.items(); this.put(last ? i[i.length - 1] : i[0]) },
+       type(e) {
+         if (e.key === ' ' || e.key.length !== 1 || e.metaKey || e.ctrlKey || e.altKey) return;
+         clearTimeout(this.bt); this.bt = setTimeout(() => { this.buf = '' }, 500);
+         this.buf += e.key.toLowerCase();
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         const from = this.buf.length > 1 ? Math.max(at, 0) : at + 1;
+         const order = [...i.slice(from), ...i.slice(0, from)];
+         this.put(order.find(el => el.textContent.trim().toLowerCase().startsWith(this.buf)));
+       },
+       pick(key) { this.view = key; this.close() }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+          :aria-expanded="open" aria-haspopup="menu"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="list-filter" class="size-4 text-zinc-600"></i>
+    <span x-text="labels[view]">Overdue receipts</span>
+    <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </span>
+  </button>
+
+  <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Saved views"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+       @keydown.tab="close(false)" @keydown="type($event)"
+       class="absolute top-full left-0 z-40 mt-1 max-h-72 w-64 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+
+    <div role="group" aria-label="Shared views">
+      <div aria-hidden="true" class="sticky top-0 z-10 bg-white px-3 pt-1.5 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Shared views</div>
+      <template x-for="key in ['all', 'approvals', 'overdue', 'quarter']" :key="key">
+        <button type="button" role="menuitemradio" tabindex="-1" :aria-checked="view === key" @click="pick(key)"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+            <span x-show="view === key" x-cloak><i data-lucide="check" class="size-4"></i></span>
+          </span><span x-text="labels[key]"></span>
+        </button>
+      </template>
+    </div>
+
+    <div role="group" aria-label="My views">
+      <div aria-hidden="true" class="sticky top-0 z-10 bg-white px-3 pt-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">My views</div>
+      <template x-for="key in ['nashik', 'vapi', 'capex', 'fasteners', 'imports', 'drafts', 'gst', 'quality']" :key="key">
+        <button type="button" role="menuitemradio" tabindex="-1" :aria-checked="view === key" @click="pick(key)"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+            <span x-show="view === key" x-cloak><i data-lucide="check" class="size-4"></i></span>
+          </span><span class="truncate" x-text="labels[key]"></span>
+        </button>
+      </template>
+    </div>
+
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="bookmark" class="size-4 text-zinc-600"></i>Save the current filters as a view
+    </button>
+  </div>
+</div>

@@ -3,7 +3,10 @@
      the wrong radii. Below sm it is a select instead, which is one tap and
      costs no width at all.
 
-     The two share one x-data, so whichever the user touches, both agree. -->
+     The two share one x-data, so whichever the user touches, both agree. Only
+     one of them is in the accessibility tree at a time, because hidden and
+     sm:hidden are display:none rather than opacity — two controls for one
+     value, both announced, is worse than the layout problem this solves. -->
 <div data-kui="button-group/responsive" x-data="{
        v: 'Week',
        opts: ['Day', 'Week', 'Month', 'Quarter'],
@@ -15,16 +18,17 @@
      }">
   <label for="range-sm" class="sr-only">Date range</label>
   <select id="range-sm" x-model="v"
-          class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:hidden">
+          class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:hidden">
     <template x-for="o in opts" :key="o"><option :value="o" x-text="o"></option></template>
   </select>
 
   <div role="radiogroup" aria-label="Date range" x-ref="grp"
-       @keydown.arrow-right.prevent="move(1)" @keydown.arrow-left.prevent="move(-1)"
-       class="hidden rounded-lg bg-zinc-200 p-0.5 sm:inline-flex">
+       @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+       @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+       class="hidden rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300 sm:inline-flex">
     <template x-for="o in opts" :key="o">
       <button type="button" role="radio" :aria-checked="v === o" :tabindex="v === o ? 0 : -1" @click="v = o"
-              class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition"
+              class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               :class="v === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
         <span x-text="o"></span>
       </button>

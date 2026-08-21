@@ -1,0 +1,50 @@
+<!-- Not a radiogroup, and the difference is not cosmetic. Several of these are
+     on at the same time, so there is no single value for a roving tabindex to
+     follow: it is role="group" with aria-pressed on each member, Tab reaches
+     every one of them, and Space toggles. Give this the radiogroup treatment
+     and the keyboard can only ever reach the last thing that was switched on.
+
+     aria-pressed is bound rather than written, because Alpine keeps
+     aria-pressed, aria-checked, aria-expanded and aria-selected on the element
+     when they resolve to false and strips every other aria-* attribute that
+     does. A toggle with no aria-pressed at all is announced as a plain button
+     and nobody is told it latches.
+
+     The latched fill is bg-zinc-200 against the strip's white, and the status
+     colour stays in the dot. Filling these three buttons red, amber and green
+     would turn a filter bar into a traffic light, which is the same mistake as
+     a column of tinted status pills.
+
+     The result line is role="status", so the count is announced. A filter that
+     only changes the rows tells a screen-reader user nothing. -->
+<div data-kui="button-group/toggle-group"
+     x-data="{
+       on: ['overdue'],
+       toggle(f) {
+         const i = this.on.indexOf(f);
+         i === -1 ? this.on.push(f) : this.on.splice(i, 1);
+       },
+       counts: { open: 42, hold: 11, overdue: 6 },
+       get total() { return this.on.reduce((n, f) => n + this.counts[f], 0) }
+     }">
+  <div role="group" aria-label="Filter by status" class="inline-flex h-9 items-stretch rounded-lg border border-zinc-300 bg-white">
+    <button type="button" @click="toggle('open')" :aria-pressed="on.includes('open')"
+            class="inline-flex items-center gap-2 rounded-l-[7px] px-3 text-[13px]/5 font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700"
+            :class="on.includes('open') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
+      <span class="size-1.5 rounded-full bg-zinc-500"></span>Open
+    </button>
+    <button type="button" @click="toggle('hold')" :aria-pressed="on.includes('hold')"
+            class="inline-flex items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700"
+            :class="on.includes('hold') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
+      <span class="size-1.5 rounded-full bg-amber-500"></span>On hold
+    </button>
+    <button type="button" @click="toggle('overdue')" :aria-pressed="on.includes('overdue')"
+            class="inline-flex items-center gap-2 rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700"
+            :class="on.includes('overdue') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
+      <span class="size-1.5 rounded-full bg-red-600"></span>Overdue
+    </button>
+  </div>
+
+  <p role="status" class="mt-2 text-[12px]/4 tabular-nums text-zinc-500"
+     x-text="on.length ? total + ' receipts match' : 'No status filter — showing all 1,284 receipts'"></p>
+</div>

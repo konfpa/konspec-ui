@@ -1,0 +1,86 @@
+<!-- Three, matched to the button scale: 28, 36 and 44px overall, so a group
+     never sits two pixels out of line with the button beside it. The two
+     shapes reach those numbers by different arithmetic, and this is the
+     variant that records it.
+
+     A strip declares the height on the wrapper, because the wrapper owns the
+     border: h-7, h-9 or h-11 plus that 1px border on each side is exactly the
+     28, 36 or 44 of a button. A track declares it on the members and lets
+     p-0.5 make up the last four pixels: h-6 + 4 = 28, h-8 + 4 = 36, h-10 + 4
+     = 44.
+
+     Radii step with the size, and so do the flush inner corners. A 28px strip
+     is rounded-md, so its end members are rounded-*-[5px]; a 36 and a 44 are
+     rounded-lg and rounded-*-[7px]. Inside a track the pill is one step in
+     from the track: rounded on a rounded-md track, rounded-md on a
+     rounded-lg one.
+
+     One value drives all three tracks, because the size is the only thing
+     changing between them. -->
+<div data-kui="button-group/sizes" class="flex flex-col gap-4"
+     x-data="{
+       v: 'Week',
+       opts: ['Day', 'Week', 'Month'],
+       move(step, el) {
+         const i = (this.opts.indexOf(this.v) + step + this.opts.length) % this.opts.length;
+         this.v = this.opts[i];
+         this.$nextTick(() => el.querySelector('[aria-checked=true]').focus());
+       }
+     }">
+  <div class="flex flex-wrap items-center gap-3">
+    <div role="radiogroup" aria-label="Date range, compact"
+         @keydown.arrow-right.prevent="move(1, $event.currentTarget)" @keydown.arrow-left.prevent="move(-1, $event.currentTarget)"
+         class="inline-flex rounded-md bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+      <template x-for="o in opts" :key="o">
+        <button type="button" role="radio" :aria-checked="v === o" :tabindex="v === o ? 0 : -1" @click="v = o"
+                class="inline-flex h-6 items-center rounded px-2.5 text-[12px]/4 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="v === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+          <span x-text="o"></span>
+        </button>
+      </template>
+    </div>
+    <div role="group" aria-label="Row actions, compact" class="inline-flex h-7 items-stretch rounded-md border border-zinc-300 bg-white">
+      <button type="button" class="inline-flex items-center rounded-l-[5px] px-2.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">Edit</button>
+      <button type="button" class="inline-flex items-center rounded-r-[5px] border-l border-zinc-200 px-2.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">Copy</button>
+    </div>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500">28px</span>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <div role="radiogroup" aria-label="Date range, default"
+         @keydown.arrow-right.prevent="move(1, $event.currentTarget)" @keydown.arrow-left.prevent="move(-1, $event.currentTarget)"
+         class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+      <template x-for="o in opts" :key="o">
+        <button type="button" role="radio" :aria-checked="v === o" :tabindex="v === o ? 0 : -1" @click="v = o"
+                class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="v === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+          <span x-text="o"></span>
+        </button>
+      </template>
+    </div>
+    <div role="group" aria-label="Row actions, default" class="inline-flex h-9 items-stretch rounded-lg border border-zinc-300 bg-white">
+      <button type="button" class="inline-flex items-center rounded-l-[7px] px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">Edit</button>
+      <button type="button" class="inline-flex items-center rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">Copy</button>
+    </div>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500">36px</span>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <div role="radiogroup" aria-label="Date range, large"
+         @keydown.arrow-right.prevent="move(1, $event.currentTarget)" @keydown.arrow-left.prevent="move(-1, $event.currentTarget)"
+         class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+      <template x-for="o in opts" :key="o">
+        <button type="button" role="radio" :aria-checked="v === o" :tabindex="v === o ? 0 : -1" @click="v = o"
+                class="inline-flex h-10 items-center rounded-md px-4 text-[14px]/5 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="v === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+          <span x-text="o"></span>
+        </button>
+      </template>
+    </div>
+    <div role="group" aria-label="Row actions, large" class="inline-flex h-11 items-stretch rounded-lg border border-zinc-300 bg-white">
+      <button type="button" class="inline-flex items-center rounded-l-[7px] px-4 text-[14px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">Edit</button>
+      <button type="button" class="inline-flex items-center rounded-r-[7px] border-l border-zinc-200 px-4 text-[14px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">Copy</button>
+    </div>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500">44px</span>
+  </div>
+</div>

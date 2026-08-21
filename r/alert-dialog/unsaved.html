@@ -2,7 +2,7 @@
      a two-way choice makes people pick the destructive one to get out. -->
 <div data-kui="alert-dialog/unsaved" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Leave page</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Leave page</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
@@ -16,7 +16,7 @@
         <button type="button" @click="open = false"
                 class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Keep editing</button>
         <button type="button" @click="open = false"
-                class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Discard changes</button>
+                class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Discard changes</button>
         <button type="button" @click="open = false"
                 class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save and leave</button>
       </div>

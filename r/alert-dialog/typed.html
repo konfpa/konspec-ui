@@ -3,7 +3,7 @@
      people learn to type without reading. -->
 <div data-kui="alert-dialog/typed" x-data="{ open: false, typed: '', target: 'SHARMA-EXT' }">
   <button type="button" @click="open = true; typed = ''"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete vendor</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Delete vendor</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">

@@ -1,12 +1,28 @@
 <!-- The border lives on the wrapper, not on the input, so there is one rule
      around the pair instead of two abutting ones. The input is transparent and
-     borderless inside it, and focus-within moves the ring to the wrapper — put
-     it on the input and the ring is drawn inside the border it shares. -->
+     borderless inside it, and focus-within moves the halo to the wrapper — put
+     it on the input and the halo is drawn inside the border it shares.
+
+     The button keeps an indicator of its own, drawn inset. focus-within cannot
+     say which of the two controls the keyboard is on, so without it the
+     enclosure lights up identically whether the caret is in the box or on the
+     button beside it, which is the same as having no indicator at all. The
+     wrapper halo says the keyboard is in this group; the inset outline says
+     which part.
+
+     No height anywhere inside. The enclosure is 38px because of the field's
+     own padding, and the button takes that by stretching — write h-8 on it and
+     you get a 3px strip of white above and below, with a border-l that stops
+     short of both edges.
+
+     One box and one button is the ceiling for this variant. The moment there
+     is a unit, a currency or a second addon, it is an input-group and that is
+     the entry to copy. -->
 <div data-kui="button-group/input" class="flex max-w-md items-stretch rounded-lg border border-zinc-300 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
   <label for="add-part" class="sr-only">Part number</label>
   <input id="add-part" type="text" placeholder="Part number"
-         class="w-full min-w-0 rounded-l-lg bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
-  <button type="button" class="inline-flex shrink-0 items-center gap-2 rounded-r-lg border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+         class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  <button type="button" class="inline-flex shrink-0 items-center gap-2 rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
     <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add line
   </button>
 </div>

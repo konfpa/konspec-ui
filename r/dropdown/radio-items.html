@@ -4,17 +4,23 @@
      options and the density options as one choice of six, where picking a
      density would appear to un-pick the sort.
 
-     Like the checkbox variant, choosing does not close. These are view
-     settings and they are set in runs — sort, then density, then look at the
-     result. The trigger label carries the current sort so the setting is
-     legible with the menu shut; a settings menu whose trigger says only Sort
-     forces it open again to find out what is in force.
+     Like the checkbox variant, choosing does not close, and for the same
+     reason: these are view settings and they are set in runs — sort, then
+     density, then look at the result. That is a statement about runs and not
+     about the role. The saved-view menu in the scrolling variant is radios too
+     and it does close, because picking a view is one exclusive choice with
+     nothing to follow it and a panel left standing over the register hides the
+     only confirmation there is.
+
+     The trigger label carries the current sort so the setting is legible with
+     the menu shut; a settings menu whose trigger says only Sort forces it open
+     again to find out what is in force.
 
      A radio item is not a toggle: clicking the one already chosen sets it to
      itself, it does not clear it. There is no "unsorted" here, so there is
      nothing for a second click to mean, and offering one would just be a way
      to leave the register in a state it cannot render. -->
-<div data-kui="dropdown/radio-items" class="relative"
+<div data-kui="dropdown/radio-items" class="relative inline-block"
      x-data="{
        open: false,
        sort: 'date', dense: 'comfortable',
@@ -42,17 +48,19 @@
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
           :aria-expanded="open" aria-haspopup="menu"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="arrow-down-wide-narrow" class="size-4 text-zinc-600"></i>
     <span>Sorted by <span x-text="labels[sort]">Order date</span></span>
-    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </span>
   </button>
 
   <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Register view"
        @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
        @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
        @keydown.tab="close(false)"
-       class="absolute left-0 z-40 mt-1 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+       class="absolute top-full left-0 z-40 mt-1 w-56 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
 
     <div role="group" aria-label="Sort by">
       <div aria-hidden="true" class="px-3 pt-1.5 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Sort by</div>

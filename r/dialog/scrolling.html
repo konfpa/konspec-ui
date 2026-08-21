@@ -2,7 +2,7 @@
      overflow-y on the body, and min-h-0 so the flex child is allowed to shrink. -->
 <div data-kui="dialog/scrolling" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Review 6 lines</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Review 6 lines</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
@@ -14,7 +14,7 @@
           <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">PO-24-1187 · Sharma Extrusions · 6 lines</p>
         </div>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>

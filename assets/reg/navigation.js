@@ -398,7 +398,7 @@ register(
            class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <p class="text-zinc-600">
           <span class="font-medium text-zinc-900" x-text="t.label"></span> of PO-24-1187.
-          The address now ends <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600" x-text="'?tab=' + t.id"></code>.
+          The address now ends <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600" x-text="'?tab=' + t.id"></code>.
         </p>
       </div>
     </template>
@@ -471,7 +471,7 @@ register(
   <div id="po-panel" role="tabpanel" tabindex="0" :aria-labelledby="'po-tab-' + tab" aria-live="polite"
        class="rounded-lg pt-4 text-[14px]/5 transition-opacity [&.htmx-request]:opacity-40 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <p class="text-zinc-600">Summary renders with the page. Every other tab is fetched from
-      <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4">/orders/1187/&lt;tab&gt;/</code>
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4">/orders/1187/&lt;tab&gt;/</code>
       and swapped in here.</p>
   </div>
 </div>` },
@@ -2052,7 +2052,7 @@ register(
       <button type="button" x-ref="sTrigger" aria-haspopup="menu" :aria-expanded="sheet"
               @click="sheet ? sClose(false) : sShow()"
               @keydown.arrow-down.prevent="sShow()" @keydown.arrow-up.prevent="sShow(true)"
-              class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               :class="sheet && 'bg-zinc-200 text-zinc-900'">
         <i data-lucide="menu" class="size-4"></i>Menu
       </button>
@@ -3235,7 +3235,7 @@ register(
   <div class="flex h-12 items-center justify-between gap-3 px-3">
     <span class="text-[13px]/5 font-medium">Operations</span>
     <button type="button" @click="nav = !nav" :aria-expanded="nav" aria-controls="nmph-list"
-            class="flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            class="flex size-9 items-center justify-center rounded-lg hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
             :aria-label="nav ? 'Close navigation' : 'Open navigation'">
       <span x-show="!nav" class="flex"><i data-lucide="menu" class="size-4 text-zinc-600"></i></span>
       <span x-show="nav" x-cloak class="flex"><i data-lucide="x" class="size-4 text-zinc-600"></i></span>
@@ -3947,7 +3947,7 @@ register(
   <div class="shrink-0 border-t border-zinc-200 py-2">
     <div class="group relative flex justify-center">
       <button type="button" aria-label="Account — Akshay Prabhu, Level 2 approver"
-              class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
       </button>
       <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Akshay Prabhu</span>
@@ -4061,7 +4061,7 @@ register(
          @focusout="if (!$el.contains($event.relatedTarget)) open = false"
          @keydown.escape="if (open) { open = false; $refs.trig.focus() }">
       <button type="button" x-ref="trig" :aria-expanded="open" aria-label="Account — Akshay Prabhu, Level 2 approver"
-              class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
       </button>
       <div x-show="open" x-cloak class="absolute bottom-0 left-full z-50 w-60 pl-1">
@@ -4071,9 +4071,9 @@ register(
             <p class="truncate text-[12px]/4 text-zinc-500">Level 2 approver · Vasai plant</p>
           </div>
           <div class="my-1 border-t border-zinc-100"></div>
-          <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="user" class="size-4 shrink-0"></i>My profile</a>
-          <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="arrow-left-right" class="size-4 shrink-0"></i>Switch plant</a>
-          <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
+          <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="user" class="size-4 shrink-0"></i>My profile</a>
+          <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="arrow-left-right" class="size-4 shrink-0"></i>Switch plant</a>
+          <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
         </div>
       </div>
     </div>
@@ -4210,7 +4210,7 @@ register(
 
   <header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3">
     <button type="button" @click="nav = true" :aria-expanded="nav" aria-controls="sb7-panel" aria-label="Open navigation"
-            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="menu" class="size-5"></i>
     </button>
     <p class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">Purchase orders</p>
@@ -4243,7 +4243,7 @@ register(
         <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
         <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
         <button type="button" @click="nav = false" aria-label="Close navigation"
-                class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -4298,7 +4298,7 @@ register(
       </nav>
 
       <div class="shrink-0 border-t border-zinc-200 p-2">
-        <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold ring-1 ring-inset ring-zinc-300">AP</span>
           <span class="min-w-0 flex-1">
             <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
@@ -4360,7 +4360,7 @@ register(
           <span class="min-w-0 flex-1 truncate">Silvassa unit</span>
         </button>
         <div class="my-1 border-t border-zinc-100"></div>
-        <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="settings" class="size-4 shrink-0"></i>Plant settings
         </a>
       </div>
@@ -4407,11 +4407,11 @@ register(
         <p class="truncate text-[12px]/4 text-zinc-500">akshay.prabhu@konspec.com</p>
       </div>
       <div class="my-1 border-t border-zinc-100"></div>
-      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="user" class="size-4 shrink-0"></i>My profile</a>
-      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="sliders-horizontal" class="size-4 shrink-0"></i>Preferences</a>
-      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="stamp" class="size-4 shrink-0"></i>Approval limits</a>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="user" class="size-4 shrink-0"></i>My profile</a>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="sliders-horizontal" class="size-4 shrink-0"></i>Preferences</a>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="stamp" class="size-4 shrink-0"></i>Approval limits</a>
       <div class="my-1 border-t border-zinc-100"></div>
-      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
     </div>
   </div>
 </div>` },
@@ -4578,7 +4578,7 @@ register(
 
   <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
     <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="tb-nav"
-            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
       <i data-lucide="menu" class="size-5"></i>
     </button>
 
@@ -4594,7 +4594,7 @@ register(
 
     <div class="ml-auto flex shrink-0 items-center gap-1">
       <button type="button" aria-label="Notifications, 3 unread"
-              class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="bell" class="size-[18px]"></i>
         <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
       </button>
@@ -4645,7 +4645,7 @@ register(
   <p class="min-w-0 shrink truncate text-[13px]/5 font-medium">Purchase orders</p>
 
   <button type="button" aria-label="Search the application"
-          class="ml-auto flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+          class="ml-auto flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
     <i data-lucide="search" class="size-[18px]"></i>
   </button>
 
@@ -4657,7 +4657,7 @@ register(
              placeholder="Search orders, vendors, materials"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500">
       <button type="button" x-show="q" x-cloak @click="q = ''; $refs.q.focus()" aria-label="Clear search"
-              class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="x" class="size-3.5"></i>
       </button>
       <kbd x-show="!q" aria-hidden="true" class="mr-2 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-600">⌘K</kbd>
@@ -4716,7 +4716,7 @@ register(
   <div class="relative shrink-0">
     <button type="button" @click="open = open === 'bell' ? '' : 'bell'"
             :aria-expanded="open === 'bell'" aria-controls="tb-alerts" aria-label="Notifications, 3 unread"
-            class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
             :class="open === 'bell' && 'bg-zinc-200 text-zinc-900'">
       <i data-lucide="bell" class="size-[18px]"></i>
       <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
@@ -4841,7 +4841,7 @@ register(
   <div class="flex min-w-0 flex-1 flex-col">
     <header class="flex h-14 shrink-0 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
       <button type="button" x-ref="burger" @click="nav = true" :aria-expanded="nav" aria-controls="tb-sheet" aria-label="Open navigation"
-              class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+              class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
         <i data-lucide="menu" class="size-5"></i>
       </button>
       <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white lg:hidden"><i data-lucide="package" class="size-[18px]"></i></span>
@@ -4876,7 +4876,7 @@ register(
         <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
         <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
         <button type="button" @click="nav = false; $refs.burger.focus()" aria-label="Close navigation"
-                class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>
@@ -5018,7 +5018,7 @@ register(
      and the row does not wrap. -->
 <header data-kui="topbar/compact" class="flex h-12 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4">
   <a href="#" aria-label="Back to rate contracts"
-     class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+     class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="arrow-left" class="size-4"></i>
   </a>
 
@@ -5132,7 +5132,7 @@ register(
 <div data-kui="topbar/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
   <header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-2">
     <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="tb-ph-nav"
-            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="menu" class="size-5"></i>
     </button>
 
@@ -5143,12 +5143,12 @@ register(
     </nav>
 
     <button type="button" aria-label="Search the application"
-            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="search" class="size-[18px]"></i>
     </button>
 
     <button type="button" aria-label="Notifications, 3 unread"
-            class="relative flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="relative flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="bell" class="size-[18px]"></i>
       <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
     </button>
@@ -5205,7 +5205,7 @@ register(
   <header class="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-3 sm:px-4"
           @click.outside="open = ''">
     <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="console-nav"
-            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
       <i data-lucide="menu" class="size-5"></i>
     </button>
     <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white lg:hidden"><i data-lucide="package" class="size-[18px]"></i></span>
@@ -5226,7 +5226,7 @@ register(
     </nav>
 
     <button type="button" aria-label="Search the application"
-            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
       <i data-lucide="search" class="size-[18px]"></i>
     </button>
 
@@ -5241,7 +5241,7 @@ register(
     </form>
 
     <button type="button" aria-label="Approvals, 3 waiting on you"
-            class="relative flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="relative flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="bell" class="size-[18px]"></i>
       <span aria-hidden="true" class="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">3</span>
     </button>
@@ -5637,7 +5637,7 @@ register(
      }">
   <div class="flex h-12 items-center gap-3 px-4">
     <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-filters"
-            class="-mx-2 flex h-9 items-center gap-2 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+            class="-mx-2 flex h-9 items-center gap-2 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-200">
       <i data-lucide="sliders-horizontal" class="size-4 shrink-0 text-zinc-600"></i>
       Filters
       <span x-show="active.length"
@@ -5791,7 +5791,7 @@ register(
     </div>
     <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-gst"
             aria-label="GST breakup"
-            class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-zinc-100">
+            class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-zinc-200">
       <span class="flex transition-transform" :class="open && 'rotate-180'">
         <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
       </span>
@@ -5840,7 +5840,7 @@ register(
       <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Gujarat Polymers Ltd · posted 11/08/2026</p>
     </div>
     <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-lines"
-            class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">
+            class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200">
       <i data-lucide="list" class="size-4 shrink-0 text-zinc-600"></i>
       <span x-text="open ? 'Hide line detail' : 'Show line detail'">Show line detail</span>
     </button>
@@ -6025,7 +6025,7 @@ register(
   <input type="hidden" name="f" value="1">
   <div class="flex h-12 items-center gap-3 px-4">
     <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-filters"
-            class="-mx-2 flex h-9 items-center gap-2 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+            class="-mx-2 flex h-9 items-center gap-2 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-200">
       <i data-lucide="sliders-horizontal" class="size-4 shrink-0 text-zinc-600"></i>
       Filters
       {% if active_filters %}
@@ -6184,7 +6184,7 @@ register(
      @keydown.escape.window="hide()">
 
   <button type="button" @click="show()"
-          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-100">
+          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-200">
     <i data-lucide="search" class="size-4 text-zinc-600"></i>
     <span class="flex-1 text-left">Search Operations</span>
     <kbd class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>

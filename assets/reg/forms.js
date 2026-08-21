@@ -267,7 +267,7 @@ register(
   </select>
 
   <button type="button" aria-label="Export to CSV"
-          class="rounded-lg border border-zinc-200 bg-white p-1.5 hover:bg-zinc-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="rounded-lg border border-zinc-200 bg-white p-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="download" class="size-4 text-zinc-600"></i>
   </button>
 </div>` },
@@ -295,7 +295,7 @@ register(
 <div data-kui="label/states" class="max-w-xl space-y-5">
   <div class="has-[:disabled]:text-zinc-500">
     <label for="lb-off" class="mb-1.5 block text-[13px]/5 font-medium">Rate contract</label>
-    <div class="rounded-lg border border-zinc-200 bg-white has-[:disabled]:bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-white has-[:disabled]:bg-zinc-200">
       <input id="lb-off" value="RC-2026-014 — Gujarat Polymers Ltd" disabled
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums disabled:text-zinc-400">
     </div>
@@ -304,7 +304,7 @@ register(
 
   <div>
     <label for="lb-ro" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <input id="lb-ro" value="PO-24-1187" readonly
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>
@@ -452,7 +452,7 @@ register(
       ['Required marker', 'A red asterisk with aria-hidden="true", backed by the required attribute. Flips to an Optional word in the label on a form where most fields are required.'],
       ['Legend', 'The name of a group of controls, on a fieldset. It names the question; the labels inside name the answers, and it does not replace them.'],
       ['Trailing action', 'A type="button" on the label row, right-aligned — Same as plant address, Clear, Look up. Outside the label, so it neither submits nor joins the field\'s name.'],
-      ['Locked surface', 'bg-zinc-100 with no focus outline, for a value that cannot be typed into. Read-only keeps zinc-900 text because the value still matters; disabled drops to zinc-400.']
+      ['Locked surface', 'bg-zinc-200 with no focus outline, for a value that cannot be typed into. Read-only keeps zinc-900 text because the value still matters; disabled drops to zinc-400.']
     ],
     behaviour: [
       'The error replaces the help text in the same paragraph, so aria-describedby never has to change and the block never grows. The help text has done its job by the time the error exists — it described a format that has now been broken, and repeating it under the error is two sentences about the same mistake.',
@@ -980,7 +980,7 @@ register(
      Read-only is still a field. readonly keeps it in the tab order, keeps the
      value selectable, and still posts it. disabled does none of those, so a
      disabled order number drops out of the POST and a server that reads absence
-     as a change clears it. The locked surface — bg-zinc-100, no focus outline —
+     as a change clears it. The locked surface — bg-zinc-200, no focus outline —
      is what says you cannot type here; the zinc-900 text is what says the value
      still matters.
 
@@ -999,7 +999,7 @@ register(
 
   <div>
     <label for="fr-no" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <input id="fr-no" name="number" readonly value="PO-24-1187" aria-describedby="fr-no-msg"
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>
@@ -1041,7 +1041,7 @@ register(
 
   <div>
     <label for="fr-contract" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Rate contract</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <input id="fr-contract" disabled value="Not applicable — spot purchase" aria-describedby="fr-contract-msg"
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 text-zinc-400">
     </div>
@@ -1066,7 +1066,7 @@ register(
       'type="number" is the wrong control for a rupee amount and for every other number this system takes. The scroll wheel edits a focused number input in Chrome and Safari, so a rate changes silently when somebody scrolls the page past it. Grouping separators are not valid, so 18,42,000 makes the field invalid and .value comes back as an empty string — the digits are on screen and unreadable to script. The decimal separator is the browser\'s locale, so the same keystroke means 1.5 and 15 in two different browsers. And the spinner is two 12px targets nobody has ever deliberately pressed. Write type="text" with inputmode="decimal" and parse on the server.',
       'Indian grouping is not thousands grouping. A naive three-digit regex turns 1842000 into 1,842,000, which is wrong on an order printed in Silvassa; the lakh and crore grouping is 18,42,000 and Intl.NumberFormat with the en-IN locale is what produces it. Group for display only — post the raw digits from a hidden input, because the server should never have to guess which separators a string came dressed in.',
       'Disabled and read-only are different states and must not look the same, and the difference that matters is not visual: a disabled control is not submitted with the form. Lock a field by disabling it and its value vanishes from the POST, so the server sees a blank where the locked value used to be and writes the blank. readonly submits, stays in the Tab order and stays copyable. Disable a field only when there is genuinely nothing to send.',
-      'They do share one surface, though: bg-zinc-100 with no resting focus ring, because neither can be typed into. Only the text separates them — zinc-900 for read-only, whose value still matters and still has to be read off the screen and copied, zinc-400 for disabled, whose value does not. Read-only keeps a focus outline on its wrapper, because read-only is still focusable and a keyboard user has to see where they have landed. A read-only field left white, bordered and focus-ringed is pixel for pixel an editable one, and the only way to find out otherwise is to click into it and get nothing back.',
+      'They do share one surface, though: bg-zinc-200 with no resting focus ring, because neither can be typed into. Only the text separates them — zinc-900 for read-only, whose value still matters and still has to be read off the screen and copied, zinc-400 for disabled, whose value does not. Read-only keeps a focus outline on its wrapper, because read-only is still focusable and a keyboard user has to see where they have landed. A read-only field left white, bordered and focus-ringed is pixel for pixel an editable one, and the only way to find out otherwise is to click into it and get nothing back.',
       'An invalid wrapper has to state its red border in the focused form as well as the resting one. focus-within:border-zinc-700 and has-[:user-invalid]:border-red-600 have the same specificity, so which one wins is decided by the order Tailwind happens to emit them in — and if the grey one wins, focusing a wrong field repaints it as a normal field while the error text is still under it. Write has-[:user-invalid]:focus-within:border-red-600 as well and the question stops being a question.',
       'Prefer :user-invalid to :invalid for anything the browser can check itself. :invalid matches from first paint, so a required field is red before it has been touched and the form opens covered in errors nobody has made yet. :user-invalid waits until the field has been interacted with and left, which is the same rule Field states in prose. It needs a real pattern or type or required to fire — CSS cannot invalidate a field the HTML says is fine.',
       'A trailing button inside the wrapper must hand focus back to the input when it removes itself. A clear button that disappears the instant it is pressed takes the focus with it, and focus resets to the document body, which puts a keyboard user back at the top of the page with no way to know it happened. Clear the value, then focus the field.',
@@ -1295,7 +1295,7 @@ register(
 
     <button type="button" x-show="q" x-cloak
             @click="q = ''; $refs.q.focus()" aria-label="Clear the order search"
-            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
       <i data-lucide="x" class="size-4"></i>
     </button>
   </div>
@@ -1438,7 +1438,7 @@ register(
 
     <button type="button" @click="show = !show"
             :aria-label="show ? 'Hide password' : 'Show password'"
-            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
       <span x-show="!show" class="flex"><i data-lucide="eye" class="size-4"></i></span>
       <span x-show="show" x-cloak class="flex"><i data-lucide="eye-off" class="size-4"></i></span>
     </button>
@@ -1469,7 +1469,7 @@ register(
 <div data-kui="input/disabled" class="max-w-xl space-y-5">
   <div>
     <label for="in-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Rate contract</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <input id="in-off" disabled value="Locked by policy" aria-describedby="in-off-help"
              class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 text-zinc-400">
     </div>
@@ -1478,7 +1478,7 @@ register(
 
   <div>
     <label for="in-ro" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <input id="in-ro" name="order_no" readonly value="PO-24-1187" aria-describedby="in-ro-help"
              class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 tabular-nums outline-none">
     </div>
@@ -1504,7 +1504,7 @@ register(
       'A trailing unit is decoration or it is content, and the difference is whether the label already says it. The suffix span is a sibling of the input, not part of its accessible name, so it is silent by default — somebody typing 40 into a field called Quantity never learns it is MT. Either the label carries the unit, "Quantity (MT)", and the visible span takes aria-hidden so a label-wrapped group does not read it twice, or the span keeps an id and aria-describedby points at it. What is not allowed is the unit existing only as pixels.',
       'The red edge in an error state belongs to the wrapper. border-red-600 on the input draws the rule round the number alone and leaves the currency and the unit outside it in zinc, so the error looks like it belongs to a part of the group rather than to the value. The border stays red-600 while the group has focus — leaving focus-within:border-zinc-700 in place beside it erases the error the instant somebody clicks in to fix it, which is the one moment they are looking at it — and only the halo changes colour, to red-600/15. aria-invalid goes on the control that is actually wrong, which may be the select and not the number; mark both and one mistake is reported twice.',
       'Two addons and a field is the ceiling, because the group is the one component that adds width in three places at once. A scoped select, a box, a submit and a clear is four things and it does not fit 390px: the button label goes first, then the button becomes an icon, then the group gives up and puts its controls on a line of their own under the field. Nothing in this component scrolls sideways, and a native select is as wide as its longest option, so the options are codes — MT, +91, All — and never spelled-out words.',
-      'Disabled and read-only apply to the enclosure, not to the field inside it. Grey the wrapper to bg-zinc-100, drop the focus-within border change, and then decide each addon separately: one that reads the value stays live, because copying a locked GRN number is exactly what a locked GRN number is for, and one that changes the value goes disabled with the field. A live Apply button on a dead field is a button that posts an empty value.'
+      'Disabled and read-only apply to the enclosure, not to the field inside it. Grey the wrapper to bg-zinc-200, drop the focus-within border change, and then decide each addon separately: one that reads the value stays live, because copying a locked GRN number is exactly what a locked GRN number is for, and one that changes the value goes disabled with the field. A live Apply button on a dead field is a button that posts an empty value.'
     ],
     anatomy: [
       ['Enclosure', 'The bordered flex row. It owns the border, the focus outline and the height, and it is the only thing in the component that is not a control.'],
@@ -1532,7 +1532,7 @@ register(
       'Only the field writes outline-none, and only because the wrapper draws its outline. Every other focusable child keeps an indicator, inset so it does not stack a second box on the enclosure\'s own. The wrapper indicator is an outline rather than a ring, so it survives forced-colours mode where box-shadows are dropped; the border and the internal dividers survive it too, because they are borders.',
       'aria-invalid goes on the control that is wrong and on nothing else. The message is real text under the group, referenced by aria-describedby, not a colour and not a title attribute, and no addon inside the group turns red with it — a red ₹ reads as a negative amount and a red MT reads as the wrong unit.',
       'Confirmations that arrive without a page change go through role="status" or aria-live: Copied, Applied, added as line 4. A swapped icon and a changed fill are announced by nothing, and the person who cannot see them is the one who most needs to know the click landed.',
-      'Read-only keeps the field in the tab order so its value can be selected and copied; disabled takes it out. The locked surface, bg-zinc-100 with no live border, is what says so on screen — a read-only value left white and bordered is pixel for pixel an editable field until somebody clicks into it and nothing happens.',
+      'Read-only keeps the field in the tab order so its value can be selected and copied; disabled takes it out. The locked surface, bg-zinc-200 with no live border, is what says so on screen — a read-only value left white and bordered is pixel for pixel an editable field until somebody clicks into it and nothing happens.',
       'A group wrapped in role="group" with an aria-label is announced once on entry and does not name anything inside it. That is an addition to the individual labels, never a replacement for them.'
     ],
     related: ['input', 'button-group', 'field'],
@@ -1650,7 +1650,7 @@ register(
 <div data-kui="input-group/button" class="max-w-xl space-y-5">
   <div>
     <label for="ig3-grn" class="mb-1.5 block text-[13px]/5 font-medium">GRN number</label>
-    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-100 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-200 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
          x-data="{ done: false, t: null,
                    copy() { navigator.clipboard?.writeText(this.$refs.grn.value);
                             this.done = true;
@@ -1659,7 +1659,7 @@ register(
       <input id="ig3-grn" x-ref="grn" readonly value="GRN-24-0912"
              class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
       <button type="button" @click="copy()" :aria-label="done ? 'GRN number copied' : 'Copy GRN number'"
-              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 hover:bg-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 hover:bg-zinc-300 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
         <span x-show="!done"><i data-lucide="copy" class="size-4 text-zinc-600"></i></span>
         <span x-show="done" x-cloak><i data-lucide="check" class="size-4 text-emerald-600"></i></span>
       </button>
@@ -2185,7 +2185,7 @@ register(
 
   <div>
     <label for="sel-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Currency</label>
-    <div class="relative rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="relative rounded-lg border border-zinc-200 bg-zinc-200">
       <select id="sel-off" name="currency" disabled aria-describedby="sel-off-help"
               class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 text-zinc-400 outline-none">
         <option selected>INR — Indian rupee</option>
@@ -2200,7 +2200,7 @@ register(
   <div>
     <label for="sel-ro" class="mb-1.5 block text-[13px]/5 font-medium">Plant</label>
     <!-- no chevron, so no pr-9 and nothing to position: a plain bordered box -->
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <select id="sel-ro" disabled aria-describedby="sel-ro-help"
               class="block w-full min-w-0 appearance-none bg-transparent px-3 py-2 text-[14px]/5 text-zinc-900 outline-none">
         <option selected>Silvassa — Unit II</option>
@@ -2881,7 +2881,7 @@ register(
   {# hidden input, and no chevron — nothing here is going to open.              #}
   <div>
     <label for="{{ form.plant.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">{{ form.plant.label }}</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">{{ form.plant }}</div>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">{{ form.plant }}</div>
     <p id="{{ form.plant.auto_id }}-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
   </div>
 
@@ -2913,7 +2913,7 @@ register(
       'Give the control block. A textarea is inline-block by default, so it sits on a text baseline and leaves a 5px strip of wrapper below it that looks like a rendering bug.',
       'Set the height with rows, never with an h- class. h-[100px] against a 20px leading is 4.2 lines, and the fifth line is sliced in half along its x-height.',
       'Preflight already sets resize: vertical, so resize-y is redundant and resize-x is a layout bug waiting to happen. The only resize class worth writing is resize-none, on a box whose height is owned by script.',
-      'Never leave a read-only box white, bordered and ringed. It is then pixel for pixel an editable field, and the only way to find out otherwise is to click into it and get nothing back. Read-only takes bg-zinc-100, the same locked surface disabled uses, and drops the resting ring. It keeps a focus outline: read-only is still in the tab order precisely so the value can be copied, and a keyboard user has to see where they have landed.',
+      'Never leave a read-only box white, bordered and ringed. It is then pixel for pixel an editable field, and the only way to find out otherwise is to click into it and get nothing back. Read-only takes bg-zinc-200, the same locked surface disabled uses, and drops the resting ring. It keeps a focus outline: read-only is still in the tab order precisely so the value can be copied, and a keyboard user has to see where they have landed.',
       'Enter inserts a newline. Never bind Enter to submit — the one key someone needs to write a second line must not post the form.',
       'maxlength truncates a paste in silence. Use it only when the limit is the column width, and say the number in the help text before it is reached; otherwise count past the limit and block the submit, so the user can see what has to go.',
       'Set the height back to auto before reading scrollHeight, or an auto-growing box grows and never shrinks — scrollHeight cannot report less than the height already set.',
@@ -2934,7 +2934,7 @@ register(
       'The counter counts down, not up: what is left is the number the writer is deciding against. It turns amber inside the last 20 characters and red once it is over, and the submit disables while it is over.',
       'An auto-growing box grows with its content up to a ceiling, then stops and scrolls. Without the ceiling a long paste pushes the submit button off the screen.',
       'Resize is vertical only, so a textarea can never be dragged wider than the form it sits in. An auto-growing box drops the handle entirely, because script and the drag would fight over the same height.',
-      'Read-only and disabled share one locked surface, bg-zinc-100 with no resting ring, because both are boxes you cannot type into. Only read-only takes a focus outline, because only read-only is focusable. The text is what separates them: zinc-900 for read-only, whose value still matters and still has to be copyable, zinc-400 for disabled, whose value does not. A read-only field left white, bordered and ringed says nothing at all until someone clicks into it and nothing happens.'
+      'Read-only and disabled share one locked surface, bg-zinc-200 with no resting ring, because both are boxes you cannot type into. Only read-only takes a focus outline, because only read-only is focusable. The text is what separates them: zinc-900 for read-only, whose value still matters and still has to be copyable, zinc-400 for disabled, whose value does not. A read-only field left white, bordered and ringed says nothing at all until someone clicks into it and nothing happens.'
     ],
     a11y: [
       'A real label bound with for/id. A placeholder is not a label, and in a box this size it disappears the moment anyone starts typing.',
@@ -3106,7 +3106,7 @@ Held pending the test certificate.</textarea>
 `<div data-kui="textarea/disabled" class="max-w-xl space-y-5">
   <div>
     <label for="ta-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Terms and conditions</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <textarea id="ta-off" rows="3" disabled
                 class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 text-zinc-400">Set by the rate contract. Editable only on the contract itself.</textarea>
     </div>
@@ -3120,7 +3120,7 @@ Held pending the test certificate.</textarea>
          white bordered box with a focus ring, nothing says read-only until you
          click into it and nothing happens. -->
     <label for="ta-ro" class="mb-1.5 block text-[13px]/5 font-medium">Vendor reply</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <textarea id="ta-ro" rows="3" readonly
                 class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Balance 40 kg dispatched on 18 August by Gati, LR 4471029.
 Test certificate follows by email.</textarea>
@@ -3202,7 +3202,7 @@ Test certificate follows by email.</textarea>
       ['Help text', 'A 12px zinc-500 line outside the label, indented to the text with pl-[26px] and named by aria-describedby.'],
       ['Group', 'A fieldset with a legend, one name repeated across the options, and one help line under the whole group rather than one under every row.'],
       ['Select-all', 'A box with no name and no value of its own. It reads all, some or none off the count, and writes indeterminate back through script.'],
-      ['Selected row', 'bg-zinc-100 through has-[:checked], so the tint is the box\'s own state and not a second copy of it.'],
+      ['Selected row', 'bg-zinc-200 through has-[:checked], so the tint is the box\'s own state and not a second copy of it.'],
       ['Bulk bar', 'The strip above the rows once something is selected: how many, what will happen to them, and the way back out.']
     ],
     behaviour: [
@@ -3342,7 +3342,7 @@ Test certificate follows by email.</textarea>
   <legend class="mb-2 text-[13px]/5 font-medium">Send with the vendor email</legend>
 
   <div class="grid gap-2 sm:grid-cols-3">
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
       <input type="checkbox" name="enclose" value="po" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">Purchase order</span>
@@ -3350,7 +3350,7 @@ Test certificate follows by email.</textarea>
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
       <input type="checkbox" name="enclose" value="drawings" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">Drawing set</span>
@@ -3358,7 +3358,7 @@ Test certificate follows by email.</textarea>
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
       <input type="checkbox" name="enclose" value="contract" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">Rate contract extract</span>
@@ -3474,8 +3474,8 @@ Test certificate follows by email.</textarea>
     </span>
     <div class="flex flex-wrap items-center gap-2">
       <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
-      <button type="button" class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Cancel orders</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">Export</button>
+      <button type="button" class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Cancel orders</button>
     </div>
     <button type="button" x-show="every && scope === 'page'" x-cloak @click="scope = 'query'"
             class="text-[13px]/5 tabular-nums text-zinc-900 underline underline-offset-2">Select all 4,312 matching orders</button>
@@ -3845,7 +3845,7 @@ Test certificate follows by email.</textarea>
       ['Group', 'A fieldset whose legend is the question. Radios are never alone, so this is not optional the way it is for a single checkbox.'],
       ['Label', 'Wrapping the input as its direct child, so the text is part of the target and the row is not a 16px hit.'],
       ['Description', 'A 12px zinc-500 line per option, outside the label, indented with pl-[26px] and named by aria-describedby. Group-level help sits under the fieldset instead.'],
-      ['Chosen tile', 'has-[:checked]:bg-zinc-100 with has-[:checked]:border-zinc-700, reading the box\'s own state so the tint cannot disagree with the answer.']
+      ['Chosen tile', 'has-[:checked]:bg-zinc-200 with has-[:checked]:border-zinc-700, reading the box\'s own state so the tint cannot disagree with the answer.']
     ],
     behaviour: [
       'The group is one Tab stop. Tab enters on the checked option, or on the first when none is checked, and the next Tab leaves the group entirely rather than walking through the rest of it.',
@@ -3959,7 +3959,7 @@ Test certificate follows by email.</textarea>
   <legend class="mb-2 text-[13px]/5 font-medium">Inspection before dispatch</legend>
 
   <div class="grid gap-2 sm:grid-cols-3">
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
       <input type="radio" name="inspection" value="vendor" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">At vendor works</span>
@@ -3967,7 +3967,7 @@ Test certificate follows by email.</textarea>
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
       <input type="radio" name="inspection" value="gate" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">At the plant gate</span>
@@ -3975,7 +3975,7 @@ Test certificate follows by email.</textarea>
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
       <input type="radio" name="inspection" value="third_party" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">Third-party agency</span>
@@ -4943,14 +4943,14 @@ Test certificate follows by email.</textarea>
            class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
 
     <button type="button" x-show="sel" x-cloak @click="clear()" aria-label="Clear the selected vendor"
-            class="mr-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+            class="mr-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
       <i data-lucide="x" class="size-4"></i>
     </button>
 
     <!-- the rotation goes on a wrapping span. createIcons() replaces the <i>
          with an <svg> and takes any binding on it with it. -->
     <button type="button" tabindex="-1" aria-hidden="true" @click="open ? close() : (show(), $refs.q.focus())"
-            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100">
+            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200">
       <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
         <i data-lucide="chevron-down" class="size-4"></i>
       </span>
@@ -5769,7 +5769,7 @@ Test certificate follows by email.</textarea>
        because they sit in one example — in a real form all three are vendor. -->
   <div>
     <label for="cb-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Vendor</label>
-    <div class="flex items-center rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-zinc-200">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-400"></i>
       <!-- no aria-controls: there is no popup in the document to point it at,
            and aria-controls naming an id that does not exist is worse than
@@ -6127,7 +6127,7 @@ Test certificate follows by email.</textarea>
       <span class="text-[13px]/5 text-zinc-600">Drag files here or</span>
       <input type="file" id="po-files" name="attachments" multiple class="peer sr-only">
       <label for="po-files"
-             class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+             class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
         Browse files
       </label>
       <span class="text-[12px]/4 text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</span>
@@ -6309,7 +6309,7 @@ Test certificate follows by email.</textarea>
     <span class="text-[12px]/4 tabular-nums text-zinc-500">4 of 10</span>
   </div>
   <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-    <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
       <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
       <button type="button" aria-label="Remove gate-in-truck.jpg"
               class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 opacity-0 transition hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100">
@@ -6317,7 +6317,7 @@ Test certificate follows by email.</textarea>
       </button>
       <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pb-1 pt-4 text-[11px]/4 text-white">gate-in-truck.jpg</p>
     </div>
-    <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
       <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
       <button type="button" aria-label="Remove unloading-bay-3.jpg"
               class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 opacity-0 transition hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100">
@@ -6325,7 +6325,7 @@ Test certificate follows by email.</textarea>
       </button>
       <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pb-1 pt-4 text-[11px]/4 text-white">unloading-bay-3.jpg</p>
     </div>
-    <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
       <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
       <button type="button" aria-label="Remove weighbridge-slip.jpg"
               class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 opacity-0 transition hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100">
@@ -6336,7 +6336,7 @@ Test certificate follows by email.</textarea>
     <div>
       <input type="file" id="photo-add" name="photos" accept="image/*" multiple class="peer sr-only">
       <label for="photo-add"
-             class="flex aspect-4/3 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-200 bg-zinc-100 text-zinc-600 hover:border-zinc-700 hover:bg-zinc-50 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+             class="flex aspect-4/3 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-200 bg-zinc-100 text-zinc-600 hover:border-zinc-700 hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
         <i data-lucide="plus" class="size-5"></i>
         <span class="text-[12px]/4 font-medium">Add photo</span>
       </label>
@@ -6367,7 +6367,7 @@ Test certificate follows by email.</textarea>
   <div class="mt-2">
     <input type="file" name="attachment" id="id_attachment" class="peer sr-only">
     <label for="id_attachment"
-           class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+           class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
       <i data-lucide="upload" class="size-4"></i>Choose a replacement
     </label>
   </div>
@@ -6596,7 +6596,7 @@ Test certificate follows by email.</textarea>
 
   <button type="button" x-ref="trigger" @click="open = !open"
           aria-labelledby="due-label" :aria-expanded="open" aria-haspopup="dialog"
-          class="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 hover:bg-zinc-100">
+          class="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 hover:bg-zinc-200">
     <span class="tabular-nums" :class="sel ? 'text-zinc-900' : 'text-zinc-500'" x-text="sel ? fmt(sel) : 'Select a date'"></span>
     <i data-lucide="calendar" class="size-4 shrink-0 text-zinc-600"></i>
   </button>
@@ -7106,7 +7106,7 @@ Test certificate follows by email.</textarea>
        tap(s) { this.preset = null; this.pick(s); }
      }" @click.outside="open = false" @keydown.escape.window="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="dialog"
-          class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="calendar-range" class="size-4 text-zinc-600"></i>
     <span class="tabular-nums" x-text="preset || (start ? fmt(start) + ' – ' + fmt(end) : 'Select period')"></span>
     <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -7329,15 +7329,15 @@ Test certificate follows by email.</textarea>
   <p id="qq-crit" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Must be for lot 24-HD-118, dated on or before 16 Aug 2026.</p>
 
   <div class="mt-3 grid max-w-sm grid-cols-3 gap-2">
-    <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+    <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="qc_certificate" value="pass" required aria-describedby="qq-crit" class="size-4 shrink-0 accent-zinc-700">
       <span>Pass</span>
     </label>
-    <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+    <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="qc_certificate" value="fail" required aria-describedby="qq-crit" class="size-4 shrink-0 accent-zinc-700">
       <span>Fail</span>
     </label>
-    <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+    <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="qc_certificate" value="na" required aria-describedby="qq-crit" class="size-4 shrink-0 accent-zinc-700">
       <span>N/A</span>
     </label>
@@ -7370,13 +7370,13 @@ Test certificate follows by email.</textarea>
   <fieldset class="py-4 first:pt-0 last:pb-0">
     <legend class="text-[13px]/5 font-medium">Bag markings — grade, lot and net weight legible on every bag</legend>
     <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_marking" value="pass" checked class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_marking" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_marking" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
       </label>
     </div>
@@ -7385,13 +7385,13 @@ Test certificate follows by email.</textarea>
   <fieldset class="py-4 first:pt-0 last:pb-0">
     <legend class="text-[13px]/5 font-medium">Bags sealed, no tears and no damp patches on the pallet</legend>
     <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_seal" value="pass" checked class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_seal" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_seal" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
       </label>
     </div>
@@ -7400,13 +7400,13 @@ Test certificate follows by email.</textarea>
   <fieldset class="py-4 first:pt-0 last:pb-0">
     <legend class="text-[13px]/5 font-medium">Test certificate lot number matches the bags</legend>
     <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_cert" value="pass" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_cert" value="fail" checked class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_cert" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
       </label>
     </div>
@@ -7415,13 +7415,13 @@ Test certificate follows by email.</textarea>
   <fieldset class="py-4 first:pt-0 last:pb-0">
     <legend class="text-[13px]/5 font-medium tabular-nums">Moisture on the hand-held meter at or below 0.05%</legend>
     <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_moisture" value="pass" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_moisture" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_moisture" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
       </label>
     </div>
@@ -7430,13 +7430,13 @@ Test certificate follows by email.</textarea>
   <fieldset class="py-4 first:pt-0 last:pb-0">
     <legend class="text-[13px]/5 font-medium tabular-nums">Retention sample of 500 g drawn and labelled</legend>
     <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_sample" value="pass" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_sample" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qr_sample" value="na" checked class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
       </label>
     </div>
@@ -7537,13 +7537,13 @@ Test certificate follows by email.</textarea>
     </legend>
 
     <div class="mt-3 grid max-w-sm grid-cols-3 gap-2">
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qc_ppe" value="pass" x-model="ppe" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qc_ppe" value="fail" x-model="ppe" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
       </label>
-      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
         <input type="radio" name="qc_ppe" value="na" x-model="ppe" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
       </label>
     </div>
@@ -7590,23 +7590,23 @@ Test certificate follows by email.</textarea>
   </legend>
 
   <div class="mt-3 grid grid-cols-5 gap-2">
-    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="va_docs" value="1" aria-describedby="qs-low" class="size-4 shrink-0 accent-zinc-700">
       <span class="text-[13px]/5 tabular-nums">1</span>
     </label>
-    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="va_docs" value="2" class="size-4 shrink-0 accent-zinc-700">
       <span class="text-[13px]/5 tabular-nums">2</span>
     </label>
-    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="va_docs" value="3" checked class="size-4 shrink-0 accent-zinc-700">
       <span class="text-[13px]/5 tabular-nums">3</span>
     </label>
-    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="va_docs" value="4" class="size-4 shrink-0 accent-zinc-700">
       <span class="text-[13px]/5 tabular-nums">4</span>
     </label>
-    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="va_docs" value="5" aria-describedby="qs-high" class="size-4 shrink-0 accent-zinc-700">
       <span class="text-[13px]/5 tabular-nums">5</span>
     </label>
@@ -7870,13 +7870,13 @@ Test certificate follows by email.</textarea>
         Q4 · Moisture on the hand-held meter at or below 0.05% <span class="text-red-600">*</span>
       </legend>
       <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_moisture" value="pass" required aria-invalid="true" aria-describedby="qv-q4-err" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_moisture" value="fail" required aria-invalid="true" aria-describedby="qv-q4-err" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_moisture" value="na" required aria-invalid="true" aria-describedby="qv-q4-err" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
         </label>
       </div>
@@ -7890,13 +7890,13 @@ Test certificate follows by email.</textarea>
         Q9 · Pallet count matches the delivery challan <span class="text-red-600">*</span>
       </legend>
       <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_pallets" value="pass" required aria-invalid="true" aria-describedby="qv-q9-err" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_pallets" value="fail" required aria-invalid="true" aria-describedby="qv-q9-err" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_pallets" value="na" required aria-invalid="true" aria-describedby="qv-q9-err" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
         </label>
       </div>

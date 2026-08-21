@@ -3,23 +3,36 @@
      no roving tabindex to maintain, and the browser gives arrow keys and the
      radiogroup semantics for free.
 
+     The fieldset is what names the group, with an sr-only legend. aria-label
+     on the form would name nothing: a form is not a radiogroup, and the
+     browser will not treat it as one. Tailwind's preflight already strips the
+     fieldset's own border and padding, so it takes the track classes cleanly.
+
      The input is sr-only rather than hidden, because display:none takes it out
      of the tab order and off the keyboard entirely. peer-checked styles the
-     label that follows it; peer-focus-visible puts the focus ring there too,
+     label that follows it; peer-focus-visible puts the focus halo there too,
      since the input itself cannot be seen.
+
+     h-8 on the label rather than py-1.5, for the same reason every other
+     member in this component declares its height: 32 plus the track's p-0.5
+     is 36, and a member sized by its padding drifts the moment the type scale
+     under it changes.
 
      # views.py
      rng = request.GET.get('range', 'week')   # 'day' | 'week' | 'month' -->
-<form data-kui="button-group/django" method="get" class="inline-flex rounded-lg bg-zinc-200 p-0.5">
-  {% for value, label in ranges %}
-    <div>
-      <input type="radio" name="range" id="range-{{ value }}" value="{{ value }}"
-             {% if value == selected %}checked{% endif %}
-             onchange="this.form.submit()" class="peer sr-only">
-      <label for="range-{{ value }}"
-             class="block rounded-md px-3 py-1.5 text-[13px]/5 font-medium text-zinc-600 transition hover:text-zinc-900 peer-checked:bg-white peer-checked:text-zinc-900 peer-checked:shadow-sm peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
-        {{ label }}
-      </label>
-    </div>
-  {% endfor %}
+<form data-kui="button-group/django" method="get">
+  <fieldset class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+    <legend class="sr-only">Date range</legend>
+    {% for value, label in ranges %}
+      <div>
+        <input type="radio" name="range" id="range-{{ value }}" value="{{ value }}"
+               {% if value == selected %}checked{% endif %}
+               onchange="this.form.submit()" class="peer sr-only">
+        <label for="range-{{ value }}"
+               class="flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium text-zinc-600 transition hover:text-zinc-900 peer-checked:bg-white peer-checked:text-zinc-900 peer-checked:shadow-sm peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+          {{ label }}
+        </label>
+      </div>
+    {% endfor %}
+  </fieldset>
 </form>

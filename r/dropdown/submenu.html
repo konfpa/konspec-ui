@@ -11,8 +11,14 @@
      Below sm neither side fits. A 208px panel hanging off a 208px panel needs
      416px and a phone gives 390, so flipping only moves the overflow from one
      edge to the other. The shape has to change instead: static, full width,
-     indented, on a zinc-100 surface — a drill-down inside the parent panel.
-     All the flyout positioning is sm:-prefixed, so one set of markup is both.
+     indented, on a recessed surface — a drill-down inside the parent panel.
+     The surface is bg-zinc-50 and not bg-zinc-100, because a band recessed
+     inside a white panel is the Recessed token, and the item highlight inside
+     it is the ordinary bg-zinc-100. Draw the band at zinc-100 and the highlight
+     has to climb to zinc-200 to be seen, which is the chip fill and reads as a
+     badge switched on. Getting the band right means the item classes are the
+     same at every width and the sm: overrides on them disappear; all that is
+     left prefixed is the positioning.
 
      Hover intent runs on pointerenter, guarded on pointerType === 'mouse'. On a
      phone a tap synthesises a mouseenter before the click, so an unguarded
@@ -26,8 +32,11 @@
      items() filters to elements whose nearest role="menu" is this one, so the
      parent's arrow walk stops at the submenu trigger instead of falling through
      into its contents. The submenu is its own scope: Right or Enter enters it,
-     Left or Escape steps back out onto the trigger, and its arrow handlers stop
-     propagation so the parent does not act on the same key.
+     Left or Escape steps back out onto the trigger, and its arrow, Home and End
+     handlers stop propagation so the parent does not act on the same key. Both
+     scopes carry Home and End, and the submenu's reach only its own three
+     items — End inside a submenu that jumped to the bottom of the parent panel
+     would throw the user out of the thing they had just entered.
 
      $event.detail === 0 is how a click from Enter is told from a click from the
      mouse. Enter should open the submenu and land on its first item; a real
@@ -57,6 +66,7 @@
            const i = this.items(), at = i.indexOf(document.activeElement);
            i[(at + step + i.length) % i.length]?.focus();
          },
+         edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
          openSub(focusFirst) {
            clearTimeout(this.t);
            this.flip = this.$refs.subtrigger.getBoundingClientRect().right + 216 > window.innerWidth;
@@ -73,6 +83,7 @@
            const i = this.subItems(), at = i.indexOf(document.activeElement);
            i[(at + step + i.length) % i.length]?.focus();
          },
+         edgeSub(last) { const i = this.subItems(); (last ? i[i.length - 1] : i[0])?.focus() },
          hoverIn(e) {
            if (e.pointerType !== 'mouse') return;
            clearTimeout(this.t); this.t = setTimeout(() => this.openSub(false), 120);
@@ -91,15 +102,18 @@
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
             @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
             :aria-expanded="open" aria-haspopup="menu"
-            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
-      <i data-lucide="download" class="size-4"></i>Export
-      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+            class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="download" class="size-4 text-zinc-600"></i>Export
+      <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+        <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+      </span>
     </button>
 
     <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Export the order register"
          @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+         @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
          @keydown.tab="close(false)"
-         class="absolute right-0 z-40 mt-1 w-52 rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+         class="absolute top-full right-0 z-40 mt-1 w-52 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
 
       <button type="button" role="menuitem" tabindex="-1" @click="close()" @pointerenter="closeSub()"
               class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
@@ -125,21 +139,22 @@
 
         <div x-show="sub" x-cloak x-ref="sub" role="menu" aria-label="Email a copy to"
              @keydown.arrow-down.prevent.stop="moveSub(1)" @keydown.arrow-up.prevent.stop="moveSub(-1)"
+             @keydown.home.prevent.stop="edgeSub(false)" @keydown.end.prevent.stop="edgeSub(true)"
              @keydown.arrow-left.prevent.stop="closeSub(true)"
              @keydown.escape.stop="closeSub(true)"
              @keydown.tab="close(false)"
              :class="flip ? 'sm:right-full sm:mr-1' : 'sm:left-full sm:ml-1'"
-             class="mt-1 w-full rounded-lg bg-zinc-100 py-1 sm:absolute sm:top-0 sm:z-50 sm:mt-0 sm:w-52 sm:rounded-xl sm:border sm:border-zinc-200 sm:bg-white sm:shadow-lg">
+             class="mt-1 w-full rounded-lg bg-zinc-50 py-1 sm:absolute sm:top-0 sm:z-50 sm:mt-0 sm:w-52 sm:rounded-xl sm:border sm:border-zinc-300 sm:bg-white sm:shadow-lg">
           <button type="button" role="menuitem" tabindex="-1" @click="close()"
-                  class="flex w-full items-center gap-2.5 py-2 pr-3 pl-9 text-left text-[13px]/5 hover:bg-zinc-200 focus:bg-zinc-200 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:pl-3 sm:hover:bg-zinc-100 sm:focus:bg-zinc-100">
+                  class="flex w-full items-center gap-2.5 py-2 pr-3 pl-9 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:pl-3">
             <i data-lucide="user" class="size-4 text-zinc-600"></i>Ritu Deshpande
           </button>
           <button type="button" role="menuitem" tabindex="-1" @click="close()"
-                  class="flex w-full items-center gap-2.5 py-2 pr-3 pl-9 text-left text-[13px]/5 hover:bg-zinc-200 focus:bg-zinc-200 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:pl-3 sm:hover:bg-zinc-100 sm:focus:bg-zinc-100">
+                  class="flex w-full items-center gap-2.5 py-2 pr-3 pl-9 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:pl-3">
             <i data-lucide="building-2" class="size-4 text-zinc-600"></i>Vendor contact
           </button>
           <button type="button" role="menuitem" tabindex="-1" @click="close()"
-                  class="flex w-full items-center gap-2.5 py-2 pr-3 pl-9 text-left text-[13px]/5 hover:bg-zinc-200 focus:bg-zinc-200 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:pl-3 sm:hover:bg-zinc-100 sm:focus:bg-zinc-100">
+                  class="flex w-full items-center gap-2.5 py-2 pr-3 pl-9 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:pl-3">
             <i data-lucide="indian-rupee" class="size-4 text-zinc-600"></i>Accounts payable
           </button>
         </div>

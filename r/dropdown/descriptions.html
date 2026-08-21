@@ -1,0 +1,96 @@
+<!-- Four items whose labels do not distinguish them. Release, Refresh and
+     Reopen all mean something specific to a production order and something
+     different to whoever last used a different ERP, so the consequence goes on
+     the item rather than in a training document nobody reads at 6am.
+
+     The second line is inside the button. That makes it part of the accessible
+     name, announced straight after the label in the order it is written;
+     aria-describedby would put it after a pause, in verbose mode only in some
+     readers, and twice in others. It costs nothing here because the description
+     is one short clause — anything longer is a page pretending to be a menu.
+
+     Every item has one. A single described item among bare ones reads as the
+     only one with consequences, which is exactly backwards: Print is not safer
+     than Release, it is just easier to explain.
+
+     items-start rather than items-center, and the icon takes mt-0.5 so it sits
+     on the first line rather than floating between the two. The panel is w-80,
+     which is as wide as a menu is allowed to get before it stops being anchored
+     to its trigger and starts being a panel; max-w keeps it inside a 390px
+     screen. The label is 13px zinc-900 and the line under it 12px zinc-500 —
+     the same two steps a table cell and its caption take, so a menu of these
+     reads at the same rhythm as the record behind it. -->
+<div data-kui="dropdown/descriptions" class="relative inline-block"
+     x-data="{
+       open: false,
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         i[(at + step + i.length) % i.length]?.focus();
+       },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+          :aria-expanded="open" aria-haspopup="menu"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="factory" class="size-4 text-zinc-600"></i>PROD-2611
+    <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </span>
+  </button>
+
+  <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Actions on production order PROD-2611"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+       @keydown.tab="close(false)"
+       class="absolute top-full left-0 z-40 mt-1 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-start gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="play" class="mt-0.5 size-4 shrink-0 text-zinc-600"></i>
+      <span class="min-w-0">Release to the shop floor
+        <span class="block text-[12px]/4 text-zinc-500">Locks the BOM and issues components from Nashik stores.</span>
+      </span>
+    </button>
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-start gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="refresh-cw" class="mt-0.5 size-4 shrink-0 text-zinc-600"></i>
+      <span class="min-w-0">Refresh from the BOM
+        <span class="block text-[12px]/4 text-zinc-500">Re-reads the routing and discards manual line edits.</span>
+      </span>
+    </button>
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-start gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="boxes" class="mt-0.5 size-4 shrink-0 text-zinc-600"></i>
+      <span class="min-w-0">Post output and consumption
+        <span class="block text-[12px]/4 text-zinc-500">Books finished quantity and backflushes the components.</span>
+      </span>
+    </button>
+
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-start gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="circle-x" class="mt-0.5 size-4 shrink-0"></i>
+      <span class="min-w-0">Cancel the order
+        <span class="block text-[12px]/4">Returns issued components to stores. Posted output stays posted.</span>
+      </span>
+    </button>
+  </div>
+</div>

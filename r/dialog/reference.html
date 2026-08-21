@@ -1,7 +1,7 @@
 <!-- Read-only, nothing to submit, so the only control is a close button. -->
 <div data-kui="dialog/reference" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">
     <i data-lucide="keyboard" class="size-4"></i>Shortcuts
   </button>
 
@@ -12,7 +12,7 @@
       <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <h2 id="keys-title" class="text-[16px]/6 font-semibold">Keyboard shortcuts</h2>
         <button type="button" @click="open = false" aria-label="Close"
-                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
           <i data-lucide="x" class="size-4"></i>
         </button>
       </div>

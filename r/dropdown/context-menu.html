@@ -1,0 +1,144 @@
+<!-- A right-click menu is an accelerator over actions that are also on a
+     button, exactly as the command palette is an accelerator over navigation.
+     There is no right-click on a touch screen and no keyboard gesture for it
+     that anybody actually uses, so every item here is also on the More button
+     in the last column — one panel, two ways in, and the keyboard route is the
+     button. Ship this as the only way to cancel an order and the order cannot
+     be cancelled from a phone.
+
+     One menu serves the whole table rather than one per row. It is positioned
+     at the pointer, so it cannot be a child of the row it acts on, and row is
+     the piece of state that says which record it is about — that is also what
+     names it, :aria-label="'Actions for ' + row.po", because a menu that opens
+     under the cursor has lost the one thing that told you which row it belongs
+     to. The row itself takes the selected tint while the menu is open for the
+     same reason.
+
+     Position is a bound :style on a fixed panel, which brings two conditions.
+     It must not also carry x-transition: the transition writes its own style
+     attribute over the element and restores the cached one on finish, so the
+     panel snaps back to wherever it was last opened. And it must close on
+     scroll, because viewport coordinates stop describing the row the moment the
+     register moves under them. Note also that any ancestor carrying transform,
+     filter or will-change becomes the containing block for a fixed element, and
+     the panel then anchors to that instead of the viewport.
+
+     The horizontal clamp is arithmetic done before the panel is shown — the
+     w-52 panel plus a 16px margin — because there is nothing to measure yet.
+     The vertical flip is the opposite and has to be: the height depends on how
+     many items a permission check left in the panel, so it is read inside the
+     same requestAnimationFrame that moves focus, one frame after x-show has
+     written display. The submenu variant measures its trigger before showing
+     for the same underlying reason: measure what exists, never what is still
+     display:none.
+
+     The root closes the menu on any left click that did not land inside it, not
+     just on clicks outside the table — a right-click on one row followed by a
+     left-click on another has to put the menu away. The More button stops its
+     own click so that handler does not close the menu it just opened. -->
+<div data-kui="dropdown/context-menu"
+     x-data="{
+       open: false, x: 0, y: 0, row: null, opener: null,
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '18,42,000' },
+         { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: '4,68,500' },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: '27,10,400' }
+       ],
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+       showAt(cx, cy, r, opener) {
+         this.row = r; this.opener = opener;
+         this.x = Math.max(8, Math.min(cx, window.innerWidth - 224));
+         this.y = cy;
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const h = this.$refs.menu.offsetHeight;
+           if (cy + h > window.innerHeight - 8) this.y = Math.max(8, cy - h);
+           this.items()[0]?.focus();
+         }));
+       },
+       fromRow(e, r) { this.showAt(e.clientX, e.clientY, r, e.currentTarget.querySelector('[aria-haspopup]')) },
+       fromButton(e, r) {
+         const b = e.currentTarget.getBoundingClientRect();
+         this.showAt(b.right - 208, b.bottom + 4, r, e.currentTarget);
+       },
+       close(toOpener = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toOpener) this.opener?.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         i[(at + step + i.length) % i.length]?.focus();
+       },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+     }"
+     @click="if (open && !$refs.menu.contains($event.target)) close(false)"
+     @click.outside="close(false)"
+     @scroll.window="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <p class="border-b border-zinc-200 px-4 py-2 text-[12px]/4 text-zinc-500">Right-click a row, or use the button at the end of it.</p>
+
+  <table class="w-full text-[13px]/5">
+    <caption class="sr-only">Purchase orders awaiting approval</caption>
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" class="w-12 px-2 py-2.5"><span class="sr-only">Row actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in rows" :key="r.po">
+        <tr @contextmenu.prevent="fromRow($event, r)"
+            :class="open && row && row.po === r.po ? '[&>td]:bg-zinc-100' : ''"
+            class="border-b border-zinc-100 last:border-0 hover:[&>td]:bg-zinc-100">
+          <td class="px-4 py-2 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2 sm:table-cell" x-text="r.vendor"></td>
+          <td class="px-4 py-2 text-right tabular-nums">₹<span x-text="r.amount"></span></td>
+          <td class="w-12 px-2 py-2">
+            <div class="flex justify-end">
+              <button type="button" @click.stop="fromButton($event, r)"
+                      aria-haspopup="menu" :aria-expanded="open && row && row.po === r.po"
+                      :aria-label="'Actions for ' + r.po"
+                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="more-horizontal" class="size-4"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <div x-show="open" x-cloak x-ref="menu" role="menu"
+       :aria-label="row ? 'Actions for ' + row.po : 'Row actions'"
+       :style="'left: ' + x + 'px; top: ' + y + 'px'"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+       @keydown.tab="close(false)"
+       class="fixed z-40 w-52 overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="eye" class="size-4 text-zinc-600"></i>Open order
+    </button>
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="copy" class="size-4 text-zinc-600"></i>Copy PO number
+    </button>
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="package-check" class="size-4 text-zinc-600"></i>Post GRN
+    </button>
+
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="x-circle" class="size-4"></i>Cancel order
+    </button>
+  </div>
+</div>

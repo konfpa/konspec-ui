@@ -4,29 +4,68 @@
 
      The chevron carries its own aria-label because "Approve" is already the
      name of the half beside it, and its own aria-expanded because it is the
-     half that opens something. The divider is border-zinc-600, one step
+     half that opens something. The divider is border-l-zinc-600, one step
      lighter than the fill, because a zinc-200 rule on a dark button reads as a
-     crack rather than a join. -->
-<div data-kui="button-group/split" class="relative inline-flex" x-data="{ open: false }"
-     @click.outside="open = false" @keydown.escape.window="open = false">
-  <button type="button" class="inline-flex h-9 items-center rounded-l-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+     crack rather than a join. Both halves take border border-transparent so
+     they measure the same 36px as the plain primary button, which carries a
+     border it does not draw for exactly this reason.
+
+     The menu is the dropdown keyboard model, not a list of tabbable buttons:
+     every item is tabindex="-1", the arrows move real focus, and Escape hands
+     focus back to the chevron. A role="menu" whose items are in the tab order
+     tells the screen reader to expect one thing and gives it another.
+
+     The separator is its own element rather than a border-t on Reject. Hung
+     off the item it belongs to the item, so a permission check that hides
+     Reject takes the rule to the top of the panel where it introduces
+     nothing. -->
+<div data-kui="button-group/split" class="relative inline-flex"
+     x-data="{
+       open: false,
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.chevron.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         i[(at + step + i.length) % i.length]?.focus();
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+  <button type="button" class="inline-flex h-9 items-center rounded-l-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
     Approve
   </button>
-  <button type="button" @click.stop="open = !open"
+  <button type="button" x-ref="chevron" @click.stop="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
           aria-label="More approval options" :aria-expanded="open" aria-haspopup="menu"
-          class="inline-flex h-9 items-center rounded-r-lg border-l border-zinc-600 bg-zinc-700 px-2 text-white hover:bg-zinc-800">
+          class="inline-flex h-9 items-center rounded-r-lg border border-transparent border-l-zinc-600 bg-zinc-700 px-2 text-white hover:bg-zinc-800">
     <i data-lucide="chevron-down" class="size-4"></i>
   </button>
 
-  <div x-show="open" x-cloak @click.stop role="menu"
+  <div x-show="open" x-cloak x-ref="menu" @click.stop role="menu" aria-label="Approval options"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.tab="close(false)"
        class="absolute top-full right-0 z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
-    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
       <i data-lucide="check-check" class="size-4 text-zinc-600"></i>Approve and close
     </button>
-    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
       <i data-lucide="user-round-plus" class="size-4 text-zinc-600"></i>Approve and forward
     </button>
-    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 border-t border-zinc-200 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-red-50">
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
       <i data-lucide="circle-x" class="size-4"></i>Reject
     </button>
   </div>

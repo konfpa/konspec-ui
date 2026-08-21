@@ -40,7 +40,7 @@
     <button type="button" aria-label="Bold"
             @mouseenter="show('bold')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('bold', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="bold" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'bold'" x-cloak x-transition.opacity.duration.100ms
@@ -51,7 +51,7 @@
     <button type="button" aria-label="Italic"
             @mouseenter="show('italic')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('italic', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="italic" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'italic'" x-cloak x-transition.opacity.duration.100ms
@@ -62,7 +62,7 @@
     <button type="button" aria-label="Bulleted list"
             @mouseenter="show('list')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('list', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="list" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'list'" x-cloak x-transition.opacity.duration.100ms
@@ -73,7 +73,7 @@
     <button type="button" aria-label="Insert link"
             @mouseenter="show('link')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('link', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="link" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'link'" x-cloak x-transition.opacity.duration.100ms
@@ -84,7 +84,7 @@
     <button type="button" aria-label="Clear formatting"
             @mouseenter="show('clear')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('clear', true)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="eraser" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open === 'clear'" x-cloak x-transition.opacity.duration.100ms

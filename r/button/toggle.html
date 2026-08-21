@@ -1,0 +1,47 @@
+<!-- A button that stays down. aria-pressed is the whole component: it lets one
+     control carry two states without a second control beside it and without a
+     label that changes meaning under the user.
+
+     The label does not change with the state, and this is the mistake worth
+     naming. "Show cancelled lines" while pressed means they are showing; a
+     button that relabels itself to "Hide cancelled lines" is announcing the
+     next action while aria-pressed announces the current one, so a screen
+     reader is handed both at once and they contradict each other. Pick one. A
+     real toggle keeps its name and moves aria-pressed — that is this. If the
+     label has to change, it is two actions rather than a toggle, and it takes
+     no aria-pressed at all.
+
+     Alpine keeps aria-pressed on the element when it binds to false, unlike
+     most aria-* attributes, so an unpressed button still renders
+     aria-pressed="false" and is still announced as a toggle. A button with the
+     attribute missing entirely is announced as an ordinary button and nothing
+     tells the user it has an off state to come back to.
+
+     Pressed is the chip fill with the chip edge — bg-zinc-200 on border-zinc-300,
+     the same tinted shape a selected nav item takes. It is deliberately not the
+     primary fill: zinc-700 says "this is the action the screen exists for", and
+     a filter that happens to be on is not that.
+
+     These are view state. Anything that writes to the server the moment it is
+     touched is the toggle component instead — a real checkbox wearing
+     role="switch" — because a switch reads as a setting with a label beside it
+     and a pressed button reads as a control you are operating right now. -->
+<div data-kui="button/toggle" class="flex flex-wrap items-center gap-3" x-data="{ cancelled: false, mine: true, holds: false }">
+  <button type="button" @click="cancelled = !cancelled" :aria-pressed="cancelled"
+          class="inline-flex h-8 items-center gap-2 rounded-lg border px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+          :class="cancelled ? 'border-zinc-300 bg-zinc-200 text-zinc-900' : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900'">
+    <i data-lucide="eye" class="size-4"></i>Show cancelled lines
+  </button>
+
+  <button type="button" @click="holds = !holds" :aria-pressed="holds"
+          class="inline-flex h-8 items-center gap-2 rounded-lg border px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+          :class="holds ? 'border-zinc-300 bg-zinc-200 text-zinc-900' : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900'">
+    <i data-lucide="filter" class="size-4"></i>QC holds only
+  </button>
+
+  <button type="button" @click="mine = !mine" :aria-pressed="mine" aria-label="Only orders I raised"
+          class="inline-flex size-8 items-center justify-center rounded-lg border focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+          :class="mine ? 'border-zinc-300 bg-zinc-200 text-zinc-900' : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900'">
+    <i data-lucide="user-round" class="size-4"></i>
+  </button>
+</div>

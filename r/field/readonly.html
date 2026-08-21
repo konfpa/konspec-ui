@@ -4,7 +4,7 @@
      Read-only is still a field. readonly keeps it in the tab order, keeps the
      value selectable, and still posts it. disabled does none of those, so a
      disabled order number drops out of the POST and a server that reads absence
-     as a change clears it. The locked surface — bg-zinc-100, no focus outline —
+     as a change clears it. The locked surface — bg-zinc-200, no focus outline —
      is what says you cannot type here; the zinc-900 text is what says the value
      still matters.
 
@@ -23,7 +23,7 @@
 
   <div>
     <label for="fr-no" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <input id="fr-no" name="number" readonly value="PO-24-1187" aria-describedby="fr-no-msg"
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>
@@ -65,7 +65,7 @@
 
   <div>
     <label for="fr-contract" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Rate contract</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <input id="fr-contract" disabled value="Not applicable — spot purchase" aria-describedby="fr-contract-msg"
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 text-zinc-400">
     </div>

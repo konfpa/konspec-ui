@@ -75,14 +75,14 @@
            class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
 
     <button type="button" x-show="sel" x-cloak @click="clear()" aria-label="Clear the selected vendor"
-            class="mr-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+            class="mr-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
       <i data-lucide="x" class="size-4"></i>
     </button>
 
     <!-- the rotation goes on a wrapping span. createIcons() replaces the <i>
          with an <svg> and takes any binding on it with it. -->
     <button type="button" tabindex="-1" aria-hidden="true" @click="open ? close() : (show(), $refs.q.focus())"
-            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100">
+            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200">
       <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
         <i data-lucide="chevron-down" class="size-4"></i>
       </span>

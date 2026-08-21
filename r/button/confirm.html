@@ -1,0 +1,78 @@
+<!-- The cheap half of alert-dialog. A dialog is right when the act is
+     irreversible and there is something the user has to read first. For a line
+     item that can be typed back in ten seconds it is more ceremony than the act
+     deserves, and ceremony that is not deserved gets clicked through without
+     being read — which is how a modal ends up making the mistake more likely
+     rather than less. This asks inside the button itself.
+
+     Three things make it safe rather than merely clever. The armed button says
+     a different word, so a double click on the first press cannot sail through
+     the second: the second press has to be aimed at a label that was not there
+     when the finger started moving. It disarms on Escape and after four
+     seconds, so a button left armed on a screen somebody walked away from is
+     not a trap for the next person. And the width is held the same way the busy
+     state holds it, both strings in one grid cell, so the row does not move
+     between the two presses.
+
+     aria-live on the button is what tells a screen reader that the label
+     changed under focus that is already sitting on it. Without it the second
+     press is unannounced and the user confirms something they were never asked.
+
+     Armed is the solid danger fill rather than a red edge — the token table has
+     one destructive shape and this is it. The escalation from white-with-red-
+     text to red-with-white-text is the point: the button visibly becomes the
+     thing it was only describing.
+
+     In a real screen the second press is where the request goes. Put hx-post
+     and hx-confirm-free handling on this button, not on the first press. -->
+<div data-kui="button/confirm" class="max-w-md divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+  <div class="flex items-center justify-between gap-4 px-4 py-3">
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium tabular-nums">HDPE-BLM-45 · 1,200 kg</p>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">Line 4 · ₹1,04,400</p>
+    </div>
+    <button type="button" aria-live="polite"
+            x-data="{ armed: false, t: null,
+                      press() {
+                        clearTimeout(this.t);
+                        if (this.armed) { this.armed = false; return }
+                        this.armed = true;
+                        this.t = setTimeout(() => this.armed = false, 4000);
+                      } }"
+            @click="press()"
+            @keydown.escape.window="armed = false; clearTimeout(t)"
+            class="inline-flex h-8 shrink-0 items-center gap-2 rounded-lg border px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            :class="armed ? 'border-transparent bg-red-600 text-white hover:bg-red-700' : 'border-zinc-200 bg-white text-red-600 hover:bg-zinc-100'">
+      <i data-lucide="trash-2" class="size-4"></i>
+      <span class="grid">
+        <span class="col-start-1 row-start-1" :class="armed && 'invisible'">Remove</span>
+        <span class="col-start-1 row-start-1" :class="!armed && 'invisible'">Remove it?</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="flex items-center justify-between gap-4 px-4 py-3">
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium tabular-nums">LDPE-FLM-12 · 400 kg</p>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">Line 5 · ₹38,800</p>
+    </div>
+    <button type="button" aria-live="polite"
+            x-data="{ armed: false, t: null,
+                      press() {
+                        clearTimeout(this.t);
+                        if (this.armed) { this.armed = false; return }
+                        this.armed = true;
+                        this.t = setTimeout(() => this.armed = false, 4000);
+                      } }"
+            @click="press()"
+            @keydown.escape.window="armed = false; clearTimeout(t)"
+            class="inline-flex h-8 shrink-0 items-center gap-2 rounded-lg border px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            :class="armed ? 'border-transparent bg-red-600 text-white hover:bg-red-700' : 'border-zinc-200 bg-white text-red-600 hover:bg-zinc-100'">
+      <i data-lucide="trash-2" class="size-4"></i>
+      <span class="grid">
+        <span class="col-start-1 row-start-1" :class="armed && 'invisible'">Remove</span>
+        <span class="col-start-1 row-start-1" :class="!armed && 'invisible'">Remove it?</span>
+      </span>
+    </button>
+  </div>
+</div>

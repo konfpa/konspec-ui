@@ -1,10 +1,17 @@
 <!-- A real radiogroup: one Tab stop, arrows to move, aria-checked to announce.
      The roving tabindex is what makes it one stop — every unchecked option is
-     tabindex="-1", so Tab skips straight past them.
+     tabindex="-1", so Tab skips straight past them. Right and Down step
+     forward, Left and Up step back, which is what a radiogroup is expected to
+     answer to whichever pair the user reaches for.
 
      The track is bg-zinc-200 and the active pill is white. White on a tint is
      what reads as chosen; a darker tint on a lighter tint does not, and it
-     leaves the unchosen options looking disabled. -->
+     leaves the unchosen options looking disabled. The track carries
+     ring-zinc-300 like every other tinted shape here, because a fill with no
+     edge is a step of grey with nothing holding its outline.
+
+     h-8 on the options plus p-0.5 on the track is 36px overall — the height of
+     an h-9 button, which is what this sits next to. -->
 <div data-kui="button-group/segmented" role="radiogroup" aria-label="Date range" x-ref="grp"
      x-data="{
        v: 'Week',
@@ -15,12 +22,13 @@
          this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());
        }
      }"
-     @keydown.arrow-right.prevent="move(1)" @keydown.arrow-left.prevent="move(-1)"
-     class="inline-flex rounded-lg bg-zinc-200 p-0.5">
+     @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+     @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+     class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
   <template x-for="o in opts" :key="o">
     <button type="button" role="radio" :aria-checked="v === o" :tabindex="v === o ? 0 : -1"
             @click="v = o"
-            class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition"
+            class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
             :class="v === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
       <span x-text="o"></span>
     </button>

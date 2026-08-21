@@ -1,0 +1,29 @@
+<!-- One verb, three weights, and the weight is set by what the click costs
+     rather than by how the row looks. Solid red is the one action a screen
+     exists to warn about and cannot be undone. Bordered red is the same act
+     from a place where it is not the point of the screen — a footer, a detail
+     panel, a settings card. Red text on nothing is a row action, where a border
+     each would draw a grid and a filled red button on every row would turn a
+     register into a wall of alarm and stop meaning anything by the twelfth row.
+
+     None of the three take a red fill behind the text on hover. Destructive
+     hover is hover:bg-zinc-200 like any other ghost on the page. The pale red tint that
+     suggests itself here is one the token table rejects by name, and a red wash
+     under one row of a table reads as a status the record is in rather than as
+     a pointer that happens to be over a button.
+
+     The word carries as much of the warning as the colour does. "Delete
+     vendor", "Cancel order", "Remove line" — never "Yes", "Confirm" or "OK",
+     which say nothing at all to somebody who cannot see that the button is red.
+     Colour is never the only signal. -->
+<div data-kui="button/destructive" class="flex flex-wrap items-center gap-3">
+  <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-red-600 px-4 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="trash-2" class="size-4"></i>Delete vendor
+  </button>
+  <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="circle-x" class="size-4"></i>Cancel order
+  </button>
+  <button type="button" class="inline-flex h-8 items-center gap-2 rounded-lg border border-transparent px-3 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="trash-2" class="size-4"></i>Remove line
+  </button>
+</div>

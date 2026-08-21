@@ -1,8 +1,14 @@
 <!-- Three, matched to density rather than to importance. Small belongs in a
      table row or a dense toolbar; large is for the one button on a sign-in card
-     or the primary action of a full-page form. Everything else is medium. -->
+     or the primary action of a full-page form. Everything else is medium.
+
+     All three are rounded-lg. The radius is a token of the control, not of its
+     height — a small button at rounded-md sitting beside a size-7 icon button at
+     rounded-lg is two different shapes doing one job, and the mismatch is
+     visible at a glance in a toolbar even though neither corner looks wrong on
+     its own. -->
 <div data-kui="button/sizes" class="flex flex-wrap items-center gap-3">
-  <button type="button" class="inline-flex h-7 items-center rounded-md border border-transparent bg-zinc-700 px-2.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800">Small</button>
-  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Medium</button>
-  <button type="button" class="inline-flex h-11 items-center rounded-lg border border-transparent bg-zinc-700 px-5 text-[14px]/5 font-medium text-white hover:bg-zinc-800">Large</button>
+  <button type="button" class="inline-flex h-7 items-center rounded-lg border border-transparent bg-zinc-700 px-2.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Small</button>
+  <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Medium</button>
+  <button type="button" class="inline-flex h-11 items-center rounded-lg border border-transparent bg-zinc-700 px-5 text-[14px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Large</button>
 </div>

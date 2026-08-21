@@ -85,7 +85,7 @@
          @keydown.escape="if (open) { $event.stopPropagation(); close() }">
       <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
               :aria-expanded="open" aria-controls="pop-col"
-              class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
         <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="shown() + ' of ' + cols.length"></span>
       </button>
@@ -107,7 +107,7 @@
 
         <div class="mt-2 space-y-0.5">
           <template x-for="c in list()" :key="c.key">
-            <label class="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-[13px]/5 hover:bg-zinc-100 has-[:disabled]:text-zinc-500">
+            <label class="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-[13px]/5 hover:bg-zinc-200 has-[:disabled]:text-zinc-500">
               <input type="checkbox" x-model="c.on" :disabled="c.on && shown() === 1" class="size-4 shrink-0 accent-zinc-700">
               <span x-text="c.label"></span>
             </label>

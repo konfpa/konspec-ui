@@ -64,7 +64,7 @@
               <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
                       @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
                       :aria-expanded="open" aria-haspopup="menu" :aria-label="'Actions for ' + r.po"
-                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
                 <i data-lucide="more-horizontal" class="size-4"></i>
               </button>
               <div x-show="open" x-cloak x-ref="menu" role="menu" :aria-label="'Actions for ' + r.po"

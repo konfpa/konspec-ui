@@ -1,15 +1,34 @@
 <!-- A bordered strip, which says "these do different things" — the opposite of
-     the tinted track above. One border around the outside, border-l between,
-     and the radii on the end buttons rather than overflow-hidden on the
-     container, so the focus ring is not clipped off either end. -->
-<div data-kui="button-group/attached" class="inline-flex rounded-lg border border-zinc-300 bg-white">
-  <button type="button" class="inline-flex h-8 items-center gap-2 rounded-l-lg px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+     the tinted track above. One border-zinc-300 around the outside, a lighter
+     border-zinc-200 between, and the radii on the end buttons rather than
+     overflow-hidden on the container, so nothing is clipped off either end.
+
+     The height is declared once, on the wrapper: h-9 plus its own border is
+     exactly the 36px of the button standing next to it, and the members take
+     it by stretching. Put h-9 on the members and the group comes out 38; put
+     h-8 on them and it comes out 34. Both are wrong in a way that only shows
+     up when something else is beside it.
+
+     The end members are rounded-*-[7px], not -lg. The wrapper is 8px with a
+     1px border, so its inner curve is 7px — an 8px corner on the member leaves
+     a white crescent that appears the first time the member is hovered.
+
+     The focus outline on a member is inset. A flush member with the ordinary
+     outward halo draws a second rounded box two pixels outside the border it
+     is already touching, so the indicator reads as two boxes rather than one.
+
+     Delete is red text on the ordinary zinc hover. The red says destructive;
+     a red-50 fill behind it would make the last member of every strip the
+     loudest thing in the toolbar. -->
+<div data-kui="button-group/attached" role="group" aria-label="Order actions"
+     class="inline-flex h-9 items-stretch rounded-lg border border-zinc-300 bg-white">
+  <button type="button" class="inline-flex items-center gap-2 rounded-l-[7px] px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
     <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Edit
   </button>
-  <button type="button" class="inline-flex h-8 items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="inline-flex items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
     <i data-lucide="copy" class="size-4 text-zinc-600"></i>Duplicate
   </button>
-  <button type="button" class="inline-flex h-8 items-center gap-2 rounded-r-lg border-l border-zinc-200 px-3 text-[13px]/5 font-medium text-red-600 hover:bg-red-50">
+  <button type="button" class="inline-flex items-center gap-2 rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
     <i data-lucide="trash-2" class="size-4"></i>Delete
   </button>
 </div>

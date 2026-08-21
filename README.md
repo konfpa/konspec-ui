@@ -11,7 +11,7 @@
 
 [![CI](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml)
 [![components](https://img.shields.io/badge/components-55-18181b?style=flat-square)](#components)
-[![variants](https://img.shields.io/badge/variants-417-18181b?style=flat-square)](#components)
+[![variants](https://img.shields.io/badge/variants-436-18181b?style=flat-square)](#components)
 [![build step](https://img.shields.io/badge/build_step-none-18181b?style=flat-square)](#running-it-locally)
 [![licence](https://img.shields.io/badge/licence-MIT-18181b?style=flat-square)](LICENSE)
 
@@ -41,7 +41,7 @@ Arrived without reading llms.txt:         /r/index.json
 Never fetch /registry.json — the whole system in one file, ~725k tokens.
 ```
 
-`llms.txt` is 35 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
+`llms.txt` is 36 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 
@@ -72,15 +72,15 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**55 components · 417 variants · 55 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
+**55 components · 436 variants · 55 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
 
 ### Actions
 
 | Component | id | Variants | Page |
 |---|---|--:|---|
-| Button | `button` | 8 | [open](https://konfpa.github.io/konspec-ui/components/button.html) |
-| Button group | `button-group` | 8 | [open](https://konfpa.github.io/konspec-ui/components/button-group.html) |
-| Dropdown menu | `dropdown` | 9 | [open](https://konfpa.github.io/konspec-ui/components/dropdown.html) |
+| Button | `button` | 14 | [open](https://konfpa.github.io/konspec-ui/components/button.html) |
+| Button group | `button-group` | 15 | [open](https://konfpa.github.io/konspec-ui/components/button-group.html) |
+| Dropdown menu | `dropdown` | 15 | [open](https://konfpa.github.io/konspec-ui/components/dropdown.html) |
 
 ### Forms
 

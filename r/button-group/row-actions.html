@@ -1,0 +1,71 @@
+<!-- h-7, because a 36px strip in a 40px row leaves two pixels above and below
+     it and the register stops reading as a table. Small is the one size that
+     is a density decision rather than an importance one, and a row is where
+     that decision gets made.
+
+     Revealed on hover and on focus-within, never on hover alone. Keyboard
+     users never hover, so a strip that only appears under the pointer is a set
+     of actions nobody can reach with a Tab — and because focus-within fires
+     the moment the first member is focused, the strip is visible by the time
+     anyone can act on it.
+
+     opacity rather than hidden. An invisible strip still occupies its column,
+     so the last column does not change width as the pointer travels down the
+     register, and the rows do not jitter under the cursor.
+
+     Every member is icon-only, so every member names the record as well as the
+     verb. Twelve rows of a button called Print say nothing about which GRN is
+     about to come out of the printer, and the row heading is not part of the
+     button's accessible name. -->
+<div data-kui="button-group/row-actions" class="overflow-x-auto rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">GRN</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
+        <th scope="col" class="px-4 py-2.5"><span class="sr-only">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="group border-b border-zinc-100 last:border-0">
+        <th scope="row" class="px-4 py-2 text-left font-medium tabular-nums">GRN-26-0442</th>
+        <td class="px-4 py-2">Sharma Extrusions</td>
+        <td class="px-4 py-2 text-right tabular-nums">12,000 kg</td>
+        <td class="px-4 py-2 text-right">
+          <div role="group" aria-label="Actions for GRN-26-0442"
+               class="inline-flex h-7 items-stretch rounded-md border border-zinc-300 bg-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+            <button type="button" aria-label="Open GRN-26-0442" class="flex w-7 items-center justify-center rounded-l-[5px] text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              <i data-lucide="eye" class="size-4"></i>
+            </button>
+            <button type="button" aria-label="Print GRN-26-0442" class="flex w-7 items-center justify-center border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              <i data-lucide="printer" class="size-4"></i>
+            </button>
+            <button type="button" aria-label="More actions for GRN-26-0442" aria-haspopup="menu" class="flex w-7 items-center justify-center rounded-r-[5px] border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              <i data-lucide="ellipsis" class="size-4"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+      <tr class="group border-b border-zinc-100 last:border-0">
+        <th scope="row" class="px-4 py-2 text-left font-medium tabular-nums">GRN-26-0443</th>
+        <td class="px-4 py-2">Nashik Steel Traders</td>
+        <td class="px-4 py-2 text-right tabular-nums">640 kg</td>
+        <td class="px-4 py-2 text-right">
+          <div role="group" aria-label="Actions for GRN-26-0443"
+               class="inline-flex h-7 items-stretch rounded-md border border-zinc-300 bg-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+            <button type="button" aria-label="Open GRN-26-0443" class="flex w-7 items-center justify-center rounded-l-[5px] text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              <i data-lucide="eye" class="size-4"></i>
+            </button>
+            <button type="button" aria-label="Print GRN-26-0443" class="flex w-7 items-center justify-center border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              <i data-lucide="printer" class="size-4"></i>
+            </button>
+            <button type="button" aria-label="More actions for GRN-26-0443" aria-haspopup="menu" class="flex w-7 items-center justify-center rounded-r-[5px] border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              <i data-lucide="ellipsis" class="size-4"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

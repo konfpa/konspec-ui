@@ -118,8 +118,8 @@ register(
     <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
     <div class="flex flex-wrap items-center gap-2">
       <button class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
-      <button class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Cancel orders</button>
+      <button class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">Export</button>
+      <button class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Cancel orders</button>
     </div>
     <button @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-600 underline underline-offset-2">Clear</button>
   </div>
@@ -249,7 +249,7 @@ register(
               <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
                       @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
                       :aria-expanded="open" aria-haspopup="menu" :aria-label="'Actions for ' + r.po"
-                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
                 <i data-lucide="more-horizontal" class="size-4"></i>
               </button>
               <div x-show="open" x-cloak x-ref="menu" role="menu" :aria-label="'Actions for ' + r.po"
@@ -506,13 +506,13 @@ register(
       </button>
       <div x-show="open" x-cloak role="group" aria-label="Columns shown"
            class="absolute right-0 z-40 mt-1 w-44 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
-        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-100">
+        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
           <input type="checkbox" x-model="cols.dept" class="size-4 shrink-0 accent-zinc-700">Department
         </label>
-        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-100">
+        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
           <input type="checkbox" x-model="cols.status" class="size-4 shrink-0 accent-zinc-700">Status
         </label>
-        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-100">
+        <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
           <input type="checkbox" x-model="cols.due" class="size-4 shrink-0 accent-zinc-700">Due
         </label>
       </div>
@@ -523,7 +523,7 @@ register(
     <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
     <div class="flex flex-wrap items-center gap-2">
       <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-50">Export</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">Export</button>
     </div>
     <button type="button" @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2">Clear</button>
   </div>
@@ -1934,7 +1934,7 @@ register(
      nobody scrolls. -->
 <div data-kui="stat-card/dense" class="max-w-3xl">
   <div class="overflow-hidden rounded-xl border border-zinc-200">
-    <dl class="grid grid-cols-2 gap-px bg-zinc-100 sm:grid-cols-4">
+    <dl class="grid grid-cols-2 gap-px bg-zinc-200 sm:grid-cols-4">
 
       <div class="bg-white px-3 py-2.5">
         <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open</dt>
@@ -2034,7 +2034,7 @@ register(
   </div>
 
   <button type="button" @click="run()"
-          class="mt-3 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="mt-3 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Load again
   </button>
 </div>` },
@@ -4879,7 +4879,7 @@ register(
       <p class="mt-1 text-[13px]/5 text-zinc-600">Sharma Extrusions · Fabrication</p>
     </div>
     <div class="flex shrink-0 gap-2">
-      <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
       </button>
       <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -6087,7 +6087,7 @@ register(
   <p class="text-[12px]/4 text-zinc-500">Nothing was changed.</p>
   <button type="button" hx-get="{% url 'order-register-rows' %}"
           hx-target="#register-rows" hx-swap="outerHTML"
-          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
+          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200">
     <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry
   </button>
 </div>` }

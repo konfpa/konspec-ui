@@ -42,7 +42,7 @@
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-sh"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Narrow the GRN list
   </button>
 
@@ -84,7 +84,7 @@
 
     <div class="flex flex-col-reverse gap-2 border-t border-zinc-200 bg-zinc-100 px-4 py-3 pb-4 sm:flex-row sm:items-center sm:justify-between sm:py-2.5">
       <button type="button" @click="close()"
-              class="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px]/4 sm:underline sm:underline-offset-2 sm:hover:bg-transparent">Cancel</button>
+              class="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px]/4 sm:underline sm:underline-offset-2 sm:hover:bg-transparent">Cancel</button>
       <button type="button" @click="close()"
               class="w-full rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:px-3.5 sm:py-1.5">Apply</button>
     </div>

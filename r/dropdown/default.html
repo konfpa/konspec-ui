@@ -4,9 +4,19 @@
      it introduces nothing. As its own element it drops out with the same
      {% if %} as the item it introduces.
 
-     zinc-100, not zinc-200: the panel edge is the zinc-200, and a rule inside
-     an already bordered surface is a step lighter. role="separator" is real
-     here because the panel is a role="menu" and a menu is a list of peers.
+     Three fills, three borders, one step apart. The panel floats over the page
+     so its edge is border-zinc-300, the Edge token; the rule inside it is
+     zinc-100, because a divider inside an already bordered surface is a step
+     lighter again; and the focused item is bg-zinc-100, the tint token for a
+     highlighted option. Nothing in a menu takes bg-zinc-200 — that is the chip
+     fill, and an item wearing it reads as a badge left switched on.
+     role="separator" is real here because the panel is a role="menu" and a menu
+     is a list of peers.
+
+     The root is relative inline-block and the trigger inline-flex. A block-level
+     flex button stretches to whatever column it is dropped into, so a menu
+     trigger pasted into a form ends up the width of the page and reads as a
+     field rather than a button.
 
      A menu moves real focus between its items, one tabindex="-1" at a time.
      That is the opposite of the combobox next door, which keeps focus in the
@@ -17,8 +27,9 @@
      drops it from the keyboard order too, and the separator is skipped for
      free because it is not a menuitem. The focused item takes a tint and an
      inset outline rather than outline-none plus a tint: the panel is
-     overflow-hidden so a positive offset would be clipped, and in forced
-     colours the tint is dropped and the outline is all that is left.
+     overflow-hidden so a positive offset would be clipped, in forced colours
+     the tint is dropped and the outline is all that is left, and outline-none
+     beside an outline width silences the outline while leaving it configured.
 
      The opening focus is moved on the next animation frame, not in $nextTick.
      x-show has not written display yet when $nextTick runs: measured, the panel
@@ -26,8 +37,13 @@
      focus() on a hidden button is a silent no-op that leaves the caret on the
      trigger. It only shows up when the trigger already had focus, because
      otherwise there is nothing to notice: a menu that opens with focus still
-     outside it is a menu the arrow keys do not drive. -->
-<div data-kui="dropdown/default" class="relative"
+     outside it is a menu the arrow keys do not drive.
+
+     The panel does not fade. It is opened deliberately and read immediately, so
+     the only motion is the chevron reporting a state that persists, bound on a
+     wrapping span because createIcons() replaces the <i> and takes any :class
+     on it with it. -->
+<div data-kui="dropdown/default" class="relative inline-block"
      x-data="{
        open: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
@@ -53,15 +69,17 @@
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
           :aria-expanded="open" aria-haspopup="menu"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
-    <i data-lucide="download" class="size-4"></i>Export
-    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="download" class="size-4 text-zinc-600"></i>Export
+    <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </span>
   </button>
   <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Export options"
        @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
        @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
        @keydown.tab="close(false)"
-       class="absolute left-0 z-40 mt-1 w-52 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+       class="absolute top-full left-0 z-40 mt-1 w-52 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
     <button type="button" role="menuitem" tabindex="-1" @click="close()"
             class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
       <i data-lucide="sheet" class="size-4 text-zinc-600"></i>Excel (.xlsx)
