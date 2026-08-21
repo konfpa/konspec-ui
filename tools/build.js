@@ -466,6 +466,13 @@ if (focusProblems.length) {
    rather than leave a number nobody rebuilds */
 readmeOut = readmeOut.replace(/`llms\.txt` is \d+ KB/, '`llms.txt` is ' + llmsKB + ' KB');
 
+/* same for the header badges — a hand-kept count in a badge is a count that is
+   wrong by the next component, and it is the first thing anyone reads */
+const nVariants = R.components.reduce((a, c) => a + c.variants.length, 0);
+readmeOut = readmeOut
+  .replace(/badge\/components-\d+-/, 'badge/components-' + R.components.length + '-')
+  .replace(/badge\/variants-\d+-/,   'badge/variants-' + nVariants + '-');
+
 const outputs = [
   ['README.md',         readmeOut],
   ['registry.json',     registryOut],
