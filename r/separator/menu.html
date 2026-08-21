@@ -12,7 +12,7 @@
      zinc-100 and full bleed, my-1 for the breathing room the items already have
      through their padding. The panel is the zinc-200 edge; the divider inside
      it is a step lighter, the same as in any card. -->
-<div class="relative max-w-xs" x-data="{ open: false }" @click.outside="open = false">
+<div data-kui="separator/menu" class="relative max-w-xs" x-data="{ open: false }" @click.outside="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="menu"
           class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="ellipsis" class="size-4 text-zinc-600"></i>Actions

@@ -29,7 +29,7 @@
      Below md the row is display:none and "Page 4 of 15" stands in its place.
      Seven squares and two buttons and a range do not fit in 390px, and the
      failure is a sideways scroll under a table that was restacked to avoid one. -->
-<nav aria-label="Order register pages"
+<nav data-kui="pagination/numbered" aria-label="Order register pages"
      x-data="{
        page: 4, size: 10, total: 148,
        get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },

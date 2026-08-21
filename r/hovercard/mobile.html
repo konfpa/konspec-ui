@@ -14,7 +14,7 @@
      nothing is hidden behind it. That is also why the hover target is the whole
      row rather than the link alone: trigger and panel share one box, so there
      is no gap for the pointer to fall through and no bridge to build. -->
-<div class="rounded-xl border border-zinc-300 bg-white p-4"
+<div data-kui="hovercard/mobile" class="rounded-xl border border-zinc-300 bg-white p-4"
      x-data="{
        open: false, timer: 0,
        fine: matchMedia('(hover: hover) and (pointer: fine)').matches,

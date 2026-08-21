@@ -17,7 +17,7 @@
      inside takes py-1 rather than a margin — a margin on the first child
      collapses through the wrapper and the measured height comes up short by
      exactly that margin, clipping the last row until the next toggle. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<div data-kui="sidebar/nested" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ open: { orders: true, vendors: false, quality: false } }">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>

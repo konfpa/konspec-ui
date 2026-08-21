@@ -9,7 +9,7 @@
      With the trigger away from the panel, aria-controls is the only thing tying
      them together and it is doing real work. Keep the panel after the trigger
      in document order so Tab reaches it next. -->
-<div x-data="{ open: false }" class="space-y-4">
+<div data-kui="collapsible/controlled" x-data="{ open: false }" class="space-y-4">
   <div class="flex flex-wrap items-start justify-between gap-3">
     <div class="min-w-0">
       <h2 class="text-[20px]/7 font-semibold tracking-tight">GRN-3391</h2>

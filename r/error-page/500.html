@@ -23,7 +23,7 @@
 
      The well is graphite and the tone is the glyph alone. A red screen for a
      failure that changed nothing makes a two-minute fault look like data loss. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div data-kui="error-page/500" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{ done: false, t: null,
                copy() { navigator.clipboard?.writeText(this.$refs.ref.textContent.trim());
                         this.done = true;

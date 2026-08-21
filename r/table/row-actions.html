@@ -9,7 +9,7 @@
      component. items() is read out of the DOM on every keystroke, so a row
      whose Approve is hidden by a permission check drops out of the keyboard
      order with it. -->
-<div x-data="{
+<div data-kui="table/row-actions" x-data="{
        rows: [
          { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '₹18,42,000', status: 'Open', dot: 'bg-zinc-700' },
          { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: '₹4,68,500', status: 'Approved', dot: 'bg-amber-500' },

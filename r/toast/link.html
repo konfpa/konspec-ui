@@ -9,7 +9,7 @@
 
      Ten seconds rather than five, because the user has to read the number,
      decide, and travel to a target that is not under the pointer. -->
-<div x-data="{
+<div data-kui="toast/link" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {

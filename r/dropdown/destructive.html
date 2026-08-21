@@ -19,7 +19,7 @@
      cannot close itself out from under the dialog it opened. Escape is bound
      .window on the dialog and unbound-but-stopped on the menu, so exactly one
      of them answers whichever is up. -->
-<div class="relative"
+<div data-kui="dropdown/destructive" class="relative"
      x-data="{
        open: false, confirm: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },

@@ -18,7 +18,7 @@
 
      The @click does not preventDefault — htmx listens for the same click — and
      hx-headers sits on the root, since there is no form to read a token from. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/htmx" class="rounded-xl border border-zinc-300 bg-white"
      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
      x-data="{
        open: null, at: 'file', typed: '', clock: null, busy: false, msg: '', ok: true,

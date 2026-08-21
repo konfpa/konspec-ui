@@ -47,7 +47,7 @@
      required is inherited into every option, which is what the browser needs to
      block the submit and what a screen reader needs to announce on whichever
      option has focus. -->
-<form method="post" class="max-w-xl">
+<form data-kui="radio/django" method="post" class="max-w-xl">
   {% csrf_token %}
 
   <fieldset>

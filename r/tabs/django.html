@@ -21,7 +21,7 @@
      class OrderDetail(DetailView):
          def get_context_data(self, **kw):
              return super().get_context_data(**kw) | {'section': self.kwargs['section']} -->
-<nav aria-label="Purchase order sections" class="border-b border-zinc-200">
+<nav data-kui="tabs/django" aria-label="Purchase order sections" class="border-b border-zinc-200">
   <div class="-mb-px flex gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
     {% for key, label in sections %}
       <a href="{% url 'order-detail' order.pk key %}"

@@ -22,7 +22,7 @@
      stops. That is a different component. If the command palette is also on
      this page, only one of the two may bind ⌘K — bind it twice and the winner
      depends on script order. -->
-<header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+<header data-kui="topbar/search" class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
         x-data="{ q: '' }"
         @keydown.window.meta.k.prevent="$refs.q.focus()" @keydown.window.ctrl.k.prevent="$refs.q.focus()">
 

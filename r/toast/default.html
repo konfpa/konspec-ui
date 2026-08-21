@@ -14,7 +14,7 @@
      <svg> keeps its data-lucide, so an unguarded call repaints every icon on the
      page. The span around it carries the size-4 box and the colour: createIcons()
      replaces the <i> and anything bound on it goes with it. -->
-<div x-data="{
+<div data-kui="toast/default" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {

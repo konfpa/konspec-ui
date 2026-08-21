@@ -21,7 +21,7 @@
      First and Last earn their place on a register deep enough that Last is a
      real question — "what is the oldest thing in here". On a five-page list they
      are two more controls saying what Previous and Next already said. -->
-<nav aria-label="Receipt register pages"
+<nav data-kui="pagination/edges" aria-label="Receipt register pages"
      x-data="{
        page: 2, pages: 4,
        first() { this.page = 1; this.$refs.next.focus() },

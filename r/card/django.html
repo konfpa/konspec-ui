@@ -4,7 +4,7 @@
 
      get_absolute_url on the model, not a hard-coded path, so the card keeps
      working when the URL conf moves. Nothing else in the card is a link. -->
-<div class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
+<div data-kui="card/django" class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
   {% for order in orders %}
     <a href="{{ order.get_absolute_url }}"
        class="group rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400">

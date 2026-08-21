@@ -1,6 +1,6 @@
 <!-- Header and footer stay put, only the middle scrolls. max-h on the panel,
      overflow-y on the body, and min-h-0 so the flex child is allowed to shrink. -->
-<div x-data="{ open: false }">
+<div data-kui="dialog/scrolling" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Review 6 lines</button>
 

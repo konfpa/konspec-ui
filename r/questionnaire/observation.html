@@ -19,7 +19,7 @@
      shorter, but Lucide hydrates once at load and an icon rendered later by
      Alpine stays a bare <i>, so the warning icon inside the loop never
      appears. -->
-<div class="max-w-xl space-y-5"
+<div data-kui="questionnaire/observation" class="max-w-xl space-y-5"
      x-data="{
        thickness: '2.42', mfi: '0.46',
        out(v, lo, hi) { const n = parseFloat(v); return v !== '' && !isNaN(n) && (lo > n || n > hi) }

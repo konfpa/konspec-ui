@@ -21,7 +21,7 @@
      Ticks drawn inside template x-for do not exist when createIcons() first
      runs, so the page needs the guarded re-hydration loop or they come up
      empty. The x-show goes on the wrapping span, never on the <i>. -->
-<div class="relative max-w-sm"
+<div data-kui="select/status" class="relative max-w-sm"
      x-data="{
        open: false, sel: 'accepted', buf: '', timer: null,
        options: [

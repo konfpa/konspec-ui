@@ -19,7 +19,7 @@
      The label comes from get_status_display, so it follows the model's choices
      and reads identically on every screen. -->
 {% load ui %}
-<span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+<span data-kui="badge/django" class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
   <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>
   {{ order.get_status_display }}
 </span>

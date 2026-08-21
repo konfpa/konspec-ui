@@ -21,7 +21,7 @@
 
      Padding, not a margin: py-12 on the cell keeps the panel at the height it
      had with rows in it, and cannot collapse against a sibling. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+<div data-kui="empty-state/in-table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ cols: { received: true, status: true },
                get span() { return 2 + (this.cols.received ? 1 : 0) + (this.cols.status ? 1 : 0) } }">
 

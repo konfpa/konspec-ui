@@ -17,7 +17,7 @@
      follows and what Tab follows are the same. At 390px it is one column, which
      is why the dates are labelled Effective from and Effective to rather than
      one date and the word "to" between them. -->
-<div class="max-w-2xl"
+<div data-kui="field/grid" class="max-w-2xl"
      x-data="{ rate: '118.40', floor: 95, touched: true,
                get bad() { return this.touched && Number(this.rate) < this.floor } }">
   <div class="grid gap-4 sm:grid-cols-2">

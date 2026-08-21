@@ -6,7 +6,7 @@
      auto first (it can never report less than the height already set, so the
      box only ever grows), and never re-measuring, which leaves a box sized at
      desktop width still that tall at 390px. -->
-<div class="max-w-xl"
+<div data-kui="textarea/autogrow" class="max-w-xl"
      x-data="{
        grow() {
          const t = this.$refs.ta;

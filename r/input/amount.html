@@ -16,7 +16,7 @@
      gives 18,42,000. It groups on blur and ungroups on focus, because editing
      a string with commas in it means counting commas to find the digit you
      want. The hidden input is what posts — never the formatted string. -->
-<div class="max-w-xl space-y-5"
+<div data-kui="input/amount" class="max-w-xl space-y-5"
      x-data="{
        amount: '18,42,000',
        strip() { this.amount = this.amount.replace(/[^0-9.]/g, ''); },

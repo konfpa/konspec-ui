@@ -1,4 +1,4 @@
-<div x-data="{ depth: 0 }">
+<div data-kui="attachment/default" x-data="{ depth: 0 }">
   <label class="mb-1.5 block text-[13px]/5 font-medium">Attachments</label>
 
   <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"

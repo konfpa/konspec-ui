@@ -29,7 +29,7 @@
      The pager under the list is pagination's dense form. It pages the queue and
      nothing else: the selection survives it, which is why the detail can still
      be showing a record from page one while page two is on screen. -->
-<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<main data-kui="list-detail/search" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
       x-id="['q', 'rec']"
       x-data="{
         q: '', plant: 'all', sel: 'BN-26-0418', page: 1, size: 4, detail: false,

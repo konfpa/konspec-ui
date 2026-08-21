@@ -9,7 +9,7 @@
      survives paging and filtering.
 
      The panel is not overflow-hidden: the column menu opens out of it. -->
-<div x-data="{
+<div data-kui="data-table/default" x-data="{
        q: '', col: 'po', dir: 'asc', page: 1, size: 5, sel: [],
        cols: { dept: true, status: true, due: true },
        rows: [

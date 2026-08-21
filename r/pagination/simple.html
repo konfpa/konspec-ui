@@ -20,7 +20,7 @@
      Pressing Previous into page one disables Previous, and a browser blurs a
      disabled element to the body — so the handler hands focus to Next. Without
      it the keyboard user is at the top of the document with no way back but Tab. -->
-<nav aria-label="Order register pages"
+<nav data-kui="pagination/simple" aria-label="Order register pages"
      x-data="{
        page: 3, size: 10, total: 148,
        get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },

@@ -22,7 +22,7 @@
      disabled option saying so, and the child stays required so nothing can be
      submitted past it. An empty fragment leaves a select with no options at
      all, which is a 20px sliver nobody can explain. -->
-<div class="max-w-md space-y-4"
+<div data-kui="select/cascade" class="max-w-md space-y-4"
      x-data="{ vendor: '', loading: false, count: 0 }"
      @htmx:before-request.camel="loading = true"
      @htmx:after-request.camel="loading = false"

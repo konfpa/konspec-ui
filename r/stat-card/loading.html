@@ -14,7 +14,7 @@
      aria-busy is on the tile, the bars are aria-hidden, and x-cloak keeps the
      loaded state from flashing before Alpine boots. x-init runs the cycle once
      so the example resolves; in an application the swap is what clears it. -->
-<div class="max-w-sm"
+<div data-kui="stat-card/loading" class="max-w-sm"
      x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 1800) } }"
      x-init="run()">
 

@@ -20,7 +20,7 @@
      line of text, and a browser drops focus from a removed element to the body —
      so the handler moves focus to the count, which is tabindex="-1" for exactly
      that reason and is also the sentence that says what just happened. -->
-<div class="max-w-md rounded-xl border border-zinc-300 bg-white"
+<div data-kui="pagination/load-more" class="max-w-md rounded-xl border border-zinc-300 bg-white"
      x-data="{
        shown: 6, step: 6, total: 21,
        get rows() { return Array.from({ length: this.shown }, (_, i) => ({

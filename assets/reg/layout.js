@@ -53,7 +53,7 @@ register(
     related: ['sidebar', 'topbar', 'command-palette', 'dropdown', 'page-header'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div class="relative flex h-[720px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+`<div data-kui="app-shell/default" class="relative flex h-[720px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{
        sidebar: true, nav: false, wide: false,
        init() {
@@ -721,7 +721,7 @@ register(
      A top-level register has no parent, so there is no trail. Two actions, and
      only the last is filled — the primary is last in the DOM as well as last on
      the right, so it is announced in the order it is drawn. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/default" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto flex max-w-[1600px] flex-wrap items-start justify-between gap-x-6 gap-y-3 px-4 py-4 lg:px-6">
       <div class="min-w-0">
@@ -751,7 +751,7 @@ register(
      Render this here only if the topbar does not carry a trail. One of the two,
      decided once for the application; on screen twice, the second one is the one
      that goes stale. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/trail" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
       <nav aria-label="Breadcrumb">
@@ -795,7 +795,7 @@ register(
      string; as a definition list each value has a name that survives being read
      out on its own. Every figure is tabular-nums so the band does not reflow
      when the order is amended and the value changes width. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/record" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
       <nav aria-label="Breadcrumb">
@@ -877,7 +877,7 @@ register(
      four tabs do not fit 390px and a second line of tabs reads as a different
      control. Its scrollbar is hidden and the focus outline takes a negative
      offset, because a positive one is clipped by the scroller. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100"
+<div data-kui="page-header/tabs" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100"
      x-id="['ph-tab', 'ph-panel']"
      x-data="{
        tab: 'orders',
@@ -991,7 +991,7 @@ register(
      called Remove is what a screen reader reads out otherwise. The count is
      plain text and not a live region — it changes on a page of results, not on
      a keystroke. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100"
+<div data-kui="page-header/filters" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100"
      x-data="{ q: '' }">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
@@ -1083,7 +1083,7 @@ register(
      Its arrows carry names that say what they step through, because Previous
      and Next on their own are the same two words as every other pager on the
      screen. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/back" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
       <a href="#" class="inline-flex items-center gap-1.5 rounded text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -1151,7 +1151,7 @@ register(
      To ship it: keep the <header> as written, drop the wrapper's height,
      overflow, rounding and border, and move @scroll onto whichever element
      scrolls on that page. -->
-<div class="h-[420px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100"
+<div data-kui="page-header/sticky" class="h-[420px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100"
      x-data="{ shrunk: false }"
      @scroll.self="shrunk = $event.target.scrollTop > 56">
   <header class="sticky top-0 z-20 border-b border-transparent bg-white transition-colors"
@@ -1226,7 +1226,7 @@ register(
      clip: the rounded-t-xl on the <header> and the deep bottom padding are the
      frame giving the menu somewhere to open, and both come off on a real page.
      The destructive item is last, under a real role="separator". -->
-<div class="rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/overflow" class="rounded-xl border border-zinc-300 bg-zinc-100">
   <header class="rounded-t-xl border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
       <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
@@ -1362,7 +1362,7 @@ register(
     related: ['stat-card', 'table', 'separator'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+`<div data-kui="card/default" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-5 py-3.5">
     <h2 class="text-[14px]/5 font-semibold">Delivery terms</h2>
   </div>
@@ -1388,7 +1388,7 @@ register(
   </div>
 </div>` },
       { id: 'actions', name: 'With header actions', code:
-`<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+`<div data-kui="card/actions" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200 px-5 py-3.5">
     <div class="min-w-0">
       <h2 class="text-[14px]/5 font-semibold">Attached documents</h2>
@@ -1421,7 +1421,7 @@ register(
   </ul>
 </div>` },
       { id: 'stats', name: 'Split stats footer', code:
-`<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+`<div data-kui="card/stats" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-5 py-3.5">
     <h2 class="text-[14px]/5 font-semibold">Order value</h2>
     <p class="text-[12px]/4 text-zinc-600">PO-24-1187 · 9 lines · Sharma Steel &amp; Alloys</p>
@@ -1450,7 +1450,7 @@ register(
   </div>
 </div>` },
       { id: 'section', name: 'Section card', code:
-`<div class="rounded-xl border border-zinc-300 bg-white px-5 py-5">
+`<div data-kui="card/section" class="rounded-xl border border-zinc-300 bg-white px-5 py-5">
   <h2 class="text-[16px]/6 font-semibold">Approval policy</h2>
   <p class="mt-1 max-w-prose text-[13px]/5 text-zinc-600">
     Who has to sign off before an order is released to the vendor. Changes apply to orders raised from tomorrow onward.
@@ -1478,7 +1478,7 @@ register(
 
      The footer is the totals row. It belongs in the card rather than the table
      because it is a summary of the query, not another record. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+<div data-kui="card/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200 px-5 py-3.5">
     <div class="min-w-0">
       <h2 class="text-[14px]/5 font-semibold">Order lines</h2>
@@ -1538,7 +1538,7 @@ register(
 
      The chevron is aria-hidden — the accessible name is already the whole
      card's text, and "chevron right" adds nothing to it. -->
-<div class="grid max-w-2xl items-start gap-3 sm:grid-cols-2">
+<div data-kui="card/clickable" class="grid max-w-2xl items-start gap-3 sm:grid-cols-2">
   <a href="#" class="group rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400">
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
@@ -1578,7 +1578,7 @@ register(
      bottom and makes them read as though data is missing.
 
      Let them size to their content and the ragged bottom edge is honest. -->
-<div class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
+<div data-kui="card/grid" class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
   <div class="rounded-xl border border-zinc-300 bg-white">
     <div class="border-b border-zinc-200 px-5 py-3.5">
       <h3 class="text-[14px]/5 font-semibold">Vendor</h3>
@@ -1625,7 +1625,7 @@ register(
 
      No border and no fill on the inner block — a dashed box inside a bordered
      card is a card inside a card. -->
-<div class="max-w-md rounded-xl border border-zinc-300 bg-white">
+<div data-kui="card/empty" class="max-w-md rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-5 py-3.5">
     <h2 class="text-[14px]/5 font-semibold">Attached documents</h2>
   </div>
@@ -1650,7 +1650,7 @@ register(
 
      get_absolute_url on the model, not a hard-coded path, so the card keeps
      working when the URL conf moves. Nothing else in the card is a link. -->
-<div class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
+<div data-kui="card/django" class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
   {% for order in orders %}
     <a href="{{ order.get_absolute_url }}"
        class="group rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400">
@@ -1738,7 +1738,7 @@ register(
      role="separator" — border-zinc-200 sets its colour and there is nothing
      else to add. Use it where you would start a new heading, never between the
      rows of a list. -->
-<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+<div data-kui="separator/default" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h2 class="text-[16px]/6 font-semibold">Payment terms</h2>
   <p class="mt-1 text-[13px]/5 text-zinc-600">45 days from GRN, against a clean receipt note.</p>
 
@@ -1771,7 +1771,7 @@ register(
      border. It is border-zinc-200 rather than zinc-100 because it is a strip
      that ends the card, the same weight as the header above it, not another
      row. x-cloak because it is hidden at first paint. -->
-<div class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white" x-data="{ cancelled: false }">
+<div data-kui="separator/rows" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white" x-data="{ cancelled: false }">
   <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
     <h2 class="text-[14px]/5 font-semibold">Order lines</h2>
     <button type="button" @click="cancelled = !cancelled"
@@ -1817,7 +1817,7 @@ register(
      For a fixed set of columns, divide-x on the grid is the whole job — no
      heights to manage and no element that can be left behind by a hidden
      child. -->
-<div class="space-y-3">
+<div data-kui="separator/vertical" class="space-y-3">
   <div class="flex max-w-md flex-wrap items-center gap-2 rounded-xl border border-zinc-300 bg-white p-2">
     <div role="group" aria-label="Row height" class="flex items-center gap-1">
       <button type="button" aria-label="Compact rows" aria-pressed="true"
@@ -1875,7 +1875,7 @@ register(
      The second one is the exception — a label that names a choice rather than a
      section. "or" is plain text with no role, because that is exactly what it
      is; only the lines are hidden. -->
-<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+<div data-kui="separator/labelled" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <p class="text-[13px]/5 text-zinc-600">Nine lines released to the vendor on 04 Aug 2026.</p>
 
   <div class="mt-5 flex items-center gap-3">
@@ -1908,7 +1908,7 @@ register(
      zinc-100 and full bleed, my-1 for the breathing room the items already have
      through their padding. The panel is the zinc-200 edge; the divider inside
      it is a step lighter, the same as in any card. -->
-<div class="relative max-w-xs" x-data="{ open: false }" @click.outside="open = false">
+<div data-kui="separator/menu" class="relative max-w-xs" x-data="{ open: false }" @click.outside="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="menu"
           class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="ellipsis" class="size-4 text-zinc-600"></i>Actions
@@ -1960,7 +1960,7 @@ register(
      {% endif %} -->
 {% load humanize ui %}
 
-<div role="menu" aria-label="Order actions"
+<div data-kui="separator/django" role="menu" aria-label="Order actions"
      class="w-52 overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
   {% for action in order.menu_actions %}
     <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
@@ -2035,7 +2035,7 @@ register(
     related: ['card', 'attachment', 'pagination'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div x-data="{
+`<div data-kui="carousel/default" x-data="{
        i: 0, n: 0, atStart: true, atEnd: true,
        slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
        pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
@@ -2188,7 +2188,7 @@ register(
   </div>
 </div>` },
       { id: 'peek', name: 'Peek', code:
-`<div x-data="{
+`<div data-kui="carousel/peek" x-data="{
        i: 0, n: 0, atStart: true, atEnd: true,
        slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
        pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
@@ -2270,7 +2270,7 @@ register(
 </div>` },
 
       { id: 'dots', name: 'Dots', code:
-`<div x-data="{
+`<div data-kui="carousel/dots" x-data="{
        i: 0, n: 0, atStart: true, atEnd: true,
        slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
        pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
@@ -2347,7 +2347,7 @@ register(
   </div>
 </div>` },
       { id: 'photo', name: 'Photo gallery', code:
-`<div x-data="{
+`<div data-kui="carousel/photo" x-data="{
        i: 0, n: 0, atStart: true, atEnd: true,
        slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
        pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
@@ -2436,7 +2436,7 @@ register(
 </div>` },
 
       { id: 'thumbnails', name: 'Thumbnail rail', code:
-`<div x-data="{
+`<div data-kui="carousel/thumbnails" x-data="{
        i: 0, n: 0, atStart: true, atEnd: true,
        slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
        pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
@@ -2523,7 +2523,7 @@ register(
 </div>` },
       { id: 'stats', name: 'Strip on mobile, grid on desktop', code:
 `<!-- no JavaScript: below sm it is a snapped strip, from sm up it is an ordinary grid -->
-<div role="group" aria-label="This month at Silvassa" tabindex="0"
+<div data-kui="carousel/stats" role="group" aria-label="This month at Silvassa" tabindex="0"
      class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible lg:grid-cols-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
   <div class="shrink-0 basis-[78%] snap-start rounded-xl border border-zinc-300 bg-white p-4 sm:basis-auto">
@@ -2554,7 +2554,7 @@ register(
 </div>` },
 
       { id: 'empty', name: 'Empty', code:
-`<div>
+`<div data-kui="carousel/empty">
   <h3 class="mb-3 text-[14px]/5 font-semibold">Photographs</h3>
   <div class="rounded-xl border border-dashed border-zinc-300 bg-white px-6 py-10 text-center">
     <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
@@ -2572,7 +2572,7 @@ register(
 
       { id: 'django', name: 'Django template', code:
 `{% if inspection.photos.exists %}
-<div x-data="{
+<div data-kui="carousel/django" x-data="{
        i: 0, n: 0, atStart: true, atEnd: true,
        slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
        pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
@@ -2731,7 +2731,7 @@ register(
      As a real page: drop the wrapper border and h-[640px], put h-screen
      overflow-hidden on <body>, and render this inside app-shell's main column
      with the shell's own header above it. -->
-<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<main data-kui="list-detail/default" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
       x-id="['q', 'rec']"
       x-data="{
         sel: 0, detail: false, said: '',
@@ -2962,7 +2962,7 @@ register(
      selection the listbox still needs one Tab stop, so the first option carries
      tabindex="0" while sel is null and Down from there selects rather than
      moves. -->
-<main class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<main data-kui="list-detail/nothing-selected" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
       x-id="['q', 'rec']"
       x-data="{
         sel: null, detail: false,
@@ -3118,7 +3118,7 @@ register(
      Nothing scrolls sideways. The summary grid is two columns at 390px and four
      from sm; the lines table is a stack of cards below md and a table above it,
      which is the same restack the table entry uses. -->
-<main class="flex h-[600px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<main data-kui="list-detail/responsive" class="flex h-[600px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
       x-id="['q', 'rec']"
       x-data="{
         sel: 0, detail: false,
@@ -3342,7 +3342,7 @@ register(
      The pager under the list is pagination's dense form. It pages the queue and
      nothing else: the selection survives it, which is why the detail can still
      be showing a record from page one while page two is on screen. -->
-<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<main data-kui="list-detail/search" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
       x-id="['q', 'rec']"
       x-data="{
         q: '', plant: 'all', sel: 'BN-26-0418', page: 1, size: 4, detail: false,
@@ -3582,7 +3582,7 @@ register(
      overflow-hidden on <body>, and let the rail sit beside app-shell's sidebar
      rather than inside it — one is where you are in the application and the
      other is what you are looking at in this screen. -->
-<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<main data-kui="list-detail/three-pane" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
       x-id="['q', 'rec']"
       x-data="{
         sel: 0, detail: false, view: 'mine', tones: { Overdue: true, Approved: true, Open: true },
@@ -3825,7 +3825,7 @@ register(
      motion-reduce:animate-none. The status region is where this layout does need
      a live region: the pane resolves without focus moving, so nothing else would
      say it had. -->
-<main class="flex h-[600px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<main data-kui="list-detail/loading" class="flex h-[600px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
       x-id="['q', 'rec']"
       x-data="{
         sel: 1, detail: false, loading: false, token: 0, said: '',
@@ -4105,7 +4105,7 @@ register(
 
      As a real page: drop the border and h-[640px], put h-screen overflow-hidden
      on <body>, and render this in app-shell's main column. -->
-<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<main data-kui="list-detail/qc-hold" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
       x-id="['q', 'rec', 'tab', 'panel']"
       x-data="{
         sel: 0, detail: false, decided: 3, tab: 'results', said: '',
@@ -4407,7 +4407,7 @@ register(
      ignores any string you return, so there is nothing to write there — the
      preventDefault is the whole handler, and it only prompts because a person
      actually typed something. -->
-<div class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/two-column" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        dirty: false, leaving: false,
        arm(e) { if (e.target.matches('input, select, textarea')) this.dirty = true },
@@ -4663,7 +4663,7 @@ register(
      The commitment total is an <output>, not a disabled input: nobody was ever
      going to edit it. aria-live="off" because it recomputes on every keystroke,
      and an <output> is a live region by default. -->
-<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/side-rail" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        qty: 45000, rate: 118.40, freight: 0.85,
        get goods() { return Number(this.qty) * Number(this.rate) },
@@ -4903,7 +4903,7 @@ register(
      own it; the section headings and the scroll are the navigation, and a rail
      folded into a sideways strip above the form is the one thing this system
      does not allow. -->
-<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/sections" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        active: 'sec-identity',
        spy() {
@@ -5179,7 +5179,7 @@ register(
      Errors are recomputed live once submitted, and not before. Telling somebody
      their half-typed GSTIN is fourteen characters while they are on the ninth
      is noise. -->
-<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/invalid" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        submitted: false, saved: false, ordered: '2026-08-16',
        // focus after a reveal needs a frame as well as a tick: at
@@ -5442,7 +5442,7 @@ register(
 
      Below sm the three buttons go full width and stack, in DOM order. Two 36px
      buttons side by side at 390px is a thumb-sized problem. -->
-<div class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/sticky-actions" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        busy: false, t: null,
        save() {
@@ -5685,7 +5685,7 @@ register(
 
      The totals are <output>, not disabled inputs: nobody was ever going to edit
      them. aria-live="off" because they recompute on every keystroke. -->
-<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/line-items" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        seq: 3,
        lines: [
@@ -5914,7 +5914,7 @@ register(
 
      Below sm the labelled steps do not fit, so they collapse to a rail and a
      line of text. They never scroll sideways. -->
-<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/wizard" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        step: 1, last: 4,
        // focus after a reveal needs a frame as well as a tick: at
@@ -6156,7 +6156,7 @@ register(
 
      Attachments in read mode keep Download and lose Remove. A control that
      cannot act is a control that should not be drawn. -->
-<div class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/readonly" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        mode: 'view', dirty: false, leaving: false,
        // focus after a reveal needs a frame as well as a tick: at
@@ -6470,7 +6470,7 @@ register(
      No sign-up link. Konspec accounts are created by IT, so the dead end is the
      support address rather than a register page that would 403 anyone who
      reached it. -->
-<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/signin" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ show: false, busy: false }">
   <main class="w-full max-w-sm">
 
@@ -6563,7 +6563,7 @@ register(
      happened. Bind the mark to a string — written once by the server it
      survives the correction, and the field then announces as invalid all
      session while its border is grey again. -->
-<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/failed" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{
        failed: true, edited: false, show: false,
        get bad() { return this.failed &amp;&amp; !this.edited },
@@ -6655,7 +6655,7 @@ register(
      about the domain, not about the address. Somebody who signs in through SSO
      has no password to reset, and without this line they type their address,
      get the confirmation screen, and wait for an email that will never come. -->
-<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/forgot" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ busy: false }">
   <main class="w-full max-w-sm">
 
@@ -6725,7 +6725,7 @@ register(
      plain text. Making it a live region announces one fact sixty times. The
      button is disabled while it runs, which is only acceptable because the
      figure beside it says exactly what it is waiting for. -->
-<div class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/sent" class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ left: 45 }"
      x-init="setInterval(() => { if (left &gt; 0) left-- }, 1000)">
   <main class="w-full max-w-sm">
@@ -6804,7 +6804,7 @@ register(
      The submit stays enabled. A disabled button with no explanation is a dead
      end for anybody who cannot see which rule is still grey; the form validates
      and says so. -->
-<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/reset" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{
        pw: '', pw2: '', show: false, touched: false,
        get long() { return this.pw.length &gt;= 12 },
@@ -6921,7 +6921,7 @@ register(
 
      Naming the factor is safe here — the password already proved who this is —
      and it is what stops the user hunting through three apps for a code. -->
-<div class="flex min-h-[520px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/otp" class="flex min-h-[520px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ code: '', left: 28 }"
      x-init="setInterval(() => { if (left &gt; 0) left-- }, 1000)">
   <main class="w-full max-w-sm">
@@ -6997,7 +6997,7 @@ register(
      The vendor portal line is the escape hatch. Contractors and vendors are not
      in Entra, so without it every one of them mails IT to ask why the password
      box has gone. One primary action, one route out, nothing else. -->
-<div class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/sso" class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ busy: false }">
   <main class="w-full max-w-sm">
 
@@ -7073,7 +7073,7 @@ register(
      The reference is selectable text. Somebody stuck here cannot raise a ticket
      in the app, so the one identifier support will ask for has to be copyable
      off this page. -->
-<div class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/locked" class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ left: 822 }"
      x-init="setInterval(() => { if (left &gt; 0) left-- }, 1000)">
   <main class="w-full max-w-sm">
@@ -7184,7 +7184,7 @@ register(
      No shell, so the wordmark is the only navigation and it is a real link. No
      search box: the register the button lands on has one, and it has the
      filters that go with it. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+<div data-kui="error-page/404" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
 
   <header class="flex items-center justify-between gap-3">
     <a href="/" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -7248,7 +7248,7 @@ register(
      shared terminal in QC the commonest cause of a 403 is that the last person
      never signed out, and the way out of that is the second link, not the
      first. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+<div data-kui="error-page/403" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
 
   <header class="flex items-center justify-between gap-3">
     <a href="/" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -7318,7 +7318,7 @@ register(
 
      The well is graphite and the tone is the glyph alone. A red screen for a
      failure that changed nothing makes a two-minute fault look like data loss. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div data-kui="error-page/500" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{ done: false, t: null,
                copy() { navigator.clipboard?.writeText(this.$refs.ref.textContent.trim());
                         this.done = true;
@@ -7403,7 +7403,7 @@ register(
 
      The countdown is not a live region. Announcing a two-hour window every
      thirty seconds buries everything else on the screen. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div data-kui="error-page/maintenance" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{
        until: 0, left: '', late: false, checking: false,
        tick() {
@@ -7496,7 +7496,7 @@ register(
      role="alert" and x-init moves focus to the h1, which has tabindex="-1", so
      the heading is spoken and Tab restarts at the top of the message instead of
      wherever the abandoned page left it. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div data-kui="error-page/offline" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{
        state: 'offline', tries: 2, last: '14:07',
        retry() {
@@ -7588,7 +7588,7 @@ register(
      The second link is the shared-terminal case, and on a plant floor it is the
      common one: the address in the message is not always the address of the
      person now standing at the screen. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div data-kui="error-page/expired" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{ next: '/grn/GRN-24-0912/?tab=lines' }">
 
   <header class="flex items-center justify-between gap-3">
@@ -7661,7 +7661,7 @@ register(
 
      And none of them render at all until DEBUG is False, which is why they are
      the templates that ship broken. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+<div data-kui="error-page/django" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
 
   <header class="flex items-center gap-2.5">
     <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">

@@ -6,7 +6,7 @@
 
      Busy keeps disabled as well as aria-busy — aria-busy announces the wait,
      disabled is what actually stops the second click. -->
-<div class="flex flex-wrap items-center gap-3" x-data="{ busy: false }">
+<div data-kui="button/states" class="flex flex-wrap items-center gap-3" x-data="{ busy: false }">
   <button type="button" @click="busy = true; setTimeout(() => busy = false, 2200)"
           :disabled="busy" :aria-busy="busy"
           class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:hover:bg-zinc-700">

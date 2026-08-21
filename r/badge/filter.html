@@ -1,7 +1,7 @@
 <!-- A badge that does something is a button. Selected is a solid fill, because
      a marginally darker tint is not a state anyone can see across a toolbar.
      aria-pressed carries the same fact to a screen reader. -->
-<div class="flex flex-wrap items-center gap-2" x-data="{ on: ['overdue'] }">
+<div data-kui="badge/filter" class="flex flex-wrap items-center gap-2" x-data="{ on: ['overdue'] }">
   <template x-for="f in [{ id: 'mine', label: 'My orders' }, { id: 'overdue', label: 'Overdue' }, { id: 'unapproved', label: 'Awaiting approval' }, { id: 'month', label: 'This month' }]" :key="f.id">
     <button type="button"
             @click="on = on.includes(f.id) ? on.filter(x => x !== f.id) : [...on, f.id]"

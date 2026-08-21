@@ -1,7 +1,7 @@
 <!-- The footer sits inside the ring, which is the whole reason the border is on
      the wrapper and not on the control. Ctrl or Cmd plus Enter posts; a bare
      Enter writes a newline, because that is what the key is for. -->
-<div class="max-w-xl" x-data="{ text: '' }">
+<div data-kui="textarea/toolbar" class="max-w-xl" x-data="{ text: '' }">
   <div class="rounded-xl border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <label for="ta-note" class="sr-only">Add a note to this order</label>
     <textarea id="ta-note" name="body" rows="3" x-model="text"

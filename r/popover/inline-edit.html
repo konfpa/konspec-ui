@@ -28,7 +28,7 @@
      panel belongs to survives the swap; Alpine closes the panel and hands focus
      back to that trigger on a successful request, and leaves it open with the
      text intact on a failure. -->
-<div class="overflow-x-auto rounded-xl border border-zinc-300 bg-white"
+<div data-kui="popover/inline-edit" class="overflow-x-auto rounded-xl border border-zinc-300 bg-white"
      x-data @scroll="$dispatch('rail-scroll')">
   <table class="w-full min-w-[34rem] text-left text-[13px]/5">
     <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">

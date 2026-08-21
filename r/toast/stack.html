@@ -16,7 +16,7 @@
      gets its timer set twice and the other never gets one at all, and it sits
      in the corner until the page is reloaded. -->
 
-<div x-data="{
+<div data-kui="toast/stack" x-data="{
        toasts: [], seq: 0, cap: 3, dropped: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {

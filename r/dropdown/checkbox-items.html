@@ -22,7 +22,7 @@
      so the labels do not shift sideways as columns come and go. x-cloak sits on
      every tick, including the ones that start ticked: before Alpine boots,
      x-show has not run and all five would paint at once. -->
-<div x-data="{
+<div data-kui="dropdown/checkbox-items" x-data="{
        open: false,
        cols: { vendor: true, dept: false, status: true, due: true, gst: false },
        get shown() { return Object.values(this.cols).filter(Boolean).length + 1 },

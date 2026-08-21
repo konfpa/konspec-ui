@@ -18,7 +18,7 @@
      aria-invalid="false" is the valid state rather than a missing attribute.
      The icon sits inside x-show rather than x-if: Lucide hydrates once at load
      and never sees markup x-if inserts later. -->
-<div class="max-w-sm"
+<div data-kui="field/error" class="max-w-sm"
      x-data="{ gstin: '24AAACG4171B1Z', touched: true,
                get bad() { return this.touched && this.gstin.trim().length !== 15 } }">
   <label for="fe-gstin" class="mb-1.5 block text-[13px]/5 font-medium">

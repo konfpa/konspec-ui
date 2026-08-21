@@ -24,7 +24,7 @@
      moment focus moves there is nothing inside it yet. It stays on the panel
      after the swap: moving focus when a response lands takes the caret away
      from wherever the user had already tabbed to. -->
-<div class="relative inline-block"
+<div data-kui="popover/htmx" class="relative inline-block"
      x-data="{
        open: false, loaded: false, failed: false,
        show() {

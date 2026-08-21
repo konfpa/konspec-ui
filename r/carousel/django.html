@@ -1,5 +1,5 @@
 {% if inspection.photos.exists %}
-<div x-data="{
+<div data-kui="carousel/django" x-data="{
        i: 0, n: 0, atStart: true, atEnd: true,
        slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
        pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },

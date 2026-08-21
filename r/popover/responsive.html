@@ -23,7 +23,7 @@
      fixed inset-x-0 bottom-0 depends on no ancestor carrying a transform,
      filter or will-change. One of those and the sheet anchors to that element
      instead of the viewport, and it lands halfway up the page. -->
-<div class="relative inline-block"
+<div data-kui="popover/responsive" class="relative inline-block"
      x-data="{
        open: false,
        show() {

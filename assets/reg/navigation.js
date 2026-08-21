@@ -47,7 +47,7 @@ register(
 
      tabEls() filters on [role=tab] rather than reading children: x-for leaves a
      <template> in the DOM and it counts as an element child. -->
-<div x-id="['tab', 'panel']"
+<div data-kui="tabs/underline" x-id="['tab', 'panel']"
      x-data="{
        tab: 'lines',
        items: [
@@ -123,7 +123,7 @@ register(
      an underline. Reach for it when the tabs filter a list rather than section a
      record, and when the row has to sit beside other controls without a rule
      running under it. -->
-<div x-id="['tab', 'panel']"
+<div data-kui="tabs/pill" x-id="['tab', 'panel']"
      x-data="{
        tab: 'open',
        items: [
@@ -186,7 +186,7 @@ register(
      focus() scrolls a hidden element into view on both axes, which on a long
      page means the whole document jumps to the tab strip. So focus with
      preventScroll and do the horizontal scroll by hand, on the strip only. -->
-<div x-id="['tab', 'panel']"
+<div data-kui="tabs/scrollable" x-id="['tab', 'panel']"
      x-data="{
        tab: 'grn',
        items: [
@@ -262,7 +262,7 @@ register(
      and never the whole of it: drop these tabs onto the zinc-100 page surface
      and a fill-only marker measures 1.00 against its background, which is not
      faint but invisible. -->
-<div x-id="['tab', 'panel']"
+<div data-kui="tabs/vertical" x-id="['tab', 'panel']"
      x-data="{
        tab: 'approvals',
        items: [
@@ -342,7 +342,7 @@ register(
      every tab they touched before it finally leaves the record, which is not
      what Back means to anyone. If a tab genuinely is a place you can go back
      to, it is a page, and that is the django variant. -->
-<div x-id="['tab', 'panel']"
+<div data-kui="tabs/url" x-id="['tab', 'panel']"
      x-data="{
        tab: 'lines',
        items: [
@@ -420,7 +420,7 @@ register(
      with $id(): htmx reads them when it processes the element, and that is not
      guaranteed to be after Alpine has bound them. Two of these on one page need
      their ids changed by hand. -->
-<div x-data="{
+<div data-kui="tabs/lazy" x-data="{
        tab: 'summary',
        cursor: 'summary',
        items: [
@@ -487,7 +487,7 @@ register(
      end with no way to know why. It also drops aria-controls: there is no panel
      to point at, and a reference to an id that is not in the document is worse
      than no reference at all. -->
-<div x-id="['tab', 'panel']"
+<div data-kui="tabs/states" x-id="['tab', 'panel']"
      x-data="{
        tab: 'lines',
        items: [
@@ -588,7 +588,7 @@ register(
      class OrderDetail(DetailView):
          def get_context_data(self, **kw):
              return super().get_context_data(**kw) | {'section': self.kwargs['section']} -->
-<nav aria-label="Purchase order sections" class="border-b border-zinc-200">
+<nav data-kui="tabs/django" aria-label="Purchase order sections" class="border-b border-zinc-200">
   <div class="-mb-px flex gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
     {% for key, label in sections %}
       <a href="{% url 'order-detail' order.pk key %}"
@@ -647,7 +647,7 @@ register(
 `<!-- Three levels, which is the common case. The separator is aria-hidden so a
      screen reader reads "Home, Procurement, Purchase orders" rather than
      spelling out a slash between each one. -->
-<nav aria-label="Breadcrumb">
+<nav data-kui="breadcrumbs/default" aria-label="Breadcrumb">
   <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
     <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
     <li aria-hidden="true" class="text-zinc-500">/</li>
@@ -662,7 +662,7 @@ register(
      the trail, so they sit after the last crumb rather than inside it — putting
      them inside makes the accessible name of the current page read
      "PO-24-1187 Awaiting GRN Copy order number". -->
-<nav aria-label="Breadcrumb">
+<nav data-kui="breadcrumbs/record" aria-label="Breadcrumb">
   <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
     <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
     <li aria-hidden="true" class="text-zinc-500">/</li>
@@ -686,7 +686,7 @@ register(
 `<!-- Vendor and project names run long. The middle crumbs truncate; the last one
      never does. min-w-0 on the <li> is what makes truncate work at all inside a
      flex row — without it the item refuses to shrink below its content. -->
-<nav aria-label="Breadcrumb">
+<nav data-kui="breadcrumbs/truncated" aria-label="Breadcrumb">
   <ol class="flex flex-nowrap items-center gap-1.5 text-[13px]/5">
     <li class="shrink-0"><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
     <li aria-hidden="true" class="shrink-0 text-zinc-500">/</li>
@@ -709,7 +709,7 @@ register(
 
      @click.stop on the button and the panel keeps the document-level handler
      from closing this menu the moment it opens. -->
-<nav aria-label="Breadcrumb" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
+<nav data-kui="breadcrumbs/overflow" aria-label="Breadcrumb" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
   <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
     <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
     <li aria-hidden="true" class="text-zinc-500">/</li>
@@ -741,7 +741,7 @@ register(
      sm:hidden compile to display:none, which takes the inactive one out of the
      accessibility tree as well as off the screen. Hide one with opacity or
      visibility instead and a screen reader reads the path twice. -->
-<div>
+<div data-kui="breadcrumbs/responsive">
   <!-- phone: parent and current only -->
   <nav aria-label="Breadcrumb" class="sm:hidden">
     <ol class="flex items-center gap-1.5 text-[13px]/5">
@@ -772,7 +772,7 @@ register(
 `<!-- Where a trail actually lives. It sits above the title, not beside it, and
      the title repeats the last crumb — that repetition is correct: the crumb is
      navigation and the h1 is the page. -->
-<div class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
+<div data-kui="breadcrumbs/page-header" class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
   <nav aria-label="Breadcrumb">
     <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
       <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
@@ -799,7 +799,7 @@ register(
 `<!-- Not a breadcrumb, and that is the point. One level deep there is nothing to
      trace, so a trail of two is ceremony. A back link says the same thing in
      less space and gives a bigger target on a phone. -->
-<a href="#" class="inline-flex items-center gap-1.5 text-[13px]/5 text-zinc-600 hover:text-zinc-900">
+<a data-kui="breadcrumbs/back" href="#" class="inline-flex items-center gap-1.5 text-[13px]/5 text-zinc-600 hover:text-zinc-900">
   <i data-lucide="chevron-left" class="size-4"></i>Purchase orders
 </a>` },
 
@@ -818,7 +818,7 @@ register(
 
      Build it in the view, not in the template. A trail assembled from
      request.path is browsing history wearing a hierarchy's clothes. -->
-<nav aria-label="Breadcrumb">
+<nav data-kui="breadcrumbs/django" aria-label="Breadcrumb">
   <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
     {% for label, url in crumbs %}
       {% if not forloop.first %}<li aria-hidden="true" class="text-zinc-500">/</li>{% endif %}
@@ -907,7 +907,7 @@ register(
      Hover switches menus but never opens one: the guard is open !== null.
      Escape only stops propagating when it actually closed something, so a
      second Escape reaches the dialog this editor may be sitting in. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/default" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
@@ -1137,7 +1137,7 @@ register(
      this way a group that empties out — every command in it hidden by a
      permission check — takes its own rule with it. role="group" is a permitted
      child of role="menu"; a bare div is not. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/shortcuts" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        menus: [
@@ -1265,7 +1265,7 @@ register(
 
      The visible group headings are aria-hidden — a bare <p> is not a permitted
      child of role="menu", and role="group" already carries the name. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/checks" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        cols: { hsn: true, contract: false, tax: true },
@@ -1455,7 +1455,7 @@ register(
      every sibling row closes it on mouseenter. Below md it drops under its
      trigger instead of flying sideways: left-full at 390px puts a 256px panel
      off the right of the screen and the page scrolls to find it. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/submenu" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, sub: null, at: 'file', typed: '', clock: null,
        trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
@@ -1636,7 +1636,7 @@ register(
 
      Void order is last, below its own rule, in red-600, named by its verb
      rather than by its colour, and not adjacent to Print. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/states" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
@@ -1815,7 +1815,7 @@ register(
 
      Below md this is the first thing to collapse, not the last: a dense bar is
      already at the target-size floor, so there is nothing left to give. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/dense" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        menus: [
@@ -1940,7 +1940,7 @@ register(
      answer is a page.
 
      The breakpoint is md, not sm: what overflows is the count, not the width. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/collapsed" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', sheet: false, typed: '', clock: null,
        menus: [
@@ -2104,7 +2104,7 @@ register(
      Submit button is the smallest honest version of "saved, and here is what to
      do next". Hiding the button instead would leave the primary action of the
      screen reachable only from the File menu. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/trailing" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        menus: [
@@ -2236,7 +2236,7 @@ register(
 
      The @click does not preventDefault — htmx listens for the same click — and
      hx-headers sits on the root, since there is no form to read a token from. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/htmx" class="rounded-xl border border-zinc-300 bg-white"
      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
      x-data="{
        open: null, at: 'file', typed: '', clock: null, busy: false, msg: '', ok: true,
@@ -2431,7 +2431,7 @@ register(
      interactive text is zinc-900 plus an underline everywhere else in this
      system, and four underlined labels in a row read as a fence rather than a
      bar. The hover tint carries it. -->
-<nav aria-label="Main" class="rounded-xl border border-zinc-300 bg-white p-1">
+<nav data-kui="navigation-menu/links" aria-label="Main" class="rounded-xl border border-zinc-300 bg-white p-1">
   <ul class="flex flex-wrap items-center gap-1">
     <li>
       <a href="/dashboard/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
@@ -2478,7 +2478,7 @@ register(
      fine is the touch guard. A tap fires a synthetic mouseenter and then a
      click, so without it the panel opens on the first and closes on the second
      and the section cannot be reached by tapping it. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+<nav data-kui="navigation-menu/panel" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -2572,7 +2572,7 @@ register(
      panel and wrong the moment two of them swap, because both are mounted for
      the length of the transition and you get a crossfade of two menus. The
      open delay is what makes it feel deliberate. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+<nav data-kui="navigation-menu/columns" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -2745,7 +2745,7 @@ register(
      The rail is a single anchor wrapping four lines, so the whole block is the
      target. Splitting the amount out into a sibling would leave the largest
      thing on the card unclickable, which is exactly the part people aim at. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+<nav data-kui="navigation-menu/featured" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -2879,7 +2879,7 @@ register(
      No Alpine binding goes on the <i data-lucide>. createIcons() replaces that
      element with an <svg> and takes the binding with it; the rotating chevron
      on the trigger is bound on the span around it for the same reason. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+<nav data-kui="navigation-menu/icons" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -3016,7 +3016,7 @@ register(
      rather than of any code: open holds an id or null. A boolean per item
      needs a rule to keep them exclusive, and the rule is what eventually gets
      forgotten in one of the branches. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+<nav data-kui="navigation-menu/mixed" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -3130,7 +3130,7 @@ register(
      hidden or disabled. A menu that drops the page you are on changes length
      depending on where you stand, and a list people navigate by position
      cannot move under them. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+<nav data-kui="navigation-menu/current" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -3230,7 +3230,7 @@ register(
      them, not one <i> with the name bound. createIcons() replaces the <i> with
      an <svg> and any binding on it goes with the element; a name that never
      changes survives being read once, and one that toggles does not. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="navigation-menu/phone" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ nav: false, open: { proc: true, inv: false, rep: false } }">
   <div class="flex h-12 items-center justify-between gap-3 px-3">
     <span class="text-[13px]/5 font-medium">Konspec Operations</span>
@@ -3327,7 +3327,7 @@ register(
      There is no CSRF token on this and there should not be: opening a menu is
      a read, so it is a GET, and a navigation panel that needs a token is a
      navigation panel that is writing something. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+<nav data-kui="navigation-menu/htmx" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -3496,7 +3496,7 @@ register(
      The counts sit inside the anchor, which is why they need no aria work — the
      name is already "Purchase orders, 148". Lift one out into a span positioned
      beside the link and it becomes a number with nothing attached to it. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<div data-kui="sidebar/default" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ scrolled: false, more: true }">
 
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-transparent px-4 transition-colors"
@@ -3632,7 +3632,7 @@ register(
      needs a pointer to exist does not exist on a phone at all, and the opacity-0
      version is worse than useless: it stays in the Tab order, so a keyboard user
      lands on a button that paints nothing. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+<div data-kui="sidebar/counts" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
     <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
@@ -3745,7 +3745,7 @@ register(
      inside takes py-1 rather than a margin — a margin on the first child
      collapses through the wrapper and the measured height comes up short by
      exactly that margin, clipping the last row until the next toggle. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<div data-kui="sidebar/nested" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ open: { orders: true, vendors: false, quality: false } }">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
@@ -3867,7 +3867,7 @@ register(
      This nav deliberately does not scroll: overflow-y:auto forces overflow-x to
      auto, so a scrolling rail clips its own tooltips at the right edge. More
      destinations than fit needs the flyout variant. -->
-<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+<div data-kui="sidebar/rail" class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
     <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
   </div>
@@ -3976,7 +3976,7 @@ register(
      account menu at the foot of the rail is permanently in that case. And the
      nav does not scroll, because overflow-y:auto would force overflow-x with it
      and clip every panel at the rail edge. -->
-<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+<div data-kui="sidebar/flyout" class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
     <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
   </div>
@@ -4101,7 +4101,7 @@ register(
      app-shell it is lg:hidden, because below lg there is no rail state at all.
      The control keeps its icon in a fixed 68px box so its centre does not move
      between the two widths — centre it in the strip and the second click misses. -->
-<div class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<div data-kui="sidebar/collapse" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ expanded: true, ready: false }"
      x-init="expanded = localStorage.getItem('kon-sidebar') !== '0';
              $nextTick(() => ready = true);
@@ -4205,7 +4205,7 @@ register(
      The overlay is absolute inside this preview box. In app-shell it is fixed
      inset-0 — the shell is the thing that owns the viewport, and a fixed overlay
      rendered here would escape the docs frame and cover the page around it. -->
-<div class="relative h-[560px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div data-kui="sidebar/mobile" class="relative h-[560px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{ nav: false }" @htmx:after-swap.camel.window="nav = false">
 
   <header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3">
@@ -4330,7 +4330,7 @@ register(
      icon. The switcher marks the selected plant with a check rather than a tint,
      because a tinted row in a menu is the hover state and a permanently tinted
      one reads as permanently hovered. -->
-<div class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+<div data-kui="sidebar/blocks" class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ menu: '' }" @keydown.escape.window="menu = ''">
 
   <div class="shrink-0 border-b border-zinc-200 p-2">
@@ -4437,7 +4437,7 @@ register(
      blocks are decorative and the links appear with nothing announcing them.
      Nothing in here is focusable, so a Tab during the wait skips straight past
      to the footer rather than landing on a grey rectangle. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+<div data-kui="sidebar/skeleton" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
     <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
@@ -4573,7 +4573,7 @@ register(
        [id] { scroll-margin-top: 88px }
      Without it, following #line-14 out of an error summary scrolls the row to
      the top of the viewport, which is underneath this bar. -->
-<div class="relative min-h-64 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="topbar/default" class="relative min-h-64 bg-zinc-100 text-[14px]/5 text-zinc-900">
   <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
@@ -4638,7 +4638,7 @@ register(
      stops. That is a different component. If the command palette is also on
      this page, only one of the two may bind ⌘K — bind it twice and the winner
      depends on script order. -->
-<header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+<header data-kui="topbar/search" class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
         x-data="{ q: '' }"
         @keydown.window.meta.k.prevent="$refs.q.focus()" @keydown.window.ctrl.k.prevent="$refs.q.focus()">
 
@@ -4690,7 +4690,7 @@ register(
      nothing left to say on the morning something is genuinely late. The dot is
      aria-hidden and the state is in the button's name — a disc announces
      nothing. -->
-<header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+<header data-kui="topbar/account" class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
         x-data="{
           open: '',
           items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
@@ -4822,7 +4822,7 @@ register(
      Inside app-shell this header does not scroll, so it needs no sticky and no
      z-index. The overlay is absolute here because the preview box owns the
      frame; in the real shell it is fixed inset-0. -->
-<div class="relative flex h-[420px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div data-kui="topbar/toggle" class="relative flex h-[420px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{ nav: false }" @keydown.escape.window="nav = false">
 
   <aside class="hidden w-64 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
@@ -4912,7 +4912,7 @@ register(
      role="group" with a name, and its rows are role="menuitemradio" with
      aria-checked bound — a screen reader then announces "Vasai plant, 1 of 3,
      selected" rather than three unrelated buttons. -->
-<header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+<header data-kui="topbar/context" class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
         x-data="{
           open: false,
           plant: 'Vasai',
@@ -5016,7 +5016,7 @@ register(
      for an autosave is a notification of nothing, fired forty times an hour.
      Below sm the button keeps its icon and drops its label; it does not shrink
      and the row does not wrap. -->
-<header class="flex h-12 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4">
+<header data-kui="topbar/compact" class="flex h-12 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4">
   <a href="#" aria-label="Back to rate contracts"
      class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="arrow-left" class="size-4"></i>
@@ -5065,7 +5065,7 @@ register(
      #line-14 out of an error summary lands on a row underneath this header and
      the link reads as broken. One rule on [id] rather than scroll-mt-22 on the
      elements that happen to be targets today. -->
-<div class="h-[420px] overflow-y-auto overscroll-contain rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div data-kui="topbar/sticky" class="h-[420px] overflow-y-auto overscroll-contain rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0">
 
   <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-transparent bg-white px-3 backdrop-blur transition-colors supports-[backdrop-filter]:bg-white/80 sm:px-4"
@@ -5129,7 +5129,7 @@ register(
      crumbs at 390px either wrap onto a second line or push the page sideways,
      and both are worse than showing two. The last crumb is the one that is
      never truncated — it is the one that says where you are. -->
-<div class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="topbar/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
   <header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-2">
     <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="tb-ph-nav"
             class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -5199,7 +5199,7 @@ register(
 
      Add to the page around it:
        [id] { scroll-margin-top: 88px } -->
-<div class="relative bg-zinc-100 text-[14px]/5 text-zinc-900" x-data="{ open: '' }" @keydown.escape.window="open = ''">
+<div data-kui="topbar/assembled" class="relative bg-zinc-100 text-[14px]/5 text-zinc-900" x-data="{ open: '' }" @keydown.escape.window="open = ''">
   <a href="#main-console" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-3 sm:px-4"
@@ -5329,7 +5329,7 @@ register(
     related: ['collapsible', 'tabs', 'card'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div class="rounded-xl border border-zinc-300 bg-white" x-data="{ open: true }">
+`<div data-kui="accordion/default" class="rounded-xl border border-zinc-300 bg-white" x-data="{ open: true }">
   <h3>
     <button @click="open = !open" :aria-expanded="open" aria-controls="acc-delivery"
             class="flex h-12 w-full items-center gap-3 px-4 text-left">
@@ -5350,7 +5350,7 @@ register(
 </div>` },
 
       { id: 'single', name: 'Single-open', code:
-`<div class="divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white" x-data="{ open: 'terms' }">
+`<div data-kui="accordion/single" class="divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white" x-data="{ open: 'terms' }">
   <div>
     <h3>
       <button @click="open = open === 'terms' ? '' : 'terms'" :aria-expanded="open === 'terms'" aria-controls="acc-terms"
@@ -5402,7 +5402,7 @@ register(
 </div>` },
 
       { id: 'cards', name: 'Bordered card list', code:
-`<div x-data="{ open: 'grn-3391' }" class="space-y-2">
+`<div data-kui="accordion/cards" x-data="{ open: 'grn-3391' }" class="space-y-2">
   <div class="rounded-xl border border-zinc-200 bg-white">
     <h3>
       <button @click="open = open === 'grn-3391' ? '' : 'grn-3391'" :aria-expanded="open === 'grn-3391'" aria-controls="acc-grn-3391"
@@ -5508,7 +5508,7 @@ register(
      The animated div carries no padding and no border — border-box means
      height:0 cannot go below them, so the close would bottom out at the padding
      and then vanish in one frame. The dl inside takes both. -->
-<div class="max-w-xl rounded-xl border border-zinc-300 bg-white p-4" x-data="{ open: false }">
+<div data-kui="collapsible/default" class="max-w-xl rounded-xl border border-zinc-300 bg-white p-4" x-data="{ open: false }">
   <div class="flex items-baseline justify-between gap-3">
     <p class="min-w-0 truncate text-[14px]/5 font-medium tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</p>
     <p class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</p>
@@ -5547,7 +5547,7 @@ register(
 
      Everything inside still posts. display:none inputs submit like any other,
      so folding this section away hides it — it does not clear it. -->
-<form class="max-w-xl" x-data="{ open: false }">
+<form data-kui="collapsible/advanced" class="max-w-xl" x-data="{ open: false }">
   <div class="space-y-4">
     <div>
       <label for="ao-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
@@ -5625,7 +5625,7 @@ register(
 
      The result count sits beside the trigger for the same reason: 218 of 1,438
      is the sentence that stops the phone call. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="collapsible/filters" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: false,
        active: [
@@ -5734,7 +5734,7 @@ register(
      flex on the summary already does it in Chrome, and Safari needs the
      pseudo. group-open on the wrapping span is what rotates the chevron —
      still a span, never the <i>, because Lucide replaces that element. -->
-<details class="group max-w-xl rounded-xl border border-zinc-300 bg-white">
+<details data-kui="collapsible/native" class="group max-w-xl rounded-xl border border-zinc-300 bg-white">
   <summary class="flex h-12 list-none items-center gap-3 px-4 [&::-webkit-details-marker]:hidden">
     <i data-lucide="history" class="size-4 shrink-0 text-zinc-600"></i>
     <span class="flex-1 text-[14px]/5 font-medium">Audit trail</span>
@@ -5783,7 +5783,7 @@ register(
      The trigger is icon-only, so its name says what it opens rather than what
      it does — aria-expanded already announces expanded or collapsed, and a
      button called "Expand" in a page with four of them names nothing. -->
-<div class="max-w-xl rounded-xl border border-zinc-300 bg-white" x-data="{ open: true }">
+<div data-kui="collapsible/card" class="max-w-xl rounded-xl border border-zinc-300 bg-white" x-data="{ open: true }">
   <div class="flex min-h-14 items-center gap-3 px-4 py-3">
     <div class="min-w-0 flex-1">
       <h3 class="truncate text-[16px]/6 font-semibold">GST breakup</h3>
@@ -5833,7 +5833,7 @@ register(
      With the trigger away from the panel, aria-controls is the only thing tying
      them together and it is doing real work. Keep the panel after the trigger
      in document order so Tab reaches it next. -->
-<div x-data="{ open: false }" class="space-y-4">
+<div data-kui="collapsible/controlled" x-data="{ open: false }" class="space-y-4">
   <div class="flex flex-wrap items-start justify-between gap-3">
     <div class="min-w-0">
       <h2 class="text-[20px]/7 font-semibold tracking-tight">GRN-3391</h2>
@@ -5882,7 +5882,7 @@ register(
 </div>` },
 
       { id: 'states', name: 'Locked, empty and open on desktop', code:
-`<div class="max-w-xl space-y-4">
+`<div data-kui="collapsible/states" class="max-w-xl space-y-4">
   <!-- Locked. The trigger is disabled, so it leaves the Tab order, and the
        reason sits beside it as text rather than in a title attribute nobody on
        a touchscreen will ever see. No chevron — a chevron promises something
@@ -5965,7 +5965,7 @@ register(
       trigger's aria-controls points at the first panel and both rows open the
       same thing. #}
 
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="collapsible/django" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ open: {% if section_open %}true{% else %}false{% endif %} }">
   <button type="button" @click="open = !open" :aria-expanded="open"
           aria-controls="col-lines-{{ order.pk }}"
@@ -6146,7 +6146,7 @@ register(
      The letters on the action rows are the application's own shortcuts, shown
      so people learn them. The palette does not listen for them: inside a
      search box, N has to type an N. -->
-<div x-data="{
+<div data-kui="command-palette/default" x-data="{
        open: false, q: '', ai: 0,
        groups: [
          { name: 'Actions', items: [

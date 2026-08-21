@@ -4,7 +4,7 @@
 
      @click.stop on the button and the panel keeps the document-level handler
      from closing this menu the moment it opens. -->
-<nav aria-label="Breadcrumb" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
+<nav data-kui="breadcrumbs/overflow" aria-label="Breadcrumb" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
   <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
     <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
     <li aria-hidden="true" class="text-zinc-500">/</li>

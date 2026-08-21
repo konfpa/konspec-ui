@@ -11,7 +11,7 @@
      means the click came from Enter or Space rather than a pointer, and only
      then is focus put back on the control that raised the toasts — a mouse user
      gets no focus jump they did not ask for. -->
-<div x-data="{
+<div data-kui="toast/dismiss-all" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {

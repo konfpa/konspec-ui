@@ -54,7 +54,7 @@
 {{ vendors|json_script:"vendor-options" }}
 {{ form.recipients.value|default:''|json_script:"rfq-recipients" }}
 
-<form method="post" class="max-w-md">
+<form data-kui="combobox/django" method="post" class="max-w-md">
   {% csrf_token %}
 
   <div class="relative"

@@ -18,7 +18,7 @@
      variant exists to close: at forty seconds a turning ring is
      indistinguishable from a hung page, and the only move left is a reload,
      which on a form means posting it twice. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="empty-state/error" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        state: 'failed',
        retry() { this.state = 'busy'; setTimeout(() => this.state = 'ok', 1400) }

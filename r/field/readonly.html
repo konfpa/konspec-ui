@@ -17,7 +17,7 @@
      changes on a discrete action and wrong for one that recomputes on every
      keystroke, which is why this one carries aria-live="off" and is read on
      focus like any other described value. -->
-<div class="max-w-sm space-y-5"
+<div data-kui="field/readonly" class="max-w-sm space-y-5"
      x-data="{ qty: 2000, rate: 118.40,
                get total() { return this.qty * this.rate } }">
 

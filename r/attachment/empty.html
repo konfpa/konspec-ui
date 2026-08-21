@@ -1,5 +1,5 @@
 <!-- Say what to attach and why. "No files" is a fact, not an instruction. -->
-<div x-data="{ depth: 0 }">
+<div data-kui="attachment/empty" x-data="{ depth: 0 }">
   <label class="mb-1.5 block text-[13px]/5 font-medium">Attachments</label>
   <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
        class="rounded-lg border border-dashed px-4 py-8 text-center transition"

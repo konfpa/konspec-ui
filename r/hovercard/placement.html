@@ -19,7 +19,7 @@
      transition does not touch it and the fade and the clamp can coexist. The
      other way out is to keep the transform on this element and move x-show and
      x-transition to a child, which costs a wrapper. -->
-<div class="flex items-center justify-between gap-4"
+<div data-kui="hovercard/placement" class="flex items-center justify-between gap-4"
      x-data="{ orders: [
        { id: 'PO-24-1187', vendor: 'Gujarat Polymers Ltd', value: '₹18,42,000', due: '28 Aug 2026' },
        { id: 'PO-24-1191', vendor: 'Nashik Steel Traders',  value: '₹6,04,750',  due: '02 Aug 2026' }

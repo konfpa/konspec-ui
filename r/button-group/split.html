@@ -7,7 +7,7 @@
      half that opens something. The divider is border-zinc-600, one step
      lighter than the fill, because a zinc-200 rule on a dark button reads as a
      crack rather than a join. -->
-<div class="relative inline-flex" x-data="{ open: false }"
+<div data-kui="button-group/split" class="relative inline-flex" x-data="{ open: false }"
      @click.outside="open = false" @keydown.escape.window="open = false">
   <button type="button" class="inline-flex h-9 items-center rounded-l-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
     Approve

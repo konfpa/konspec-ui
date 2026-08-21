@@ -41,7 +41,7 @@
 
      hx-headers sits on the card so every switch inside it sends the CSRF token;
      htmx will not find one without a form to read it from. -->
-<div class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white"
+<div data-kui="toggle/django" class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white"
      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
   {% for setting in settings %}
     <div class="px-4 py-2.5"

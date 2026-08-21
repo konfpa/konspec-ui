@@ -14,7 +14,7 @@
      busy starts true so the scrim is already there at first paint rather than
      appearing over rows somebody has begun reading, and x-init runs the cycle
      once so it resolves. In an application the swap is what clears it. -->
-<div class="relative overflow-hidden rounded-xl border border-zinc-300 bg-white"
+<div data-kui="spinner/overlay" class="relative overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 2400) } }"
      x-init="run()"
      :aria-busy="busy">

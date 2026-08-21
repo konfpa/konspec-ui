@@ -15,7 +15,7 @@
      Two seconds of waiting belongs here. A job that outlives the request belongs
      in an alert on the page with a progress bar, because the user will navigate
      away and the toast will not survive it. -->
-<div x-data="{
+<div data-kui="toast/pending" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {

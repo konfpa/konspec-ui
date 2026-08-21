@@ -41,7 +41,7 @@ register(
 `<!-- Five, and no others. Primary is the one thing this screen is for; secondary
      is everything else that acts; ghost is for actions dense enough that a
      border each would draw a grid; danger cannot be undone; link navigates. -->
-<div class="flex flex-wrap items-center gap-3">
+<div data-kui="button/variants" class="flex flex-wrap items-center gap-3">
   <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Primary</button>
   <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Secondary</button>
   <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Ghost</button>
@@ -53,7 +53,7 @@ register(
 `<!-- Three, matched to density rather than to importance. Small belongs in a
      table row or a dense toolbar; large is for the one button on a sign-in card
      or the primary action of a full-page form. Everything else is medium. -->
-<div class="flex flex-wrap items-center gap-3">
+<div data-kui="button/sizes" class="flex flex-wrap items-center gap-3">
   <button type="button" class="inline-flex h-7 items-center rounded-md border border-transparent bg-zinc-700 px-2.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800">Small</button>
   <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Medium</button>
   <button type="button" class="inline-flex h-11 items-center rounded-lg border border-transparent bg-zinc-700 px-5 text-[14px]/5 font-medium text-white hover:bg-zinc-800">Large</button>
@@ -65,7 +65,7 @@ register(
 
      Icon-only buttons are square so the hit area stays square, and they carry
      aria-label — the icon is decorative and contributes nothing to the name. -->
-<div class="flex flex-wrap items-center gap-3">
+<div data-kui="button/icons" class="flex flex-wrap items-center gap-3">
   <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
     <i data-lucide="plus" class="size-4"></i>New order
   </button>
@@ -92,7 +92,7 @@ register(
 
      Busy keeps disabled as well as aria-busy — aria-busy announces the wait,
      disabled is what actually stops the second click. -->
-<div class="flex flex-wrap items-center gap-3" x-data="{ busy: false }">
+<div data-kui="button/states" class="flex flex-wrap items-center gap-3" x-data="{ busy: false }">
   <button type="button" @click="busy = true; setTimeout(() => busy = false, 2200)"
           :disabled="busy" :aria-busy="busy"
           class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:hover:bg-zinc-700">
@@ -115,7 +115,7 @@ register(
 
      inline-flex rather than flex, because an anchor is inline and a bare flex
      would stretch it across the row. -->
-<div class="flex flex-wrap items-center gap-3">
+<div data-kui="button/link" class="flex flex-wrap items-center gap-3">
   <a href="#" class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
     <i data-lucide="plus" class="size-4"></i>New purchase order
   </a>
@@ -129,7 +129,7 @@ register(
      from sm they sit inline and right-aligned. flex-col-reverse is deliberate:
      the primary is last in the DOM so it is last in the Tab order, but first on
      screen once stacked, which is where a thumb lands. -->
-<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+<div data-kui="button/full-width" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <p class="text-[14px]/5">Approve PO-24-1187 for ₹4,82,000?</p>
   <p class="mt-1 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · 6 lines</p>
 
@@ -143,7 +143,7 @@ register(
 `<!-- Where the one-primary rule earns its keep. Four actions, one solid. The
      primary sits last, nearest the right edge and the thumb, and matches the
      order a dialog footer uses so the two never contradict each other. -->
-<div class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
+<div data-kui="button/toolbar" class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
   <div class="flex flex-wrap items-start justify-between gap-3">
     <div>
       <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">PO-24-1187</h1>
@@ -174,7 +174,7 @@ register(
      type="submit" is explicit even though it is the default, because the
      surrounding toolbar buttons all carry type="button" and the difference is
      the whole point. -->
-<form method="post" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+<form data-kui="button/django" method="post" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   {% csrf_token %}
   <label for="id_remarks" class="mb-1.5 block text-[13px]/5 font-medium">Approval remarks</label>
   <textarea name="remarks" id="id_remarks" rows="3"
@@ -236,7 +236,7 @@ register(
      The track is bg-zinc-200 and the active pill is white. White on a tint is
      what reads as chosen; a darker tint on a lighter tint does not, and it
      leaves the unchosen options looking disabled. -->
-<div role="radiogroup" aria-label="Date range" x-ref="grp"
+<div data-kui="button-group/segmented" role="radiogroup" aria-label="Date range" x-ref="grp"
      x-data="{
        v: 'Week',
        opts: ['Day', 'Week', 'Month', 'Quarter'],
@@ -263,7 +263,7 @@ register(
      the tinted track above. One border around the outside, border-l between,
      and the radii on the end buttons rather than overflow-hidden on the
      container, so the focus ring is not clipped off either end. -->
-<div class="inline-flex rounded-lg border border-zinc-300 bg-white">
+<div data-kui="button-group/attached" class="inline-flex rounded-lg border border-zinc-300 bg-white">
   <button type="button" class="inline-flex h-8 items-center gap-2 rounded-l-lg px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Edit
   </button>
@@ -282,7 +282,7 @@ register(
 
      The pressed one is aria-pressed, not aria-checked: these are independent
      toggles, and only the density one is a choice. -->
-<div class="flex flex-wrap items-center gap-3">
+<div data-kui="button-group/icon-toolbar" class="flex flex-wrap items-center gap-3">
   <div role="radiogroup" aria-label="Row density" x-ref="dens"
        x-data="{
          v: 'comfortable',
@@ -335,7 +335,7 @@ register(
      half that opens something. The divider is border-zinc-600, one step
      lighter than the fill, because a zinc-200 rule on a dark button reads as a
      crack rather than a join. -->
-<div class="relative inline-flex" x-data="{ open: false }"
+<div data-kui="button-group/split" class="relative inline-flex" x-data="{ open: false }"
      @click.outside="open = false" @keydown.escape.window="open = false">
   <button type="button" class="inline-flex h-9 items-center rounded-l-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
     Approve
@@ -365,7 +365,7 @@ register(
      around the pair instead of two abutting ones. The input is transparent and
      borderless inside it, and focus-within moves the ring to the wrapper — put
      it on the input and the ring is drawn inside the border it shares. -->
-<div class="flex max-w-md items-stretch rounded-lg border border-zinc-300 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+<div data-kui="button-group/input" class="flex max-w-md items-stretch rounded-lg border border-zinc-300 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
   <label for="add-part" class="sr-only">Part number</label>
   <input id="add-part" type="text" placeholder="Part number"
          class="w-full min-w-0 rounded-l-lg bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
@@ -379,7 +379,7 @@ register(
      rotated: one border outside, border-t between, radii on the ends. Buttons
      are left-aligned rather than centred, so the labels form a reading column
      the way a menu does. -->
-<div role="group" aria-label="Record actions" class="inline-flex w-56 flex-col rounded-lg border border-zinc-300 bg-white">
+<div data-kui="button-group/vertical" role="group" aria-label="Record actions" class="inline-flex w-56 flex-col rounded-lg border border-zinc-300 bg-white">
   <button type="button" class="flex h-9 items-center gap-2.5 rounded-t-lg px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="file-check-2" class="size-4 text-zinc-600"></i>Record GRN
   </button>
@@ -401,7 +401,7 @@ register(
      costs no width at all.
 
      The two share one x-data, so whichever the user touches, both agree. -->
-<div x-data="{
+<div data-kui="button-group/responsive" x-data="{
        v: 'Week',
        opts: ['Day', 'Week', 'Month', 'Quarter'],
        move(step) {
@@ -442,7 +442,7 @@ register(
 
      # views.py
      rng = request.GET.get('range', 'week')   # 'day' | 'week' | 'month' -->
-<form method="get" class="inline-flex rounded-lg bg-zinc-200 p-0.5">
+<form data-kui="button-group/django" method="get" class="inline-flex rounded-lg bg-zinc-200 p-0.5">
   {% for value, label in ranges %}
     <div>
       <input type="radio" name="range" id="range-{{ value }}" value="{{ value }}"
@@ -539,7 +539,7 @@ register(
      trigger. It only shows up when the trigger already had focus, because
      otherwise there is nothing to notice: a menu that opens with focus still
      outside it is a menu the arrow keys do not drive. -->
-<div class="relative"
+<div data-kui="dropdown/default" class="relative"
      x-data="{
        open: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
@@ -616,7 +616,7 @@ register(
      The vendor column goes below sm rather than being scrolled to. Two figures
      and a menu is what fits at 390px, and hiding a column somebody can still
      reach on the record page is better than a table that moves sideways. -->
-<div x-data="{
+<div data-kui="dropdown/row-actions" x-data="{
        rows: [
          { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '18,42,000' },
          { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: '4,68,500' },
@@ -720,7 +720,7 @@ register(
      starts to look like a form. The rule is kept for the one place a label
      would be wrong: above the destructive item, where the point is distance,
      not a name. -->
-<div class="relative"
+<div data-kui="dropdown/groups" class="relative"
      x-data="{
        open: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
@@ -831,7 +831,7 @@ register(
      so the labels do not shift sideways as columns come and go. x-cloak sits on
      every tick, including the ones that start ticked: before Alpine boots,
      x-show has not run and all five would paint at once. -->
-<div x-data="{
+<div data-kui="dropdown/checkbox-items" x-data="{
        open: false,
        cols: { vendor: true, dept: false, status: true, due: true, gst: false },
        get shown() { return Object.values(this.cols).filter(Boolean).length + 1 },
@@ -939,7 +939,7 @@ register(
      itself, it does not clear it. There is no "unsorted" here, so there is
      nothing for a second click to mean, and offering one would just be a way
      to leave the register in a state it cannot render. -->
-<div class="relative"
+<div data-kui="dropdown/radio-items" class="relative"
      x-data="{
        open: false,
        sort: 'date', dense: 'comfortable',
@@ -1032,7 +1032,7 @@ register(
      Do not label a shortcut nobody has bound yet. A menu is the only place
      most people will ever read them, so a hint here is a promise the window
      handler has to keep. -->
-<div class="relative"
+<div data-kui="dropdown/shortcuts" class="relative"
      x-data="{
        open: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
@@ -1140,7 +1140,7 @@ register(
      mouse. Enter should open the submenu and land on its first item; a real
      click should open it and leave the pointer in charge. Both arrive as click,
      and detail is the click count, which is 0 for a synthesised one. -->
-<div class="flex justify-end">
+<div data-kui="dropdown/submenu" class="flex justify-end">
   <div class="relative"
        x-data="{
          open: false, sub: false, flip: false, t: null,
@@ -1284,7 +1284,7 @@ register(
      cannot close itself out from under the dialog it opened. Escape is bound
      .window on the dialog and unbound-but-stopped on the menu, so exactly one
      of them answers whichever is up. -->
-<div class="relative"
+<div data-kui="dropdown/destructive" class="relative"
      x-data="{
        open: false, confirm: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
@@ -1408,7 +1408,7 @@ register(
 
      A GET link would be followed by every link prefetcher and mail scanner that
      ever sees the page, and the user is signed out by a robot. -->
-<div class="flex justify-end">
+<div data-kui="dropdown/account" class="flex justify-end">
   <div class="relative"
        x-data="{
          open: false,

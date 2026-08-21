@@ -27,7 +27,7 @@
      trigger. It only shows up when the trigger already had focus, because
      otherwise there is nothing to notice: a menu that opens with focus still
      outside it is a menu the arrow keys do not drive. -->
-<div class="relative"
+<div data-kui="dropdown/default" class="relative"
      x-data="{
        open: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },

@@ -12,7 +12,7 @@
 
      push() forces ms: 0 on the danger tone whatever the call site asked for. A
      failure is not removed by a timer. -->
-<div x-data="{
+<div data-kui="toast/tones" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        icon: { info: 'info', success: 'check-circle-2', warning: 'alert-triangle', danger: 'alert-circle' },

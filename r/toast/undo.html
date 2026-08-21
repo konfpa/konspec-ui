@@ -11,7 +11,7 @@
      The timer clears on focusin as well as on hover, so tabbing towards Undo
      does not make it disappear on the way, and it never runs at all under
      prefers-reduced-motion. -->
-<div x-data="{
+<div data-kui="toast/undo" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {

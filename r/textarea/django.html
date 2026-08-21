@@ -21,7 +21,7 @@
      truncates a paste in silence. Either drop it from the widget and let
      clean() reject the value with a message, or say the number in help_text
      before anyone reaches it. form.body.field.max_length is the number. -->
-<form method="post" class="max-w-xl">
+<form data-kui="textarea/django" method="post" class="max-w-xl">
   {% csrf_token %}
   <div>
     <label for="{{ form.body.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">

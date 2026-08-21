@@ -12,7 +12,7 @@
 
      Build it in the view, not in the template. A trail assembled from
      request.path is browsing history wearing a hierarchy's clothes. -->
-<nav aria-label="Breadcrumb">
+<nav data-kui="breadcrumbs/django" aria-label="Breadcrumb">
   <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
     {% for label, url in crumbs %}
       {% if not forloop.first %}<li aria-hidden="true" class="text-zinc-500">/</li>{% endif %}

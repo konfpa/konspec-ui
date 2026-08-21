@@ -4,7 +4,7 @@
 
      The year list is built around the current year rather than hard-coded, so
      this markup does not quietly expire. -->
-<div class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
+<div data-kui="calendar/jump" class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
        focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        sel: null,

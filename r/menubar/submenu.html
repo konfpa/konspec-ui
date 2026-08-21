@@ -18,7 +18,7 @@
      every sibling row closes it on mouseenter. Below md it drops under its
      trigger instead of flying sideways: left-full at 390px puts a 256px panel
      off the right of the screen and the page scrolls to find it. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/submenu" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, sub: null, at: 'file', typed: '', clock: null,
        trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },

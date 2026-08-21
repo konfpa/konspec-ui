@@ -18,7 +18,7 @@
      Hover switches menus but never opens one: the guard is open !== null.
      Escape only stops propagating when it actually closed something, so a
      second Escape reaches the dialog this editor may be sitting in. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="menubar/default" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },

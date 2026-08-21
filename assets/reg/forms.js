@@ -62,7 +62,7 @@ register(
      The label keeps the text cursor. The base rule gives the pointer only to a
      label directly wrapping a checkbox or a radio, and this one is neither —
      clicking it focuses the field, which is not the same promise. -->
-<div class="max-w-xl">
+<div data-kui="label/default" class="max-w-xl">
   <label for="lb-title" class="mb-1.5 block text-[13px]/5 font-medium">Order title</label>
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <input id="lb-title" name="title" value="MS angles and plates — August lot"
@@ -90,7 +90,7 @@ register(
      one that is optional and says so at the top instead. Whichever way round,
      the word Optional is plain zinc-500 and not a second colour — optional is
      not a data state. -->
-<div class="max-w-xl">
+<div data-kui="label/required" class="max-w-xl">
   <p class="mb-4 text-[12px]/4 text-zinc-500">
     Fields marked <span class="text-red-600">*</span> are required.
   </p>
@@ -146,7 +146,7 @@ register(
      items-start with mt-0.5 on the box, because the second row wraps to two
      lines at 390px and items-center would float a 16px square against the
      middle of the block. -->
-<div class="max-w-xl space-y-2">
+<div data-kui="label/wrapping" class="max-w-xl space-y-2">
   <label class="flex items-start gap-2.5 py-1 text-[14px]/5">
     <input type="checkbox" name="notify" value="buyer" checked
            class="mt-0.5 size-4 shrink-0 accent-zinc-700">
@@ -174,7 +174,7 @@ register(
      The help line under the group is one line for the whole set, not one per
      option — per-option help attaches to its own option with
      aria-describedby, and is read back on every arrow-key pass. -->
-<fieldset class="max-w-xl">
+<fieldset data-kui="label/legend" class="max-w-xl">
   <legend class="mb-2 text-[13px]/5 font-medium tabular-nums">Lab result — batch 24-0912</legend>
 
   <div class="space-y-2">
@@ -213,7 +213,7 @@ register(
      items-baseline rather than items-center, so the 13px label and the 12px
      hint sit on one line of text instead of being centred against each
      other. -->
-<div class="max-w-xl">
+<div data-kui="label/trailing" class="max-w-xl">
   <div class="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
     <label for="lb-gstin" class="text-[13px]/5 font-medium">Vendor GSTIN</label>
     <div class="flex items-baseline gap-3">
@@ -250,7 +250,7 @@ register(
      add aria-label to the search box as well: it would replace the visible
      label with a string nobody can see, and a voice-control user saying the
      words on screen would be addressing a control that is not called that. -->
-<div class="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+<div data-kui="label/hidden" class="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
   <h3 class="mr-auto text-[13px]/5 font-medium">Purchase orders</h3>
 
   <label for="lb-search" class="sr-only">Search purchase orders</label>
@@ -292,7 +292,7 @@ register(
      element that is not user-alterable, which includes the label and the
      paragraph inside the wrapper, so the wrapper matches always. Match the
      attribute — has-[[readonly]] — or write the classes, as here. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="label/states" class="max-w-xl space-y-5">
   <div class="has-[:disabled]:text-zinc-500">
     <label for="lb-off" class="mb-1.5 block text-[13px]/5 font-medium">Rate contract</label>
     <div class="rounded-lg border border-zinc-200 bg-white has-[:disabled]:bg-zinc-100">
@@ -339,7 +339,7 @@ register(
      Below sm the whole thing stacks and the label goes back above its control.
      A 10rem gutter at 390px leaves the name wrapping to four lines beside a box
      barely wider than it, and the eye stops being able to pair them. -->
-<div class="max-w-2xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+<div data-kui="label/horizontal" class="max-w-2xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
   <div class="px-4 py-3">
     <h3 class="text-[13px]/5 font-medium">Order defaults — Gujarat Polymers Ltd</h3>
   </div>
@@ -397,7 +397,7 @@ register(
      caption and the column header. Form control names are 13px font-medium in
      the ordinary text colour — swap the two and an eight-field form reads as
      eight section headings with a box under each. -->
-<dl class="grid max-w-xl grid-cols-2 gap-x-4 gap-y-3 rounded-xl border border-zinc-300 bg-white p-4 sm:grid-cols-3">
+<dl data-kui="label/caption" class="grid max-w-xl grid-cols-2 gap-x-4 gap-y-3 rounded-xl border border-zinc-300 bg-white p-4 sm:grid-cols-3">
   <div>
     <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Order</dt>
     <dd class="mt-0.5 text-[13px]/5 tabular-nums">PO-24-1187</dd>
@@ -490,7 +490,7 @@ register(
      The asterisk carries aria-hidden. required is what announces required; the
      asterisk is how you find the field by scanning, and without the hidden flag
      the field introduces itself as "Order title star". -->
-<div class="max-w-sm">
+<div data-kui="field/default" class="max-w-sm">
   <label for="fd-title" class="mb-1.5 block text-[13px]/5 font-medium">
     Order title <span aria-hidden="true" class="text-red-600">*</span>
   </label>
@@ -525,7 +525,7 @@ register(
      aria-invalid="false" is the valid state rather than a missing attribute.
      The icon sits inside x-show rather than x-if: Lucide hydrates once at load
      and never sees markup x-if inserts later. -->
-<div class="max-w-sm"
+<div data-kui="field/error" class="max-w-sm"
      x-data="{ gstin: '24AAACG4171B1Z', touched: true,
                get bad() { return this.touched && this.gstin.trim().length !== 15 } }">
   <label for="fe-gstin" class="mb-1.5 block text-[13px]/5 font-medium">
@@ -566,7 +566,7 @@ register(
      unless the first option has value="" — a select whose first option is a
      real vendor is never empty, so the constraint is satisfied on a form
      nobody has touched and the field submits whatever happened to be first. -->
-<div class="max-w-sm space-y-6">
+<div data-kui="field/required" class="max-w-sm space-y-6">
   <div>
     <p class="mb-3 text-[12px]/4 text-zinc-600">
       Two of the nine fields on this form are required. <span aria-hidden="true" class="text-red-600">*</span> marks them.
@@ -655,7 +655,7 @@ register(
      The message lives in the control column, never under the label. Under the
      label it lines up with nothing, and on a field that errors it appears on
      the opposite side of the form from the red border it belongs to. -->
-<div class="@container max-w-2xl"
+<div data-kui="field/horizontal" class="@container max-w-2xl"
      x-data="{ limit: '750000', touched: true,
                get bad() { return this.touched && Number(this.limit) > 500000 } }">
   <div class="space-y-4">
@@ -737,7 +737,7 @@ register(
      The legend names the question. Every input inside still needs its own
      label; a legend does not stand in for one, and two fields under one legend
      with no labels are announced as "Tax registration, edit" twice. -->
-<fieldset class="max-w-md" aria-describedby="fg-msg">
+<fieldset data-kui="field/group" class="max-w-md" aria-describedby="fg-msg">
   <legend class="mb-2 text-[13px]/5 font-medium">
     Tax registration <span aria-hidden="true" class="text-red-600">*</span>
   </legend>
@@ -783,7 +783,7 @@ register(
      The locked option keeps its place and goes disabled rather than
      disappearing. A list that changes length is one nobody can scan by
      position. -->
-<fieldset class="max-w-md" aria-describedby="fc-msg">
+<fieldset data-kui="field/choice" class="max-w-md" aria-describedby="fc-msg">
   <legend class="mb-2 text-[13px]/5 font-medium">
     Receipt outcome <span aria-hidden="true" class="text-red-600">*</span>
   </legend>
@@ -834,7 +834,7 @@ register(
      written in is the order they are read in: "fa-qty-unit fa-qty-msg" gives
      "kilograms, whole kilograms only", the other way round gives "whole
      kilograms only, kilograms". DOM order has nothing to do with it. -->
-<div class="max-w-sm space-y-5" x-data="{ addr: '' }">
+<div data-kui="field/action" class="max-w-sm space-y-5" x-data="{ addr: '' }">
 
   <div>
     <div class="mb-1.5 flex items-baseline justify-between gap-3">
@@ -888,7 +888,7 @@ register(
      follows and what Tab follows are the same. At 390px it is one column, which
      is why the dates are labelled Effective from and Effective to rather than
      one date and the word "to" between them. -->
-<div class="max-w-2xl"
+<div data-kui="field/grid" class="max-w-2xl"
      x-data="{ rate: '118.40', floor: 95, touched: true,
                get bad() { return this.touched && Number(this.rate) < this.floor } }">
   <div class="grid gap-4 sm:grid-cols-2">
@@ -993,7 +993,7 @@ register(
      changes on a discrete action and wrong for one that recomputes on every
      keystroke, which is why this one carries aria-live="off" and is read on
      focus like any other described value. -->
-<div class="max-w-sm space-y-5"
+<div data-kui="field/readonly" class="max-w-sm space-y-5"
      x-data="{ qty: 2000, rate: 118.40,
                get total() { return this.qty * this.rate } }">
 
@@ -1116,7 +1116,7 @@ register(
      min-w-0 is what lets the input shrink at 390px; without it an input holds
      a min-content width of about twenty characters and pushes anything beside
      it out through the border. -->
-<div class="max-w-xl">
+<div data-kui="input/default" class="max-w-xl">
   <label for="in-title" class="mb-1.5 block text-[13px]/5 font-medium">Order title <span class="text-red-600">*</span></label>
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <input id="in-title" name="title" value="MS angles and plates — August lot"
@@ -1140,7 +1140,7 @@ register(
 
      The dense field also drops to 13px text. Keeping 14px inside a 32px box
      leaves 6px of padding, and the descenders start touching the border. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="input/sizes" class="max-w-xl space-y-5">
   <div>
     <label for="in-h36" class="mb-1.5 block text-[13px]/5 font-medium">36px — the form field</label>
     <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -1180,7 +1180,7 @@ register(
      A unit rendered as text is not submitted. What posts is the number alone,
      so the server has to know that this field is rupees and that one is
      percent — the prefix tells the user, not the endpoint. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="input/icon" class="max-w-xl space-y-5">
   <div>
     <label for="in-search" class="mb-1.5 block text-[13px]/5 font-medium">Find a vendor</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -1229,7 +1229,7 @@ register(
      gives 18,42,000. It groups on blur and ungroups on focus, because editing
      a string with commas in it means counting commas to find the digit you
      want. The hidden input is what posts — never the formatted string. -->
-<div class="max-w-xl space-y-5"
+<div data-kui="input/amount" class="max-w-xl space-y-5"
      x-data="{
        amount: '18,42,000',
        strip() { this.amount = this.amount.replace(/[^0-9.]/g, ''); },
@@ -1282,7 +1282,7 @@ register(
      Escape clears the field and stops propagating. A search box inside a sheet
      or a dialog shares Escape with the panel around it, and without the stop
      the first press both clears the query and closes the panel. -->
-<div class="max-w-xl" x-data="{ q: 'gujarat polymers' }">
+<div data-kui="input/search" class="max-w-xl" x-data="{ q: 'gujarat polymers' }">
   <label for="in-q" class="mb-1.5 block text-[13px]/5 font-medium">Search purchase orders</label>
 
   <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -1326,7 +1326,7 @@ register(
      The help line is always occupied — help text when valid, the error when
      not — so the block keeps its height and the fields below it do not jump
      as the user types. -->
-<div class="max-w-xl"
+<div data-kui="input/error" class="max-w-xl"
      x-data="{
        rate: '51,800',
        touched: true,
@@ -1376,7 +1376,7 @@ register(
      type="date" always posts yyyy-mm-dd whatever it displays, and what it
      displays is the browser's locale — so the hint says what the date means,
      not what it should look like. -->
-<div class="max-w-xl space-y-5" x-data="{ ref: 'GRN-24-0912' }">
+<div data-kui="input/format" class="max-w-xl space-y-5" x-data="{ ref: 'GRN-24-0912' }">
   <div>
     <label for="in-ref" class="mb-1.5 block text-[13px]/5 font-medium">GRN reference</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 has-[:user-invalid]:border-red-600 has-[:user-invalid]:focus-within:border-red-600 has-[:user-invalid]:focus-within:outline-red-600/15">
@@ -1427,7 +1427,7 @@ register(
      Suppressing Edge's control needs a rule in the application stylesheet, and
      until somebody decides it is worth one, the second eye stays. -->
 
-<div class="max-w-xl" x-data="{ show: false }">
+<div data-kui="input/password" class="max-w-xl" x-data="{ show: false }">
   <label for="in-pw" class="mb-1.5 block text-[13px]/5 font-medium">Password</label>
 
   <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -1466,7 +1466,7 @@ register(
      no idea where they are. A read-only value left on white with a border and
      a focus ring is pixel for pixel an editable field, and the only way to
      find out otherwise is to click into it and get nothing back. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="input/disabled" class="max-w-xl space-y-5">
   <div>
     <label for="in-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Rate contract</label>
     <div class="rounded-lg border border-zinc-200 bg-zinc-100">
@@ -1557,7 +1557,7 @@ register(
      the wrapper's own border and the fourth is the divider, so a ring inside it
      would draw a second rule one pixel in from the first. Neither ₹ nor .00
      takes a divider — a rule there would say the glyph is a control. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="input-group/default" class="max-w-xl space-y-5">
   <div>
     <label for="ig1-value" class="mb-1.5 block text-[13px]/5 font-medium">Order value (₹)</label>
     <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -1600,7 +1600,7 @@ register(
      control, hard against its right edge, and an addon there lands on top of
      it. The left end is free, which is why the decorative calendar goes there —
      it names the field at a glance and opens nothing. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="input-group/icon" class="max-w-xl space-y-5">
   <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <label for="ig2-q" class="sr-only">Search purchase orders</label>
     <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 self-center text-zinc-500"></i>
@@ -1647,7 +1647,7 @@ register(
      back. The button is visible at first paint here because the filter starts
      with a value in it — start it empty and it needs x-cloak, or it flashes on
      screen for one frame before Alpine boots and takes it away. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="input-group/button" class="max-w-xl space-y-5">
   <div>
     <label for="ig3-grn" class="mb-1.5 block text-[13px]/5 font-medium">GRN number</label>
     <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-100 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
@@ -1703,7 +1703,7 @@ register(
      and that is not a preference. A unit follows its quantity and a country
      code precedes its number; reverse either and the value reads back as
      something nobody would write down. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="input-group/select" class="max-w-xl space-y-5">
   <div>
     <label for="ig4-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity</label>
     <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -1758,7 +1758,7 @@ register(
      screen and it is never a field's helper: an outline addon says this does
      something to the field, a filled one says this is what the page is for, and
      two filled groups on one form makes both of them wrong. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="input-group/action" class="max-w-xl space-y-5">
   <form @submit.prevent="add()"
         x-data="{ code: '', lines: 3, msg: '',
                   add() { const c = this.code.trim().toUpperCase();
@@ -1821,7 +1821,7 @@ register(
 
      The scope options are one word each because the select is as wide as its
      longest one, and every pixel it takes comes off the box at 390px. -->
-<form role="search" action="/search/" class="max-w-xl">
+<form data-kui="input-group/search" role="search" action="/search/" class="max-w-xl">
   <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <label for="ig6-scope" class="sr-only">Search in</label>
     <select id="ig6-scope" name="scope"
@@ -1868,7 +1868,7 @@ register(
      Ctrl or Cmd plus Enter posts, and the hint says so rather than leaving it
      to be discovered — and the hint is hidden below sm, because a phone has no
      Ctrl key. -->
-<div class="max-w-xl" x-data="{ text: '' }">
+<div data-kui="input-group/textarea" class="max-w-xl" x-data="{ text: '' }">
   <label for="ig7-note" class="mb-1.5 block text-[13px]/5 font-medium">Remark on GRN-24-0912</label>
 
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -1934,7 +1934,7 @@ register(
      would read as the wrong unit the way a red ₹ reads as a negative amount.
      The red text is the message under the box, and it says the number it is
      comparing against — "invalid" tells nobody what to type instead. -->
-<div class="max-w-xl">
+<div data-kui="input-group/error" class="max-w-xl">
   <label for="ig8-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity <span class="text-red-600">*</span></label>
 
   <div class="flex items-stretch rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
@@ -1973,7 +1973,7 @@ register(
      which is the one thing a filter bar must never do. min-w-0 is what lets the
      search box shrink at all — without it the input holds its intrinsic
      twenty-character width and pushes the row past the screen. -->
-<div class="flex flex-wrap items-center gap-2">
+<div data-kui="input-group/dense" class="flex flex-wrap items-center gap-2">
   <div class="flex min-w-0 flex-1 basis-56 items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <label for="ig9-q" class="sr-only">Search the item ledger</label>
     <i data-lucide="search" aria-hidden="true" class="ml-2.5 size-4 shrink-0 self-center text-zinc-500"></i>
@@ -2078,7 +2078,7 @@ register(
      The border and the focus outline live on the wrapper as they do for an
      input, so this and the fields above it are the same object at the same
      height. outline-none on the select is the carve-out rule 8 allows. -->
-<div class="max-w-sm">
+<div data-kui="select/default" class="max-w-sm">
   <label for="sel-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
 
   <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -2126,7 +2126,7 @@ register(
      <optgroup> is a heading and never a value. One level, a label attribute and
      nothing else: no count, no icon, no second line. Wanting any of those is
      the signal to move to the listbox variants below. -->
-<div class="max-w-sm">
+<div data-kui="select/groups" class="max-w-sm">
   <label for="sel-item" class="mb-1.5 block text-[13px]/5 font-medium">Item <span class="text-red-600">*</span></label>
 
   <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -2181,7 +2181,7 @@ register(
      help text rather than stacking under it. Do not reach for the invalid:
      variant here — :invalid matches from first paint, so every required select
      on a blank form comes up red before anybody has done anything wrong. -->
-<div class="max-w-sm space-y-6">
+<div data-kui="select/states" class="max-w-sm space-y-6">
 
   <div>
     <label for="sel-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Currency</label>
@@ -2255,7 +2255,7 @@ register(
      Django needs MultipleChoiceField either way — its widget reads the POST
      with getlist, and a plain ChoiceField takes the last value and silently
      drops the rest. -->
-<div class="max-w-sm space-y-6">
+<div data-kui="select/multiple" class="max-w-sm space-y-6">
 
   <div>
     <label for="sel-multi" class="mb-1.5 block text-[13px]/5 font-medium">Plants — the control to avoid</label>
@@ -2329,7 +2329,7 @@ register(
 
      At 390px the three selects are a two-column grid, not a row that scrolls.
      min-w-0 on each, or a long vendor name pushes the grid past the viewport. -->
-<div x-data="{
+<div data-kui="select/filter" x-data="{
        status: '', vendor: '', plant: '',
        orders: [
          { no: 'PO-24-1187', vendor: 'gujarat-polymers', vname: 'Gujarat Polymers Ltd', plant: 'silvassa', status: 'overdue', amount: '₹18,42,000', due: '02 Aug 2026' },
@@ -2467,7 +2467,7 @@ register(
      trigger takes aria-labelledby with two ids. The trigger shows one line: the
      second belongs to the list, and in the closed control it makes every field
      in the form a different height. -->
-<div class="relative max-w-md"
+<div data-kui="select/rich" class="relative max-w-md"
      x-data="{
        open: false, sel: 'sharma-extrusions', buf: '', timer: null,
        options: [
@@ -2601,7 +2601,7 @@ register(
      Ticks drawn inside template x-for do not exist when createIcons() first
      runs, so the page needs the guarded re-hydration loop or they come up
      empty. The x-show goes on the wrapping span, never on the <i>. -->
-<div class="relative max-w-sm"
+<div data-kui="select/status" class="relative max-w-sm"
      x-data="{
        open: false, sel: 'accepted', buf: '', timer: null,
        options: [
@@ -2721,7 +2721,7 @@ register(
      disabled option saying so, and the child stays required so nothing can be
      submitted past it. An empty fragment leaves a select with no options at
      all, which is a 20px sliver nobody can explain. -->
-<div class="max-w-md space-y-4"
+<div data-kui="select/cascade" class="max-w-md space-y-4"
      x-data="{ vendor: '', loading: false, count: 0 }"
      @htmx:before-request.camel="loading = true"
      @htmx:after-request.camel="loading = false"
@@ -2852,7 +2852,7 @@ register(
      chevron and the focus outline are template markup, so {{ form.vendor }} on
      its own is never the whole field — which is the one thing that catches
      everybody who has used a crispy-forms style renderer before. -->
-<form method="post" class="max-w-md space-y-5">
+<form data-kui="select/django" method="post" class="max-w-md space-y-5">
   {% csrf_token %}
 
   <div>
@@ -2947,7 +2947,7 @@ register(
     related: ['field', 'input', 'form-page'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div class="max-w-xl">
+`<div data-kui="textarea/default" class="max-w-xl">
   <label for="ta-notes" class="mb-1.5 block text-[13px]/5 font-medium">Delivery instructions</label>
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <textarea id="ta-notes" name="notes" rows="4"
@@ -2961,7 +2961,7 @@ register(
       { id: 'sizes', name: 'Sizes', code:
 `<!-- Three heights, and rows is what sets all three. A pixel height cuts the
      last line in half: h-[100px] against a 20px leading is 4.2 lines. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="textarea/sizes" class="max-w-xl space-y-5">
   <div>
     <label for="ta-2" class="mb-1.5 block text-[13px]/5 font-medium">Two rows — a remark inside a table row or a dialog</label>
     <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -2989,7 +2989,7 @@ Dadra &amp; Nagar Haveli 396230</textarea>
       { id: 'counter', name: 'With a counter', code:
 `<!-- A soft limit: typing past it is allowed, submitting past it is not. A hard
      maxlength would swallow the tail of a paste without saying so. -->
-<div class="max-w-xl"
+<div data-kui="textarea/counter" class="max-w-xl"
      x-data="{
        text: 'Rate revised after the vendor withdrew the August discount.',
        limit: 180,
@@ -3038,7 +3038,7 @@ Dadra &amp; Nagar Haveli 396230</textarea>
      auto first (it can never report less than the height already set, so the
      box only ever grows), and never re-measuring, which leaves a box sized at
      desktop width still that tall at 390px. -->
-<div class="max-w-xl"
+<div data-kui="textarea/autogrow" class="max-w-xl"
      x-data="{
        grow() {
          const t = this.$refs.ta;
@@ -3063,7 +3063,7 @@ Held pending the test certificate.</textarea>
 `<!-- The footer sits inside the ring, which is the whole reason the border is on
      the wrapper and not on the control. Ctrl or Cmd plus Enter posts; a bare
      Enter writes a newline, because that is what the key is for. -->
-<div class="max-w-xl" x-data="{ text: '' }">
+<div data-kui="textarea/toolbar" class="max-w-xl" x-data="{ text: '' }">
   <div class="rounded-xl border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <label for="ta-note" class="sr-only">Add a note to this order</label>
     <textarea id="ta-note" name="body" rows="3" x-model="text"
@@ -3090,7 +3090,7 @@ Held pending the test certificate.</textarea>
 </div>` },
 
       { id: 'error', name: 'With error', code:
-`<div class="max-w-xl">
+`<div data-kui="textarea/error" class="max-w-xl">
   <label for="ta-bad" class="mb-1.5 block text-[13px]/5 font-medium">Rejection reason <span class="text-red-600">*</span></label>
   <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
     <textarea id="ta-bad" name="reason" rows="4" aria-invalid="true" aria-describedby="ta-bad-err"
@@ -3103,7 +3103,7 @@ Held pending the test certificate.</textarea>
 </div>` },
 
       { id: 'disabled', name: 'Disabled and read-only', code:
-`<div class="max-w-xl space-y-5">
+`<div data-kui="textarea/disabled" class="max-w-xl space-y-5">
   <div>
     <label for="ta-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Terms and conditions</label>
     <div class="rounded-lg border border-zinc-200 bg-zinc-100">
@@ -3152,7 +3152,7 @@ Test certificate follows by email.</textarea>
      truncates a paste in silence. Either drop it from the widget and let
      clean() reject the value with a message, or say the number in help_text
      before anyone reaches it. form.body.field.max_length is the number. -->
-<form method="post" class="max-w-xl">
+<form data-kui="textarea/django" method="post" class="max-w-xl">
   {% csrf_token %}
   <div>
     <label for="{{ form.body.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
@@ -3229,7 +3229,7 @@ Test certificate follows by email.</textarea>
 `<!-- The help text sits outside the label. Inside it, it becomes part of the
      box's accessible name, and the whole sentence is read back every time focus
      lands on the box. -->
-<div class="max-w-xl">
+<div data-kui="checkbox/default" class="max-w-xl">
   <label class="flex items-start gap-2.5 text-[14px]/5">
     <input type="checkbox" id="cb-notify" name="notify_vendor" value="1" checked
            aria-describedby="cb-notify-help"
@@ -3245,7 +3245,7 @@ Test certificate follows by email.</textarea>
 `<!-- One name across the group. Two ticks post notify twice; no ticks post
      nothing at all, and the server reads that absence off the form definition
      rather than off the request. -->
-<fieldset class="max-w-xl">
+<fieldset data-kui="checkbox/group" class="max-w-xl">
   <legend class="mb-2 text-[13px]/5 font-medium">Notify when this order is approved</legend>
 
   <div class="space-y-2">
@@ -3282,7 +3282,7 @@ Test certificate follows by email.</textarea>
 
      The select-all carries no name: indeterminate changes nothing about what is
      submitted, so a mixed box with a name posts as if it were simply ticked. -->
-<fieldset class="max-w-xl"
+<fieldset data-kui="checkbox/indeterminate" class="max-w-xl"
           x-data="{
             lines: ['hdpe', 'ldpe', 'mb', 'ao'],
             sel: ['hdpe', 'mb'],
@@ -3338,7 +3338,7 @@ Test certificate follows by email.</textarea>
      The hover tint carries the [&:not(:has(:checked))] guard: hover and selected
      are one class each at equal specificity, and without it which one paints a
      hovered selected tile depends on the order Tailwind emits the variants. -->
-<fieldset>
+<fieldset data-kui="checkbox/cards">
   <legend class="mb-2 text-[13px]/5 font-medium">Send with the vendor email</legend>
 
   <div class="grid gap-2 sm:grid-cols-3">
@@ -3373,7 +3373,7 @@ Test certificate follows by email.</textarea>
      on the height so twenty vendors do not push the register off the screen. The
      vendor name truncates and the count is shrink-0, so nothing reflows at
      390px and the digits still line up. -->
-<div class="max-w-xs rounded-xl border border-zinc-300 bg-white"
+<div data-kui="checkbox/filters" class="max-w-xs rounded-xl border border-zinc-300 bg-white"
      x-data="{ sel: ['gujarat-polymers', 'sharma-extrusions'] }">
   <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
     <h3 class="text-[13px]/5 font-medium">Vendor</h3>
@@ -3440,7 +3440,7 @@ Test certificate follows by email.</textarea>
 
      Select-all means this page. The other 4,312 are a second, deliberate click,
      because a bulk approve that quietly took every match cannot be undone. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+<div data-kui="checkbox/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{
        ids: ['PO-24-1187', 'PO-24-1191', 'PO-24-1194', 'PO-24-1203', 'PO-24-1206'],
        sel: ['PO-24-1191'],
@@ -3688,7 +3688,7 @@ Test certificate follows by email.</textarea>
 </div>` },
 
       { id: 'states', name: 'Disabled, locked and invalid', code:
-`<div class="max-w-xl space-y-5">
+`<div data-kui="checkbox/states" class="max-w-xl space-y-5">
   <!-- disabled: out of the Tab order and out of the POST -->
   <div>
     <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
@@ -3767,7 +3767,7 @@ Test certificate follows by email.</textarea>
      brings its own wrapper markup — a div per option since Django 4.0, a ul
      before that — and no amount of attrs will lay it out. Each iteration yields
      the input as {{ choice.tag }} and its text as {{ choice.choice_label }}. -->
-<form method="post" class="max-w-xl">
+<form data-kui="checkbox/django" method="post" class="max-w-xl">
   {% csrf_token %}
 
   <div>
@@ -3874,7 +3874,7 @@ Test certificate follows by email.</textarea>
      Nothing is preselected: this goes on the printed order, so it is a choice
      somebody has to make rather than one that makes itself for anybody who
      never read the question. -->
-<fieldset class="max-w-xl">
+<fieldset data-kui="radio/default" class="max-w-xl">
   <legend class="mb-2 text-[13px]/5 font-medium">Payment terms</legend>
 
   <div class="space-y-2">
@@ -3901,7 +3901,7 @@ Test certificate follows by email.</textarea>
      option's accessible name, and the whole sentence is read back every time the
      arrow keys pass over the option — which, in a group, is on the way to every
      option after it. -->
-<fieldset class="max-w-xl">
+<fieldset data-kui="radio/descriptions" class="max-w-xl">
   <legend class="mb-2 text-[13px]/5 font-medium">How this order is priced</legend>
 
   <div class="space-y-3">
@@ -3955,7 +3955,7 @@ Test certificate follows by email.</textarea>
      The hover tint carries the [&:not(:has(:checked))] guard: hover and chosen
      are one class each at equal specificity, and without it which one wins on a
      hovered chosen tile depends on the order Tailwind emits the variants. -->
-<fieldset>
+<fieldset data-kui="radio/cards">
   <legend class="mb-2 text-[13px]/5 font-medium">Inspection before dispatch</legend>
 
   <div class="grid gap-2 sm:grid-cols-3">
@@ -3993,7 +3993,7 @@ Test certificate follows by email.</textarea>
      Four one-word options that filter the view the moment they are touched are
      the segmented track in button-group instead; this shape is for a value that
      is part of the form and is saved with it. -->
-<fieldset>
+<fieldset data-kui="radio/inline">
   <legend class="mb-2 text-[13px]/5 font-medium">Quantity unit</legend>
 
   <div class="flex flex-wrap gap-x-5 gap-y-2">
@@ -4027,7 +4027,7 @@ Test certificate follows by email.</textarea>
      So the way out is an option. "Any vendor" carries a value like every other
      option, is the checked default, and is the only thing that makes this group
      clearable at all. -->
-<fieldset class="max-w-xs">
+<fieldset data-kui="radio/none" class="max-w-xs">
   <legend class="mb-2 text-[13px]/5 font-medium">Vendor</legend>
 
   <div class="space-y-2">
@@ -4071,7 +4071,7 @@ Test certificate follows by email.</textarea>
 
      No select-all and no bulk bar. The answer is a single record, so it is named
      in the footer instead — the filled dot alone is not readable at a glance. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+<div data-kui="radio/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ po: 'PO-24-1191' }">
   <table class="w-full text-[13px]/5">
     <thead>
@@ -4148,7 +4148,7 @@ Test certificate follows by email.</textarea>
 </div>` },
 
       { id: 'states', name: 'Default, locked and invalid', code:
-`<div class="max-w-xl space-y-6">
+`<div data-kui="radio/states" class="max-w-xl space-y-6">
   <!-- A checked default is also the tab target, and it is what a bare POST
        carries for everybody who never read the question. That is right for the
        ordinary case and wrong for a consequential one. -->
@@ -4266,7 +4266,7 @@ Test certificate follows by email.</textarea>
      required is inherited into every option, which is what the browser needs to
      block the submit and what a screen reader needs to announce on whichever
      option has focus. -->
-<form method="post" class="max-w-xl">
+<form data-kui="radio/django" method="post" class="max-w-xl">
   {% csrf_token %}
 
   <fieldset>
@@ -4382,7 +4382,7 @@ Test certificate follows by email.</textarea>
      The help text sits outside the label. Inside it, it joins the switch's
      accessible name and is read back in full on every toggle. pr-13 is the
      track plus the gap, so the sentence lines up under the setting name. -->
-<div class="max-w-xl">
+<div data-kui="toggle/default" class="max-w-xl">
   <label class="flex items-start justify-between gap-4 py-1">
     <span class="text-[14px]/5 tabular-nums">Auto-approve orders under ₹50,000</span>
     <input type="checkbox" role="switch" id="sw-auto" name="auto_approve" value="1" checked
@@ -4405,7 +4405,7 @@ Test certificate follows by email.</textarea>
      24px WCAG 2.2 asks for. The label is the target, and the padding on it is
      what closes the gap: py-1 round the small one takes the row to 24px, and a
      settings row is taller than that already. -->
-<div class="max-w-xl space-y-4">
+<div data-kui="toggle/sizes" class="max-w-xl space-y-4">
   <label class="flex items-center justify-between gap-4 py-1">
     <span class="text-[14px]/5 tabular-nums">Default — 36×20, one setting per row</span>
     <input type="checkbox" role="switch" checked class="peer sr-only">
@@ -4432,7 +4432,7 @@ Test certificate follows by email.</textarea>
      One locked row keeps its place and its position. Dropping it would change
      the shape of a list people scan by position, and repainting it to the off
      fill would say the setting is off when it is on and out of their hands. -->
-<div class="max-w-xl rounded-xl border border-zinc-300 bg-white">
+<div data-kui="toggle/list" class="max-w-xl rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[13px]/5 font-medium">Notifications — Gujarat Polymers Ltd</h3>
     <p class="mt-0.5 text-[12px]/4 text-zinc-500">Each switch applies as you set it. There is nothing to save.</p>
@@ -4504,7 +4504,7 @@ Test certificate follows by email.</textarea>
      list that changes length under the pointer is a list nobody can scan by
      position. peer-disabled:opacity-60 drains the whole switch in one go, which
      is why the drain sits on the track and not on the thumb inside it. -->
-<fieldset class="max-w-xl rounded-xl border border-zinc-300 bg-white" x-data="{ email: true }">
+<fieldset data-kui="toggle/group" class="max-w-xl rounded-xl border border-zinc-300 bg-white" x-data="{ email: true }">
   <legend class="sr-only">Email notifications for Gujarat Polymers Ltd</legend>
 
   <div class="px-4 py-2.5">
@@ -4557,7 +4557,7 @@ Test certificate follows by email.</textarea>
      The small track is 16px tall, so the label carries py-1.5 to bring the
      target to 28px. aria-label is not needed here — the text beside it is the
      label, and it names the filter rather than its state. -->
-<div class="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+<div data-kui="toggle/inline" class="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
   <h3 class="text-[13px]/5 font-medium">Purchase orders</h3>
   <span class="text-[12px]/4 tabular-nums text-zinc-500">1,438 open · 84 overdue</span>
 
@@ -4589,7 +4589,7 @@ Test certificate follows by email.</textarea>
 
      The handlers behind Saving and Not saved are in the htmx variant; here the
      rows are pinned so both states can be read side by side. -->
-<div class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+<div data-kui="toggle/states" class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
   <div class="px-4 py-2.5">
     <label class="flex items-center justify-between gap-4 py-1">
       <span class="text-[14px]/5">On — the setting is in force</span>
@@ -4672,7 +4672,7 @@ Test certificate follows by email.</textarea>
      The status line is role="status" because the revert is script setting
      checked, and a programmatic change is announced by nothing. Without it the
      only sign the setting did not stick is a pixel moving back. -->
-<div class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
+<div data-kui="toggle/htmx" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
      x-data="{ state: 'idle', want: true }"
      @htmx:before-request.camel="want = $refs.sw.checked; state = 'saving'"
      @htmx:after-request.camel="
@@ -4755,7 +4755,7 @@ Test certificate follows by email.</textarea>
 
      hx-headers sits on the card so every switch inside it sends the CSRF token;
      htmx will not find one without a form to read it from. -->
-<div class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white"
+<div data-kui="toggle/django" class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white"
      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
   {% for setting in settings %}
     <div class="px-4 py-2.5"
@@ -4877,7 +4877,7 @@ Test certificate follows by email.</textarea>
      the list is open, or it swallows the keystroke a surrounding dialog is
      waiting for; Enter is prevented only while the list is open, or the field
      takes form submission away from the keyboard. -->
-<div class="relative max-w-sm"
+<div data-kui="combobox/default" class="relative max-w-sm"
      x-data="{
        open: false, typed: false, q: 'Gujarat Polymers Ltd', sel: 'gujarat-polymers', ai: 0,
        options: [
@@ -5007,7 +5007,7 @@ Test certificate follows by email.</textarea>
      say nothing about which chip the cursor is on. They are real tab stops,
      which is the price of being reachable at all — Backspace on an empty query
      is the fast way out. -->
-<div class="relative max-w-md"
+<div data-kui="combobox/multi" class="relative max-w-md"
      x-data="{
        open: false, typed: false, q: '', ai: 0,
        sel: ['gujarat-polymers', 'nashik-steel'],
@@ -5143,7 +5143,7 @@ Test certificate follows by email.</textarea>
 
      The line under the buttons only appears while a query is typed, so the
      asymmetry is on screen rather than in the documentation. -->
-<div class="relative max-w-md"
+<div data-kui="combobox/select-all" class="relative max-w-md"
      x-data="{
        open: false, typed: false, q: '', ai: 0,
        sel: ['cc-1200', 'cc-3100'],
@@ -5305,7 +5305,7 @@ Test certificate follows by email.</textarea>
      A sticky heading needs a background of its own. Left transparent, the rows
      scroll straight through the text and neither is readable. A group whose
      options are all filtered out goes with its heading. -->
-<div class="relative max-w-md"
+<div data-kui="combobox/groups" class="relative max-w-md"
      x-data="{
        open: false, typed: false, q: 'Nashik Steel Traders', sel: 'nashik-steel', ai: 0,
        groups: [
@@ -5425,7 +5425,7 @@ Test certificate follows by email.</textarea>
 
      Below sm the GSTIN is dropped rather than wrapped. Three facts on a 390px
      row is one too many, and the vendor code is the one people search by. -->
-<div class="relative max-w-lg"
+<div data-kui="combobox/rich" class="relative max-w-lg"
      x-data="{
        open: false, typed: false, q: 'Sharma Extrusions', sel: 'sharma-extrusions', ai: 0,
        options: [
@@ -5546,7 +5546,7 @@ Test certificate follows by email.</textarea>
 
      The search box is named q, never vendor. The value is the hidden input, and
      a Django form ignores a POST key it has no field for. -->
-<div class="relative max-w-md"
+<div data-kui="combobox/remote" class="relative max-w-md"
      x-data="{
        open: false, loading: false, failed: false, searched: false, empty: false,
        ai: 0, aid: null, sel: '', label: '', term: '',
@@ -5662,7 +5662,7 @@ Test certificate follows by email.</textarea>
 
      This is also why the arrows clamp rather than wrap. A list that wrapped
      would land on Add new vendor every time somebody overshot the bottom. -->
-<div class="relative max-w-md"
+<div data-kui="combobox/create" class="relative max-w-md"
      x-data="{
        open: false, typed: false, q: '', sel: '', fresh: '', ai: 0,
        options: [
@@ -5760,7 +5760,7 @@ Test certificate follows by email.</textarea>
 </div>` },
 
       { id: 'states', name: 'Disabled, locked, invalid', code:
-`<div class="max-w-md space-y-7">
+`<div data-kui="combobox/states" class="max-w-md space-y-7">
 
   <!-- Disabled reaches the hidden input too. disabled on the search box only
        stops the typing; the hidden input has no appearance of its own and posts
@@ -5954,7 +5954,7 @@ Test certificate follows by email.</textarea>
 {{ vendors|json_script:"vendor-options" }}
 {{ form.recipients.value|default:''|json_script:"rfq-recipients" }}
 
-<form method="post" class="max-w-md">
+<form data-kui="combobox/django" method="post" class="max-w-md">
   {% csrf_token %}
 
   <div class="relative"
@@ -6116,7 +6116,7 @@ Test certificate follows by email.</textarea>
     related: ['input', 'field', 'alert-dialog'],
     variants: [
       { id: 'default', name: 'Drop zone and list', code:
-`<div x-data="{ depth: 0 }">
+`<div data-kui="attachment/default" x-data="{ depth: 0 }">
   <label class="mb-1.5 block text-[13px]/5 font-medium">Attachments</label>
 
   <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
@@ -6170,7 +6170,7 @@ Test certificate follows by email.</textarea>
 
       { id: 'empty', name: 'Nothing attached', code:
 `<!-- Say what to attach and why. "No files" is a fact, not an instruction. -->
-<div x-data="{ depth: 0 }">
+<div data-kui="attachment/empty" x-data="{ depth: 0 }">
   <label class="mb-1.5 block text-[13px]/5 font-medium">Attachments</label>
   <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
        class="rounded-lg border border-dashed px-4 py-8 text-center transition"
@@ -6192,7 +6192,7 @@ Test certificate follows by email.</textarea>
       { id: 'uploading', name: 'Uploading', code:
 `<!-- The number comes from the real XHR progress event. If you cannot get it,
      drop the percentage and show an indeterminate bar instead of inventing one. -->
-<ul class="space-y-2">
+<ul data-kui="attachment/uploading" class="space-y-2">
   <li class="rounded-lg border border-zinc-200 bg-white px-3 py-2">
     <div class="flex items-center gap-3">
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
@@ -6225,7 +6225,7 @@ Test certificate follows by email.</textarea>
       { id: 'rejected', name: 'Rejected file', code:
 `<!-- The rejected file stays visible with its reason. Removing it from the list
      silently is how users end up believing something uploaded when it did not. -->
-<ul class="space-y-2">
+<ul data-kui="attachment/rejected" class="space-y-2">
   <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
     <div class="min-w-0 flex-1">
@@ -6256,7 +6256,7 @@ Test certificate follows by email.</textarea>
       { id: 'readonly', name: 'Read only', code:
 `<!-- No upload rights. Do not render a disabled drop zone — remove it, and let
      the list stand on its own. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+<div data-kui="attachment/readonly" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[13px]/5 font-medium">Attachments</h3>
     <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">3 files · 2.4 MB</span>
@@ -6282,7 +6282,7 @@ Test certificate follows by email.</textarea>
 
       { id: 'single', name: 'Single file field', code:
 `<!-- One file, inside a form, where a whole panel would be out of proportion. -->
-<div>
+<div data-kui="attachment/single">
   <label for="grn-scan" class="mb-1.5 block text-[13px]/5 font-medium">
     Signed GRN <span class="text-red-600">*</span>
   </label>
@@ -6303,7 +6303,7 @@ Test certificate follows by email.</textarea>
 
       { id: 'images', name: 'Image grid', code:
 `<!-- Photographs are recognised by sight, not by filename. Show them. -->
-<div>
+<div data-kui="attachment/images">
   <div class="flex items-end justify-between gap-3">
     <label class="text-[13px]/5 font-medium">Delivery photographs</label>
     <span class="text-[12px]/4 tabular-nums text-zinc-500">4 of 10</span>
@@ -6351,7 +6351,7 @@ Test certificate follows by email.</textarea>
      three names or the POST does not clear the file.
 
      {% if form.attachment.value %} … {% endif %} guards the first two. -->
-<div>
+<div data-kui="attachment/django">
   <label for="id_attachment" class="mb-1.5 block text-[13px]/5 font-medium">Attachment</label>
 
   <div class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
@@ -6435,7 +6435,7 @@ Test certificate follows by email.</textarea>
 
      Monday first: (getDay() + 6) % 7 moves Sunday from 0 to 6, which is where
      the weekend belongs in an office that works Saturdays. -->
-<div class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
+<div data-kui="calendar/month" class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
        focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        sel: null,
@@ -6540,7 +6540,7 @@ Test certificate follows by email.</textarea>
      x-trap keeps Tab inside the panel and returns focus to the trigger on
      close. Choosing a day closes it, because a single date is finished the
      moment it is picked. -->
-<div class="relative max-w-xs"
+<div data-kui="calendar/picker" class="relative max-w-xs"
      x-data="{
        open: false,
        focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
@@ -6670,7 +6670,7 @@ Test certificate follows by email.</textarea>
      stripe runs behind the row while the two ends stay round. Today keeps only
      a ring here, not a fill — a zinc-200 chip inside a zinc-200 band is
      invisible. -->
-<div class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
+<div data-kui="calendar/range" class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
        vy: new Date().getFullYear(),
        vm: new Date().getMonth(),
@@ -6788,7 +6788,7 @@ Test certificate follows by email.</textarea>
 
      The year list is built around the current year rather than hard-coded, so
      this markup does not quietly expire. -->
-<div class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
+<div data-kui="calendar/jump" class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
        focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        sel: null,
@@ -6911,7 +6911,7 @@ Test certificate follows by email.</textarea>
 
      why() puts the reason into the accessible name, because a disabled button
      announces "unavailable" and never says why. -->
-<div class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
+<div data-kui="calendar/constrained" class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
        focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        sel: null,
@@ -7028,7 +7028,7 @@ Test certificate follows by email.</textarea>
 
      Picking a day in the grid clears the preset label, because the range is no
      longer the thing the preset named. -->
-<div class="relative inline-block"
+<div data-kui="calendar/presets" class="relative inline-block"
      x-data="{
        open: false,
        vy: new Date().getFullYear(),
@@ -7192,7 +7192,7 @@ Test certificate follows by email.</textarea>
      Use the grid instead when the choice depends on seeing the month — a
      delivery date next to the weekend, a range across a month end. Use this
      when the user already knows the date. -->
-<div class="max-w-xs">
+<div data-kui="calendar/native" class="max-w-xs">
   <label for="grn-date" class="mb-1.5 block text-[13px]/5 font-medium">GRN date</label>
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <input type="date" id="grn-date" name="grn_date" value="2026-08-14" max="2026-12-31"
@@ -7219,7 +7219,7 @@ Test certificate follows by email.</textarea>
      The clean() check is not optional even though the widget prevents it — a
      POST does not have to come from this page. :min on the end input is a
      convenience for the user, never a guarantee to the view. -->
-<form method="get" class="max-w-md"
+<form data-kui="calendar/django" method="get" class="max-w-md"
       x-data="{
         start: '2026-04-01', end: '2026-08-20',
         parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
@@ -7320,7 +7320,7 @@ Test certificate follows by email.</textarea>
      scrolls past it, and an unanswered group posts no key at all, so "does not
      apply to this material" and "nobody reached this line" would be the same
      empty POST. -->
-<fieldset class="max-w-xl">
+<fieldset data-kui="questionnaire/question" class="max-w-xl">
   <legend>
     <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">Question 3 of 18</span>
     <span class="mt-1.5 block text-[14px]/5 font-medium">Test certificate received, and the lot number on it matches every bag</span>
@@ -7366,7 +7366,7 @@ Test certificate follows by email.</textarea>
      content box, so it is not a flex item and the fieldset's own padding-top
      lands underneath it — put the question on its own line and the spacing on
      the fieldset's margins. -->
-<div class="max-w-2xl divide-y divide-zinc-100">
+<div data-kui="questionnaire/run" class="max-w-2xl divide-y divide-zinc-100">
   <fieldset class="py-4 first:pt-0 last:pb-0">
     <legend class="text-[13px]/5 font-medium">Bag markings — grade, lot and net weight legible on every bag</legend>
     <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
@@ -7465,7 +7465,7 @@ Test certificate follows by email.</textarea>
      shorter, but Lucide hydrates once at load and an icon rendered later by
      Alpine stays a bare <i>, so the warning icon inside the loop never
      appears. -->
-<div class="max-w-xl space-y-5"
+<div data-kui="questionnaire/observation" class="max-w-xl space-y-5"
      x-data="{
        thickness: '2.42', mfi: '0.46',
        out(v, lo, hi) { const n = parseFloat(v); return v !== '' && !isNaN(n) && (lo > n || n > hi) }
@@ -7527,7 +7527,7 @@ Test certificate follows by email.</textarea>
      It counts as a question, which is why the eyebrow above says 5 while it is
      open and 4 when it is not. A denominator that ignores conditionals either
      cannot be reached on a clean sheet or is exceeded on a failed one. -->
-<div class="max-w-xl" x-data="{ ppe: 'fail' }">
+<div data-kui="questionnaire/conditional" class="max-w-xl" x-data="{ ppe: 'fail' }">
   <fieldset>
     <legend>
       <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">
@@ -7583,7 +7583,7 @@ Test certificate follows by email.</textarea>
      Not applicable sits below a rule and outside the scale, because it is not a
      low score. Folded in as a sixth tile it joins the ordering and starts
      getting averaged with the rest. -->
-<fieldset class="max-w-lg">
+<fieldset data-kui="questionnaire/scale" class="max-w-lg">
   <legend>
     <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Vendor assessment · Deccan Bearings Pvt Ltd</span>
     <span class="mt-1.5 block text-[14px]/5 font-medium">Documentation control — drawings, test certificates and revision history</span>
@@ -7639,7 +7639,7 @@ Test certificate follows by email.</textarea>
      at all, which is the same POST as a question that was never on the form, so
      without the explicit option there is no way to record that somebody looked
      at the bay and found nobody in PPE. -->
-<fieldset class="max-w-md"
+<fieldset data-kui="questionnaire/multi" class="max-w-md"
           x-data="{
             ppe: ['helmet', 'shoes'],
             toggle(v) {
@@ -7710,7 +7710,7 @@ Test certificate follows by email.</textarea>
      One red line, on the one row that causes something. A sheet where every
      failed row is tinted is a wall of colour with nothing standing out in
      it. -->
-<form class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+<form data-kui="questionnaire/sheet" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
       x-data="{
         a: { marking: 'pass', seal: 'pass', cert: 'fail', moisture: '', sample: '' },
         get total() { return Object.keys(this.a).length },
@@ -7851,7 +7851,7 @@ Test certificate follows by email.</textarea>
      just the first. Only the focused radio's attributes are announced, so
      marking one leaves the message unread for anybody who arrows onto the
      second. -->
-<div class="max-w-2xl">
+<div data-kui="questionnaire/invalid" class="max-w-2xl">
   <div id="qv-summary" tabindex="-1" class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3.5">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
     <div class="min-w-0">
@@ -7925,7 +7925,7 @@ Test certificate follows by email.</textarea>
      certified, by whom and when is the record; "attested = true" is not.
      Reopening is a named action that gets logged against the GRN, never an edit
      in place. -->
-<div class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+<div data-kui="questionnaire/signed" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-zinc-200 px-5 py-4">
     <div class="min-w-0">
       <h2 class="text-[16px]/6 font-semibold">Incoming inspection — GRN-24-0912</h2>

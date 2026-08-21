@@ -15,7 +15,7 @@
      The clean() check is not optional even though the widget prevents it — a
      POST does not have to come from this page. :min on the end input is a
      convenience for the user, never a guarantee to the view. -->
-<form method="get" class="max-w-md"
+<form data-kui="calendar/django" method="get" class="max-w-md"
       x-data="{
         start: '2026-04-01', end: '2026-08-20',
         parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },

@@ -4,7 +4,7 @@
      focus() scrolls a hidden element into view on both axes, which on a long
      page means the whole document jumps to the tab strip. So focus with
      preventScroll and do the horizontal scroll by hand, on the strip only. -->
-<div x-id="['tab', 'panel']"
+<div data-kui="tabs/scrollable" x-id="['tab', 'panel']"
      x-data="{
        tab: 'grn',
        items: [

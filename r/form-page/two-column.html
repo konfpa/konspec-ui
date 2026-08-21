@@ -14,7 +14,7 @@
      ignores any string you return, so there is nothing to write there — the
      preventDefault is the whole handler, and it only prompts because a person
      actually typed something. -->
-<div class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/two-column" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        dirty: false, leaving: false,
        arm(e) { if (e.target.matches('input, select, textarea')) this.dirty = true },

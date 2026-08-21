@@ -18,7 +18,7 @@
      One red line, on the one row that causes something. A sheet where every
      failed row is tinted is a wall of colour with nothing standing out in
      it. -->
-<form class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+<form data-kui="questionnaire/sheet" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
       x-data="{
         a: { marking: 'pass', seal: 'pass', cert: 'fail', moisture: '', sample: '' },
         get total() { return Object.keys(this.a).length },

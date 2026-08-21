@@ -3,7 +3,7 @@
 
      tabEls() filters on [role=tab] rather than reading children: x-for leaves a
      <template> in the DOM and it counts as an element child. -->
-<div x-id="['tab', 'panel']"
+<div data-kui="tabs/underline" x-id="['tab', 'panel']"
      x-data="{
        tab: 'lines',
        items: [

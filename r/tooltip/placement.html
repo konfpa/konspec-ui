@@ -18,7 +18,7 @@
      One x-data for all four, because a pointer is only ever in one place and
      an open id is cheaper than four booleans. Escape is bound once, on the
      root, with .window so it fires whether or not anything here has focus. -->
-<div class="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-10"
+<div data-kui="tooltip/placement" class="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-10"
      x-data="{
        open: null, timer: 0,
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },

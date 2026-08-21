@@ -26,7 +26,7 @@
      {% endif %} -->
 {% load humanize ui %}
 
-<div role="menu" aria-label="Order actions"
+<div data-kui="separator/django" role="menu" aria-label="Order actions"
      class="w-52 overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
   {% for action in order.menu_actions %}
     <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">

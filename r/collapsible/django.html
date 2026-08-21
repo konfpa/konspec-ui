@@ -16,7 +16,7 @@
       trigger's aria-controls points at the first panel and both rows open the
       same thing. #}
 
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="collapsible/django" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ open: {% if section_open %}true{% else %}false{% endif %} }">
   <button type="button" @click="open = !open" :aria-expanded="open"
           aria-controls="col-lines-{{ order.pk }}"

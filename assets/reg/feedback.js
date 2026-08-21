@@ -37,7 +37,7 @@ register(
     related: ['toast', 'alert-dialog', 'badge'],
     variants: [
       { id: 'tags', name: 'Four severities', code:
-`<div class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+`<div data-kui="alert/tags" class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
   <div class="min-w-0">
     <p class="text-[13px]/5 font-medium">Rate contract with Sharma Extrusions expires on 30 Sep 2024.</p>
@@ -72,14 +72,14 @@ register(
       { id: 'compact', name: 'Compact', code:
 `<!-- One line, 32px tall. For a table toolbar or a card header, where a
      three-line alert would push the data below the fold. -->
-<div class="flex items-center gap-2.5 rounded-lg border border-zinc-300 bg-white px-3 py-2">
+<div data-kui="alert/compact" class="flex items-center gap-2.5 rounded-lg border border-zinc-300 bg-white px-3 py-2">
   <i data-lucide="alert-triangle" class="size-3.5 shrink-0 text-amber-700"></i>
   <p class="min-w-0 flex-1 truncate text-[12px]/4">Showing the first 200 of <span class="tabular-nums">1,438</span> matching rows.</p>
   <a href="#" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Narrow the filters</a>
 </div>` },
 
       { id: 'dismissible', name: 'Dismissible', code:
-`<div x-data="{ show: true }" x-show="show" x-cloak
+`<div data-kui="alert/dismissible" x-data="{ show: true }" x-show="show" x-cloak
      class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
   <div class="min-w-0 flex-1">
@@ -93,7 +93,7 @@ register(
 </div>` },
 
       { id: 'action', name: 'With action', code:
-`<div class="flex flex-wrap items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+`<div data-kui="alert/action" class="flex flex-wrap items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
   <div class="min-w-[16rem] flex-1">
     <p class="text-[13px]/5 font-medium">PO-24-1163 has been waiting for approval for 9 days.</p>
@@ -108,7 +108,7 @@ register(
       { id: 'records', name: 'With affected records', code:
 `<!-- When the message is about a set of rows, name them. "4 invoices failed"
      with no list means someone has to go hunting for which four. -->
-<div class="rounded-lg border border-zinc-300 bg-white px-4 py-3" role="alert">
+<div data-kui="alert/records" class="rounded-lg border border-zinc-300 bg-white px-4 py-3" role="alert">
   <div class="flex items-start gap-3">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
     <div class="min-w-0">
@@ -135,7 +135,7 @@ register(
       { id: 'progress', name: 'In progress', code:
 `<!-- A job the user started that outlives the request. Poll the bar with htmx:
      hx-get="/imports/8841/progress/" hx-trigger="every 2s" hx-swap="outerHTML". -->
-<div class="rounded-lg border border-zinc-300 bg-white px-4 py-3">
+<div data-kui="alert/progress" class="rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <div class="flex items-start gap-3">
     <i data-lucide="loader-2" class="mt-0.5 size-4 shrink-0 animate-spin text-zinc-500"></i>
     <div class="min-w-0 flex-1">
@@ -152,7 +152,7 @@ register(
       { id: 'banner', name: 'Page banner', code:
 `<!-- Full-bleed, above the application header, outside the content column.
      Graphite — never red. A red bar across the top reads as an outage. -->
-<div x-data="{ show: true }" x-show="show" x-cloak
+<div data-kui="alert/banner" x-data="{ show: true }" x-show="show" x-cloak
      class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-zinc-900 px-4 py-2.5 text-white sm:px-6">
   <i data-lucide="wrench" class="size-4 shrink-0 text-zinc-500"></i>
   <p class="min-w-[14rem] flex-1 text-[13px]/5">
@@ -170,7 +170,7 @@ register(
 `<!-- {{ form.non_field_errors }} plus one line per field that has errors.
      It summarises; it does not replace the message under each input.
      x-init focuses it so the keyboard is already at the problem. -->
-<div role="alert" tabindex="-1" x-data x-init="$el.focus()"
+<div data-kui="alert/form-errors" role="alert" tabindex="-1" x-data x-init="$el.focus()"
      class="rounded-lg border border-zinc-300 bg-white px-4 py-3 outline-none">
   <div class="flex items-start gap-3">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
@@ -199,7 +199,7 @@ register(
      Swap the icon and its colour on message.tags: success / warning / error,
      anything else falls through to the neutral info icon. Give error and
      warning role="alert"; success and info do not need it. -->
-<div x-data="{ show: true }" x-show="show" x-cloak
+<div data-kui="alert/django" x-data="{ show: true }" x-show="show" x-cloak
      class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
   <p class="min-w-0 flex-1 text-[13px]/5 font-medium">GRN 1142 posted against PO-24-1187.</p>
@@ -280,7 +280,7 @@ register(
      <svg> keeps its data-lucide, so an unguarded call repaints every icon on the
      page. The span around it carries the size-4 box and the colour: createIcons()
      replaces the <i> and anything bound on it goes with it. -->
-<div x-data="{
+<div data-kui="toast/default" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {
@@ -352,7 +352,7 @@ register(
 
      push() forces ms: 0 on the danger tone whatever the call site asked for. A
      failure is not removed by a timer. -->
-<div x-data="{
+<div data-kui="toast/tones" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        icon: { info: 'info', success: 'check-circle-2', warning: 'alert-triangle', danger: 'alert-circle' },
@@ -447,7 +447,7 @@ register(
      The timer clears on focusin as well as on hover, so tabbing towards Undo
      does not make it disappear on the way, and it never runs at all under
      prefers-reduced-motion. -->
-<div x-data="{
+<div data-kui="toast/undo" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {
@@ -515,7 +515,7 @@ register(
 
      Ten seconds rather than five, because the user has to read the number,
      decide, and travel to a target that is not under the pointer. -->
-<div x-data="{
+<div data-kui="toast/link" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {
@@ -582,7 +582,7 @@ register(
      this says Failed with the reason on it, and this toast is the fact that it
      happened while the user was looking somewhere else. Anything the user has to
      copy down or work from belongs in an alert on the page. -->
-<div x-data="{
+<div data-kui="toast/error" x-data="{
        toasts: [], seq: 0,
        push(t) {
          this.toasts.push({ id: ++this.seq, ms: 0, ...t });
@@ -642,7 +642,7 @@ register(
      gets its timer set twice and the other never gets one at all, and it sits
      in the corner until the page is reloaded. -->
 
-<div x-data="{
+<div data-kui="toast/stack" x-data="{
        toasts: [], seq: 0, cap: 3, dropped: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {
@@ -719,7 +719,7 @@ register(
      Two seconds of waiting belongs here. A job that outlives the request belongs
      in an alert on the page with a progress bar, because the user will navigate
      away and the toast will not survive it. -->
-<div x-data="{
+<div data-kui="toast/pending" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {
@@ -798,7 +798,7 @@ register(
      means the click came from Enter or Space rather than a pointer, and only
      then is focus put back on the control that raised the toasts — a mouse user
      gets no focus jump they did not ask for. -->
-<div x-data="{
+<div data-kui="toast/dismiss-all" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
        push(t) {
@@ -873,7 +873,7 @@ register(
 
      Status colour is the locked mapping and lives in the dot: zinc-500 Open,
      emerald-600 Closed. The pill around it never changes. -->
-<div class="max-w-xl"
+<div data-kui="toast/posting" class="max-w-xl"
      x-data="{
        posted: false, grn: null, toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -1013,7 +1013,7 @@ register(
     related: ['dialog', 'alert', 'sheet'],
     variants: [
       { id: 'confirm', name: 'Confirm', code:
-`<div x-data="{ open: false }">
+`<div data-kui="alert-dialog/confirm" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Close order</button>
 
@@ -1038,7 +1038,7 @@ register(
 </div>` },
 
       { id: 'destructive', name: 'Destructive', code:
-`<div x-data="{ open: false }">
+`<div data-kui="alert-dialog/destructive" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete order</button>
 
@@ -1072,7 +1072,7 @@ register(
 `<!-- For the small number of actions that cannot be undone at all. Do not reach
      for this every time something is deleted — if every dialog asks for typing,
      people learn to type without reading. -->
-<div x-data="{ open: false, typed: '', target: 'SHARMA-EXT' }">
+<div data-kui="alert-dialog/typed" x-data="{ open: false, typed: '', target: 'SHARMA-EXT' }">
   <button type="button" @click="open = true; typed = ''"
           class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete vendor</button>
 
@@ -1112,7 +1112,7 @@ register(
       { id: 'bulk', name: 'Bulk action', code:
 `<!-- Acting on a selection. Say how many, and say which ones will not go
      through — a bulk action that silently skips rows is the worst kind. -->
-<div x-data="{ open: false }">
+<div data-kui="alert-dialog/bulk" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve 12 selected</button>
 
@@ -1154,7 +1154,7 @@ register(
       { id: 'unsaved', name: 'Three answers', code:
 `<!-- Discard / Cancel / Save. When there is a middle answer, offer it — forcing
      a two-way choice makes people pick the destructive one to get out. -->
-<div x-data="{ open: false }">
+<div data-kui="alert-dialog/unsaved" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Leave page</button>
 
@@ -1220,7 +1220,7 @@ register(
     related: ['alert-dialog', 'sheet', 'form-page'],
     variants: [
       { id: 'form', name: 'Form dialog', code:
-`<div x-data="{ open: false }">
+`<div data-kui="dialog/form" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
     <i data-lucide="plus" class="size-4"></i>Record GRN
@@ -1273,7 +1273,7 @@ register(
       { id: 'scrolling', name: 'Scrolling body', code:
 `<!-- Header and footer stay put, only the middle scrolls. max-h on the panel,
      overflow-y on the body, and min-h-0 so the flex child is allowed to shrink. -->
-<div x-data="{ open: false }">
+<div data-kui="dialog/scrolling" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Review 6 lines</button>
 
@@ -1330,7 +1330,7 @@ register(
 
       { id: 'reference', name: 'Reference panel', code:
 `<!-- Read-only, nothing to submit, so the only control is a close button. -->
-<div x-data="{ open: false }">
+<div data-kui="dialog/reference" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="keyboard" class="size-4"></i>Shortcuts
@@ -1410,7 +1410,7 @@ register(
     related: ['dialog', 'list-detail', 'table'],
     variants: [
       { id: 'record', name: 'Record detail', code:
-`<div x-data="{ open: false }">
+`<div data-kui="sheet/record" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Open PO-24-1187</button>
 
@@ -1481,7 +1481,7 @@ register(
   </div>
 </div>` },
       { id: 'filters', name: 'Filters', code:
-`<div x-data="{ open: false }">
+`<div data-kui="sheet/filters" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
@@ -1606,7 +1606,7 @@ register(
     related: ['sheet', 'dialog', 'dropdown'],
     variants: [
       { id: 'actions', name: 'Action list', code:
-`<div x-data="{ open: false }">
+`<div data-kui="drawer/actions" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="ellipsis" class="size-4"></i>PO-24-1187
@@ -1665,7 +1665,7 @@ register(
 </div>` },
 
       { id: 'filter', name: 'Quick filter', code:
-`<div x-data="{ open: false }">
+`<div data-kui="drawer/filter" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
@@ -1731,7 +1731,7 @@ register(
 
       { id: 'long', name: 'Longer than the cap', code:
 `<!-- More rows than the cap allows, so the body scrolls and everything else holds still. -->
-<div x-data="{ open: false }">
+<div data-kui="drawer/long" x-data="{ open: false }">
   <button type="button" @click="open = true"
           class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="plus" class="size-4"></i>Add a line
@@ -1838,7 +1838,7 @@ register(
 `<!-- The locked mapping. One pill class on all five; the dot is the only thing
      that differs. Copy these verbatim, and do not invent a sixth colour for a
      sixth state — add the state to this list or reuse Open. -->
-<div class="flex flex-wrap items-center gap-2">
+<div data-kui="badge/status" class="flex flex-wrap items-center gap-2">
   <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
     <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
   </span>
@@ -1861,7 +1861,7 @@ register(
      status and nothing to line it up with — a detail header, a card meta line.
      The pill exists to give a column of states a shared left edge; one state on
      its own has no column, so the shape is doing nothing but adding weight. -->
-<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-4">
+<div data-kui="badge/inline" class="max-w-md rounded-xl border border-zinc-300 bg-white p-4">
   <div class="flex items-baseline justify-between gap-3">
     <h3 class="text-[16px]/6 font-semibold">PO-24-1187</h3>
     <span class="text-[13px]/5 tabular-nums text-zinc-600">₹4,82,000</span>
@@ -1888,7 +1888,7 @@ register(
 `<!-- Two sizes and no third. Small is for table cells and dense toolbars, where
      the default pill makes the row taller than its text needs. The dot stays
      1.5 at both sizes — shrinking it is how a state stops being visible. -->
-<div class="flex flex-wrap items-center gap-4">
+<div data-kui="badge/sizes" class="flex flex-wrap items-center gap-4">
   <div class="flex items-center gap-2">
     <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
       <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
@@ -1906,7 +1906,7 @@ register(
       { id: 'icon', name: 'With an icon', code:
 `<!-- An icon belongs on a badge that names a kind, not a state. States already
      have the five colours; a kind has nothing else to distinguish it. -->
-<div class="flex flex-wrap items-center gap-2">
+<div data-kui="badge/icon" class="flex flex-wrap items-center gap-2">
   <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-2.5 pl-2 text-[12px]/4 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300">
     <i data-lucide="mail" class="size-3 text-zinc-600"></i>Email
   </span>
@@ -1925,7 +1925,7 @@ register(
 `<!-- A badge that does something is a button. Selected is a solid fill, because
      a marginally darker tint is not a state anyone can see across a toolbar.
      aria-pressed carries the same fact to a screen reader. -->
-<div class="flex flex-wrap items-center gap-2" x-data="{ on: ['overdue'] }">
+<div data-kui="badge/filter" class="flex flex-wrap items-center gap-2" x-data="{ on: ['overdue'] }">
   <template x-for="f in [{ id: 'mine', label: 'My orders' }, { id: 'overdue', label: 'Overdue' }, { id: 'unapproved', label: 'Awaiting approval' }, { id: 'month', label: 'This month' }]" :key="f.id">
     <button type="button"
             @click="on = on.includes(f.id) ? on.filter(x => x !== f.id) : [...on, f.id]"
@@ -1945,7 +1945,7 @@ register(
 `<!-- Only for tags the user applied. A status is not removable — it describes
      the record rather than decorating it, and an x on it promises an edit that
      is not going to happen. -->
-<div class="flex flex-wrap items-center gap-2" x-data="{ tags: ['Sharma Extrusions', 'Open', '₹1,00,000+'] }">
+<div data-kui="badge/removable" class="flex flex-wrap items-center gap-2" x-data="{ tags: ['Sharma Extrusions', 'Open', '₹1,00,000+'] }">
   <template x-for="tag in tags" :key="tag">
     <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium ring-1 ring-inset ring-zinc-300">
       <span x-text="tag"></span>
@@ -1968,7 +1968,7 @@ register(
      A count is not a state, so it takes no hue — the word next to it already
      says "Overdue". Solid graphite is for the one badge that must be seen from
      across the toolbar, and solid shapes take no ring. -->
-<div class="flex flex-wrap items-center gap-4">
+<div data-kui="badge/count" class="flex flex-wrap items-center gap-4">
   <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     Pending approval
     <span class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tabular-nums ring-1 ring-inset ring-zinc-300">12</span>
@@ -1996,7 +1996,7 @@ register(
      nothing scrolls sideways on a phone, and table-fixed with declared widths
      has a minimum that a phone cannot meet. The full small-screen treatment,
      where rows become stacked cards, belongs to the table component. -->
-<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+<div data-kui="badge/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="w-full table-fixed text-left text-[13px]/5">
     <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
@@ -2073,7 +2073,7 @@ register(
      The label comes from get_status_display, so it follows the model's choices
      and reads identically on every screen. -->
 {% load ui %}
-<span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+<span data-kui="badge/django" class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
   <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>
   {{ order.get_status_display }}
 </span>` }
@@ -2155,7 +2155,7 @@ register(
      here can be entered, so the trigger is the whole surface being tracked.
      Escape is bound on window, because a tooltip opened by the pointer has no
      focus inside it and a root-scoped keydown would never fire. -->
-<div class="flex items-center gap-3">
+<div data-kui="tooltip/icon" class="flex items-center gap-3">
 
   <span class="relative inline-flex"
         x-data="{
@@ -2214,7 +2214,7 @@ register(
      One x-data for all four, because a pointer is only ever in one place and
      an open id is cheaper than four booleans. Escape is bound once, on the
      root, with .window so it fires whether or not anything here has focus. -->
-<div class="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-10"
+<div data-kui="tooltip/placement" class="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-10"
      x-data="{
        open: null, timer: 0,
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
@@ -2296,7 +2296,7 @@ register(
      it opens on — so the header cells are rounded instead. truncate on the
      cell itself would clip it too, which is why the ellipsis lives on an inner
      span and the positioned wrapper around it does no clipping of its own. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="tooltip/truncated" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, timer: 0,
        show(id, el, d = 150) {
@@ -2363,7 +2363,7 @@ register(
      reached on a phone and nobody hovers a button hunting for keys. The same
      accelerators belong in the record's action menu, which is where people
      actually read them. -->
-<div class="flex flex-wrap items-center gap-3"
+<div data-kui="tooltip/shortcut" class="flex flex-wrap items-center gap-3"
      x-data="{
        open: null, timer: 0,
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
@@ -2422,7 +2422,7 @@ register(
 
      Either way the reason is on the page as well. A rule that decides whether
      somebody can post a receipt is not something to hide behind a hover. -->
-<div class="flex flex-wrap items-center gap-3">
+<div data-kui="tooltip/disabled" class="flex flex-wrap items-center gap-3">
 
   <span class="relative inline-flex"
         x-data="{
@@ -2482,7 +2482,7 @@ register(
      The spec limits are printed under the table, which is what makes the
      tooltip on the failing result legal. It is a shortcut to something already
      on the page, not the only copy of it. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="tooltip/table" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, timer: 0,
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
@@ -2574,7 +2574,7 @@ register(
      Use it where the trigger is one of several close together and the bubble
      could plausibly belong to a neighbour. On a lone button it is 8px of
      decoration on a component whose entire job is to be read and gone. -->
-<div class="flex items-center justify-center rounded-xl border border-zinc-300 bg-white p-10">
+<div data-kui="tooltip/arrow" class="flex items-center justify-center rounded-xl border border-zinc-300 bg-white p-10">
   <span class="relative inline-flex"
         x-data="{
           open: false, timer: 0,
@@ -2619,7 +2619,7 @@ register(
      the icon name would have to become :data-lucide — a binding on the one
      node createIcons() is about to replace with an svg. -->
 
-<div class="inline-flex items-center gap-1 rounded-xl border border-zinc-300 bg-white p-1"
+<div data-kui="tooltip/delay-group" class="inline-flex items-center gap-1 rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null, warm: false, timer: 0, cool: 0,
        show(id, now = false) {
@@ -2719,7 +2719,7 @@ register(
      that scrolls sideways — the dropdown behind that button carries the same
      four actions with their names written out, which is also the touch route
      to everything these tooltips say. -->
-<div class="rounded-xl border border-zinc-300 bg-white"
+<div data-kui="tooltip/row-actions" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, warm: false, timer: 0, cool: 0,
        show(id, now = false) {
@@ -2880,7 +2880,7 @@ register(
 
      Two rows carry a card so the delay is testable: drag the pointer across
      both and nothing should open. -->
-<div class="rounded-xl border border-zinc-300 bg-white">
+<div data-kui="hovercard/default" class="rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-left text-[13px]/5">
     <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
@@ -3023,7 +3023,7 @@ register(
      the word with a different dot is how one screen ends up contradicting the
      next, so the standing of a person or a party takes emerald the way the
      presence dot does, and the record words are left to records. -->
-<div class="rounded-xl border border-zinc-300 bg-white p-4">
+<div data-kui="hovercard/vendor" class="rounded-xl border border-zinc-300 bg-white p-4">
   <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Vendor</p>
   <span class="relative mt-1 inline-block"
         x-data="{
@@ -3103,7 +3103,7 @@ register(
      320px panel halfway off a 390px screen; starting its own line is the
      cheapest way to be sure it does not. Where the trigger genuinely has to sit
      inside a sentence, use the clamp from the placement variant. -->
-<div>
+<div data-kui="hovercard/user">
   <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Approved by</p>
   <span class="relative mt-1 inline-block"
         x-data="{
@@ -3187,7 +3187,7 @@ register(
      transition does not touch it and the fade and the clamp can coexist. The
      other way out is to keep the transform on this element and move x-show and
      x-transition to a child, which costs a wrapper. -->
-<div class="flex items-center justify-between gap-4"
+<div data-kui="hovercard/placement" class="flex items-center justify-between gap-4"
      x-data="{ orders: [
        { id: 'PO-24-1187', vendor: 'Gujarat Polymers Ltd', value: '₹18,42,000', due: '28 Aug 2026' },
        { id: 'PO-24-1191', vendor: 'Nashik Steel Traders',  value: '₹6,04,750',  due: '02 Aug 2026' }
@@ -3259,7 +3259,7 @@ register(
 
      hx-sync="this:drop" throws away a request raised while one is in flight,
      which is what a pointer leaving and returning inside 300ms produces. -->
-<div class="rounded-xl border border-zinc-300 bg-white p-4">
+<div data-kui="hovercard/htmx" class="rounded-xl border border-zinc-300 bg-white p-4">
   <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Short receipt against</p>
   <div class="mt-1">
     <span class="relative inline-block"
@@ -3334,7 +3334,7 @@ register(
      subtitle, a pill and two figures — because the panel is under the pointer,
      and one that grows when the data lands moves the thing being read out from
      under it, or shrinks away from the cursor and closes itself. -->
-<div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg"
+<div data-kui="hovercard/loading" class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg"
      aria-busy="true" aria-label="Loading order PO-24-1187">
   <div class="animate-pulse" aria-hidden="true">
     <div class="flex items-start justify-between gap-3">
@@ -3367,7 +3367,7 @@ register(
      the link was always the real route to this record, and it still works when
      the preview does not. Neutral card, colour only in the icon, exactly as an
      alert. -->
-<div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+<div data-kui="hovercard/error" class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
   <div class="flex items-start gap-2.5">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
     <div class="min-w-0">
@@ -3402,7 +3402,7 @@ register(
      nothing is hidden behind it. That is also why the hover target is the whole
      row rather than the link alone: trigger and panel share one box, so there
      is no gap for the pointer to fall through and no bridge to build. -->
-<div class="rounded-xl border border-zinc-300 bg-white p-4"
+<div data-kui="hovercard/mobile" class="rounded-xl border border-zinc-300 bg-white p-4"
      x-data="{
        open: false, timer: 0,
        fine: matchMedia('(hover: hover) and (pointer: fine)').matches,
@@ -3485,7 +3485,7 @@ register(
      hovercard is the one component a user can fire fifty times in ten seconds
      without meaning to. -->
 {% for order in page_obj %}
-  <tr class="border-b border-zinc-200">
+  <tr data-kui="hovercard/django" class="border-b border-zinc-200">
     <td class="px-4 py-2.5">
       <span class="relative inline-block"
             x-data="{
@@ -3631,7 +3631,7 @@ register(
      it matches :focus-visible and takes the outline, which is the only thing on
      screen that says focus moved; opened by a click it does not match and
      nothing is painted. -->
-<div class="relative inline-block"
+<div data-kui="popover/default" class="relative inline-block"
      x-data="{
        open: false,
        show() {
@@ -3724,7 +3724,7 @@ register(
      The footer sits on a zinc-100 strip, so the panel is overflow-hidden and
      the panel padding moves onto the sections. That is also why this variant
      has no arrow: overflow-hidden clips one. -->
-<div class="relative inline-block"
+<div data-kui="popover/filter" class="relative inline-block"
      x-data="{
        open: false,
        applied: { status: 'all', min: '', max: '', overdue: false },
@@ -3869,7 +3869,7 @@ register(
      would test as still inside and never close the panel. Every other variant
      has the handlers on the root and the two are the same element. -->
 
-<div x-data="{
+<div data-kui="popover/columns" x-data="{
        open: false, q: '',
        cols: [
          { key: 'po', label: 'Order', on: true },
@@ -3995,7 +3995,7 @@ register(
      Apply is the only write. The trigger label is the committed range, so a
      panel dismissed by a click on the page leaves the label saying what the
      register is actually showing. -->
-<div class="relative inline-block"
+<div data-kui="popover/date-range" class="relative inline-block"
      x-data="{
        open: false,
        applied: { from: '2026-08-01', to: '2026-08-31', label: '01 Aug 2026 – 31 Aug 2026' },
@@ -4107,7 +4107,7 @@ register(
      panel belongs to survives the swap; Alpine closes the panel and hands focus
      back to that trigger on a successful request, and leaves it open with the
      text intact on a failure. -->
-<div class="overflow-x-auto rounded-xl border border-zinc-300 bg-white"
+<div data-kui="popover/inline-edit" class="overflow-x-auto rounded-xl border border-zinc-300 bg-white"
      x-data @scroll="$dispatch('rail-scroll')">
   <table class="w-full min-w-[34rem] text-left text-[13px]/5">
     <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
@@ -4271,7 +4271,7 @@ register(
      the transition wins by restoring a cached style attribute after the clamp
      has already run. The arrow\'s own :style is safe, because the arrow is a
      child and has no transition of its own. -->
-<div class="flex items-center justify-between gap-4 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+<div data-kui="popover/arrow" class="flex items-center justify-between gap-4 rounded-xl border border-zinc-300 bg-white px-4 py-3">
   <div class="min-w-0">
     <p class="truncate text-[13px]/5 font-medium">MS angle 50×50×6</p>
     <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">GRN-24-4471 · 12,000 kg</p>
@@ -4374,7 +4374,7 @@ register(
      This is deliberately the same maths as the hovercard's placement variant.
      Two positioning strategies in one system is one too many; the difference
      between the components is what opens them, not where they land. -->
-<div class="flex items-center justify-between gap-4">
+<div data-kui="popover/placement" class="flex items-center justify-between gap-4">
   <div class="relative"
        x-data="{
          open: false, end: false, up: false, dx: 0,
@@ -4484,7 +4484,7 @@ register(
      fixed inset-x-0 bottom-0 depends on no ancestor carrying a transform,
      filter or will-change. One of those and the sheet anchors to that element
      instead of the viewport, and it lands halfway up the page. -->
-<div class="relative inline-block"
+<div data-kui="popover/responsive" class="relative inline-block"
      x-data="{
        open: false,
        show() {
@@ -4579,7 +4579,7 @@ register(
      moment focus moves there is nothing inside it yet. It stays on the panel
      after the swap: moving focus when a response lands takes the caret away
      from wherever the user had already tabbed to. -->
-<div class="relative inline-block"
+<div data-kui="popover/htmx" class="relative inline-block"
      x-data="{
        open: false, loaded: false, failed: false,
        show() {
@@ -4703,7 +4703,7 @@ register(
       { id: 'sizes', name: 'Sizes', code:
 `<!-- size-7 in a table row, size-9 in a list or card header, size-11 on a record.
      The text step drops with the circle so the letters never crowd the edge. -->
-<div class="flex flex-wrap items-center gap-4">
+<div data-kui="avatar/sizes" class="flex flex-wrap items-center gap-4">
   <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[11px]/4 font-medium text-zinc-600" aria-label="Ritu Deshpande" role="img">RD</span>
   <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-label="Ritu Deshpande" role="img">RD</span>
   <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[14px]/5 font-medium text-zinc-600" aria-label="Ritu Deshpande" role="img">RD</span>
@@ -4712,7 +4712,7 @@ register(
       { id: 'self', name: 'The signed-in user', code:
 `<!-- Graphite marks you, and nobody else. If every avatar is filled, the
      distinction it exists to make has gone. -->
-<div class="flex flex-wrap items-center gap-4">
+<div data-kui="avatar/self" class="flex flex-wrap items-center gap-4">
   <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[13px]/5 font-medium text-white" aria-label="Ritu Deshpande, you" role="img">RD</span>
   <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-label="Sanjay More" role="img">SM</span>
   <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-label="Imran Qureshi" role="img">IQ</span>
@@ -4721,7 +4721,7 @@ register(
       { id: 'with-name', name: 'With name and role', code:
 `<!-- The name is written, so the circle is aria-hidden. Otherwise a screen
      reader announces "RD Ritu Deshpande". -->
-<div class="flex items-center gap-3">
+<div data-kui="avatar/with-name" class="flex items-center gap-3">
   <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-hidden="true">RD</span>
   <div class="min-w-0">
     <p class="truncate text-[13px]/5 font-medium">Ritu Deshpande</p>
@@ -4747,7 +4747,7 @@ register(
      The names are on the group, which is what a screen reader gets. The +N
      chip is last and therefore fully visible, because it is the one part
      that has to be read. -->
-<div class="flex items-center -space-x-5" role="img"
+<div data-kui="avatar/stacked" class="flex items-center -space-x-5" role="img"
      aria-label="Approvers: Ritu Deshpande, Sanjay More, Imran Qureshi and 3 more">
   <span class="flex size-11 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-2 ring-white" aria-hidden="true">RD</span>
   <span class="flex size-11 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-2 ring-white" aria-hidden="true">SM</span>
@@ -4760,7 +4760,7 @@ register(
      cell grows to fit its content, so a long name widens the column and pushes
      the amount off the right edge instead of ellipsing. Widths are declared on
      the first row. -->
-<table class="w-full table-fixed">
+<table data-kui="avatar/in-row" class="w-full table-fixed">
   <tbody class="divide-y divide-zinc-200">
     <tr>
       <td class="w-[7.5rem] py-2.5 pr-4 text-[13px]/5 font-medium tabular-nums">PO-24-1187</td>
@@ -4788,7 +4788,7 @@ register(
       { id: 'presence', name: 'With presence', code:
 `<!-- The dot says something about the person. It never carries record state —
      that belongs on a badge, where the colour mapping is fixed. -->
-<div class="flex flex-wrap items-center gap-6">
+<div data-kui="avatar/presence" class="flex flex-wrap items-center gap-6">
   <div class="flex items-center gap-3">
     <span class="relative shrink-0">
       <span class="flex size-9 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-hidden="true">RD</span>
@@ -4814,7 +4814,7 @@ register(
       { id: 'menu', name: 'Account trigger', code:
 `<!-- The circle is inside a real button carrying its own name. An avatar that
      is the only clickable thing gives the keyboard nothing to land on. -->
-<div class="flex justify-end">
+<div data-kui="avatar/menu" class="flex justify-end">
   <div class="relative inline-block" x-data="{ open: false }" @click.outside="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="menu"
           class="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 hover:bg-zinc-100">
@@ -4845,7 +4845,7 @@ register(
       { id: 'placeholder', name: 'Unassigned', code:
 `<!-- Nobody is a real state and needs a real rendering. An empty circle reads
      as a loading bug; a dashed one with a verb reads as an invitation. -->
-<div class="flex flex-wrap items-center gap-6">
+<div data-kui="avatar/placeholder" class="flex flex-wrap items-center gap-6">
   <div class="flex items-center gap-3">
     <span class="flex size-9 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-300 text-zinc-500" aria-hidden="true">
       <i data-lucide="user" class="size-4"></i>

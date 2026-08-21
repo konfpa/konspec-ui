@@ -1,6 +1,6 @@
 <!-- The circle is inside a real button carrying its own name. An avatar that
      is the only clickable thing gives the keyboard nothing to land on. -->
-<div class="flex justify-end">
+<div data-kui="avatar/menu" class="flex justify-end">
   <div class="relative inline-block" x-data="{ open: false }" @click.outside="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="menu"
           class="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 hover:bg-zinc-100">

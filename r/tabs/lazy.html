@@ -12,7 +12,7 @@
      with $id(): htmx reads them when it processes the element, and that is not
      guaranteed to be after Alpine has bound them. Two of these on one page need
      their ids changed by hand. -->
-<div x-data="{
+<div data-kui="tabs/lazy" x-data="{
        tab: 'summary',
        cursor: 'summary',
        items: [

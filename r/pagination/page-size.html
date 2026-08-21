@@ -18,7 +18,7 @@
      x-model.number, not x-model. A select yields a string, so page arithmetic on
      it silently concatenates: '25' * 3 is 75 but (page - 1) * '25' + 1 is fine
      while total / '25' is fine and '25' + 1 is '251'. One of those turns up. -->
-<nav aria-label="Order register pages"
+<nav data-kui="pagination/page-size" aria-label="Order register pages"
      x-data="{
        page: 2, size: 25, total: 148,
        get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },

@@ -17,7 +17,7 @@
      reached on a phone and nobody hovers a button hunting for keys. The same
      accelerators belong in the record's action menu, which is where people
      actually read them. -->
-<div class="flex flex-wrap items-center gap-3"
+<div data-kui="tooltip/shortcut" class="flex flex-wrap items-center gap-3"
      x-data="{
        open: null, timer: 0,
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },

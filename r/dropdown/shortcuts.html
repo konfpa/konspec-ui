@@ -18,7 +18,7 @@
      Do not label a shortcut nobody has bound yet. A menu is the only place
      most people will ever read them, so a hint here is a promise the window
      handler has to keep. -->
-<div class="relative"
+<div data-kui="dropdown/shortcuts" class="relative"
      x-data="{
        open: false,
        items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },

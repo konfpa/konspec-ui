@@ -5,7 +5,7 @@
      x-trap keeps Tab inside the panel and returns focus to the trigger on
      close. Choosing a day closes it, because a single date is finished the
      moment it is picked. -->
-<div class="relative max-w-xs"
+<div data-kui="calendar/picker" class="relative max-w-xs"
      x-data="{
        open: false,
        focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),

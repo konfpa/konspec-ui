@@ -27,7 +27,7 @@
      brings its own wrapper markup — a div per option since Django 4.0, a ul
      before that — and no amount of attrs will lay it out. Each iteration yields
      the input as {{ choice.tag }} and its text as {{ choice.choice_label }}. -->
-<form method="post" class="max-w-xl">
+<form data-kui="checkbox/django" method="post" class="max-w-xl">
   {% csrf_token %}
 
   <div>

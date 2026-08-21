@@ -21,7 +21,7 @@
      To ship it: keep the <header> as written, drop the wrapper's height,
      overflow, rounding and border, and move @scroll onto whichever element
      scrolls on that page. -->
-<div class="h-[420px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100"
+<div data-kui="page-header/sticky" class="h-[420px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100"
      x-data="{ shrunk: false }"
      @scroll.self="shrunk = $event.target.scrollTop > 56">
   <header class="sticky top-0 z-20 border-b border-transparent bg-white transition-colors"

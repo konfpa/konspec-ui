@@ -12,7 +12,7 @@
      content rather than an aria-label because a live region reports what changed
      inside it and a name is not content. Here it is sr-only, because the panel
      around it already says what is loading. -->
-<div class="flex items-center gap-3">
+<div data-kui="spinner/default" class="flex items-center gap-3">
   <span class="size-5 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
   <p role="status" class="sr-only">Loading purchase orders</p>
 </div>

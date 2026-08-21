@@ -3,7 +3,7 @@
      binding written on the icon itself is thrown away on hydration. It is
      invisible rather than absent on the unsorted columns, so the header labels
      do not shift when the sort moves. -->
-<div x-data="{
+<div data-kui="table/default" x-data="{
        col: 'po', dir: 'asc',
        rows: [
          { po: 'PO-24-1187', vendor: 'Sharma Extrusions', dept: 'Fabrication', amount: 1842000, status: 'Open', due: '12 Aug' },

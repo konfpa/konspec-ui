@@ -21,7 +21,7 @@
 
      At 390px the three selects are a two-column grid, not a row that scrolls.
      min-w-0 on each, or a long vendor name pushes the grid past the viewport. -->
-<div x-data="{
+<div data-kui="select/filter" x-data="{
        status: '', vendor: '', plant: '',
        orders: [
          { no: 'PO-24-1187', vendor: 'gujarat-polymers', vname: 'Gujarat Polymers Ltd', plant: 'silvassa', status: 'overdue', amount: '₹18,42,000', due: '02 Aug 2026' },

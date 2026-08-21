@@ -17,7 +17,7 @@
      screen and it is never a field's helper: an outline addon says this does
      something to the field, a filled one says this is what the page is for, and
      two filled groups on one form makes both of them wrong. -->
-<div class="max-w-xl space-y-5">
+<div data-kui="input-group/action" class="max-w-xl space-y-5">
   <form @submit.prevent="add()"
         x-data="{ code: '', lines: 3, msg: '',
                   add() { const c = this.code.trim().toUpperCase();

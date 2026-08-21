@@ -11,7 +11,7 @@
      this says Failed with the reason on it, and this toast is the fact that it
      happened while the user was looking somewhere else. Anything the user has to
      copy down or work from belongs in an alert on the page. -->
-<div x-data="{
+<div data-kui="toast/error" x-data="{
        toasts: [], seq: 0,
        push(t) {
          this.toasts.push({ id: ++this.seq, ms: 0, ...t });
