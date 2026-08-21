@@ -17,7 +17,7 @@
      inside takes py-1 rather than a margin — a margin on the first child
      collapses through the wrapper and the measured height comes up short by
      exactly that margin, clipping the last row until the next toggle. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ open: { orders: true, vendors: false, quality: false } }">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
@@ -49,7 +49,7 @@
             </a>
           </li>
           <li>
-            <a href="#" aria-current="page" class="flex min-h-8 items-center gap-2 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <a href="#" aria-current="page" class="flex min-h-8 items-center gap-2 rounded-lg bg-zinc-200 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
               <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
               <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">12</span>
             </a>

@@ -1,4 +1,4 @@
-<div class="relative flex h-[720px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div class="relative flex h-[720px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{
        sidebar: true, nav: false, wide: false,
        init() {
@@ -68,7 +68,7 @@
       <p class="overflow-hidden px-1.5 pt-2 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Procurement</p>
 
       <a @mouseenter="showTip($el, 'Overview')" @mouseleave="hideTip()" @focus="showTip($el, 'Overview')" @blur="hideTip()" href="#" aria-current="page"
-         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg bg-zinc-100 px-1.5 text-[13px]/5 font-medium whitespace-nowrap text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg bg-zinc-200 px-1.5 text-[13px]/5 font-medium whitespace-nowrap text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="layout-dashboard" class="size-[18px]"></i></span>
         <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Overview</span>
       </a>
@@ -383,29 +383,29 @@
           </div>
           <div class="flex shrink-0 items-center gap-2">
             <button type="button" disabled
-                    class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400">Export</button>
+                    class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400">Export</button>
             <button type="button"
                     class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">New purchase order</button>
           </div>
         </div>
 
         <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div class="rounded-xl border border-zinc-200 bg-white p-4">
+          <div class="rounded-xl border border-zinc-300 bg-white p-4">
             <p class="text-[13px]/5 text-zinc-600">Open commitment</p>
             <p class="mt-2 text-[24px]/7 font-semibold tracking-tight tabular-nums">₹1,66,40,000</p>
             <p class="mt-2 text-[12px]/4 text-zinc-500">Across 148 purchase orders</p>
           </div>
-          <div class="rounded-xl border border-zinc-200 bg-white p-4">
+          <div class="rounded-xl border border-zinc-300 bg-white p-4">
             <p class="text-[13px]/5 text-zinc-600">Awaiting GRN</p>
             <p class="mt-2 text-[24px]/7 font-semibold tracking-tight tabular-nums">27</p>
             <p class="mt-2 flex items-center gap-1.5 text-[12px]/4 text-zinc-500"><span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>9 past the promised date</p>
           </div>
-          <div class="rounded-xl border border-zinc-200 bg-white p-4">
+          <div class="rounded-xl border border-zinc-300 bg-white p-4">
             <p class="text-[13px]/5 text-zinc-600">Pending my approval</p>
             <p class="mt-2 text-[24px]/7 font-semibold tracking-tight tabular-nums">4</p>
             <p class="mt-2 text-[12px]/4 text-zinc-500">Oldest raised 3 days ago</p>
           </div>
-          <div class="rounded-xl border border-zinc-200 bg-white p-4">
+          <div class="rounded-xl border border-zinc-300 bg-white p-4">
             <p class="text-[13px]/5 text-zinc-600">Vendors on hold</p>
             <p class="mt-2 text-[24px]/7 font-semibold tracking-tight tabular-nums">3</p>
             <p class="mt-2 flex items-center gap-1.5 text-[12px]/4 text-zinc-500"><span aria-hidden="true" class="size-1.5 rounded-full bg-red-600"></span>2 for expired documents</p>
@@ -414,7 +414,7 @@
 
         <div class="grid gap-4 xl:grid-cols-3">
 
-          <div class="rounded-xl border border-zinc-200 bg-white xl:col-span-2">
+          <div class="rounded-xl border border-zinc-300 bg-white xl:col-span-2">
             <div class="flex items-center gap-3 border-b border-zinc-200 px-4 py-3">
               <h2 class="text-[16px]/6 font-semibold">Recent purchase orders</h2>
               <a href="#" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2">All 148</a>
@@ -422,7 +422,7 @@
 
             <table class="hidden w-full text-[13px]/5 md:table">
               <thead>
-                <tr class="border-b border-zinc-200 bg-zinc-100 text-left text-zinc-600">
+                <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-zinc-600">
                   <th scope="col" class="px-4 py-2 font-medium">PO</th>
                   <th scope="col" class="px-4 py-2 font-medium">Vendor</th>
                   <th scope="col" class="px-4 py-2 font-medium">Promised</th>
@@ -531,7 +531,7 @@
           </div>
 
           <div class="space-y-4">
-            <div class="rounded-xl border border-zinc-200 bg-white">
+            <div class="rounded-xl border border-zinc-300 bg-white">
               <div class="flex items-center gap-3 border-b border-zinc-200 px-4 py-3">
                 <h2 class="text-[16px]/6 font-semibold">Waiting on you</h2>
                 <span class="ml-auto rounded-full bg-zinc-200 px-2 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4</span>
@@ -566,7 +566,7 @@
               </ul>
             </div>
 
-            <div class="rounded-xl border border-zinc-200 bg-white">
+            <div class="rounded-xl border border-zinc-300 bg-white">
               <div class="border-b border-zinc-200 px-4 py-3">
                 <h2 class="text-[16px]/6 font-semibold">Latest activity</h2>
               </div>

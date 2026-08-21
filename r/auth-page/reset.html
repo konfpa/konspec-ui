@@ -19,7 +19,7 @@
      The submit stays enabled. A disabled button with no explanation is a dead
      end for anybody who cannot see which rule is still grey; the form validates
      and says so. -->
-<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{
        pw: '', pw2: '', show: false, touched: false,
        get long() { return this.pw.length &gt;= 12 },
@@ -35,7 +35,7 @@
     </div>
 
     <form method="post" action="/accounts/reset/set-password/"
-          class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6">
+          class="mt-6 rounded-xl border border-zinc-300 bg-white px-6 py-6">
       <h1 class="text-[20px]/7 font-semibold tracking-tight">Set a new password</h1>
       <p class="mt-1 text-[13px]/5 text-zinc-600">This link works once and expires at 14:20 IST.</p>
 

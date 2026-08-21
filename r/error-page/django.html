@@ -26,7 +26,7 @@
 
      And none of them render at all until DEBUG is False, which is why they are
      the templates that ship broken. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
 
   <header class="flex items-center gap-2.5">
     <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -48,7 +48,7 @@
       </p>
 
       {# request_path is already URL-quoted by page_not_found; escape it anyway and never mark it safe #}
-      <p class="mt-4 inline-block max-w-full break-all rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-left text-[12px]/4">
+      <p class="mt-4 inline-block max-w-full break-all rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-left text-[12px]/4">
         <span class="select-all font-mono text-zinc-600">{{ request_path }}</span>
       </p>
 
@@ -58,7 +58,7 @@
           Back to purchase orders
         </a>
         <a href="mailto:it@konspec.com?subject=Broken%20link"
-           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-300 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           Report the link
         </a>
       </div>

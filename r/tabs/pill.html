@@ -29,7 +29,7 @@
        @keydown.arrow-left.prevent="move(-1)"
        @keydown.home.prevent="pick(items[0].id)"
        @keydown.end.prevent="pick(items[items.length - 1].id)"
-       class="inline-flex rounded-lg bg-zinc-100 p-1">
+       class="inline-flex rounded-lg bg-zinc-200 p-1">
     <template x-for="t in items" :key="t.id">
       <button type="button" role="tab" :data-tab="t.id"
               :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"

@@ -28,7 +28,7 @@
 
      Below sm the labelled steps do not fit, so they collapse to a rail and a
      line of text. They never scroll sideways. -->
-<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        step: 1, last: 4,
        // focus after a reveal needs a frame as well as a tick: at
@@ -101,12 +101,12 @@
     <form novalidate class="mt-4" @submit.prevent="go(step + 1)">
 
       <div x-show="bad.length" x-cloak role="alert"
-           class="mb-4 flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+           class="mb-4 flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
         <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
         <p class="text-[13px]/5 font-medium" x-text="'This step is not finished — check ' + bad.join(' and ') + '.'"></p>
       </div>
 
-      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
 
         <div x-show="step === 1">
           <div class="border-b border-zinc-200 px-5 py-3.5">
@@ -224,7 +224,7 @@
 
       <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
         <button type="button" @click="go(step - 1)" x-show="step > 1" x-cloak
-                class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">
+                class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">
           <i data-lucide="chevron-left" class="size-4"></i>Back
         </button>
         <div class="ml-auto flex items-center gap-2">

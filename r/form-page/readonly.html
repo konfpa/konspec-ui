@@ -24,7 +24,7 @@
 
      Attachments in read mode keep Download and lose Remove. A control that
      cannot act is a control that should not be drawn. -->
-<div class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+<div class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        mode: 'view', dirty: false, leaving: false,
        // focus after a reveal needs a frame as well as a tick: at
@@ -58,7 +58,7 @@
         <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">PO-24-1194 · raised 02 Aug 2026 by Ritu Deshpande · ₹27,10,400</p>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+        <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
           <i data-lucide="printer" class="size-4"></i>Print
         </button>
         <button type="button" x-ref="edit" @click="edit()" x-show="mode === 'view'"
@@ -70,7 +70,7 @@
 
     <div class="mt-5 space-y-4">
 
-      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
           <h2 class="text-[16px]/6 font-semibold">Order</h2>
           <p x-show="mode === 'edit'" x-cloak class="text-[12px]/4 text-zinc-600">
@@ -196,7 +196,7 @@
         </form>
       </div>
 
-      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="border-b border-zinc-200 px-5 py-3.5">
           <h2 class="text-[16px]/6 font-semibold">Attachments</h2>
         </div>
@@ -226,7 +226,7 @@
         </ul>
       </div>
 
-      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="border-b border-zinc-200 px-5 py-3.5">
           <h2 class="text-[16px]/6 font-semibold">History</h2>
         </div>
@@ -251,7 +251,7 @@
   <div x-show="leaving" x-cloak x-trap.noscroll="leaving" @keydown.escape.window="leaving = false"
        class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="ro-leave-t" aria-describedby="ro-leave-b"
-         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <h2 id="ro-leave-t" class="text-[16px]/6 font-semibold">Discard this amendment?</h2>
       <p id="ro-leave-b" class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
         PO-24-1194 has changes that have not been saved. Going back to the record loses them.

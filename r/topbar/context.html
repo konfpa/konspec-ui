@@ -37,7 +37,7 @@
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()" @keydown.arrow-down.prevent="show()"
             :aria-expanded="open" aria-haspopup="menu" aria-controls="tb-ctx"
             class="flex max-w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-            :class="open && 'bg-zinc-100'">
+            :class="open && 'bg-zinc-200'">
       <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
       <span class="min-w-0">
         <span class="block truncate text-[13px]/5 font-medium">Konspec Polymers Pvt Ltd</span>

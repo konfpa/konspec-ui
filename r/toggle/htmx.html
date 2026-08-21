@@ -19,7 +19,7 @@
      The status line is role="status" because the revert is script setting
      checked, and a programmatic change is announced by nothing. Without it the
      only sign the setting did not stick is a pixel moving back. -->
-<div class="max-w-xl rounded-xl border border-zinc-200 bg-white px-4 py-2.5"
+<div class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
      x-data="{ state: 'idle', want: true }"
      @htmx:before-request.camel="want = $refs.sw.checked; state = 'saving'"
      @htmx:after-request.camel="

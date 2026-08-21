@@ -32,7 +32,7 @@
     <button type="button" aria-labelledby="tt-duplicate"
             @mouseenter="show()" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="copy" class="size-4"></i>
     </button>
     <span id="tt-duplicate" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
@@ -49,7 +49,7 @@
     <button type="button" aria-label="Print order"
             @mouseenter="show()" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="printer" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open" x-cloak x-transition.opacity.duration.100ms

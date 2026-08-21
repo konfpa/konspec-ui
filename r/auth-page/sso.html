@@ -12,7 +12,7 @@
      The vendor portal line is the escape hatch. Contractors and vendors are not
      in Entra, so without it every one of them mails IT to ask why the password
      box has gone. One primary action, one route out, nothing else. -->
-<div class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ busy: false }">
   <main class="w-full max-w-sm">
 
@@ -22,7 +22,7 @@
     </div>
 
     <form method="post" action="/accounts/sso/start/" @submit="busy = true"
-          class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6">
+          class="mt-6 rounded-xl border border-zinc-300 bg-white px-6 py-6">
       <h1 class="text-[20px]/7 font-semibold tracking-tight">Sign in</h1>
       <p class="mt-1 text-[13px]/5 text-zinc-600">
         <span class="font-medium text-zinc-900">konspec.com</span> signs in through Microsoft Entra ID. There is no separate password for this system.

@@ -64,7 +64,7 @@ register(
          return [...this.rows].sort((a, b) => s * (typeof a[c] === 'number' ? a[c] - b[c] : String(a[c]).localeCompare(b[c])));
        }
      }"
-     class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+     class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-[13px]/5">
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
@@ -112,13 +112,13 @@ register(
 
       { id: 'selection', name: 'With selection', code:
 `<div x-data="{ all: ['PO-24-1187','PO-24-1191','PO-24-1194'], sel: [] }"
-     class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+     class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div x-show="sel.length" x-cloak
        class="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-zinc-100 px-4 py-2">
     <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
     <div class="flex flex-wrap items-center gap-2">
       <button class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
+      <button class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
       <button class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Cancel orders</button>
     </div>
     <button @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-600 underline underline-offset-2">Clear</button>
@@ -201,7 +201,7 @@ register(
          { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: '₹27,10,400', status: 'Overdue', dot: 'bg-red-600' }
        ]
      }"
-     class="rounded-xl border border-zinc-200 bg-white">
+     class="rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-[13px]/5">
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
@@ -281,7 +281,7 @@ register(
 </div>` },
 
       { id: 'dense', name: 'Dense', code:
-`<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+`<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-[13px]/5">
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
@@ -333,7 +333,7 @@ register(
 </div>` },
 
       { id: 'responsive', name: 'Responsive', code:
-`<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+`<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
@@ -487,7 +487,7 @@ register(
          this.sel = on ? [...new Set([...this.sel, ...ids])] : this.sel.filter(id => !ids.includes(id));
        }
      }"
-     class="rounded-xl border border-zinc-200 bg-white">
+     class="rounded-xl border border-zinc-300 bg-white">
 
   <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
     <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -523,7 +523,7 @@ register(
     <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
     <div class="flex flex-wrap items-center gap-2">
       <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-50">Export</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-50">Export</button>
     </div>
     <button type="button" @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2">Clear</button>
   </div>
@@ -654,7 +654,7 @@ register(
        get from() { return this.filtered.length ? (this.page - 1) * this.size + 1 : 0 },
        get to() { return Math.min(this.page * this.size, this.filtered.length) }
      }"
-     class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+     class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
 
   <div class="border-b border-zinc-200 px-3 py-2.5">
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -734,7 +734,7 @@ register(
      does not survive a swap. Reach for the full register when you need it. -->
 
 {# orders/register.html #}
-<div id="register" class="rounded-xl border border-zinc-200 bg-white">
+<div id="register" class="rounded-xl border border-zinc-300 bg-white">
 
   <form method="get" action="{% url 'order-register' %}"
         class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
@@ -921,7 +921,7 @@ register(
        prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
        next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
      }"
-     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
 
   <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
      x-text="from + '–' + to + ' of ' + total + ' orders'">21–30 of 148 orders</p>
@@ -985,7 +985,7 @@ register(
        },
        go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
      }"
-     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
 
   <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
      x-text="from + '–' + to + ' of ' + total + ' orders'">31–40 of 148 orders</p>
@@ -1046,27 +1046,27 @@ register(
      One page of results does not get a range at all. "1–14 of 14 orders" is
      three numbers to say fourteen. -->
 <div class="max-w-xl space-y-2">
-  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+  <div class="rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
     <p class="text-[13px]/5 tabular-nums text-zinc-600">21–40 of 1,438 orders</p>
     <p class="mt-1 text-[12px]/4 text-zinc-500">The ordinary case. Where you are, how much there is, and what is being counted.</p>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+  <div class="rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
     <p class="text-[13px]/5 tabular-nums text-zinc-600">21–40 of 148 orders <span class="text-zinc-500">· filtered from 1,438</span></p>
     <p class="mt-1 text-[12px]/4 text-zinc-500">A filter is on. Both totals stay, or the register looks like it has lost 1,290 records.</p>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+  <div class="rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
     <p class="text-[13px]/5 tabular-nums text-zinc-600">All 14 orders</p>
     <p class="mt-1 text-[12px]/4 text-zinc-500">One page. A range of 1–14 of 14 is three numbers to say fourteen.</p>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+  <div class="rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
     <p class="text-[13px]/5 tabular-nums text-zinc-600">21–40 of about 1,400 orders</p>
     <p class="mt-1 text-[12px]/4 text-zinc-500">The count is a slow scan over a partitioned ledger. Say "about" rather than block the page on an exact figure nobody is reading.</p>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+  <div class="rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
     <p class="text-[13px]/5 text-zinc-600">No orders match this filter</p>
     <p class="mt-1 text-[12px]/4 text-zinc-500">Zero is a sentence, not "0–0 of 0". The rows above it are an empty-state, and the pager keeps its ends disabled rather than vanishing.</p>
   </div>
@@ -1101,7 +1101,7 @@ register(
        get to() { return Math.min(this.page * this.size, this.total) },
        go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
      }"
-     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
 
   <div class="flex items-center gap-2">
     <label for="pager-size" class="text-[13px]/5 text-zinc-600">Rows per page</label>
@@ -1150,7 +1150,7 @@ register(
      The panel is not overflow-hidden, so the focus outline at offset-2 is not
      clipped by the rounded corner. Where a panel has to clip, the pager's
      buttons take focus-visible:-outline-offset-2 instead and draw inside. -->
-<div class="max-w-xl rounded-xl border border-zinc-200 bg-white"
+<div class="max-w-xl rounded-xl border border-zinc-300 bg-white"
      x-data="{
        page: 1, size: 4,
        rows: [
@@ -1247,7 +1247,7 @@ register(
        next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() },
        last() { this.page = this.pages; this.$refs.prev.focus() }
      }"
-     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
 
   <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
      x-text="((page - 1) * 25 + 1) + '–' + Math.min(page * 25, 94) + ' of 94 receipts'">26–50 of 94 receipts</p>
@@ -1309,7 +1309,7 @@ register(
      row action against them. Alpine treats inert as a boolean attribute, so a
      false value removes it rather than writing inert="false", which is a truthy
      string that would leave the table permanently unreachable. -->
-<div class="max-w-xl rounded-xl border border-zinc-200 bg-white"
+<div class="max-w-xl rounded-xl border border-zinc-300 bg-white"
      x-data="{
        page: 2, pages: 6, size: 3, total: 18, busy: false, t: null,
        get from() { return (this.page - 1) * this.size + 1 },
@@ -1387,7 +1387,7 @@ register(
      line of text, and a browser drops focus from a removed element to the body —
      so the handler moves focus to the count, which is tabindex="-1" for exactly
      that reason and is also the sentence that says what just happened. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white"
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white"
      x-data="{
        shown: 6, step: 6, total: 21,
        get rows() { return Array.from({ length: this.shown }, (_, i) => ({
@@ -1448,7 +1448,7 @@ register(
      the URL — ?page=12&size=25 — so a record opened from row four can be closed
      with Back and land on page 12 again. Client state is what this snippet
      demonstrates and what a register screen should not ship. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        page: 12, size: 25,
        rows: Array.from({ length: 1438 }, (_, i) => ({
@@ -1576,7 +1576,7 @@ register(
       'Colour in a tile is only ever the delta tone and a status dot. No tinted card, no coloured left border, no red tile for the bad metric. A field of colour behind a number shouts louder than the overdue rows it is describing, and the moment one tile is red the graphite ones read as switched off. This is the alert rule arriving on a dashboard, and it is the reason the delta tone still means something when it appears.'
     ],
     anatomy: [
-      ['Tile', 'rounded-xl border border-zinc-200 bg-white p-4, and no shadow. The border already separates it from the zinc-100 page; a strip of shadowed tiles reads as a toy and stacks badly at 390px.'],
+      ['Tile', 'rounded-xl border border-zinc-300 bg-white p-4, and no shadow. The border already separates it from the zinc-100 page; a strip of shadowed tiles reads as a toy and stacks badly at 390px.'],
       ['Label', 'text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600, above the figure because the label is what you read first. It names the metric and its scope, not just the metric.'],
       ['Figure', 'The number, at text-[24px]/7 font-semibold tracking-tight tabular-nums. The largest thing in the tile and the only thing at that step, so the eye lands on it without being told to.'],
       ['Unit', 'The currency mark, the percent sign or the noun, at text-[13px]/5 in zinc-500 and baseline-aligned to the figure. Sized separately, always, so the digits across a row start at the same x.'],
@@ -1624,7 +1624,7 @@ register(
      The rupee mark is its own span one step down. Set it at 24px semibold and
      four tiles in a row start their digits at four different x positions, which
      is the whole reason the figure is tabular-nums in the first place. -->
-<div class="max-w-xs rounded-xl border border-zinc-200 bg-white p-4">
+<div class="max-w-xs rounded-xl border border-zinc-300 bg-white p-4">
   <dl>
     <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open order value · all plants</dt>
     <dd class="mt-1.5 flex items-baseline gap-1">
@@ -1661,7 +1661,7 @@ register(
      approvals "+33%" claims a precision nine records do not have. -->
 <div class="grid gap-3 sm:grid-cols-3">
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Orders raised</dt>
       <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">148</dd>
@@ -1676,7 +1676,7 @@ register(
 
   <!-- up is bad. Same arrow as the tile on the left, opposite tone, and the
        label is what makes it legible with no tone at all. -->
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue value</dt>
       <dd class="mt-1.5 flex items-baseline gap-1">
@@ -1692,7 +1692,7 @@ register(
     </dl>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Awaiting approval</dt>
       <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">9</dd>
@@ -1725,7 +1725,7 @@ register(
      that sentence is the only route to the trend for anyone not reading the
      picture. The last point is the only one with a radius, so "where we are now"
      is marked without putting a number on every week. -->
-<div class="max-w-xs rounded-xl border border-zinc-200 bg-white p-4"
+<div class="max-w-xs rounded-xl border border-zinc-300 bg-white p-4"
      x-data="{
        chart: null,
        init() { this.wait(() => this.draw()); },
@@ -1798,7 +1798,7 @@ register(
      did not move. Read the labels rather than the colours and it still works. -->
 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open orders</dt>
       <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">148</dd>
@@ -1811,7 +1811,7 @@ register(
     </dl>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open order value</dt>
       <dd class="mt-1.5 flex items-baseline gap-1">
@@ -1827,7 +1827,7 @@ register(
     </dl>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue value</dt>
       <dd class="mt-1.5 flex items-baseline gap-1">
@@ -1843,7 +1843,7 @@ register(
     </dl>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Awaiting approval</dt>
       <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">9</dd>
@@ -1877,7 +1877,7 @@ register(
      and "Held", "Awaiting release" and "Filed" still say everything. -->
 <div class="grid gap-3 sm:grid-cols-3">
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Compounding line 3</dt>
       <dd class="mt-1.5 flex items-center gap-2">
@@ -1888,7 +1888,7 @@ register(
     <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Since 09:40 · batch B-24-0912</p>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Batch B-24-0918</dt>
       <dd class="mt-1.5 flex items-center gap-2">
@@ -1899,7 +1899,7 @@ register(
     <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Melt flow logged 08:15 · with QC 1 h 12 m</p>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">GSTR-1 · July</dt>
       <dd class="mt-1.5 flex items-center gap-2">
@@ -2001,7 +2001,7 @@ register(
      x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 1800) } }"
      x-init="run()">
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4" :aria-busy="busy">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4" :aria-busy="busy">
 
     <!-- loading -->
     <div x-show="busy" class="animate-pulse">
@@ -2034,7 +2034,7 @@ register(
   </div>
 
   <button type="button" @click="run()"
-          class="mt-3 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="mt-3 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Load again
   </button>
 </div>` },
@@ -2063,7 +2063,7 @@ register(
 <div class="grid gap-3 sm:grid-cols-2">
 
   <!-- zero: a real answer -->
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">QC holds open</dt>
       <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">0</dd>
@@ -2077,7 +2077,7 @@ register(
   </div>
 
   <!-- no data: no answer -->
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <dl>
       <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Scrap rate · Silvassa</dt>
       <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight text-zinc-400">
@@ -2134,7 +2134,7 @@ register(
 
   <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
 
-    <a href="#" class="group block rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <a href="#" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <dl>
         <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
           <span>Open orders</span>
@@ -2150,7 +2150,7 @@ register(
       </dl>
     </a>
 
-    <a href="#" class="group block rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <a href="#" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <dl>
         <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
           <span>Overdue value</span>
@@ -2169,7 +2169,7 @@ register(
       </dl>
     </a>
 
-    <a href="#" class="group block rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <a href="#" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <dl>
         <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
           <span>GRNs posted today</span>
@@ -2185,7 +2185,7 @@ register(
       </dl>
     </a>
 
-    <a href="#" class="group block rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <a href="#" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <dl>
         <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
           <span>QC holds open</span>
@@ -2269,7 +2269,7 @@ register(
 </script>` },
 
       { id: 'line', name: 'Line', code:
-`<div class="rounded-xl border border-zinc-200 bg-white p-5"
+`<div class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
        chart: null,
        init() { this.wait(() => this.draw()); },
@@ -2356,7 +2356,7 @@ register(
 </div>` },
 
       { id: 'bar', name: 'Grouped bar', code:
-`<div class="rounded-xl border border-zinc-200 bg-white p-5"
+`<div class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
        chart: null,
        init() { this.wait(() => this.draw()); },
@@ -2433,7 +2433,7 @@ register(
   </div>
 </div>` },
       { id: 'horizontal', name: 'Ranking', code:
-`<div class="rounded-xl border border-zinc-200 bg-white p-5"
+`<div class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
        chart: null,
        init() { this.wait(() => this.draw()); },
@@ -2516,7 +2516,7 @@ register(
 </div>` },
 
       { id: 'stacked', name: 'Stacked by status', code:
-`<div class="rounded-xl border border-zinc-200 bg-white p-5"
+`<div class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
        chart: null,
        init() { this.wait(() => this.draw()); },
@@ -2602,7 +2602,7 @@ register(
 </div>` },
 
       { id: 'donut', name: 'Donut', code:
-`<div class="rounded-xl border border-zinc-200 bg-white p-5"
+`<div class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
        chart: null,
        init() { this.wait(() => this.draw()); },
@@ -2678,7 +2678,7 @@ register(
   </div>
 </div>` },
       { id: 'sparkline', name: 'Sparkline', code:
-`<div class="max-w-xs rounded-xl border border-zinc-200 bg-white p-4"
+`<div class="max-w-xs rounded-xl border border-zinc-300 bg-white p-4"
      x-data="{
        chart: null,
        init() { this.wait(() => this.draw()); },
@@ -2729,7 +2729,7 @@ register(
 </div>` },
 
       { id: 'empty', name: 'Empty', code:
-`<div class="rounded-xl border border-zinc-200 bg-white p-5">
+`<div class="rounded-xl border border-zinc-300 bg-white p-5">
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
     <h3 class="text-[14px]/5 font-semibold">Committed value by month</h3>
     <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa plant · 2026</p>
@@ -2753,7 +2753,7 @@ register(
    supplier name ends the attribute and takes the page with it. #}
 {{ spend_by_month|json_script:"spend-by-month" }}
 
-<div class="rounded-xl border border-zinc-200 bg-white p-5"
+<div class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
        chart: null,
        init() { this.wait(() => this.draw()); },
@@ -2849,12 +2849,12 @@ register(
       'A stacked bar is three parts at the outside. Good, rework and scrap is a stack; six purchase categories is a chart, and squeezing them into an 8px rail produces four segments under two pixels wide that cannot be pointed at, told apart or read. Past three parts, or where the parts need naming on the bar itself, it is the stacked variant of chart. Every stack carries a legend list with the real figures under it, because the one thing nobody can do with a stacked bar is read a value off it.'
     ],
     anatomy: [
-      ['Track', 'The rail the fill runs in: h-1 to h-2, rounded-full, bg-zinc-100, overflow-hidden so a fill at any width is clipped to the rail\'s own corners. This is the element that carries role="progressbar" and the three aria values, because it is the thing whose extent means something.'],
+      ['Track', 'The rail the fill runs in: h-1 to h-2, rounded-full, bg-zinc-200, overflow-hidden so a fill at any width is clipped to the rail\'s own corners. This is the element that carries role="progressbar" and the three aria values, because it is the thing whose extent means something.'],
       ['Fill', 'h-full with the width in an inline style and the colour in a class. Graphite by default, a semantic fill only when the record\'s state says so. min-w-[2px] so a fraction of a per cent still marks the rail, transition-[width] duration-300 so a changed value moves rather than jumps, motion-reduce:transition-none because that movement is decoration.'],
       ['Name', 'What is progressing, in text — the heading the bar sits under, tied to it with aria-labelledby, or an aria-label where there is no heading. Never the word "Progress".'],
       ['Reading', 'The two figures with their unit — "7,800 of 12,000 kg", "₹12,52,560 received of ₹18,42,000" — on the line under the bar, tabular-nums. The bar shows the shape of the answer; this is the answer.'],
       ['Percentage', 'The derived figure, on the heading baseline, right-aligned, tabular-nums. Optional where the reading already says everything, and omitted entirely when the scale is not a percentage.'],
-      ['Segments', 'One block per stage in a flex gap-1 row for a run of named steps: graphite for done, zinc-400 for the one in progress, zinc-100 for the ones still ahead. Three greys, no semantic colour — the stage is a position, not a state.'],
+      ['Segments', 'One block per stage in a flex gap-1 row for a run of named steps: graphite for done, zinc-400 for the one in progress, zinc-200 for the ones still ahead. Three greys, no semantic colour — the stage is a position, not a state.'],
       ['Legend', 'The list under a stacked bar: a swatch in the segment\'s own fill, the part name, the quantity. It is the accessible carrier of the numbers, since one progressbar cannot report three of them.'],
       ['Arc', 'The radial form. Two SVG circles at r="15.9155", whose circumference is 100 to three places, so stroke-dasharray="68 100" is the percentage written literally with no arithmetic in the template.']
     ],
@@ -2908,12 +2908,12 @@ register(
      every navigation. motion-reduce drops the movement because the movement is
      decoration over a value that is correct at both ends — the opposite call to
      the spinner, whose rotation is the only thing it says. -->
-<div class="rounded-xl border border-zinc-200 bg-white p-4">
+<div class="rounded-xl border border-zinc-300 bg-white p-4">
   <div class="flex items-baseline justify-between gap-3">
     <h3 id="pg-po1187" class="text-[13px]/5 font-medium">Receipt against PO-24-1187</h3>
     <p class="text-[13px]/5 tabular-nums">68%</p>
   </div>
-  <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100"
+  <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
        role="progressbar" aria-labelledby="pg-po1187"
        aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">
     <div class="h-full min-w-[2px] rounded-full bg-zinc-700 transition-[width] duration-300 motion-reduce:transition-none"
@@ -2941,21 +2941,21 @@ register(
      and the empty part of it becomes a block of colour on the card. -->
 <div class="grid gap-4 sm:grid-cols-3">
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <h3 id="pg-bare-quota" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Quota used</h3>
     <p class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">8,240</p>
     <p class="text-[12px]/4 tabular-nums text-zinc-500">of 12,000 GRN lines, August</p>
-    <div class="mt-2.5 h-1 overflow-hidden rounded-full bg-zinc-100"
+    <div class="mt-2.5 h-1 overflow-hidden rounded-full bg-zinc-200"
          role="progressbar" aria-labelledby="pg-bare-quota"
          aria-valuenow="69" aria-valuemin="0" aria-valuemax="100">
       <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 69%"></div>
     </div>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <h3 id="pg-bare-store" class="text-[13px]/5 font-medium">Store 2 capacity</h3>
     <div class="mt-2 flex items-center gap-3">
-      <div class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-zinc-100"
+      <div class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-labelledby="pg-bare-store"
            aria-valuenow="41" aria-valuemin="0" aria-valuemax="100">
         <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 41%"></div>
@@ -2965,9 +2965,9 @@ register(
     <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">1,640 of 4,000 pallet positions</p>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <h3 id="pg-bare-empty" class="text-[13px]/5 font-medium">Receipt against PO-24-1211</h3>
-    <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100"
+    <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
          role="progressbar" aria-labelledby="pg-bare-empty"
          aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
       <!-- zero renders no fill at all, not a fill floored to 2px, so nothing
@@ -3004,7 +3004,7 @@ register(
      matters. -->
 <div class="space-y-4">
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <div class="flex items-baseline justify-between gap-3">
       <h3 id="pg-seg-stage" class="text-[13px]/5 font-medium">PR-24-0338 · Requisition to payment</h3>
       <p class="text-[13px]/5 tabular-nums text-zinc-600">Stage 4 of 6</p>
@@ -3018,8 +3018,8 @@ register(
       <span class="h-2 flex-1 rounded-full bg-zinc-700"></span>
       <span class="h-2 flex-1 rounded-full bg-zinc-700"></span>
       <span class="h-2 flex-1 rounded-full bg-zinc-400"></span>
-      <span class="h-2 flex-1 rounded-full bg-zinc-100"></span>
-      <span class="h-2 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-2 flex-1 rounded-full bg-zinc-200"></span>
+      <span class="h-2 flex-1 rounded-full bg-zinc-200"></span>
     </div>
 
     <div class="mt-1.5 hidden gap-1 sm:flex" aria-hidden="true">
@@ -3034,7 +3034,7 @@ register(
     <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500 sm:mt-2">Receipt in progress since 09 Aug · Sharma Extrusions · next, invoice against GRN</p>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <div class="flex items-baseline justify-between gap-3">
       <h3 id="pg-seg-lines" class="text-[13px]/5 font-medium">Lines received on PO-24-1203</h3>
       <p class="text-[13px]/5 tabular-nums text-zinc-600">6 of 14</p>
@@ -3049,14 +3049,14 @@ register(
       <span class="h-1.5 flex-1 rounded-full bg-zinc-700"></span>
       <span class="h-1.5 flex-1 rounded-full bg-zinc-700"></span>
       <span class="h-1.5 flex-1 rounded-full bg-zinc-700"></span>
-      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
-      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
-      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
-      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
-      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
-      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
-      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
-      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-200"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-200"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-200"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-200"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-200"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-200"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-200"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-200"></span>
     </div>
     <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Last GRN 12 Aug · Nashik Steel Traders · 8 lines open</p>
   </div>
@@ -3092,7 +3092,7 @@ register(
      plus a vendor name in a 390px row is what forces the sideways scroll rule to
      be broken, so on a phone the bar goes full width under the record and the
      figures sit above it. -->
-<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
@@ -3108,7 +3108,7 @@ register(
         <td class="px-4 py-2.5">Sharma Extrusions</td>
         <td class="px-4 py-2.5">
           <span class="flex items-center gap-2">
-            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                   role="progressbar" aria-label="Received against PO-24-1187"
                   aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">
               <span class="block h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 68%"></span>
@@ -3123,7 +3123,7 @@ register(
         <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
         <td class="px-4 py-2.5">
           <span class="flex items-center gap-2">
-            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                   role="progressbar" aria-label="Received against PO-24-1194"
                   aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
                   aria-valuetext="104% received, over by 320 kg">
@@ -3139,7 +3139,7 @@ register(
         <td class="px-4 py-2.5">Nashik Steel Traders</td>
         <td class="px-4 py-2.5">
           <span class="flex items-center gap-2">
-            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                   role="progressbar" aria-label="Received against PO-24-1211"
                   aria-valuenow="3" aria-valuemin="0" aria-valuemax="100">
               <span class="block h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 3%"></span>
@@ -3154,7 +3154,7 @@ register(
         <td class="px-4 py-2.5">Aurangabad Castings</td>
         <td class="px-4 py-2.5">
           <span class="flex items-center gap-2">
-            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                   role="progressbar" aria-label="Received against PO-24-1218"
                   aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></span>
             <span class="text-[12px]/4 tabular-nums text-zinc-500">0%</span>
@@ -3172,7 +3172,7 @@ register(
         <span class="text-[13px]/5 tabular-nums text-zinc-600">68%</span>
       </div>
       <p class="mt-0.5 text-[13px]/5 text-zinc-600">Sharma Extrusions</p>
-      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-label="Received against PO-24-1187"
            aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">
         <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 68%"></div>
@@ -3185,7 +3185,7 @@ register(
         <span class="text-[13px]/5 tabular-nums text-zinc-600">104%</span>
       </div>
       <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd</p>
-      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-label="Received against PO-24-1194"
            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
            aria-valuetext="104% received, over by 320 kg">
@@ -3218,7 +3218,7 @@ register(
 
      The bar is graphite again the moment the breach is cleared. A red rail is a
      description of what the account is doing now, not a mark against it. -->
-<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h2 class="text-[14px]/5 font-semibold">Credit limit utilisation</h2>
     <p class="mt-0.5 text-[12px]/4 text-zinc-500">Outstanding against sanctioned limit · as at 20 Aug</p>
@@ -3230,7 +3230,7 @@ register(
         <h3 id="pg-tone-a" class="text-[13px]/5 font-medium">Delhi Traders Pvt Ltd</h3>
         <p class="text-[13px]/5 tabular-nums text-zinc-600">41%</p>
       </div>
-      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-labelledby="pg-tone-a"
            aria-valuenow="41" aria-valuemin="0" aria-valuemax="100">
         <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 41%"></div>
@@ -3243,7 +3243,7 @@ register(
         <h3 id="pg-tone-b" class="text-[13px]/5 font-medium">Gujarat Polymers Ltd</h3>
         <p class="text-[13px]/5 tabular-nums text-amber-700">92%</p>
       </div>
-      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-labelledby="pg-tone-b"
            aria-valuenow="92" aria-valuemin="0" aria-valuemax="100">
         <div class="h-full min-w-[2px] rounded-full bg-amber-500" style="width: 92%"></div>
@@ -3256,7 +3256,7 @@ register(
         <h3 id="pg-tone-c" class="text-[13px]/5 font-medium">Nashik Steel Traders</h3>
         <p class="text-[13px]/5 tabular-nums text-red-600">118%</p>
       </div>
-      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-labelledby="pg-tone-c"
            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
            aria-valuetext="118% of limit, over by 1,44,000 rupees">
@@ -3270,7 +3270,7 @@ register(
         <h3 id="pg-tone-d" class="text-[13px]/5 font-medium">Aurangabad Castings</h3>
         <p class="text-[13px]/5 tabular-nums text-zinc-600">0%</p>
       </div>
-      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-labelledby="pg-tone-d"
            aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
       <p class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
@@ -3307,13 +3307,13 @@ register(
      The swatches are solid shapes and take no ring — the ring rule is for tinted
      shapes, and a pale ring around a 10px emerald square looks like a rendering
      fault. -->
-<div class="max-w-lg rounded-xl border border-zinc-200 bg-white p-4">
+<div class="max-w-lg rounded-xl border border-zinc-300 bg-white p-4">
   <div class="flex items-baseline justify-between gap-3">
     <h3 class="text-[13px]/5 font-medium">PRD-24-0417 · quantity built</h3>
     <p class="text-[13px]/5 tabular-nums text-zinc-600">9,540 of 12,000 kg</p>
   </div>
 
-  <div class="mt-2.5 flex h-2 overflow-hidden rounded-full bg-zinc-100" aria-hidden="true">
+  <div class="mt-2.5 flex h-2 overflow-hidden rounded-full bg-zinc-200" aria-hidden="true">
     <div class="h-full bg-emerald-600" style="width: 74.5%"></div>
     <div class="h-full bg-amber-500" style="width: 3.5%"></div>
     <div class="h-full bg-red-600" style="width: 1.5%"></div>
@@ -3378,7 +3378,7 @@ register(
      role and the values go on the wrapper and the svg is aria-hidden, because
      Firefox has historically mishandled ARIA on inline SVG roots and because the
      percentage in the middle is a real text node either way. -->
-<div class="flex max-w-xs flex-col items-center rounded-xl border border-zinc-200 bg-white p-5 text-center">
+<div class="flex max-w-xs flex-col items-center rounded-xl border border-zinc-300 bg-white p-5 text-center">
   <h3 id="pg-radial" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Despatch against plan</h3>
 
   <div class="relative mt-3 flex size-28 items-center justify-center"
@@ -3424,7 +3424,7 @@ register(
 
      x-cloak on the branch hidden at first paint, because Alpine boots after the
      HTML renders and without it the bar flashes under the spinner on load. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-4"
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-4"
      x-data="{
        phase: 'counting', done: 0, total: 0, said: 0, timer: null,
        pct() { return this.total ? Math.round(this.done / this.total * 100) : 0 },
@@ -3460,7 +3460,7 @@ register(
 
   <!-- the total exists: the bar takes over, at the value the job is actually at -->
   <div x-show="phase !== 'counting'" x-cloak class="mt-3">
-    <div class="h-1.5 overflow-hidden rounded-full bg-zinc-100"
+    <div class="h-1.5 overflow-hidden rounded-full bg-zinc-200"
          role="progressbar" aria-labelledby="pg-import"
          :aria-valuenow="done" aria-valuemin="0" :aria-valuemax="total"
          :aria-valuetext="done.toLocaleString('en-IN') + ' of ' + total.toLocaleString('en-IN') + ' rows imported'">
@@ -3506,7 +3506,7 @@ register(
      Nothing in the panel is focusable except the link out to the order, which is
      the record number in text. A progressbar is output, and Tab has nothing to do
      inside one. -->
-<div class="max-w-3xl overflow-hidden rounded-xl border border-zinc-200 bg-white">
+<div class="max-w-3xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
 
   <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
     <div class="min-w-0">
@@ -3523,7 +3523,7 @@ register(
       <h3 id="pg-prd-qty" class="text-[13px]/5 font-medium">Quantity built against plan</h3>
       <p class="text-[13px]/5 tabular-nums text-amber-700">104%</p>
     </div>
-    <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100"
+    <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
          role="progressbar" aria-labelledby="pg-prd-qty"
          aria-valuenow="12000" aria-valuemin="0" aria-valuemax="12000"
          aria-valuetext="12,480 kg of 12,000 planned, over by 480 kg">
@@ -3535,7 +3535,7 @@ register(
 
   <div class="border-b border-zinc-200 px-4 py-4">
     <h3 class="text-[13px]/5 font-medium">Quality split</h3>
-    <div class="mt-2.5 flex h-2 overflow-hidden rounded-full bg-zinc-100" aria-hidden="true">
+    <div class="mt-2.5 flex h-2 overflow-hidden rounded-full bg-zinc-200" aria-hidden="true">
       <div class="h-full bg-emerald-600" style="width: 95.2%"></div>
       <div class="h-full bg-amber-500" style="width: 3.4%"></div>
       <div class="h-full bg-red-600" style="width: 1.4%"></div>
@@ -3566,7 +3566,7 @@ register(
       <li class="grid gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[1fr_auto_auto] sm:items-center">
         <span class="text-[13px]/5">10 · Blow moulding</span>
         <span class="flex items-center gap-2 sm:order-3">
-          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                 role="progressbar" aria-label="Operation 10, blow moulding"
                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
             <span class="block h-full rounded-full bg-emerald-600" style="width: 100%"></span>
@@ -3579,7 +3579,7 @@ register(
       <li class="grid gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[1fr_auto_auto] sm:items-center">
         <span class="text-[13px]/5">20 · Neck trimming</span>
         <span class="flex items-center gap-2 sm:order-3">
-          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                 role="progressbar" aria-label="Operation 20, neck trimming"
                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
             <span class="block h-full rounded-full bg-emerald-600" style="width: 100%"></span>
@@ -3592,7 +3592,7 @@ register(
       <li class="grid gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[1fr_auto_auto] sm:items-center">
         <span class="text-[13px]/5">30 · Leak test</span>
         <span class="flex items-center gap-2 sm:order-3">
-          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                 role="progressbar" aria-label="Operation 30, leak test"
                 aria-valuenow="62" aria-valuemin="0" aria-valuemax="100">
             <span class="block h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 62%"></span>
@@ -3605,7 +3605,7 @@ register(
       <li class="grid gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[1fr_auto_auto] sm:items-center">
         <span class="text-[13px]/5 text-zinc-600">40 · Labelling and palletising</span>
         <span class="flex items-center gap-2 sm:order-3">
-          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                 role="progressbar" aria-label="Operation 40, labelling and palletising"
                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></span>
           <span class="w-10 shrink-0 text-right text-[12px]/4 tabular-nums text-zinc-500">0%</span>
@@ -3690,7 +3690,7 @@ register(
 
      The well is graphite, as it is in all four states. Nothing in this
      component takes a tint. -->
-<div class="rounded-xl border border-zinc-200 bg-white">
+<div class="rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h2 class="text-[14px]/5 font-semibold">Purchase orders</h2>
   </div>
@@ -3730,7 +3730,7 @@ register(
      rather than inside the empty block so it is in the document before the
      first keystroke. Clearing the search puts the rows back and the same region
      reports the new count. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        q: 'PO-24-9910',
        rows: [
@@ -3798,7 +3798,7 @@ register(
      change a screen reader reports. Put it inside the empty block instead and
      it arrives with its message already in it, which is not a change and is
      announced to nobody. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        filters: ['Gujarat Polymers Ltd', 'Gate 2', 'Rejected at QC', '01–12 Aug'],
        total: 128
@@ -3868,7 +3868,7 @@ register(
      variant exists to close: at forty seconds a turning ring is
      indistinguishable from a hung page, and the only move left is a reload,
      which on a form means posting it twice. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        state: 'failed',
        retry() { this.state = 'busy'; setTimeout(() => this.state = 'ok', 1400) }
@@ -3936,7 +3936,7 @@ register(
      dead Tab stop that explains nothing; the explanation is the paragraph. The
      only action here is a route to the person who can change the answer, and it
      is a link because it leaves the application. -->
-<div class="rounded-xl border border-zinc-200 bg-white">
+<div class="rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h2 class="text-[14px]/5 font-semibold">Purchase orders · Fabrication</h2>
   </div>
@@ -3989,7 +3989,7 @@ register(
 
      Padding, not a margin: py-12 on the cell keeps the panel at the height it
      had with rows in it, and cannot collapse against a sibling. -->
-<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white"
+<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ cols: { received: true, status: true },
                get span() { return 2 + (this.cols.received ? 1 : 0) + (this.cols.status ? 1 : 0) } }">
 
@@ -4051,7 +4051,7 @@ register(
      one tile taller than the three beside it. -->
 <div class="grid gap-4 sm:grid-cols-3">
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <h3 class="text-[13px]/5 font-medium">Pending QC</h3>
     <div class="mt-3 flex flex-col items-center py-4 text-center">
       <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
@@ -4062,7 +4062,7 @@ register(
     </div>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <h3 class="text-[13px]/5 font-medium">Overdue orders</h3>
     <div class="mt-3 flex flex-col items-center py-4 text-center">
       <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
@@ -4077,7 +4077,7 @@ register(
     </div>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <h3 class="text-[13px]/5 font-medium">Committed value</h3>
     <div class="mt-3 flex flex-col items-center py-4 text-center">
       <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
@@ -4113,7 +4113,7 @@ register(
      and the button says what to do, so a glyph between them is a third thing
      saying nothing. Once there are lines the sentence goes and the button
      stays. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ lines: [] }">
 
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
@@ -4171,7 +4171,7 @@ register(
      disappearing, so the panel holds its height and the pager does not jump up
      under the cursor when the scope changes. Below md the rows are cards; at
      390px nothing here scrolls sideways. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        scope: 'today',
        all: {
@@ -4286,7 +4286,7 @@ register(
         'Every bar sits inside a box the height of the line it stands in for, and the bar is centred in it — flex h-5 items-center round an h-2.5 bar for text-[13px]/5, h-6 round h-2.5 for prose at /6, h-4 round h-2 for a 12px caption, h-7 round h-4 for a 24px figure. Stack bare bars with space-y-2 instead and a four-line paragraph measures 72px of skeleton against 96px of text, so the card grows by a line and a half on arrival. This is the marker\'s dot doing the same job for the same reason: the box is derived from the leading, the leading is already written in the class name beside it, and the two cannot drift. A margin tuned by eye is correct for exactly one type size.',
         'The row count is the page size, not a guess. A register that asked for 25 rows draws 25. Where the count genuinely cannot be known — a permission-filtered list, a variable set of exceptions — guess low rather than high: growth pushes down only what is below the panel, while shrinkage pulls the whole page up under a cursor that has already started moving towards something.',
         'Draw for real everything the page already knows. Table headers, tile labels, the section titles, the record number and vendor name that came from the row somebody clicked to get here. None of that is waiting on the query, and greying it out makes the page flash its own headings away and land them again. It also costs the only thing a skeleton is good for over a spinner: with the column headers and the tile labels drawn, somebody can decide where to look before the figures arrive.',
-        'Blocks are bg-zinc-200 and carry no ring. zinc-100 is a surface — the page, a selected row, a table header — so a zinc-100 bar on a white card is one step from invisible and on the page behind it is the identical colour. The ring that every other tinted shape takes is deliberately absent here: a ring draws an edge, and a skeleton bar is ink standing in for text, not a shape you are meant to read the outline of. Twelve ringed bars in a column read as twelve empty input boxes.',
+        'Blocks are bg-zinc-200 and carry no ring. zinc-100 is a surface — the page, a selected row, an open menu trigger — so a zinc-100 bar on a white card is one step from invisible and on the page behind it is the identical colour. The ring that every other tinted shape takes is deliberately absent here: a ring draws an edge, and a skeleton bar is ink standing in for text, not a shape you are meant to read the outline of. Twelve ringed bars in a column read as twelve empty input boxes.',
         'The radius of a block is the radius of the thing it replaces. rounded for a line of text, rounded-lg for a control or a button, rounded-full for an avatar or a status pill, and the pill block is h-5 because the real pill is py-0.5 on text-[12px]/4. Give a text bar rounded-full and a paragraph reads as a stack of lozenges, which is a row of badges, which is a different component.',
         'animate-pulse goes on the smallest wrapper that contains nothing but blocks, and it always carries motion-reduce:animate-none. One wrapper over the whole group is what keeps the bars in phase, and the phase problem is real for anything a template inserts a row at a time — forty blocks that started their animations at forty different moments fade against each other and the panel reads as static rather than as a wait. Where real text is interleaved with the blocks, as it is in a form of drawn labels, the classes move down onto each block instead: they all begin in the same paint so they stay in step, and a label that is not loading has no business pulsing. The reduced-motion suppression is where this parts company with the spinner, which must never take it — a stopped ring is a broken ring and the only signal is gone, whereas a stopped skeleton is still an accurate picture of the layout that is coming, and it is a much larger area of the screen moving, which is the motion the preference exists for.',
         'The last line of a paragraph is short, because real paragraphs end mid-line. Three bars at w-full and a fourth at about w-2/5 reads as text; four bars at w-full reads as a table. The widths are written into the markup and never generated — a width randomised per render changes between two paints of the same wait, and Alpine re-evaluating an expression is enough to make the block jump while it is standing still.',
@@ -4347,7 +4347,7 @@ register(
      aria-busy on the card, aria-hidden on the pulse wrapper, and the sr-only
      status outside that wrapper — inside it, it would be hidden along with the
      bars and the wait would be announced to nobody. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5" x-data="{ loaded: false }" :aria-busy="!loaded">
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5" x-data="{ loaded: false }" :aria-busy="!loaded">
   <h3 class="text-[13px]/5 font-medium">Vendor note · Sharma Extrusions</h3>
 
   <div class="mt-3">
@@ -4391,7 +4391,7 @@ register(
      twelve empty inputs rather than as text. -->
 <div class="grid gap-4 sm:grid-cols-2">
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-5" aria-busy="true">
+  <div class="rounded-xl border border-zinc-300 bg-white p-5" aria-busy="true">
     <p role="status" class="sr-only">Loading the receipt summary</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="flex h-6 items-center"><div class="h-3 w-44 rounded bg-zinc-200"></div></div>
@@ -4408,7 +4408,7 @@ register(
     </div>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-5">
+  <div class="rounded-xl border border-zinc-300 bg-white p-5">
     <h3 class="text-[16px]/6 font-semibold tabular-nums">GRN-26-0442</h3>
     <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Posted 16 Aug 2026 · Ritu Deshpande</p>
     <p class="mt-4 text-[13px]/5 text-zinc-600">Short receipt of 600 kg against PO-24-1187. Two bags opened at the gate and 48 kg written off to the debit note.</p>
@@ -4446,7 +4446,7 @@ register(
      Below md the loaded table restacks into cards, so the skeleton restacks at
      the same breakpoint. A skeleton that keeps its columns on a phone is a
      promise the table does not keep. -->
-<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white" aria-busy="true">
+<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <p role="status" class="sr-only">Loading the order register</p>
 
   <table class="hidden w-full text-[13px]/5 md:table">
@@ -4552,7 +4552,7 @@ register(
      radius of the buttons that replace them, and they are divs rather than
      disabled buttons: a Tab during the wait should run past the card, not stop
      on a control that cannot do anything yet. -->
-<div class="max-w-sm rounded-xl border border-zinc-200 bg-white" aria-busy="true">
+<div class="max-w-sm rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <p role="status" class="sr-only">Loading the vendor summary</p>
 
   <div class="animate-pulse p-4 motion-reduce:animate-none" aria-hidden="true">
@@ -4612,7 +4612,7 @@ register(
 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-busy="true">
   <p role="status" class="sr-only">Loading the order summary figures</p>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open orders</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-16 rounded bg-zinc-200"></div></div>
@@ -4620,7 +4620,7 @@ register(
     </div>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open value</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-40 rounded bg-zinc-200"></div></div>
@@ -4628,7 +4628,7 @@ register(
     </div>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-36 rounded bg-zinc-200"></div></div>
@@ -4636,7 +4636,7 @@ register(
     </div>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Awaiting approval</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-12 rounded bg-zinc-200"></div></div>
@@ -4661,7 +4661,7 @@ register(
 
      Rows are py-3 on a 40px content block, so a row is 64px loading and 64px
      loaded, and five of them is the page size the list asked for. -->
-<div class="max-w-md overflow-hidden rounded-xl border border-zinc-200 bg-white" aria-busy="true">
+<div class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[14px]/5 font-semibold">Awaiting your approval</h3>
     <p role="status" class="sr-only">Loading the approvals list</p>
@@ -4748,7 +4748,7 @@ register(
      h-9 rounded-lg blocks in the real footer, on the real border. Nothing here
      is focusable, so a Tab during the wait leaves the form entirely rather than
      stopping on a rectangle with no accessible name. -->
-<div class="max-w-2xl rounded-xl border border-zinc-200 bg-white" aria-busy="true">
+<div class="max-w-2xl rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <div class="border-b border-zinc-200 px-5 py-4">
     <h2 class="text-[16px]/6 font-semibold">Edit purchase order</h2>
     <p role="status" class="sr-only">Loading the purchase order for editing</p>
@@ -4807,7 +4807,7 @@ register(
      Nothing here is an svg. A skeleton built out of <template x-for> inside an
      svg does not render at all — the template is parsed in the SVG namespace
      and has no .content — and it would be a fake series if it did. -->
-<div class="rounded-xl border border-zinc-200 bg-white" aria-busy="true">
+<div class="rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
     <div>
       <h2 class="text-[16px]/6 font-semibold">Receipts against orders</h2>
@@ -4879,7 +4879,7 @@ register(
       <p class="mt-1 text-[13px]/5 text-zinc-600">Sharma Extrusions · Fabrication</p>
     </div>
     <div class="flex shrink-0 gap-2">
-      <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
       </button>
       <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -4895,7 +4895,7 @@ register(
 
       <!-- summary. The four labels are the record's own field names and are
            drawn; only the values are waiting. -->
-      <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="rounded-xl border border-zinc-300 bg-white p-4">
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
             <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Raised on</p>
@@ -4918,7 +4918,7 @@ register(
 
       <!-- lines. Real thead, four rows because the order has four lines, and
            the totals row is drawn because the footer is structure. -->
-      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="border-b border-zinc-200 px-4 py-3">
           <h2 class="text-[14px]/5 font-semibold">Order lines</h2>
         </div>
@@ -5007,7 +5007,7 @@ register(
     <!-- the rail. Receipts against this order, four rows of a list that has
          not answered yet. -->
     <div class="space-y-4">
-      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="border-b border-zinc-200 px-4 py-3">
           <h2 class="text-[14px]/5 font-semibold">Receipts</h2>
         </div>
@@ -5036,7 +5036,7 @@ register(
         </ul>
       </div>
 
-      <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="rounded-xl border border-zinc-300 bg-white p-4">
         <h2 class="text-[14px]/5 font-semibold">Terms</h2>
         <div class="animate-pulse mt-3 motion-reduce:animate-none" aria-hidden="true">
           <div class="flex h-5 items-center"><div class="h-2.5 w-full rounded bg-zinc-200"></div></div>
@@ -5119,7 +5119,7 @@ register(
      marker:tabular-nums earns its place on any ordered list that runs past
      nine: outside markers align to their right edge on their own, but
      proportional figures still make 9 and 11 different widths. -->
-<div class="max-w-md space-y-5 rounded-xl border border-zinc-200 bg-white p-5">
+<div class="max-w-md space-y-5 rounded-xl border border-zinc-300 bg-white p-5">
   <div>
     <h3 class="text-[13px]/5 font-medium">Conditions on the rate contract</h3>
     <ul class="mt-2 list-disc space-y-1 pl-5 text-[14px]/6 text-zinc-600 marker:text-zinc-400">
@@ -5156,7 +5156,7 @@ register(
      margin. A 6px disc on a 20px line wants 7px of offset, 7px is not a step on
      the scale, and mt-[7px] is correct for exactly one type size. h-5 is the
      leading of text-[13px]/5, so the box and the text cannot drift apart. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium">Exceptions on GRN-26-0442</h3>
   <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Posted 16 Aug 2026 by Ritu Deshpande</p>
 
@@ -5193,7 +5193,7 @@ register(
 
      x-cloak on the row that starts hidden, or it flashes on every load before
      Alpine boots. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5" x-data="{ cancelled: false }">
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5" x-data="{ cancelled: false }">
   <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
     <h3 class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · lines</h3>
     <button type="button" @click="cancelled = !cancelled"
@@ -5243,7 +5243,7 @@ register(
      Colour lives in the icon and nowhere else: no tinted row, no coloured text,
      no fill behind the line. Three of these six are graphite, which is what
      makes the red one findable. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium">Three-way match — INV-8841</h3>
   <p class="mt-0.5 text-[12px]/4 text-zinc-500">Nashik Steel Traders · checked 16 Aug 2026, 11:04</p>
 
@@ -5291,7 +5291,7 @@ register(
 
      Everything in the marker column is aria-hidden. The rail is a picture of
      the fact that these entries are one sequence; the dates say it in words. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · history</h3>
 
   <ul role="list" class="mt-3">
@@ -5352,7 +5352,7 @@ register(
      The dot is aria-hidden and the status is a sr-only word at the front of the
      meta line, so the state is not colour alone. The link is the label, never
      the mark — a 6px disc is 6px of hit area with no accessible name. -->
-<div class="max-w-md overflow-hidden rounded-xl border border-zinc-200 bg-white">
+<div class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[13px]/5 font-medium">Orders awaiting receipt</h3>
     <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">5 of 1,438 · sorted by due date</p>
@@ -5428,7 +5428,7 @@ register(
      child marks hang under the parent's text rather than under its mark. Line
      the two levels of mark up with each other instead and the nesting is
      invisible. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium">Rejections this month</h3>
 
   <ul role="list" class="mt-3 space-y-2 text-[13px]/5">
@@ -5484,7 +5484,7 @@ register(
      text: they are what people quote when a run stalls, and with list-style
      already gone nothing else is going to say them. The done steps swap the
      number for a check and put the word back with sr-only. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium tabular-nums">Invoice INV-8841 · payment run</h3>
 
   <ol role="list" class="mt-3 space-y-3 text-[13px]/5">
@@ -5543,9 +5543,9 @@ register(
      announced as "list, 1 item" and the tidiness costs a sentence.
 
      Vendor drops below sm rather than the table scrolling sideways. -->
-<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="w-full table-fixed text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="px-4 py-2 font-medium sm:w-32">GRN</th>
         <th scope="col" class="hidden px-4 py-2 font-medium sm:table-cell">Vendor</th>
@@ -5578,7 +5578,7 @@ register(
   </table>
 </div>
 
-<div class="mt-3 max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+<div class="mt-3 max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium tabular-nums">Note printed on GRN-26-0442</h3>
   <ul role="list" class="mt-2 space-y-1.5 text-[14px]/6 text-zinc-600">
     <li class="flex items-start gap-2.5">
@@ -5743,7 +5743,7 @@ register(
 
      aria-busy is on the panel. The panel is the thing that is waiting; the ring
      is only what is drawn. -->
-<div class="flex min-h-64 items-center justify-center rounded-xl border border-zinc-200 bg-white p-6" aria-busy="true">
+<div class="flex min-h-64 items-center justify-center rounded-xl border border-zinc-300 bg-white p-6" aria-busy="true">
   <div class="flex flex-col items-center gap-3 text-center">
     <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
     <p role="status" class="text-[13px]/5 text-zinc-600">Loading the order register</p>
@@ -5763,7 +5763,7 @@ register(
      Each of the three has its own role="status", because each names a different
      piece of work. One region for the page would have them overwriting each
      other, and the last one to finish would be the only one ever announced. -->
-<div class="max-w-md space-y-6 rounded-xl border border-zinc-200 bg-white p-4">
+<div class="max-w-md space-y-6 rounded-xl border border-zinc-300 bg-white p-4">
 
   <!-- inside the field's ring, where the input entry puts its icons -->
   <div>
@@ -5815,7 +5815,7 @@ register(
      busy starts true so the scrim is already there at first paint rather than
      appearing over rows somebody has begun reading, and x-init runs the cycle
      once so it resolves. In an application the swap is what clears it. -->
-<div class="relative overflow-hidden rounded-xl border border-zinc-200 bg-white"
+<div class="relative overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 2400) } }"
      x-init="run()"
      :aria-busy="busy">
@@ -5892,7 +5892,7 @@ register(
      The floor cannot reach the live region: x-text fires the moment the flag
      flips, so the announcement gets its own 500ms timer. Without it a 120ms
      request that never painted a ring is still announced as a wait. -->
-<div class="rounded-xl border border-zinc-200 bg-white p-4"
+<div class="rounded-xl border border-zinc-300 bg-white p-4"
      x-data="{
        busy: false, late: false, timer: null,
        run(ms) {
@@ -5935,12 +5935,12 @@ register(
      turning at forty seconds is indistinguishable from a hung page. -->
 <div class="grid gap-4 sm:grid-cols-3">
 
-  <div class="flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white p-5 text-center" aria-busy="true">
+  <div class="flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-5 text-center" aria-busy="true">
     <span class="size-6 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
     <p role="status" class="text-[13px]/5 text-zinc-600">Loading the order register</p>
   </div>
 
-  <div class="flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white p-5 text-center" aria-busy="true">
+  <div class="flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-5 text-center" aria-busy="true">
     <span class="size-6 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
     <div role="status">
       <p class="text-[13px]/5 text-zinc-600">Loading the order register</p>
@@ -5948,7 +5948,7 @@ register(
     </div>
   </div>
 
-  <div class="flex min-h-44 flex-col items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white p-5 text-center">
+  <div class="flex min-h-44 flex-col items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white p-5 text-center">
     <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
       <i data-lucide="alert-circle" class="size-4 text-red-600"></i>
     </span>
@@ -6014,7 +6014,7 @@ register(
      there is nothing for a screen reader to report. -->
 
 {# orders/register.html #}
-<div id="register" class="relative overflow-hidden rounded-xl border border-zinc-200 bg-white"
+<div id="register" class="relative overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ busy: false }" :aria-busy="busy">
 
   <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3"
@@ -6067,7 +6067,7 @@ register(
     </thead>
     <tbody>
       {% for o in orders %}
-        <tr class="border-b border-zinc-100 last:border-0">
+        <tr class="border-b border-zinc-200 last:border-0">
           <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
           <td class="px-4 py-2.5">{{ o.vendor.name }}</td>
           <td class="px-4 py-2.5 text-right tabular-nums">₹{{ o.amount|intcomma }}</td>
@@ -6087,7 +6087,7 @@ register(
   <p class="text-[12px]/4 text-zinc-500">Nothing was changed.</p>
   <button type="button" hx-get="{% url 'order-register-rows' %}"
           hx-target="#register-rows" hx-swap="outerHTML"
-          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
+          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
     <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry
   </button>
 </div>` }

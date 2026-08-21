@@ -18,7 +18,7 @@
 
      Below md this is the first thing to collapse, not the last: a dense bar is
      already at the target-size floor, so there is nothing left to give. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        menus: [
@@ -89,7 +89,7 @@
                 @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
                 @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
                 class="rounded px-2 py-1 text-[12px]/4 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+                :class="open === m.id && 'bg-zinc-200 text-zinc-900'" x-text="m.label"></button>
 
         <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
              @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -111,7 +111,7 @@
   </div>
 
   <table class="w-full text-[12px]/4">
-    <thead class="bg-zinc-100 text-left text-zinc-600">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-left text-zinc-600">
       <tr><th class="px-3 py-1.5 font-medium">Component</th><th class="px-3 py-1.5 text-right font-medium">Qty</th><th class="px-3 py-1.5 text-right font-medium">Cost</th></tr>
     </thead>
     <tbody class="divide-y divide-zinc-100">

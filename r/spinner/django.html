@@ -51,7 +51,7 @@
      there is nothing for a screen reader to report. -->
 
 {# orders/register.html #}
-<div id="register" class="relative overflow-hidden rounded-xl border border-zinc-200 bg-white"
+<div id="register" class="relative overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ busy: false }" :aria-busy="busy">
 
   <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3"
@@ -104,7 +104,7 @@
     </thead>
     <tbody>
       {% for o in orders %}
-        <tr class="border-b border-zinc-100 last:border-0">
+        <tr class="border-b border-zinc-200 last:border-0">
           <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
           <td class="px-4 py-2.5">{{ o.vendor.name }}</td>
           <td class="px-4 py-2.5 text-right tabular-nums">₹{{ o.amount|intcomma }}</td>
@@ -124,7 +124,7 @@
   <p class="text-[12px]/4 text-zinc-500">Nothing was changed.</p>
   <button type="button" hx-get="{% url 'order-register-rows' %}"
           hx-target="#register-rows" hx-swap="outerHTML"
-          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
+          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
     <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry
   </button>
 </div>

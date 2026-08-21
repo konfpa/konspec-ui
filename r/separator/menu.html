@@ -14,12 +14,12 @@
      it is a step lighter, the same as in any card. -->
 <div class="relative max-w-xs" x-data="{ open: false }" @click.outside="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="menu"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="ellipsis" class="size-4 text-zinc-600"></i>Actions
   </button>
 
   <div x-show="open" x-cloak role="menu" aria-label="Order actions"
-       class="absolute left-0 z-40 mt-1 w-52 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+       class="absolute left-0 z-40 mt-1 w-52 overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
     <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
       <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Amend
     </button>

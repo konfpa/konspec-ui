@@ -24,7 +24,7 @@
 
      The countdown is not a live region. Announcing a two-hour window every
      thirty seconds buries everything else on the screen. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{
        until: 0, left: '', late: false, checking: false,
        tick() {
@@ -63,7 +63,7 @@
         The upgrade is running past its window. Nothing is lost and nothing can be entered yet — IT is on it, and the console comes back on its own.
       </p>
 
-      <p class="mt-4 inline-block rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[12px]/4 tabular-nums text-zinc-600">
+      <p class="mt-4 inline-block rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[12px]/4 tabular-nums text-zinc-600">
         Window 01:00–<time x-ref="back" datetime="2026-08-23T03:00:00+05:30" class="font-medium text-zinc-900">03:00 IST</time>
         <span x-show="!late"> · about <span class="font-medium text-zinc-900" x-text="left"></span> from now</span>
         <span x-show="late" x-cloak> · running late</span>
@@ -81,7 +81,7 @@
           <span x-text="checking ? 'Checking' : 'Check again'">Check again</span>
         </button>
         <a href="tel:+912602640102"
-           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-300 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           Call the IT desk
         </a>
       </div>

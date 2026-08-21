@@ -250,7 +250,7 @@ register(
      add aria-label to the search box as well: it would replace the visible
      label with a string nobody can see, and a voice-control user saying the
      words on screen would be addressing a control that is not called that. -->
-<div class="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+<div class="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
   <h3 class="mr-auto text-[13px]/5 font-medium">Purchase orders</h3>
 
   <label for="lb-search" class="sr-only">Search purchase orders</label>
@@ -339,7 +339,7 @@ register(
      Below sm the whole thing stacks and the label goes back above its control.
      A 10rem gutter at 390px leaves the name wrapping to four lines beside a box
      barely wider than it, and the eye stops being able to pair them. -->
-<div class="max-w-2xl divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+<div class="max-w-2xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
   <div class="px-4 py-3">
     <h3 class="text-[13px]/5 font-medium">Order defaults — Gujarat Polymers Ltd</h3>
   </div>
@@ -397,7 +397,7 @@ register(
      caption and the column header. Form control names are 13px font-medium in
      the ordinary text colour — swap the two and an eight-field form reads as
      eight section headings with a box under each. -->
-<dl class="grid max-w-xl grid-cols-2 gap-x-4 gap-y-3 rounded-xl border border-zinc-200 bg-white p-4 sm:grid-cols-3">
+<dl class="grid max-w-xl grid-cols-2 gap-x-4 gap-y-3 rounded-xl border border-zinc-300 bg-white p-4 sm:grid-cols-3">
   <div>
     <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Order</dt>
     <dd class="mt-0.5 text-[13px]/5 tabular-nums">PO-24-1187</dd>
@@ -3373,7 +3373,7 @@ Test certificate follows by email.</textarea>
      on the height so twenty vendors do not push the register off the screen. The
      vendor name truncates and the count is shrink-0, so nothing reflows at
      390px and the digits still line up. -->
-<div class="max-w-xs rounded-xl border border-zinc-200 bg-white"
+<div class="max-w-xs rounded-xl border border-zinc-300 bg-white"
      x-data="{ sel: ['gujarat-polymers', 'sharma-extrusions'] }">
   <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
     <h3 class="text-[13px]/5 font-medium">Vendor</h3>
@@ -3440,7 +3440,7 @@ Test certificate follows by email.</textarea>
 
      Select-all means this page. The other 4,312 are a second, deliberate click,
      because a bulk approve that quietly took every match cannot be undone. -->
-<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white"
+<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{
        ids: ['PO-24-1187', 'PO-24-1191', 'PO-24-1194', 'PO-24-1203', 'PO-24-1206'],
        sel: ['PO-24-1191'],
@@ -3474,7 +3474,7 @@ Test certificate follows by email.</textarea>
     </span>
     <div class="flex flex-wrap items-center gap-2">
       <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
       <button type="button" class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Cancel orders</button>
     </div>
     <button type="button" x-show="every && scope === 'page'" x-cloak @click="scope = 'query'"
@@ -4071,7 +4071,7 @@ Test certificate follows by email.</textarea>
 
      No select-all and no bulk bar. The answer is a single record, so it is named
      in the footer instead — the filled dot alone is not readable at a glance. -->
-<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white"
+<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ po: 'PO-24-1191' }">
   <table class="w-full text-[13px]/5">
     <thead>
@@ -4432,7 +4432,7 @@ Test certificate follows by email.</textarea>
      One locked row keeps its place and its position. Dropping it would change
      the shape of a list people scan by position, and repainting it to the off
      fill would say the setting is off when it is on and out of their hands. -->
-<div class="max-w-xl rounded-xl border border-zinc-200 bg-white">
+<div class="max-w-xl rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[13px]/5 font-medium">Notifications — Gujarat Polymers Ltd</h3>
     <p class="mt-0.5 text-[12px]/4 text-zinc-500">Each switch applies as you set it. There is nothing to save.</p>
@@ -4504,7 +4504,7 @@ Test certificate follows by email.</textarea>
      list that changes length under the pointer is a list nobody can scan by
      position. peer-disabled:opacity-60 drains the whole switch in one go, which
      is why the drain sits on the track and not on the thumb inside it. -->
-<fieldset class="max-w-xl rounded-xl border border-zinc-200 bg-white" x-data="{ email: true }">
+<fieldset class="max-w-xl rounded-xl border border-zinc-300 bg-white" x-data="{ email: true }">
   <legend class="sr-only">Email notifications for Gujarat Polymers Ltd</legend>
 
   <div class="px-4 py-2.5">
@@ -4557,7 +4557,7 @@ Test certificate follows by email.</textarea>
      The small track is 16px tall, so the label carries py-1.5 to bring the
      target to 28px. aria-label is not needed here — the text beside it is the
      label, and it names the filter rather than its state. -->
-<div class="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
   <h3 class="text-[13px]/5 font-medium">Purchase orders</h3>
   <span class="text-[12px]/4 tabular-nums text-zinc-500">1,438 open · 84 overdue</span>
 
@@ -4572,7 +4572,7 @@ Test certificate follows by email.</textarea>
   </label>
 </div>
 
-<div id="po-rows" class="mt-3 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+<div id="po-rows" class="mt-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
   <p class="text-[13px]/5 tabular-nums text-zinc-600">PO-24-1187 · Gujarat Polymers Ltd · ₹18,42,000</p>
 </div>` },
 
@@ -4589,7 +4589,7 @@ Test certificate follows by email.</textarea>
 
      The handlers behind Saving and Not saved are in the htmx variant; here the
      rows are pinned so both states can be read side by side. -->
-<div class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+<div class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
   <div class="px-4 py-2.5">
     <label class="flex items-center justify-between gap-4 py-1">
       <span class="text-[14px]/5">On — the setting is in force</span>
@@ -4672,7 +4672,7 @@ Test certificate follows by email.</textarea>
      The status line is role="status" because the revert is script setting
      checked, and a programmatic change is announced by nothing. Without it the
      only sign the setting did not stick is a pixel moving back. -->
-<div class="max-w-xl rounded-xl border border-zinc-200 bg-white px-4 py-2.5"
+<div class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
      x-data="{ state: 'idle', want: true }"
      @htmx:before-request.camel="want = $refs.sw.checked; state = 'saving'"
      @htmx:after-request.camel="
@@ -4755,7 +4755,7 @@ Test certificate follows by email.</textarea>
 
      hx-headers sits on the card so every switch inside it sends the CSRF token;
      htmx will not find one without a form to read it from. -->
-<div class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white"
+<div class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white"
      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
   {% for setting in settings %}
     <div class="px-4 py-2.5"
@@ -6208,7 +6208,7 @@ Test certificate follows by email.</textarea>
     </div>
     <div role="progressbar" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"
          aria-label="Uploading signed-grn-1142.pdf"
-         class="mt-2 h-1 overflow-hidden rounded-full bg-zinc-100">
+         class="mt-2 h-1 overflow-hidden rounded-full bg-zinc-200">
       <div class="h-full rounded-full bg-zinc-700 transition-[width] duration-300" style="width: 43%"></div>
     </div>
   </li>
@@ -6256,7 +6256,7 @@ Test certificate follows by email.</textarea>
       { id: 'readonly', name: 'Read only', code:
 `<!-- No upload rights. Do not render a disabled drop zone — remove it, and let
      the list stand on its own. -->
-<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[13px]/5 font-medium">Attachments</h3>
     <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">3 files · 2.4 MB</span>
@@ -6435,7 +6435,7 @@ Test certificate follows by email.</textarea>
 
      Monday first: (getDay() + 6) % 7 moves Sunday from 0 to 6, which is where
      the weekend belongs in an office that works Saturdays. -->
-<div class="inline-block rounded-xl border border-zinc-200 bg-white p-3"
+<div class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
        focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        sel: null,
@@ -6670,7 +6670,7 @@ Test certificate follows by email.</textarea>
      stripe runs behind the row while the two ends stay round. Today keeps only
      a ring here, not a fill — a zinc-200 chip inside a zinc-200 band is
      invisible. -->
-<div class="inline-block rounded-xl border border-zinc-200 bg-white p-3"
+<div class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
        vy: new Date().getFullYear(),
        vm: new Date().getMonth(),
@@ -6788,7 +6788,7 @@ Test certificate follows by email.</textarea>
 
      The year list is built around the current year rather than hard-coded, so
      this markup does not quietly expire. -->
-<div class="inline-block rounded-xl border border-zinc-200 bg-white p-3"
+<div class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
        focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        sel: null,
@@ -6911,7 +6911,7 @@ Test certificate follows by email.</textarea>
 
      why() puts the reason into the accessible name, because a disabled button
      announces "unavailable" and never says why. -->
-<div class="inline-block rounded-xl border border-zinc-200 bg-white p-3"
+<div class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
        focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        sel: null,
@@ -7710,7 +7710,7 @@ Test certificate follows by email.</textarea>
      One red line, on the one row that causes something. A sheet where every
      failed row is tinted is a wall of colour with nothing standing out in
      it. -->
-<form class="max-w-2xl overflow-hidden rounded-xl border border-zinc-200 bg-white"
+<form class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
       x-data="{
         a: { marking: 'pass', seal: 'pass', cert: 'fail', moisture: '', sample: '' },
         get total() { return Object.keys(this.a).length },
@@ -7722,7 +7722,7 @@ Test certificate follows by email.</textarea>
     <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">HDPE granules, natural · lot 24-HD-118 · Gujarat Polymers Ltd · 16 Aug 2026</p>
 
     <div class="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2">
-      <div class="h-1 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+      <div class="h-1 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-label="Parameters answered on GRN-24-0912"
            :aria-valuenow="done" aria-valuemin="0" :aria-valuemax="total">
         <div class="h-full rounded-full bg-zinc-700 transition-[width] motion-reduce:transition-none"
@@ -7925,7 +7925,7 @@ Test certificate follows by email.</textarea>
      certified, by whom and when is the record; "attested = true" is not.
      Reopening is a named action that gets logged against the GRN, never an edit
      in place. -->
-<div class="max-w-2xl overflow-hidden rounded-xl border border-zinc-200 bg-white">
+<div class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-zinc-200 px-5 py-4">
     <div class="min-w-0">
       <h2 class="text-[16px]/6 font-semibold">Incoming inspection — GRN-24-0912</h2>

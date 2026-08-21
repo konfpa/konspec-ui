@@ -19,7 +19,7 @@
      The spec limits are printed under the table, which is what makes the
      tooltip on the failing result legal. It is a shortcut to something already
      on the page, not the only copy of it. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, timer: 0,
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
@@ -27,7 +27,7 @@
      }"
      @keydown.escape.window="hide()">
   <table class="w-full text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="rounded-tl-xl px-3 py-2 font-medium">Batch</th>
         <th scope="col" class="px-3 py-2 text-right font-medium">

@@ -18,7 +18,7 @@
      One red line, on the one row that causes something. A sheet where every
      failed row is tinted is a wall of colour with nothing standing out in
      it. -->
-<form class="max-w-2xl overflow-hidden rounded-xl border border-zinc-200 bg-white"
+<form class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
       x-data="{
         a: { marking: 'pass', seal: 'pass', cert: 'fail', moisture: '', sample: '' },
         get total() { return Object.keys(this.a).length },
@@ -30,7 +30,7 @@
     <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">HDPE granules, natural · lot 24-HD-118 · Gujarat Polymers Ltd · 16 Aug 2026</p>
 
     <div class="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2">
-      <div class="h-1 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+      <div class="h-1 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-label="Parameters answered on GRN-24-0912"
            :aria-valuenow="done" aria-valuemin="0" :aria-valuemax="total">
         <div class="h-full rounded-full bg-zinc-700 transition-[width] motion-reduce:transition-none"

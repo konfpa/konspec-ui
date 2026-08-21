@@ -17,7 +17,7 @@
      The rail is a single anchor wrapping four lines, so the whole block is the
      target. Splitting the amount out into a sibling would leave the largest
      thing on the card unclickable, which is exactly the part people aim at. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -49,7 +49,7 @@
               @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
               @keydown.arrow-down.prevent="jump('proc')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'proc' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'proc' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Procurement
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -72,7 +72,7 @@
     <div class="rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
       <div class="grid gap-3 sm:grid-cols-3">
         <a href="/procurement/orders/1187/"
-           class="block rounded-lg bg-zinc-100 p-3 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+           class="block rounded-lg bg-zinc-200 p-3 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Back to where you were</span>
           <span class="mt-2 block text-[14px]/5 font-semibold tabular-nums text-zinc-900">PO-24-1187</span>
           <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Gujarat Polymers Ltd</span>

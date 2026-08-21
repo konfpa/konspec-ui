@@ -17,7 +17,7 @@
      icon. The switcher marks the selected plant with a check rather than a tint,
      because a tinted row in a menu is the hover state and a permanently tinted
      one reads as permanently hovered. -->
-<div class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+<div class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ menu: '' }" @keydown.escape.window="menu = ''">
 
   <div class="shrink-0 border-b border-zinc-200 p-2">
@@ -55,7 +55,7 @@
   </div>
 
   <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
-    <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Overview</span>
     </a>
     <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">

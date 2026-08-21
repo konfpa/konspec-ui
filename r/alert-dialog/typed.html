@@ -3,12 +3,12 @@
      people learn to type without reading. -->
 <div x-data="{ open: false, typed: '', target: 'SHARMA-EXT' }">
   <button type="button" @click="open = true; typed = ''"
-          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete vendor</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete vendor</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="wipe-title" aria-describedby="wipe-body"
-         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <h2 id="wipe-title" class="text-[16px]/6 font-semibold">Delete Sharma Extrusions</h2>
       <p id="wipe-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
         <span class="font-medium text-red-600">34 orders, 61 invoices and the rate contract</span>

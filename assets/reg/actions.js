@@ -129,7 +129,7 @@ register(
      from sm they sit inline and right-aligned. flex-col-reverse is deliberate:
      the primary is last in the DOM so it is last in the Tab order, but first on
      screen once stacked, which is where a thumb lands. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <p class="text-[14px]/5">Approve PO-24-1187 for ₹4,82,000?</p>
   <p class="mt-1 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · 6 lines</p>
 
@@ -143,7 +143,7 @@ register(
 `<!-- Where the one-primary rule earns its keep. Four actions, one solid. The
      primary sits last, nearest the right edge and the thumb, and matches the
      order a dialog footer uses so the two never contradict each other. -->
-<div class="rounded-xl border border-zinc-200 bg-white px-5 py-4">
+<div class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
   <div class="flex flex-wrap items-start justify-between gap-3">
     <div>
       <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">PO-24-1187</h1>
@@ -174,7 +174,7 @@ register(
      type="submit" is explicit even though it is the default, because the
      surrounding toolbar buttons all carry type="button" and the difference is
      the whole point. -->
-<form method="post" class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+<form method="post" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   {% csrf_token %}
   <label for="id_remarks" class="mb-1.5 block text-[13px]/5 font-medium">Approval remarks</label>
   <textarea name="remarks" id="id_remarks" rows="3"
@@ -263,7 +263,7 @@ register(
      the tinted track above. One border around the outside, border-l between,
      and the radii on the end buttons rather than overflow-hidden on the
      container, so the focus ring is not clipped off either end. -->
-<div class="inline-flex rounded-lg border border-zinc-200 bg-white">
+<div class="inline-flex rounded-lg border border-zinc-300 bg-white">
   <button type="button" class="inline-flex h-8 items-center gap-2 rounded-l-lg px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Edit
   </button>
@@ -365,7 +365,7 @@ register(
      around the pair instead of two abutting ones. The input is transparent and
      borderless inside it, and focus-within moves the ring to the wrapper — put
      it on the input and the ring is drawn inside the border it shares. -->
-<div class="flex max-w-md items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+<div class="flex max-w-md items-stretch rounded-lg border border-zinc-300 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
   <label for="add-part" class="sr-only">Part number</label>
   <input id="add-part" type="text" placeholder="Part number"
          class="w-full min-w-0 rounded-l-lg bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
@@ -379,7 +379,7 @@ register(
      rotated: one border outside, border-t between, radii on the ends. Buttons
      are left-aligned rather than centred, so the labels form a reading column
      the way a menu does. -->
-<div role="group" aria-label="Record actions" class="inline-flex w-56 flex-col rounded-lg border border-zinc-200 bg-white">
+<div role="group" aria-label="Record actions" class="inline-flex w-56 flex-col rounded-lg border border-zinc-300 bg-white">
   <button type="button" class="flex h-9 items-center gap-2.5 rounded-t-lg px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="file-check-2" class="size-4 text-zinc-600"></i>Record GRN
   </button>
@@ -623,7 +623,7 @@ register(
          { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: '27,10,400' }
        ]
      }"
-     class="rounded-xl border border-zinc-200 bg-white">
+     class="rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-[13px]/5">
     <caption class="sr-only">Purchase orders awaiting approval</caption>
     <thead>

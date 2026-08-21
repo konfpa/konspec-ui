@@ -18,7 +18,7 @@
      answer is a page.
 
      The breakpoint is md, not sm: what overflows is the count, not the width. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', sheet: false, typed: '', clock: null,
        menus: [
@@ -106,7 +106,7 @@
                   @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
                   @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
                   class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                  :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+                  :class="open === m.id && 'bg-zinc-200 text-zinc-900'" x-text="m.label"></button>
 
           <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
                @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -131,7 +131,7 @@
               @click="sheet ? sClose(false) : sShow()"
               @keydown.arrow-down.prevent="sShow()" @keydown.arrow-up.prevent="sShow(true)"
               class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="sheet && 'bg-zinc-100 text-zinc-900'">
+              :class="sheet && 'bg-zinc-200 text-zinc-900'">
         <i data-lucide="menu" class="size-4"></i>Menu
       </button>
 

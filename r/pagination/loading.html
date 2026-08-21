@@ -33,7 +33,7 @@
      row action against them. Alpine treats inert as a boolean attribute, so a
      false value removes it rather than writing inert="false", which is a truthy
      string that would leave the table permanently unreachable. -->
-<div class="max-w-xl rounded-xl border border-zinc-200 bg-white"
+<div class="max-w-xl rounded-xl border border-zinc-300 bg-white"
      x-data="{
        page: 2, pages: 6, size: 3, total: 18, busy: false, t: null,
        get from() { return (this.page - 1) * this.size + 1 },

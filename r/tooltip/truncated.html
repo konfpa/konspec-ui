@@ -25,7 +25,7 @@
      it opens on — so the header cells are rounded instead. truncate on the
      cell itself would clip it too, which is why the ellipsis lives on an inner
      span and the positioned wrapper around it does no clipping of its own. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, timer: 0,
        show(id, el, d = 150) {
@@ -37,7 +37,7 @@
      }"
      @keydown.escape.window="hide()">
   <table class="w-full table-fixed text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="rounded-tl-xl px-4 py-2 font-medium sm:w-32">Order</th>
         <th scope="col" class="rounded-tr-xl px-4 py-2 font-medium">Line description</th>

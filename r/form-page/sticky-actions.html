@@ -33,7 +33,7 @@
 
      Below sm the three buttons go full width and stack, in DOM order. Two 36px
      buttons side by side at 390px is a thumb-sized problem. -->
-<div class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+<div class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        busy: false, t: null,
        save() {
@@ -73,7 +73,7 @@
              this element, so the button keeps focus through the whole save. -->
         <div class="space-y-4" :inert="busy">
 
-          <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+          <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
             <div class="border-b border-zinc-200 px-5 py-3.5">
               <h2 class="text-[16px]/6 font-semibold">Plan</h2>
             </div>
@@ -129,7 +129,7 @@
             </div>
           </div>
 
-          <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+          <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
             <div class="border-b border-zinc-200 px-5 py-3.5">
               <h2 class="text-[16px]/6 font-semibold">Shift and supervision</h2>
             </div>
@@ -181,7 +181,7 @@
             </div>
           </div>
 
-          <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white" x-data="{ depth: 0 }">
+          <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white" x-data="{ depth: 0 }">
             <div class="border-b border-zinc-200 px-5 py-3.5">
               <h2 class="text-[16px]/6 font-semibold">Attachments</h2>
             </div>

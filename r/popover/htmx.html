@@ -47,14 +47,14 @@
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-hx"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="git-compare" class="size-4 text-zinc-600"></i>Three-way match
     <span class="text-[12px]/4 tabular-nums text-zinc-500">GRN-24-4471</span>
   </button>
 
   <div id="pop-hx" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
        role="dialog" tabindex="-1" aria-labelledby="pop-hx-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <p id="pop-hx-title" class="text-[13px]/5 font-medium tabular-nums">Match · GRN-24-4471</p>
 

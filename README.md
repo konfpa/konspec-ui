@@ -1,10 +1,25 @@
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png">
+  <img src="assets/logo.png" alt="Konspec UI" width="88" height="88">
+</picture>
+
 # Konspec UI
 
-A component library for internal data applications, written for the agents that build them.
+**A component library for internal data applications — written for the agents that build them.**
+
+[![CI](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml)
+[![components](https://img.shields.io/badge/components-55-18181b?style=flat-square)](#components)
+[![variants](https://img.shields.io/badge/variants-417-18181b?style=flat-square)](#components)
+[![build step](https://img.shields.io/badge/build_step-none-18181b?style=flat-square)](#running-it-locally)
+[![licence](https://img.shields.io/badge/licence-MIT-18181b?style=flat-square)](LICENSE)
 
 **[konfpa.github.io/konspec-ui](https://konfpa.github.io/konspec-ui/)** · [llms.txt](https://konfpa.github.io/konspec-ui/llms.txt) · [r/index.json](https://konfpa.github.io/konspec-ui/r/index.json)
 
-Tailwind CSS v4, Alpine.js, htmx and Lucide. No build step, no npm install, no design tokens to import — the Tailwind class *is* the token. Every component is HTML you copy.
+Tailwind CSS v4, Alpine.js, htmx and Lucide. No build step, no npm install,<br>no design tokens to import — the Tailwind class *is* the token. Every component is HTML you copy.
+
+</div>
 
 ---
 
@@ -26,7 +41,7 @@ Arrived without reading llms.txt:         /r/index.json
 Never fetch /registry.json — the whole system in one file, ~725k tokens.
 ```
 
-`llms.txt` is 33 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
+`llms.txt` is 34 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 
@@ -169,6 +184,14 @@ Never hand-edit a generated file. The landing page and the component pages rende
 
 To add a component: append it to the right group in `assets/reg/`, run the build, then copy any existing page in `components/` and change three lines — the `<title>`, the meta description and `window.COMPONENT_ID`. The page needs nothing else.
 
+[CONTRIBUTING.md](CONTRIBUTING.md) has the long version — the source layout, what the build lints for, and what makes a variant worth adding.
+
+## Contributing
+
+A missing component is a decision for a person, not a gap for an agent to fill. If you needed something that is not here, [open a request](https://github.com/konfpa/konspec-ui/issues/new?template=missing-component.yml) — name it, say what it has to do, and it gets added properly once rather than approximated in five codebases.
+
+Bug reports, variant requests and pull requests are all welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Licence
 
-[MIT](LICENSE).
+[MIT](LICENSE) © Konspec Industries.

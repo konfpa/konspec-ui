@@ -16,7 +16,7 @@
       trigger's aria-controls points at the first panel and both rows open the
       same thing. #}
 
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ open: {% if section_open %}true{% else %}false{% endif %} }">
   <button type="button" @click="open = !open" :aria-expanded="open"
           aria-controls="col-lines-{{ order.pk }}"
@@ -44,7 +44,7 @@
 
 {# The panel a user may not read is not rendered, hidden or otherwise. #}
 {% if perms.purchasing.view_cost %}
-  <div class="mt-4 rounded-xl border border-zinc-200 bg-white" x-data="{ open: false }">
+  <div class="mt-4 rounded-xl border border-zinc-300 bg-white" x-data="{ open: false }">
     <button type="button" @click="open = !open" :aria-expanded="open"
             aria-controls="col-cost-{{ order.pk }}"
             class="flex h-12 w-full items-center gap-3 px-4 text-left">
@@ -71,7 +71,7 @@
    The hidden f=1 keeps the panel open through the submit; the count on the
    trigger is what the closed row says, and without it a filtered register reads
    as the whole register. #}
-<form method="get" class="mt-4 rounded-xl border border-zinc-200 bg-white"
+<form method="get" class="mt-4 rounded-xl border border-zinc-300 bg-white"
       x-data="{ open: {% if filters_open %}true{% else %}false{% endif %} }">
   <input type="hidden" name="f" value="1">
   <div class="flex h-12 items-center gap-3 px-4">

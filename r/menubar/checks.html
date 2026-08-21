@@ -18,7 +18,7 @@
 
      The visible group headings are aria-hidden — a bare <p> is not a permitted
      child of role="menu", and role="group" already carries the name. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        cols: { hsn: true, contract: false, tax: true },
@@ -76,7 +76,7 @@
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+              :class="open === 'file' && 'bg-zinc-200 text-zinc-900'">File</button>
 
       <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -104,7 +104,7 @@
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'view' && 'bg-zinc-100 text-zinc-900'">View</button>
+              :class="open === 'view' && 'bg-zinc-200 text-zinc-900'">View</button>
 
       <div x-show="open === 'view'" x-cloak data-panel="view" role="menu" aria-label="View"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -164,7 +164,7 @@
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'help' && 'bg-zinc-100 text-zinc-900'">Help</button>
+              :class="open === 'help' && 'bg-zinc-200 text-zinc-900'">Help</button>
 
       <div x-show="open === 'help'" x-cloak data-panel="help" role="menu" aria-label="Help"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"

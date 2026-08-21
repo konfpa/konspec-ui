@@ -150,7 +150,7 @@ register(
        @keydown.arrow-left.prevent="move(-1)"
        @keydown.home.prevent="pick(items[0].id)"
        @keydown.end.prevent="pick(items[items.length - 1].id)"
-       class="inline-flex rounded-lg bg-zinc-100 p-1">
+       class="inline-flex rounded-lg bg-zinc-200 p-1">
     <template x-for="t in items" :key="t.id">
       <button type="button" role="tab" :data-tab="t.id"
               :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
@@ -300,7 +300,7 @@ register(
               :tabindex="tab === t.id ? 0 : -1"
               @click="pick(t.id)"
               class="rounded-r-lg border-l-2 px-3 py-2 text-left text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="tab === t.id ? 'border-zinc-900 bg-zinc-100 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'"
+              :class="tab === t.id ? 'border-zinc-900 bg-zinc-100 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'"
               x-text="t.label"></button>
     </template>
   </div>
@@ -772,7 +772,7 @@ register(
 `<!-- Where a trail actually lives. It sits above the title, not beside it, and
      the title repeats the last crumb — that repetition is correct: the crumb is
      navigation and the h1 is the page. -->
-<div class="rounded-xl border border-zinc-200 bg-white px-5 py-4">
+<div class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
   <nav aria-label="Breadcrumb">
     <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
       <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
@@ -907,7 +907,7 @@ register(
      Hover switches menus but never opens one: the guard is open !== null.
      Escape only stops propagating when it actually closed something, so a
      second Escape reaches the dialog this editor may be sitting in. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
@@ -963,7 +963,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+              :class="open === 'file' && 'bg-zinc-200 text-zinc-900'">File</button>
 
       <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1006,7 +1006,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+              :class="open === 'edit' && 'bg-zinc-200 text-zinc-900'">Edit</button>
 
       <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1049,7 +1049,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'view' && 'bg-zinc-100 text-zinc-900'">View</button>
+              :class="open === 'view' && 'bg-zinc-200 text-zinc-900'">View</button>
 
       <div x-show="open === 'view'" x-cloak data-panel="view" role="menu" aria-label="View"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1081,7 +1081,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'help' && 'bg-zinc-100 text-zinc-900'">Help</button>
+              :class="open === 'help' && 'bg-zinc-200 text-zinc-900'">Help</button>
 
       <!-- Every panel is left-0, including this one, and the phone case is
            handled by the wrapper instead: relative max-md:static. Below md the
@@ -1137,7 +1137,7 @@ register(
      this way a group that empties out — every command in it hidden by a
      permission check — takes its own rule with it. role="group" is a permitted
      child of role="menu"; a bare div is not. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        menus: [
@@ -1213,7 +1213,7 @@ register(
                 @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
                 @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
                 class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+                :class="open === m.id && 'bg-zinc-200 text-zinc-900'" x-text="m.label"></button>
 
         <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
              @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1265,7 +1265,7 @@ register(
 
      The visible group headings are aria-hidden — a bare <p> is not a permitted
      child of role="menu", and role="group" already carries the name. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        cols: { hsn: true, contract: false, tax: true },
@@ -1323,7 +1323,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+              :class="open === 'file' && 'bg-zinc-200 text-zinc-900'">File</button>
 
       <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1351,7 +1351,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'view' && 'bg-zinc-100 text-zinc-900'">View</button>
+              :class="open === 'view' && 'bg-zinc-200 text-zinc-900'">View</button>
 
       <div x-show="open === 'view'" x-cloak data-panel="view" role="menu" aria-label="View"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1411,7 +1411,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'help' && 'bg-zinc-100 text-zinc-900'">Help</button>
+              :class="open === 'help' && 'bg-zinc-200 text-zinc-900'">Help</button>
 
       <div x-show="open === 'help'" x-cloak data-panel="help" role="menu" aria-label="Help"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1455,7 +1455,7 @@ register(
      every sibling row closes it on mouseenter. Below md it drops under its
      trigger instead of flying sideways: left-full at 390px puts a 256px panel
      off the right of the screen and the page scrolls to find it. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, sub: null, at: 'file', typed: '', clock: null,
        trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
@@ -1524,7 +1524,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+              :class="open === 'file' && 'bg-zinc-200 text-zinc-900'">File</button>
 
       <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1544,7 +1544,7 @@ register(
                   @click="openSub('recent')" @mouseenter="sub = 'recent'"
                   @keydown.arrow-right.prevent.stop="openSub('recent')"
                   class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"
-                  :class="sub === 'recent' && 'bg-zinc-100'">
+                  :class="sub === 'recent' && 'bg-zinc-200'">
             <i data-lucide="clock" class="size-4 text-zinc-600"></i>Open recent
             <span class="ml-auto flex text-zinc-600"><i data-lucide="chevron-right" class="size-3.5"></i></span>
           </button>
@@ -1590,7 +1590,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+              :class="open === 'edit' && 'bg-zinc-200 text-zinc-900'">Edit</button>
 
       <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1636,7 +1636,7 @@ register(
 
      Void order is last, below its own rule, in red-600, named by its verb
      rather than by its colour, and not adjacent to Print. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
@@ -1692,7 +1692,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+              :class="open === 'file' && 'bg-zinc-200 text-zinc-900'">File</button>
 
       <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1738,7 +1738,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+              :class="open === 'edit' && 'bg-zinc-200 text-zinc-900'">Edit</button>
 
       <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1773,7 +1773,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'help' && 'bg-zinc-100 text-zinc-900'">Help</button>
+              :class="open === 'help' && 'bg-zinc-200 text-zinc-900'">Help</button>
 
       <div x-show="open === 'help'" x-cloak data-panel="help" role="menu" aria-label="Help"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1815,7 +1815,7 @@ register(
 
      Below md this is the first thing to collapse, not the last: a dense bar is
      already at the target-size floor, so there is nothing left to give. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        menus: [
@@ -1886,7 +1886,7 @@ register(
                 @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
                 @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
                 class="rounded px-2 py-1 text-[12px]/4 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+                :class="open === m.id && 'bg-zinc-200 text-zinc-900'" x-text="m.label"></button>
 
         <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
              @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -1908,7 +1908,7 @@ register(
   </div>
 
   <table class="w-full text-[12px]/4">
-    <thead class="bg-zinc-100 text-left text-zinc-600">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-left text-zinc-600">
       <tr><th class="px-3 py-1.5 font-medium">Component</th><th class="px-3 py-1.5 text-right font-medium">Qty</th><th class="px-3 py-1.5 text-right font-medium">Cost</th></tr>
     </thead>
     <tbody class="divide-y divide-zinc-100">
@@ -1940,7 +1940,7 @@ register(
      answer is a page.
 
      The breakpoint is md, not sm: what overflows is the count, not the width. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', sheet: false, typed: '', clock: null,
        menus: [
@@ -2028,7 +2028,7 @@ register(
                   @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
                   @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
                   class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                  :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+                  :class="open === m.id && 'bg-zinc-200 text-zinc-900'" x-text="m.label"></button>
 
           <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
                @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -2053,7 +2053,7 @@ register(
               @click="sheet ? sClose(false) : sShow()"
               @keydown.arrow-down.prevent="sShow()" @keydown.arrow-up.prevent="sShow(true)"
               class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="sheet && 'bg-zinc-100 text-zinc-900'">
+              :class="sheet && 'bg-zinc-200 text-zinc-900'">
         <i data-lucide="menu" class="size-4"></i>Menu
       </button>
 
@@ -2104,7 +2104,7 @@ register(
      Submit button is the smallest honest version of "saved, and here is what to
      do next". Hiding the button instead would leave the primary action of the
      screen reachable only from the File menu. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
        menus: [
@@ -2177,7 +2177,7 @@ register(
                   @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
                   @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
                   class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                  :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+                  :class="open === m.id && 'bg-zinc-200 text-zinc-900'" x-text="m.label"></button>
 
           <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
                @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -2236,7 +2236,7 @@ register(
 
      The @click does not preventDefault — htmx listens for the same click — and
      hx-headers sits on the root, since there is no form to read a token from. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
      x-data="{
        open: null, at: 'file', typed: '', clock: null, busy: false, msg: '', ok: true,
@@ -2297,7 +2297,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+              :class="open === 'file' && 'bg-zinc-200 text-zinc-900'">File</button>
 
       <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -2325,7 +2325,7 @@ register(
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+              :class="open === 'edit' && 'bg-zinc-200 text-zinc-900'">Edit</button>
 
       <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -2431,13 +2431,13 @@ register(
      interactive text is zinc-900 plus an underline everywhere else in this
      system, and four underlined labels in a row read as a fence rather than a
      bar. The hover tint carries it. -->
-<nav aria-label="Main" class="rounded-xl border border-zinc-200 bg-white p-1">
+<nav aria-label="Main" class="rounded-xl border border-zinc-300 bg-white p-1">
   <ul class="flex flex-wrap items-center gap-1">
     <li>
       <a href="/dashboard/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
     </li>
     <li>
-      <a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a>
+      <a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a>
     </li>
     <li>
       <a href="/inventory/grn/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a>
@@ -2478,7 +2478,7 @@ register(
      fine is the touch guard. A tap fires a synthetic mouseenter and then a
      click, so without it the panel opens on the first and closes on the second
      and the section cannot be reached by tapping it. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -2515,7 +2515,7 @@ register(
               @click="open === 'vendors' ? shut($refs.vendors) : jump('vendors')"
               @keydown.arrow-down.prevent="jump('vendors')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'vendors' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'vendors' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Vendors
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'vendors' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -2572,7 +2572,7 @@ register(
      panel and wrong the moment two of them swap, because both are mounted for
      the length of the transition and you get a crossfade of two menus. The
      open delay is what makes it feel deliberate. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -2604,7 +2604,7 @@ register(
               @click="open === 'modules' ? shut($refs.modules) : jump('modules')"
               @keydown.arrow-down.prevent="jump('modules')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'modules' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'modules' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Modules
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'modules' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -2745,7 +2745,7 @@ register(
      The rail is a single anchor wrapping four lines, so the whole block is the
      target. Splitting the amount out into a sibling would leave the largest
      thing on the card unclickable, which is exactly the part people aim at. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -2777,7 +2777,7 @@ register(
               @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
               @keydown.arrow-down.prevent="jump('proc')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'proc' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'proc' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Procurement
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -2800,7 +2800,7 @@ register(
     <div class="rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
       <div class="grid gap-3 sm:grid-cols-3">
         <a href="/procurement/orders/1187/"
-           class="block rounded-lg bg-zinc-100 p-3 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+           class="block rounded-lg bg-zinc-200 p-3 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Back to where you were</span>
           <span class="mt-2 block text-[14px]/5 font-semibold tabular-nums text-zinc-900">PO-24-1187</span>
           <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Gujarat Polymers Ltd</span>
@@ -2879,7 +2879,7 @@ register(
      No Alpine binding goes on the <i data-lucide>. createIcons() replaces that
      element with an <svg> and takes the binding with it; the rotating chevron
      on the trigger is bound on the span around it for the same reason. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -2916,7 +2916,7 @@ register(
               @click="open === 'inv' ? shut($refs.inv) : jump('inv')"
               @keydown.arrow-down.prevent="jump('inv')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'inv' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'inv' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Inventory
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'inv' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -3016,7 +3016,7 @@ register(
      rather than of any code: open holds an id or null. A boolean per item
      needs a rule to keep them exclusive, and the rule is what eventually gets
      forgotten in one of the branches. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -3053,7 +3053,7 @@ register(
               @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
               @keydown.arrow-down.prevent="jump('proc')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'proc' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'proc' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Procurement
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -3080,7 +3080,7 @@ register(
               @click="open === 'inv' ? shut($refs.inv) : jump('inv')"
               @keydown.arrow-down.prevent="jump('inv')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'inv' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'inv' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Inventory
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'inv' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -3101,7 +3101,7 @@ register(
 
     <li>
       <a href="/reports/" aria-current="page" @mouseenter="if (open) shut()"
-         class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+         class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
     </li>
   </ul>
 </nav>` },
@@ -3130,7 +3130,7 @@ register(
      hidden or disabled. A menu that drops the page you are on changes length
      depending on where you stand, and a list people navigate by position
      cannot move under them. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -3166,7 +3166,7 @@ register(
               @mouseenter="hover('proc')"
               @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
               @keydown.arrow-down.prevent="jump('proc')"
-              class="flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="flex items-center gap-1.5 rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Procurement
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -3180,7 +3180,7 @@ register(
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
           <li>
             <a href="/procurement/orders/" aria-current="page"
-               class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a>
+               class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a>
           </li>
           <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
           <li><a href="/procurement/contracts/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rate contracts</a></li>
@@ -3230,7 +3230,7 @@ register(
      them, not one <i> with the name bound. createIcons() replaces the <i> with
      an <svg> and any binding on it goes with the element; a name that never
      changes survives being read once, and one that toggles does not. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ nav: false, open: { proc: true, inv: false, rep: false } }">
   <div class="flex h-12 items-center justify-between gap-3 px-3">
     <span class="text-[13px]/5 font-medium">Konspec Operations</span>
@@ -3258,7 +3258,7 @@ register(
         </button>
         <ul id="nmph-proc" x-show="open.proc" class="mt-0.5 ml-3 space-y-0.5 border-l border-zinc-200 pl-3">
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
-          <li><a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+          <li><a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
           <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
           <li><a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a></li>
         </ul>
@@ -3327,7 +3327,7 @@ register(
      There is no CSRF token on this and there should not be: opening a menu is
      a read, so it is a GET, and a navigation panel that needs a token is a
      navigation panel that is writing something. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -3367,7 +3367,7 @@ register(
               @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
               @keydown.arrow-down.prevent="jump('proc')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'proc' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'proc' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Procurement
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -3496,7 +3496,7 @@ register(
      The counts sit inside the anchor, which is why they need no aria work — the
      name is already "Purchase orders, 148". Lift one out into a span positioned
      beside the link and it becomes a number with nothing attached to it. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ scrolled: false, more: true }">
 
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-transparent px-4 transition-colors"
@@ -3520,7 +3520,7 @@ register(
         </a>
       </li>
       <li>
-        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
           <span class="min-w-0 flex-1 truncate">Purchase orders</span>
           <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">148</span>
@@ -3632,7 +3632,7 @@ register(
      needs a pointer to exist does not exist on a phone at all, and the opacity-0
      version is worse than useless: it stays in the Tab order, so a keyboard user
      lands on a button that paints nothing. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
     <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
@@ -3648,7 +3648,7 @@ register(
     </div>
     <ul role="list" aria-labelledby="sb2-g1" class="space-y-0.5">
       <li>
-        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="truck" class="size-[18px] shrink-0"></i>
           <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
           <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
@@ -3745,7 +3745,7 @@ register(
      inside takes py-1 rather than a margin — a margin on the first child
      collapses through the wrapper and the measured height comes up short by
      exactly that margin, clipping the last row until the next toggle. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ open: { orders: true, vendors: false, quality: false } }">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
@@ -3777,7 +3777,7 @@ register(
             </a>
           </li>
           <li>
-            <a href="#" aria-current="page" class="flex min-h-8 items-center gap-2 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <a href="#" aria-current="page" class="flex min-h-8 items-center gap-2 rounded-lg bg-zinc-200 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
               <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
               <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">12</span>
             </a>
@@ -3867,7 +3867,7 @@ register(
      This nav deliberately does not scroll: overflow-y:auto forces overflow-x to
      auto, so a scrolling rail clips its own tooltips at the right edge. More
      destinations than fit needs the flyout variant. -->
-<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
     <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
   </div>
@@ -3883,7 +3883,7 @@ register(
 
     <div class="group relative flex justify-center">
       <a href="#" aria-current="page" aria-label="Purchase orders, 148 open"
-         class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-100 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-200 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="file-text" class="size-[18px]"></i>
         <span aria-hidden="true" class="absolute -top-1 -right-1 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
       </a>
@@ -3976,7 +3976,7 @@ register(
      account menu at the foot of the rail is permanently in that case. And the
      nav does not scroll, because overflow-y:auto would force overflow-x with it
      and clip every panel at the rail edge. -->
-<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
     <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
   </div>
@@ -3997,7 +3997,7 @@ register(
           @focusout="if (!$el.contains($event.relatedTarget)) open = false"
           @keydown.escape="if (open) { open = false; $refs.trig.focus() }">
         <a href="#" x-ref="trig" aria-current="page" aria-label="Purchase orders, 1,438 — section open"
-           class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-100 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+           class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-200 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="file-text" class="size-[18px]"></i>
           <span aria-hidden="true" class="absolute -top-1 -right-1 rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">12</span>
         </a>
@@ -4010,7 +4010,7 @@ register(
             <div class="my-1 border-t border-zinc-100"></div>
             <ul role="list">
               <li><a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><span class="min-w-0 flex-1 truncate">All orders</span><span class="shrink-0 text-[11px]/4 tabular-nums">1,438</span></a></li>
-              <li><a href="#" class="flex items-center gap-2 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15" aria-current="page"><span class="min-w-0 flex-1 truncate">Awaiting GRN</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">12</span></a></li>
+              <li><a href="#" class="flex items-center gap-2 rounded-lg bg-zinc-200 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15" aria-current="page"><span class="min-w-0 flex-1 truncate">Awaiting GRN</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">12</span></a></li>
               <li><a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><span class="min-w-0 flex-1 truncate">Overdue over 7 days</span><span class="shrink-0 text-[11px]/4 tabular-nums">18</span></a></li>
               <li><a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><span class="min-w-0 flex-1 truncate">Closed</span></a></li>
             </ul>
@@ -4101,7 +4101,7 @@ register(
      app-shell it is lg:hidden, because below lg there is no rail state at all.
      The control keeps its icon in a fixed 68px box so its centre does not move
      between the two widths — centre it in the strip and the second click misses. -->
-<div class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+<div class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ expanded: true, ready: false }"
      x-init="expanded = localStorage.getItem('kon-sidebar') !== '0';
              $nextTick(() => ready = true);
@@ -4117,7 +4117,7 @@ register(
   <nav id="sb6-nav" aria-label="Main" class="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain py-2" :class="expanded ? 'px-3' : 'px-3.5'">
     <div class="group relative">
       <a href="#" aria-current="page" aria-label="Purchase orders, 148 open"
-         class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
          :class="expanded ? 'px-2.5' : 'justify-center px-0'">
         <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
         <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Purchase orders</span>
@@ -4205,7 +4205,7 @@ register(
      The overlay is absolute inside this preview box. In app-shell it is fixed
      inset-0 — the shell is the thing that owns the viewport, and a fixed overlay
      rendered here would escape the docs frame and cover the page around it. -->
-<div class="relative h-[560px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div class="relative h-[560px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{ nav: false }" @htmx:after-swap.camel.window="nav = false">
 
   <header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3">
@@ -4218,11 +4218,11 @@ register(
   </header>
 
   <div class="space-y-3 p-4">
-    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <div class="rounded-xl border border-zinc-300 bg-white p-4">
       <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
       <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · promised 22 Aug 2026</p>
     </div>
-    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <div class="rounded-xl border border-zinc-300 bg-white p-4">
       <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1191 · Sharma Extrusions</p>
       <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹4,26,500 · promised 28 Aug 2026</p>
     </div>
@@ -4257,7 +4257,7 @@ register(
             </a>
           </li>
           <li>
-            <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[14px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[14px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
               <i data-lucide="file-text" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Purchase orders</span>
               <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">148</span>
             </a>
@@ -4330,7 +4330,7 @@ register(
      icon. The switcher marks the selected plant with a check rather than a tint,
      because a tinted row in a menu is the hover state and a permanently tinted
      one reads as permanently hovered. -->
-<div class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+<div class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ menu: '' }" @keydown.escape.window="menu = ''">
 
   <div class="shrink-0 border-b border-zinc-200 p-2">
@@ -4368,7 +4368,7 @@ register(
   </div>
 
   <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
-    <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Overview</span>
     </a>
     <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -4437,7 +4437,7 @@ register(
      blocks are decorative and the links appear with nothing announcing them.
      Nothing in here is focusable, so a Tab during the wait skips straight past
      to the footer rather than landing on a grey rectangle. -->
-<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
     <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
@@ -4606,7 +4606,7 @@ register(
   </header>
 
   <main id="main" tabindex="-1" class="p-4">
-    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <div class="rounded-xl border border-zinc-300 bg-white p-4">
       <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
       <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · promised 22 Aug 2026</p>
     </div>
@@ -4717,7 +4717,7 @@ register(
     <button type="button" @click="open = open === 'bell' ? '' : 'bell'"
             :aria-expanded="open === 'bell'" aria-controls="tb-alerts" aria-label="Notifications, 3 unread"
             class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-            :class="open === 'bell' && 'bg-zinc-100 text-zinc-900'">
+            :class="open === 'bell' && 'bg-zinc-200 text-zinc-900'">
       <i data-lucide="bell" class="size-[18px]"></i>
       <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
     </button>
@@ -4822,7 +4822,7 @@ register(
      Inside app-shell this header does not scroll, so it needs no sticky and no
      z-index. The overlay is absolute here because the preview box owns the
      frame; in the real shell it is fixed inset-0. -->
-<div class="relative flex h-[420px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div class="relative flex h-[420px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{ nav: false }" @keydown.escape.window="nav = false">
 
   <aside class="hidden w-64 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
@@ -4832,7 +4832,7 @@ register(
     </div>
     <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
       <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>Overview</a>
-      <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
+      <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
       <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="truck" class="size-[18px] shrink-0"></i>Goods receipt</a>
     </nav>
     <div class="shrink-0 border-t border-zinc-200 px-3 py-2 text-[11px]/4 text-zinc-500">The collapse control lives here, lg and up.</div>
@@ -4856,11 +4856,11 @@ register(
     </header>
 
     <main class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-      <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="rounded-xl border border-zinc-300 bg-white p-4">
         <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
         <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · promised 22 Aug 2026</p>
       </div>
-      <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="rounded-xl border border-zinc-300 bg-white p-4">
         <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1191 · Sharma Extrusions</p>
         <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹4,26,500 · promised 28 Aug 2026</p>
       </div>
@@ -4882,7 +4882,7 @@ register(
       </div>
       <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
         <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>Overview</a>
-        <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
+        <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
         <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="truck" class="size-[18px] shrink-0"></i>Goods receipt</a>
       </nav>
     </div>
@@ -4929,7 +4929,7 @@ register(
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()" @keydown.arrow-down.prevent="show()"
             :aria-expanded="open" aria-haspopup="menu" aria-controls="tb-ctx"
             class="flex max-w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-            :class="open && 'bg-zinc-100'">
+            :class="open && 'bg-zinc-200'">
       <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
       <span class="min-w-0">
         <span class="block truncate text-[13px]/5 font-medium">Konspec Polymers Pvt Ltd</span>
@@ -5065,7 +5065,7 @@ register(
      #line-14 out of an error summary lands on a row underneath this header and
      the link reads as broken. One rule on [id] rather than scroll-mt-22 on the
      elements that happen to be targets today. -->
-<div class="h-[420px] overflow-y-auto overscroll-contain rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div class="h-[420px] overflow-y-auto overscroll-contain rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0">
 
   <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-transparent bg-white px-3 backdrop-blur transition-colors supports-[backdrop-filter]:bg-white/80 sm:px-4"
@@ -5081,27 +5081,27 @@ register(
   </header>
 
   <div class="space-y-2 p-4">
-    <div id="line-11" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+    <div id="line-11" class="rounded-xl border border-zinc-300 bg-white px-4 py-3">
       <p class="text-[13px]/5 font-medium tabular-nums">B-26-0411 · LDPE 24FS040</p>
       <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">1,250.000 kg · received 04/08/2026</p>
     </div>
-    <div id="line-12" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+    <div id="line-12" class="rounded-xl border border-zinc-300 bg-white px-4 py-3">
       <p class="text-[13px]/5 font-medium tabular-nums">B-26-0412 · LDPE 24FS040</p>
       <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">980.500 kg · received 06/08/2026</p>
     </div>
-    <div id="line-13" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+    <div id="line-13" class="rounded-xl border border-zinc-300 bg-white px-4 py-3">
       <p class="text-[13px]/5 font-medium tabular-nums">B-26-0413 · HDPE 26HD110</p>
       <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">2,400.000 kg · received 09/08/2026</p>
     </div>
-    <div id="line-14" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+    <div id="line-14" class="rounded-xl border border-zinc-300 bg-white px-4 py-3">
       <p class="text-[13px]/5 font-medium tabular-nums">B-26-0414 · HDPE 26HD110</p>
       <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">1,875.250 kg · received 11/08/2026</p>
     </div>
-    <div id="line-15" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+    <div id="line-15" class="rounded-xl border border-zinc-300 bg-white px-4 py-3">
       <p class="text-[13px]/5 font-medium tabular-nums">B-26-0415 · PP 26PP220</p>
       <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">640.000 kg · received 12/08/2026</p>
     </div>
-    <div id="line-16" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+    <div id="line-16" class="rounded-xl border border-zinc-300 bg-white px-4 py-3">
       <p class="text-[13px]/5 font-medium tabular-nums">B-26-0416 · PP 26PP220</p>
       <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">1,120.750 kg · received 14/08/2026</p>
     </div>
@@ -5129,7 +5129,7 @@ register(
      crumbs at 390px either wrap onto a second line or push the page sideways,
      and both are worse than showing two. The last crumb is the one that is
      never truncated — it is the one that says where you are. -->
-<div class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
   <header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-2">
     <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="tb-ph-nav"
             class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -5167,11 +5167,11 @@ register(
   </div>
 
   <div class="space-y-2 p-3">
-    <div class="rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+    <div class="rounded-xl border border-zinc-300 bg-white px-3 py-2.5">
       <p class="text-[13px]/5 font-medium tabular-nums">GRN-8842 · Gujarat Polymers Ltd</p>
       <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">4 lines · posted 11/08/2026</p>
     </div>
-    <div class="rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+    <div class="rounded-xl border border-zinc-300 bg-white px-3 py-2.5">
       <p class="text-[13px]/5 font-medium tabular-nums">GRN-8843 · Sharma Extrusions</p>
       <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">2 lines · awaiting QC</p>
     </div>
@@ -5329,7 +5329,7 @@ register(
     related: ['collapsible', 'tabs', 'card'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div class="rounded-xl border border-zinc-200 bg-white" x-data="{ open: true }">
+`<div class="rounded-xl border border-zinc-300 bg-white" x-data="{ open: true }">
   <h3>
     <button @click="open = !open" :aria-expanded="open" aria-controls="acc-delivery"
             class="flex h-12 w-full items-center gap-3 px-4 text-left">
@@ -5350,7 +5350,7 @@ register(
 </div>` },
 
       { id: 'single', name: 'Single-open', code:
-`<div class="divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white" x-data="{ open: 'terms' }">
+`<div class="divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white" x-data="{ open: 'terms' }">
   <div>
     <h3>
       <button @click="open = open === 'terms' ? '' : 'terms'" :aria-expanded="open === 'terms'" aria-controls="acc-terms"
@@ -5508,7 +5508,7 @@ register(
      The animated div carries no padding and no border — border-box means
      height:0 cannot go below them, so the close would bottom out at the padding
      and then vanish in one frame. The dl inside takes both. -->
-<div class="max-w-xl rounded-xl border border-zinc-200 bg-white p-4" x-data="{ open: false }">
+<div class="max-w-xl rounded-xl border border-zinc-300 bg-white p-4" x-data="{ open: false }">
   <div class="flex items-baseline justify-between gap-3">
     <p class="min-w-0 truncate text-[14px]/5 font-medium tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</p>
     <p class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</p>
@@ -5625,7 +5625,7 @@ register(
 
      The result count sits beside the trigger for the same reason: 218 of 1,438
      is the sentence that stops the phone call. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: false,
        active: [
@@ -5734,7 +5734,7 @@ register(
      flex on the summary already does it in Chrome, and Safari needs the
      pseudo. group-open on the wrapping span is what rotates the chevron —
      still a span, never the <i>, because Lucide replaces that element. -->
-<details class="group max-w-xl rounded-xl border border-zinc-200 bg-white">
+<details class="group max-w-xl rounded-xl border border-zinc-300 bg-white">
   <summary class="flex h-12 list-none items-center gap-3 px-4 [&::-webkit-details-marker]:hidden">
     <i data-lucide="history" class="size-4 shrink-0 text-zinc-600"></i>
     <span class="flex-1 text-[14px]/5 font-medium">Audit trail</span>
@@ -5783,7 +5783,7 @@ register(
      The trigger is icon-only, so its name says what it opens rather than what
      it does — aria-expanded already announces expanded or collapsed, and a
      button called "Expand" in a page with four of them names nothing. -->
-<div class="max-w-xl rounded-xl border border-zinc-200 bg-white" x-data="{ open: true }">
+<div class="max-w-xl rounded-xl border border-zinc-300 bg-white" x-data="{ open: true }">
   <div class="flex min-h-14 items-center gap-3 px-4 py-3">
     <div class="min-w-0 flex-1">
       <h3 class="truncate text-[16px]/6 font-semibold">GST breakup</h3>
@@ -5965,7 +5965,7 @@ register(
       trigger's aria-controls points at the first panel and both rows open the
       same thing. #}
 
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ open: {% if section_open %}true{% else %}false{% endif %} }">
   <button type="button" @click="open = !open" :aria-expanded="open"
           aria-controls="col-lines-{{ order.pk }}"
@@ -5993,7 +5993,7 @@ register(
 
 {# The panel a user may not read is not rendered, hidden or otherwise. #}
 {% if perms.purchasing.view_cost %}
-  <div class="mt-4 rounded-xl border border-zinc-200 bg-white" x-data="{ open: false }">
+  <div class="mt-4 rounded-xl border border-zinc-300 bg-white" x-data="{ open: false }">
     <button type="button" @click="open = !open" :aria-expanded="open"
             aria-controls="col-cost-{{ order.pk }}"
             class="flex h-12 w-full items-center gap-3 px-4 text-left">
@@ -6020,7 +6020,7 @@ register(
    The hidden f=1 keeps the panel open through the submit; the count on the
    trigger is what the closed row says, and without it a filtered register reads
    as the whole register. #}
-<form method="get" class="mt-4 rounded-xl border border-zinc-200 bg-white"
+<form method="get" class="mt-4 rounded-xl border border-zinc-300 bg-white"
       x-data="{ open: {% if filters_open %}true{% else %}false{% endif %} }">
   <input type="hidden" name="f" value="1">
   <div class="flex h-12 items-center gap-3 px-4">

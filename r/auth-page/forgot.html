@@ -12,7 +12,7 @@
      about the domain, not about the address. Somebody who signs in through SSO
      has no password to reset, and without this line they type their address,
      get the confirmation screen, and wait for an email that will never come. -->
-<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ busy: false }">
   <main class="w-full max-w-sm">
 
@@ -22,7 +22,7 @@
     </div>
 
     <form method="post" action="/accounts/password_reset/" @submit="busy = true"
-          class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6">
+          class="mt-6 rounded-xl border border-zinc-300 bg-white px-6 py-6">
       <h1 class="text-[20px]/7 font-semibold tracking-tight">Reset your password</h1>
       <p class="mt-1 text-[13px]/5 text-zinc-600">Enter your work email and we will send a link to set a new one.</p>
 

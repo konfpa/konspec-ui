@@ -18,7 +18,7 @@
      account menu at the foot of the rail is permanently in that case. And the
      nav does not scroll, because overflow-y:auto would force overflow-x with it
      and clip every panel at the rail edge. -->
-<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
     <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
   </div>
@@ -39,7 +39,7 @@
           @focusout="if (!$el.contains($event.relatedTarget)) open = false"
           @keydown.escape="if (open) { open = false; $refs.trig.focus() }">
         <a href="#" x-ref="trig" aria-current="page" aria-label="Purchase orders, 1,438 — section open"
-           class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-100 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+           class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-200 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="file-text" class="size-[18px]"></i>
           <span aria-hidden="true" class="absolute -top-1 -right-1 rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">12</span>
         </a>
@@ -52,7 +52,7 @@
             <div class="my-1 border-t border-zinc-100"></div>
             <ul role="list">
               <li><a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><span class="min-w-0 flex-1 truncate">All orders</span><span class="shrink-0 text-[11px]/4 tabular-nums">1,438</span></a></li>
-              <li><a href="#" class="flex items-center gap-2 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15" aria-current="page"><span class="min-w-0 flex-1 truncate">Awaiting GRN</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">12</span></a></li>
+              <li><a href="#" class="flex items-center gap-2 rounded-lg bg-zinc-200 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15" aria-current="page"><span class="min-w-0 flex-1 truncate">Awaiting GRN</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">12</span></a></li>
               <li><a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><span class="min-w-0 flex-1 truncate">Overdue over 7 days</span><span class="shrink-0 text-[11px]/4 tabular-nums">18</span></a></li>
               <li><a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><span class="min-w-0 flex-1 truncate">Closed</span></a></li>
             </ul>

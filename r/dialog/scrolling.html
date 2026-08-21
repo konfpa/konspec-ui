@@ -2,12 +2,12 @@
      overflow-y on the body, and min-h-0 so the flex child is allowed to shrink. -->
 <div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Review 6 lines</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Review 6 lines</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="dialog" aria-modal="true" aria-labelledby="lines-title"
-         class="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+         class="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
       <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <div class="min-w-0">
           <h2 id="lines-title" class="text-[16px]/6 font-semibold">Order lines</h2>

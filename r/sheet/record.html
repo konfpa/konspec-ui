@@ -1,6 +1,6 @@
 <div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Open PO-24-1187</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Open PO-24-1187</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex justify-end bg-zinc-900/40">
@@ -53,7 +53,7 @@
             <p class="text-[13px]/5 font-medium">Received against GRN</p>
             <p class="text-[13px]/5 font-medium tabular-nums">7,800 / 12,000 kg</p>
           </div>
-          <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+          <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
             <div class="h-full rounded-full bg-zinc-700" style="width: 65%"></div>
           </div>
           <p class="mt-2 text-[12px]/4 text-zinc-500">Last receipt GRN 1142 on 16 Aug 2024.</p>
@@ -62,7 +62,7 @@
 
       <div class="flex flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Print order</button>
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Print order</button>
         <button type="button" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Record GRN</button>
       </div>
     </div>

@@ -29,7 +29,7 @@
 
      The totals are <output>, not disabled inputs: nobody was ever going to edit
      them. aria-live="off" because they recompute on every keystroke. -->
-<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{
        seq: 3,
        lines: [
@@ -84,7 +84,7 @@
       <input type="hidden" name="lines-MIN_NUM_FORMS" value="1">
       <input type="hidden" name="lines-MAX_NUM_FORMS" value="50">
 
-      <div class="rounded-xl border border-zinc-200 bg-white">
+      <div class="rounded-xl border border-zinc-300 bg-white">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
           <h2 class="text-[16px]/6 font-semibold">Order lines</h2>
           <p class="text-[12px]/4 tabular-nums text-zinc-600" x-text="lines.length + (lines.length === 1 ? ' line' : ' lines')">3 lines</p>
@@ -191,7 +191,7 @@
         </div>
       </div>
 
-      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="border-b border-zinc-200 px-5 py-3.5">
           <h2 class="text-[16px]/6 font-semibold">Delivery</h2>
         </div>
@@ -218,7 +218,7 @@
         </div>
       </div>
 
-      <div class="sticky bottom-0 flex flex-wrap items-center justify-end gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <div class="sticky bottom-0 flex flex-wrap items-center justify-end gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3">
         <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Cancel</button>
         <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Save draft</button>
         <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Send for approval</button>

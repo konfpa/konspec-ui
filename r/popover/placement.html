@@ -58,7 +58,7 @@
 
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
             :aria-expanded="open" aria-controls="pop-plc-a"
-            class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="align-left" class="size-4 text-zinc-600"></i>Aligned to the start
     </button>
 
@@ -66,7 +66,7 @@
          :class="up ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
          :style="'transform: translateX(' + dx + 'px)'"
          role="dialog" tabindex="-1" aria-labelledby="pop-plc-a-title"
-         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p id="pop-plc-a-title" class="text-[13px]/5 font-medium">Start aligned</p>
       <p class="mt-1 text-[12px]/4 text-zinc-600">The panel starts at the trigger's left edge, and shifts right only if that would put it off the left of the screen.</p>
       <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Flips above the trigger near the foot of the page.</p>
@@ -99,7 +99,7 @@
 
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
             :aria-expanded="open" aria-controls="pop-plc-b"
-            class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="align-right" class="size-4 text-zinc-600"></i>Aligned to the end
     </button>
 
@@ -107,7 +107,7 @@
          :class="up ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
          :style="'transform: translateX(' + dx + 'px)'"
          role="dialog" tabindex="-1" aria-labelledby="pop-plc-b-title"
-         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p id="pop-plc-b-title" class="text-[13px]/5 font-medium">End aligned</p>
       <p class="mt-1 text-[12px]/4 text-zinc-600">The panel ends at the trigger's right edge. left-0 plus a translate rather than right-0, so one clamp covers both alignments.</p>
       <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">At 390px both panels land 12px from the edge and nothing scrolls sideways.</p>

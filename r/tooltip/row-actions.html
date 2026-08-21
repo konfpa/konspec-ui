@@ -24,7 +24,7 @@
      that scrolls sideways — the dropdown behind that button carries the same
      four actions with their names written out, which is also the touch route
      to everything these tooltips say. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, warm: false, timer: 0, cool: 0,
        show(id, now = false) {
@@ -45,7 +45,7 @@
      }"
      @keydown.escape.window="hide()">
   <table class="w-full text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="rounded-tl-xl px-4 py-2 font-medium">Receipt</th>
         <th scope="col" class="hidden px-4 py-2 font-medium md:table-cell">Vendor</th>

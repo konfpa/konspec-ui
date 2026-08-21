@@ -37,7 +37,7 @@ register(
     related: ['toast', 'alert-dialog', 'badge'],
     variants: [
       { id: 'tags', name: 'Four severities', code:
-`<div class="flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
+`<div class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
   <div class="min-w-0">
     <p class="text-[13px]/5 font-medium">Rate contract with Sharma Extrusions expires on 30 Sep 2024.</p>
@@ -45,7 +45,7 @@ register(
   </div>
 </div>
 
-<div class="mt-2 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
+<div class="mt-2 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
   <div class="min-w-0">
     <p class="text-[13px]/5 font-medium">PO-24-1187 emailed to Sharma Extrusions.</p>
@@ -53,7 +53,7 @@ register(
   </div>
 </div>
 
-<div class="mt-2 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
+<div class="mt-2 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
   <div class="min-w-0">
     <p class="text-[13px]/5 font-medium">GRN pending for 3 orders older than 30 days.</p>
@@ -61,7 +61,7 @@ register(
   </div>
 </div>
 
-<div class="mt-2 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3" role="alert">
+<div class="mt-2 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3" role="alert">
   <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
   <div class="min-w-0">
     <p class="text-[13px]/5 font-medium">Order value <span class="tabular-nums">₹18,42,000</span> exceeds your approval limit.</p>
@@ -72,7 +72,7 @@ register(
       { id: 'compact', name: 'Compact', code:
 `<!-- One line, 32px tall. For a table toolbar or a card header, where a
      three-line alert would push the data below the fold. -->
-<div class="flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+<div class="flex items-center gap-2.5 rounded-lg border border-zinc-300 bg-white px-3 py-2">
   <i data-lucide="alert-triangle" class="size-3.5 shrink-0 text-amber-700"></i>
   <p class="min-w-0 flex-1 truncate text-[12px]/4">Showing the first 200 of <span class="tabular-nums">1,438</span> matching rows.</p>
   <a href="#" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Narrow the filters</a>
@@ -80,7 +80,7 @@ register(
 
       { id: 'dismissible', name: 'Dismissible', code:
 `<div x-data="{ show: true }" x-show="show" x-cloak
-     class="flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
+     class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
   <div class="min-w-0 flex-1">
     <p class="text-[13px]/5 font-medium">Vendor bank details changed on 12 Aug 2024.</p>
@@ -93,7 +93,7 @@ register(
 </div>` },
 
       { id: 'action', name: 'With action', code:
-`<div class="flex flex-wrap items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
+`<div class="flex flex-wrap items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
   <div class="min-w-[16rem] flex-1">
     <p class="text-[13px]/5 font-medium">PO-24-1163 has been waiting for approval for 9 days.</p>
@@ -108,7 +108,7 @@ register(
       { id: 'records', name: 'With affected records', code:
 `<!-- When the message is about a set of rows, name them. "4 invoices failed"
      with no list means someone has to go hunting for which four. -->
-<div class="rounded-lg border border-zinc-200 bg-white px-4 py-3" role="alert">
+<div class="rounded-lg border border-zinc-300 bg-white px-4 py-3" role="alert">
   <div class="flex items-start gap-3">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
     <div class="min-w-0">
@@ -135,7 +135,7 @@ register(
       { id: 'progress', name: 'In progress', code:
 `<!-- A job the user started that outlives the request. Poll the bar with htmx:
      hx-get="/imports/8841/progress/" hx-trigger="every 2s" hx-swap="outerHTML". -->
-<div class="rounded-lg border border-zinc-200 bg-white px-4 py-3">
+<div class="rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <div class="flex items-start gap-3">
     <i data-lucide="loader-2" class="mt-0.5 size-4 shrink-0 animate-spin text-zinc-500"></i>
     <div class="min-w-0 flex-1">
@@ -144,7 +144,7 @@ register(
     </div>
     <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">40%</span>
   </div>
-  <div class="mt-3 h-1 overflow-hidden rounded-full bg-zinc-100">
+  <div class="mt-3 h-1 overflow-hidden rounded-full bg-zinc-200">
     <div class="h-full rounded-full bg-zinc-700 transition-[width] duration-500" style="width: 40%"></div>
   </div>
 </div>` },
@@ -171,7 +171,7 @@ register(
      It summarises; it does not replace the message under each input.
      x-init focuses it so the keyboard is already at the problem. -->
 <div role="alert" tabindex="-1" x-data x-init="$el.focus()"
-     class="rounded-lg border border-zinc-200 bg-white px-4 py-3 outline-none">
+     class="rounded-lg border border-zinc-300 bg-white px-4 py-3 outline-none">
   <div class="flex items-start gap-3">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
     <div class="min-w-0">
@@ -200,7 +200,7 @@ register(
      anything else falls through to the neutral info icon. Give error and
      warning role="alert"; success and info do not need it. -->
 <div x-data="{ show: true }" x-show="show" x-cloak
-     class="flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
+     class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
   <p class="min-w-0 flex-1 text-[13px]/5 font-medium">GRN 1142 posted against PO-24-1187.</p>
   <button type="button" @click="show = false" aria-label="Dismiss"
@@ -315,7 +315,7 @@ register(
   <div role="status" aria-live="polite"
        class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
     <template x-for="t in toasts" :key="t.id">
-      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
            @mouseenter="pause(t)" @mouseleave="start(t)"
            @focusin="pause(t)" @focusout="start(t)"
            x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
@@ -378,20 +378,20 @@ register(
 
   <div class="flex flex-wrap gap-2">
     <button type="button" x-ref="fire" @click="push({ tone: 'info', text: 'Rate card refreshed', meta: 'August 2024 · 3,100 rows' })"
-            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Info</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Info</button>
     <button type="button" @click="push({ tone: 'success', text: 'PO-24-1187 emailed to Sharma Extrusions', meta: 'Sent 11:42' })"
-            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Success</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Success</button>
     <button type="button" @click="push({ tone: 'warning', text: 'Saved, but 2 lines are over the rate contract', meta: 'MS plate 10 mm · MS angle 50×50' })"
-            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Warning</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Warning</button>
     <button type="button" @click="push({ tone: 'danger', text: 'PO-24-1187 could not be emailed', meta: 'The vendor has no contact address on file' })"
-            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
+            class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
   </div>
 
   <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
     <!-- both regions are in the DOM from first paint, both empty -->
     <div role="alert" aria-live="assertive" class="flex flex-col gap-2">
       <template x-for="t in bucket('danger')" :key="t.id">
-        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
              @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
              x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
              x-transition:enter-start="translate-y-2 opacity-0"
@@ -412,7 +412,7 @@ register(
 
     <div role="status" aria-live="polite" class="flex flex-col gap-2">
       <template x-for="t in bucket('polite')" :key="t.id">
-        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
              @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
              x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
              x-transition:enter-start="translate-y-2 opacity-0"
@@ -469,14 +469,14 @@ register(
 
   <button type="button" x-ref="fire"
           @click="push({ text: 'Line 4 removed from PO-24-1187', meta: 'MS plate 10 mm · 4.200 MT · ₹1,08,400' })"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="trash-2" class="size-4 text-zinc-600"></i>Remove line
   </button>
 
   <div role="status" aria-live="polite"
        class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
     <template x-for="t in toasts" :key="t.id">
-      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
            @mouseenter="pause(t)" @mouseleave="start(t)"
            @focusin="pause(t)" @focusout="start(t)"
            x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
@@ -544,7 +544,7 @@ register(
   <div role="status" aria-live="polite"
        class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
     <template x-for="t in toasts" :key="t.id">
-      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
            @mouseenter="pause(t)" @mouseleave="start(t)"
            @focusin="pause(t)" @focusout="start(t)"
            x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
@@ -593,14 +593,14 @@ register(
 
   <button type="button" x-ref="fire"
           @click="push({ text: 'The August ledger export failed', meta: 'Row 1,842 · posting date is outside the open period' })"
-          class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Export ledger
   </button>
 
   <div role="alert" aria-live="assertive"
        class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
     <template x-for="t in toasts" :key="t.id">
-      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
            x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
            x-transition:enter-start="translate-y-2 opacity-0"
            x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
@@ -665,7 +665,7 @@ register(
 
   <button type="button" x-ref="fire"
           @click="push({ text: 'PO-24-1' + (180 + seq) + ' approved', meta: '₹' + (3 + seq) + ',26,500 · Nashik Steel Traders' })"
-          class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Approve next order
   </button>
 
@@ -679,7 +679,7 @@ register(
 
     <div role="status" aria-live="polite" class="flex flex-col gap-2">
       <template x-for="t in toasts" :key="t.id">
-        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
              @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
              x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
              x-transition:enter-start="translate-y-2 opacity-0"
@@ -758,7 +758,7 @@ register(
   <div role="status" aria-live="polite"
        class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
     <template x-for="t in toasts" :key="t.id">
-      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
            @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
            x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
            x-transition:enter-start="translate-y-2 opacity-0"
@@ -822,20 +822,20 @@ register(
 
   <button type="button" x-ref="fire"
           @click="push({ text: 'Batch B-2411' + seq + ' released', meta: 'QC passed · 480 kg' })"
-          class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Release batch
   </button>
 
   <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
     <button type="button" x-show="toasts.length > 1" x-cloak
             @click="closeAll(); if ($event.detail === 0) $refs.fire.focus()"
-            class="pointer-events-auto self-start rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="pointer-events-auto self-start rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       Dismiss all <span class="tabular-nums" x-text="toasts.length"></span>
     </button>
 
     <div role="status" aria-live="polite" class="flex flex-col gap-2">
       <template x-for="t in toasts" :key="t.id">
-        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
              @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
              x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
              x-transition:enter-start="translate-y-2 opacity-0"
@@ -902,7 +902,7 @@ register(
        }
      }">
 
-  <div class="rounded-xl border border-zinc-200 bg-white">
+  <div class="rounded-xl border border-zinc-300 bg-white">
     <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
       <div class="min-w-0 flex-1">
         <h3 class="text-[16px]/6 font-semibold">Receipt against PO-24-1187</h3>
@@ -944,7 +944,7 @@ register(
   <div role="status" aria-live="polite"
        class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
     <template x-for="t in toasts" :key="t.id">
-      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
            @mouseenter="pause(t)" @mouseleave="start(t)"
            @focusin="pause(t)" @focusout="start(t)"
            x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
@@ -1015,13 +1015,13 @@ register(
       { id: 'confirm', name: 'Confirm', code:
 `<div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Close order</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Close order</button>
 
   <!-- no @click.self here, and that is deliberate: the backdrop does not answer for the user -->
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="close-title" aria-describedby="close-body"
-         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <h2 id="close-title" class="text-[16px]/6 font-semibold">Close PO-24-1187?</h2>
       <p id="close-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
         Sharma Extrusions · <span class="tabular-nums">₹18,42,000</span>. All 6 lines are fully received.
@@ -1040,12 +1040,12 @@ register(
       { id: 'destructive', name: 'Destructive', code:
 `<div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete order</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete order</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="del-title" aria-describedby="del-body"
-         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <div class="flex items-start gap-3">
         <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
         <div class="min-w-0">
@@ -1074,12 +1074,12 @@ register(
      people learn to type without reading. -->
 <div x-data="{ open: false, typed: '', target: 'SHARMA-EXT' }">
   <button type="button" @click="open = true; typed = ''"
-          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete vendor</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete vendor</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="wipe-title" aria-describedby="wipe-body"
-         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <h2 id="wipe-title" class="text-[16px]/6 font-semibold">Delete Sharma Extrusions</h2>
       <p id="wipe-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
         <span class="font-medium text-red-600">34 orders, 61 invoices and the rate contract</span>
@@ -1119,7 +1119,7 @@ register(
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="bulk-title" aria-describedby="bulk-body"
-         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <h2 id="bulk-title" class="text-[16px]/6 font-semibold">Approve 12 purchase orders</h2>
       <p id="bulk-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
         Total value <span class="font-medium tabular-nums text-zinc-900">₹94,18,600</span>.
@@ -1156,12 +1156,12 @@ register(
      a two-way choice makes people pick the destructive one to get out. -->
 <div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Leave page</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Leave page</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="leave-title" aria-describedby="leave-body"
-         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <h2 id="leave-title" class="text-[16px]/6 font-semibold">Leave without saving?</h2>
       <p id="leave-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
         PO-24-1187 has 4 unsaved line items and a changed delivery date. Leaving now loses them.
@@ -1229,7 +1229,7 @@ register(
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="dialog" aria-modal="true" aria-labelledby="grn-title"
-         class="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+         class="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
       <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <div class="min-w-0">
           <h2 id="grn-title" class="text-[16px]/6 font-semibold">Record GRN</h2>
@@ -1262,7 +1262,7 @@ register(
 
       <div class="flex shrink-0 flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
         <button type="button" @click="open = false"
                 class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save</button>
       </div>
@@ -1275,12 +1275,12 @@ register(
      overflow-y on the body, and min-h-0 so the flex child is allowed to shrink. -->
 <div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Review 6 lines</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Review 6 lines</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="dialog" aria-modal="true" aria-labelledby="lines-title"
-         class="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+         class="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
       <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <div class="min-w-0">
           <h2 id="lines-title" class="text-[16px]/6 font-semibold">Order lines</h2>
@@ -1332,14 +1332,14 @@ register(
 `<!-- Read-only, nothing to submit, so the only control is a close button. -->
 <div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="keyboard" class="size-4"></i>Shortcuts
   </button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="dialog" aria-modal="true" aria-labelledby="keys-title"
-         class="flex max-h-[80vh] w-full max-w-sm flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+         class="flex max-h-[80vh] w-full max-w-sm flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
       <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4">
         <h2 id="keys-title" class="text-[16px]/6 font-semibold">Keyboard shortcuts</h2>
         <button type="button" @click="open = false" aria-label="Close"
@@ -1412,7 +1412,7 @@ register(
       { id: 'record', name: 'Record detail', code:
 `<div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Open PO-24-1187</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Open PO-24-1187</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
        class="fixed inset-0 z-50 flex justify-end bg-zinc-900/40">
@@ -1465,7 +1465,7 @@ register(
             <p class="text-[13px]/5 font-medium">Received against GRN</p>
             <p class="text-[13px]/5 font-medium tabular-nums">7,800 / 12,000 kg</p>
           </div>
-          <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+          <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
             <div class="h-full rounded-full bg-zinc-700" style="width: 65%"></div>
           </div>
           <p class="mt-2 text-[12px]/4 text-zinc-500">Last receipt GRN 1142 on 16 Aug 2024.</p>
@@ -1474,7 +1474,7 @@ register(
 
       <div class="flex flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Print order</button>
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Print order</button>
         <button type="button" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Record GRN</button>
       </div>
     </div>
@@ -1483,7 +1483,7 @@ register(
       { id: 'filters', name: 'Filters', code:
 `<div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
     <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 text-[11px]/4 font-medium tabular-nums">2</span>
   </button>
@@ -1608,7 +1608,7 @@ register(
       { id: 'actions', name: 'Action list', code:
 `<div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="ellipsis" class="size-4"></i>PO-24-1187
   </button>
 
@@ -1667,7 +1667,7 @@ register(
       { id: 'filter', name: 'Quick filter', code:
 `<div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
     <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 text-[11px]/4 font-medium tabular-nums">1</span>
   </button>
@@ -1733,7 +1733,7 @@ register(
 `<!-- More rows than the cap allows, so the body scrolls and everything else holds still. -->
 <div x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="plus" class="size-4"></i>Add a line
   </button>
 
@@ -1787,7 +1787,7 @@ register(
 
       <div class="flex shrink-0 justify-end border-t border-zinc-200 bg-zinc-100 px-5 py-3">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
       </div>
     </div>
   </div>
@@ -1861,7 +1861,7 @@ register(
      status and nothing to line it up with — a detail header, a card meta line.
      The pill exists to give a column of states a shared left edge; one state on
      its own has no column, so the shape is doing nothing but adding weight. -->
-<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-4">
+<div class="max-w-md rounded-xl border border-zinc-300 bg-white p-4">
   <div class="flex items-baseline justify-between gap-3">
     <h3 class="text-[16px]/6 font-semibold">PO-24-1187</h3>
     <span class="text-[13px]/5 tabular-nums text-zinc-600">₹4,82,000</span>
@@ -1969,18 +1969,18 @@ register(
      says "Overdue". Solid graphite is for the one badge that must be seen from
      across the toolbar, and solid shapes take no ring. -->
 <div class="flex flex-wrap items-center gap-4">
-  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     Pending approval
     <span class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tabular-nums ring-1 ring-inset ring-zinc-300">12</span>
   </button>
 
-  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
     Overdue
     <span class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">3</span>
   </button>
 
   <button type="button" aria-label="Notifications, 99 or more unread"
-          class="relative flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100">
+          class="relative flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white hover:bg-zinc-100">
     <i data-lucide="bell" class="size-4"></i>
     <span class="absolute -top-1.5 -right-1.5 rounded-full bg-zinc-700 px-1.5 text-[11px]/4 font-medium tabular-nums text-white">99+</span>
   </button>
@@ -1996,9 +1996,9 @@ register(
      nothing scrolls sideways on a phone, and table-fixed with declared widths
      has a minimum that a phone cannot meet. The full small-screen treatment,
      where rows become stacked cards, belongs to the table component. -->
-<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+<div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="w-full table-fixed text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="px-4 py-2 font-medium sm:w-32">Order</th>
         <th scope="col" class="hidden px-4 py-2 font-medium sm:table-cell">Supplier</th>
@@ -2017,7 +2017,7 @@ register(
           </td>
           <td class="hidden px-4 py-2.5 text-right tabular-nums sm:table-cell">₹4,82,000</td>
         </tr>
-        <tr class="border-b border-zinc-100 bg-zinc-100">
+        <tr class="border-b border-zinc-100 bg-zinc-50">
           <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1186</td>
           <td class="hidden truncate px-4 py-2.5 sm:table-cell">Konkan Fabricators</td>
           <td class="px-4 py-2.5">
@@ -2167,7 +2167,7 @@ register(
     <button type="button" aria-labelledby="tt-duplicate"
             @mouseenter="show()" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="copy" class="size-4"></i>
     </button>
     <span id="tt-duplicate" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
@@ -2184,7 +2184,7 @@ register(
     <button type="button" aria-label="Print order"
             @mouseenter="show()" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="printer" class="size-4"></i>
     </button>
     <span aria-hidden="true" x-show="open" x-cloak x-transition.opacity.duration.100ms
@@ -2214,7 +2214,7 @@ register(
      One x-data for all four, because a pointer is only ever in one place and
      an open id is cheaper than four booleans. Escape is bound once, on the
      root, with .window so it fires whether or not anything here has focus. -->
-<div class="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white p-10"
+<div class="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-10"
      x-data="{
        open: null, timer: 0,
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
@@ -2296,7 +2296,7 @@ register(
      it opens on — so the header cells are rounded instead. truncate on the
      cell itself would clip it too, which is why the ellipsis lives on an inner
      span and the positioned wrapper around it does no clipping of its own. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, timer: 0,
        show(id, el, d = 150) {
@@ -2308,7 +2308,7 @@ register(
      }"
      @keydown.escape.window="hide()">
   <table class="w-full table-fixed text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="rounded-tl-xl px-4 py-2 font-medium sm:w-32">Order</th>
         <th scope="col" class="rounded-tr-xl px-4 py-2 font-medium">Line description</th>
@@ -2389,7 +2389,7 @@ register(
     <button type="button" aria-label="Search orders" aria-describedby="tt-search" aria-keyshortcuts="Control+K"
             @mouseenter="show('search')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('search', 0)" @blur="hide()"
-            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="search" class="size-4"></i>
     </button>
     <span id="tt-search" role="tooltip" x-show="open === 'search'" x-cloak x-transition.opacity.duration.100ms
@@ -2433,7 +2433,7 @@ register(
         @mouseenter="show()" @mouseleave="hide()"
         @keydown.escape.window="hide()">
     <button type="button" disabled aria-describedby="tt-void"
-            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 disabled:pointer-events-none">
+            class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 disabled:pointer-events-none">
       <i data-lucide="ban" class="size-4"></i>Void GRN
     </button>
     <span id="tt-void" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
@@ -2451,7 +2451,7 @@ register(
             @click.prevent
             @mouseenter="show()" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
-            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="check-circle-2" class="size-4"></i>Post to stock
     </button>
     <span id="tt-post" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
@@ -2482,7 +2482,7 @@ register(
      The spec limits are printed under the table, which is what makes the
      tooltip on the failing result legal. It is a shortcut to something already
      on the page, not the only copy of it. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, timer: 0,
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
@@ -2490,7 +2490,7 @@ register(
      }"
      @keydown.escape.window="hide()">
   <table class="w-full text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="rounded-tl-xl px-3 py-2 font-medium">Batch</th>
         <th scope="col" class="px-3 py-2 text-right font-medium">
@@ -2574,7 +2574,7 @@ register(
      Use it where the trigger is one of several close together and the bubble
      could plausibly belong to a neighbour. On a lone button it is 8px of
      decoration on a component whose entire job is to be read and gone. -->
-<div class="flex items-center justify-center rounded-xl border border-zinc-200 bg-white p-10">
+<div class="flex items-center justify-center rounded-xl border border-zinc-300 bg-white p-10">
   <span class="relative inline-flex"
         x-data="{
           open: false, timer: 0,
@@ -2619,7 +2619,7 @@ register(
      the icon name would have to become :data-lucide — a binding on the one
      node createIcons() is about to replace with an svg. -->
 
-<div class="inline-flex items-center gap-1 rounded-xl border border-zinc-200 bg-white p-1"
+<div class="inline-flex items-center gap-1 rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null, warm: false, timer: 0, cool: 0,
        show(id, now = false) {
@@ -2719,7 +2719,7 @@ register(
      that scrolls sideways — the dropdown behind that button carries the same
      four actions with their names written out, which is also the touch route
      to everything these tooltips say. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, warm: false, timer: 0, cool: 0,
        show(id, now = false) {
@@ -2740,7 +2740,7 @@ register(
      }"
      @keydown.escape.window="hide()">
   <table class="w-full text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="rounded-tl-xl px-4 py-2 font-medium">Receipt</th>
         <th scope="col" class="hidden px-4 py-2 font-medium md:table-cell">Vendor</th>
@@ -2880,9 +2880,9 @@ register(
 
      Two rows carry a card so the delay is testable: drag the pointer across
      both and nothing should open. -->
-<div class="rounded-xl border border-zinc-200 bg-white">
+<div class="rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="rounded-tl-xl px-4 py-2 font-medium">Order</th>
         <th scope="col" class="hidden px-4 py-2 font-medium sm:table-cell">Vendor</th>
@@ -3023,7 +3023,7 @@ register(
      the word with a different dot is how one screen ends up contradicting the
      next, so the standing of a person or a party takes emerald the way the
      presence dot does, and the record words are left to records. -->
-<div class="rounded-xl border border-zinc-200 bg-white p-4">
+<div class="rounded-xl border border-zinc-300 bg-white p-4">
   <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Vendor</p>
   <span class="relative mt-1 inline-block"
         x-data="{
@@ -3130,7 +3130,7 @@ register(
 
     <div x-show="open" x-cloak x-transition.opacity.duration.150ms
          class="absolute top-full left-0 z-40 pt-2">
-      <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+      <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
         <div class="flex items-start gap-3">
           <span class="relative shrink-0">
             <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">RD</span>
@@ -3224,7 +3224,7 @@ register(
            :class="up ? 'bottom-full pb-2' : 'top-full pt-2'"
            :style="'left: ' + dx + 'px'"
            class="absolute left-0 z-40">
-        <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+        <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
           <p class="truncate text-[14px]/5 font-semibold tabular-nums" x-text="po.id"></p>
           <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600" x-text="po.vendor"></p>
           <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
@@ -3259,7 +3259,7 @@ register(
 
      hx-sync="this:drop" throws away a request raised while one is in flight,
      which is what a pointer leaving and returning inside 300ms produces. -->
-<div class="rounded-xl border border-zinc-200 bg-white p-4">
+<div class="rounded-xl border border-zinc-300 bg-white p-4">
   <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Short receipt against</p>
   <div class="mt-1">
     <span class="relative inline-block"
@@ -3334,7 +3334,7 @@ register(
      subtitle, a pill and two figures — because the panel is under the pointer,
      and one that grows when the data lands moves the thing being read out from
      under it, or shrinks away from the cursor and closes itself. -->
-<div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg"
+<div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg"
      aria-busy="true" aria-label="Loading order PO-24-1187">
   <div class="animate-pulse" aria-hidden="true">
     <div class="flex items-start justify-between gap-3">
@@ -3367,7 +3367,7 @@ register(
      the link was always the real route to this record, and it still works when
      the preview does not. Neutral card, colour only in the icon, exactly as an
      alert. -->
-<div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+<div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
   <div class="flex items-start gap-2.5">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
     <div class="min-w-0">
@@ -3402,7 +3402,7 @@ register(
      nothing is hidden behind it. That is also why the hover target is the whole
      row rather than the link alone: trigger and panel share one box, so there
      is no gap for the pointer to fall through and no bridge to build. -->
-<div class="rounded-xl border border-zinc-200 bg-white p-4"
+<div class="rounded-xl border border-zinc-300 bg-white p-4"
      x-data="{
        open: false, timer: 0,
        fine: matchMedia('(hover: hover) and (pointer: fine)').matches,
@@ -3485,7 +3485,7 @@ register(
      hovercard is the one component a user can fire fifty times in ten seconds
      without meaning to. -->
 {% for order in page_obj %}
-  <tr class="border-b border-zinc-100">
+  <tr class="border-b border-zinc-200">
     <td class="px-4 py-2.5">
       <span class="relative inline-block"
             x-data="{
@@ -3514,7 +3514,7 @@ register(
           <div x-ref="body"
                hx-get="{% url 'order-card' order.pk %}" hx-trigger="hovercard-fetch"
                hx-swap="innerHTML" hx-sync="this:drop"
-               class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+               class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
             <div class="animate-pulse" aria-hidden="true">
               <div class="h-3 w-28 rounded bg-zinc-200"></div>
               <div class="mt-2 h-2.5 w-40 rounded bg-zinc-200"></div>
@@ -3541,7 +3541,7 @@ register(
     <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>{{ order.get_status_display }}
   </span>
 </div>
-<dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+<dl class="mt-3 space-y-1.5 border-t border-zinc-200 pt-3">
   <div class="flex items-baseline justify-between gap-3">
     <dt class="text-[12px]/4 text-zinc-600">Value</dt>
     <dd class="text-[12px]/4 font-medium tabular-nums">₹{{ order.value|intcomma }}</dd>
@@ -3555,7 +3555,7 @@ register(
     <dd class="text-[12px]/4 tabular-nums">{{ order.received_count }} of {{ order.line_count }} GRNs</dd>
   </div>
 </dl>
-<p class="mt-3 border-t border-zinc-100 pt-3 text-[12px]/4 text-zinc-500 tabular-nums">Raised by {{ order.raised_by.get_full_name }} · {{ order.raised_on|date:"d M Y" }}</p>` }
+<p class="mt-3 border-t border-zinc-200 pt-3 text-[12px]/4 text-zinc-500 tabular-nums">Raised by {{ order.raised_by.get_full_name }} · {{ order.raised_on|date:"d M Y" }}</p>` }
     ]
   },
 
@@ -3650,7 +3650,7 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-det"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="building-2" class="size-4 text-zinc-600"></i>Gujarat Polymers Ltd
     <span :class="open ? 'rotate-180' : ''" class="flex transition-transform motion-reduce:transition-none">
       <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -3659,7 +3659,7 @@ register(
 
   <div id="pop-det" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
        role="dialog" tabindex="-1" aria-labelledby="pop-det-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
@@ -3755,7 +3755,7 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-flt"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="filter" class="size-4 text-zinc-600"></i>Filters
     <span x-show="count() > 0" x-cloak
           class="inline-flex min-w-5 items-center justify-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300"
@@ -3764,7 +3764,7 @@ register(
 
   <div id="pop-flt" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
        role="dialog" tabindex="-1" aria-labelledby="pop-flt-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <div class="space-y-3 px-4 py-3.5">
       <p id="pop-flt-title" class="text-[13px]/5 font-medium">Filter purchase orders</p>
@@ -3902,14 +3902,14 @@ register(
          @keydown.escape="if (open) { $event.stopPropagation(); close() }">
       <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
               :aria-expanded="open" aria-controls="pop-col"
-              class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
         <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="shown() + ' of ' + cols.length"></span>
       </button>
 
       <div id="pop-col" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
            role="dialog" tabindex="-1" aria-labelledby="pop-col-title"
-           class="absolute top-full right-0 z-40 mt-1.5 w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-3 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+           class="absolute top-full right-0 z-40 mt-1.5 w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-3 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
         <p id="pop-col-title" class="text-[13px]/5 font-medium">Columns</p>
         <p class="mt-0.5 text-[12px]/4 text-zinc-500">Each change applies to the table at once.</p>
@@ -3935,9 +3935,9 @@ register(
     </div>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white">
+  <div class="rounded-xl border border-zinc-300 bg-white">
     <table class="w-full text-left text-[13px]/5">
-      <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
         <tr>
           <th scope="col" x-show="on('po')" class="px-4 py-2 font-medium">Order</th>
           <th scope="col" x-show="on('vendor')" class="hidden px-4 py-2 font-medium sm:table-cell">Vendor</th>
@@ -4028,14 +4028,14 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-dt"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="calendar" class="size-4 text-zinc-600"></i>
     <span x-text="applied.label">01 Aug 2026 – 31 Aug 2026</span>
   </button>
 
   <div id="pop-dt" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
        role="dialog" tabindex="-1" aria-labelledby="pop-dt-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <div class="space-y-3 px-4 py-3.5">
       <p id="pop-dt-title" class="text-[13px]/5 font-medium">Delivery date between</p>
@@ -4107,10 +4107,10 @@ register(
      panel belongs to survives the swap; Alpine closes the panel and hands focus
      back to that trigger on a successful request, and leaves it open with the
      text intact on a failure. -->
-<div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white"
+<div class="overflow-x-auto rounded-xl border border-zinc-300 bg-white"
      x-data @scroll="$dispatch('rail-scroll')">
   <table class="w-full min-w-[34rem] text-left text-[13px]/5">
-    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
       <tr>
         <th scope="col" class="px-4 py-2 font-medium">Item</th>
         <th scope="col" class="px-4 py-2 text-right font-medium">Qty</th>
@@ -4271,7 +4271,7 @@ register(
      the transition wins by restoring a cached style attribute after the clamp
      has already run. The arrow\'s own :style is safe, because the arrow is a
      child and has no transition of its own. -->
-<div class="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+<div class="flex items-center justify-between gap-4 rounded-xl border border-zinc-300 bg-white px-4 py-3">
   <div class="min-w-0">
     <p class="truncate text-[13px]/5 font-medium">MS angle 50×50×6</p>
     <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">GRN-24-4471 · 12,000 kg</p>
@@ -4401,7 +4401,7 @@ register(
 
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
             :aria-expanded="open" aria-controls="pop-plc-a"
-            class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="align-left" class="size-4 text-zinc-600"></i>Aligned to the start
     </button>
 
@@ -4409,7 +4409,7 @@ register(
          :class="up ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
          :style="'transform: translateX(' + dx + 'px)'"
          role="dialog" tabindex="-1" aria-labelledby="pop-plc-a-title"
-         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p id="pop-plc-a-title" class="text-[13px]/5 font-medium">Start aligned</p>
       <p class="mt-1 text-[12px]/4 text-zinc-600">The panel starts at the trigger's left edge, and shifts right only if that would put it off the left of the screen.</p>
       <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Flips above the trigger near the foot of the page.</p>
@@ -4442,7 +4442,7 @@ register(
 
     <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
             :aria-expanded="open" aria-controls="pop-plc-b"
-            class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="align-right" class="size-4 text-zinc-600"></i>Aligned to the end
     </button>
 
@@ -4450,7 +4450,7 @@ register(
          :class="up ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
          :style="'transform: translateX(' + dx + 'px)'"
          role="dialog" tabindex="-1" aria-labelledby="pop-plc-b-title"
-         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p id="pop-plc-b-title" class="text-[13px]/5 font-medium">End aligned</p>
       <p class="mt-1 text-[12px]/4 text-zinc-600">The panel ends at the trigger's right edge. left-0 plus a translate rather than right-0, so one clamp covers both alignments.</p>
       <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">At 390px both panels land 12px from the edge and nothing scrolls sideways.</p>
@@ -4503,13 +4503,13 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-sh"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Narrow the GRN list
   </button>
 
   <div id="pop-sh" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
        role="dialog" tabindex="-1" aria-labelledby="pop-sh-title"
-       class="fixed inset-x-0 bottom-0 z-40 w-full overflow-hidden rounded-t-2xl border border-zinc-200 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:absolute sm:inset-auto sm:top-full sm:left-0 sm:mt-1.5 sm:w-80 sm:max-w-[calc(100vw_-_1.5rem)] sm:rounded-xl">
+       class="fixed inset-x-0 bottom-0 z-40 w-full overflow-hidden rounded-t-2xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:absolute sm:inset-auto sm:top-full sm:left-0 sm:mt-1.5 sm:w-80 sm:max-w-[calc(100vw_-_1.5rem)] sm:rounded-xl">
 
     <div class="flex justify-center pt-2 sm:hidden">
       <span class="h-1 w-10 rounded-full bg-zinc-300" aria-hidden="true"></span>
@@ -4545,7 +4545,7 @@ register(
 
     <div class="flex flex-col-reverse gap-2 border-t border-zinc-200 bg-zinc-100 px-4 py-3 pb-4 sm:flex-row sm:items-center sm:justify-between sm:py-2.5">
       <button type="button" @click="close()"
-              class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px]/4 sm:underline sm:underline-offset-2 sm:hover:bg-transparent">Cancel</button>
+              class="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px]/4 sm:underline sm:underline-offset-2 sm:hover:bg-transparent">Cancel</button>
       <button type="button" @click="close()"
               class="w-full rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:px-3.5 sm:py-1.5">Apply</button>
     </div>
@@ -4602,14 +4602,14 @@ register(
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-hx"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="git-compare" class="size-4 text-zinc-600"></i>Three-way match
     <span class="text-[12px]/4 tabular-nums text-zinc-500">GRN-24-4471</span>
   </button>
 
   <div id="pop-hx" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
        role="dialog" tabindex="-1" aria-labelledby="pop-hx-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <p id="pop-hx-title" class="text-[13px]/5 font-medium tabular-nums">Match · GRN-24-4471</p>
 
@@ -4761,7 +4761,7 @@ register(
      the amount off the right edge instead of ellipsing. Widths are declared on
      the first row. -->
 <table class="w-full table-fixed">
-  <tbody class="divide-y divide-zinc-100">
+  <tbody class="divide-y divide-zinc-200">
     <tr>
       <td class="w-[7.5rem] py-2.5 pr-4 text-[13px]/5 font-medium tabular-nums">PO-24-1187</td>
       <td class="py-2.5 pr-4">
@@ -4824,7 +4824,7 @@ register(
   </button>
 
   <div x-show="open" x-cloak role="menu"
-       class="absolute right-0 z-40 mt-1 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+       class="absolute right-0 z-40 mt-1 w-56 overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
     <div class="border-b border-zinc-200 px-3 py-2">
       <p class="truncate text-[13px]/5 font-medium">Ritu Deshpande</p>
       <p class="truncate text-[12px]/4 text-zinc-600">ritu.deshpande@konspec.com</p>
@@ -4855,7 +4855,7 @@ register(
       <p class="truncate text-[12px]/4 text-zinc-500">PO-24-1191 · raised 18 Aug</p>
     </div>
   </div>
-  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
     <i data-lucide="user-plus" class="size-4 text-zinc-600"></i>Assign approver
   </button>
 </div>` }

@@ -27,7 +27,7 @@
          @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
          class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
-      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="flex aspect-video items-center justify-center bg-zinc-100">
           <i data-lucide="image" class="size-6 text-zinc-500"></i>
         </div>
@@ -37,7 +37,7 @@
         </figcaption>
       </figure>
 
-      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="flex aspect-video items-center justify-center bg-zinc-100">
           <i data-lucide="image" class="size-6 text-zinc-500"></i>
         </div>
@@ -47,7 +47,7 @@
         </figcaption>
       </figure>
 
-      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="flex aspect-video items-center justify-center bg-zinc-100">
           <i data-lucide="image" class="size-6 text-zinc-500"></i>
         </div>
@@ -57,7 +57,7 @@
         </figcaption>
       </figure>
 
-      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="flex aspect-video items-center justify-center bg-zinc-100">
           <i data-lucide="image" class="size-6 text-zinc-500"></i>
         </div>
@@ -69,11 +69,11 @@
     </div>
 
     <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous photograph"
-            class="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
+            class="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
     <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="Next photograph"
-            class="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
+            class="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>

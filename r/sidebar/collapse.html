@@ -18,7 +18,7 @@
      app-shell it is lg:hidden, because below lg there is no rail state at all.
      The control keeps its icon in a fixed 68px box so its centre does not move
      between the two widths — centre it in the strip and the second click misses. -->
-<div class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+<div class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{ expanded: true, ready: false }"
      x-init="expanded = localStorage.getItem('kon-sidebar') !== '0';
              $nextTick(() => ready = true);
@@ -34,7 +34,7 @@
   <nav id="sb6-nav" aria-label="Main" class="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain py-2" :class="expanded ? 'px-3' : 'px-3.5'">
     <div class="group relative">
       <a href="#" aria-current="page" aria-label="Purchase orders, 148 open"
-         class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
          :class="expanded ? 'px-2.5' : 'justify-center px-0'">
         <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
         <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Purchase orders</span>

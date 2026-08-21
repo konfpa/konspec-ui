@@ -27,7 +27,7 @@
 {% load humanize ui %}
 
 <div role="menu" aria-label="Order actions"
-     class="w-52 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+     class="w-52 overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
   {% for action in order.menu_actions %}
     <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
       <i data-lucide="{{ action.icon }}" class="size-4 text-zinc-600"></i>{{ action.label }}
@@ -43,7 +43,7 @@
   {% endif %}
 </div>
 
-<dl class="mt-4 divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200 bg-white text-[13px]/5">
+<dl class="mt-4 divide-y divide-zinc-200 overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
   {% for line in order.active_lines %}
     <div class="flex items-center justify-between gap-4 px-5 py-2.5">
       <dt class="min-w-0 truncate text-zinc-600">{{ line.item }}</dt>

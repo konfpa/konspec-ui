@@ -26,7 +26,7 @@
      hovercard is the one component a user can fire fifty times in ten seconds
      without meaning to. -->
 {% for order in page_obj %}
-  <tr class="border-b border-zinc-100">
+  <tr class="border-b border-zinc-200">
     <td class="px-4 py-2.5">
       <span class="relative inline-block"
             x-data="{
@@ -55,7 +55,7 @@
           <div x-ref="body"
                hx-get="{% url 'order-card' order.pk %}" hx-trigger="hovercard-fetch"
                hx-swap="innerHTML" hx-sync="this:drop"
-               class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+               class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
             <div class="animate-pulse" aria-hidden="true">
               <div class="h-3 w-28 rounded bg-zinc-200"></div>
               <div class="mt-2 h-2.5 w-40 rounded bg-zinc-200"></div>
@@ -82,7 +82,7 @@
     <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>{{ order.get_status_display }}
   </span>
 </div>
-<dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+<dl class="mt-3 space-y-1.5 border-t border-zinc-200 pt-3">
   <div class="flex items-baseline justify-between gap-3">
     <dt class="text-[12px]/4 text-zinc-600">Value</dt>
     <dd class="text-[12px]/4 font-medium tabular-nums">₹{{ order.value|intcomma }}</dd>
@@ -96,4 +96,4 @@
     <dd class="text-[12px]/4 tabular-nums">{{ order.received_count }} of {{ order.line_count }} GRNs</dd>
   </div>
 </dl>
-<p class="mt-3 border-t border-zinc-100 pt-3 text-[12px]/4 text-zinc-500 tabular-nums">Raised by {{ order.raised_by.get_full_name }} · {{ order.raised_on|date:"d M Y" }}</p>
+<p class="mt-3 border-t border-zinc-200 pt-3 text-[12px]/4 text-zinc-500 tabular-nums">Raised by {{ order.raised_by.get_full_name }} · {{ order.raised_on|date:"d M Y" }}</p>

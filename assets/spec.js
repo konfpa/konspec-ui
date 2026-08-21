@@ -120,7 +120,7 @@ window.SPEC = {
     { t: 'Focus is an outline, never a ring',
       d: 'ring-* compiles to box-shadow, and forced-colours mode drops every box-shadow, so a ring is the one focus style guaranteed to vanish for the users who most need it. Write focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15, and take the negative offset when the control sits flush inside a scroller that would clip it. outline-none is allowed only on a field whose wrapper draws the outline for it, because Tailwind resolves outline-style through a variable: outline-none on the same element kills its own focus outline while leaving the width and colour set, which measures as styled and renders as nothing.' },
     { t: 'Every tinted shape carries its ring',
-      d: 'A tinted shape is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 — pills, chips, avatars, icon wells, all of them. A tinted surface is bg-zinc-100 — the page, selected rows, active nav, table headers. Give a shape the surface fill and it measures 1.00 contrast against the surface it sits on, which is not low contrast but the identical colour, and it disappears. One step of fill separates them and the ring holds the edge. Solid shapes need no ring, and it is ring rather than border so adding it reflows nothing.' },
+      d: 'A tinted shape is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 — pills, chips, avatars, icon wells, control tracks, the selected nav item, all of them. A tinted surface is bg-zinc-100 — the page, a selected row, the highlighted option in a menu — and a band recessed inside a white surface is bg-zinc-50, which is a table header or a zebra row. Give a shape the surface fill and it measures 1.00 contrast against the surface it sits on, which is not low contrast but the identical colour, and it disappears. One step of fill separates them and the ring holds the edge. Solid shapes need no ring, and it is ring rather than border so adding it reflows nothing.' },
     { t: 'Status colour lives in the dot',
       d: 'Every status pill is the same graphite shape — bg-zinc-200, ring-zinc-300, zinc-700 text, the same fill an avatar takes. What separates Open from Overdue is a 6px dot. A column of tinted pills reads as a traffic light and stops meaning anything by the twelfth row; a column of identical pills with one red dot in it reads at a glance. This is the alert rule — colour only in the marker — applied to a pill.' },
     { t: 'One shade per meaning',
@@ -139,10 +139,12 @@ window.SPEC = {
 
   tokens: {
     surfaces: [
-      ['Page',        'bg-zinc-100', 'The scrolling page behind everything.'],
+      ['Page',        'bg-zinc-100', 'The scrolling page behind everything. Nothing inside a white surface may take this fill — same hex twice is a 1.00 contrast, and the card reads as a hole.'],
       ['Surface',     'bg-white',    'Cards, panels, sidebar, topbar, table bodies.'],
-      ['Border',      'border-zinc-200', 'Card edges, table rules, input borders.'],
-      ['Divider',     'border-zinc-100', 'Rows inside a card that is already bordered.']
+      ['Recessed',    'bg-zinc-50',  'A band inside a white surface: table header, zebra row. Lighter than the page, so it can never be read as the page showing through.'],
+      ['Edge',        'border-zinc-300', 'The outer edge of anything sitting on the page. White on zinc-100 is 1.10 and a zinc-200 edge is the first thing a washed-out panel drops.'],
+      ['Border',      'border-zinc-200', 'Edges inside a surface: inputs, a strip that ends a region, a nested panel.'],
+      ['Divider',     'border-zinc-100', 'Rows inside a card that is already bordered. On white only — on any tinted surface it computes to the surface.']
     ],
     text: [
       ['Primary',   'text-zinc-900', 'Headings, values, anything you read first.'],
@@ -153,8 +155,8 @@ window.SPEC = {
     accent: [
       ['Solid', 'bg-zinc-700', 'Primary buttons, progress fills, chart bars, the active nav marker.'],
       ['Hover', 'bg-zinc-800', 'Hover state of anything accent-filled.'],
-      ['Tint',  'bg-zinc-100', 'Selected rows, active nav, table headers — surfaces, never shapes.'],
-      ['Chip',  'bg-zinc-200', 'Every tinted shape sitting on the page: badges, avatars, icon wells. One step deeper than the page so it has a fill of its own, and one step deeper again for its ring.'],
+      ['Tint',  'bg-zinc-100', 'A selected row, the highlighted option in a menu — surfaces, never shapes.'],
+      ['Chip',  'bg-zinc-200', 'Every tinted shape: badges, avatars, icon wells, control tracks, the selected nav item. One step deeper than the page so it keeps a fill of its own on either surface, and one deeper again for its ring.'],
       ['Link',  'text-zinc-900 underline underline-offset-2', 'Interactive text. Colour is not the signal — the underline is.']
     ],
     /* One shade per meaning, and the same shade wherever that meaning appears.
@@ -178,6 +180,7 @@ window.SPEC = {
       ['zinc-50',  'bg-zinc-50'],
       ['zinc-100', 'bg-zinc-100'],
       ['zinc-200', 'bg-zinc-200'],
+      ['zinc-300', 'bg-zinc-300'],
       ['zinc-400', 'bg-zinc-400'],
       ['zinc-700', 'bg-zinc-700'],
       ['zinc-900', 'bg-zinc-900']

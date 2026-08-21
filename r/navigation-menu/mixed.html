@@ -20,7 +20,7 @@
      rather than of any code: open holds an id or null. A boolean per item
      needs a rule to keep them exclusive, and the rule is what eventually gets
      forgotten in one of the branches. -->
-<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
      x-data="{
        open: null,
        timer: 0,
@@ -57,7 +57,7 @@
               @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
               @keydown.arrow-down.prevent="jump('proc')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'proc' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'proc' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Procurement
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -84,7 +84,7 @@
               @click="open === 'inv' ? shut($refs.inv) : jump('inv')"
               @keydown.arrow-down.prevent="jump('inv')"
               class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'inv' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              :class="open === 'inv' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
         Inventory
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'inv' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -105,7 +105,7 @@
 
     <li>
       <a href="/reports/" aria-current="page" @mouseenter="if (open) shut()"
-         class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+         class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
     </li>
   </ul>
 </nav>

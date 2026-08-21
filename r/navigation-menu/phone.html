@@ -27,7 +27,7 @@
      them, not one <i> with the name bound. createIcons() replaces the <i> with
      an <svg> and any binding on it goes with the element; a name that never
      changes survives being read once, and one that toggles does not. -->
-<div class="rounded-xl border border-zinc-200 bg-white"
+<div class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ nav: false, open: { proc: true, inv: false, rep: false } }">
   <div class="flex h-12 items-center justify-between gap-3 px-3">
     <span class="text-[13px]/5 font-medium">Konspec Operations</span>
@@ -55,7 +55,7 @@
         </button>
         <ul id="nmph-proc" x-show="open.proc" class="mt-0.5 ml-3 space-y-0.5 border-l border-zinc-200 pl-3">
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
-          <li><a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+          <li><a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
           <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
           <li><a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a></li>
         </ul>

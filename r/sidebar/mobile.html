@@ -17,7 +17,7 @@
      The overlay is absolute inside this preview box. In app-shell it is fixed
      inset-0 — the shell is the thing that owns the viewport, and a fixed overlay
      rendered here would escape the docs frame and cover the page around it. -->
-<div class="relative h-[560px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div class="relative h-[560px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{ nav: false }" @htmx:after-swap.camel.window="nav = false">
 
   <header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3">
@@ -30,11 +30,11 @@
   </header>
 
   <div class="space-y-3 p-4">
-    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <div class="rounded-xl border border-zinc-300 bg-white p-4">
       <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
       <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · promised 22 Aug 2026</p>
     </div>
-    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <div class="rounded-xl border border-zinc-300 bg-white p-4">
       <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1191 · Sharma Extrusions</p>
       <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹4,26,500 · promised 28 Aug 2026</p>
     </div>
@@ -69,7 +69,7 @@
             </a>
           </li>
           <li>
-            <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[14px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[14px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
               <i data-lucide="file-text" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Purchase orders</span>
               <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">148</span>
             </a>

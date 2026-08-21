@@ -34,7 +34,7 @@
      As a real page: drop the wrapper border and h-[640px], put h-screen
      overflow-hidden on <body>, and render this inside app-shell's main column
      with the shell's own header above it. -->
-<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
       x-id="['q', 'rec']"
       x-data="{
         sel: 0, detail: false, said: '',
@@ -179,7 +179,7 @@
             <span class="text-zinc-600" x-text="rec.note"></span>
             <span class="font-medium tabular-nums" x-text="rec.pct + '% received'"></span>
           </div>
-          <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100">
+          <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200">
             <div class="h-full rounded-full bg-zinc-700" :style="'width:' + rec.pct + '%'"></div>
           </div>
         </div>

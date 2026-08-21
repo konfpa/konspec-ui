@@ -54,7 +54,7 @@
 
   <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
           :aria-expanded="open" aria-controls="pop-flt"
-          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="filter" class="size-4 text-zinc-600"></i>Filters
     <span x-show="count() > 0" x-cloak
           class="inline-flex min-w-5 items-center justify-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300"
@@ -63,7 +63,7 @@
 
   <div id="pop-flt" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
        role="dialog" tabindex="-1" aria-labelledby="pop-flt-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <div class="space-y-3 px-4 py-3.5">
       <p id="pop-flt-title" class="text-[13px]/5 font-medium">Filter purchase orders</p>

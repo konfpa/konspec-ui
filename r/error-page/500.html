@@ -23,7 +23,7 @@
 
      The well is graphite and the tone is the glyph alone. A red screen for a
      failure that changed nothing makes a two-minute fault look like data loss. -->
-<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{ done: false, t: null,
                copy() { navigator.clipboard?.writeText(this.$refs.ref.textContent.trim());
                         this.done = true;
@@ -49,7 +49,7 @@
         Something on our side failed while writing GRN-24-0912. Nothing reached the item ledger and no stock moved, so the receipt can be entered again from the register against the same challan.
       </p>
 
-      <div class="mx-auto mt-5 max-w-sm rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-left">
+      <div class="mx-auto mt-5 max-w-sm rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-left">
         <p class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Support reference</p>
         <div class="mt-1.5 flex items-center gap-2">
           <span x-ref="ref" class="min-w-0 flex-1 select-all break-all font-mono text-[13px]/5 font-medium tabular-nums">INC-2608-4471</span>
@@ -69,7 +69,7 @@
           Back to goods receipts
         </a>
         <a href="mailto:it@konspec.com?subject=INC-2608-4471%20%E2%80%94%20goods%20receipt%20failed"
-           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-300 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           Email IT with this reference
         </a>
       </div>

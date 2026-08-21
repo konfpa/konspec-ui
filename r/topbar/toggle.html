@@ -20,7 +20,7 @@
      Inside app-shell this header does not scroll, so it needs no sticky and no
      z-index. The overlay is absolute here because the preview box owns the
      frame; in the real shell it is fixed inset-0. -->
-<div class="relative flex h-[420px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div class="relative flex h-[420px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{ nav: false }" @keydown.escape.window="nav = false">
 
   <aside class="hidden w-64 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
@@ -30,7 +30,7 @@
     </div>
     <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
       <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>Overview</a>
-      <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
+      <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
       <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="truck" class="size-[18px] shrink-0"></i>Goods receipt</a>
     </nav>
     <div class="shrink-0 border-t border-zinc-200 px-3 py-2 text-[11px]/4 text-zinc-500">The collapse control lives here, lg and up.</div>
@@ -54,11 +54,11 @@
     </header>
 
     <main class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-      <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="rounded-xl border border-zinc-300 bg-white p-4">
         <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
         <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · promised 22 Aug 2026</p>
       </div>
-      <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="rounded-xl border border-zinc-300 bg-white p-4">
         <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1191 · Sharma Extrusions</p>
         <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹4,26,500 · promised 28 Aug 2026</p>
       </div>
@@ -80,7 +80,7 @@
       </div>
       <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
         <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>Overview</a>
-        <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
+        <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i>Purchase orders</a>
         <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="truck" class="size-[18px] shrink-0"></i>Goods receipt</a>
       </nav>
     </div>

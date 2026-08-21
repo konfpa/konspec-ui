@@ -29,7 +29,7 @@
        next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() },
        last() { this.page = this.pages; this.$refs.prev.focus() }
      }"
-     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
 
   <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
      x-text="((page - 1) * 25 + 1) + '–' + Math.min(page * 25, 94) + ' of 94 receipts'">26–50 of 94 receipts</p>
