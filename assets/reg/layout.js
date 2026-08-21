@@ -1906,7 +1906,7 @@ register(
      {% if %} as the item it introduces.
 
      zinc-100 and full bleed, my-1 for the breathing room the items already have
-     through their padding. The panel is the zinc-200 edge; the divider inside
+     through their padding. The panel is the zinc-300 edge; the divider inside
      it is a step lighter, the same as in any card. -->
 <div data-kui="separator/menu" class="relative max-w-xs" x-data="{ open: false }" @click.outside="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="menu"

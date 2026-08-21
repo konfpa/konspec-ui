@@ -119,7 +119,7 @@ register(
 </div>` },
 
       { id: 'pill', name: 'Pill', code:
-`<!-- Same widget, different marker: a white pill on a zinc-100 track instead of
+`<!-- Same widget, different marker: a white pill on a zinc-200 track instead of
      an underline. Reach for it when the tabs filter a list rather than section a
      record, and when the row has to sit beside other controls without a rule
      running under it. -->

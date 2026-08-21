@@ -2883,7 +2883,7 @@ register(
     related: ['spinner', 'stat-card', 'chart', 'skeleton'],
     variants: [
       { id: 'bar', name: 'Bar with a label', code:
-`<!-- The whole component. A zinc-100 rail with overflow-hidden, a graphite fill
+`<!-- The whole component. A zinc-200 rail with overflow-hidden, a graphite fill
      inside it, and the two figures written out underneath.
 
      The width is an inline style and has to be. Tailwind compiles its stylesheet
@@ -2984,7 +2984,7 @@ register(
 
      Three greys and no semantic colour. A stage is a position in a sequence, not
      a state — an order at "PO issued" is not a warning — so done is zinc-700, the
-     stage in progress is zinc-400 and the ones ahead are zinc-100. Reaching for
+     stage in progress is zinc-400 and the ones ahead are zinc-200. Reaching for
      amber on the current block spends a colour that has to mean "waiting" when
      the register renders it in a status dot two lines down.
 
@@ -3365,7 +3365,7 @@ register(
      dasharray="0 100", so a plant that has despatched nothing shows a mark saying
      it has started.
 
-     The track is stroke-zinc-200, one step darker than the zinc-100 a rail uses.
+     The track is stroke-zinc-200, the same shade a straight rail uses.
      At 4px on white, zinc-100 reads as a groove; at 9px it is a wide pale band
      that vanishes into a white card, which is the same reason the spinner's ring
      takes zinc-200.
