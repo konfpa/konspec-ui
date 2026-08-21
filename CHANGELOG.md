@@ -5,6 +5,34 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-08-21
+
+### Added
+
+- **Search on the component index.** Client-side filtering over the 55
+  components already in the page, so there is no request and no index to
+  build. Every term has to match, so `form date` narrows rather than widens,
+  and a term matches the name, the id, the category or the description:
+  searching `date` finds `calendar`, and `queue` finds `list-detail`.
+- **Search aliases** in `assets/spec.js`, mapping the words people reach for
+  onto the ids the library uses. `modal`, `popup`, `snackbar`, `chip`,
+  `date picker`, `autocomplete`, `notification`, `loading`, `stepper` and
+  `wizard` all returned nothing before this, while the component they wanted
+  was in the list. Site chrome only, not emitted into `llms.txt` or the
+  registry.
+- `/` focuses the search box (ignored while focus is in a field), Escape
+  clears it, a live count shows how many of the 55 match, and an empty state
+  says the list is a closed set rather than implying the search broke.
+- Component descriptions now ride along in `window.INDEX` so the search can
+  match on what a component is for. Costs ~9 KB; variant ids are deliberately
+  left out.
+
+### Fixed
+
+- The version badge in the navbar was the literal string `v0.1.0` and went on
+  saying so through the v0.1.1 release. It now reads `spec.meta.version`, so
+  it cannot drift from the version it claims.
+
 ## [0.1.1] - 2026-08-21
 
 ### Fixed
@@ -73,5 +101,6 @@ remove yet.
   a tinted pill, so a column of twelve rows still means something at the
   twelfth.
 
+[0.2.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.2.0
 [0.1.1]: https://github.com/konfpa/konspec-ui/releases/tag/v0.1.1
 [0.1.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.1.0

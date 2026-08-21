@@ -8,7 +8,7 @@
     "full": "/registry.json — the whole system in one file. Do not fetch it; it will not fit in context."
   },
   "name": "Konspec UI",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "purpose": "Copy-paste HTML components for internal data applications. Light theme only.",
   "generated_by": "node tools/build.js",
   "read_first": "llms.txt",
