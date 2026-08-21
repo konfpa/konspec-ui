@@ -1,0 +1,19 @@
+<div class="rounded-xl border border-zinc-200 bg-white" x-data="{ open: true }">
+  <h3>
+    <button @click="open = !open" :aria-expanded="open" aria-controls="acc-delivery"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left">
+      <span class="flex-1 text-[14px]/5 font-medium">Delivery and freight</span>
+      <span class="text-[12px]/4 text-zinc-500">3 of 3 filled</span>
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+  </h3>
+  <div id="acc-delivery" x-show="open" class="border-t border-zinc-100 px-4 py-3 text-[14px]/5">
+    <dl class="grid gap-2 sm:grid-cols-2">
+      <div><dt class="text-[12px]/4 text-zinc-600">Deliver to</dt><dd>Site store — Vasai plant</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Promised date</dt><dd class="tabular-nums">22 August 2026</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Freight</dt><dd class="tabular-nums">₹14,500 — to pay</dd></div>
+    </dl>
+  </div>
+</div>

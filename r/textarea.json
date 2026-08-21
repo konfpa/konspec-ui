@@ -1,0 +1,107 @@
+{
+  "id": "textarea",
+  "name": "Textarea",
+  "category": "forms",
+  "description": "Multi-line text entry. Same bordered wrapper as the input, a height measured in rows, and a counter when there is a limit worth showing.",
+  "when_to_use": "Free text longer than a line — notes, remarks, an address, a reason for a revision.",
+  "rules": [
+    "Give the control block. A textarea is inline-block by default, so it sits on a text baseline and leaves a 5px strip of wrapper below it that looks like a rendering bug.",
+    "Set the height with rows, never with an h- class. h-[100px] against a 20px leading is 4.2 lines, and the fifth line is sliced in half along its x-height.",
+    "Preflight already sets resize: vertical, so resize-y is redundant and resize-x is a layout bug waiting to happen. The only resize class worth writing is resize-none, on a box whose height is owned by script.",
+    "Never leave a read-only box white, bordered and ringed. It is then pixel for pixel an editable field, and the only way to find out otherwise is to click into it and get nothing back. Read-only takes bg-zinc-100, the same locked surface disabled uses, and drops the resting ring. It keeps a focus outline: read-only is still in the tab order precisely so the value can be copied, and a keyboard user has to see where they have landed.",
+    "Enter inserts a newline. Never bind Enter to submit — the one key someone needs to write a second line must not post the form.",
+    "maxlength truncates a paste in silence. Use it only when the limit is the column width, and say the number in the help text before it is reached; otherwise count past the limit and block the submit, so the user can see what has to go.",
+    "Set the height back to auto before reading scrollHeight, or an auto-growing box grows and never shrinks — scrollHeight cannot report less than the height already set.",
+    "Re-measure an auto-growing box on resize. Its height was computed at whatever width it had when it was first painted, and that is the wrong height at 390px.",
+    "The counter is tabular-nums. Proportional digits change width as they count and the label beside them shifts on every keystroke."
+  ],
+  "anatomy": [
+    {
+      "part": "Wrapper",
+      "description": "The bordered box, and what owns the focus ring. Same as the input, which is why a footer row can sit inside the ring."
+    },
+    {
+      "part": "Control",
+      "description": "A borderless, transparent, block-level textarea with outline-none. Its height comes from rows."
+    },
+    {
+      "part": "Label row",
+      "description": "The label on the left, the counter on the right, on one line above the box, so the counter costs no vertical space."
+    },
+    {
+      "part": "Counter",
+      "description": "11px mono tabular-nums, counting down. zinc-500, amber-700 inside the last 20, red-600 once it is over."
+    },
+    {
+      "part": "Footer",
+      "description": "An optional row inside the ring: a hint on the left, the submit on the right. This is what the wrapper border buys."
+    },
+    {
+      "part": "Help or error",
+      "description": "12px under the box. The error replaces the help text rather than stacking under it, exactly as in Field."
+    }
+  ],
+  "behaviour": [
+    "The height is a number of rows, so the box is always a whole number of lines and nothing is ever half-visible at the bottom.",
+    "Enter inserts a newline and never submits. Where a submit shortcut is genuinely wanted, it is Ctrl or Cmd plus Enter, and it is written in the hint rather than left to be discovered.",
+    "The counter counts down, not up: what is left is the number the writer is deciding against. It turns amber inside the last 20 characters and red once it is over, and the submit disables while it is over.",
+    "An auto-growing box grows with its content up to a ceiling, then stops and scrolls. Without the ceiling a long paste pushes the submit button off the screen.",
+    "Resize is vertical only, so a textarea can never be dragged wider than the form it sits in. An auto-growing box drops the handle entirely, because script and the drag would fight over the same height.",
+    "Read-only and disabled share one locked surface, bg-zinc-100 with no resting ring, because both are boxes you cannot type into. Only read-only takes a focus outline, because only read-only is focusable. The text is what separates them: zinc-900 for read-only, whose value still matters and still has to be copyable, zinc-400 for disabled, whose value does not. A read-only field left white, bordered and ringed says nothing at all until someone clicks into it and nothing happens."
+  ],
+  "accessibility": [
+    "A real label bound with for/id. A placeholder is not a label, and in a box this size it disappears the moment anyone starts typing.",
+    "aria-describedby points at the help text, at the error when there is one, and at the counter, so the limit is announced with the field and not left as a number floating beside it.",
+    "The visible counter is aria-hidden and mirrored in a polite live region that stays empty until the last 20 characters, then updates on a debounce. Announcing a count on every keystroke makes the field unusable with a screen reader.",
+    "Over the limit sets aria-invalid on the control, and the reason is real text under the box, not a colour and not a title attribute.",
+    "Never a contenteditable div. A real textarea brings keyboard support, IME composition, spellcheck, undo and form submission with it, and none of that is worth reimplementing.",
+    "The focus ring sits on the wrapper via focus-within, so it stays visible against both white and zinc-100 and never leaves the footer row outside it."
+  ],
+  "related": [
+    "field",
+    "input",
+    "form-page"
+  ],
+  "variants": [
+    {
+      "id": "default",
+      "name": "Default",
+      "html": "<div class=\"max-w-xl\">\n  <label for=\"ta-notes\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Delivery instructions</label>\n  <div class=\"rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n    <textarea id=\"ta-notes\" name=\"notes\" rows=\"4\"\n              placeholder=\"Gate timings, unloading contact, anything the driver needs to know\"\n              aria-describedby=\"ta-notes-help\"\n              class=\"block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500\"></textarea>\n  </div>\n  <p id=\"ta-notes-help\" class=\"mt-1.5 text-[12px]/4 text-zinc-500\">Printed on the delivery challan.</p>\n</div>"
+    },
+    {
+      "id": "sizes",
+      "name": "Sizes",
+      "html": "<!-- Three heights, and rows is what sets all three. A pixel height cuts the\n     last line in half: h-[100px] against a 20px leading is 4.2 lines. -->\n<div class=\"max-w-xl space-y-5\">\n  <div>\n    <label for=\"ta-2\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Two rows — a remark inside a table row or a dialog</label>\n    <div class=\"rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n      <textarea id=\"ta-2\" rows=\"2\" class=\"block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none\">Short shipped by 40 kg, balance promised Friday.</textarea>\n    </div>\n  </div>\n\n  <div>\n    <label for=\"ta-4\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Four rows — the default for a form field</label>\n    <div class=\"rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n      <textarea id=\"ta-4\" rows=\"4\" class=\"block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none\">Konspec Industries\nPlot 214, Silvassa Industrial Estate\nDadra &amp; Nagar Haveli 396230</textarea>\n    </div>\n  </div>\n\n  <div>\n    <label for=\"ta-10\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Ten rows — the page is the field</label>\n    <div class=\"rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n      <textarea id=\"ta-10\" rows=\"10\" class=\"block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none\" placeholder=\"Scope of work\"></textarea>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "counter",
+      "name": "With a counter",
+      "html": "<!-- A soft limit: typing past it is allowed, submitting past it is not. A hard\n     maxlength would swallow the tail of a paste without saying so. -->\n<div class=\"max-w-xl\"\n     x-data=\"{\n       text: 'Rate revised after the vendor withdrew the August discount.',\n       limit: 180,\n       t: null,\n       announce: '',\n       get left() { return this.limit - this.text.length; },\n       get over() { return this.left < 0; },\n       get msg() { return this.over ? Math.abs(this.left) + ' over the limit' : this.left + ' left'; },\n       get tone() { return this.over ? 'text-red-600' : this.left <= 20 ? 'text-amber-700' : 'text-zinc-500'; },\n       say(m) { clearTimeout(this.t); this.t = setTimeout(() => this.announce = m, 700); }\n     }\"\n     x-effect=\"say(left <= 20 ? msg : '')\">\n  <div class=\"mb-1.5 flex items-baseline justify-between gap-3\">\n    <label for=\"ta-reason\" class=\"text-[13px]/5 font-medium\">Reason for revision <span class=\"text-red-600\">*</span></label>\n    <span id=\"ta-reason-count\" aria-hidden=\"true\"\n          class=\"shrink-0 font-mono text-[11px]/4 tabular-nums\" :class=\"tone\" x-text=\"msg\"></span>\n  </div>\n\n  <div class=\"rounded-lg bg-white border\"\n       :class=\"over ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'\n                    : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'\">\n    <textarea id=\"ta-reason\" name=\"reason\" rows=\"4\" x-model=\"text\"\n              :aria-invalid=\"over ? 'true' : null\"\n              aria-describedby=\"ta-reason-help ta-reason-count\"\n              class=\"block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none\"></textarea>\n  </div>\n\n  <p id=\"ta-reason-help\" class=\"mt-1.5 text-[12px]/4\" :class=\"over ? 'font-medium text-red-600' : 'text-zinc-500'\">\n    <span x-show=\"!over\">Goes on the amendment record, visible to the vendor. 180 characters.</span>\n    <span x-show=\"over\" x-cloak class=\"flex items-center gap-1.5\">\n      <i data-lucide=\"alert-circle\" class=\"size-3.5 shrink-0\"></i>Too long to fit on the amendment record.\n    </span>\n  </p>\n\n  <!-- silent until it matters, then debounced, so a screen reader is not read a\n       running count on every keystroke -->\n  <span class=\"sr-only\" aria-live=\"polite\" x-text=\"announce\"></span>\n</div>"
+    },
+    {
+      "id": "autogrow",
+      "name": "Auto-growing",
+      "html": "<!-- Grows with the content up to a ceiling, then scrolls. Chromium and Safari\n     can do this in one class, field-sizing-content, but Firefox cannot yet, so\n     this is the version that ships.\n\n     Two things break it: reading scrollHeight without resetting the height to\n     auto first (it can never report less than the height already set, so the\n     box only ever grows), and never re-measuring, which leaves a box sized at\n     desktop width still that tall at 390px. -->\n<div class=\"max-w-xl\"\n     x-data=\"{\n       grow() {\n         const t = this.$refs.ta;\n         t.style.height = 'auto';\n         t.style.height = t.scrollHeight + 'px';\n       }\n     }\"\n     x-init=\"$nextTick(() => grow())\"\n     @resize.window.debounce=\"grow()\">\n  <label for=\"ta-grow\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Inspection remarks</label>\n  <div class=\"rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n    <textarea id=\"ta-grow\" name=\"remarks\" x-ref=\"ta\" rows=\"2\" @input=\"grow()\"\n              placeholder=\"Type — the box follows\"\n              class=\"block max-h-54 w-full resize-none overflow-y-auto bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500\">Material received against GRN-24-0912.\nTwo bundles show mill scale on the outer face.\nHeld pending the test certificate.</textarea>\n  </div>\n  <p class=\"mt-1.5 text-[12px]/4 text-zinc-500\">Stops growing at 10 rows and scrolls after that.</p>\n</div>"
+    },
+    {
+      "id": "toolbar",
+      "name": "With a footer",
+      "html": "<!-- The footer sits inside the ring, which is the whole reason the border is on\n     the wrapper and not on the control. Ctrl or Cmd plus Enter posts; a bare\n     Enter writes a newline, because that is what the key is for. -->\n<div class=\"max-w-xl\" x-data=\"{ text: '' }\">\n  <div class=\"rounded-xl border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n    <label for=\"ta-note\" class=\"sr-only\">Add a note to this order</label>\n    <textarea id=\"ta-note\" name=\"body\" rows=\"3\" x-model=\"text\"\n              @keydown.ctrl.enter=\"if (text.trim()) $refs.post.click()\"\n              @keydown.meta.enter=\"if (text.trim()) $refs.post.click()\"\n              placeholder=\"Add a note for whoever picks this up next\"\n              class=\"block w-full resize-none bg-transparent px-3.5 pt-3 text-[14px]/5 outline-none placeholder:text-zinc-500\"></textarea>\n\n    <div class=\"flex items-center justify-between gap-3 px-3.5 pb-3 pt-1.5\">\n      <span class=\"min-w-0 text-[12px]/4 text-zinc-500\">\n        Visible to everyone on this order\n        <!-- a phone has no Ctrl key, so the hint goes rather than truncates -->\n        <span class=\"hidden sm:inline\">\n          <kbd class=\"ml-1 rounded border border-zinc-200 bg-zinc-100 px-1 py-0.5 font-mono text-[10px]/3 text-zinc-600\">Ctrl</kbd>\n          <kbd class=\"rounded border border-zinc-200 bg-zinc-100 px-1 py-0.5 font-mono text-[10px]/3 text-zinc-600\">Enter</kbd>\n        </span>\n      </span>\n      <button type=\"submit\" x-ref=\"post\" :disabled=\"!text.trim()\"\n              class=\"inline-flex h-8 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400\">\n        Post note\n      </button>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "error",
+      "name": "With error",
+      "html": "<div class=\"max-w-xl\">\n  <label for=\"ta-bad\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Rejection reason <span class=\"text-red-600\">*</span></label>\n  <div class=\"rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15\">\n    <textarea id=\"ta-bad\" name=\"reason\" rows=\"4\" aria-invalid=\"true\" aria-describedby=\"ta-bad-err\"\n              class=\"block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none\"></textarea>\n  </div>\n  <!-- the error replaces the help text, it does not stack under it -->\n  <p id=\"ta-bad-err\" class=\"mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600\">\n    <i data-lucide=\"alert-circle\" class=\"size-3.5 shrink-0\"></i>A reason is required before an order can be rejected.\n  </p>\n</div>"
+    },
+    {
+      "id": "disabled",
+      "name": "Disabled and read-only",
+      "html": "<div class=\"max-w-xl space-y-5\">\n  <div>\n    <label for=\"ta-off\" class=\"mb-1.5 block text-[13px]/5 font-medium text-zinc-500\">Terms and conditions</label>\n    <div class=\"rounded-lg border border-zinc-200 bg-zinc-100\">\n      <textarea id=\"ta-off\" rows=\"3\" disabled\n                class=\"block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 text-zinc-400\">Set by the rate contract. Editable only on the contract itself.</textarea>\n    </div>\n  </div>\n\n  <div>\n    <!-- Same locked surface as disabled, and deliberately so: a filled, ringless\n         box reads as a field that is closed. The only thing separating the two\n         is the text, zinc-900 here against zinc-400 above, because a read-only\n         value still matters and still has to be selectable and copyable. On a\n         white bordered box with a focus ring, nothing says read-only until you\n         click into it and nothing happens. -->\n    <label for=\"ta-ro\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Vendor reply</label>\n    <div class=\"rounded-lg border border-zinc-200 bg-zinc-100\">\n      <textarea id=\"ta-ro\" rows=\"3\" readonly\n                class=\"block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15\">Balance 40 kg dispatched on 18 August by Gati, LR 4471029.\nTest certificate follows by email.</textarea>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "django",
+      "name": "Django form field",
+      "html": "<!-- The border being on the wrapper is what keeps the error state in the\n     template. The widget class is written once in forms.py and never has to be\n     rewritten in __init__ to add a red border, because the red border is not on\n     the widget.\n\n     # forms.py\n     class OrderNoteForm(forms.ModelForm):\n         class Meta:\n             model = OrderNote\n             fields = ['body']\n             widgets = {\n                 'body': forms.Textarea(attrs={\n                     'rows': 4,\n                     'placeholder': 'Add a note for whoever picks this up next',\n                     'class': 'block w-full bg-transparent px-3 py-2 text-[14px]/5 '\n                              'outline-none placeholder:text-zinc-500',\n                 })\n             }\n\n     A max_length on the model renders as maxlength on the widget, which\n     truncates a paste in silence. Either drop it from the widget and let\n     clean() reject the value with a message, or say the number in help_text\n     before anyone reaches it. form.body.field.max_length is the number. -->\n<form method=\"post\" class=\"max-w-xl\">\n  {% csrf_token %}\n  <div>\n    <label for=\"{{ form.body.id_for_label }}\" class=\"mb-1.5 block text-[13px]/5 font-medium\">\n      {{ form.body.label }}{% if form.body.field.required %} <span class=\"text-red-600\">*</span>{% endif %}\n    </label>\n\n    <div class=\"rounded-lg bg-white {% if form.body.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}\">\n      {{ form.body }}\n    </div>\n\n    {% if form.body.errors %}\n      <p class=\"mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600\">\n        <i data-lucide=\"alert-circle\" class=\"size-3.5 shrink-0\"></i>{{ form.body.errors.0 }}\n      </p>\n    {% elif form.body.help_text %}\n      <p class=\"mt-1.5 text-[12px]/4 text-zinc-500\">{{ form.body.help_text }}</p>\n    {% endif %}\n  </div>\n\n  <button type=\"submit\" class=\"mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Post note</button>\n</form>"
+    }
+  ]
+}

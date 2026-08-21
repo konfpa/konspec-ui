@@ -1,0 +1,59 @@
+<!-- The well is a tinted shape, so it takes bg-zinc-200 with ring-1 ring-inset
+     ring-zinc-300. bg-zinc-100 would be the identical colour as the page and as
+     a selected row underneath it, which does not read as low contrast, it reads
+     as nothing there at all. The current step is the one solid shape,
+     bg-zinc-700, and a solid shape takes no ring — a pale ring round a dark
+     disc looks like a rendering fault.
+
+     size-5 is 20px, which is the line box of text-[13px]/5 exactly, so the well
+     needs no box around it and no offset. That is the only marker here that is
+     its own leading box.
+
+     aria-current="step" carries the same fact as the graphite fill, because the
+     fill says nothing to anyone who cannot see it. The step numbers stay real
+     text: they are what people quote when a run stalls, and with list-style
+     already gone nothing else is going to say them. The done steps swap the
+     number for a check and put the word back with sr-only. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+  <h3 class="text-[13px]/5 font-medium tabular-nums">Invoice INV-8841 · payment run</h3>
+
+  <ol role="list" class="mt-3 space-y-3 text-[13px]/5">
+    <li class="flex items-start gap-3">
+      <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="check" class="size-3 text-emerald-600" aria-hidden="true"></i>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-zinc-600"><span class="sr-only">Done — </span>Invoice received and booked</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">14 Aug 2026 · Ritu Deshpande</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-3">
+      <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="check" class="size-3 text-emerald-600" aria-hidden="true"></i>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-zinc-600"><span class="sr-only">Done — </span>Matched to GRN-26-0442</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026 · short by 600 kg</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-3" aria-current="step">
+      <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[11px]/4 font-medium tabular-nums text-white">3</span>
+      <div class="min-w-0 flex-1">
+        <p class="font-medium">Debit note approved</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">With Anil Kulkarni since 18 Aug 2026 · ₹8,200</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-3">
+      <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium tabular-nums text-zinc-600 ring-1 ring-inset ring-zinc-300">4</span>
+      <div class="min-w-0 flex-1">
+        <p class="text-zinc-500">Released to the payment run</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-3">
+      <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium tabular-nums text-zinc-600 ring-1 ring-inset ring-zinc-300">5</span>
+      <div class="min-w-0 flex-1">
+        <p class="text-zinc-500">Paid, 45 days from GRN</p>
+      </div>
+    </li>
+  </ol>
+</div>

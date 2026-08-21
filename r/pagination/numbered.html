@@ -1,0 +1,81 @@
+<!-- The window is seven slots at every page and that is the point of it. First,
+     a gap or a page, three around the current one, a gap or a page, last — walk
+     from page 1 to page 15 and the row is seven squares wide the whole way, so
+     Next never slides out from under the pointer between two clicks. A window
+     that grows from three slots at the start to seven in the middle hides the
+     same pages and moves every button while doing it.
+
+     Each slot is a fixed square rather than a min-width the digits push wider,
+     because a content-sized cell is one width on page 9 and another on page 10
+     and the row still wanders with the count pinned. size-9 at text-[13px]/5
+     tabular-nums holds three digits with room either side, which is the same
+     999-page ceiling past which paging by number was already the wrong control.
+
+     The two gaps carry distinct keys. Measured: :key="s" over
+     [1, '…', 4, 5, 6, '…', 15] renders six items, not seven — the first ellipsis
+     is dropped because the second claims the same key and the loop reuses its
+     node — and the row comes back a square narrow, which is the width rule this
+     variant exists for failing quietly.
+
+     The ellipsis is a character. It is aria-hidden, it is not a button, and it
+     does not expand — an ellipsis that unfolds into five more numbers is the
+     width change, arriving on purpose. Somebody hunting page 34 of 58 needs the
+     filter, and the filter is not hidden behind a full stop.
+
+     The current page stays enabled. Disable it to show it cannot be pressed and
+     the click that got you there blurs the element under the cursor, because a
+     browser drops focus from a disabled element to the body.
+
+     Below md the row is display:none and "Page 4 of 15" stands in its place.
+     Seven squares and two buttons and a range do not fit in 390px, and the
+     failure is a sideways scroll under a table that was restacked to avoid one. -->
+<nav aria-label="Order register pages"
+     x-data="{
+       page: 4, size: 10, total: 148,
+       get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
+       get from() { return this.total ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get slots() {
+         const n = this.pages, p = this.page;
+         if (n <= 7) return Array.from({ length: n }, (_, i) => i + 1);
+         if (p <= 4) return [1, 2, 3, 4, 5, 'gap-end', n];
+         if (p >= n - 3) return [1, 'gap-start', n - 4, n - 3, n - 2, n - 1, n];
+         return [1, 'gap-start', p - 1, p, p + 1, 'gap-end', n];
+       },
+       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
+     }"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+
+  <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+     x-text="from + '–' + to + ' of ' + total + ' orders'">31–40 of 148 orders</p>
+
+  <div class="flex items-center gap-2">
+    <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden" x-text="'Page ' + page + ' of ' + pages">Page 4 of 15</span>
+
+    <button type="button" aria-label="Previous page" @click="go(page - 1)" :disabled="page === 1"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+
+    <ul role="list" class="hidden items-center gap-1 md:flex">
+      <template x-for="s in slots" :key="s">
+        <li>
+          <template x-if="typeof s === 'number'">
+            <button type="button" @click="go(s)" :aria-label="'Page ' + s" :aria-current="s === page ? 'page' : false"
+                    class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="s === page ? 'bg-zinc-700 font-medium text-white' : 'hover:bg-zinc-100'"
+                    x-text="s"></button>
+          </template>
+          <template x-if="typeof s !== 'number'">
+            <span aria-hidden="true" class="flex size-9 items-center justify-center text-[13px]/5 text-zinc-500">…</span>
+          </template>
+        </li>
+      </template>
+    </ul>
+
+    <button type="button" aria-label="Next page" @click="go(page + 1)" :disabled="page === pages"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+</nav>

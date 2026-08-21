@@ -1,0 +1,161 @@
+<!-- Select all takes the rows the filter is showing, and the button says the
+     number out loud: "Select all 4 matching" with a query typed, "Select all 9"
+     without one. A bulk control that quietly reaches past what is on screen is
+     the same defect as a select-all that approves 4,312 orders when five are
+     visible — people can only verify what they can see.
+
+     Clear is deliberately not scoped the same way. It releases everything and
+     its label carries the total, because a Clear that only released the
+     matching rows would leave "3 selected" standing over a list with nothing
+     ticked in it, and no route back to the other three.
+
+     The line under the buttons only appears while a query is typed, so the
+     asymmetry is on screen rather than in the documentation. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: '', ai: 0,
+       sel: ['cc-1200', 'cc-3100'],
+       options: [
+         { id: 'cc-1100', label: 'Injection moulding', meta: 'CC-1100' },
+         { id: 'cc-1200', label: 'Extrusion', meta: 'CC-1200' },
+         { id: 'cc-1300', label: 'Blow moulding', meta: 'CC-1300' },
+         { id: 'cc-2100', label: 'Tool room', meta: 'CC-2100' },
+         { id: 'cc-2200', label: 'Maintenance', meta: 'CC-2200' },
+         { id: 'cc-3100', label: 'Quality lab', meta: 'CC-3100' },
+         { id: 'cc-3200', label: 'Stores', meta: 'CC-3200' },
+         { id: 'cc-4100', label: 'Dispatch', meta: 'CC-4100' },
+         { id: 'cc-5100', label: 'Plant administration', meta: 'CC-5100' }
+       ],
+       get filtering() { return this.typed && this.q.trim().length > 0; },
+       get list() {
+         if (!this.filtering) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       get allShown() { return this.list.length > 0 && this.list.every(o => this.sel.includes(o.id)); },
+       cap: 1,
+       get chips() { return this.sel.length > this.cap ? this.sel.slice(0, 1) : this.sel; },
+       get extra() { return this.sel.length - this.chips.length; },
+       has(id) { return this.sel.includes(id); },
+       label(id) { const o = this.options.find(x => x.id === id); return o ? o.label : id; },
+       drop(id) { this.sel = this.sel.filter(v => v !== id); this.$refs.q.focus(); },
+       rowId(o) { return 'cb-cc-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { if (!this.open) { this.open = true; this.typed = false; this.ai = 0; this.scroll(); } },
+       close() { this.open = false; this.typed = false; this.q = ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       toggle(o) {
+         this.sel = this.has(o.id) ? this.sel.filter(v => v !== o.id) : [...this.sel, o.id];
+         this.$refs.q.focus();
+       },
+       takeShown() { this.sel = [...new Set([...this.sel, ...this.list.map(o => o.id)])]; this.$refs.q.focus(); },
+       clearAll() { this.sel = []; this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.toggle(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-cc" class="mb-1.5 block text-[13px]/5 font-medium">Cost centres this expense is split across</label>
+
+  <!-- Select all is the control that produces a wall of chips, so the field
+       lists one name and collapses everything past it into a +N more pill
+       that opens the list. The cap is one, not two: a 390px viewport gives this
+       field 300px, and two names plus the search input do not fit on one line —
+       measured, the box stood at 42px with one selection, grew to 68px at two,
+       and dropped back to 42px at three, which reads as the field flinching. One
+       chip plus the pill holds one row at every count and every width here.
+
+       Nothing is hidden from the keyboard by the cap: every option, listed or
+       not, is a row in the popup with its own tick, and toggling it there is
+       what releases it. A field carrying only a count — 3 / 9 — is what this
+       replaced, and it left a selection nobody could see without opening the
+       popup first. -->
+  <div @click="$refs.q.focus(); show()"
+       class="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+
+    <template x-for="id in chips" :key="id">
+      <span class="inline-flex max-w-full items-center gap-1 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 ring-1 ring-inset ring-zinc-300">
+        <span class="min-w-0 truncate" x-text="label(id)"></span>
+        <button type="button" :aria-label="'Remove ' + label(id)" @click.stop="drop(id)"
+                class="flex size-4 shrink-0 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900">
+          <i data-lucide="x" class="size-3"></i>
+        </button>
+      </span>
+    </template>
+
+    <button type="button" x-show="extra" x-cloak @click.stop="$refs.q.focus(); show()"
+            :aria-label="extra + ' more selected — open the list to see all ' + sel.length"
+            class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span x-text="'+' + extra + ' more'"></span>
+    </button>
+
+    <input id="cb-cc" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-cc-list" aria-describedby="cb-cc-count"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           :placeholder="sel.length ? 'Search' : 'Search cost centres'"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.backspace="if (!q && sel.length) { $event.preventDefault(); sel = sel.slice(0, -1) }"
+           @keydown.tab="close()"
+           class="min-w-16 flex-1 bg-transparent px-1 py-1 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <template x-for="id in sel" :key="'post-' + id">
+    <input type="hidden" name="cost_centre" :value="id">
+  </template>
+
+  <p id="cb-cc-count" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500"
+     x-text="sel.length ? sel.length + ' of 9 cost centres selected' : 'No cost centre selected — the expense stays unallocated'"></p>
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 cost centre matches' : list.length + ' cost centres match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2">
+      <button type="button" @mousedown.prevent @click="takeShown()" :disabled="allShown"
+              class="text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline">
+        <span x-text="filtering ? 'Select all ' + list.length + ' matching' : 'Select all ' + options.length"></span>
+      </button>
+      <button type="button" @mousedown.prevent @click="clearAll()" :disabled="!sel.length"
+              class="text-[12px]/4 tabular-nums text-zinc-600 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline">
+        <span x-text="'Clear all ' + sel.length"></span>
+      </button>
+    </div>
+
+    <p x-show="filtering" x-cloak
+       class="border-b border-zinc-200 bg-zinc-100 px-3 py-1.5 text-[12px]/4 tabular-nums text-zinc-600"
+       x-text="'Select all takes the ' + list.length + ' rows shown. The other ' + (options.length - list.length) + ' are left as they are, and Clear releases all ' + sel.length + '.'"></p>
+
+    <div id="cb-cc-list" role="listbox" aria-multiselectable="true" aria-label="Cost centres"
+         class="max-h-64 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="has(o.id)"
+             @mousedown.prevent @click="toggle(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+          <span class="flex size-4 shrink-0 items-center justify-center rounded"
+                :class="has(o.id) ? 'bg-zinc-700 text-white' : 'bg-white ring-1 ring-inset ring-zinc-300'">
+            <span class="flex" x-show="has(o.id)" x-cloak><i data-lucide="check" class="size-3"></i></span>
+          </span>
+          <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.meta"></span>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No cost centre matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Cost centres run from CC-1100 upwards.</p>
+    </div>
+  </div>
+</div>

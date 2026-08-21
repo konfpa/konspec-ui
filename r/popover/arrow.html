@@ -1,0 +1,99 @@
+<!-- The arrow is a size-3 square rotated 45 degrees, half above the panel edge,
+     with border-t and border-l so its two visible sides continue the panel
+     border and its white fill covers the length of panel border it sits on. It
+     is a child of the panel, so a panel that is overflow-hidden clips it — which
+     is why a panel with a tinted footer strip cannot have one.
+
+     The part that is always got wrong: the arrow must be positioned against the
+     trigger, not against the panel. The moment the clamp shifts the panel left
+     to keep it on screen, an arrow at a fixed left travels with the panel and
+     points at empty space, and it points confidently, which is worse than not
+     being there. ax is the trigger centre expressed in the panel's own
+     coordinates after the shift, clamped 14px in from either end so it never
+     hangs off a rounded corner.
+
+     Drop the arrow entirely in three cases, because in all three there is no
+     honest place to put it: when the panel flips above the trigger and you have
+     not swapped the borders to border-b and border-r; when the panel becomes
+     full-width or a bottom sheet at 390px, where it spans the screen and the
+     trigger could be anywhere along it; and when the panel is position: fixed
+     and repositioned on scroll, where the arrow has to be recomputed on every
+     scroll frame for a decoration nobody is reading.
+
+     An arrow earns its place only when the panel is small and there is more
+     than one thing it could plausibly belong to — here, one figure in a column
+     of figures. On a Filters button at the top of a page, drop it.
+
+     No x-transition on the panel, for the reason spelled out in the placement
+     variant: a transition and a bound :style on one element do not compose, and
+     the transition wins by restoring a cached style attribute after the clamp
+     has already run. The arrow's own :style is safe, because the arrow is a
+     child and has no transition of its own. -->
+<div class="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+  <div class="min-w-0">
+    <p class="truncate text-[13px]/5 font-medium">MS angle 50×50×6</p>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">GRN-24-4471 · 12,000 kg</p>
+  </div>
+
+  <div class="relative shrink-0"
+       x-data="{
+         open: false, dx: 0, ax: 0,
+         place() {
+           const r = this.$root.getBoundingClientRect(), p = this.$refs.panel, m = 12;
+           this.dx = Math.round(Math.max(m, Math.min(r.left, innerWidth - m - p.offsetWidth)) - r.left);
+           this.ax = Math.round(Math.min(Math.max(r.width / 2 - this.dx, 14), p.offsetWidth - 14));
+         },
+         show() {
+           this.open = true;
+           this.$nextTick(() => requestAnimationFrame(() => { this.place(); this.$refs.panel.focus() }));
+         },
+         close(toTrigger = true) {
+           if (!this.open) return;
+           this.open = false;
+           if (toTrigger) this.$refs.trigger.focus();
+         }
+       }"
+       @click.outside="close(false)"
+       @focusout="if ($event.relatedTarget && !$root.contains($event.relatedTarget)) close(false)"
+       @keydown.escape="if (open) { $event.stopPropagation(); close() }"
+       @resize.window.debounce="open && place()">
+
+    <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+            :aria-expanded="open" aria-controls="pop-arw"
+            class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      ₹6,98,400
+      <i data-lucide="info" class="size-3.5 text-zinc-500"></i>
+    </button>
+
+    <div id="pop-arw" x-ref="panel" x-show="open" x-cloak
+         :style="'transform: translateX(' + dx + 'px)'"
+         role="dialog" tabindex="-1" aria-labelledby="pop-arw-title"
+         class="absolute top-full left-0 z-40 mt-1.5 w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-3 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+      <span :style="'left: ' + ax + 'px'"
+            class="absolute -top-1.5 size-3 -translate-x-1/2 rotate-45 border-t border-l border-zinc-200 bg-white"
+            aria-hidden="true"></span>
+
+      <p id="pop-arw-title" class="text-[13px]/5 font-medium">Landed cost</p>
+      <dl class="mt-2 space-y-1.5">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Basic</dt>
+          <dd class="text-[12px]/4 tabular-nums">₹6,84,000</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Freight</dt>
+          <dd class="text-[12px]/4 tabular-nums">₹9,200</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Unloading</dt>
+          <dd class="text-[12px]/4 tabular-nums">₹5,200</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-1.5">
+          <dt class="text-[12px]/4 font-medium">Landed</dt>
+          <dd class="text-[12px]/4 font-medium tabular-nums">₹6,98,400</dd>
+        </div>
+      </dl>
+      <a href="/grn/4471/costing/" class="mt-2.5 inline-block text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Costing sheet</a>
+    </div>
+  </div>
+</div>

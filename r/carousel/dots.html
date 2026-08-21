@@ -1,0 +1,76 @@
+<div x-data="{
+       i: 0, n: 0, atStart: true, atEnd: true,
+       slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
+       pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
+       sync() {
+         const r = this.$refs.rail, s = this.slides(), edge = r.getBoundingClientRect().left + this.pad();
+         this.n = s.length;
+         this.atStart = r.scrollLeft < 2;
+         this.atEnd = r.scrollLeft > r.scrollWidth - r.clientWidth - 2;
+         const near = s.map((el, k) => [Math.abs(el.getBoundingClientRect().left - edge), k]).sort((a, b) => a[0] - b[0]);
+         this.i = near.length ? near[0][1] : 0;
+       },
+       go(k) {
+         const r = this.$refs.rail, s = this.slides(), el = s[Math.min(Math.max(k, 0), s.length - 1)];
+         if (!el) return;
+         r.scrollBy({ left: el.getBoundingClientRect().left - r.getBoundingClientRect().left - this.pad(),
+                      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+       }
+     }"
+     x-init="sync()"
+     @resize.window.debounce="sync()">
+
+  <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Plant notices"
+       @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
+       @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
+       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+
+    <article class="flex shrink-0 basis-full snap-start gap-3 rounded-xl border border-zinc-200 bg-white p-4">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="wrench" class="size-4 text-zinc-600"></i>
+      </span>
+      <div class="min-w-0">
+        <p class="text-[14px]/5 font-semibold">Extruder line 2 shutdown, 24 to 26 August</p>
+        <p class="mt-1 text-[13px]/5 text-zinc-600">Planned gearbox replacement. Compounding orders due that week move to line 4, so expect a two day slip on anything scheduled after the 23rd.</p>
+        <p class="mt-2 text-[12px]/4 text-zinc-500">Maintenance · Sanjay More · 12 Aug 2026</p>
+      </div>
+    </article>
+
+    <article class="flex shrink-0 basis-full snap-start gap-3 rounded-xl border border-zinc-200 bg-white p-4">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="file-text" class="size-4 text-zinc-600"></i>
+      </span>
+      <div class="min-w-0">
+        <p class="text-[14px]/5 font-semibold">Purchase orders above ₹5,00,000 need a second approval</p>
+        <p class="mt-1 text-[13px]/5 text-zinc-600">From 1 September the second approver is the cost centre head, not Finance. Orders already raised keep the approval they were created with.</p>
+        <p class="mt-2 text-[12px]/4 text-zinc-500">Procurement · Nilesh Patil · 09 Aug 2026</p>
+      </div>
+    </article>
+
+    <article class="flex shrink-0 basis-full snap-start gap-3 rounded-xl border border-zinc-200 bg-white p-4">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="truck" class="size-4 text-zinc-600"></i>
+      </span>
+      <div class="min-w-0">
+        <p class="text-[14px]/5 font-semibold">Gate timings for inward material</p>
+        <p class="mt-1 text-[13px]/5 text-zinc-600">Unloading now closes at 18:00 instead of 20:00. Vehicles reporting after 18:00 are held overnight and weighed the next morning.</p>
+        <p class="mt-2 text-[12px]/4 text-zinc-500">Stores · Meera Joshi · 01 Aug 2026</p>
+      </div>
+    </article>
+  </div>
+
+  <div class="mt-3 flex items-center justify-center gap-1">
+    <button type="button" @click="go(0)" :aria-current="i === 0 ? 'true' : 'false'" aria-label="Notice 1, extruder line 2 shutdown"
+            class="flex size-6 items-center justify-center rounded-md focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="h-1.5 rounded-full transition-all" :class="i === 0 ? 'w-4 bg-zinc-700' : 'w-1.5 bg-zinc-300'"></span>
+    </button>
+    <button type="button" @click="go(1)" :aria-current="i === 1 ? 'true' : 'false'" aria-label="Notice 2, second approval limit"
+            class="flex size-6 items-center justify-center rounded-md focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="h-1.5 rounded-full transition-all" :class="i === 1 ? 'w-4 bg-zinc-700' : 'w-1.5 bg-zinc-300'"></span>
+    </button>
+    <button type="button" @click="go(2)" :aria-current="i === 2 ? 'true' : 'false'" aria-label="Notice 3, gate timings"
+            class="flex size-6 items-center justify-center rounded-md focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="h-1.5 rounded-full transition-all" :class="i === 2 ? 'w-4 bg-zinc-700' : 'w-1.5 bg-zinc-300'"></span>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<!-- The asterisk carries aria-hidden="true" and the required attribute does the
+     announcing. Left visible to a screen reader the field is called "Vendor
+     star", and every reader pronounces the glyph differently — asterisk, star,
+     nothing at all. Left without required it is a red mark with no behaviour
+     under it: the form submits empty and the mark was decoration.
+
+     The convention is explained once, above the fields, not beside each of
+     them. A form that repeats "required" twelve times has spent twelve lines
+     saying what one line says.
+
+     Mark the smaller set. Here two of three are required so the asterisks are
+     fewer; on a form where eleven of twelve are, the honest version marks the
+     one that is optional and says so at the top instead. Whichever way round,
+     the word Optional is plain zinc-500 and not a second colour — optional is
+     not a data state. -->
+<div class="max-w-xl">
+  <p class="mb-4 text-[12px]/4 text-zinc-500">
+    Fields marked <span class="text-red-600">*</span> are required.
+  </p>
+
+  <div class="space-y-4">
+    <div>
+      <label for="lb-req-vendor" class="mb-1.5 block text-[13px]/5 font-medium">
+        Vendor <span aria-hidden="true" class="text-red-600">*</span>
+      </label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="lb-req-vendor" name="vendor" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          <option>Gujarat Polymers Ltd</option>
+          <option>Sharma Extrusions Pvt Ltd</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label for="lb-req-date" class="mb-1.5 block text-[13px]/5 font-medium">
+        Required by <span aria-hidden="true" class="text-red-600">*</span>
+      </label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="lb-req-date" name="required_by" type="date" value="2026-09-04" required
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+      </div>
+    </div>
+
+    <div>
+      <!-- no attribute to back it, so no mark; the word carries it instead -->
+      <label for="lb-req-ref" class="mb-1.5 flex items-baseline gap-1.5 text-[13px]/5 font-medium">
+        Vendor reference
+        <span class="font-normal text-zinc-500">Optional</span>
+      </label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="lb-req-ref" name="vendor_ref" placeholder="Their quotation number"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+      </div>
+    </div>
+  </div>
+</div>

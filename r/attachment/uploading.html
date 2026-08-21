@@ -1,0 +1,31 @@
+<!-- The number comes from the real XHR progress event. If you cannot get it,
+     drop the percentage and show an indeterminate bar instead of inventing one. -->
+<ul class="space-y-2">
+  <li class="rounded-lg border border-zinc-200 bg-white px-3 py-2">
+    <div class="flex items-center gap-3">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[13px]/5 font-medium">signed-grn-1142.pdf</p>
+        <p class="text-[12px]/4 text-zinc-500">1.8 MB of 4.2 MB</p>
+      </div>
+      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">43%</span>
+      <button type="button" aria-label="Cancel upload of signed-grn-1142.pdf"
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+        <i data-lucide="x" class="size-4"></i>
+      </button>
+    </div>
+    <div role="progressbar" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"
+         aria-label="Uploading signed-grn-1142.pdf"
+         class="mt-2 h-1 overflow-hidden rounded-full bg-zinc-100">
+      <div class="h-full rounded-full bg-zinc-700 transition-[width] duration-300" style="width: 43%"></div>
+    </div>
+  </li>
+  <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="image" class="size-4 text-zinc-600"></i></span>
+    <div class="min-w-0 flex-1">
+      <p class="truncate text-[13px]/5 font-medium">delivery-gate-photo.jpg</p>
+      <p class="text-[12px]/4 text-zinc-500">1.1 MB · Ritu Deshpande · just now</p>
+    </div>
+    <i data-lucide="check-circle-2" class="size-4 shrink-0 text-emerald-600"></i>
+  </li>
+</ul>

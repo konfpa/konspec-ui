@@ -1,0 +1,25 @@
+<!-- Two sizes and no more. 36×20 is the settings row; 28×16 is for a toolbar
+     or a table header, where the switch sits in a line of 13px controls and the
+     full-size pill is taller than everything beside it.
+
+     Neither track is a target on its own — 20px and 16px are both under the
+     24px WCAG 2.2 asks for. The label is the target, and the padding on it is
+     what closes the gap: py-1 round the small one takes the row to 24px, and a
+     settings row is taller than that already. -->
+<div class="max-w-xl space-y-4">
+  <label class="flex items-center justify-between gap-4 py-1">
+    <span class="text-[14px]/5 tabular-nums">Default — 36×20, one setting per row</span>
+    <input type="checkbox" role="switch" checked class="peer sr-only">
+    <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+      <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+    </span>
+  </label>
+
+  <label class="flex items-center justify-between gap-3 py-1">
+    <span class="text-[13px]/5 tabular-nums">Small — 28×16, in a toolbar or a table header</span>
+    <input type="checkbox" role="switch" checked class="peer sr-only">
+    <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+      <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+    </span>
+  </label>
+</div>

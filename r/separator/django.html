@@ -1,0 +1,55 @@
+<!-- Two shapes, one file. What is worth centralising is not the div — it is
+     the shade rule, that a horizontal rule inside a bordered panel is zinc-100
+     and a vertical one is zinc-200. The fortieth template to need a divider is
+     the one that gets it wrong.
+
+     The tag is for the standalone cases only: a menu, a toolbar. A divided list
+     needs no tag at all, because there is nothing to repeat — it is one class
+     on the wrapper.
+
+     And the server is the only place divide-y is safe on a list that can
+     change. {% if %} removes the node, so :last-child lands on the last row
+     that actually rendered. Alpine cannot do this: x-show leaves the row in the
+     DOM and x-if leaves the <template> in the DOM, and either way the rule
+     above the hidden row is stranded at the bottom of the card.
+
+     # templatetags/ui.py
+     @register.inclusion_tag('ui/_separator.html')
+     def separator(orientation='horizontal'):
+         return {'vertical': orientation == 'vertical'}
+
+     # templates/ui/_separator.html
+     {% if vertical %}
+       <div role="separator" aria-orientation="vertical" class="h-5 w-px shrink-0 bg-zinc-200"></div>
+     {% else %}
+       <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+     {% endif %} -->
+{% load humanize ui %}
+
+<div role="menu" aria-label="Order actions"
+     class="w-52 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+  {% for action in order.menu_actions %}
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+      <i data-lucide="{{ action.icon }}" class="size-4 text-zinc-600"></i>{{ action.label }}
+    </button>
+  {% endfor %}
+
+  {# the separator sits in the same if-block as the item it introduces #}
+  {% if order.can_cancel %}
+    {% separator %}
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100">
+      <i data-lucide="trash-2" class="size-4"></i>Cancel order
+    </button>
+  {% endif %}
+</div>
+
+<dl class="mt-4 divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200 bg-white text-[13px]/5">
+  {% for line in order.active_lines %}
+    <div class="flex items-center justify-between gap-4 px-5 py-2.5">
+      <dt class="min-w-0 truncate text-zinc-600">{{ line.item }}</dt>
+      <dd class="shrink-0 tabular-nums">₹{{ line.value|intcomma }}</dd>
+    </div>
+  {% empty %}
+    <p class="py-4 text-center text-[13px]/5 text-zinc-500">No open lines on this order.</p>
+  {% endfor %}
+</dl>

@@ -1,0 +1,104 @@
+{
+  "id": "button-group",
+  "name": "Button group",
+  "category": "actions",
+  "description": "Several controls joined into one object. Two shapes only: a tinted track for choosing one of a set, and a bordered strip for actions that belong together.",
+  "when_to_use": "When the controls are genuinely related — one date range, one set of row actions. Unrelated buttons sitting near each other are a toolbar, not a group, and get normal gaps.",
+  "rules": [
+    "Two shapes and no third. A tinted track with a white active pill means \"pick one of these\"; a bordered strip with dividers means \"these do different things\". Mixing them makes a set of actions look like a choice.",
+    "A group where only one can be active is a radio group, not a row of buttons. role=\"radiogroup\", role=\"radio\", aria-checked, arrow keys and a roving tabindex — otherwise the keyboard tabs through every option one at a time and nothing announces which is chosen.",
+    "Never wrap a group in overflow-hidden to round its corners. It clips the focus ring off the first and last buttons. Round the end buttons instead.",
+    "A group is one object, so it never wraps. Below sm it becomes a select or a menu, not two rows of joined buttons with the join broken.",
+    "The divider between attached buttons is a single border-l on every button but the first. Putting a border on all four sides doubles every internal rule to 2px.",
+    "Members declare their height with h-*, matching the button component. A strip whose members size themselves from padding ends up 2px out of line with the icon-only button sitting next to it."
+  ],
+  "anatomy": [
+    {
+      "part": "Track",
+      "description": "For a choice: rounded-lg bg-zinc-200 with p-0.5, so the active pill has somewhere to sit."
+    },
+    {
+      "part": "Active pill",
+      "description": "bg-white with a shadow, inside the track. White against the tint is what reads as chosen — a darker tint does not."
+    },
+    {
+      "part": "Strip",
+      "description": "For actions: an inline-flex with a single border-zinc-200 around the outside and border-l between."
+    },
+    {
+      "part": "Divider",
+      "description": "border-l on every button except the first. One border, not two."
+    },
+    {
+      "part": "End radii",
+      "description": "Applied to the first and last buttons rather than clipping the container, so focus rings survive."
+    },
+    {
+      "part": "Chevron",
+      "description": "On a split button, the second half. It opens the menu; the first half does the action without opening anything."
+    }
+  ],
+  "behaviour": [
+    "A single-choice group behaves as one Tab stop: Tab enters it, arrow keys move within it, Tab leaves it.",
+    "Arrow keys wrap around at both ends, so Left from the first option lands on the last.",
+    "Choosing an option applies it immediately. A group with an Apply button beside it is a form, not a group.",
+    "A split button's main half acts and its chevron half opens; clicking the main half never opens the menu.",
+    "Below sm a group of more than three collapses to a select, because a fourth joined button either wraps or scrolls.",
+    "Disabled members keep their place in the strip. Removing one on the fly changes which buttons are on the ends and reshapes the whole group."
+  ],
+  "accessibility": [
+    "Single choice is role=\"radiogroup\" with role=\"radio\" and aria-checked on each option, plus a roving tabindex so the group is one stop.",
+    "The group carries an aria-label naming what is being chosen — \"Date range\", not \"Options\".",
+    "A group of independent toggles is role=\"group\" with aria-pressed on each, which is a different thing from a radiogroup and must not be confused with it.",
+    "Icon-only members each carry aria-label; the group label does not name them.",
+    "A split button's chevron has its own aria-label and aria-expanded, because \"Approve\" is already taken by the half beside it.",
+    "The focus ring is never clipped — this is why the container is not overflow-hidden."
+  ],
+  "related": [
+    "button",
+    "dropdown",
+    "tabs"
+  ],
+  "variants": [
+    {
+      "id": "segmented",
+      "name": "Choosing one of a set",
+      "html": "<!-- A real radiogroup: one Tab stop, arrows to move, aria-checked to announce.\n     The roving tabindex is what makes it one stop — every unchecked option is\n     tabindex=\"-1\", so Tab skips straight past them.\n\n     The track is bg-zinc-200 and the active pill is white. White on a tint is\n     what reads as chosen; a darker tint on a lighter tint does not, and it\n     leaves the unchosen options looking disabled. -->\n<div role=\"radiogroup\" aria-label=\"Date range\" x-ref=\"grp\"\n     x-data=\"{\n       v: 'Week',\n       opts: ['Day', 'Week', 'Month', 'Quarter'],\n       move(step) {\n         const i = (this.opts.indexOf(this.v) + step + this.opts.length) % this.opts.length;\n         this.v = this.opts[i];\n         this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());\n       }\n     }\"\n     @keydown.arrow-right.prevent=\"move(1)\" @keydown.arrow-left.prevent=\"move(-1)\"\n     class=\"inline-flex rounded-lg bg-zinc-200 p-0.5\">\n  <template x-for=\"o in opts\" :key=\"o\">\n    <button type=\"button\" role=\"radio\" :aria-checked=\"v === o\" :tabindex=\"v === o ? 0 : -1\"\n            @click=\"v = o\"\n            class=\"inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition\"\n            :class=\"v === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'\">\n      <span x-text=\"o\"></span>\n    </button>\n  </template>\n</div>"
+    },
+    {
+      "id": "attached",
+      "name": "Actions that belong together",
+      "html": "<!-- A bordered strip, which says \"these do different things\" — the opposite of\n     the tinted track above. One border around the outside, border-l between,\n     and the radii on the end buttons rather than overflow-hidden on the\n     container, so the focus ring is not clipped off either end. -->\n<div class=\"inline-flex rounded-lg border border-zinc-200 bg-white\">\n  <button type=\"button\" class=\"inline-flex h-8 items-center gap-2 rounded-l-lg px-3 text-[13px]/5 font-medium hover:bg-zinc-100\">\n    <i data-lucide=\"pencil\" class=\"size-4 text-zinc-600\"></i>Edit\n  </button>\n  <button type=\"button\" class=\"inline-flex h-8 items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100\">\n    <i data-lucide=\"copy\" class=\"size-4 text-zinc-600\"></i>Duplicate\n  </button>\n  <button type=\"button\" class=\"inline-flex h-8 items-center gap-2 rounded-r-lg border-l border-zinc-200 px-3 text-[13px]/5 font-medium text-red-600 hover:bg-red-50\">\n    <i data-lucide=\"trash-2\" class=\"size-4\"></i>Delete\n  </button>\n</div>"
+    },
+    {
+      "id": "icon-toolbar",
+      "name": "Icon-only strip",
+      "html": "<!-- Table density and column controls. Square buttons so the hit area is\n     square, each with its own aria-label — the group label does not name the\n     members, so \"Toolbar\" on the wrapper would leave three unnamed buttons.\n\n     The pressed one is aria-pressed, not aria-checked: these are independent\n     toggles, and only the density one is a choice. -->\n<div class=\"flex flex-wrap items-center gap-3\">\n  <div role=\"radiogroup\" aria-label=\"Row density\" x-ref=\"dens\"\n       x-data=\"{\n         v: 'comfortable',\n         opts: ['compact', 'comfortable'],\n         move(step) {\n           const i = (this.opts.indexOf(this.v) + step + this.opts.length) % this.opts.length;\n           this.v = this.opts[i];\n           this.$nextTick(() => this.$refs.dens.querySelector('[aria-checked=true]').focus());\n         }\n       }\"\n       @keydown.arrow-right.prevent=\"move(1)\" @keydown.arrow-left.prevent=\"move(-1)\"\n       class=\"inline-flex rounded-lg bg-zinc-200 p-0.5\">\n    <button type=\"button\" role=\"radio\" :aria-checked=\"v === 'compact'\" :tabindex=\"v === 'compact' ? 0 : -1\"\n            @click=\"v = 'compact'\" aria-label=\"Compact rows\"\n            class=\"flex size-8 items-center justify-center rounded-md transition\"\n            :class=\"v === 'compact' ? 'bg-white shadow-sm' : 'text-zinc-600 hover:text-zinc-900'\">\n      <i data-lucide=\"align-justify\" class=\"size-4\"></i>\n    </button>\n    <button type=\"button\" role=\"radio\" :aria-checked=\"v === 'comfortable'\" :tabindex=\"v === 'comfortable' ? 0 : -1\"\n            @click=\"v = 'comfortable'\" aria-label=\"Comfortable rows\"\n            class=\"flex size-8 items-center justify-center rounded-md transition\"\n            :class=\"v === 'comfortable' ? 'bg-white shadow-sm' : 'text-zinc-600 hover:text-zinc-900'\">\n      <i data-lucide=\"menu\" class=\"size-4\"></i>\n    </button>\n  </div>\n\n  <div role=\"group\" aria-label=\"Table view\" class=\"inline-flex rounded-lg border border-zinc-200 bg-white\">\n    <button type=\"button\" aria-label=\"Freeze first column\" aria-pressed=\"true\"\n            class=\"flex size-8 items-center justify-center rounded-l-lg bg-zinc-200 hover:bg-zinc-300\">\n      <i data-lucide=\"pin\" class=\"size-4\"></i>\n    </button>\n    <button type=\"button\" aria-label=\"Show totals row\" aria-pressed=\"false\"\n            class=\"flex size-8 items-center justify-center border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900\">\n      <i data-lucide=\"sigma\" class=\"size-4\"></i>\n    </button>\n    <button type=\"button\" aria-label=\"Wrap long text\" aria-pressed=\"false\"\n            class=\"flex size-8 items-center justify-center rounded-r-lg border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900\">\n      <i data-lucide=\"wrap-text\" class=\"size-4\"></i>\n    </button>\n  </div>\n</div>"
+    },
+    {
+      "id": "split",
+      "name": "Split button",
+      "html": "<!-- One button, two halves. The left half approves; the right half opens the\n     variations. Clicking the left half never opens the menu — that is the whole\n     reason for splitting it rather than making the entire thing a dropdown.\n\n     The chevron carries its own aria-label because \"Approve\" is already the\n     name of the half beside it, and its own aria-expanded because it is the\n     half that opens something. The divider is border-zinc-600, one step\n     lighter than the fill, because a zinc-200 rule on a dark button reads as a\n     crack rather than a join. -->\n<div class=\"relative inline-flex\" x-data=\"{ open: false }\"\n     @click.outside=\"open = false\" @keydown.escape.window=\"open = false\">\n  <button type=\"button\" class=\"inline-flex h-9 items-center rounded-l-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">\n    Approve\n  </button>\n  <button type=\"button\" @click.stop=\"open = !open\"\n          aria-label=\"More approval options\" :aria-expanded=\"open\" aria-haspopup=\"menu\"\n          class=\"inline-flex h-9 items-center rounded-r-lg border-l border-zinc-600 bg-zinc-700 px-2 text-white hover:bg-zinc-800\">\n    <i data-lucide=\"chevron-down\" class=\"size-4\"></i>\n  </button>\n\n  <div x-show=\"open\" x-cloak @click.stop role=\"menu\"\n       class=\"absolute top-full right-0 z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg\">\n    <button type=\"button\" role=\"menuitem\" class=\"flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100\">\n      <i data-lucide=\"check-check\" class=\"size-4 text-zinc-600\"></i>Approve and close\n    </button>\n    <button type=\"button\" role=\"menuitem\" class=\"flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100\">\n      <i data-lucide=\"user-round-plus\" class=\"size-4 text-zinc-600\"></i>Approve and forward\n    </button>\n    <button type=\"button\" role=\"menuitem\" class=\"flex w-full items-center gap-2.5 border-t border-zinc-200 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-red-50\">\n      <i data-lucide=\"circle-x\" class=\"size-4\"></i>Reject\n    </button>\n  </div>\n</div>"
+    },
+    {
+      "id": "input",
+      "name": "Attached to an input",
+      "html": "<!-- The border lives on the wrapper, not on the input, so there is one rule\n     around the pair instead of two abutting ones. The input is transparent and\n     borderless inside it, and focus-within moves the ring to the wrapper — put\n     it on the input and the ring is drawn inside the border it shares. -->\n<div class=\"flex max-w-md items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n  <label for=\"add-part\" class=\"sr-only\">Part number</label>\n  <input id=\"add-part\" type=\"text\" placeholder=\"Part number\"\n         class=\"w-full min-w-0 rounded-l-lg bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500\">\n  <button type=\"button\" class=\"inline-flex shrink-0 items-center gap-2 rounded-r-lg border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100\">\n    <i data-lucide=\"plus\" class=\"size-4 text-zinc-600\"></i>Add line\n  </button>\n</div>"
+    },
+    {
+      "id": "vertical",
+      "name": "Stacked",
+      "html": "<!-- For a narrow column where a horizontal strip would not fit. Same rules\n     rotated: one border outside, border-t between, radii on the ends. Buttons\n     are left-aligned rather than centred, so the labels form a reading column\n     the way a menu does. -->\n<div role=\"group\" aria-label=\"Record actions\" class=\"inline-flex w-56 flex-col rounded-lg border border-zinc-200 bg-white\">\n  <button type=\"button\" class=\"flex h-9 items-center gap-2.5 rounded-t-lg px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100\">\n    <i data-lucide=\"file-check-2\" class=\"size-4 text-zinc-600\"></i>Record GRN\n  </button>\n  <button type=\"button\" class=\"flex h-9 items-center gap-2.5 border-t border-zinc-200 px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100\">\n    <i data-lucide=\"receipt\" class=\"size-4 text-zinc-600\"></i>Attach invoice\n  </button>\n  <button type=\"button\" class=\"flex h-9 items-center gap-2.5 border-t border-zinc-200 px-3 text-left text-[13px]/5 font-medium hover:bg-zinc-100\">\n    <i data-lucide=\"history\" class=\"size-4 text-zinc-600\"></i>Amendment history\n  </button>\n  <button type=\"button\" class=\"flex h-9 items-center gap-2.5 rounded-b-lg border-t border-zinc-200 px-3 text-left text-[13px]/5 font-medium text-red-600 hover:bg-red-50\">\n    <i data-lucide=\"circle-x\" class=\"size-4\"></i>Cancel order\n  </button>\n</div>"
+    },
+    {
+      "id": "responsive",
+      "name": "On a phone",
+      "html": "<!-- Four joined buttons do not fit a 390px screen, and a group that wraps has\n     stopped being one object — the join breaks and two of the four end up with\n     the wrong radii. Below sm it is a select instead, which is one tap and\n     costs no width at all.\n\n     The two share one x-data, so whichever the user touches, both agree. -->\n<div x-data=\"{\n       v: 'Week',\n       opts: ['Day', 'Week', 'Month', 'Quarter'],\n       move(step) {\n         const i = (this.opts.indexOf(this.v) + step + this.opts.length) % this.opts.length;\n         this.v = this.opts[i];\n         this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());\n       }\n     }\">\n  <label for=\"range-sm\" class=\"sr-only\">Date range</label>\n  <select id=\"range-sm\" x-model=\"v\"\n          class=\"w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:hidden\">\n    <template x-for=\"o in opts\" :key=\"o\"><option :value=\"o\" x-text=\"o\"></option></template>\n  </select>\n\n  <div role=\"radiogroup\" aria-label=\"Date range\" x-ref=\"grp\"\n       @keydown.arrow-right.prevent=\"move(1)\" @keydown.arrow-left.prevent=\"move(-1)\"\n       class=\"hidden rounded-lg bg-zinc-200 p-0.5 sm:inline-flex\">\n    <template x-for=\"o in opts\" :key=\"o\">\n      <button type=\"button\" role=\"radio\" :aria-checked=\"v === o\" :tabindex=\"v === o ? 0 : -1\" @click=\"v = o\"\n              class=\"inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition\"\n              :class=\"v === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'\">\n        <span x-text=\"o\"></span>\n      </button>\n    </template>\n  </div>\n</div>"
+    },
+    {
+      "id": "django",
+      "name": "Django filter group",
+      "html": "<!-- A GET form, so the chosen range ends up in the querystring and the page is\n     linkable and bookmarkable. Real radio inputs do the work — no JavaScript,\n     no roving tabindex to maintain, and the browser gives arrow keys and the\n     radiogroup semantics for free.\n\n     The input is sr-only rather than hidden, because display:none takes it out\n     of the tab order and off the keyboard entirely. peer-checked styles the\n     label that follows it; peer-focus-visible puts the focus ring there too,\n     since the input itself cannot be seen.\n\n     # views.py\n     rng = request.GET.get('range', 'week')   # 'day' | 'week' | 'month' -->\n<form method=\"get\" class=\"inline-flex rounded-lg bg-zinc-200 p-0.5\">\n  {% for value, label in ranges %}\n    <div>\n      <input type=\"radio\" name=\"range\" id=\"range-{{ value }}\" value=\"{{ value }}\"\n             {% if value == selected %}checked{% endif %}\n             onchange=\"this.form.submit()\" class=\"peer sr-only\">\n      <label for=\"range-{{ value }}\"\n             class=\"block rounded-md px-3 py-1.5 text-[13px]/5 font-medium text-zinc-600 transition hover:text-zinc-900 peer-checked:bg-white peer-checked:text-zinc-900 peer-checked:shadow-sm peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15\">\n        {{ label }}\n      </label>\n    </div>\n  {% endfor %}\n</form>"
+    }
+  ]
+}

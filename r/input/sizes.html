@@ -1,0 +1,37 @@
+<!-- Two sizes and no more. 36px is the form field; 32px is the dense one, for
+     a toolbar or the filter row above a register, where the field sits in a
+     line of 13px controls and a 36px box is taller than everything beside it.
+
+     Both heights come from padding against the line box, never from an h-
+     class. py-2 on a 20px leading is 36px and py-1.5 is 32px, and both are a
+     whole number of line boxes. h-9 on the input looks identical until the
+     wrapper gains a taller child, at which point the flex row centres the text
+     instead of its own padding doing it and the caret drifts off the icon
+     beside it by a pixel or two.
+
+     The dense field also drops to 13px text. Keeping 14px inside a 32px box
+     leaves 6px of padding, and the descenders start touching the border. -->
+<div class="max-w-xl space-y-5">
+  <div>
+    <label for="in-h36" class="mb-1.5 block text-[13px]/5 font-medium">36px — the form field</label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="in-h36" value="Gujarat Polymers Ltd"
+             class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+    </div>
+  </div>
+
+  <div>
+    <p class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">32px — the filter row over a register</p>
+    <div class="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+      <div class="flex min-w-0 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <i data-lucide="search" class="ml-2.5 size-4 shrink-0 text-zinc-600"></i>
+        <label for="in-h32" class="sr-only">Filter purchase orders</label>
+        <input id="in-h32" placeholder="Filter 1,438 orders"
+               class="w-full min-w-0 bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+      </div>
+      <button type="button" class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+        <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Filters
+      </button>
+    </div>
+  </div>
+</div>

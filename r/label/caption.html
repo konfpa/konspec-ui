@@ -1,0 +1,43 @@
+<!-- These captions name values, not controls, so none of them is a label
+     element. A label with no control is bound to nothing: the click behaviour
+     does nothing, some screen readers skip it entirely because a label is
+     announced with the thing it names rather than on its own, and the next
+     person to touch the file assumes there is an input somewhere and goes
+     looking for it. dt and dd say what this actually is — a list of terms and
+     their values.
+
+     The other half of the same mistake is a real control sitting under text
+     that was never bound to it. It looks identical on screen. It is announced
+     as "edit, blank", and clicking the words does nothing, which is the
+     cheapest way to catch it.
+
+     These captions are 11px uppercase tracking-wider, which is the record
+     caption and the column header. Form control names are 13px font-medium in
+     the ordinary text colour — swap the two and an eight-field form reads as
+     eight section headings with a box under each. -->
+<dl class="grid max-w-xl grid-cols-2 gap-x-4 gap-y-3 rounded-xl border border-zinc-200 bg-white p-4 sm:grid-cols-3">
+  <div>
+    <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Order</dt>
+    <dd class="mt-0.5 text-[13px]/5 tabular-nums">PO-24-1187</dd>
+  </div>
+  <div>
+    <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Raised</dt>
+    <dd class="mt-0.5 text-[13px]/5 tabular-nums">16 Aug 2026</dd>
+  </div>
+  <div>
+    <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Value</dt>
+    <dd class="mt-0.5 text-[13px]/5 tabular-nums">₹18,42,000</dd>
+  </div>
+  <div class="col-span-2">
+    <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Vendor</dt>
+    <dd class="mt-0.5 text-[13px]/5">Gujarat Polymers Ltd</dd>
+  </div>
+  <div>
+    <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Status</dt>
+    <dd class="mt-0.5">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full bg-amber-500"></span>Approved
+      </span>
+    </dd>
+  </div>
+</dl>

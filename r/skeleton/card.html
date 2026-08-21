@@ -1,0 +1,51 @@
+<!-- The card's own frame is drawn for real and only its contents are grey. The
+     border, the radius, the padding and the divider are structure the page
+     already has, so wrapping a skeleton in a plainer box and swapping the whole
+     card in is how a border appears out of nowhere on arrival.
+
+     The header row is the loaded header exactly: a size-10 rounded-full block
+     for the avatar, a 14px name line and a 12px second line beside it. A block
+     standing in for something round is round — a rounded-lg square where a
+     circle is coming reads as an icon well, which is a different shape doing a
+     different job.
+
+     The figure is h-4 in an h-7 box because the real figure is
+     text-[24px]/7. The two action blocks are h-9 rounded-lg, the height and
+     radius of the buttons that replace them, and they are divs rather than
+     disabled buttons: a Tab during the wait should run past the card, not stop
+     on a control that cannot do anything yet. -->
+<div class="max-w-sm rounded-xl border border-zinc-200 bg-white" aria-busy="true">
+  <p role="status" class="sr-only">Loading the vendor summary</p>
+
+  <div class="animate-pulse p-4 motion-reduce:animate-none" aria-hidden="true">
+    <div class="flex items-center gap-3">
+      <div class="size-10 shrink-0 rounded-full bg-zinc-200"></div>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-24 rounded bg-zinc-200"></div></div>
+      </div>
+      <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
+    </div>
+
+    <div class="mt-4 border-t border-zinc-100 pt-3">
+      <div class="flex h-4 items-center"><div class="h-2 w-28 rounded bg-zinc-200"></div></div>
+      <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-36 rounded bg-zinc-200"></div></div>
+    </div>
+
+    <div class="mt-4 space-y-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+      </div>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+      <div class="h-9 w-28 rounded-lg bg-zinc-200"></div>
+      <div class="h-9 w-24 rounded-lg bg-zinc-200"></div>
+    </div>
+  </div>
+</div>

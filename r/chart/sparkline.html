@@ -1,0 +1,49 @@
+<div class="max-w-xs rounded-xl border border-zinc-200 bg-white p-4"
+     x-data="{
+       chart: null,
+       init() { this.wait(() => this.draw()); },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. */
+       wait(fn) {
+         getComputedStyle(this.$refs.tone).backgroundColor !== 'rgba(0, 0, 0, 0)'
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const tone = getComputedStyle(this.$refs.tone).backgroundColor;
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'line',
+           data: {
+             labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+             datasets: [{ data: [124, 138, 119, 156, 141, 168, 203, 187, 196, 224, 231, 241],
+                          borderColor: tone, borderWidth: 2, pointRadius: 0, tension: 0.35, fill: false }]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false,
+             scales: { x: { display: false }, y: { display: false } },
+             plugins: { tooltip: { enabled: false } }
+           }
+         });
+       },
+       destroy() { this.chart && this.chart.destroy(); }
+     }">
+
+  <!-- a sparkline has no legend, so the palette is a hidden swatch. It has to be a
+       real class attribute: Tailwind never sees a class name written inside x-init. -->
+  <span x-ref="tone" class="hidden bg-zinc-800" aria-hidden="true"></span>
+
+  <p class="text-[11px]/4 uppercase tracking-wider text-zinc-500">Committed value</p>
+  <div class="mt-1.5 flex items-end justify-between gap-3">
+    <p class="text-[24px]/8 font-semibold tabular-nums">₹2.41 Cr</p>
+    <p class="pb-1 text-[12px]/4 tabular-nums text-zinc-600">+14% YoY</p>
+  </div>
+
+  <div class="mt-3 h-10">
+    <canvas x-ref="canvas" role="img"
+            aria-label="Committed value over the last twelve months, rising from ₹1.24 crore to ₹2.41 crore, with the steepest climb in March."></canvas>
+  </div>
+</div>

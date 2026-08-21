@@ -1,0 +1,47 @@
+<!-- Two named inputs, one clean(). The values that post are ISO strings, which
+     is the one format DateField parses without touching DATE_INPUT_FORMATS.
+
+     # forms.py
+     class PeriodForm(forms.Form):
+         start = forms.DateField(input_formats=['%Y-%m-%d'])
+         end   = forms.DateField(input_formats=['%Y-%m-%d'])
+
+         def clean(self):
+             c = super().clean()
+             if c.get('start') and c.get('end') and c['start'] > c['end']:
+                 raise ValidationError('The period ends before it starts.')
+             return c
+
+     The clean() check is not optional even though the widget prevents it — a
+     POST does not have to come from this page. :min on the end input is a
+     convenience for the user, never a guarantee to the view. -->
+<form method="get" class="max-w-md"
+      x-data="{
+        start: '2026-04-01', end: '2026-08-20',
+        parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
+        fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
+        span() { return (this.start && this.end) ? Math.round((this.parse(this.end) - this.parse(this.start)) / 86400000) + 1 : 0; }
+      }">
+  <fieldset>
+    <legend class="mb-1.5 text-[13px]/5 font-medium">Reporting period</legend>
+
+    <div class="flex items-center gap-2">
+      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <label for="id_start" class="sr-only">Start date</label>
+        <input type="date" id="id_start" name="start" x-model="start"
+               class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
+      </div>
+      <span class="text-[13px]/5 text-zinc-500" aria-hidden="true">to</span>
+      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <label for="id_end" class="sr-only">End date</label>
+        <input type="date" id="id_end" name="end" x-model="end" :min="start"
+               class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
+      </div>
+    </div>
+
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500" aria-live="polite"
+       x-text="span() ? fmt(start) + ' to ' + fmt(end) + ' · ' + span() + ' days' : 'Both dates are required.'"></p>
+  </fieldset>
+
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Run report</button>
+</form>

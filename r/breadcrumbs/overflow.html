@@ -1,0 +1,27 @@
+<!-- Past four levels the middle collapses behind an ellipsis rather than
+     wrapping onto a second line. The button says how many levels it hides,
+     because an ellipsis on its own announces nothing.
+
+     @click.stop on the button and the panel keeps the document-level handler
+     from closing this menu the moment it opens. -->
+<nav aria-label="Breadcrumb" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
+  <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+    <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
+    <li aria-hidden="true" class="text-zinc-500">/</li>
+    <li class="relative">
+      <button type="button" @click.stop="open = !open"
+              aria-label="Show 3 hidden levels" :aria-expanded="open" aria-haspopup="menu"
+              class="rounded-md px-1.5 py-0.5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">…</button>
+      <div x-show="open" x-cloak @click.stop role="menu"
+           class="absolute left-0 z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <a href="#" role="menuitem" class="block truncate px-3 py-2 text-[13px]/5 hover:bg-zinc-100">Procurement</a>
+        <a href="#" role="menuitem" class="block truncate px-3 py-2 text-[13px]/5 hover:bg-zinc-100">Purchase orders</a>
+        <a href="#" role="menuitem" class="block truncate px-3 py-2 text-[13px]/5 hover:bg-zinc-100">Gujarat Polymers Ltd</a>
+      </div>
+    </li>
+    <li aria-hidden="true" class="text-zinc-500">/</li>
+    <li><a href="#" class="tabular-nums text-zinc-600 hover:text-zinc-900">PO-24-1187</a></li>
+    <li aria-hidden="true" class="text-zinc-500">/</li>
+    <li><span aria-current="page" class="font-medium text-zinc-900">Line 4 — MS angle 50×50×6</span></li>
+  </ol>
+</nav>

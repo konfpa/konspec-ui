@@ -1,0 +1,99 @@
+<!-- One row of a register, and the partial the card is fetched from. The same
+     template renders the panel for htmx and for a direct request, so the
+     preview and the page cannot drift apart.
+
+     # views.py
+     def order_card(request, pk):
+         order = get_object_or_404(
+             Order.objects.select_related('vendor', 'raised_by'), pk=pk
+         )
+         return render(request, 'orders/_hovercard.html', {'order': order})
+
+     # urls.py
+     path('orders/<int:pk>/card/', order_card, name='order-card'),
+
+     select_related is not a tidy-up here. The card names the vendor and the
+     person who raised the order, so without it every hovered row costs three
+     queries, and a user running the pointer down a page of fifty makes a
+     hundred and fifty.
+
+     Nothing in the block carries an id, which is what makes it safe inside a
+     for loop. The moment a hovercard names its panel — aria-controls, or an
+     htmx hx-target — the id needs {{ order.pk }} in it on every row, and
+     duplicate ids are the failure that follows a copy-paste into a loop.
+
+     Give the view the same cache headers as any other read-only partial. A
+     hovercard is the one component a user can fire fifty times in ten seconds
+     without meaning to. -->
+{% for order in page_obj %}
+  <tr class="border-b border-zinc-100">
+    <td class="px-4 py-2.5">
+      <span class="relative inline-block"
+            x-data="{
+              open: false, timer: 0, loaded: false,
+              show(d = 350) {
+                clearTimeout(this.timer);
+                this.timer = setTimeout(() => {
+                  this.open = true;
+                  if (!this.loaded) this.$refs.body.dispatchEvent(new CustomEvent('hovercard-fetch'));
+                  window.dispatchEvent(new CustomEvent('hovercard-open', { detail: this.$root }));
+                }, d);
+              },
+              hide() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = false, 200); },
+              shut() { clearTimeout(this.timer); this.open = false; }
+            }"
+            @mouseenter="show()" @mouseleave="hide()"
+            @focusin="show(0)" @focusout="hide()"
+            @keydown.escape.window="shut()"
+            @hovercard-open.window="if ($event.detail !== $root) shut()"
+            @htmx:after-swap.camel="loaded = true">
+
+        <a href="{% url 'order-detail' order.pk %}" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums">{{ order.number }}</a>
+
+        <div x-show="open" x-cloak x-transition.opacity.duration.150ms
+             class="absolute top-full left-0 z-40 pt-2">
+          <div x-ref="body"
+               hx-get="{% url 'order-card' order.pk %}" hx-trigger="hovercard-fetch"
+               hx-swap="innerHTML" hx-sync="this:drop"
+               class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+            <div class="animate-pulse" aria-hidden="true">
+              <div class="h-3 w-28 rounded bg-zinc-200"></div>
+              <div class="mt-2 h-2.5 w-40 rounded bg-zinc-200"></div>
+            </div>
+          </div>
+        </div>
+      </span>
+    </td>
+    <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">{{ order.vendor.name }}</td>
+    <td class="px-4 py-2.5 text-right tabular-nums">₹{{ order.value|intcomma }}</td>
+  </tr>
+{% endfor %}
+
+{# orders/_hovercard.html — swapped into the panel, and rendered on its own
+   when someone opens the URL directly. status_dot is the filter the badge
+   component defines; it is the single place the status colour is decided. #}
+{% load humanize ui %}
+<div class="flex items-start justify-between gap-3">
+  <div class="min-w-0">
+    <p class="truncate text-[14px]/5 font-semibold tabular-nums">{{ order.number }}</p>
+    <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">{{ order.vendor.name }}</p>
+  </div>
+  <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+    <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>{{ order.get_status_display }}
+  </span>
+</div>
+<dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+  <div class="flex items-baseline justify-between gap-3">
+    <dt class="text-[12px]/4 text-zinc-600">Value</dt>
+    <dd class="text-[12px]/4 font-medium tabular-nums">₹{{ order.value|intcomma }}</dd>
+  </div>
+  <div class="flex items-baseline justify-between gap-3">
+    <dt class="text-[12px]/4 text-zinc-600">Delivery</dt>
+    <dd class="text-[12px]/4 tabular-nums">{{ order.delivery_date|date:"d M Y" }}</dd>
+  </div>
+  <div class="flex items-baseline justify-between gap-3">
+    <dt class="text-[12px]/4 text-zinc-600">Received</dt>
+    <dd class="text-[12px]/4 tabular-nums">{{ order.received_count }} of {{ order.line_count }} GRNs</dd>
+  </div>
+</dl>
+<p class="mt-3 border-t border-zinc-100 pt-3 text-[12px]/4 text-zinc-500 tabular-nums">Raised by {{ order.raised_by.get_full_name }} · {{ order.raised_on|date:"d M Y" }}</p>

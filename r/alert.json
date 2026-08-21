@@ -1,0 +1,105 @@
+{
+  "id": "alert",
+  "name": "Alert",
+  "category": "feedback",
+  "description": "An inline notice about the page or the record in front of the user. White card, zinc border, and the only colour is the icon.",
+  "when_to_use": "A message that belongs to the page and should stay until it is read or dismissed. For a transient confirmation of something the user just did, use a toast.",
+  "rules": [
+    "Do not tint the alert body. bg-red-50 / bg-amber-50 panels shout against the graphite theme — the icon carries the severity on its own.",
+    "An alert with no action is just noise. If there is nothing to do about it, put the text where it belongs instead.",
+    "Errors coming back from a form belong on the field. A page-level alert may summarise them and link to each field, but it never replaces the field-level message.",
+    "The page banner is graphite, never red. It is an emphasis surface, not a severity — a full-bleed red bar reads as an outage even when the message is routine.",
+    "role=\"alert\" on markup already in the DOM at page load announces nothing. Put it on alerts that appear in response to an action, and leave it off static page notices.",
+    "Never stack more than two alerts above a page. Past that nobody reads any of them — collapse the rest into one alert that links to a list.",
+    "Dismiss is browser state only. The alert comes back on the next request unless the server was told about it."
+  ],
+  "anatomy": [
+    {
+      "part": "Icon",
+      "description": "The only colour in the component, and the whole severity signal. size-4, shrink-0, mt-0.5 so it sits on the first line of text."
+    },
+    {
+      "part": "Title",
+      "description": "One sentence stating the fact, in sentence case. No \"Error:\" prefix — the icon already said that."
+    },
+    {
+      "part": "Detail",
+      "description": "Optional second line: the consequence, the deadline, or who to talk to. text-[12px]/4 text-zinc-600."
+    },
+    {
+      "part": "Action",
+      "description": "Optional, and at most one. The single thing to do about the message. shrink-0 so it never compresses."
+    },
+    {
+      "part": "Dismiss",
+      "description": "Optional, and only for alerts that are safe to lose. A 28px icon button on the right with aria-label=\"Dismiss\"."
+    }
+  ],
+  "behaviour": [
+    "Alerts stack in one region at the top of the content column, newest first, separated by 8px.",
+    "The text block flexes and wraps; the icon and the action are shrink-0 and never compress.",
+    "The action wraps below the text on narrow screens — the row is flex-wrap and the text block carries a min-width for that reason.",
+    "Dismissing hides the alert in the browser. Nothing is sent to the server, so a dismissal that must survive a reload has to be recorded there.",
+    "A page banner sits outside the content column, above the application header, and spans the full viewport.",
+    "A form error summary takes focus when it renders so the keyboard is already at the problem."
+  ],
+  "accessibility": [
+    "Error and warning alerts that appear in response to an action carry role=\"alert\" so they are announced.",
+    "The icon is decorative and carries no label — the sentence alone says what happened and how bad it is.",
+    "Colour is never the only signal. The wording states the severity as well, for the 8% of men who will not see the difference between the amber and the red icon.",
+    "The dismiss button has aria-label=\"Dismiss\" because its only content is an icon.",
+    "The form error summary is focusable with tabindex=\"-1\", and every entry links to its field id so the keyboard lands on the input, not near it."
+  ],
+  "related": [
+    "toast",
+    "alert-dialog",
+    "badge"
+  ],
+  "variants": [
+    {
+      "id": "tags",
+      "name": "Four severities",
+      "html": "<div class=\"flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3\">\n  <i data-lucide=\"info\" class=\"mt-0.5 size-4 shrink-0 text-zinc-500\"></i>\n  <div class=\"min-w-0\">\n    <p class=\"text-[13px]/5 font-medium\">Rate contract with Sharma Extrusions expires on 30 Sep 2024.</p>\n    <p class=\"mt-0.5 text-[12px]/4 text-zinc-600\">Orders raised after that date will price at the spot rate.</p>\n  </div>\n</div>\n\n<div class=\"mt-2 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3\">\n  <i data-lucide=\"check-circle-2\" class=\"mt-0.5 size-4 shrink-0 text-emerald-600\"></i>\n  <div class=\"min-w-0\">\n    <p class=\"text-[13px]/5 font-medium\">PO-24-1187 emailed to Sharma Extrusions.</p>\n    <p class=\"mt-0.5 text-[12px]/4 text-zinc-600\">Sent by Ritu Deshpande, 19 Aug 2024 at 11:42.</p>\n  </div>\n</div>\n\n<div class=\"mt-2 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3\">\n  <i data-lucide=\"alert-triangle\" class=\"mt-0.5 size-4 shrink-0 text-amber-700\"></i>\n  <div class=\"min-w-0\">\n    <p class=\"text-[13px]/5 font-medium\">GRN pending for 3 orders older than 30 days.</p>\n    <p class=\"mt-0.5 text-[12px]/4 text-zinc-600\">Nashik Steel Traders, Gujarat Polymers Ltd, Sharma Extrusions.</p>\n  </div>\n</div>\n\n<div class=\"mt-2 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3\" role=\"alert\">\n  <i data-lucide=\"alert-circle\" class=\"mt-0.5 size-4 shrink-0 text-red-600\"></i>\n  <div class=\"min-w-0\">\n    <p class=\"text-[13px]/5 font-medium\">Order value <span class=\"tabular-nums\">₹18,42,000</span> exceeds your approval limit.</p>\n    <p class=\"mt-0.5 text-[12px]/4 text-zinc-600\">Anything above ₹10,00,000 goes to the plant head.</p>\n  </div>\n</div>"
+    },
+    {
+      "id": "compact",
+      "name": "Compact",
+      "html": "<!-- One line, 32px tall. For a table toolbar or a card header, where a\n     three-line alert would push the data below the fold. -->\n<div class=\"flex items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-3 py-2\">\n  <i data-lucide=\"alert-triangle\" class=\"size-3.5 shrink-0 text-amber-700\"></i>\n  <p class=\"min-w-0 flex-1 truncate text-[12px]/4\">Showing the first 200 of <span class=\"tabular-nums\">1,438</span> matching rows.</p>\n  <a href=\"#\" class=\"shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2\">Narrow the filters</a>\n</div>"
+    },
+    {
+      "id": "dismissible",
+      "name": "Dismissible",
+      "html": "<div x-data=\"{ show: true }\" x-show=\"show\" x-cloak\n     class=\"flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3\">\n  <i data-lucide=\"info\" class=\"mt-0.5 size-4 shrink-0 text-zinc-500\"></i>\n  <div class=\"min-w-0 flex-1\">\n    <p class=\"text-[13px]/5 font-medium\">Vendor bank details changed on 12 Aug 2024.</p>\n    <p class=\"mt-0.5 text-[12px]/4 text-zinc-600\">Payments to Nashik Steel Traders now go to HDFC ••4471.</p>\n  </div>\n  <button type=\"button\" @click=\"show = false\" aria-label=\"Dismiss\"\n          class=\"-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900\">\n    <i data-lucide=\"x\" class=\"size-4\"></i>\n  </button>\n</div>"
+    },
+    {
+      "id": "action",
+      "name": "With action",
+      "html": "<div class=\"flex flex-wrap items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3\">\n  <i data-lucide=\"alert-triangle\" class=\"mt-0.5 size-4 shrink-0 text-amber-700\"></i>\n  <div class=\"min-w-[16rem] flex-1\">\n    <p class=\"text-[13px]/5 font-medium\">PO-24-1163 has been waiting for approval for 9 days.</p>\n    <p class=\"mt-0.5 text-[12px]/4 text-zinc-600\">\n      Nashik Steel Traders · <span class=\"tabular-nums\">₹4,26,500</span> ·\n      <a href=\"#\" class=\"text-zinc-900 underline underline-offset-2\">open the order</a>\n    </p>\n  </div>\n  <button type=\"button\" class=\"rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100\">Remind approver</button>\n</div>"
+    },
+    {
+      "id": "records",
+      "name": "With affected records",
+      "html": "<!-- When the message is about a set of rows, name them. \"4 invoices failed\"\n     with no list means someone has to go hunting for which four. -->\n<div class=\"rounded-lg border border-zinc-200 bg-white px-4 py-3\" role=\"alert\">\n  <div class=\"flex items-start gap-3\">\n    <i data-lucide=\"alert-circle\" class=\"mt-0.5 size-4 shrink-0 text-red-600\"></i>\n    <div class=\"min-w-0\">\n      <p class=\"text-[13px]/5 font-medium\">3 invoices could not be matched to a GRN.</p>\n      <p class=\"mt-0.5 text-[12px]/4 text-zinc-600\">They stay out of the payment run until a GRN is posted against each one.</p>\n    </div>\n  </div>\n  <ul class=\"mt-3 space-y-1.5 border-t border-zinc-100 pt-3 text-[12px]/4\">\n    <li class=\"flex items-center justify-between gap-4\">\n      <a href=\"#\" class=\"truncate text-zinc-900 underline underline-offset-2\">INV-8841 · Nashik Steel Traders</a>\n      <span class=\"shrink-0 tabular-nums text-zinc-600\">₹4,26,500</span>\n    </li>\n    <li class=\"flex items-center justify-between gap-4\">\n      <a href=\"#\" class=\"truncate text-zinc-900 underline underline-offset-2\">INV-8836 · Gujarat Polymers Ltd</a>\n      <span class=\"shrink-0 tabular-nums text-zinc-600\">₹1,18,240</span>\n    </li>\n    <li class=\"flex items-center justify-between gap-4\">\n      <a href=\"#\" class=\"truncate text-zinc-900 underline underline-offset-2\">INV-8829 · Sharma Extrusions</a>\n      <span class=\"shrink-0 tabular-nums text-zinc-600\">₹87,900</span>\n    </li>\n  </ul>\n</div>"
+    },
+    {
+      "id": "progress",
+      "name": "In progress",
+      "html": "<!-- A job the user started that outlives the request. Poll the bar with htmx:\n     hx-get=\"/imports/8841/progress/\" hx-trigger=\"every 2s\" hx-swap=\"outerHTML\". -->\n<div class=\"rounded-lg border border-zinc-200 bg-white px-4 py-3\">\n  <div class=\"flex items-start gap-3\">\n    <i data-lucide=\"loader-2\" class=\"mt-0.5 size-4 shrink-0 animate-spin text-zinc-500\"></i>\n    <div class=\"min-w-0 flex-1\">\n      <p class=\"text-[13px]/5 font-medium\">Importing the August rate card.</p>\n      <p class=\"mt-0.5 text-[12px]/4 text-zinc-600\">1,240 of 3,100 rows · you can leave this page, it keeps running.</p>\n    </div>\n    <span class=\"shrink-0 text-[12px]/4 tabular-nums text-zinc-600\">40%</span>\n  </div>\n  <div class=\"mt-3 h-1 overflow-hidden rounded-full bg-zinc-100\">\n    <div class=\"h-full rounded-full bg-zinc-700 transition-[width] duration-500\" style=\"width: 40%\"></div>\n  </div>\n</div>"
+    },
+    {
+      "id": "banner",
+      "name": "Page banner",
+      "html": "<!-- Full-bleed, above the application header, outside the content column.\n     Graphite — never red. A red bar across the top reads as an outage. -->\n<div x-data=\"{ show: true }\" x-show=\"show\" x-cloak\n     class=\"flex flex-wrap items-center gap-x-3 gap-y-1 bg-zinc-900 px-4 py-2.5 text-white sm:px-6\">\n  <i data-lucide=\"wrench\" class=\"size-4 shrink-0 text-zinc-500\"></i>\n  <p class=\"min-w-[14rem] flex-1 text-[13px]/5\">\n    <span class=\"font-medium\">Scheduled maintenance.</span>\n    <span class=\"text-zinc-500\">Purchase orders are read-only on Sun 24 Aug, 01:00–03:00 IST.</span>\n  </p>\n  <a href=\"#\" class=\"shrink-0 text-[13px]/5 font-medium underline underline-offset-2\">What changes</a>\n  <button type=\"button\" @click=\"show = false\" aria-label=\"Dismiss\"\n          class=\"-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-800 hover:text-white\">\n    <i data-lucide=\"x\" class=\"size-4\"></i>\n  </button>\n</div>"
+    },
+    {
+      "id": "form-errors",
+      "name": "Form error summary",
+      "html": "<!-- {{ form.non_field_errors }} plus one line per field that has errors.\n     It summarises; it does not replace the message under each input.\n     x-init focuses it so the keyboard is already at the problem. -->\n<div role=\"alert\" tabindex=\"-1\" x-data x-init=\"$el.focus()\"\n     class=\"rounded-lg border border-zinc-200 bg-white px-4 py-3 outline-none\">\n  <div class=\"flex items-start gap-3\">\n    <i data-lucide=\"alert-circle\" class=\"mt-0.5 size-4 shrink-0 text-red-600\"></i>\n    <div class=\"min-w-0\">\n      <p class=\"text-[13px]/5 font-medium\">This order was not saved — 3 fields need attention.</p>\n      <ul class=\"mt-2 space-y-1 text-[12px]/4 text-zinc-600\">\n        <li>\n          <a href=\"#id_vendor\" class=\"font-medium text-zinc-900 underline underline-offset-2\">Vendor</a>\n          — select a vendor.\n        </li>\n        <li>\n          <a href=\"#id_delivery_date\" class=\"font-medium text-zinc-900 underline underline-offset-2\">Delivery date</a>\n          — cannot be before the order date.\n        </li>\n        <li>\n          <a href=\"#id_quantity\" class=\"font-medium text-zinc-900 underline underline-offset-2\">Quantity</a>\n          — enter a whole number greater than zero.\n        </li>\n      </ul>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "django",
+      "name": "Django messages block",
+      "html": "<!-- {% if messages %}{% for message in messages %} … {% endfor %}{% endif %}\n     Swap the icon and its colour on message.tags: success / warning / error,\n     anything else falls through to the neutral info icon. Give error and\n     warning role=\"alert\"; success and info do not need it. -->\n<div x-data=\"{ show: true }\" x-show=\"show\" x-cloak\n     class=\"flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3\">\n  <i data-lucide=\"check-circle-2\" class=\"mt-0.5 size-4 shrink-0 text-emerald-600\"></i>\n  <p class=\"min-w-0 flex-1 text-[13px]/5 font-medium\">GRN 1142 posted against PO-24-1187.</p>\n  <button type=\"button\" @click=\"show = false\" aria-label=\"Dismiss\"\n          class=\"-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900\">\n    <i data-lucide=\"x\" class=\"size-4\"></i>\n  </button>\n</div>"
+    }
+  ]
+}

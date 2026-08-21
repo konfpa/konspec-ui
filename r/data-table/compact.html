@@ -1,0 +1,87 @@
+<div x-data="{
+       q: '', col: 'vendor', dir: 'asc', page: 1, size: 4,
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: 1842000 },
+         { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: 468500 },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: 2710400 },
+         { po: 'PO-24-1199', vendor: 'Nashik Steel Traders', amount: 132900 },
+         { po: 'PO-24-1203', vendor: 'Sharma Extrusions', amount: 96750 },
+         { po: 'PO-24-1207', vendor: 'Gujarat Polymers Ltd', amount: 5460000 }
+       ],
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       sortBy(c) { this.dir = this.col === c && this.dir === 'asc' ? 'desc' : 'asc'; this.col = c; this.page = 1 },
+       ariaSort(c) { return this.col === c ? (this.dir === 'asc' ? 'ascending' : 'descending') : 'none' },
+       get filtered() {
+         const q = this.q.trim().toLowerCase(), c = this.col, s = this.dir === 'asc' ? 1 : -1;
+         return this.rows
+           .filter(r => !q || (r.po + ' ' + r.vendor).toLowerCase().includes(q))
+           .sort((a, b) => s * (typeof a[c] === 'number' ? a[c] - b[c] : String(a[c]).localeCompare(b[c])));
+       },
+       get pages() { return Math.max(1, Math.ceil(this.filtered.length / this.size)) },
+       get shown() { return this.filtered.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return this.filtered.length ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.filtered.length) }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+
+  <div class="border-b border-zinc-200 px-3 py-2.5">
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" x-model="q" @input="page = 1" aria-label="Search orders" placeholder="Search PO or vendor"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+  </div>
+
+  <table x-show="filtered.length" class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" :aria-sort="ariaSort('po')" class="px-3 py-1.5">
+          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'po' && 'text-zinc-900'">
+            PO number
+            <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
+        <th scope="col" :aria-sort="ariaSort('vendor')" class="px-3 py-1.5">
+          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'vendor' && 'text-zinc-900'">
+            Vendor
+            <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
+        <th scope="col" :aria-sort="ariaSort('amount')" class="px-3 py-1.5">
+          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'amount' && 'text-zinc-900'">
+            Amount
+            <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </button>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in shown" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-3 py-1.5 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="px-3 py-1.5" x-text="r.vendor"></td>
+          <td class="px-3 py-1.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <p x-show="!filtered.length" x-cloak class="px-3 py-8 text-center text-[13px]/5 text-zinc-600">
+    No orders match <span class="font-medium text-zinc-900" x-text="q"></span>.
+  </p>
+
+  <nav aria-label="Register pages" class="flex items-center justify-between gap-3 border-t border-zinc-200 px-3 py-2">
+    <p class="text-[13px]/5 text-zinc-600 tabular-nums"
+       x-text="filtered.length ? from + '–' + to + ' of ' + filtered.length : '0 of 0'"></p>
+    <div class="flex items-center gap-1">
+      <button type="button" @click="page--" :disabled="page === 1" aria-label="Previous page"
+              class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+      <button type="button" @click="page++" :disabled="page === pages" aria-label="Next page"
+              class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>

@@ -1,0 +1,2664 @@
+{
+  "$schema": "https://konspec.internal/ui/registry.schema.json",
+  "endpoints": {
+    "index": "/r/index.json — this file: the spec, and every component summarised with its variant ids. No markup, no per-component prose.",
+    "note": "Fetch the smallest thing that answers the question. llms.txt already lists every component with its variant ids, so an agent that read it can build a variant URL directly and never needs this file.",
+    "component": "/r/<id>.json — one component: rules, anatomy, behaviour, accessibility, and every variant with its html",
+    "variant": "/r/<id>/<variant>.html — the markup, raw, ready to paste",
+    "full": "/registry.json — the whole system in one file. Do not fetch it; it will not fit in context."
+  },
+  "name": "Konspec UI",
+  "version": "0.1.0",
+  "purpose": "Copy-paste HTML components for internal data applications. Light theme only.",
+  "generated_by": "node tools/build.js",
+  "read_first": "llms.txt",
+  "stack": {
+    "css": "Tailwind CSS v4 — utility classes only. No component CSS, no @apply, no custom colour tokens.",
+    "js": "Alpine.js 3 for local UI state, plus two official plugins — @alpinejs/collapse for animated panels and @alpinejs/focus for dialog focus traps. Both load before Alpine core. State lives on the component root, never in a global store.",
+    "server": "htmx for partial swaps. Alpine does not fetch.",
+    "charts": "Chart.js 4 via CDN, pinned, and only on pages that plot something. Colours are read out of the DOM at init, never written as hex: series from the HTML legend swatches, grid from the card border.",
+    "icons": "Lucide via CDN — <i data-lucide=\"name\"></i>, hydrated by lucide.createIcons().",
+    "build": "None. Snippets are plain HTML and paste into Django, Flask or a static file unchanged."
+  },
+  "rules": [
+    "Use what is already here — Before writing any markup, look for it in the component list in llms.txt. If a component or a page layout is already defined, copy its markup from /r/<id>/<variant>.html — writing your own version of something the registry defines is the defect this rule exists to prevent, because two implementations of one thing drift apart and only one of them ever gets the accessibility work. The layout entries are mandatory, not examples: a screen with a title and actions is page-header, a create-or-edit screen is form-page, and a queue worked one record at a time is list-detail. The shell that holds all of them is the next rule, and it is not optional. If what you need is not here, stop and flag it: name the thing, say what it has to do, and let a person add it to the framework. Do not invent a component, a layout or a pattern to fill the gap, and do not ship a one-off approximation of one under another name. A missing entry is a decision for a person; an invented one is a defect that ships and then gets copied. The same applies one level down, to variants: if the component is here but the variant you need is not, flag that too. Changing the labels, figures and records inside a variant is expected and is what copying it is for; reshaping one into a state, density or arrangement the registry does not list is a new variant, and a new variant is an addition to the framework rather than a local edit.",
+    "Every signed-in screen is app-shell — This is the one layout decision that is already made, and it is not a default you may weigh against alternatives. If a signed-in user can reach the page, the page is app-shell with the screen's own content inside <main>, copied from /r/app-shell/default.html like any other component. There are exactly two exceptions, auth-page and error-page, and they are exceptions for a reason rather than by taste: the shell reads the navigation, the counts and the signed-in user out of context that a signed-out visitor or a failed request may not have. Do not assemble a shell of your own out of sidebar and topbar. Those entries document the shell's parts and exist so its own variants can be built; a hand-rolled sidebar-plus-topbar is a second implementation of app-shell, and two implementations of one thing drift apart while only one of them keeps the accessibility work. Do not ship a lighter shell for one screen, and do not start a page at <main> because the screen looked simple enough not to need chrome. The shell owns the skip link, the nav landmark, the off-canvas focus trap, the collapse persistence, the command palette and the keyboard shortcuts; a page that skips it loses every one of them silently and still reviews as fine, because everything it dropped is invisible until somebody uses a keyboard or a phone. The test is the response, not the screen: if a signed-in request returns a page, it is app-shell. An htmx partial swapped into a shell already on screen is not a page and must not repeat it.",
+    "Stock Tailwind only — No custom CSS, no @theme colours, no arbitrary hex. Arbitrary values are for one-off sizes, never for colour.",
+    "Light theme only — There is no dark mode and none is planned. A second theme doubles the review surface for no benefit in an office tool.",
+    "Never bind Alpine on a Lucide icon — createIcons() replaces the <i> with an <svg>, destroying any :class on it. Bind on a wrapping span instead.",
+    "Never add cursor-pointer — Tailwind v4 preflight drops it from buttons. One base rule fixes every element; 300 utility classes do not.",
+    "Colour means data state — Red, amber and green describe what a record is doing. Never decoration, never a brand accent. They appear as a dot or an icon, never as a field of colour behind text.",
+    "The accent is graphite — zinc-700. Interactive text is zinc-900 plus an underline, not a colour.",
+    "Alerts are neutral — White card, zinc border, colour only in the icon. A full-width red field shouts louder than the overdue rows it describes.",
+    "Focus is an outline, never a ring — ring-* compiles to box-shadow, and forced-colours mode drops every box-shadow, so a ring is the one focus style guaranteed to vanish for the users who most need it. Write focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15, and take the negative offset when the control sits flush inside a scroller that would clip it. outline-none is allowed only on a field whose wrapper draws the outline for it, because Tailwind resolves outline-style through a variable: outline-none on the same element kills its own focus outline while leaving the width and colour set, which measures as styled and renders as nothing.",
+    "Every tinted shape carries its ring — A tinted shape is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 — pills, chips, avatars, icon wells, all of them. A tinted surface is bg-zinc-100 — the page, selected rows, active nav, table headers. Give a shape the surface fill and it measures 1.00 contrast against the surface it sits on, which is not low contrast but the identical colour, and it disappears. One step of fill separates them and the ring holds the edge. Solid shapes need no ring, and it is ring rather than border so adding it reflows nothing.",
+    "Status colour lives in the dot — Every status pill is the same graphite shape — bg-zinc-200, ring-zinc-300, zinc-700 text, the same fill an avatar takes. What separates Open from Overdue is a 6px dot. A column of tinted pills reads as a traffic light and stops meaning anything by the twelfth row; a column of identical pills with one red dot in it reads at a glance. This is the alert rule — colour only in the marker — applied to a pill.",
+    "One shade per meaning — Info is zinc-400, success emerald-600, warning amber-700, danger red-600 — and a warning is amber-700 in a component and amber-500 only when it is a dot, because a 1.5px stroke and a 6px disc need different weights of the same colour. Nothing takes a -50 tint or a -200 ring: a coloured icon well is still bg-zinc-200 with ring-zinc-300. Pick the shade from the token table, never by eye.",
+    "Survive 390px — Tables become stacked cards. Nothing scrolls sideways on a phone, with one exception: a carousel, where the sideways scroll is the component itself, and which snaps and peeks so it never looks like a layout that broke.",
+    "No template x-for inside svg — It is parsed in the SVG namespace and has no .content. Use divs, or a conic-gradient for donuts.",
+    "x-cloak on anything hidden at first paint — Alpine boots after the HTML renders. Without it, every dropdown flashes on load.",
+    "Every text size carries its leading — text-[13px] compiles to font-size alone — arbitrary sizes emit no line-height, so the element silently inherits whatever an ancestor left. Always write the slash form, text-[13px]/5. Sizes come from the seven steps; only prose may take a looser leading than the default pairing.",
+    "Guard the Lucide re-hydration loop — createIcons() leaves data-lucide on the <svg> it generates, so re-running it on every DOM mutation re-renders every icon forever. Guard on document.querySelector(\"[data-lucide]:not(svg)\") or animations stutter while the DOM never settles."
+  ],
+  "semantic_colours": {
+    "note": "One shade per meaning, everywhere. A mark you read takes the text class; a dot or bar takes the fill class. No -50 tints and no coloured rings — a coloured icon well is still bg-zinc-200 ring-zinc-300.",
+    "tone": {
+      "info": {
+        "icon": "info",
+        "text": "text-zinc-500",
+        "use": "Neutral notice. Grey, because nothing is wrong."
+      },
+      "success": {
+        "icon": "check-circle-2",
+        "text": "text-emerald-600",
+        "use": "Finished, posted, sent. Same green as the Closed dot."
+      },
+      "warning": {
+        "icon": "alert-triangle",
+        "text": "text-amber-700",
+        "use": "Waiting, expiring, over a limit. 700 for marks you read — a 1.5px amber-500 stroke on white is illegible."
+      },
+      "danger": {
+        "icon": "alert-circle",
+        "text": "text-red-600",
+        "use": "Overdue, failed, destructive. Same red as the Overdue dot."
+      }
+    },
+    "fill": {
+      "success": {
+        "fill": "bg-emerald-600",
+        "use": "Status dot, presence dot, healthy indicator."
+      },
+      "warning": {
+        "fill": "bg-amber-500",
+        "use": "Status dot only. There is no amber fill larger than 6px."
+      },
+      "danger": {
+        "fill": "bg-red-600",
+        "use": "Status dot, notification dot, an overdue progress bar, the destructive button — hover:bg-red-700."
+      }
+    }
+  },
+  "status_colours": {
+    "open": {
+      "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
+      "dot": "bg-zinc-500",
+      "meaning": "The ordinary case"
+    },
+    "approved": {
+      "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
+      "dot": "bg-amber-500",
+      "meaning": "Waiting on someone"
+    },
+    "overdue": {
+      "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
+      "dot": "bg-red-600",
+      "meaning": "The alarm state"
+    },
+    "closed": {
+      "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
+      "dot": "bg-emerald-600",
+      "meaning": "Finished"
+    },
+    "draft": {
+      "pill": "bg-zinc-200 text-zinc-600 ring-1 ring-inset ring-zinc-300",
+      "dot": "bg-zinc-400",
+      "meaning": "Not real yet"
+    }
+  },
+  "typography": {
+    "families": {
+      "sans": "Inter",
+      "mono": "JetBrains Mono"
+    },
+    "hosting": "self-hosted, assets/fonts.css — no font CDN at runtime",
+    "note": "An arbitrary font size emits no line-height. Always write the slash form: text-[13px]/5.",
+    "scale": [
+      {
+        "token": "text-[11px]/4",
+        "use": "uppercase labels, counts, badge text"
+      },
+      {
+        "token": "text-[12px]/4",
+        "use": "help text, timestamps, secondary lines"
+      },
+      {
+        "token": "text-[13px]/5",
+        "use": "buttons, table cells, default component text"
+      },
+      {
+        "token": "text-[14px]/5",
+        "use": "body copy, inputs, prose"
+      },
+      {
+        "token": "text-[16px]/6",
+        "use": "card, dialog and panel titles"
+      },
+      {
+        "token": "text-[20px]/7",
+        "use": "section headings, error page titles"
+      },
+      {
+        "token": "text-[24px]/7",
+        "use": "page titles, KPI figures"
+      }
+    ],
+    "weight": [
+      {
+        "token": "font-normal",
+        "value": "400",
+        "use": "body copy, table cells, anything you read as a sentence"
+      },
+      {
+        "token": "font-medium",
+        "value": "500",
+        "use": "anything that labels or acts — buttons, table headers, alert titles, nav items"
+      },
+      {
+        "token": "font-semibold",
+        "value": "600",
+        "use": "headings, KPI figures, panel titles"
+      }
+    ],
+    "tracking": [
+      {
+        "token": "tracking-wider",
+        "use": "11px uppercase labels only"
+      },
+      {
+        "token": "tracking-tight",
+        "use": "headings at 20px and above"
+      },
+      {
+        "token": "normal",
+        "use": "everywhere else. No arbitrary em values."
+      }
+    ]
+  },
+  "categories": [
+    {
+      "id": "actions",
+      "label": "Actions"
+    },
+    {
+      "id": "forms",
+      "label": "Forms"
+    },
+    {
+      "id": "data",
+      "label": "Data display"
+    },
+    {
+      "id": "feedback",
+      "label": "Feedback"
+    },
+    {
+      "id": "navigation",
+      "label": "Navigation"
+    },
+    {
+      "id": "layout",
+      "label": "Layout"
+    }
+  ],
+  "components": [
+    {
+      "id": "button",
+      "name": "Button",
+      "category": "actions",
+      "description": "The standard action control. Exactly one primary button per view; everything else is secondary, ghost or a link.",
+      "related": [
+        "button-group",
+        "dropdown",
+        "alert-dialog"
+      ],
+      "variants": [
+        {
+          "id": "variants",
+          "name": "Variants"
+        },
+        {
+          "id": "sizes",
+          "name": "Sizes"
+        },
+        {
+          "id": "icons",
+          "name": "With icons"
+        },
+        {
+          "id": "states",
+          "name": "Idle, busy, disabled"
+        },
+        {
+          "id": "link",
+          "name": "Navigating, not acting"
+        },
+        {
+          "id": "full-width",
+          "name": "Full width on a phone"
+        },
+        {
+          "id": "toolbar",
+          "name": "In a page header"
+        },
+        {
+          "id": "django",
+          "name": "Django form submits"
+        }
+      ],
+      "detail": "r/button.json"
+    },
+    {
+      "id": "button-group",
+      "name": "Button group",
+      "category": "actions",
+      "description": "Several controls joined into one object. Two shapes only: a tinted track for choosing one of a set, and a bordered strip for actions that belong together.",
+      "related": [
+        "button",
+        "dropdown",
+        "tabs"
+      ],
+      "variants": [
+        {
+          "id": "segmented",
+          "name": "Choosing one of a set"
+        },
+        {
+          "id": "attached",
+          "name": "Actions that belong together"
+        },
+        {
+          "id": "icon-toolbar",
+          "name": "Icon-only strip"
+        },
+        {
+          "id": "split",
+          "name": "Split button"
+        },
+        {
+          "id": "input",
+          "name": "Attached to an input"
+        },
+        {
+          "id": "vertical",
+          "name": "Stacked"
+        },
+        {
+          "id": "responsive",
+          "name": "On a phone"
+        },
+        {
+          "id": "django",
+          "name": "Django filter group"
+        }
+      ],
+      "detail": "r/button-group.json"
+    },
+    {
+      "id": "dropdown",
+      "name": "Dropdown menu",
+      "category": "actions",
+      "description": "A menu of actions anchored to a trigger. Real focus walks the items one tabindex=\"-1\" at a time; destructive items sit last, below a divider.",
+      "related": [
+        "button",
+        "command-palette",
+        "separator"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "row-actions",
+          "name": "Row actions"
+        },
+        {
+          "id": "groups",
+          "name": "Labelled sections"
+        },
+        {
+          "id": "checkbox-items",
+          "name": "Checkbox items"
+        },
+        {
+          "id": "radio-items",
+          "name": "Radio items"
+        },
+        {
+          "id": "shortcuts",
+          "name": "Shortcut hints"
+        },
+        {
+          "id": "submenu",
+          "name": "Submenu"
+        },
+        {
+          "id": "destructive",
+          "name": "Disabled and destructive"
+        },
+        {
+          "id": "account",
+          "name": "Account menu"
+        }
+      ],
+      "detail": "r/dropdown.json"
+    },
+    {
+      "id": "table",
+      "name": "Table",
+      "category": "data",
+      "description": "Rows of records with a sortable header. The workhorse of every register screen — order lists, GRN lists, ledgers.",
+      "related": [
+        "data-table",
+        "empty-state",
+        "skeleton"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "selection",
+          "name": "With selection"
+        },
+        {
+          "id": "row-actions",
+          "name": "Row actions"
+        },
+        {
+          "id": "dense",
+          "name": "Dense"
+        },
+        {
+          "id": "responsive",
+          "name": "Responsive"
+        }
+      ],
+      "detail": "r/table.json"
+    },
+    {
+      "id": "data-table",
+      "name": "Data table",
+      "category": "data",
+      "description": "The register screen assembled: a table with a search box, sortable headers, column visibility, row selection and a pager, all running off one array of records.",
+      "related": [
+        "table",
+        "pagination",
+        "dropdown"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Full register"
+        },
+        {
+          "id": "compact",
+          "name": "Compact"
+        },
+        {
+          "id": "server",
+          "name": "Server-paged"
+        }
+      ],
+      "detail": "r/data-table.json"
+    },
+    {
+      "id": "pagination",
+      "name": "Pagination",
+      "category": "data",
+      "description": "Moves through a long register a page at a time, and says where you are in it. The range and the total are the component; the arrows are only what you do about them.",
+      "related": [
+        "data-table",
+        "table",
+        "empty-state",
+        "spinner"
+      ],
+      "variants": [
+        {
+          "id": "simple",
+          "name": "Simple"
+        },
+        {
+          "id": "numbered",
+          "name": "Numbered with truncation"
+        },
+        {
+          "id": "range",
+          "name": "The range line"
+        },
+        {
+          "id": "page-size",
+          "name": "With page size"
+        },
+        {
+          "id": "dense",
+          "name": "Under a dense table"
+        },
+        {
+          "id": "edges",
+          "name": "Disabled at the ends"
+        },
+        {
+          "id": "loading",
+          "name": "While a page is in flight"
+        },
+        {
+          "id": "load-more",
+          "name": "Load more"
+        },
+        {
+          "id": "footer",
+          "name": "Order register footer"
+        }
+      ],
+      "detail": "r/pagination.json"
+    },
+    {
+      "id": "stat-card",
+      "name": "Stat card",
+      "category": "data",
+      "description": "One number that matters, with the label above it and the change since the last period below. The tile a dashboard strip is made of, and the answer whenever the data is a single current value rather than a shape.",
+      "related": [
+        "card",
+        "chart",
+        "skeleton",
+        "progress"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "delta",
+          "name": "With a delta"
+        },
+        {
+          "id": "sparkline",
+          "name": "With a sparkline"
+        },
+        {
+          "id": "grid",
+          "name": "Grid of four"
+        },
+        {
+          "id": "status",
+          "name": "Value is a status"
+        },
+        {
+          "id": "dense",
+          "name": "Dense strip"
+        },
+        {
+          "id": "loading",
+          "name": "Loading"
+        },
+        {
+          "id": "empty",
+          "name": "Zero and no data"
+        },
+        {
+          "id": "dashboard",
+          "name": "Procurement strip"
+        }
+      ],
+      "detail": "r/stat-card.json"
+    },
+    {
+      "id": "chart",
+      "name": "Chart",
+      "category": "data",
+      "description": "Chart.js on a canvas, wearing this system's colours. The legend is HTML and doubles as the palette the canvas paints from, so a swatch and the line it names cannot drift apart.",
+      "related": [
+        "stat-card",
+        "table",
+        "progress"
+      ],
+      "variants": [
+        {
+          "id": "setup",
+          "name": "Page setup"
+        },
+        {
+          "id": "line",
+          "name": "Line"
+        },
+        {
+          "id": "bar",
+          "name": "Grouped bar"
+        },
+        {
+          "id": "horizontal",
+          "name": "Ranking"
+        },
+        {
+          "id": "stacked",
+          "name": "Stacked by status"
+        },
+        {
+          "id": "donut",
+          "name": "Donut"
+        },
+        {
+          "id": "sparkline",
+          "name": "Sparkline"
+        },
+        {
+          "id": "empty",
+          "name": "Empty"
+        },
+        {
+          "id": "django",
+          "name": "Django template"
+        }
+      ],
+      "detail": "r/chart.json"
+    },
+    {
+      "id": "progress",
+      "name": "Progress",
+      "category": "data",
+      "description": "The determinate wait. A graphite rail filled to the fraction of a known total that is done — receipt against an order, lines closed on a GRN, quantity built against a plan — with the two figures written out beside it.",
+      "related": [
+        "spinner",
+        "stat-card",
+        "chart",
+        "skeleton"
+      ],
+      "variants": [
+        {
+          "id": "bar",
+          "name": "Bar with a label"
+        },
+        {
+          "id": "bare",
+          "name": "Bar on its own"
+        },
+        {
+          "id": "steps",
+          "name": "Segmented"
+        },
+        {
+          "id": "inline",
+          "name": "In a register row"
+        },
+        {
+          "id": "tones",
+          "name": "Over a limit"
+        },
+        {
+          "id": "stacked",
+          "name": "Stacked"
+        },
+        {
+          "id": "radial",
+          "name": "Radial meter"
+        },
+        {
+          "id": "indeterminate",
+          "name": "When the total is not known yet"
+        },
+        {
+          "id": "production",
+          "name": "A production order"
+        }
+      ],
+      "detail": "r/progress.json"
+    },
+    {
+      "id": "empty-state",
+      "name": "Empty state",
+      "category": "data",
+      "description": "What a region shows when it has nothing to draw. Four different situations wearing one shape — nothing created yet, nothing matching the query, nothing this account may see, and nothing that loaded — and the whole job of the component is saying which one it is.",
+      "related": [
+        "data-table",
+        "skeleton",
+        "error-page"
+      ],
+      "variants": [
+        {
+          "id": "nothing-yet",
+          "name": "Nothing created yet"
+        },
+        {
+          "id": "no-results",
+          "name": "No search results"
+        },
+        {
+          "id": "filtered",
+          "name": "Behind an active filter set"
+        },
+        {
+          "id": "error",
+          "name": "The load failed"
+        },
+        {
+          "id": "permission",
+          "name": "Nothing you may see"
+        },
+        {
+          "id": "in-table",
+          "name": "Inside the table body"
+        },
+        {
+          "id": "compact",
+          "name": "In a small panel"
+        },
+        {
+          "id": "inline-create",
+          "name": "Empty list with an inline add"
+        },
+        {
+          "id": "register",
+          "name": "The GRN register, nothing today"
+        }
+      ],
+      "detail": "r/empty-state.json"
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "category": "data",
+      "description": "Grey blocks standing in the exact box the content will occupy — same rows, same leading, same column widths — so the first paint of a screen whose layout is already known lands without moving.",
+      "related": [
+        "spinner",
+        "empty-state",
+        "progress"
+      ],
+      "variants": [
+        {
+          "id": "text",
+          "name": "Text lines"
+        },
+        {
+          "id": "heading",
+          "name": "Heading and body"
+        },
+        {
+          "id": "table",
+          "name": "Table rows"
+        },
+        {
+          "id": "card",
+          "name": "Card"
+        },
+        {
+          "id": "stats",
+          "name": "Stat tiles"
+        },
+        {
+          "id": "list",
+          "name": "List with markers"
+        },
+        {
+          "id": "form",
+          "name": "Edit form loading its values"
+        },
+        {
+          "id": "chart",
+          "name": "Chart panel"
+        },
+        {
+          "id": "record",
+          "name": "Purchase order detail loading"
+        }
+      ],
+      "detail": "r/skeleton.json"
+    },
+    {
+      "id": "marker",
+      "name": "Marker",
+      "category": "data",
+      "description": "The mark that opens a list item — a dot, a number, an icon or a tinted well — drawn as a real element in a box the height of one line, so it holds its place when the item wraps.",
+      "related": [
+        "badge",
+        "progress",
+        "separator"
+      ],
+      "variants": [
+        {
+          "id": "prose",
+          "name": "What ::marker already does"
+        },
+        {
+          "id": "dot",
+          "name": "Dot list"
+        },
+        {
+          "id": "numbered",
+          "name": "Numbered lines"
+        },
+        {
+          "id": "checklist",
+          "name": "Icon checklist"
+        },
+        {
+          "id": "timeline",
+          "name": "Activity feed with a rail"
+        },
+        {
+          "id": "register",
+          "name": "Status marks down a register"
+        },
+        {
+          "id": "nested",
+          "name": "Nested list"
+        },
+        {
+          "id": "steps",
+          "name": "Steps in wells"
+        },
+        {
+          "id": "dense",
+          "name": "In a cell and in prose"
+        }
+      ],
+      "detail": "r/marker.json"
+    },
+    {
+      "id": "spinner",
+      "name": "Spinner",
+      "category": "data",
+      "description": "The indeterminate wait. A graphite ring that turns while work of unknown length is in flight, and a line of text that says what the work is.",
+      "related": [
+        "skeleton",
+        "progress",
+        "button"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "The spinner"
+        },
+        {
+          "id": "sizes",
+          "name": "Sizes"
+        },
+        {
+          "id": "label",
+          "name": "With a label"
+        },
+        {
+          "id": "panel",
+          "name": "Centred in a panel"
+        },
+        {
+          "id": "inline",
+          "name": "Beside a control"
+        },
+        {
+          "id": "overlay",
+          "name": "Over content already on screen"
+        },
+        {
+          "id": "delayed",
+          "name": "The 500ms floor"
+        },
+        {
+          "id": "states",
+          "name": "Running, slow, failed"
+        },
+        {
+          "id": "django",
+          "name": "Django and htmx"
+        }
+      ],
+      "detail": "r/spinner.json"
+    },
+    {
+      "id": "alert",
+      "name": "Alert",
+      "category": "feedback",
+      "description": "An inline notice about the page or the record in front of the user. White card, zinc border, and the only colour is the icon.",
+      "related": [
+        "toast",
+        "alert-dialog",
+        "badge"
+      ],
+      "variants": [
+        {
+          "id": "tags",
+          "name": "Four severities"
+        },
+        {
+          "id": "compact",
+          "name": "Compact"
+        },
+        {
+          "id": "dismissible",
+          "name": "Dismissible"
+        },
+        {
+          "id": "action",
+          "name": "With action"
+        },
+        {
+          "id": "records",
+          "name": "With affected records"
+        },
+        {
+          "id": "progress",
+          "name": "In progress"
+        },
+        {
+          "id": "banner",
+          "name": "Page banner"
+        },
+        {
+          "id": "form-errors",
+          "name": "Form error summary"
+        },
+        {
+          "id": "django",
+          "name": "Django messages block"
+        }
+      ],
+      "detail": "r/alert.json"
+    },
+    {
+      "id": "toast",
+      "name": "Toast",
+      "category": "feedback",
+      "description": "A short confirmation that an action the user just took has finished, pushed into a live region pinned to the bottom-left and gone a few seconds later. It reports an outcome; it is never where the outcome is recorded.",
+      "related": [
+        "alert",
+        "alert-dialog",
+        "spinner"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "tones",
+          "name": "Four tones, two regions"
+        },
+        {
+          "id": "undo",
+          "name": "With undo action"
+        },
+        {
+          "id": "link",
+          "name": "Link to the record"
+        },
+        {
+          "id": "error",
+          "name": "Error, no timer"
+        },
+        {
+          "id": "stack",
+          "name": "Stack, capped at three"
+        },
+        {
+          "id": "pending",
+          "name": "Pending, then resolved"
+        },
+        {
+          "id": "dismiss-all",
+          "name": "Dismiss all"
+        },
+        {
+          "id": "posting",
+          "name": "Posting a GRN"
+        }
+      ],
+      "detail": "r/toast.json"
+    },
+    {
+      "id": "alert-dialog",
+      "name": "Alert dialog",
+      "category": "feedback",
+      "description": "A dialog that interrupts to ask one question with two answers. Unlike a plain dialog it does not dismiss on a backdrop click — the user has to choose.",
+      "related": [
+        "dialog",
+        "alert",
+        "sheet"
+      ],
+      "variants": [
+        {
+          "id": "confirm",
+          "name": "Confirm"
+        },
+        {
+          "id": "destructive",
+          "name": "Destructive"
+        },
+        {
+          "id": "typed",
+          "name": "Typed confirmation"
+        },
+        {
+          "id": "bulk",
+          "name": "Bulk action"
+        },
+        {
+          "id": "unsaved",
+          "name": "Three answers"
+        }
+      ],
+      "detail": "r/alert-dialog.json"
+    },
+    {
+      "id": "dialog",
+      "name": "Dialog",
+      "category": "feedback",
+      "description": "A centred, dismissible panel over a dimmed page. Use it to take a handful of fields without leaving the list.",
+      "related": [
+        "alert-dialog",
+        "sheet",
+        "form-page"
+      ],
+      "variants": [
+        {
+          "id": "form",
+          "name": "Form dialog"
+        },
+        {
+          "id": "scrolling",
+          "name": "Scrolling body"
+        },
+        {
+          "id": "reference",
+          "name": "Reference panel"
+        }
+      ],
+      "detail": "r/dialog.json"
+    },
+    {
+      "id": "sheet",
+      "name": "Sheet",
+      "category": "feedback",
+      "description": "A panel that slides in from the right over the page. Shows a record, or the filters for a list, without losing the user's place in it.",
+      "related": [
+        "dialog",
+        "list-detail",
+        "table"
+      ],
+      "variants": [
+        {
+          "id": "record",
+          "name": "Record detail"
+        },
+        {
+          "id": "filters",
+          "name": "Filters"
+        }
+      ],
+      "detail": "r/sheet.json"
+    },
+    {
+      "id": "drawer",
+      "name": "Drawer",
+      "category": "feedback",
+      "description": "A panel that rises from the bottom edge, sized to its content and capped short of the viewport. The phone-shaped place to put a short action list or a quick filter, because the bottom of the screen is where the thumb already is.",
+      "related": [
+        "sheet",
+        "dialog",
+        "dropdown"
+      ],
+      "variants": [
+        {
+          "id": "actions",
+          "name": "Action list"
+        },
+        {
+          "id": "filter",
+          "name": "Quick filter"
+        },
+        {
+          "id": "long",
+          "name": "Longer than the cap"
+        }
+      ],
+      "detail": "r/drawer.json"
+    },
+    {
+      "id": "badge",
+      "name": "Badge",
+      "category": "feedback",
+      "description": "A small pill that labels a record — status, tag or count. Every pill is the same graphite shape; a 6px dot carries the colour.",
+      "related": [
+        "table",
+        "alert",
+        "avatar"
+      ],
+      "variants": [
+        {
+          "id": "status",
+          "name": "Status pills"
+        },
+        {
+          "id": "inline",
+          "name": "Inline, without the pill"
+        },
+        {
+          "id": "sizes",
+          "name": "Sizes"
+        },
+        {
+          "id": "icon",
+          "name": "With an icon"
+        },
+        {
+          "id": "filter",
+          "name": "Filter chips"
+        },
+        {
+          "id": "removable",
+          "name": "Removable tag"
+        },
+        {
+          "id": "count",
+          "name": "Count badge"
+        },
+        {
+          "id": "table",
+          "name": "In a table"
+        },
+        {
+          "id": "django",
+          "name": "Django status field"
+        }
+      ],
+      "detail": "r/badge.json"
+    },
+    {
+      "id": "tooltip",
+      "name": "Tooltip",
+      "category": "feedback",
+      "description": "A short dark bubble that names the control under the pointer or under the keyboard. It carries a label and nothing else — no controls, no facts that are not already somewhere the user can reach without hovering.",
+      "related": [
+        "hovercard",
+        "popover",
+        "button"
+      ],
+      "variants": [
+        {
+          "id": "icon",
+          "name": "On an icon button"
+        },
+        {
+          "id": "placement",
+          "name": "Four placements"
+        },
+        {
+          "id": "truncated",
+          "name": "Only when the text is clipped"
+        },
+        {
+          "id": "shortcut",
+          "name": "With a keyboard shortcut"
+        },
+        {
+          "id": "disabled",
+          "name": "On a disabled control"
+        },
+        {
+          "id": "table",
+          "name": "In a dense table cell"
+        },
+        {
+          "id": "arrow",
+          "name": "With an arrow"
+        },
+        {
+          "id": "delay-group",
+          "name": "Delay group along a toolbar"
+        },
+        {
+          "id": "row-actions",
+          "name": "A row action bar"
+        }
+      ],
+      "detail": "r/tooltip.json"
+    },
+    {
+      "id": "hovercard",
+      "name": "Hovercard",
+      "category": "feedback",
+      "description": "A card of record detail that opens under a link on hover or focus, after a deliberate delay, and stays open long enough to be read and clicked.",
+      "related": [
+        "tooltip",
+        "dropdown",
+        "card"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "On a record link"
+        },
+        {
+          "id": "vendor",
+          "name": "Vendor card"
+        },
+        {
+          "id": "user",
+          "name": "Person card"
+        },
+        {
+          "id": "placement",
+          "name": "Flipping and clamping"
+        },
+        {
+          "id": "htmx",
+          "name": "Fetched on first open"
+        },
+        {
+          "id": "loading",
+          "name": "Loading"
+        },
+        {
+          "id": "error",
+          "name": "Failed to load"
+        },
+        {
+          "id": "mobile",
+          "name": "On touch"
+        },
+        {
+          "id": "django",
+          "name": "Django register row"
+        }
+      ],
+      "detail": "r/hovercard.json"
+    },
+    {
+      "id": "popover",
+      "name": "Popover",
+      "category": "feedback",
+      "description": "A panel of controls anchored to a button and opened by a click. It holds things you focus and operate — a filter, a column list, a date range, a two-field edit — and the page behind it keeps working.",
+      "related": [
+        "hovercard",
+        "dialog",
+        "dropdown"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "filter",
+          "name": "Filter with Apply"
+        },
+        {
+          "id": "columns",
+          "name": "Column picker"
+        },
+        {
+          "id": "date-range",
+          "name": "Date range"
+        },
+        {
+          "id": "inline-edit",
+          "name": "Inline edit in a scrolling table"
+        },
+        {
+          "id": "arrow",
+          "name": "Arrow, and when to drop it"
+        },
+        {
+          "id": "placement",
+          "name": "Right-aligned and flipped"
+        },
+        {
+          "id": "responsive",
+          "name": "Sheet at 390px"
+        },
+        {
+          "id": "htmx",
+          "name": "Body fetched on first open"
+        }
+      ],
+      "detail": "r/popover.json"
+    },
+    {
+      "id": "avatar",
+      "name": "Avatar",
+      "category": "feedback",
+      "description": "Initials in a circle standing in for a person. There are no photographs in this system, so a zinc tint and two letters is the whole thing.",
+      "related": [
+        "badge",
+        "tooltip",
+        "topbar"
+      ],
+      "variants": [
+        {
+          "id": "sizes",
+          "name": "Sizes"
+        },
+        {
+          "id": "self",
+          "name": "The signed-in user"
+        },
+        {
+          "id": "with-name",
+          "name": "With name and role"
+        },
+        {
+          "id": "stacked",
+          "name": "Stacked group"
+        },
+        {
+          "id": "in-row",
+          "name": "In a table cell"
+        },
+        {
+          "id": "presence",
+          "name": "With presence"
+        },
+        {
+          "id": "menu",
+          "name": "Account trigger"
+        },
+        {
+          "id": "placeholder",
+          "name": "Unassigned"
+        }
+      ],
+      "detail": "r/avatar.json"
+    },
+    {
+      "id": "label",
+      "name": "Label",
+      "category": "forms",
+      "description": "The name of a control, bound to it with for and id or by wrapping it. The smallest component here, and the one that is most often drawn rather than connected.",
+      "related": [
+        "field",
+        "input",
+        "checkbox"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Bound with for and id"
+        },
+        {
+          "id": "required",
+          "name": "Required and optional"
+        },
+        {
+          "id": "wrapping",
+          "name": "Wrapping a checkbox"
+        },
+        {
+          "id": "legend",
+          "name": "A legend for a group"
+        },
+        {
+          "id": "trailing",
+          "name": "With a hint and an action"
+        },
+        {
+          "id": "hidden",
+          "name": "Hidden and absent labels"
+        },
+        {
+          "id": "states",
+          "name": "Disabled and read-only"
+        },
+        {
+          "id": "horizontal",
+          "name": "Dense horizontal form"
+        },
+        {
+          "id": "caption",
+          "name": "What is not a label"
+        }
+      ],
+      "detail": "r/label.json"
+    },
+    {
+      "id": "field",
+      "name": "Field",
+      "category": "forms",
+      "description": "Label, control, help text and error in one block. This is the unit every form is built from, and the thing that owns the wiring between the four.",
+      "related": [
+        "label",
+        "input",
+        "form-page"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "With help text"
+        },
+        {
+          "id": "error",
+          "name": "Error replaces the help text"
+        },
+        {
+          "id": "required",
+          "name": "Required and optional"
+        },
+        {
+          "id": "horizontal",
+          "name": "Label in a left column"
+        },
+        {
+          "id": "group",
+          "name": "Fieldset with a legend"
+        },
+        {
+          "id": "choice",
+          "name": "Around a radio group"
+        },
+        {
+          "id": "action",
+          "name": "Trailing action and a unit"
+        },
+        {
+          "id": "grid",
+          "name": "Two columns, one field spanning"
+        },
+        {
+          "id": "readonly",
+          "name": "Read-only and derived"
+        }
+      ],
+      "detail": "r/field.json"
+    },
+    {
+      "id": "input",
+      "name": "Input",
+      "category": "forms",
+      "description": "Single-line text entry. The border lives on the wrapper, not on the control, so an icon, a unit or a clear button sits inside the focus outline instead of beside it.",
+      "related": [
+        "field",
+        "textarea",
+        "combobox"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "sizes",
+          "name": "Two heights"
+        },
+        {
+          "id": "icon",
+          "name": "Icon and unit"
+        },
+        {
+          "id": "amount",
+          "name": "Rupee amounts and quantities"
+        },
+        {
+          "id": "search",
+          "name": "Search with a clear button"
+        },
+        {
+          "id": "error",
+          "name": "Invalid, and clearing as it is fixed"
+        },
+        {
+          "id": "format",
+          "name": "Format-constrained fields"
+        },
+        {
+          "id": "password",
+          "name": "Password with show and hide"
+        },
+        {
+          "id": "disabled",
+          "name": "Disabled and read-only"
+        }
+      ],
+      "detail": "r/input.json"
+    },
+    {
+      "id": "input-group",
+      "name": "Input group",
+      "category": "forms",
+      "description": "One text field and the things that qualify it — a unit, a currency, a scope select, an action — inside a single bordered enclosure that draws one focus outline for all of them.",
+      "related": [
+        "input",
+        "button-group",
+        "field"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Prefix and suffix"
+        },
+        {
+          "id": "icon",
+          "name": "Leading icon"
+        },
+        {
+          "id": "button",
+          "name": "Trailing icon button"
+        },
+        {
+          "id": "select",
+          "name": "A select fused to the field"
+        },
+        {
+          "id": "action",
+          "name": "A trailing action button"
+        },
+        {
+          "id": "search",
+          "name": "Scoped search"
+        },
+        {
+          "id": "textarea",
+          "name": "Textarea with a footer"
+        },
+        {
+          "id": "error",
+          "name": "Error on the enclosure"
+        },
+        {
+          "id": "dense",
+          "name": "In a table filter row"
+        }
+      ],
+      "detail": "r/input-group.json"
+    },
+    {
+      "id": "select",
+      "name": "Select",
+      "category": "forms",
+      "description": "One answer out of a short fixed list. A real <select>, styled through its wrapper the way an input is, and an Alpine listbox only for the rows an <option> cannot hold.",
+      "related": [
+        "combobox",
+        "field",
+        "dropdown"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Native select"
+        },
+        {
+          "id": "groups",
+          "name": "Groups and a placeholder"
+        },
+        {
+          "id": "states",
+          "name": "Disabled, read-only, invalid"
+        },
+        {
+          "id": "multiple",
+          "name": "Native multiple, and what replaces it"
+        },
+        {
+          "id": "filter",
+          "name": "Dense, in a filter bar"
+        },
+        {
+          "id": "rich",
+          "name": "Listbox with two-line rows"
+        },
+        {
+          "id": "status",
+          "name": "Listbox with a status dot"
+        },
+        {
+          "id": "cascade",
+          "name": "Options loaded by htmx"
+        },
+        {
+          "id": "django",
+          "name": "Django form field"
+        }
+      ],
+      "detail": "r/select.json"
+    },
+    {
+      "id": "textarea",
+      "name": "Textarea",
+      "category": "forms",
+      "description": "Multi-line text entry. Same bordered wrapper as the input, a height measured in rows, and a counter when there is a limit worth showing.",
+      "related": [
+        "field",
+        "input",
+        "form-page"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "sizes",
+          "name": "Sizes"
+        },
+        {
+          "id": "counter",
+          "name": "With a counter"
+        },
+        {
+          "id": "autogrow",
+          "name": "Auto-growing"
+        },
+        {
+          "id": "toolbar",
+          "name": "With a footer"
+        },
+        {
+          "id": "error",
+          "name": "With error"
+        },
+        {
+          "id": "disabled",
+          "name": "Disabled and read-only"
+        },
+        {
+          "id": "django",
+          "name": "Django form field"
+        }
+      ],
+      "detail": "r/textarea.json"
+    },
+    {
+      "id": "checkbox",
+      "name": "Checkbox",
+      "category": "forms",
+      "description": "An independent on or off — one flag, a set of options, or the row selection a register's bulk actions run on. A real native box wearing accent-zinc-700.",
+      "related": [
+        "radio",
+        "toggle",
+        "table"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "group",
+          "name": "Group"
+        },
+        {
+          "id": "indeterminate",
+          "name": "Select all and mixed"
+        },
+        {
+          "id": "cards",
+          "name": "Option tiles"
+        },
+        {
+          "id": "filters",
+          "name": "Filter list"
+        },
+        {
+          "id": "table",
+          "name": "Row selection"
+        },
+        {
+          "id": "states",
+          "name": "Disabled, locked and invalid"
+        },
+        {
+          "id": "django",
+          "name": "Django form field"
+        }
+      ],
+      "detail": "r/checkbox.json"
+    },
+    {
+      "id": "radio",
+      "name": "Radio",
+      "category": "forms",
+      "description": "One of a set, and exactly one. Real native radios wearing accent-zinc-700, where the shared name is the group and the only way to mean none is an option that says so.",
+      "related": [
+        "checkbox",
+        "toggle",
+        "field"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "descriptions",
+          "name": "Options with a description"
+        },
+        {
+          "id": "cards",
+          "name": "Option tiles"
+        },
+        {
+          "id": "inline",
+          "name": "On one row"
+        },
+        {
+          "id": "none",
+          "name": "When none is an answer"
+        },
+        {
+          "id": "table",
+          "name": "Picking one record"
+        },
+        {
+          "id": "states",
+          "name": "Default, locked and invalid"
+        },
+        {
+          "id": "django",
+          "name": "Django form field"
+        }
+      ],
+      "detail": "r/radio.json"
+    },
+    {
+      "id": "toggle",
+      "name": "Toggle",
+      "category": "forms",
+      "description": "A setting that takes effect the moment it is touched. A real checkbox carrying role=\"switch\", with the track and the thumb beside it painted by peer-checked utilities.",
+      "related": [
+        "checkbox",
+        "radio",
+        "field"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "sizes",
+          "name": "Sizes"
+        },
+        {
+          "id": "list",
+          "name": "Settings list"
+        },
+        {
+          "id": "group",
+          "name": "Master and dependants"
+        },
+        {
+          "id": "inline",
+          "name": "In a toolbar"
+        },
+        {
+          "id": "states",
+          "name": "On, off, locked, saving, failed"
+        },
+        {
+          "id": "htmx",
+          "name": "Saved on change"
+        },
+        {
+          "id": "django",
+          "name": "Django settings endpoint"
+        }
+      ],
+      "detail": "r/toggle.json"
+    },
+    {
+      "id": "combobox",
+      "name": "Combobox",
+      "category": "forms",
+      "description": "A text box that filters a list of records and commits one of them. The typing is a search; what reaches the server is a hidden input under it.",
+      "related": [
+        "input",
+        "checkbox",
+        "command-palette"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Single select"
+        },
+        {
+          "id": "multi",
+          "name": "Multiselect with chips"
+        },
+        {
+          "id": "select-all",
+          "name": "Select all, scoped to the filter"
+        },
+        {
+          "id": "groups",
+          "name": "Grouped options"
+        },
+        {
+          "id": "rich",
+          "name": "Two-line options"
+        },
+        {
+          "id": "remote",
+          "name": "Options fetched with htmx"
+        },
+        {
+          "id": "create",
+          "name": "A value that is not in the list"
+        },
+        {
+          "id": "states",
+          "name": "Disabled, locked, invalid"
+        },
+        {
+          "id": "django",
+          "name": "Django form field"
+        }
+      ],
+      "detail": "r/combobox.json"
+    },
+    {
+      "id": "attachment",
+      "name": "Attachment",
+      "category": "forms",
+      "description": "The documents hanging off a record — a drop zone over the list of what is already there. Every file shows its type, size, who attached it and when.",
+      "related": [
+        "input",
+        "field",
+        "alert-dialog"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Drop zone and list"
+        },
+        {
+          "id": "empty",
+          "name": "Nothing attached"
+        },
+        {
+          "id": "uploading",
+          "name": "Uploading"
+        },
+        {
+          "id": "rejected",
+          "name": "Rejected file"
+        },
+        {
+          "id": "readonly",
+          "name": "Read only"
+        },
+        {
+          "id": "single",
+          "name": "Single file field"
+        },
+        {
+          "id": "images",
+          "name": "Image grid"
+        },
+        {
+          "id": "django",
+          "name": "Django ClearableFileInput"
+        }
+      ],
+      "detail": "r/attachment.json"
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar",
+      "category": "forms",
+      "description": "A month grid for picking a date or a range. Monday-first, tabular figures, and the same graphite selection the rest of the system uses.",
+      "related": [
+        "input",
+        "field",
+        "button"
+      ],
+      "variants": [
+        {
+          "id": "month",
+          "name": "Month grid"
+        },
+        {
+          "id": "picker",
+          "name": "Date picker"
+        },
+        {
+          "id": "range",
+          "name": "Date range"
+        },
+        {
+          "id": "jump",
+          "name": "Jumping to a distant month"
+        },
+        {
+          "id": "constrained",
+          "name": "Limits and blocked dates"
+        },
+        {
+          "id": "presets",
+          "name": "Range with presets"
+        },
+        {
+          "id": "native",
+          "name": "The native input"
+        },
+        {
+          "id": "django",
+          "name": "Django form fields"
+        }
+      ],
+      "detail": "r/calendar.json"
+    },
+    {
+      "id": "questionnaire",
+      "name": "Questionnaire",
+      "category": "forms",
+      "description": "A run of questions answered in order on one page — a QC checklist, a vendor assessment, a safety audit. One fieldset per question, the question text as its legend, and three equal tiles carrying the answer so a column of them can be read at a glance.",
+      "related": [
+        "radio",
+        "field",
+        "form-page"
+      ],
+      "variants": [
+        {
+          "id": "question",
+          "name": "One question"
+        },
+        {
+          "id": "run",
+          "name": "A run of questions"
+        },
+        {
+          "id": "observation",
+          "name": "Measured against a spec"
+        },
+        {
+          "id": "conditional",
+          "name": "Follow-up on a fail"
+        },
+        {
+          "id": "scale",
+          "name": "Rating on a scale"
+        },
+        {
+          "id": "multi",
+          "name": "Several answers, one exclusive"
+        },
+        {
+          "id": "sheet",
+          "name": "The whole sheet"
+        },
+        {
+          "id": "invalid",
+          "name": "Submitted with gaps"
+        },
+        {
+          "id": "signed",
+          "name": "Signed off"
+        }
+      ],
+      "detail": "r/questionnaire.json"
+    },
+    {
+      "id": "app-shell",
+      "name": "App shell",
+      "category": "layout",
+      "description": "The page skeleton: an icon rail that expands to a labelled sidebar, a topbar carrying the hamburger, breadcrumb, command palette and account menu, and a single scrolling main column. Everything else in the app renders inside the main column.",
+      "related": [
+        "sidebar",
+        "topbar",
+        "command-palette",
+        "dropdown",
+        "page-header"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        }
+      ],
+      "detail": "r/app-shell.json"
+    },
+    {
+      "id": "page-header",
+      "name": "Page header",
+      "category": "layout",
+      "description": "The top block of a page: where it sits in the app, what it is, what state it is in, and what you can do to it. One h1 per page and it lives here.",
+      "related": [
+        "breadcrumbs",
+        "tabs",
+        "badge",
+        "button-group",
+        "dropdown",
+        "topbar",
+        "app-shell"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Title and actions"
+        },
+        {
+          "id": "trail",
+          "name": "With a breadcrumb"
+        },
+        {
+          "id": "record",
+          "name": "Record header"
+        },
+        {
+          "id": "tabs",
+          "name": "With tabs"
+        },
+        {
+          "id": "filters",
+          "name": "With a filter row"
+        },
+        {
+          "id": "back",
+          "name": "Back link and record paging"
+        },
+        {
+          "id": "sticky",
+          "name": "Sticky and condensing"
+        },
+        {
+          "id": "overflow",
+          "name": "Actions in a menu"
+        }
+      ],
+      "detail": "r/page-header.json"
+    },
+    {
+      "id": "card",
+      "name": "Card",
+      "category": "layout",
+      "description": "A bordered white panel that groups one thing. A header names it, the body holds the content, and an optional footer carries totals or actions.",
+      "related": [
+        "stat-card",
+        "table",
+        "separator"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "actions",
+          "name": "With header actions"
+        },
+        {
+          "id": "stats",
+          "name": "Split stats footer"
+        },
+        {
+          "id": "section",
+          "name": "Section card"
+        },
+        {
+          "id": "table",
+          "name": "Holding a table"
+        },
+        {
+          "id": "clickable",
+          "name": "The whole card is a link"
+        },
+        {
+          "id": "grid",
+          "name": "A row of cards"
+        },
+        {
+          "id": "empty",
+          "name": "With nothing in it"
+        },
+        {
+          "id": "django",
+          "name": "Django loop"
+        }
+      ],
+      "detail": "r/card.json"
+    },
+    {
+      "id": "separator",
+      "name": "Separator",
+      "category": "layout",
+      "description": "The rule that divides content. Almost always a border on the thing beside it rather than an element of its own, and almost always silent to a screen reader.",
+      "related": [
+        "card",
+        "dropdown",
+        "button-group"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Horizontal rule"
+        },
+        {
+          "id": "rows",
+          "name": "Rows in a card"
+        },
+        {
+          "id": "vertical",
+          "name": "Vertical"
+        },
+        {
+          "id": "labelled",
+          "name": "With a label"
+        },
+        {
+          "id": "menu",
+          "name": "Inside a menu"
+        },
+        {
+          "id": "django",
+          "name": "Django partial"
+        }
+      ],
+      "detail": "r/separator.json"
+    },
+    {
+      "id": "carousel",
+      "name": "Carousel",
+      "category": "layout",
+      "description": "A horizontal rail of items that snaps one item at a time. CSS scroll snap does the moving; the arrows and the counter are the only JavaScript.",
+      "related": [
+        "card",
+        "attachment",
+        "pagination"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "peek",
+          "name": "Peek"
+        },
+        {
+          "id": "dots",
+          "name": "Dots"
+        },
+        {
+          "id": "photo",
+          "name": "Photo gallery"
+        },
+        {
+          "id": "thumbnails",
+          "name": "Thumbnail rail"
+        },
+        {
+          "id": "stats",
+          "name": "Strip on mobile, grid on desktop"
+        },
+        {
+          "id": "empty",
+          "name": "Empty"
+        },
+        {
+          "id": "django",
+          "name": "Django template"
+        }
+      ],
+      "detail": "r/carousel.json"
+    },
+    {
+      "id": "list-detail",
+      "name": "List and detail",
+      "category": "layout",
+      "description": "A queue on the left and the record being worked on beside it. Arrow keys walk the list, Enter opens the record into the detail pane, and only the two panes scroll — the page behind them does not move.",
+      "related": [
+        "data-table",
+        "app-shell",
+        "sheet",
+        "empty-state",
+        "skeleton"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Two panes"
+        },
+        {
+          "id": "nothing-selected",
+          "name": "Nothing selected yet"
+        },
+        {
+          "id": "responsive",
+          "name": "Two screens on a phone"
+        },
+        {
+          "id": "search",
+          "name": "Search and filters over the list"
+        },
+        {
+          "id": "three-pane",
+          "name": "Filters, list and detail"
+        },
+        {
+          "id": "loading",
+          "name": "Detail loading, list still live"
+        },
+        {
+          "id": "qc-hold",
+          "name": "QC hold queue, worked one batch at a time"
+        }
+      ],
+      "detail": "r/list-detail.json"
+    },
+    {
+      "id": "form-page",
+      "name": "Form page",
+      "category": "layout",
+      "description": "The layout a create or edit screen uses: one h1, the fields grouped in cards, a validation summary that links to every field that failed, and Save and Cancel where the user can always reach them.",
+      "related": [
+        "field",
+        "page-header",
+        "alert",
+        "card",
+        "button"
+      ],
+      "variants": [
+        {
+          "id": "two-column",
+          "name": "Two columns and a guarded exit"
+        },
+        {
+          "id": "side-rail",
+          "name": "A summary rail beside the fields"
+        },
+        {
+          "id": "sections",
+          "name": "A long form with an in-page nav"
+        },
+        {
+          "id": "invalid",
+          "name": "After a failed submit"
+        },
+        {
+          "id": "sticky-actions",
+          "name": "An action bar that never scrolls away"
+        },
+        {
+          "id": "line-items",
+          "name": "An editable line grid"
+        },
+        {
+          "id": "wizard",
+          "name": "Stepped, with a review at the end"
+        },
+        {
+          "id": "readonly",
+          "name": "The same record in read mode"
+        }
+      ],
+      "detail": "r/form-page.json"
+    },
+    {
+      "id": "auth-page",
+      "name": "Auth page",
+      "category": "layout",
+      "description": "The signed-out screen: one centred card, the fewest fields that will do, and nothing else on the page. Sign in, the second factor after it, and every screen the user lands on when one of the two fails.",
+      "related": [
+        "field",
+        "input",
+        "button",
+        "alert",
+        "checkbox",
+        "error-page"
+      ],
+      "variants": [
+        {
+          "id": "signin",
+          "name": "Sign in"
+        },
+        {
+          "id": "failed",
+          "name": "Failed credentials"
+        },
+        {
+          "id": "forgot",
+          "name": "Forgot password"
+        },
+        {
+          "id": "sent",
+          "name": "Check your email"
+        },
+        {
+          "id": "reset",
+          "name": "Set a new password"
+        },
+        {
+          "id": "otp",
+          "name": "One-time code"
+        },
+        {
+          "id": "sso",
+          "name": "Single sign-on only"
+        },
+        {
+          "id": "locked",
+          "name": "Locked out"
+        }
+      ],
+      "detail": "r/auth-page.json"
+    },
+    {
+      "id": "error-page",
+      "name": "Error page",
+      "category": "layout",
+      "description": "The whole screen the user gets when the page could not be produced at all. It says what failed in their own terms, whether anything they did was saved, and gives one way back into an application whose navigation is not on this page.",
+      "related": [
+        "empty-state",
+        "auth-page",
+        "app-shell",
+        "alert"
+      ],
+      "variants": [
+        {
+          "id": "404",
+          "name": "404 not found"
+        },
+        {
+          "id": "403",
+          "name": "403 permission denied"
+        },
+        {
+          "id": "500",
+          "name": "500 with a support reference"
+        },
+        {
+          "id": "maintenance",
+          "name": "503 scheduled maintenance"
+        },
+        {
+          "id": "offline",
+          "name": "Network failure, retried in place"
+        },
+        {
+          "id": "expired",
+          "name": "Session expired"
+        },
+        {
+          "id": "django",
+          "name": "Django handler templates"
+        }
+      ],
+      "detail": "r/error-page.json"
+    },
+    {
+      "id": "tabs",
+      "name": "Tabs",
+      "category": "navigation",
+      "description": "Switches between views of the same record without leaving the page. The panel below changes; the row above is a widget, not a menu, and the keyboard has to know the difference.",
+      "related": [
+        "page-header",
+        "accordion",
+        "sidebar"
+      ],
+      "variants": [
+        {
+          "id": "underline",
+          "name": "Underline"
+        },
+        {
+          "id": "pill",
+          "name": "Pill"
+        },
+        {
+          "id": "scrollable",
+          "name": "Scrollable"
+        },
+        {
+          "id": "vertical",
+          "name": "Vertical"
+        },
+        {
+          "id": "url",
+          "name": "Linkable"
+        },
+        {
+          "id": "lazy",
+          "name": "Server-loaded panels"
+        },
+        {
+          "id": "states",
+          "name": "Count, flag and unavailable"
+        },
+        {
+          "id": "django",
+          "name": "Tabs that are pages"
+        }
+      ],
+      "detail": "r/tabs.json"
+    },
+    {
+      "id": "breadcrumbs",
+      "name": "Breadcrumbs",
+      "category": "navigation",
+      "description": "The path from the section root down to the record on screen. The last crumb says where you are and is not a link.",
+      "related": [
+        "page-header",
+        "tabs",
+        "sidebar"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "record",
+          "name": "On a record"
+        },
+        {
+          "id": "truncated",
+          "name": "Long labels"
+        },
+        {
+          "id": "overflow",
+          "name": "Collapsed middle"
+        },
+        {
+          "id": "responsive",
+          "name": "On a phone"
+        },
+        {
+          "id": "page-header",
+          "name": "Above a page title"
+        },
+        {
+          "id": "back",
+          "name": "One level deep"
+        },
+        {
+          "id": "django",
+          "name": "Django template"
+        }
+      ],
+      "detail": "r/breadcrumbs.json"
+    },
+    {
+      "id": "menubar",
+      "name": "Menubar",
+      "category": "navigation",
+      "description": "A row of menus across the top of a document — File, Edit, View — sharing one tab stop and one keyboard model. A desktop-application affordance, and most internal screens should not have one.",
+      "related": [
+        "dropdown",
+        "topbar",
+        "navigation-menu"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "shortcuts",
+          "name": "With shortcut hints"
+        },
+        {
+          "id": "checks",
+          "name": "Checkbox and radio items"
+        },
+        {
+          "id": "submenu",
+          "name": "With a submenu"
+        },
+        {
+          "id": "states",
+          "name": "Disabled and destructive items"
+        },
+        {
+          "id": "dense",
+          "name": "Dense, embedded in an editor"
+        },
+        {
+          "id": "collapsed",
+          "name": "Collapsed to one button"
+        },
+        {
+          "id": "trailing",
+          "name": "With a trailing status"
+        },
+        {
+          "id": "htmx",
+          "name": "A command that posts"
+        }
+      ],
+      "detail": "r/menubar.json"
+    },
+    {
+      "id": "navigation-menu",
+      "name": "Navigation menu",
+      "category": "navigation",
+      "description": "A horizontal bar of links to places, some of which open a panel of more links. Every item is an anchor, so the browser's own navigation gestures keep working, and aria-current says which one you are on.",
+      "related": [
+        "topbar",
+        "menubar",
+        "sidebar"
+      ],
+      "variants": [
+        {
+          "id": "links",
+          "name": "Link bar"
+        },
+        {
+          "id": "panel",
+          "name": "One panel of links"
+        },
+        {
+          "id": "columns",
+          "name": "Wide panel, grouped columns"
+        },
+        {
+          "id": "featured",
+          "name": "Featured rail"
+        },
+        {
+          "id": "icons",
+          "name": "Icons per link"
+        },
+        {
+          "id": "mixed",
+          "name": "Links and triggers together"
+        },
+        {
+          "id": "current",
+          "name": "Inside the section"
+        },
+        {
+          "id": "phone",
+          "name": "On a phone"
+        },
+        {
+          "id": "htmx",
+          "name": "Fetched on first open"
+        }
+      ],
+      "detail": "r/navigation-menu.json"
+    },
+    {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "category": "navigation",
+      "description": "The primary navigation panel of the console: a header, grouped menus with counts and submenus, and a footer for the signed-in user. It has three forms — a 256px panel, a 68px icon rail, and an off-canvas sheet over the page.",
+      "related": [
+        "app-shell",
+        "topbar",
+        "navigation-menu"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Expanded panel"
+        },
+        {
+          "id": "counts",
+          "name": "Group labels and counts"
+        },
+        {
+          "id": "nested",
+          "name": "Nested children"
+        },
+        {
+          "id": "rail",
+          "name": "Icon rail"
+        },
+        {
+          "id": "flyout",
+          "name": "Rail flyout submenu"
+        },
+        {
+          "id": "collapse",
+          "name": "Collapse and persist"
+        },
+        {
+          "id": "mobile",
+          "name": "Off-canvas sheet"
+        },
+        {
+          "id": "blocks",
+          "name": "Header switcher and user menu"
+        },
+        {
+          "id": "skeleton",
+          "name": "Loading a permission-filtered nav"
+        }
+      ],
+      "detail": "r/sidebar.json"
+    },
+    {
+      "id": "topbar",
+      "name": "Topbar",
+      "category": "navigation",
+      "description": "The application header above the page content: the sidebar trigger, the context you are working in, what you can search and who you are signed in as. A real <header> holding a named <nav>, sticky over the column and out of the way of everything that opens above it.",
+      "related": [
+        "app-shell",
+        "sidebar",
+        "breadcrumbs",
+        "command-palette",
+        "dropdown",
+        "page-header"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Application bar"
+        },
+        {
+          "id": "search",
+          "name": "Global search"
+        },
+        {
+          "id": "account",
+          "name": "Notifications and account menu"
+        },
+        {
+          "id": "toggle",
+          "name": "Sidebar trigger below lg"
+        },
+        {
+          "id": "context",
+          "name": "Company, plant and financial year"
+        },
+        {
+          "id": "compact",
+          "name": "Document title and actions"
+        },
+        {
+          "id": "sticky",
+          "name": "Sticky, with a scrolled border"
+        },
+        {
+          "id": "phone",
+          "name": "At 390px"
+        },
+        {
+          "id": "assembled",
+          "name": "Procurement console header"
+        }
+      ],
+      "detail": "r/topbar.json"
+    },
+    {
+      "id": "accordion",
+      "name": "Accordion",
+      "category": "navigation",
+      "description": "Sections of content that collapse to their heading. The heading is a button that toggles the panel below it.",
+      "related": [
+        "collapsible",
+        "tabs",
+        "card"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "single",
+          "name": "Single-open"
+        },
+        {
+          "id": "cards",
+          "name": "Bordered card list"
+        }
+      ],
+      "detail": "r/accordion.json"
+    },
+    {
+      "id": "collapsible",
+      "name": "Collapsible",
+      "category": "navigation",
+      "description": "One trigger and one panel. The standalone disclosure — show more, an advanced section at the foot of a form, a filter bar that folds away.",
+      "related": [
+        "accordion",
+        "card",
+        "tabs"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Show more"
+        },
+        {
+          "id": "advanced",
+          "name": "Advanced options"
+        },
+        {
+          "id": "filters",
+          "name": "Filter panel"
+        },
+        {
+          "id": "native",
+          "name": "No JavaScript"
+        },
+        {
+          "id": "card",
+          "name": "Inside a card"
+        },
+        {
+          "id": "controlled",
+          "name": "Trigger outside the panel"
+        },
+        {
+          "id": "states",
+          "name": "Locked, empty and open on desktop"
+        },
+        {
+          "id": "django",
+          "name": "Server-rendered"
+        }
+      ],
+      "detail": "r/collapsible.json"
+    },
+    {
+      "id": "command-palette",
+      "name": "Command palette",
+      "category": "navigation",
+      "description": "A ⌘K overlay for jumping to a record or firing an action by typing. It is a shortcut over the navigation, never the only route to something.",
+      "related": [
+        "combobox",
+        "sidebar",
+        "dropdown"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        }
+      ],
+      "detail": "r/command-palette.json"
+    }
+  ]
+}

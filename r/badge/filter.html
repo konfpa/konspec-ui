@@ -1,0 +1,18 @@
+<!-- A badge that does something is a button. Selected is a solid fill, because
+     a marginally darker tint is not a state anyone can see across a toolbar.
+     aria-pressed carries the same fact to a screen reader. -->
+<div class="flex flex-wrap items-center gap-2" x-data="{ on: ['overdue'] }">
+  <template x-for="f in [{ id: 'mine', label: 'My orders' }, { id: 'overdue', label: 'Overdue' }, { id: 'unapproved', label: 'Awaiting approval' }, { id: 'month', label: 'This month' }]" :key="f.id">
+    <button type="button"
+            @click="on = on.includes(f.id) ? on.filter(x => x !== f.id) : [...on, f.id]"
+            :aria-pressed="on.includes(f.id)"
+            class="rounded-full px-2.5 py-1 text-[12px]/4 font-medium"
+            :class="on.includes(f.id)
+              ? 'bg-zinc-700 text-white hover:bg-zinc-800'
+              : 'bg-white text-zinc-600 ring-1 ring-inset ring-zinc-200 hover:bg-zinc-100'">
+      <span x-text="f.label"></span>
+    </button>
+  </template>
+  <button type="button" x-show="on.length" x-cloak @click="on = []"
+          class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Clear</button>
+</div>

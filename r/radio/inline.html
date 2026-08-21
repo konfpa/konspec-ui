@@ -1,0 +1,31 @@
+<!-- A row only works while every label is a word or two and the set is short.
+     It wraps rather than scrolls at 390px, which is the whole reason gap-y is
+     set as well as gap-x.
+
+     Four one-word options that filter the view the moment they are touched are
+     the segmented track in button-group instead; this shape is for a value that
+     is part of the form and is saved with it. -->
+<fieldset>
+  <legend class="mb-2 text-[13px]/5 font-medium">Quantity unit</legend>
+
+  <div class="flex flex-wrap gap-x-5 gap-y-2">
+    <label class="flex items-center gap-2.5 text-[14px]/5">
+      <input type="radio" name="uom" value="kg" checked class="size-4 shrink-0 accent-zinc-700">
+      <span>kg</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[14px]/5">
+      <input type="radio" name="uom" value="mt" class="size-4 shrink-0 accent-zinc-700">
+      <span>MT</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[14px]/5">
+      <input type="radio" name="uom" value="nos" class="size-4 shrink-0 accent-zinc-700">
+      <span>Nos</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[14px]/5">
+      <input type="radio" name="uom" value="ltr" class="size-4 shrink-0 accent-zinc-700">
+      <span>Litres</span>
+    </label>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500">Applies to every line on this order. Changing it does not convert the quantities already entered.</p>
+</fieldset>

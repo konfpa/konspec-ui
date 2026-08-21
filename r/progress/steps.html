@@ -1,0 +1,83 @@
+<!-- Two things wear this shape and they are not the same thing. The top strip is
+     a run of named stages, where the interesting fact is which stage. The bottom
+     one is a count of identical units, where the interesting fact is how many.
+
+     Three greys and no semantic colour. A stage is a position in a sequence, not
+     a state — an order at "PO issued" is not a warning — so done is zinc-700, the
+     stage in progress is zinc-400 and the ones ahead are zinc-100. Reaching for
+     amber on the current block spends a colour that has to mean "waiting" when
+     the register renders it in a status dot two lines down.
+
+     One progressbar over the whole strip, not one per block. Six progressbars in
+     a row are announced as six separate waits; one, with aria-valuenow="3",
+     aria-valuemax="6" and a valuetext naming the stage, is the fact somebody
+     wanted. The blocks inside it need no aria of their own — the children of a
+     progressbar are presentational.
+
+     aria-valuetext is doing real work in both: without it the top strip is read
+     out as 50% and the bottom as 43%, which are arithmetically true and are not
+     what either bar is about.
+
+     The stage names are hidden below sm rather than shrunk. Six labels across
+     390px is either six sideways-scrolling columns or six truncations reading
+     "Rai…", and the summary line under the strip already names the one that
+     matters. -->
+<div class="space-y-4">
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 id="pg-seg-stage" class="text-[13px]/5 font-medium">PR-24-0338 · Requisition to payment</h3>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">Stage 4 of 6</p>
+    </div>
+
+    <div class="mt-2.5 flex gap-1"
+         role="progressbar" aria-labelledby="pg-seg-stage"
+         aria-valuenow="3" aria-valuemin="0" aria-valuemax="6"
+         aria-valuetext="Stage 4 of 6, receipt in progress">
+      <span class="h-2 flex-1 rounded-full bg-zinc-700"></span>
+      <span class="h-2 flex-1 rounded-full bg-zinc-700"></span>
+      <span class="h-2 flex-1 rounded-full bg-zinc-700"></span>
+      <span class="h-2 flex-1 rounded-full bg-zinc-400"></span>
+      <span class="h-2 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-2 flex-1 rounded-full bg-zinc-100"></span>
+    </div>
+
+    <div class="mt-1.5 hidden gap-1 sm:flex" aria-hidden="true">
+      <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Raised</span>
+      <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Approved</span>
+      <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">PO issued</span>
+      <span class="min-w-0 flex-1 truncate text-[11px]/4 font-medium text-zinc-900">Receipt</span>
+      <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Invoiced</span>
+      <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Paid</span>
+    </div>
+
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500 sm:mt-2">Receipt in progress since 09 Aug · Sharma Extrusions · next, invoice against GRN</p>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 id="pg-seg-lines" class="text-[13px]/5 font-medium">Lines received on PO-24-1203</h3>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">6 of 14</p>
+    </div>
+    <div class="mt-2.5 flex gap-1"
+         role="progressbar" aria-labelledby="pg-seg-lines"
+         aria-valuenow="6" aria-valuemin="0" aria-valuemax="14"
+         aria-valuetext="6 of 14 lines received">
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-700"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-700"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-700"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-700"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-700"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-700"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
+      <span class="h-1.5 flex-1 rounded-full bg-zinc-100"></span>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Last GRN 12 Aug · Nashik Steel Traders · 8 lines open</p>
+  </div>
+</div>

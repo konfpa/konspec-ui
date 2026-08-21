@@ -1,0 +1,15 @@
+<!-- Circles sit over the ones beneath them and cover most of their initials.
+     That is the point: a stack answers "how many and roughly who", not "which
+     one is Sanjay". Keeping every pair of letters readable would mean barely
+     overlapping at all, and then it reads as a row rather than a group.
+
+     The names are on the group, which is what a screen reader gets. The +N
+     chip is last and therefore fully visible, because it is the one part
+     that has to be read. -->
+<div class="flex items-center -space-x-5" role="img"
+     aria-label="Approvers: Ritu Deshpande, Sanjay More, Imran Qureshi and 3 more">
+  <span class="flex size-11 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-2 ring-white" aria-hidden="true">RD</span>
+  <span class="flex size-11 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-2 ring-white" aria-hidden="true">SM</span>
+  <span class="flex size-11 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-2 ring-white" aria-hidden="true">IQ</span>
+  <span class="flex size-11 items-center justify-center rounded-full bg-zinc-700 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white" aria-hidden="true">+3</span>
+</div>

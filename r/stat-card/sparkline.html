@@ -1,0 +1,75 @@
+<!-- The chart entry's sparkline, dropped into a tile. It needs that entry's page
+     setup — Chart.js 4 pinned, in the head, before this markup.
+
+     Do not hand-roll the points into an inline <svg> instead. <template x-for>
+     is parsed in the SVG namespace and has no .content, so the points cannot be
+     bound to anything and stay hand-written while the figure above them changes
+     every morning. This block also already solves reading the colour out of the
+     DOM rather than writing a hex into JS.
+
+     The hidden swatch is the palette. It has to be a real class attribute:
+     Tailwind never sees a class name written inside x-init or a JS string.
+
+     The sparkline is shape. With no axis and no labels it says direction and
+     volatility and nothing else, which is why the figure is beside it and why
+     the canvas takes role="img" with a sentence naming both ends of the range —
+     that sentence is the only route to the trend for anyone not reading the
+     picture. The last point is the only one with a radius, so "where we are now"
+     is marked without putting a number on every week. -->
+<div class="max-w-xs rounded-xl border border-zinc-200 bg-white p-4"
+     x-data="{
+       chart: null,
+       init() { this.wait(() => this.draw()); },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle hands
+          back transparent. With a compiled stylesheet this passes on the first
+          frame and costs nothing. */
+       wait(fn) {
+         getComputedStyle(this.$refs.tone).backgroundColor !== 'rgba(0, 0, 0, 0)'
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const tone = getComputedStyle(this.$refs.tone).backgroundColor;
+         const data = [112, 121, 108, 130, 124, 137, 129, 141, 136, 144, 137, 148];
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'line',
+           data: {
+             labels: ['w1','w2','w3','w4','w5','w6','w7','w8','w9','w10','w11','w12'],
+             datasets: [{
+               data,
+               borderColor: tone, backgroundColor: tone,
+               borderWidth: 2, tension: 0.35, fill: false,
+               pointRadius: c => c.dataIndex === data.length - 1 ? 2.5 : 0,
+               pointHoverRadius: 0
+             }]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false,
+             scales: { x: { display: false }, y: { display: false } },
+             plugins: { tooltip: { enabled: false } }
+           }
+         });
+       },
+       destroy() { this.chart && this.chart.destroy(); }
+     }">
+
+  <span x-ref="tone" class="hidden bg-zinc-800" aria-hidden="true"></span>
+
+  <dl>
+    <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Orders raised · 12 weeks</dt>
+    <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">148</dd>
+    <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+      <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+        <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+11
+      </span>
+      <span class="text-zinc-500">vs. previous 12 weeks</span>
+    </dd>
+  </dl>
+
+  <div class="mt-3 h-10">
+    <canvas x-ref="canvas" role="img"
+            aria-label="Orders raised per week over twelve weeks, rising from 112 to 148 with a dip to 108 in week three and no week below 108 after it."></canvas>
+  </div>
+</div>

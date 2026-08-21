@@ -1,0 +1,179 @@
+<!-- One level of submenu, never two. Two levels means holding a diagonal
+     across two live panels, and the fix for that is a dialog with a search box,
+     not a third flyout.
+
+     items() had to grow a filter. querySelectorAll is deep, so the parent
+     panel's item list picked up the rows inside the flyout as well and Down
+     from Save fell straight into last Tuesday's order. Excluding anything
+     inside [data-sub] puts the walk back on the parent's own rows.
+
+     The submenu keys carry .stop as well as .prevent. Every handler here lives
+     on an ancestor of the flyout — the panel binds Left and Right to walk the
+     bar, the root binds Escape — so without .stop, Left closes the submenu and
+     also jumps to the previous menu, and Escape closes two levels in one press.
+
+     move() clears sub, or arrowing past the submenu trigger leaves a flyout on
+     screen belonging to a row nobody is on. There is no safe triangle and no
+     hover delay, so the flyout is anchored hard against the parent's edge and
+     every sibling row closes it on mouseenter. Below md it drops under its
+     trigger instead of flying sideways: left-full at 390px puts a 256px panel
+     off the right of the screen and the page scrolls to find it. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, sub: null, at: 'file', typed: '', clock: null,
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')].filter(e => !e.closest('[data-sub]')) : [];
+       },
+       subItems() {
+         const p = this.$refs.bar.querySelector('[data-sub=' + this.sub + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id; this.sub = null;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id; this.sub = null;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null; this.sub = null;
+         if (back) this.to(id);
+       },
+       openSub(id) {
+         this.sub = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.subItems()[0]?.focus()));
+       },
+       closeSub() {
+         const id = this.sub; this.sub = null;
+         this.$refs.bar.querySelector('[data-subtrigger=' + id + ']')?.focus();
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { this.sub = null; const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { this.sub = null; const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       subMove(n) { const i = this.subItems(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()" @mouseenter="sub = null"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="file-plus" class="size-4 text-zinc-600"></i>New purchase order
+        </button>
+
+        <div class="relative">
+          <button type="button" role="menuitem" tabindex="-1" aria-haspopup="menu" data-subtrigger="recent"
+                  :aria-expanded="sub === 'recent'"
+                  @click="openSub('recent')" @mouseenter="sub = 'recent'"
+                  @keydown.arrow-right.prevent.stop="openSub('recent')"
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"
+                  :class="sub === 'recent' && 'bg-zinc-100'">
+            <i data-lucide="clock" class="size-4 text-zinc-600"></i>Open recent
+            <span class="ml-auto flex text-zinc-600"><i data-lucide="chevron-right" class="size-3.5"></i></span>
+          </button>
+
+          <div x-show="sub === 'recent'" x-cloak data-sub="recent" role="menu" aria-label="Open recent"
+               @keydown.arrow-down.prevent.stop="subMove(1)" @keydown.arrow-up.prevent.stop="subMove(-1)"
+               @keydown.arrow-left.prevent.stop="closeSub()"
+               @keydown.escape.stop="closeSub()"
+               @keydown.tab="close()"
+               class="absolute top-0 left-full z-40 ml-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg max-md:top-full max-md:left-0 max-md:mt-1 max-md:ml-0">
+            <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                    class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[13px]/5 tabular-nums hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span>PO-24-1187 — Gujarat Polymers</span><span class="shrink-0 text-[12px]/4 text-zinc-500">16 Aug</span>
+            </button>
+            <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                    class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[13px]/5 tabular-nums hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span>PO-24-1179 — Sharma Steel</span><span class="shrink-0 text-[12px]/4 text-zinc-500">11 Aug</span>
+            </button>
+            <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                    class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[13px]/5 tabular-nums hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span>PO-24-1166 — Deccan Fasteners</span><span class="shrink-0 text-[12px]/4 text-zinc-500">4 Aug</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()" @mouseenter="sub = null"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save draft
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()" @mouseenter="sub = null"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="edit"
+              :aria-expanded="open === 'edit'" :tabindex="at === 'edit' ? 0 : -1"
+              @click="open === 'edit' ? close() : show('edit')"
+              @mouseenter="if (open !== null) to('edit')"
+              @keydown.arrow-down.prevent="show('edit')" @keydown.arrow-up.prevent="show('edit', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+
+      <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="rows-3" class="size-4 text-zinc-600"></i>Insert line
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="search" class="size-4 text-zinc-600"></i>Find item code
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 py-3">
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">PO-24-1187 · 14 lines · ₹18,42,000 before tax</p>
+  </div>
+</div>

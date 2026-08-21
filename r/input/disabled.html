@@ -1,0 +1,35 @@
+<!-- These are not two shades of the same state. A disabled control is not
+     submitted with the form, so locking a value by disabling it deletes it
+     from the POST and the server writes the blank it received. readonly
+     submits, stays in the Tab order and stays selectable. Lock with readonly;
+     disable only when there is genuinely nothing to send.
+
+     They do share a surface, and deliberately: bg-zinc-100 with no resting
+     ring reads as a field that is closed. What separates them is the text —
+     zinc-400 for disabled, whose value does not matter, zinc-900 for
+     read-only, whose value still has to be read off the screen and copied.
+
+     Only the read-only wrapper takes a focus outline, because only read-only
+     is focusable, and a keyboard user landing in a field with no indicator has
+     no idea where they are. A read-only value left on white with a border and
+     a focus ring is pixel for pixel an editable field, and the only way to
+     find out otherwise is to click into it and get nothing back. -->
+<div class="max-w-xl space-y-5">
+  <div>
+    <label for="in-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Rate contract</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+      <input id="in-off" disabled value="Locked by policy" aria-describedby="in-off-help"
+             class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 text-zinc-400">
+    </div>
+    <p id="in-off-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Nothing is sent for this field. It is set on the contract itself.</p>
+  </div>
+
+  <div>
+    <label for="in-ro" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-100 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="in-ro" name="order_no" readonly value="PO-24-1187" aria-describedby="in-ro-help"
+             class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 tabular-nums outline-none">
+    </div>
+    <p id="in-ro-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Allotted on 16 Aug 2026 and submitted with the form. Select it to copy.</p>
+  </div>
+</div>

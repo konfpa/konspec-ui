@@ -1,0 +1,41 @@
+<!-- A soft limit: typing past it is allowed, submitting past it is not. A hard
+     maxlength would swallow the tail of a paste without saying so. -->
+<div class="max-w-xl"
+     x-data="{
+       text: 'Rate revised after the vendor withdrew the August discount.',
+       limit: 180,
+       t: null,
+       announce: '',
+       get left() { return this.limit - this.text.length; },
+       get over() { return this.left < 0; },
+       get msg() { return this.over ? Math.abs(this.left) + ' over the limit' : this.left + ' left'; },
+       get tone() { return this.over ? 'text-red-600' : this.left <= 20 ? 'text-amber-700' : 'text-zinc-500'; },
+       say(m) { clearTimeout(this.t); this.t = setTimeout(() => this.announce = m, 700); }
+     }"
+     x-effect="say(left <= 20 ? msg : '')">
+  <div class="mb-1.5 flex items-baseline justify-between gap-3">
+    <label for="ta-reason" class="text-[13px]/5 font-medium">Reason for revision <span class="text-red-600">*</span></label>
+    <span id="ta-reason-count" aria-hidden="true"
+          class="shrink-0 font-mono text-[11px]/4 tabular-nums" :class="tone" x-text="msg"></span>
+  </div>
+
+  <div class="rounded-lg bg-white border"
+       :class="over ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
+                    : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
+    <textarea id="ta-reason" name="reason" rows="4" x-model="text"
+              :aria-invalid="over ? 'true' : null"
+              aria-describedby="ta-reason-help ta-reason-count"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none"></textarea>
+  </div>
+
+  <p id="ta-reason-help" class="mt-1.5 text-[12px]/4" :class="over ? 'font-medium text-red-600' : 'text-zinc-500'">
+    <span x-show="!over">Goes on the amendment record, visible to the vendor. 180 characters.</span>
+    <span x-show="over" x-cloak class="flex items-center gap-1.5">
+      <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Too long to fit on the amendment record.
+    </span>
+  </p>
+
+  <!-- silent until it matters, then debounced, so a screen reader is not read a
+       running count on every keystroke -->
+  <span class="sr-only" aria-live="polite" x-text="announce"></span>
+</div>

@@ -1,0 +1,134 @@
+<!-- The one variant where the frame is the point: a sheet is a document, so it
+     gets a header naming the record it is about and a footer saying when it was
+     last written. Every other shape on this page is the questions on their own,
+     because a card round three radios is a card round nothing.
+
+     The progress rail is 4px and no wider than the sentence beside it. A
+     full-width graphite bar is the heaviest object on any page it appears on,
+     and it is describing five questions the reader can already see.
+
+     Submit is not disabled while questions are unanswered. A dead button says
+     the sheet is not ready and nothing about which line is missing, so the
+     count and the jump carry that instead — and when the submit does fail, the
+     summary in the next variant is what answers it. The jump reads data-open
+     off the questions themselves and focuses the first control inside the first
+     one, because a fieldset is not focusable and focusing the control is what
+     makes the focus ring visible.
+
+     One red line, on the one row that causes something. A sheet where every
+     failed row is tinted is a wall of colour with nothing standing out in
+     it. -->
+<form class="max-w-2xl overflow-hidden rounded-xl border border-zinc-200 bg-white"
+      x-data="{
+        a: { marking: 'pass', seal: 'pass', cert: 'fail', moisture: '', sample: '' },
+        get total() { return Object.keys(this.a).length },
+        get done() { return Object.values(this.a).filter(v => v !== '').length }
+      }">
+
+  <div class="border-b border-zinc-200 px-5 py-4">
+    <h2 class="text-[16px]/6 font-semibold">Incoming inspection — GRN-24-0912</h2>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">HDPE granules, natural · lot 24-HD-118 · Gujarat Polymers Ltd · 16 Aug 2026</p>
+
+    <div class="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div class="h-1 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+           role="progressbar" aria-label="Parameters answered on GRN-24-0912"
+           :aria-valuenow="done" aria-valuemin="0" :aria-valuemax="total">
+        <div class="h-full rounded-full bg-zinc-700 transition-[width] motion-reduce:transition-none"
+             :style="'width: ' + Math.round(done / total * 100) + '%'"></div>
+      </div>
+      <p class="text-[12px]/4 tabular-nums text-zinc-600">
+        <span x-text="done"></span> of <span x-text="total"></span> answered
+      </p>
+      <button type="button" x-show="done !== total" x-cloak
+              @click="$root.querySelector('[data-open] input')?.focus()"
+              class="ml-auto text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Go to the first gap
+      </button>
+    </div>
+  </div>
+
+  <div class="divide-y divide-zinc-100 px-5">
+    <fieldset class="py-4" :data-open="a.marking === ''">
+      <legend class="text-[13px]/5 font-medium">Bag markings — grade, lot and net weight legible on every bag</legend>
+      <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_marking" value="pass" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_marking" value="fail" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_marking" value="na" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="py-4" :data-open="a.seal === ''">
+      <legend class="text-[13px]/5 font-medium">Bags sealed, no tears and no damp patches on the pallet</legend>
+      <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_seal" value="pass" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_seal" value="fail" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_seal" value="na" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="py-4" :data-open="a.cert === ''">
+      <legend class="text-[13px]/5 font-medium">Test certificate lot number matches the bags</legend>
+      <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_cert" value="pass" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_cert" value="fail" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_cert" value="na" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+      <p x-show="a.cert === 'fail'" x-cloak class="mt-2.5 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-red-600">
+        <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>Raises a non-conformance against GRN-24-0912.
+      </p>
+    </fieldset>
+
+    <fieldset class="py-4" :data-open="a.moisture === ''">
+      <legend class="text-[13px]/5 font-medium tabular-nums">Moisture on the hand-held meter at or below 0.05%</legend>
+      <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_moisture" value="pass" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_moisture" value="fail" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_moisture" value="na" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="py-4" :data-open="a.sample === ''">
+      <legend class="text-[13px]/5 font-medium tabular-nums">Retention sample of 500 g drawn and labelled</legend>
+      <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_sample" value="pass" x-model="a.sample" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_sample" value="fail" x-model="a.sample" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qs_sample" value="na" x-model="a.sample" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-zinc-200 px-5 py-3.5">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Draft saved 11:04 · Ritu Deshpande</p>
+    <button type="submit" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Review and sign</button>
+  </div>
+</form>

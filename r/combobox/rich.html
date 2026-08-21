@@ -1,0 +1,108 @@
+<!-- A second line is what makes two vendors called Sharma tell each other
+     apart. It carries the identifying facts — code, GSTIN, last order — and
+     nothing decorative.
+
+     Every row gets an explicit aria-label, because left alone a screen reader
+     reads the whole cell as one run: the name, then a GSTIN spelled out
+     character by character, then a date, then an amount. The label is the name
+     and the code; the rest is aria-hidden and stays on screen for the people
+     reading it.
+
+     Below sm the GSTIN is dropped rather than wrapped. Three facts on a 390px
+     row is one too many, and the vendor code is the one people search by. -->
+<div class="relative max-w-lg"
+     x-data="{
+       open: false, typed: false, q: 'Sharma Extrusions', sel: 'sharma-extrusions', ai: 0,
+       options: [
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', code: 'VEN-0187', gstin: '27AABCS9012K1Z5', last: '14 Aug 2026', spend: '₹18,42,000' },
+         { id: 'sharma-polymers', label: 'Sharma Polymers and Compounds', code: 'VEN-0192', gstin: '24AABCS4471D1ZM', last: '02 Aug 2026', spend: '₹6,90,400' },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', code: 'VEN-0203', gstin: '27AACCN4455P1ZR', last: '19 Aug 2026', spend: '₹4,68,500' },
+         { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', code: 'VEN-0219', gstin: '27AAECD7788M1ZT', last: '28 Jul 2026', spend: '₹96,750' },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', code: 'VEN-0244', gstin: '27AAGCK2266H1ZW', last: '11 Jun 2026', spend: '₹1,32,900' },
+         { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', code: 'VEN-0266', gstin: '33AAJCC8811N1ZD', last: '04 Mar 2026', spend: '₹27,10,400' }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.code + ' ' + o.gstin).toLowerCase().includes(s));
+       },
+       get chosen() { return this.options.find(o => o.id === this.sel) || null; },
+       rowId(o) { return 'cb-rich-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(o => o.id === this.sel));
+         this.scroll();
+       },
+       close() { this.open = false; this.typed = false; this.q = this.chosen ? this.chosen.label : ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-rich" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <i data-lucide="building-2" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-rich" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-rich-list"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Name, vendor code or GSTIN"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <input type="hidden" name="vendor" :value="sel || ''">
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-rich-list" role="listbox" aria-label="Vendors" class="max-h-80 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="o.id === sel" :aria-label="o.label + ', ' + o.code"
+             @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-start gap-3 px-3 py-2">
+          <span class="min-w-0 flex-1" aria-hidden="true">
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate text-[13px]/5 font-medium" x-text="o.label"></span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600" x-text="o.spend"></span>
+            </span>
+            <span class="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px]/4 tabular-nums text-zinc-500">
+              <span x-text="o.code"></span>
+              <span class="hidden sm:inline">·</span>
+              <span class="hidden font-mono sm:inline" x-text="o.gstin"></span>
+              <span>·</span>
+              <span x-text="'last order ' + o.last"></span>
+            </span>
+          </span>
+          <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+            <i data-lucide="check" class="size-4 text-zinc-600"></i>
+          </span>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">A GSTIN search needs all 15 characters.</p>
+    </div>
+  </div>
+</div>

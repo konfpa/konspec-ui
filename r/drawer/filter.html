@@ -1,0 +1,63 @@
+<div x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
+    <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 text-[11px]/4 font-medium tabular-nums">1</span>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-end justify-center bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="quick-filter-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-y-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-y-full"
+         class="flex max-h-[calc(100dvh-6rem)] w-full flex-col rounded-t-2xl border-t border-zinc-200 bg-white shadow-lg sm:max-w-md">
+
+      <div class="flex shrink-0 justify-center pt-2.5 pb-1">
+        <div class="h-1 w-9 rounded-full bg-zinc-300" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 px-5 pt-2 pb-3">
+        <h2 id="quick-filter-title" class="text-[16px]/6 font-semibold">Filter orders</h2>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <div>
+          <label for="bs-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="bs-vendor" autofocus class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 outline-none">
+              <option>All vendors</option>
+              <option selected>Sharma Extrusions</option>
+              <option>Nashik Steel Traders</option>
+              <option>Gujarat Polymers Ltd</option>
+            </select>
+          </div>
+        </div>
+
+        <fieldset class="mt-4">
+          <legend class="mb-2 text-[13px]/5 font-medium">Status</legend>
+          <label class="flex items-center gap-3 py-2 text-[14px]/5"><input type="radio" name="bs-status" checked class="size-4 accent-zinc-700">Any status</label>
+          <label class="flex items-center gap-3 py-2 text-[14px]/5"><input type="radio" name="bs-status" class="size-4 accent-zinc-700">Open</label>
+          <label class="flex items-center gap-3 py-2 text-[14px]/5"><input type="radio" name="bs-status" class="size-4 accent-zinc-700">Awaiting approval</label>
+          <label class="flex items-center gap-3 py-2 text-[14px]/5"><input type="radio" name="bs-status" class="size-4 accent-zinc-700">Overdue</label>
+        </fieldset>
+
+        <label class="mt-2 flex items-center gap-3 py-2 text-[14px]/5">
+          <input type="checkbox" checked class="size-4 rounded accent-zinc-700">Only orders raised by me
+        </label>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" class="rounded-lg px-4 py-2.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-white">Reset</button>
+        <button type="button" @click="open = false"
+                class="flex-1 rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Show 24 orders</button>
+      </div>
+    </div>
+  </div>
+</div>

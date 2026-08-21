@@ -1,0 +1,244 @@
+<!-- Steps are for a process that is genuinely sequential — where step 3 cannot
+     be answered until step 2 is, or where the set of questions in step 3
+     depends on the answer in step 2. A long form that is merely long is the
+     sectioned variant instead: hiding four fifths of a vendor record behind
+     Next costs the person who knows the form by heart three page transitions
+     to do what scrolling does for free, and it stops anyone noticing that two
+     answers contradict each other.
+
+     The step list is an <ol> and not a tablist. These are stages of one task,
+     not views of one record, so they take aria-current="step"; passed steps are
+     buttons back and steps ahead are plain text, because a wizard that lets you
+     jump to step 4 first is a form with a confusing layout.
+
+     The form is novalidate and each step validates itself. A required control
+     inside a display:none panel makes the whole form unsubmittable — the
+     browser refuses with "An invalid form control is not focusable" in the
+     console and nothing at all on screen, because it cannot scroll to a control
+     it is not painting. Hidden steps keep their values and still post; that is
+     the point, and it is also why the guard has to be script.
+
+     Every step change moves focus to the new step's heading, which is
+     tabindex="-1" for that reason. Without it focus stays on Next, which has
+     just changed what it means, and a screen reader is told nothing happened.
+
+     The review step is the whole justification for the pattern: it shows every
+     answer at once with a route back to the step that owns each one, so the
+     thing a wizard hides is visible before anybody commits it.
+
+     Below sm the labelled steps do not fit, so they collapse to a rail and a
+     line of text. They never scroll sideways. -->
+<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+     x-data="{
+       step: 1, last: 4,
+       // focus after a reveal needs a frame as well as a tick: at
+       // $nextTick the panel x-show is about to unhide is still
+       // display:none, and .focus() on an unrendered element is a
+       // silent no-op that leaves the keyboard where it was.
+       focusAfterReveal(get) { this.$nextTick(() => requestAnimationFrame(() => { const el = get(); if (el) el.focus() })) },
+       names: ['Identity', 'Tax and banking', 'Contacts', 'Review'],
+       f: { name: 'Coimbatore Castings Ltd', kind: 'pvt', gstin: '33AAJCC8811N1ZD', ifsc: 'ICIC0000481',
+            person: 'S. Raghunathan', email: 'accounts@coimbatorecastings.in' },
+       bad: [],
+       check(n) {
+         const b = [];
+         if (n === 1 && !this.f.name.trim()) b.push('Registered name');
+         if (n === 2 && this.f.gstin.trim().length !== 15) b.push('GSTIN');
+         if (n === 3 && !this.f.email.includes('@')) b.push('Email');
+         this.bad = b;
+         return !b.length;
+       },
+       go(n) {
+         if (n < 1 || n > this.last) return;
+         if (n > this.step && !this.check(this.step)) return;
+         this.bad = [];
+         this.step = n;
+         this.focusAfterReveal(() => this.$refs['h' + n]);
+       }
+     }">
+
+  <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Master data</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Vendors</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">New</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Onboard a vendor</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">Nothing is created until the review step is confirmed.</p>
+    </div>
+
+    <!-- above sm: the whole route. Below sm: a rail and one line of text. -->
+    <nav aria-label="Onboarding steps" class="mt-5">
+      <ol class="hidden items-center gap-2 sm:flex">
+        <template x-for="(n, i) in names" :key="n">
+          <li class="flex min-w-0 flex-1 items-center gap-2">
+            <button type="button" @click="go(i + 1)" :disabled="i + 1 > step"
+                    :aria-current="step === i + 1 ? 'step' : false"
+                    class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left enabled:hover:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[11px]/4 font-semibold tabular-nums ring-1 ring-inset"
+                    :class="step > i + 1 ? 'bg-zinc-700 text-white ring-zinc-700'
+                                         : (step === i + 1 ? 'bg-zinc-200 text-zinc-900 ring-zinc-300' : 'bg-white text-zinc-500 ring-zinc-200')"
+                    x-text="i + 1"></span>
+              <span class="min-w-0 truncate text-[13px]/5" :class="step === i + 1 ? 'font-semibold text-zinc-900' : ''" x-text="n"></span>
+            </button>
+            <span x-show="i < names.length - 1" class="h-px w-4 shrink-0 bg-zinc-200" aria-hidden="true"></span>
+          </li>
+        </template>
+      </ol>
+
+      <div class="sm:hidden">
+        <p class="text-[13px]/5 font-medium tabular-nums" x-text="'Step ' + step + ' of ' + last + ' · ' + names[step - 1]"></p>
+        <div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-zinc-200">
+          <div class="h-full rounded-full bg-zinc-700 transition-all" :style="'width: ' + (step / last * 100) + '%'"></div>
+        </div>
+      </div>
+    </nav>
+
+    <form novalidate class="mt-4" @submit.prevent="go(step + 1)">
+
+      <div x-show="bad.length" x-cloak role="alert"
+           class="mb-4 flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+        <p class="text-[13px]/5 font-medium" x-text="'This step is not finished — check ' + bad.join(' and ') + '.'"></p>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+
+        <div x-show="step === 1">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 x-ref="h1" tabindex="-1" class="text-[16px]/6 font-semibold focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Identity</h2>
+          </div>
+          <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+            <div class="min-w-0 sm:col-span-2">
+              <label for="wz-name" class="mb-1.5 block text-[13px]/5 font-medium">Registered name</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="wz-name" name="name" x-model="f.name" aria-describedby="wz-name-msg"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              </div>
+              <p id="wz-name-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">Exactly as it appears on the GST certificate.</p>
+            </div>
+            <div class="min-w-0">
+              <label for="wz-kind" class="mb-1.5 block text-[13px]/5 font-medium">Constitution</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select id="wz-kind" name="constitution" x-model="f.kind" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                  <option value="pvt">Private limited</option>
+                  <option value="llp">LLP</option>
+                  <option value="prop">Proprietorship</option>
+                </select>
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+          </div>
+        </div>
+
+        <div x-show="step === 2" x-cloak>
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 x-ref="h2" tabindex="-1" class="text-[16px]/6 font-semibold focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Tax and banking</h2>
+          </div>
+          <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+            <div class="min-w-0">
+              <label for="wz-gstin" class="mb-1.5 block text-[13px]/5 font-medium">GSTIN</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="wz-gstin" name="gstin" x-model="f.gstin" maxlength="15" aria-describedby="wz-gstin-msg"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 uppercase tabular-nums outline-none">
+              </div>
+              <p id="wz-gstin-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">15 characters, as printed on the certificate.</p>
+            </div>
+            <div class="min-w-0">
+              <label for="wz-ifsc" class="mb-1.5 block text-[13px]/5 font-medium">IFSC</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="wz-ifsc" name="ifsc" x-model="f.ifsc" maxlength="11"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 uppercase tabular-nums outline-none">
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+          </div>
+        </div>
+
+        <div x-show="step === 3" x-cloak>
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 x-ref="h3" tabindex="-1" class="text-[16px]/6 font-semibold focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Contacts</h2>
+          </div>
+          <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+            <div class="min-w-0">
+              <label for="wz-person" class="mb-1.5 block text-[13px]/5 font-medium">Sales contact</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="wz-person" name="contact" x-model="f.person"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+            <div class="min-w-0">
+              <label for="wz-email" class="mb-1.5 block text-[13px]/5 font-medium">Email for purchase orders</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="wz-email" name="email" type="email" x-model="f.email" aria-describedby="wz-email-msg"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              </div>
+              <p id="wz-email-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">Every approved order is sent here automatically.</p>
+            </div>
+          </div>
+        </div>
+
+        <div x-show="step === 4" x-cloak>
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 x-ref="h4" tabindex="-1" class="text-[16px]/6 font-semibold focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Review</h2>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Everything you entered, in one place, before anything is created.</p>
+          </div>
+          <div class="divide-y divide-zinc-100">
+            <div class="flex items-start justify-between gap-4 px-5 py-3">
+              <dl class="min-w-0 grid flex-1 gap-2 text-[13px]/5 sm:grid-cols-2">
+                <div><dt class="text-zinc-600">Registered name</dt><dd class="font-medium" x-text="f.name"></dd></div>
+                <div><dt class="text-zinc-600">Constitution</dt><dd class="font-medium" x-text="({ pvt: 'Private limited', llp: 'LLP', prop: 'Proprietorship' })[f.kind]"></dd></div>
+              </dl>
+              <button type="button" @click="go(1)" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Edit identity</button>
+            </div>
+            <div class="flex items-start justify-between gap-4 px-5 py-3">
+              <dl class="min-w-0 grid flex-1 gap-2 text-[13px]/5 sm:grid-cols-2">
+                <div><dt class="text-zinc-600">GSTIN</dt><dd class="font-medium tabular-nums" x-text="f.gstin"></dd></div>
+                <div><dt class="text-zinc-600">IFSC</dt><dd class="font-medium tabular-nums" x-text="f.ifsc"></dd></div>
+              </dl>
+              <button type="button" @click="go(2)" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Edit tax and banking</button>
+            </div>
+            <div class="flex items-start justify-between gap-4 px-5 py-3">
+              <dl class="min-w-0 grid flex-1 gap-2 text-[13px]/5 sm:grid-cols-2">
+                <div><dt class="text-zinc-600">Sales contact</dt><dd class="font-medium" x-text="f.person"></dd></div>
+                <div><dt class="text-zinc-600">Email</dt><dd class="font-medium" x-text="f.email"></dd></div>
+              </dl>
+              <button type="button" @click="go(3)" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Edit contacts</button>
+            </div>
+          </div>
+          <div class="border-t border-zinc-200 px-5 py-4">
+            <label class="flex items-start gap-2.5 text-[14px]/5">
+              <input type="checkbox" name="confirm" class="mt-0.5 size-4 shrink-0 rounded accent-zinc-700">
+              <span>I have checked the GST certificate and the cancelled cheque against these details
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-500">Recorded against your name on the vendor record.</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <button type="button" @click="go(step - 1)" x-show="step > 1" x-cloak
+                class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">
+          <i data-lucide="chevron-left" class="size-4"></i>Back
+        </button>
+        <div class="ml-auto flex items-center gap-2">
+          <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Save and finish later</button>
+          <button type="submit" x-show="step < last"
+                  class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+            Next<i data-lucide="chevron-right" class="size-4"></i>
+          </button>
+          <button type="button" x-show="step === last" x-cloak
+                  class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+            <i data-lucide="check" class="size-4"></i>Create vendor
+          </button>
+        </div>
+      </div>
+    </form>
+  </main>
+</div>

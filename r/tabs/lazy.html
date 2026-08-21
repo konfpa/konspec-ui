@@ -1,0 +1,69 @@
+<!-- Manual activation, because each tab is a request. With automatic
+     activation, arrowing from the first tab to the fourth fires four fetches
+     and the user reads whichever one happens to land last. So the arrows move
+     focus only, and Enter or Space commits — which a real <button> already does
+     for free, so there is nothing to bind.
+
+     cursor is where focus is, tab is what is showing. Only in automatic
+     activation are those the same thing, which is why the other variants can
+     get away with one variable.
+
+     The hx- attributes and the panel id are written out rather than generated
+     with $id(): htmx reads them when it processes the element, and that is not
+     guaranteed to be after Alpine has bound them. Two of these on one page need
+     their ids changed by hand. -->
+<div x-data="{
+       tab: 'summary',
+       cursor: 'summary',
+       items: [
+         { id: 'summary',  label: 'Summary' },
+         { id: 'lines',    label: 'Lines' },
+         { id: 'receipts', label: 'Receipts' },
+         { id: 'history',  label: 'History' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.cursor);
+         this.focusTab(this.items[(i + step + n) % n].id);
+       },
+       focusTab(id) {
+         this.cursor = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       },
+       pick(id) { this.tab = id; this.cursor = id; }
+     }">
+  <div class="border-b border-zinc-200">
+    <div x-ref="list" role="tablist" aria-label="Purchase order sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="focusTab(items[0].id)"
+         @keydown.end.prevent="focusTab(items[items.length - 1].id)"
+         class="-mb-px flex gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="'po-tab-' + t.id" aria-controls="po-panel"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :tabindex="cursor === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                :hx-get="'/orders/1187/' + t.id + '/'"
+                hx-target="#po-panel" hx-swap="innerHTML" hx-indicator="#po-panel"
+                class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
+                x-text="t.label"></button>
+      </template>
+    </div>
+  </div>
+
+  <!-- hx-indicator puts .htmx-request on this panel for the length of the
+       request, which is enough to fade it without any custom CSS -->
+  <div id="po-panel" role="tabpanel" tabindex="0" :aria-labelledby="'po-tab-' + tab" aria-live="polite"
+       class="rounded-lg pt-4 text-[14px]/5 transition-opacity [&.htmx-request]:opacity-40 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <p class="text-zinc-600">Summary renders with the page. Every other tab is fetched from
+      <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4">/orders/1187/&lt;tab&gt;/</code>
+      and swapped in here.</p>
+  </div>
+</div>

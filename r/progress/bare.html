@@ -1,0 +1,53 @@
+<!-- No percentage beside it, because the figure above it is already the reading.
+     The bar is the shape of the number, not a second copy of it, and a KPI tile
+     that prints 8,240 and then 69% next to a rail has said the same thing three
+     times.
+
+     Dropping the label does not drop the name. Each of these points
+     aria-labelledby at the heading it sits under, so the bar is announced as
+     "Quota used, 69%" and not as "progress bar, 69%" — which is what a bar with
+     no name at all comes back as, three times over on this card, with nothing to
+     tell them apart.
+
+     Three heights and that is the scale. h-1 under a figure, where the bar is a
+     footnote to something already stated; h-1.5 in a list row, where it shares a
+     line with text; h-2 as the subject of its own panel. Nothing thicker — past
+     8px the rail stops reading as a measurement and starts reading as a chart,
+     and the empty part of it becomes a block of colour on the card. -->
+<div class="grid gap-4 sm:grid-cols-3">
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <h3 id="pg-bare-quota" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Quota used</h3>
+    <p class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">8,240</p>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">of 12,000 GRN lines, August</p>
+    <div class="mt-2.5 h-1 overflow-hidden rounded-full bg-zinc-100"
+         role="progressbar" aria-labelledby="pg-bare-quota"
+         aria-valuenow="69" aria-valuemin="0" aria-valuemax="100">
+      <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 69%"></div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <h3 id="pg-bare-store" class="text-[13px]/5 font-medium">Store 2 capacity</h3>
+    <div class="mt-2 flex items-center gap-3">
+      <div class="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-zinc-100"
+           role="progressbar" aria-labelledby="pg-bare-store"
+           aria-valuenow="41" aria-valuemin="0" aria-valuemax="100">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 41%"></div>
+      </div>
+      <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">41%</span>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">1,640 of 4,000 pallet positions</p>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <h3 id="pg-bare-empty" class="text-[13px]/5 font-medium">Receipt against PO-24-1211</h3>
+    <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100"
+         role="progressbar" aria-labelledby="pg-bare-empty"
+         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <!-- zero renders no fill at all, not a fill floored to 2px, so nothing
+           and almost-nothing stay two different pictures -->
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Nothing received yet · raised 18 Aug</p>
+  </div>
+</div>

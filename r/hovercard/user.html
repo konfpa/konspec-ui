@@ -1,0 +1,71 @@
+<!-- The trigger is the avatar and the name together inside one link, so the
+     tab order gets one stop and not two. The presence dot says something about
+     the person and never about a record — record state belongs on a badge,
+     where the colour mapping is fixed.
+
+     The label sits above the trigger rather than beside it. left-0 anchors the
+     panel to the trigger, so a trigger that starts halfway along a line puts a
+     320px panel halfway off a 390px screen; starting its own line is the
+     cheapest way to be sure it does not. Where the trigger genuinely has to sit
+     inside a sentence, use the clamp from the placement variant. -->
+<div>
+  <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Approved by</p>
+  <span class="relative mt-1 inline-block"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 350) {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+              this.open = true;
+              window.dispatchEvent(new CustomEvent('hovercard-open', { detail: this.$root }));
+            }, d);
+          },
+          hide() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = false, 200); },
+          shut() { clearTimeout(this.timer); this.open = false; }
+        }"
+        @mouseenter="show()" @mouseleave="hide()"
+        @focusin="show(0)" @focusout="hide()"
+        @keydown.escape.window="shut()"
+        @hovercard-open.window="if ($event.detail !== $root) shut()">
+
+    <a href="/people/ritu-deshpande/" class="inline-flex items-center gap-2 rounded-lg py-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex size-6 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">RD</span>
+      <span class="font-medium text-zinc-900 underline underline-offset-2">Ritu Deshpande</span>
+    </a>
+
+    <div x-show="open" x-cloak x-transition.opacity.duration.150ms
+         class="absolute top-full left-0 z-40 pt-2">
+      <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+        <div class="flex items-start gap-3">
+          <span class="relative shrink-0">
+            <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">RD</span>
+            <span class="absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full bg-emerald-600 ring-2 ring-white" aria-hidden="true"></span>
+          </span>
+          <div class="min-w-0">
+            <p class="truncate text-[14px]/5 font-semibold">Ritu Deshpande</p>
+            <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Purchase Manager · Waluj plant</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-500">Online</p>
+          </div>
+        </div>
+
+        <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+          <div class="flex items-baseline justify-between gap-3">
+            <dt class="text-[12px]/4 text-zinc-600">Approves up to</dt>
+            <dd class="text-[12px]/4 font-medium tabular-nums">₹5,00,000</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-3">
+            <dt class="text-[12px]/4 text-zinc-600">Waiting on her</dt>
+            <dd class="text-[12px]/4 tabular-nums">3 orders</dd>
+          </div>
+        </dl>
+
+        <div class="mt-3 flex items-center justify-between gap-3 border-t border-zinc-100 pt-3">
+          <span class="truncate text-[12px]/4 text-zinc-500 tabular-nums">+91 98220 41187</span>
+          <a href="mailto:ritu.deshpande@konspec.in" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium hover:bg-zinc-100">
+            <i data-lucide="mail" class="size-3.5 text-zinc-600"></i>Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </span>
+</div>

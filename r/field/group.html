@@ -1,0 +1,45 @@
+<!-- Two fields that are one question, and an error that belongs to neither of
+     them on its own: characters 3 to 12 of a GSTIN are the PAN, so the mismatch
+     is a property of the pair. Reported under whichever field the user touched
+     last, the same mistake shows up in two different places on two different
+     visits.
+
+     The grid is on a div inside the fieldset, not on the fieldset. display on a
+     fieldset has only recently become reliable and the legend is laid out by
+     rules of its own; making the fieldset a grid container is how a legend ends
+     up as a grid item in the first cell.
+
+     aria-invalid on the fieldset is ignored — its implicit role is group, which
+     is not a widget — so the flag goes on both inputs and the description goes
+     on the fieldset, where it is read once on entry rather than once per field.
+
+     The legend names the question. Every input inside still needs its own
+     label; a legend does not stand in for one, and two fields under one legend
+     with no labels are announced as "Tax registration, edit" twice. -->
+<fieldset class="max-w-md" aria-describedby="fg-msg">
+  <legend class="mb-2 text-[13px]/5 font-medium">
+    Tax registration <span aria-hidden="true" class="text-red-600">*</span>
+  </legend>
+
+  <div class="grid gap-3 sm:grid-cols-2">
+    <div>
+      <label for="fg-pan" class="mb-1.5 block text-[12px]/4 text-zinc-600">PAN</label>
+      <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+        <input id="fg-pan" name="pan" value="AAACG4171B" required aria-invalid="true"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums uppercase outline-none">
+      </div>
+    </div>
+    <div>
+      <label for="fg-gstin" class="mb-1.5 block text-[12px]/4 text-zinc-600">GSTIN</label>
+      <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+        <input id="fg-gstin" name="gstin" value="24AAACG9902B1ZP" required aria-invalid="true"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums uppercase outline-none">
+      </div>
+    </div>
+  </div>
+
+  <p id="fg-msg" class="mt-2 flex items-start gap-1.5 min-h-4 text-[12px]/4 font-medium text-red-600">
+    <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+    <span class="tabular-nums">Characters 3 to 12 of the GSTIN are the PAN. This pair reads AAACG9902B against AAACG4171B.</span>
+  </p>
+</fieldset>

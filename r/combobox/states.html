@@ -1,0 +1,136 @@
+<div class="max-w-md space-y-7">
+
+  <!-- Disabled reaches the hidden input too. disabled on the search box only
+       stops the typing; the hidden input has no appearance of its own and posts
+       whatever it holds, so a field somebody was told they cannot change still
+       submits its value. The three fields here carry different names only
+       because they sit in one example — in a real form all three are vendor. -->
+  <div>
+    <label for="cb-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Vendor</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-zinc-100">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-400"></i>
+      <!-- no aria-controls: there is no popup in the document to point it at,
+           and aria-controls naming an id that does not exist is worse than
+           leaving it off -->
+      <input id="cb-off" type="text" disabled value="Gujarat Polymers Ltd"
+             role="combobox" aria-expanded="false"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 text-zinc-400">
+      <span class="mr-3 flex size-4 shrink-0 items-center justify-center">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-400"></i>
+      </span>
+    </div>
+    <input type="hidden" name="vendor_disabled" value="gujarat-polymers" disabled>
+    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
+  </div>
+
+  <!-- A locked value is rendered, not made read-only. There is no read-only
+       combobox: readonly leaves the box focusable, the chevron still opens the
+       list, and readonly means nothing at all on an option row. The value still
+       has to reach the server, so a hidden input goes with the text. -->
+  <div>
+    <p class="text-[13px]/5 font-medium text-zinc-600">Vendor</p>
+    <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px]/5">
+      <i data-lucide="lock" class="size-4 shrink-0 text-zinc-600"></i>
+      Gujarat Polymers Ltd
+      <span class="text-[12px]/4 tabular-nums text-zinc-500">VEN-0142</span>
+    </p>
+    <input type="hidden" name="vendor_locked" value="gujarat-polymers">
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Fixed when GRN-24-0912 was posted against this order.</p>
+  </div>
+
+  <!-- Invalid, with two locked rows in the list. The red border is drawn;
+       aria-invalid and aria-describedby are what gets announced. -->
+  <div class="relative"
+       x-data="{
+         open: false, typed: false, q: 'Bhiwandi Traders', sel: '', ai: 0,
+         options: [
+           { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'VEN-0142', blocked: false },
+           { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'VEN-0187', blocked: false },
+           { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'VEN-0203', blocked: true },
+           { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'VEN-0244', blocked: true },
+           { id: 'baroda-fasteners', label: 'Baroda Fasteners', meta: 'VEN-0258', blocked: false }
+         ],
+         get list() {
+           if (!this.typed) return this.options;
+           const s = this.q.trim().toLowerCase();
+           return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+         },
+         get chosen() { return this.options.find(o => o.id === this.sel) || null; },
+         rowId(o) { return 'cb-bad-' + o.id; },
+         get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+         scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+         next(from, step) {
+           for (let i = from + step; i >= 0 && i < this.list.length; i += step) {
+             if (!this.list[i].blocked) return i;
+           }
+           return from < 0 ? 0 : from;
+         },
+         show() { if (!this.open) { this.open = true; this.typed = false; this.ai = this.next(-1, 1); this.scroll(); } },
+         close() { this.open = false; this.typed = false; this.q = this.chosen ? this.chosen.label : ''; },
+         move(step) {
+           if (!this.open) { this.show(); return; }
+           if (!this.list.length) return;
+           this.ai = this.next(this.ai, step);
+           this.scroll();
+         },
+         pick(o) { if (o.blocked) return; this.sel = o.id; this.close(); this.$refs.q.focus(); },
+         commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+       }"
+       @click.outside="close()"
+       @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+    <label for="cb-bad" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+
+    <div class="flex items-center rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input id="cb-bad" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+             aria-autocomplete="list" aria-controls="cb-bad-list"
+             aria-invalid="true" aria-describedby="cb-bad-err"
+             :aria-expanded="open" :aria-activedescendant="activeId"
+             @click="show()"
+             @input="typed = true; open = true; ai = 0"
+             @keydown.arrow-down.prevent="move(1)"
+             @keydown.arrow-up.prevent="move(-1)"
+             @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+             @keydown.tab="close()"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none">
+    </div>
+
+    <input type="hidden" name="vendor" :value="sel">
+
+    <p id="cb-bad-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
+      Pick a vendor from the list. Typed text is not a vendor.
+    </p>
+
+    <p role="status" class="sr-only"
+       x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+      <!-- aria-disabled announces the state and blocks nothing at all. next()
+           steps over the blocked rows and pick() returns early, or the row is
+           unreachable by keyboard and fully clickable by mouse. It keeps its
+           place in the list: dropping it changes the shape of a set people scan
+           by position. -->
+      <div id="cb-bad-list" role="listbox" aria-label="Vendors" class="max-h-64 overflow-y-auto py-1">
+        <template x-for="(o, i) in list" :key="o.id">
+          <div :id="rowId(o)" role="option" :aria-selected="o.id === sel" :aria-disabled="o.blocked"
+               @mousedown.prevent @click="pick(o)" @mousemove="if (!o.blocked) ai = i"
+               :class="[i === ai && !o.blocked ? 'bg-zinc-100' : '', o.blocked ? 'text-zinc-400' : '']"
+               class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+            <span class="shrink-0 text-[12px]/4 text-zinc-500" x-show="o.blocked" x-cloak>Rate contract expired</span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-show="!o.blocked" x-text="o.meta"></span>
+          </div>
+        </template>
+      </div>
+
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Two of these five are locked until their rate contract is renewed.</p>
+      </div>
+    </div>
+  </div>
+</div>

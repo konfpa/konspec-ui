@@ -1,0 +1,80 @@
+<!-- For a settings page, where the labels are phrases rather than nouns and the
+     list is long enough that a row would scroll. Up and down arrows instead of
+     left and right, and aria-orientation says so.
+
+     The marker is the same 2px zinc-900 rule the horizontal variants use, only
+     turned on its side. The zinc-100 fill is the second half of the statement
+     and never the whole of it: drop these tabs onto the zinc-100 page surface
+     and a fill-only marker measures 1.00 against its background, which is not
+     faint but invisible. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'approvals',
+       items: [
+         { id: 'general',   label: 'General' },
+         { id: 'approvals', label: 'Approval limits' },
+         { id: 'numbering', label: 'Document numbering' },
+         { id: 'tax',       label: 'Tax and HSN' },
+         { id: 'users',     label: 'Users and roles' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }"
+     class="grid gap-6 sm:grid-cols-[190px_minmax(0,1fr)]">
+  <div x-ref="list" role="tablist" aria-orientation="vertical" aria-label="Settings sections"
+       @keydown.arrow-down.prevent="move(1)"
+       @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="pick(items[0].id)"
+       @keydown.end.prevent="pick(items[items.length - 1].id)"
+       class="flex flex-col gap-0.5">
+    <template x-for="t in items" :key="t.id">
+      <button type="button" role="tab" :data-tab="t.id"
+              :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+              :aria-selected="tab === t.id ? 'true' : 'false'"
+              :tabindex="tab === t.id ? 0 : -1"
+              @click="pick(t.id)"
+              class="rounded-r-lg border-l-2 px-3 py-2 text-left text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="tab === t.id ? 'border-zinc-900 bg-zinc-100 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'"
+              x-text="t.label"></button>
+    </template>
+  </div>
+
+  <div class="min-w-0 text-[14px]/5">
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'general')" :aria-labelledby="$id('tab', 'general')"
+         x-show="tab === 'general'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">General</h3>
+      <p class="mt-1.5 text-zinc-600">Company name, registered address and the financial year start.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'approvals')" :aria-labelledby="$id('tab', 'approvals')"
+         x-show="tab === 'approvals'" class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">Approval limits</h3>
+      <p class="mt-1.5 text-zinc-600">Orders above <span class="font-medium tabular-nums text-zinc-900">₹5,00,000</span> need a second approval.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'numbering')" :aria-labelledby="$id('tab', 'numbering')"
+         x-show="tab === 'numbering'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">Document numbering</h3>
+      <p class="mt-1.5 text-zinc-600">PO-YY-nnnn, reset every financial year.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'tax')" :aria-labelledby="$id('tab', 'tax')"
+         x-show="tab === 'tax'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">Tax and HSN</h3>
+      <p class="mt-1.5 text-zinc-600">Default GST rate per HSN code, applied when a line has none of its own.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'users')" :aria-labelledby="$id('tab', 'users')"
+         x-show="tab === 'users'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <h3 class="text-[14px]/5 font-semibold">Users and roles</h3>
+      <p class="mt-1.5 text-zinc-600">14 users, 4 roles. Buyers cannot approve their own orders.</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<!-- One input, six digits. Six separate boxes is the version everybody builds
+     and it fights the platform on every axis: iOS and Android drop the whole
+     code into whichever box is focused, a paste puts six characters in one box
+     and nothing in the others, and moving backwards across a boundary needs
+     keydown handling that gets the Android soft keyboard wrong. A single input
+     with inputmode="numeric" and autocomplete="one-time-code" gets the numeric
+     keypad, the SMS suggestion strip and paste without a line of JavaScript.
+     It is also the only version that fits on a 320px screen.
+
+     No auto-submit on the sixth character. Autofill delivers all six at once
+     and would race a user still fixing the fourth digit, and a code rejected
+     because it was submitted half-corrected costs another trip to the
+     authenticator app. The submit is a button somebody presses.
+
+     Naming the factor is safe here — the password already proved who this is —
+     and it is what stops the user hunting through three apps for a code. -->
+<div class="flex min-h-[520px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+     x-data="{ code: '', left: 28 }"
+     x-init="setInterval(() => { if (left &gt; 0) left-- }, 1000)">
+  <main class="w-full max-w-sm">
+
+    <div class="flex items-center justify-center gap-2.5">
+      <span class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[14px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec Operations</span>
+    </div>
+
+    <form method="post" action="/accounts/two-factor/" class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Enter your code</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">
+        Open Microsoft Authenticator on <span class="font-medium text-zinc-900">Pixel 7a</span> and read the 6-digit code for Konspec Operations.
+      </p>
+
+      <div class="mt-5">
+        <label for="ot-code" class="mb-1.5 block text-[13px]/5 font-medium">6-digit code</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="ot-code" name="code" x-model="code" @input="code = code.replace(/[^0-9]/g, '')"
+                 inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}"
+                 maxlength="6" minlength="6" required autofocus
+                 spellcheck="false" autocapitalize="none" autocorrect="off"
+                 aria-describedby="ot-code-help"
+                 class="w-full min-w-0 bg-transparent px-3 py-2.5 text-center font-mono text-[20px]/7 tabular-nums outline-none">
+        </div>
+        <p id="ot-code-help" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums"
+           :class="left === 0 ? 'font-medium text-amber-700' : 'text-zinc-500'">
+          <span x-show="left &gt; 0">Six digits. This code expires in <span x-text="left"></span>s.</span>
+          <span x-show="left === 0" x-cloak class="flex items-center gap-1.5">
+            <i data-lucide="alert-triangle" class="size-3.5 shrink-0"></i>That code has expired — read the next one.
+          </span>
+        </p>
+      </div>
+
+      <label class="mt-3 flex items-start gap-2.5 text-[13px]/5">
+        <input type="checkbox" name="trust_device" value="1" aria-describedby="ot-trust-help"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Do not ask for a code on this device for 30 days</span>
+      </label>
+      <p id="ot-trust-help" class="mt-1 pl-[26px] text-[12px]/4 text-zinc-500">Only on a device nobody else uses. A shared plant terminal is not one.</p>
+
+      <button type="submit"
+              class="mt-5 inline-flex h-10 w-full items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Verify and continue</button>
+
+      <div class="mt-4 space-y-2 border-t border-zinc-100 pt-4 text-[12px]/4">
+        <p>
+          <a href="/accounts/two-factor/recovery/" class="font-medium text-zinc-900 underline underline-offset-2">Use a recovery code instead</a>
+          <span class="text-zinc-600"> — the 10 codes issued when you set up the authenticator.</span>
+        </p>
+        <p>
+          <a href="/accounts/logout/" class="font-medium text-zinc-900 underline underline-offset-2">Sign in as someone else</a>
+          <span class="text-zinc-600"> — signed in as akshay.prabhu@konspec.com.</span>
+        </p>
+      </div>
+    </form>
+
+    <p class="mt-4 text-center text-[11px]/4 text-zinc-500">Konspec Industries · internal system · activity is logged</p>
+  </main>
+</div>

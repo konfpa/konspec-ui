@@ -1,0 +1,63 @@
+<div class="max-w-xl space-y-4">
+  <!-- Locked. The trigger is disabled, so it leaves the Tab order, and the
+       reason sits beside it as text rather than in a title attribute nobody on
+       a touchscreen will ever see. No chevron — a chevron promises something
+       opens.
+
+       There is no panel in the document at all, so there is no aria-controls
+       either: pointing it at an id that does not exist is worse than omitting
+       it. The content is absent because a collapsed panel is not a permission
+       boundary — x-show renders the markup and hides it, and a cost breakup
+       behind a trigger is in the page source of everyone who can load the
+       page. This one is gated in the view. -->
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <button type="button" disabled aria-expanded="false"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left text-zinc-500">
+      <i data-lucide="lock" class="size-4 shrink-0"></i>
+      <span class="flex-1 text-[14px]/5 font-medium">Cost breakup</span>
+    </button>
+    <p class="border-t border-zinc-100 px-4 py-2.5 text-[12px]/4 text-zinc-500">
+      Category managers and above. Raise a request with the buying desk.
+    </p>
+  </div>
+
+  <!-- Empty. A collapsible with nothing behind it is a control that opens onto
+       a blank panel, and the only way to find that out is to click it. Say the
+       answer on the closed row and drop the control. -->
+  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+    <p class="text-[14px]/5 font-medium">Amendments</p>
+    <p class="mt-1 flex items-center gap-2 text-[13px]/5 text-zinc-600">
+      <i data-lucide="minus" class="size-4 shrink-0 text-zinc-500"></i>
+      None since this order was released on 04/08/2026.
+    </p>
+  </div>
+
+  <!-- Collapsed on a phone, open at md and up, where there is room for it.
+       x-show writes display inline and a plain class cannot beat an inline
+       style, so the desktop override is the important modifier — md:block! in
+       Tailwind v4, where the bang goes on the end of the utility and not the
+       front.
+
+       That instance drops x-collapse. The plugin writes an inline height as
+       well, and md:block! would then show a panel sitting at height 0.
+
+       The trigger is md:hidden and a plain heading takes its place at md, so
+       desktop is not left with an unlabelled block of text. -->
+  <div class="rounded-xl border border-zinc-200 bg-white" x-data="{ open: false }">
+    <h3 class="hidden h-12 items-center px-4 text-[14px]/5 font-medium md:flex">Payment and freight terms</h3>
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-terms"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left md:hidden">
+      <span class="flex-1 text-[14px]/5 font-medium">Payment and freight terms</span>
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+    <div id="col-terms" x-show="open" x-cloak class="md:block!">
+      <div class="border-t border-zinc-100 px-4 py-3 text-[14px]/5 text-zinc-600 md:border-t-0 md:pt-0">
+        45 days from GRN posting, 2% early-payment discount inside 10 days.
+        Freight paid and included in the rate. Debit note raised on any short
+        receipt beyond the 2% tolerance.
+      </div>
+    </div>
+  </div>
+</div>

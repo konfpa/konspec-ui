@@ -1,0 +1,64 @@
+<!-- The exclusive option clears the others; it never disables them. A disabled
+     checkbox that is still ticked shows a tick on screen and posts nothing, so
+     the audit record ends up saying no PPE was worn while the page in front of
+     the auditor lists three items. Clearing is honest — what is on screen is
+     what posts.
+
+     x-model is not used. The exclusivity has to run after the box has changed,
+     and both x-model and an @change handler listen to the same change event, so
+     which one wins is the order Alpine happens to bind them in. :checked plus
+     one @change per box is explicit and cannot race itself.
+
+     "None of the above" is a value, not zero ticks. No ticked boxes post no key
+     at all, which is the same POST as a question that was never on the form, so
+     without the explicit option there is no way to record that somebody looked
+     at the bay and found nobody in PPE. -->
+<fieldset class="max-w-md"
+          x-data="{
+            ppe: ['helmet', 'shoes'],
+            toggle(v) {
+              if (this.ppe.includes(v)) { this.ppe = this.ppe.filter(x => x !== v) }
+              else if (v === 'none') { this.ppe = ['none'] }
+              else { this.ppe = this.ppe.filter(x => x !== 'none').concat(v) }
+            }
+          }">
+  <legend class="text-[14px]/5 font-medium">Which PPE was actually in use on the unloading bay</legend>
+  <p id="qm-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Observed in use, not what is stocked at the gate.</p>
+
+  <div class="mt-3 space-y-2.5">
+    <label class="flex items-center gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="audit_ppe" value="helmet" aria-describedby="qm-help"
+             :checked="ppe.includes('helmet')" @change="toggle('helmet')"
+             class="size-4 shrink-0 accent-zinc-700">
+      <span>Helmets</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="audit_ppe" value="shoes" aria-describedby="qm-help"
+             :checked="ppe.includes('shoes')" @change="toggle('shoes')"
+             class="size-4 shrink-0 accent-zinc-700">
+      <span>Safety shoes</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="audit_ppe" value="gloves" aria-describedby="qm-help"
+             :checked="ppe.includes('gloves')" @change="toggle('gloves')"
+             class="size-4 shrink-0 accent-zinc-700">
+      <span>Cut-resistant gloves</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="audit_ppe" value="vis" aria-describedby="qm-help"
+             :checked="ppe.includes('vis')" @change="toggle('vis')"
+             class="size-4 shrink-0 accent-zinc-700">
+      <span>Hi-vis jackets</span>
+    </label>
+  </div>
+
+  <div class="mt-3.5 border-t border-zinc-100 pt-3.5">
+    <label class="flex items-center gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="audit_ppe" value="none" aria-describedby="qm-none-help"
+             :checked="ppe.includes('none')" @change="toggle('none')"
+             class="size-4 shrink-0 accent-zinc-700">
+      <span>None of the above</span>
+    </label>
+    <p id="qm-none-help" class="mt-1.5 pl-[26px] text-[12px]/4 text-zinc-500">Clears the four above. Nobody in PPE is an answer; an empty question is not.</p>
+  </div>
+</fieldset>

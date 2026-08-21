@@ -1,0 +1,28 @@
+<!-- The footer sits inside the ring, which is the whole reason the border is on
+     the wrapper and not on the control. Ctrl or Cmd plus Enter posts; a bare
+     Enter writes a newline, because that is what the key is for. -->
+<div class="max-w-xl" x-data="{ text: '' }">
+  <div class="rounded-xl border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <label for="ta-note" class="sr-only">Add a note to this order</label>
+    <textarea id="ta-note" name="body" rows="3" x-model="text"
+              @keydown.ctrl.enter="if (text.trim()) $refs.post.click()"
+              @keydown.meta.enter="if (text.trim()) $refs.post.click()"
+              placeholder="Add a note for whoever picks this up next"
+              class="block w-full resize-none bg-transparent px-3.5 pt-3 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
+
+    <div class="flex items-center justify-between gap-3 px-3.5 pb-3 pt-1.5">
+      <span class="min-w-0 text-[12px]/4 text-zinc-500">
+        Visible to everyone on this order
+        <!-- a phone has no Ctrl key, so the hint goes rather than truncates -->
+        <span class="hidden sm:inline">
+          <kbd class="ml-1 rounded border border-zinc-200 bg-zinc-100 px-1 py-0.5 font-mono text-[10px]/3 text-zinc-600">Ctrl</kbd>
+          <kbd class="rounded border border-zinc-200 bg-zinc-100 px-1 py-0.5 font-mono text-[10px]/3 text-zinc-600">Enter</kbd>
+        </span>
+      </span>
+      <button type="submit" x-ref="post" :disabled="!text.trim()"
+              class="inline-flex h-8 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400">
+        Post note
+      </button>
+    </div>
+  </div>
+</div>

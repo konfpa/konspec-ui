@@ -1,0 +1,132 @@
+<!-- A column of bars is read down, not across, so every rail is the same fixed
+     w-24 and every fill starts at the same x. Let them size to the column and a
+     row with a longer vendor name gets a shorter bar, which puts two orders at
+     the same 68% at two different widths and makes the column unreadable at
+     exactly the job it exists for.
+
+     h-1.5 and no thicker. The bar is one cell of a 40px row and it competes with
+     the number beside it; an 8px rail down a register reads as a bar chart
+     somebody laid over the table.
+
+     Every row is its own progressbar and every one is named for its own record —
+     aria-label="Received against PO-24-1194", not "Received" repeated four times.
+     There is no heading per row to point aria-labelledby at, so the label is
+     written out here.
+
+     PO-24-1211 is at 3%: 360 kg of 12,000. min-w-[2px] is what keeps that row
+     distinguishable from PO-24-1218 at zero, which renders an empty rail and no
+     fill element at all. Without the floor both are a bare track and the register
+     says an order that has started has not.
+
+     PO-24-1194 is over its ordered quantity. The fill clamps at 100% and
+     aria-valuenow clamps to 100 with it, because a valuenow past valuemax is
+     invalid ARIA; the true 104% is in aria-valuetext and in the amber figure, so
+     nothing rounds the overshoot away.
+
+     Below md the table goes and cards take over. 96px of rail plus a percentage
+     plus a vendor name in a 390px row is what forces the sideways scroll rule to
+     be broken, so on a phone the bar goes full width under the record and the
+     figures sit above it. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Received</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
+        <td class="px-4 py-2.5">Sharma Extrusions</td>
+        <td class="px-4 py-2.5">
+          <span class="flex items-center gap-2">
+            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+                  role="progressbar" aria-label="Received against PO-24-1187"
+                  aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">
+              <span class="block h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 68%"></span>
+            </span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-600">68%</span>
+          </span>
+        </td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-600">8,160 / 12,000 kg</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194</td>
+        <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
+        <td class="px-4 py-2.5">
+          <span class="flex items-center gap-2">
+            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+                  role="progressbar" aria-label="Received against PO-24-1194"
+                  aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+                  aria-valuetext="104% received, over by 320 kg">
+              <span class="block h-full min-w-[2px] rounded-full bg-amber-500" style="width: 100%"></span>
+            </span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-600">104%</span>
+          </span>
+        </td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-600">8,320 / 8,000 kg</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1211</td>
+        <td class="px-4 py-2.5">Nashik Steel Traders</td>
+        <td class="px-4 py-2.5">
+          <span class="flex items-center gap-2">
+            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+                  role="progressbar" aria-label="Received against PO-24-1211"
+                  aria-valuenow="3" aria-valuemin="0" aria-valuemax="100">
+              <span class="block h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 3%"></span>
+            </span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-600">3%</span>
+          </span>
+        </td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-600">360 / 12,000 kg</td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1218</td>
+        <td class="px-4 py-2.5">Aurangabad Castings</td>
+        <td class="px-4 py-2.5">
+          <span class="flex items-center gap-2">
+            <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+                  role="progressbar" aria-label="Received against PO-24-1218"
+                  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-500">0%</span>
+          </span>
+        </td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-600">0 / 2,400 kg</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul role="list" class="divide-y divide-zinc-100 md:hidden">
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1187</span>
+        <span class="text-[13px]/5 tabular-nums text-zinc-600">68%</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Sharma Extrusions</p>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+           role="progressbar" aria-label="Received against PO-24-1187"
+           aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 68%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">8,160 of 12,000 kg received</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1194</span>
+        <span class="text-[13px]/5 tabular-nums text-zinc-600">104%</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd</p>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+           role="progressbar" aria-label="Received against PO-24-1194"
+           aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+           aria-valuetext="104% received, over by 320 kg">
+        <div class="h-full min-w-[2px] rounded-full bg-amber-500" style="width: 100%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">8,320 of 8,000 kg received · over by 320 kg</p>
+    </li>
+  </ul>
+</div>

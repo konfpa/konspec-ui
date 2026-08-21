@@ -1,0 +1,152 @@
+<div x-data="{
+       i: 0, n: 0, atStart: true, atEnd: true,
+       slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
+       pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
+       sync() {
+         const r = this.$refs.rail, s = this.slides(), edge = r.getBoundingClientRect().left + this.pad();
+         this.n = s.length;
+         this.atStart = r.scrollLeft < 2;
+         this.atEnd = r.scrollLeft > r.scrollWidth - r.clientWidth - 2;
+         const near = s.map((el, k) => [Math.abs(el.getBoundingClientRect().left - edge), k]).sort((a, b) => a[0] - b[0]);
+         this.i = near.length ? near[0][1] : 0;
+       },
+       go(k) {
+         const r = this.$refs.rail, s = this.slides(), el = s[Math.min(Math.max(k, 0), s.length - 1)];
+         if (!el) return;
+         r.scrollBy({ left: el.getBoundingClientRect().left - r.getBoundingClientRect().left - this.pad(),
+                      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+       }
+     }"
+     x-init="sync()"
+     @resize.window.debounce="sync()">
+
+  <div class="mb-3 flex items-center justify-between gap-3">
+    <h3 class="text-[14px]/5 font-semibold">Orders awaiting approval</h3>
+    <div class="hidden items-center gap-1 md:flex">
+      <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous orders"
+              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+      <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="More orders"
+              class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Orders awaiting approval"
+       @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
+       @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
+       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+
+    <article class="w-72 shrink-0 snap-start rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="truncate text-[14px]/5 font-semibold">PO-24-1187</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Gujarat Polymers Ltd</p>
+        </div>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+        </span>
+      </div>
+      <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Value</dt>
+          <dd class="text-[12px]/4 font-medium tabular-nums">₹18,42,000</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Delivery</dt>
+          <dd class="text-[12px]/4 tabular-nums">28 Aug 2026</dd>
+        </div>
+      </dl>
+    </article>
+
+    <article class="w-72 shrink-0 snap-start rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="truncate text-[14px]/5 font-semibold">PO-24-1191</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Nashik Steel Traders</p>
+        </div>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+        </span>
+      </div>
+      <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Value</dt>
+          <dd class="text-[12px]/4 font-medium tabular-nums">₹4,68,500</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Delivery</dt>
+          <dd class="text-[12px]/4 tabular-nums text-red-600">11 Aug 2026</dd>
+        </div>
+      </dl>
+    </article>
+
+    <article class="w-72 shrink-0 snap-start rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="truncate text-[14px]/5 font-semibold">PO-24-1194</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Sharma Extrusions</p>
+        </div>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+        </span>
+      </div>
+      <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Value</dt>
+          <dd class="text-[12px]/4 font-medium tabular-nums">₹96,750</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Delivery</dt>
+          <dd class="text-[12px]/4 tabular-nums">04 Sep 2026</dd>
+        </div>
+      </dl>
+    </article>
+
+    <article class="w-72 shrink-0 snap-start rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="truncate text-[14px]/5 font-semibold">PO-24-1198</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Deshpande Traders</p>
+        </div>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Closed
+        </span>
+      </div>
+      <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Value</dt>
+          <dd class="text-[12px]/4 font-medium tabular-nums">₹2,31,900</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Delivery</dt>
+          <dd class="text-[12px]/4 tabular-nums">02 Aug 2026</dd>
+        </div>
+      </dl>
+    </article>
+
+    <article class="w-72 shrink-0 snap-start rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="truncate text-[14px]/5 font-semibold">PO-24-1203</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">Gujarat Polymers Ltd</p>
+        </div>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 rounded-full bg-zinc-400" aria-hidden="true"></span>Draft
+        </span>
+      </div>
+      <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Value</dt>
+          <dd class="text-[12px]/4 font-medium tabular-nums">₹7,04,200</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Delivery</dt>
+          <dd class="text-[12px]/4 text-zinc-500">Not set</dd>
+        </div>
+      </dl>
+    </article>
+  </div>
+</div>

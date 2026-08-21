@@ -1,0 +1,107 @@
+<!-- This control changes what every number on the screen means, which is what
+     makes it the opposite of a filter and the reason it sits up here rather
+     than beside them. The server reads company, plant and financial year on the
+     next request, so choosing one is a page load — swap it client-side and half
+     the screen is still showing the previous plant's stock.
+
+     Two things therefore have to be readable without opening anything. A
+     financial year that is not the current one gets a permanent pill with an
+     amber dot, because an FY switcher left on last year is how a receipt gets
+     posted into a closed period and nobody finds out until audit. And a
+     non-production tenant says so in the same slot, because the sandbox looks
+     exactly like production — which is the point of it and the danger of it.
+
+     Colour stays in the dot. The pills are the same graphite shape everything
+     else in this system uses, and what separates "sandbox" from "last year" is
+     which 6px disc is in it.
+
+     The selected option is marked with a check, not a tint: a permanently
+     tinted row in a menu reads as permanently hovered. Each set is a
+     role="group" with a name, and its rows are role="menuitemradio" with
+     aria-checked bound — a screen reader then announces "Vasai plant, 1 of 3,
+     selected" rather than three unrelated buttons. -->
+<header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+        x-data="{
+          open: false,
+          plant: 'Vasai',
+          fy: '2024-25',
+          items() { return [...this.$refs.menu.querySelectorAll('[role=menuitemradio]')] },
+          show() { this.open = true; this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus())) },
+          close(toTrigger = true) { if (!this.open) return; this.open = false; if (toTrigger) this.$refs.trigger.focus() },
+          move(step) { const i = this.items(), at = i.indexOf(document.activeElement); i[(at + step + i.length) % i.length]?.focus() }
+        }"
+        @click.outside="close(false)"
+        @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <div class="relative min-w-0">
+    <button type="button" x-ref="trigger" @click="open ? close(false) : show()" @keydown.arrow-down.prevent="show()"
+            :aria-expanded="open" aria-haspopup="menu" aria-controls="tb-ctx"
+            class="flex max-w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            :class="open && 'bg-zinc-100'">
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+      <span class="min-w-0">
+        <span class="block truncate text-[13px]/5 font-medium">Konspec Polymers Pvt Ltd</span>
+        <span class="block truncate text-[11px]/4 tabular-nums text-zinc-500" x-text="plant + ' plant · FY ' + fy">Vasai plant · FY 2024-25</span>
+      </span>
+      <i data-lucide="chevrons-up-down" class="size-3.5 shrink-0 text-zinc-500"></i>
+    </button>
+
+    <div id="tb-ctx" x-show="open" x-cloak
+         @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.tab="close(false)"
+         class="absolute left-0 z-40 mt-1 w-72 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+      <p class="px-3 pt-1.5 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Company</p>
+      <div x-ref="menu">
+        <div role="group" aria-label="Company">
+          <button type="button" role="menuitemradio" aria-checked="true" tabindex="-1" @click="close()"
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="check" class="size-4 shrink-0 text-zinc-700"></i><span class="min-w-0 flex-1 truncate">Konspec Polymers Pvt Ltd</span>
+          </button>
+          <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" @click="close()"
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span aria-hidden="true" class="size-4 shrink-0"></span><span class="min-w-0 flex-1 truncate">Konspec Compounds LLP</span>
+          </button>
+        </div>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <p class="px-3 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase" aria-hidden="true">Plant</p>
+        <div role="group" aria-label="Plant">
+          <template x-for="p in ['Vasai', 'Nashik', 'Silvassa']" :key="p">
+            <button type="button" role="menuitemradio" :aria-checked="plant === p" tabindex="-1" @click="plant = p; close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span class="flex size-4 shrink-0 items-center justify-center" x-show="plant === p"><i data-lucide="check" class="size-4 text-zinc-700"></i></span>
+              <span class="min-w-0 flex-1 truncate" x-text="p + ' plant'">Vasai plant</span>
+            </button>
+          </template>
+        </div>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <p class="px-3 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase" aria-hidden="true">Financial year</p>
+        <div role="group" aria-label="Financial year">
+          <template x-for="y in ['2026-27', '2025-26', '2024-25']" :key="y">
+            <button type="button" role="menuitemradio" :aria-checked="fy === y" tabindex="-1" @click="fy = y; close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 tabular-nums hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span class="flex size-4 shrink-0 items-center justify-center" x-show="fy === y"><i data-lucide="check" class="size-4 text-zinc-700"></i></span>
+              <span class="min-w-0 flex-1 truncate" x-text="'FY ' + y">FY 2026-27</span>
+              <span class="shrink-0 text-[11px]/4 text-zinc-500" x-show="y === '2026-27'">Current</span>
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+      <p class="px-3 py-1.5 text-[12px]/4 text-zinc-500">Changing any of these reloads the page.</p>
+    </div>
+  </div>
+
+  <span class="ml-auto hidden shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 sm:inline-flex">
+    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>Sandbox
+  </span>
+
+  <span x-show="fy !== '2026-27'"
+        class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span><span x-text="'FY ' + fy">FY 2024-25</span>
+  </span>
+
+  <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RM</span>
+</header>

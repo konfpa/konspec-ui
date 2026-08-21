@@ -1,0 +1,87 @@
+<div x-data="{
+       i: 0, n: 0, atStart: true, atEnd: true,
+       slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
+       pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
+       sync() {
+         const r = this.$refs.rail, s = this.slides(), edge = r.getBoundingClientRect().left + this.pad();
+         this.n = s.length;
+         this.atStart = r.scrollLeft < 2;
+         this.atEnd = r.scrollLeft > r.scrollWidth - r.clientWidth - 2;
+         const near = s.map((el, k) => [Math.abs(el.getBoundingClientRect().left - edge), k]).sort((a, b) => a[0] - b[0]);
+         this.i = near.length ? near[0][1] : 0;
+       },
+       go(k) {
+         const r = this.$refs.rail, s = this.slides(), el = s[Math.min(Math.max(k, 0), s.length - 1)];
+         if (!el) return;
+         r.scrollBy({ left: el.getBoundingClientRect().left - r.getBoundingClientRect().left - this.pad(),
+                      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+       }
+     }"
+     x-init="sync()"
+     @resize.window.debounce="sync()">
+
+  <div class="relative">
+    <!-- the zinc-100 wells stand in for <img class="h-full w-full object-cover">, as written out in the Django variant -->
+    <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Photographs on inspection QC-24-0412"
+         @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
+         @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
+         class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+
+      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div class="flex aspect-video items-center justify-center bg-zinc-100">
+          <i data-lucide="image" class="size-6 text-zinc-500"></i>
+        </div>
+        <figcaption class="border-t border-zinc-200 px-4 py-2.5">
+          <p class="truncate text-[13px]/5 font-medium">Consignment on the weighbridge</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500 tabular-nums">gate-inward-01.jpg · 04 Aug 2026 09:12 IST</p>
+        </figcaption>
+      </figure>
+
+      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div class="flex aspect-video items-center justify-center bg-zinc-100">
+          <i data-lucide="image" class="size-6 text-zinc-500"></i>
+        </div>
+        <figcaption class="border-t border-zinc-200 px-4 py-2.5">
+          <p class="truncate text-[13px]/5 font-medium">Bag markings against the packing list</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500 tabular-nums">gate-inward-02.jpg · 04 Aug 2026 09:18 IST</p>
+        </figcaption>
+      </figure>
+
+      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div class="flex aspect-video items-center justify-center bg-zinc-100">
+          <i data-lucide="image" class="size-6 text-zinc-500"></i>
+        </div>
+        <figcaption class="border-t border-zinc-200 px-4 py-2.5">
+          <p class="truncate text-[13px]/5 font-medium">Torn bag, third pallet from the tail</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500 tabular-nums">gate-inward-03.jpg · 04 Aug 2026 09:24 IST</p>
+        </figcaption>
+      </figure>
+
+      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div class="flex aspect-video items-center justify-center bg-zinc-100">
+          <i data-lucide="image" class="size-6 text-zinc-500"></i>
+        </div>
+        <figcaption class="border-t border-zinc-200 px-4 py-2.5">
+          <p class="truncate text-[13px]/5 font-medium">Moisture reading at sampling</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500 tabular-nums">qc-sample-01.jpg · 04 Aug 2026 10:02 IST</p>
+        </figcaption>
+      </figure>
+    </div>
+
+    <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous photograph"
+            class="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+    <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="Next photograph"
+            class="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 shadow-sm hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-0 md:flex">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+
+  <div class="mt-2 flex items-center justify-between gap-3">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500"><span x-text="i + 1"></span> of <span x-text="n"></span> photographs</p>
+    <a href="#" class="inline-flex items-center gap-1.5 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">
+      <i data-lucide="download" class="size-3.5"></i>Download all
+    </a>
+  </div>
+</div>

@@ -1,0 +1,86 @@
+<!-- forms.py
+     class SettingForm(forms.Form):
+         # required=False, always. On a BooleanField required=True means "must
+         # be ticked", so a flag that is allowed to be off comes back invalid
+         # with "This field is required" the first time somebody switches it off.
+         on = forms.BooleanField(required=False)
+
+     urls.py
+         path('vendors/<slug:slug>/settings/<slug:key>/', views.vendor_setting,
+              name='vendor-setting'),
+
+     views.py
+         @require_POST
+         def vendor_setting(request, slug, key):
+             vendor = get_object_or_404(Vendor, slug=slug)
+             if key not in EDITABLE_SETTINGS:          # never setattr a POST key
+                 return HttpResponseBadRequest()
+             form = SettingForm(request.POST)
+             form.is_valid()
+             setattr(vendor, key, form.cleaned_data['on'])
+             vendor.save(update_fields=[key])
+             # 204 leaves the row alone: the browser painted the new position
+             # before the request left. Anything 4xx or 5xx and the row's
+             # after-request handler puts the switch back where it was.
+             return HttpResponse(status=204)
+
+     One endpoint per setting is what makes the absence readable: an unticked
+     box posts nothing at all, and a body carrying only "on" says off by
+     omission. There is deliberately no <form> and no Save button here — a
+     switch above a Save is a checkbox that has been drawn wrong, and half the
+     users will press Save and half will not.
+
+     {{ form.on }} would render the bare input and you would still be writing
+     the track and thumb around it, so the widget only exists to carry the
+     attributes:
+
+         widget=forms.CheckboxInput(attrs={
+             'role': 'switch', 'class': 'peer sr-only',
+             'hx-trigger': 'change', 'hx-swap': 'none', 'hx-sync': 'this:replace',
+         })
+
+     hx-headers sits on the card so every switch inside it sends the CSRF token;
+     htmx will not find one without a form to read it from. -->
+<div class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white"
+     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  {% for setting in settings %}
+    <div class="px-4 py-2.5"
+         x-data="{ state: 'idle', want: false }"
+         @htmx:before-request.camel="want = $refs.sw.checked; state = 'saving'"
+         @htmx:after-request.camel="
+           if ($event.detail.successful) { state = 'saved' }
+           else { $refs.sw.checked = !want; state = 'failed' }">
+
+      <label class="flex items-start justify-between gap-4 py-1 has-[:disabled]:text-zinc-500">
+        <span class="text-[14px]/5 tabular-nums">{{ setting.label }}</span>
+        <input type="checkbox" role="switch" x-ref="sw" name="on" value="1"
+               {% if setting.on %}checked{% endif %}{% if setting.locked %} disabled{% endif %}
+               aria-describedby="sw-{{ setting.key }}-help"
+               hx-post="{% url 'vendor-setting' vendor.slug setting.key %}"
+               hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+               class="peer sr-only">
+        <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+          <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+        </span>
+      </label>
+
+      <p id="sw-{{ setting.key }}-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">{{ setting.help }}</p>
+
+      <p role="status" class="pr-13 text-[12px]/4">
+        <span x-show="state === 'saving'" x-cloak class="mt-1 flex items-center gap-1.5 text-zinc-500">
+          <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+        </span>
+        <span x-show="state === 'saved'" x-cloak class="mt-1 flex items-center gap-1.5 text-zinc-600">
+          <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+        </span>
+        <span x-show="state === 'failed'" x-cloak class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+          <span class="flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged
+          </span>
+          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+                  @click="$refs.sw.checked = want; $refs.sw.dispatchEvent(new Event('change'))">Try again</button>
+        </span>
+      </p>
+    </div>
+  {% endfor %}
+</div>

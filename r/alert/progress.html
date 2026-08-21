@@ -1,0 +1,15 @@
+<!-- A job the user started that outlives the request. Poll the bar with htmx:
+     hx-get="/imports/8841/progress/" hx-trigger="every 2s" hx-swap="outerHTML". -->
+<div class="rounded-lg border border-zinc-200 bg-white px-4 py-3">
+  <div class="flex items-start gap-3">
+    <i data-lucide="loader-2" class="mt-0.5 size-4 shrink-0 animate-spin text-zinc-500"></i>
+    <div class="min-w-0 flex-1">
+      <p class="text-[13px]/5 font-medium">Importing the August rate card.</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-600">1,240 of 3,100 rows · you can leave this page, it keeps running.</p>
+    </div>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">40%</span>
+  </div>
+  <div class="mt-3 h-1 overflow-hidden rounded-full bg-zinc-100">
+    <div class="h-full rounded-full bg-zinc-700 transition-[width] duration-500" style="width: 40%"></div>
+  </div>
+</div>

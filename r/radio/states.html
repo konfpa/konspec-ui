@@ -1,0 +1,67 @@
+<div class="max-w-xl space-y-6">
+  <!-- A checked default is also the tab target, and it is what a bare POST
+       carries for everybody who never read the question. That is right for the
+       ordinary case and wrong for a consequential one. -->
+  <fieldset>
+    <legend class="mb-2 text-[13px]/5 font-medium">Freight</legend>
+    <div class="space-y-2">
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="freight" value="for" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>FOR destination — included in the rate</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="freight" value="exworks" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Ex works — we arrange the vehicle</span>
+      </label>
+      <!-- disabled: out of the Tab order, skipped by the arrow keys, and out of
+           the POST. It keeps its place and says why. -->
+      <div>
+        <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+          <input type="radio" name="freight" value="topay" disabled class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+          <span>To pay</span>
+        </label>
+        <p class="mt-1 pl-[26px] text-[12px]/4 text-zinc-500">Not available on this rate contract.</p>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Settled, and not editable here. Disabling the group would be worse than
+       useless: disabled options submit nothing, so the stored value is cleared
+       on the next save. The answer is rendered, and travels in a hidden input. -->
+  <div>
+    <p class="text-[13px]/5 font-medium text-zinc-600">Inspection</p>
+    <p class="mt-1 flex items-center gap-2 text-[14px]/5">
+      <i data-lucide="check" class="size-4 shrink-0 text-zinc-600"></i>
+      At vendor works — fixed when the order was released
+    </p>
+    <input type="hidden" name="inspection" value="vendor">
+  </div>
+
+  <!-- Unanswered and required. required goes on every option, because only the
+       focused one's attribute is announced, and the error is referenced from
+       every option for the same reason. The asterisk is decoration. -->
+  <fieldset>
+    <legend class="mb-2 text-[13px]/5 font-medium">QC result for GRN-24-0912 <span class="text-red-600">*</span></legend>
+    <div class="space-y-2">
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="qc" value="pass" required aria-invalid="true" aria-describedby="rd-qc-err"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Passed — release to stores</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="qc" value="deviation" required aria-invalid="true" aria-describedby="rd-qc-err"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Passed on deviation — needs a plant head note</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="qc" value="reject" required aria-invalid="true" aria-describedby="rd-qc-err"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Rejected — raise a debit note</span>
+      </label>
+    </div>
+    <p id="rd-qc-err" class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
+      Pick a result. An unanswered group posts nothing at all, so the GRN cannot be saved half-decided.
+    </p>
+  </fieldset>
+</div>

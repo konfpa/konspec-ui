@@ -1,0 +1,136 @@
+<!-- The assembled case: one order, three of these shapes, each doing the job the
+     others cannot.
+
+     The headline bar is quantity against plan, and it is over. The fill clamps at
+     100% and aria-valuenow clamps to aria-valuemax with it, because a valuenow
+     outside its declared range is invalid ARIA and browsers disagree on whether
+     to report it, drop it or recompute it. The real 104% is in aria-valuetext, in
+     the amber figure and in the line under the bar, so the difference between
+     landing exactly on plan and running 480 kg past it survives everywhere. The
+     bar is amber-500 rather than emerald-600: this run is not simply finished,
+     there is 480 kg of unplanned stock to account for.
+
+     The stack under it is the quality split, aria-hidden with the legend beside
+     it carrying the figures, because one progressbar cannot report three values.
+
+     The operations are their own register: fixed w-24 rails so the column can be
+     read down, and a grid that puts the bar on its own line below sm rather than
+     shrinking it. The bar in the last row is zinc-700 at 0%, which renders as a
+     bare rail — a step that has not started, not a step at 2px.
+
+     Nothing in the panel is focusable except the link out to the order, which is
+     the record number in text. A progressbar is output, and Tab has nothing to do
+     inside one. -->
+<div class="max-w-3xl overflow-hidden rounded-xl border border-zinc-200 bg-white">
+
+  <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <h2 class="text-[16px]/6 font-semibold tabular-nums">PRD-24-0417</h2>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">HDPE drum 200 L, natural · Line 2, Nashik · released 11 Aug</p>
+    </div>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+    </span>
+  </div>
+
+  <div class="border-b border-zinc-200 px-4 py-4">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 id="pg-prd-qty" class="text-[13px]/5 font-medium">Quantity built against plan</h3>
+      <p class="text-[13px]/5 tabular-nums text-amber-700">104%</p>
+    </div>
+    <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100"
+         role="progressbar" aria-labelledby="pg-prd-qty"
+         aria-valuenow="12000" aria-valuemin="0" aria-valuemax="12000"
+         aria-valuetext="12,480 kg of 12,000 planned, over by 480 kg">
+      <div class="h-full min-w-[2px] rounded-full bg-amber-500 transition-[width] duration-300 motion-reduce:transition-none"
+           style="width: 100%"></div>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">12,480 kg built of 12,000 planned · over by 480 kg, awaiting a variance note before closure</p>
+  </div>
+
+  <div class="border-b border-zinc-200 px-4 py-4">
+    <h3 class="text-[13px]/5 font-medium">Quality split</h3>
+    <div class="mt-2.5 flex h-2 overflow-hidden rounded-full bg-zinc-100" aria-hidden="true">
+      <div class="h-full bg-emerald-600" style="width: 95.2%"></div>
+      <div class="h-full bg-amber-500" style="width: 3.4%"></div>
+      <div class="h-full bg-red-600" style="width: 1.4%"></div>
+    </div>
+    <ul role="list" class="mt-3 grid gap-x-6 gap-y-1.5 sm:grid-cols-3">
+      <li class="flex items-center gap-2.5">
+        <span class="size-2.5 shrink-0 rounded-sm bg-emerald-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 text-[13px]/5">Good</span>
+        <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">11,880 kg</span>
+      </li>
+      <li class="flex items-center gap-2.5">
+        <span class="size-2.5 shrink-0 rounded-sm bg-amber-500" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 text-[13px]/5">Rework</span>
+        <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">420 kg</span>
+      </li>
+      <li class="flex items-center gap-2.5">
+        <span class="size-2.5 shrink-0 rounded-sm bg-red-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 text-[13px]/5">Scrap</span>
+        <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">180 kg</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="px-4 py-4">
+    <h3 class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Operations</h3>
+    <ul role="list" class="mt-2.5 divide-y divide-zinc-100">
+
+      <li class="grid gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+        <span class="text-[13px]/5">10 · Blow moulding</span>
+        <span class="flex items-center gap-2 sm:order-3">
+          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+                role="progressbar" aria-label="Operation 10, blow moulding"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            <span class="block h-full rounded-full bg-emerald-600" style="width: 100%"></span>
+          </span>
+          <span class="w-10 shrink-0 text-right text-[12px]/4 tabular-nums text-zinc-600">100%</span>
+        </span>
+        <span class="text-[12px]/4 tabular-nums text-zinc-500 sm:order-2 sm:pr-4">12,480 / 12,000 kg</span>
+      </li>
+
+      <li class="grid gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+        <span class="text-[13px]/5">20 · Neck trimming</span>
+        <span class="flex items-center gap-2 sm:order-3">
+          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+                role="progressbar" aria-label="Operation 20, neck trimming"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            <span class="block h-full rounded-full bg-emerald-600" style="width: 100%"></span>
+          </span>
+          <span class="w-10 shrink-0 text-right text-[12px]/4 tabular-nums text-zinc-600">100%</span>
+        </span>
+        <span class="text-[12px]/4 tabular-nums text-zinc-500 sm:order-2 sm:pr-4">12,480 / 12,480 kg</span>
+      </li>
+
+      <li class="grid gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+        <span class="text-[13px]/5">30 · Leak test</span>
+        <span class="flex items-center gap-2 sm:order-3">
+          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+                role="progressbar" aria-label="Operation 30, leak test"
+                aria-valuenow="62" aria-valuemin="0" aria-valuemax="100">
+            <span class="block h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 62%"></span>
+          </span>
+          <span class="w-10 shrink-0 text-right text-[12px]/4 tabular-nums text-zinc-600">62%</span>
+        </span>
+        <span class="text-[12px]/4 tabular-nums text-zinc-500 sm:order-2 sm:pr-4">7,740 / 12,480 kg</span>
+      </li>
+
+      <li class="grid gap-x-4 gap-y-1.5 py-2.5 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+        <span class="text-[13px]/5 text-zinc-600">40 · Labelling and palletising</span>
+        <span class="flex items-center gap-2 sm:order-3">
+          <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-100"
+                role="progressbar" aria-label="Operation 40, labelling and palletising"
+                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></span>
+          <span class="w-10 shrink-0 text-right text-[12px]/4 tabular-nums text-zinc-500">0%</span>
+        </span>
+        <span class="text-[12px]/4 tabular-nums text-zinc-500 sm:order-2 sm:pr-4">0 / 12,480 kg</span>
+      </li>
+    </ul>
+
+    <p class="mt-3 text-[12px]/4 text-zinc-500">
+      Reported by Ritu Deshpande · <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">open the order</a>
+    </p>
+  </div>
+</div>

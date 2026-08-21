@@ -1,0 +1,28 @@
+<!-- With a visible label the role="status" moves to the row and the label is its
+     content. The ring stays aria-hidden and contributes nothing, and there is no
+     sr-only copy underneath — the region would then hold both strings and the
+     wait would be read out twice.
+
+     Do not name the ring with aria-label instead. Resolved, a role="status" with
+     aria-label and no children is a status *named* "Loading orders" whose content
+     is empty: it appears, nothing inside it changed, and nothing is said.
+
+     The label names the work. "Loading" is the message the ring already carries;
+     "Loading purchase orders" says which of the four panels on the screen is the
+     one holding somebody up.
+
+     The ring is shrink-0 and the paragraph is what wraps. Without it, flex takes
+     the width out of the circle instead of the sentence — measured at 390px, the
+     size-4 ring in the second row came back 12.9px wide against 16px of height,
+     which is not a smaller spinner but an ellipse. -->
+<div class="space-y-6">
+  <div class="flex items-center gap-3" role="status">
+    <span class="size-5 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <span class="text-[13px]/5 text-zinc-600">Loading purchase orders</span>
+  </div>
+
+  <div class="flex items-start gap-3" role="status">
+    <span class="mt-0.5 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <p class="text-[13px]/5 text-zinc-600">Assembling the GRN reconciliation for 01 Apr to 12 Aug. That is 14 months of receipts across five plants, so it takes a while.</p>
+  </div>
+</div>

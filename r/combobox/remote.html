@@ -1,0 +1,125 @@
+<!-- htmx makes the request; Alpine never fetches. Alpine owns open, the
+     highlight and the keyboard, htmx owns the rows.
+
+     Because htmx replaced the rows without telling Alpine, there is no array to
+     index into. The keyboard reads the option elements out of the DOM on every
+     move and paints the highlight itself; an Alpine array here goes stale the
+     moment the first response lands. That also means the ids come from the
+     server, and they still have to be unique — aria-activedescendant points at
+     one of them.
+
+     The filter binds to the event name, not to the end of the spec:
+     input[this.value.length > 1] changed delay:300ms. Written the other way
+     round it is parsed as part of the modifier and the two-character floor
+     never applies. delay is a debounce, not a throttle, and hx-sync
+     this:replace drops a request still in flight so two keystrokes inside
+     300ms cannot settle on the older reply.
+
+     Below the floor nothing fires at all, so deleting back to one character
+     clears the rows in script — otherwise last search's answer sits there under
+     a query that did not produce it.
+
+     The search box is named q, never vendor. The value is the hidden input, and
+     a Django form ignores a POST key it has no field for. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, loading: false, failed: false, searched: false, empty: false,
+       ai: 0, aid: null, sel: '', label: '', term: '',
+       rows() { return Array.from(this.$refs.list.querySelectorAll('[role=option]:not([aria-disabled=true])')); },
+       paint() {
+         const r = this.rows();
+         r.forEach((el, i) => el.classList.toggle('bg-zinc-100', i === this.ai));
+         const el = r[this.ai];
+         this.aid = el ? el.id : null;
+         if (el) el.scrollIntoView({ block: 'nearest' });
+       },
+       move(n) {
+         if (!this.open) { this.open = true; return; }
+         const r = this.rows();
+         if (!r.length) return;
+         this.ai = Math.min(r.length - 1, Math.max(0, this.ai + n));
+         this.paint();
+       },
+       take(el) {
+         if (!el) return;
+         this.sel = el.dataset.value; this.label = el.dataset.label; this.term = this.label;
+         this.rows().forEach(r => r.setAttribute('aria-selected', r === el));
+         this.$refs.q.value = this.label;
+         this.open = false; this.aid = null;
+         this.$refs.q.focus();
+       },
+       commit() { this.take(this.rows()[this.ai]); },
+       changed(v) {
+         this.term = v; this.open = true; this.failed = false;
+         if (v.trim().length < 2) { this.searched = false; this.empty = false; this.$refs.list.innerHTML = ''; }
+       },
+       close() { this.open = false; this.aid = null; this.term = this.label; this.$refs.q.value = this.label; }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }"
+     @htmx:before-request.camel="loading = true; failed = false; open = true"
+     @htmx:after-request.camel="loading = false; if (!$event.detail.successful) failed = true"
+     @htmx:after-swap.camel="searched = true; ai = 0; $nextTick(() => { empty = rows().length === 0; paint() })">
+
+  <label for="cb-remote" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-remote" x-ref="q" type="text" name="q" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-remote-list"
+           :aria-expanded="open" :aria-activedescendant="aid"
+           placeholder="Type two characters to search"
+           hx-get="/vendors/search/"
+           hx-trigger="input[this.value.length > 1] changed delay:300ms"
+           hx-target="#cb-remote-list" hx-swap="innerHTML" hx-sync="this:replace"
+           @click="open = true"
+           @input="changed($event.target.value)"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+    <span class="mr-3 flex size-4 shrink-0 items-center justify-center" x-show="loading" x-cloak>
+      <i data-lucide="loader-circle" class="size-4 animate-spin text-zinc-600"></i>
+    </span>
+  </div>
+
+  <input type="hidden" name="vendor" :value="sel">
+
+  <p role="status" class="sr-only"
+     x-text="loading ? 'Searching vendors' : (searched ? (empty ? 'No vendor matches' : 'Vendors listed') : '')"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <!-- htmx swaps the rows in here. One delegated handler, so the fragment the
+         server sends carries no behaviour of its own — only data-value and
+         data-label. -->
+    <div id="cb-remote-list" x-ref="list" role="listbox" aria-label="Vendors"
+         class="max-h-64 overflow-y-auto py-1 empty:hidden"
+         @click="take($event.target.closest('[role=option]'))"
+         @mousemove="const el = $event.target.closest('[role=option]'); if (el) { ai = rows().indexOf(el); paint() }"></div>
+
+    <div x-show="!searched && !loading" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">Type two characters to search 248 vendors.</p>
+    </div>
+
+    <div x-show="loading" x-cloak class="px-4 py-6 text-center">
+      <p class="flex items-center justify-center gap-2 text-[13px]/5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-4 shrink-0 animate-spin"></i>Searching
+      </p>
+    </div>
+
+    <div x-show="searched && empty && !loading && !failed" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="term"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">248 vendors searched by name, code and GSTIN.</p>
+    </div>
+
+    <div x-show="failed" x-cloak class="px-4 py-6 text-center">
+      <p class="flex items-center justify-center gap-1.5 text-[13px]/5 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>The vendor search did not answer
+      </p>
+      <p class="mt-1 text-[12px]/4 text-zinc-500">Type another character to try again.</p>
+    </div>
+  </div>
+</div>

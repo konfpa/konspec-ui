@@ -1,0 +1,18 @@
+<!-- The whole component. A zinc-200 track with one quarter repainted graphite by
+     border-t-zinc-700, turned by animate-spin at 1s linear.
+
+     It is borders and not a Lucide loader on purpose. A lucide glyph is a 2-unit
+     stroke on a 24-unit viewBox, so it paints 1.33px inside size-4 and 3.33px
+     inside size-10 — a size scale built on it grows heavier as it grows — and an
+     <i data-lucide> has no box at all until createIcons() has run over it, which
+     is exactly what a spinner arriving in an htmx swap cannot count on.
+
+     The ring is aria-hidden: a turning shape resolves to nothing worth reading.
+     What gets announced is the text inside the role="status", and it is text
+     content rather than an aria-label because a live region reports what changed
+     inside it and a name is not content. Here it is sr-only, because the panel
+     around it already says what is loading. -->
+<div class="flex items-center gap-3">
+  <span class="size-5 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+  <p role="status" class="sr-only">Loading purchase orders</p>
+</div>

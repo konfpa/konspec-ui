@@ -1,0 +1,62 @@
+<!-- Both of these are buttons rather than glyphs, and they are built as
+     buttons: a divider on the left, an aria-label naming the verb and the
+     object, and an inset focus outline.
+     focus-visible:outline-2 focus-visible:-outline-offset-2 draws the indicator
+     inside the enclosure. The ordinary outward halo would sit two pixels
+     outside the button and one pixel outside the wrapper it is flush against,
+     so the right-hand end of the group would carry two rounded boxes at once.
+     The enclosure still lights up through focus-within, and that is correct:
+     the halo says the keyboard is in this group, the inset outline says which
+     part of it.
+
+     The first group is read-only, so the enclosure takes the locked surface the
+     input entry uses — a read-only value on white with a live border is pixel
+     for pixel an editable field. The copy button inside it stays live, because
+     copying does not change the value; a unit select in the same enclosure
+     would go disabled with the field.
+
+     Copy swaps its icon, which is announced by nothing, so the confirmation is
+     a live region and the button's own name changes with it. The two icons are
+     spans carrying x-show rather than one :data-lucide binding, because
+     createIcons() replaces the <i> and anything bound on it goes too.
+
+     Clear destroys itself: the click empties the field, the button disappears
+     with the text, and focus lands on <body> unless the same handler puts it
+     back. The button is visible at first paint here because the filter starts
+     with a value in it — start it empty and it needs x-cloak, or it flashes on
+     screen for one frame before Alpine boots and takes it away. -->
+<div class="max-w-xl space-y-5">
+  <div>
+    <label for="ig3-grn" class="mb-1.5 block text-[13px]/5 font-medium">GRN number</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-100 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
+         x-data="{ done: false, t: null,
+                   copy() { navigator.clipboard?.writeText(this.$refs.grn.value);
+                            this.done = true;
+                            clearTimeout(this.t);
+                            this.t = setTimeout(() => this.done = false, 2000) } }">
+      <input id="ig3-grn" x-ref="grn" readonly value="GRN-24-0912"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+      <button type="button" @click="copy()" :aria-label="done ? 'GRN number copied' : 'Copy GRN number'"
+              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 hover:bg-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+        <span x-show="!done"><i data-lucide="copy" class="size-4 text-zinc-600"></i></span>
+        <span x-show="done" x-cloak><i data-lucide="check" class="size-4 text-emerald-600"></i></span>
+      </button>
+      <span class="sr-only" aria-live="polite" x-text="done ? 'GRN number copied' : ''"></span>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Posted 16 Aug 2026 against PO-24-1187. Numbering is set by the plant.</p>
+  </div>
+
+  <div x-data="{ q: 'HDPE-BLM' }">
+    <label for="ig3-filter" class="mb-1.5 block text-[13px]/5 font-medium">Filter the item ledger</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 self-center text-zinc-500"></i>
+      <input id="ig3-filter" x-ref="filter" x-model="q" placeholder="Item code or description"
+             class="min-w-0 flex-1 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+      <button type="button" x-show="q.length > 0" @click="q = ''; $refs.filter.focus()"
+              aria-label="Clear the item ledger filter"
+              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+        <i data-lucide="x" class="size-4 text-zinc-600"></i>
+      </button>
+    </div>
+  </div>
+</div>

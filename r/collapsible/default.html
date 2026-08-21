@@ -1,0 +1,33 @@
+<!-- The trigger sits above the panel. Below it, opening pushes the trigger down
+     by the whole height of what appeared and the second click lands in the
+     middle of the content; at a fixed h-9 above it, the control does not move.
+
+     The animated div carries no padding and no border — border-box means
+     height:0 cannot go below them, so the close would bottom out at the padding
+     and then vanish in one frame. The dl inside takes both. -->
+<div class="max-w-xl rounded-xl border border-zinc-200 bg-white p-4" x-data="{ open: false }">
+  <div class="flex items-baseline justify-between gap-3">
+    <p class="min-w-0 truncate text-[14px]/5 font-medium tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</p>
+    <p class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</p>
+  </div>
+  <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Released 04/08/2026 · 6 lines · Vasai plant</p>
+
+  <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-po-1187"
+          class="mt-3 inline-flex h-9 items-center gap-1.5 text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2">
+    <span x-text="open ? 'Show less' : 'Show 6 more fields'">Show 6 more fields</span>
+    <span class="flex transition-transform" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4"></i>
+    </span>
+  </button>
+
+  <div id="col-po-1187" x-show="open" x-cloak x-collapse.duration.200ms>
+    <dl class="grid gap-x-6 gap-y-2.5 border-t border-zinc-100 pt-3 text-[14px]/5 sm:grid-cols-2">
+      <div><dt class="text-[12px]/4 text-zinc-600">Deliver to</dt><dd>Site store — Vasai plant</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Promised date</dt><dd class="tabular-nums">22/08/2026</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Payment terms</dt><dd class="tabular-nums">45 days from GRN</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Freight</dt><dd class="tabular-nums">₹14,500 — to pay</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Vendor GSTIN</dt><dd class="tabular-nums">24AABCG1429P1ZK</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Buyer</dt><dd>R. Menon — Indirect materials</dd></div>
+    </dl>
+  </div>
+</div>

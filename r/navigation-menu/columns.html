@@ -1,0 +1,174 @@
+<!-- Twelve destinations under one trigger, in three columns with a real <h3>
+     over each. The headings are the reason this is readable to a screen reader
+     at all: thirty links read one at a time is a wall, and heading navigation
+     turns it back into three lists. A styled div would look identical and do
+     none of that.
+
+     The panel is anchored to the nav, not to the trigger, and takes w-full so
+     the shortest route from the trigger down into it is a straight line. Anchor
+     a wide panel to its own trigger and it either runs off the right edge or
+     has to be shifted back, and the shift is what turns the pointer's route
+     into a diagonal that the next trigger steals.
+
+     The description sits inside the anchor so the whole two-line block is the
+     target — outside it, the sentence is dead space that looks clickable and
+     is not. The cost is that it joins the accessible name, which is why every
+     one of them is six words or fewer and says what the page is rather than
+     selling it.
+
+     There is no x-transition on the panel. A fade looks considered on a single
+     panel and wrong the moment two of them swap, because both are mounted for
+     the length of the transition and you get a crossfade of two menus. The
+     open delay is what makes it feel deliberate. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <button type="button" x-ref="modules" id="nmc-t-modules"
+              aria-controls="nmc-p-modules" :aria-expanded="open === 'modules'"
+              @mouseenter="hover('modules')"
+              @click="open === 'modules' ? shut($refs.modules) : jump('modules')"
+              @keydown.arrow-down.prevent="jump('modules')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'modules' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Modules
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'modules' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+    </li>
+
+    <li>
+      <a href="/approvals/" @mouseenter="if (open) shut()"
+         class="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Approvals
+        <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/admin/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Admin</a>
+    </li>
+  </ul>
+
+  <div x-ref="modulesPanel" x-show="open === 'modules'" x-cloak
+       id="nmc-p-modules" aria-labelledby="nmc-t-modules"
+       class="absolute top-full left-0 z-40 w-full pt-2">
+    <div class="rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
+      <div class="grid gap-x-4 gap-y-4 sm:grid-cols-3">
+        <div>
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Procurement</h3>
+          <ul>
+            <li>
+              <a href="/procurement/orders/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Purchase orders</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Raised against a rate contract</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/requisitions/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Requisitions</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Indents waiting to become orders</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/contracts/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Rate contracts</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Agreed prices and their validity</span>
+              </a>
+            </li>
+            <li>
+              <a href="/vendors/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Vendors</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Suppliers and their contacts</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Inventory</h3>
+          <ul>
+            <li>
+              <a href="/inventory/grn/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Goods receipt</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">GRNs against open orders</span>
+              </a>
+            </li>
+            <li>
+              <a href="/inventory/stock/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Stock on hand</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Item ledger by store and bin</span>
+              </a>
+            </li>
+            <li>
+              <a href="/inventory/transfers/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Transfers</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Vasai to Silvassa movement</span>
+              </a>
+            </li>
+            <li>
+              <a href="/inventory/counts/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Stock counts</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Cycle counts and adjustments</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Reports</h3>
+          <ul>
+            <li>
+              <a href="/reports/consumption/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Consumption</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Issue by project and cost centre</span>
+              </a>
+            </li>
+            <li>
+              <a href="/reports/ageing/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Invoice ageing</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Outstanding past agreed terms</span>
+              </a>
+            </li>
+            <li>
+              <a href="/reports/price-trend/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Price trend</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Landed rate by item and month</span>
+              </a>
+            </li>
+            <li>
+              <a href="/reports/builder/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Saved reports</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Your own and the shared set</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

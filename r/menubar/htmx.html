@@ -1,0 +1,148 @@
+<!-- htmx does the writing, because Alpine does not fetch. What is different
+     about a command fired from a menu all comes from one fact: the control that
+     started the request is gone before the response arrives.
+
+     hx-target points at the document region, never at anything inside the
+     panel. The click closes the menu, so by the time the reply lands the panel
+     is display:none — a swap into it succeeds, changes nothing anyone can see,
+     and is thrown away when the menu re-renders. Same for hx-indicator: a
+     spinner in a closed menu is one nobody watches, so the busy state is
+     painted on the strip under the bar instead.
+
+     The answer has to stay on screen and it has to be announced. role="status"
+     does both: the user pressed an item, the menu vanished, and without a live
+     region the only evidence is a number changing three lines further down.
+
+     hx-sync="this:drop", not :replace: two toggles of a switch are one intent
+     and the later wins, but two presses of Recalculate are one already in flight.
+
+     The @click does not preventDefault — htmx listens for the same click — and
+     hx-headers sits on the root, since there is no form to read a token from. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null, busy: false, msg: '', ok: true,
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }"
+     @htmx:before-request.camel="busy = true; msg = ''"
+     @htmx:after-request.camel="
+       busy = false; ok = $event.detail.successful;
+       msg = ok ? 'Tax recalculated from the rate contract' : 'Could not recalculate — the order is unchanged'">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save draft
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="edit"
+              :aria-expanded="open === 'edit'" :tabindex="at === 'edit' ? 0 : -1"
+              @click="open === 'edit' ? close() : show('edit')"
+              @mouseenter="if (open !== null) to('edit')"
+              @keydown.arrow-down.prevent="show('edit')" @keydown.arrow-up.prevent="show('edit', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+
+      <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                hx-post="/orders/PO-24-1187/recalculate-tax/"
+                hx-target="#mb-po-total" hx-swap="innerHTML" hx-sync="this:drop"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="calculator" class="size-4 text-zinc-600"></i>Recalculate tax
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="search" class="size-4 text-zinc-600"></i>Find item code
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p role="status" class="flex min-h-9 items-center gap-1.5 border-b border-zinc-100 px-4 text-[12px]/4">
+    <span x-show="busy" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Recalculating tax
+    </span>
+    <span x-show="!busy && msg" x-cloak class="flex items-center gap-1.5"
+          :class="ok ? 'text-zinc-600' : 'font-medium text-red-600'">
+      <span class="flex shrink-0" :class="ok && 'text-emerald-600'"><i :data-lucide="ok ? 'check' : 'alert-circle'" class="size-3.5"></i></span>
+      <span x-text="msg"></span>
+    </span>
+    <span x-show="!busy && !msg" class="tabular-nums text-zinc-500">Last recalculated 16 Aug 2026, 11:04</span>
+  </p>
+
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p id="mb-po-total" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">14 lines · ₹18,42,000 before tax · IGST 18% ₹3,31,560</p>
+  </div>
+</div>

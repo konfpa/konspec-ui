@@ -1,0 +1,22 @@
+<!-- An icon sits left of the label and clarifies the verb. A chevron is the
+     exception and sits right, because it points at what is about to open.
+
+     Icon-only buttons are square so the hit area stays square, and they carry
+     aria-label — the icon is decorative and contributes nothing to the name. -->
+<div class="flex flex-wrap items-center gap-3">
+  <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+    <i data-lucide="plus" class="size-4"></i>New order
+  </button>
+  <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="download" class="size-4 text-zinc-600"></i>Export
+  </button>
+  <button type="button" aria-haspopup="menu" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">
+    Columns<i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+  </button>
+  <button type="button" aria-label="Edit order" class="inline-flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100">
+    <i data-lucide="pencil" class="size-4"></i>
+  </button>
+  <button type="button" aria-label="More actions" class="inline-flex size-9 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+    <i data-lucide="ellipsis" class="size-4"></i>
+  </button>
+</div>

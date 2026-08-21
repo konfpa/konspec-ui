@@ -1,0 +1,28 @@
+<!-- The trail comes from the view as a list of (label, url) pairs, with the
+     last entry carrying no url. forloop.last is what decides which crumb is
+     plain text, so the template never has to be told twice where it is.
+
+     # views.py
+     context['crumbs'] = [
+         ('Home', reverse('home')),
+         ('Procurement', reverse('procurement:index')),
+         ('Purchase orders', reverse('po:list')),
+         (order.number, None),
+     ]
+
+     Build it in the view, not in the template. A trail assembled from
+     request.path is browsing history wearing a hierarchy's clothes. -->
+<nav aria-label="Breadcrumb">
+  <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+    {% for label, url in crumbs %}
+      {% if not forloop.first %}<li aria-hidden="true" class="text-zinc-500">/</li>{% endif %}
+      <li>
+        {% if forloop.last %}
+          <span aria-current="page" class="font-medium text-zinc-900">{{ label }}</span>
+        {% else %}
+          <a href="{{ url }}" class="text-zinc-600 hover:text-zinc-900">{{ label }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</nav>

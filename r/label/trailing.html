@@ -1,0 +1,32 @@
+<!-- Two things on the label's baseline and neither of them is inside the label
+     element, for two different reasons.
+
+     The hint is a description, so inside the label it would join the accessible
+     name and "GSTIN, 15 characters, state code first" would be read back every
+     time focus landed in the field. It sits in the row and is pointed at with
+     aria-describedby, which is announced once, after the name.
+
+     The button is worse than verbose inside a label. The click would bubble to
+     the label and the label would forward it to its own control, so pressing
+     Copy from master would fire the action and then throw focus into the input
+     — two things from one press, and the second one undoes the first. Sibling
+     in the flex row, never a child.
+
+     items-baseline rather than items-center, so the 13px label and the 12px
+     hint sit on one line of text instead of being centred against each
+     other. -->
+<div class="max-w-xl">
+  <div class="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+    <label for="lb-gstin" class="text-[13px]/5 font-medium">Vendor GSTIN</label>
+    <div class="flex items-baseline gap-3">
+      <span id="lb-gstin-hint" class="text-[12px]/4 tabular-nums text-zinc-500">15 characters</span>
+      <button type="button" class="text-[12px]/4 text-zinc-900 underline underline-offset-2">Copy from master</button>
+    </div>
+  </div>
+
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <input id="lb-gstin" name="gstin" value="24AACCG1234M1ZP" maxlength="15"
+           aria-describedby="lb-gstin-hint"
+           class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums uppercase outline-none">
+  </div>
+</div>

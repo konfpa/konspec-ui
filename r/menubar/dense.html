@@ -1,0 +1,123 @@
+<!-- The bar an editor gets when it is a panel inside a bigger screen rather
+     than the screen itself — a BOM grid sitting in the right half of a
+     list-and-detail, where a 40px strip of chrome above a 300px grid is the
+     wrong proportion.
+
+     Only the bar shrinks. The triggers go to 12px on py-1, which lands them at
+     exactly 24px — the WCAG 2.2 target minimum and not a pixel under it, which
+     is why the padding is py-1 and not py-0.5. The panels stay at their normal
+     size, because the reason for the dense bar is the strip, not the menu: a
+     28px row in a flyout is harder to hit than a 24px trigger in a fixed strip
+     the pointer already knows the position of, and nothing is gained by
+     shrinking a panel that only exists while it is being read.
+
+     The panels are still w-56 and still hang below a 32px bar, so they overlap
+     the grid underneath. That is what z-40 is for, and it is also why the card
+     around the editor cannot be overflow-hidden — clip it and the menu opens
+     as a sliver the height of the bar.
+
+     Below md this is the first thing to collapse, not the last: a dense bar is
+     already at the target-size floor, so there is nothing left to give. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       menus: [
+         { id: 'file', label: 'File', items: [
+           { label: 'Save revision', icon: 'save', hint: 'Ctrl S', keys: 'Control+S' },
+           { label: 'Export to Excel', icon: 'sheet' }
+         ] },
+         { id: 'edit', label: 'Edit', items: [
+           { label: 'Add component', icon: 'plus', hint: 'Ctrl Enter', keys: 'Control+Enter' },
+           { label: 'Replace item', icon: 'repeat' },
+           { label: 'Recalculate cost', icon: 'calculator', hint: 'F9', keys: 'F9' }
+         ] },
+         { id: 'view', label: 'View', items: [
+           { label: 'Expand all levels', icon: 'chevrons-down-up' },
+           { label: 'Scrap and yield', icon: 'percent' }
+         ] }
+       ],
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Bill of materials commands"
+       class="relative flex h-8 items-center gap-0.5 border-b border-zinc-100 px-1">
+    <template x-for="m in menus" :key="m.id">
+      <div class="relative max-md:static">
+        <button type="button" role="menuitem" aria-haspopup="menu" :data-menu="m.id"
+                :aria-expanded="open === m.id" :tabindex="at === m.id ? 0 : -1"
+                @click="open === m.id ? close() : show(m.id)"
+                @mouseenter="if (open !== null) to(m.id)"
+                @keydown.arrow-down.prevent="show(m.id)" @keydown.arrow-up.prevent="show(m.id, true)"
+                @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+                @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+                class="rounded px-2 py-1 text-[12px]/4 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+
+        <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
+             @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+             @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+             @keydown.tab="close()"
+             class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+          <template x-for="it in m.items" :key="it.label">
+            <button type="button" role="menuitem" tabindex="-1" :aria-keyshortcuts="it.keys" @click="close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+              <span x-text="it.label"></span>
+              <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 tabular-nums text-zinc-500" x-text="it.hint"></span>
+            </button>
+          </template>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <table class="w-full text-[12px]/4">
+    <thead class="bg-zinc-100 text-left text-zinc-600">
+      <tr><th class="px-3 py-1.5 font-medium">Component</th><th class="px-3 py-1.5 text-right font-medium">Qty</th><th class="px-3 py-1.5 text-right font-medium">Cost</th></tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-100">
+      <tr><td class="px-3 py-1.5">HDPE granules — grade 5200B</td><td class="px-3 py-1.5 text-right tabular-nums">840 kg</td><td class="px-3 py-1.5 text-right tabular-nums">₹92,400</td></tr>
+      <tr><td class="px-3 py-1.5">Masterbatch — natural</td><td class="px-3 py-1.5 text-right tabular-nums">18 kg</td><td class="px-3 py-1.5 text-right tabular-nums">₹7,020</td></tr>
+      <tr><td class="px-3 py-1.5">Carton 400×300×250</td><td class="px-3 py-1.5 text-right tabular-nums">120 nos</td><td class="px-3 py-1.5 text-right tabular-nums">₹4,560</td></tr>
+    </tbody>
+  </table>
+</div>

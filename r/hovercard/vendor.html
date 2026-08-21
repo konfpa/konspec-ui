@@ -1,0 +1,81 @@
+<!-- The richest a hovercard is allowed to get: who they are, what state the
+     relationship is in, four figures and one way in. Past that the answer is
+     the vendor page, which is where the link already goes.
+
+     The initials circle is a tinted shape, so it carries its ring, and it is
+     aria-hidden because the name is written beside it.
+
+     The pill says Active, not Approved. The five fixed statuses describe what a
+     record is doing, and Approved is amber there because it means waiting on
+     someone; a vendor on the approved list is not waiting for anything. Reusing
+     the word with a different dot is how one screen ends up contradicting the
+     next, so the standing of a person or a party takes emerald the way the
+     presence dot does, and the record words are left to records. -->
+<div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Vendor</p>
+  <span class="relative mt-1 inline-block"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 350) {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+              this.open = true;
+              window.dispatchEvent(new CustomEvent('hovercard-open', { detail: this.$root }));
+            }, d);
+          },
+          hide() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = false, 200); },
+          shut() { clearTimeout(this.timer); this.open = false; }
+        }"
+        @mouseenter="show()" @mouseleave="hide()"
+        @focusin="show(0)" @focusout="hide()"
+        @keydown.escape.window="shut()"
+        @hovercard-open.window="if ($event.detail !== $root) shut()">
+
+    <a href="/vendors/142/" class="font-medium text-zinc-900 underline underline-offset-2">Gujarat Polymers Ltd</a>
+
+    <div x-show="open" x-cloak x-transition.opacity.duration.150ms
+         class="absolute top-full left-0 z-40 pt-2">
+      <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+        <div class="flex items-start gap-3">
+          <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">GP</span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-[14px]/5 font-semibold">Gujarat Polymers Ltd</p>
+            <div class="mt-1 flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Active
+              </span>
+              <span class="text-[12px]/4 text-zinc-500 tabular-nums">V-0142 · Vapi</span>
+            </div>
+          </div>
+        </div>
+
+        <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-zinc-100 pt-3">
+          <div>
+            <dt class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Open orders</dt>
+            <dd class="mt-0.5 text-[13px]/5 font-medium tabular-nums">4</dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Outstanding</dt>
+            <dd class="mt-0.5 text-[13px]/5 font-medium tabular-nums">₹42,18,500</dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Terms</dt>
+            <dd class="mt-0.5 text-[13px]/5 tabular-nums">45 days</dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">On time</dt>
+            <dd class="mt-0.5 text-[13px]/5 tabular-nums">92%</dd>
+          </div>
+        </dl>
+
+        <div class="mt-3 flex items-center justify-between gap-3 border-t border-zinc-100 pt-3">
+          <span class="truncate text-[12px]/4 text-zinc-500 tabular-nums">GSTIN 24AABCG1234F1Z5</span>
+          <a href="/vendors/142/" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium hover:bg-zinc-100">
+            Open vendor<i data-lucide="arrow-right" class="size-3.5 text-zinc-600"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </span>
+  <p class="mt-2 text-[12px]/4 text-zinc-500 tabular-nums">3 lines short · delivery due 28 Aug 2026</p>
+</div>

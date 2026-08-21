@@ -1,0 +1,24 @@
+<!-- for and id rather than wrapping, because the box is not inside the sentence
+     that names it. Wrapping a text input in its label works, but it buys
+     nothing: the click already only moves focus, and it makes the label a
+     container that layout then has to fight.
+
+     The help line sits outside the label and is reached with aria-describedby.
+     Inside the label it would join the accessible name, and every time focus
+     landed in the field the user would hear the field name plus the whole
+     sentence about vendor emails.
+
+     The label keeps the text cursor. The base rule gives the pointer only to a
+     label directly wrapping a checkbox or a radio, and this one is neither —
+     clicking it focuses the field, which is not the same promise. -->
+<div class="max-w-xl">
+  <label for="lb-title" class="mb-1.5 block text-[13px]/5 font-medium">Order title</label>
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <input id="lb-title" name="title" value="MS angles and plates — August lot"
+           aria-describedby="lb-title-help"
+           class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+  </div>
+  <p id="lb-title-help" class="mt-1.5 text-[12px]/4 text-zinc-500">
+    Shown on the printed order and in vendor emails.
+  </p>
+</div>

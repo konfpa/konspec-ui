@@ -1,0 +1,42 @@
+<!-- The error was put there by the server, so it is aria-invalid plus real
+     text tied by id — not a red border, which reaches nobody, and not a title
+     attribute, which reaches nobody either.
+
+     Two things this variant is here to show. The invalid wrapper drops
+     focus-within:border-zinc-700 entirely: leave it in and focusing a wrong
+     field repaints it grey, so the box says fixed while the message under it
+     still says broken. And once a field has errored it revalidates as the
+     value is corrected, so the message clears the moment it stops being true
+     rather than waiting for another round trip.
+
+     The help line is always occupied — help text when valid, the error when
+     not — so the block keeps its height and the fields below it do not jump
+     as the user types. -->
+<div class="max-w-xl"
+     x-data="{
+       rate: '51,800',
+       touched: true,
+       floor: 52400,
+       get n() { return Number(this.rate.replace(/[^0-9.]/g, '')); },
+       get bad() { return this.touched && (!this.rate.trim() || this.n < this.floor); }
+     }">
+  <label for="in-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per MT <span class="text-red-600">*</span></label>
+
+  <div class="flex items-center rounded-lg bg-white border"
+       :class="bad ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
+                   : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
+    <span class="pl-3 text-[14px]/5" :class="bad ? 'text-red-600' : 'text-zinc-600'">₹</span>
+    <input id="in-rate" name="rate" x-model="rate" @blur="touched = true"
+           inputmode="decimal" autocomplete="off"
+           :aria-invalid="bad ? 'true' : null"
+           aria-describedby="in-rate-msg"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+  </div>
+
+  <p id="in-rate-msg" class="mt-1.5 text-[12px]/4 tabular-nums" :class="bad ? 'font-medium text-red-600' : 'text-zinc-500'">
+    <span x-show="!bad" x-cloak>Contracted floor is ₹52,400 per MT until 31 Mar 2027.</span>
+    <span x-show="bad" x-cloak class="flex items-center gap-1.5">
+      <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Below the contracted floor of ₹52,400 per MT.
+    </span>
+  </p>
+</div>

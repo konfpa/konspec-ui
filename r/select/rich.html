@@ -1,0 +1,132 @@
+<!-- The case the native element cannot reach. An <option> holds text and
+     nothing else — HTML inside one is stripped to its characters — and a second
+     line is what tells two vendors called Sharma apart.
+
+     The keyboard moves real focus onto the option, tabindex="-1" at a time, and
+     the indicator is a plain :focus outline. That is the dropdown menu's model
+     rather than the combobox's, and the difference is where focus has to live:
+     a combobox keeps focus in its text box so typing keeps working, which
+     forces it to point at a row with aria-activedescendant and to mint a stable
+     id per option. A select has no text box, so the option can be the focused
+     thing — .focus() scrolls it into view inside the panel for free, and the
+     outline is real, with a negative offset because the list scrolls.
+
+     Typeahead is not optional. Typing gu on a focused native select jumps to
+     Gujarat; a hand-built listbox that drops that is worse than what it
+     replaced, and nobody notices in review because everyone is using a mouse.
+     The buffer clears after 600ms, the same letter twice cycles, and the search
+     wraps although the arrows clamp — clamped, r finds nothing from the bottom.
+
+     A <label for> does not name a <button>, so the label is a span and the
+     trigger takes aria-labelledby with two ids. The trigger shows one line: the
+     second belongs to the list, and in the closed control it makes every field
+     in the form a different height. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, sel: 'sharma-extrusions', buf: '', timer: null,
+       options: [
+         { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', code: 'VEN-0142', gstin: '24AABCG1122F1Z8' },
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', code: 'VEN-0187', gstin: '27AABCS9012K1Z5' },
+         { id: 'sharma-polymers', label: 'Sharma Polymers and Compounds', code: 'VEN-0192', gstin: '24AABCS4471D1ZM' },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', code: 'VEN-0203', gstin: '27AACCN4455P1ZR' },
+         { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', code: 'VEN-0219', gstin: '27AAECD7788M1ZT' },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', code: 'VEN-0244', gstin: '27AAGCK2266H1ZW' },
+         { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', code: 'VEN-0266', gstin: '33AAJCC8811N1ZD' }
+       ],
+       get chosen() { return this.options.find(o => o.id === this.sel) || null; },
+       rows() { return [...this.$refs.list.querySelectorAll('[role=option]')]; },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const r = this.rows();
+           const at = r.findIndex(el => el.dataset.value === this.sel);
+           (at > -1 ? r[at] : (last ? r[r.length - 1] : r[0]))?.focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false; this.buf = '';
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const r = this.rows(), at = r.indexOf(document.activeElement);
+         r[Math.min(r.length - 1, Math.max(0, at + step))]?.focus();
+       },
+       edge(last) { const r = this.rows(); (last ? r[r.length - 1] : r[0])?.focus(); },
+       take(el) { if (!el) return; this.sel = el.dataset.value; this.close(); },
+       commit() { const a = document.activeElement; if (a) this.take(a.closest('[role=option]')); },
+       type(k) {
+         clearTimeout(this.timer);
+         this.timer = setTimeout(() => { this.buf = ''; }, 600);
+         this.buf += k.toLowerCase();
+         const r = this.rows(), at = r.indexOf(document.activeElement);
+         const from = this.buf.length > 1 ? Math.max(at, 0) : at + 1;
+         for (let i = 0; i < r.length; i++) {
+           const el = r[(from + i) % r.length];
+           if (el.dataset.label.toLowerCase().startsWith(this.buf)) { el.focus(); return; }
+         }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <span id="lb-vendor-label" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</span>
+
+  <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
+          aria-labelledby="lb-vendor-label lb-vendor-value"
+          @click="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+          class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <span class="flex min-w-0 flex-1 items-baseline gap-2">
+      <span id="lb-vendor-value" class="min-w-0 truncate text-[14px]/5" x-text="chosen ? chosen.label : 'Choose a vendor'"></span>
+      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="chosen ? chosen.code : ''"></span>
+    </span>
+    <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </button>
+
+  <!-- what actually posts. The field is still a ChoiceField on the server; only
+       the widget changed, and only the server can say whether the id is real. -->
+  <input type="hidden" name="vendor" :value="sel">
+
+  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Seven approved vendors. The GSTIN is on the row because two of them are called Sharma.</p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div x-ref="list" role="listbox" aria-labelledby="lb-vendor-label"
+         class="max-h-72 overflow-y-auto py-1"
+         @click="take($event.target.closest('[role=option]'))"
+         @keydown.arrow-down.prevent="move(1)"
+         @keydown.arrow-up.prevent="move(-1)"
+         @keydown.home.prevent="edge(false)"
+         @keydown.end.prevent="edge(true)"
+         @keydown.enter.prevent="commit()"
+         @keydown.space.prevent="buf ? type(' ') : commit()"
+         @keydown.tab="close(false)"
+         @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }">
+
+      <template x-for="o in options" :key="o.id">
+        <!-- the whole row gets one aria-label. Left alone it is read as a single
+             run: the name, then a GSTIN spelled out character by character. The
+             label is the name and the code; the rest is aria-hidden and stays on
+             screen for the people reading it. -->
+        <div role="option" tabindex="-1" :data-value="o.id" :data-label="o.label"
+             :aria-selected="o.id === sel" :aria-label="o.label + ', ' + o.code"
+             class="flex items-start gap-3 px-3 py-2 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <span class="min-w-0 flex-1" aria-hidden="true">
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate text-[13px]/5 font-medium" x-text="o.label"></span>
+              <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.code"></span>
+            </span>
+            <span class="mt-0.5 block truncate font-mono text-[12px]/4 text-zinc-500" x-text="o.gstin"></span>
+          </span>
+          <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+            <i data-lucide="check" class="size-4 text-zinc-600"></i>
+          </span>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>

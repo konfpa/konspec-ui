@@ -1,0 +1,39 @@
+<!-- Read-only, nothing to submit, so the only control is a close button. -->
+<div x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="keyboard" class="size-4"></i>Shortcuts
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="keys-title"
+         class="flex max-h-[80vh] w-full max-w-sm flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+      <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+        <h2 id="keys-title" class="text-[16px]/6 font-semibold">Keyboard shortcuts</h2>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+      <dl class="min-h-0 flex-1 overflow-y-auto px-5 py-2">
+        <div class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+          <dt class="text-[13px]/5 text-zinc-600">Search orders</dt>
+          <dd><kbd class="rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600">/</kbd></dd>
+        </div>
+        <div class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+          <dt class="text-[13px]/5 text-zinc-600">New purchase order</dt>
+          <dd><kbd class="rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600">N</kbd></dd>
+        </div>
+        <div class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+          <dt class="text-[13px]/5 text-zinc-600">Select all rows</dt>
+          <dd><kbd class="rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600">Ctrl A</kbd></dd>
+        </div>
+        <div class="flex items-center justify-between gap-4 py-2.5">
+          <dt class="text-[13px]/5 text-zinc-600">Close this dialog</dt>
+          <dd><kbd class="rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600">Esc</kbd></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>

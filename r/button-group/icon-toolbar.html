@@ -1,0 +1,48 @@
+<!-- Table density and column controls. Square buttons so the hit area is
+     square, each with its own aria-label — the group label does not name the
+     members, so "Toolbar" on the wrapper would leave three unnamed buttons.
+
+     The pressed one is aria-pressed, not aria-checked: these are independent
+     toggles, and only the density one is a choice. -->
+<div class="flex flex-wrap items-center gap-3">
+  <div role="radiogroup" aria-label="Row density" x-ref="dens"
+       x-data="{
+         v: 'comfortable',
+         opts: ['compact', 'comfortable'],
+         move(step) {
+           const i = (this.opts.indexOf(this.v) + step + this.opts.length) % this.opts.length;
+           this.v = this.opts[i];
+           this.$nextTick(() => this.$refs.dens.querySelector('[aria-checked=true]').focus());
+         }
+       }"
+       @keydown.arrow-right.prevent="move(1)" @keydown.arrow-left.prevent="move(-1)"
+       class="inline-flex rounded-lg bg-zinc-200 p-0.5">
+    <button type="button" role="radio" :aria-checked="v === 'compact'" :tabindex="v === 'compact' ? 0 : -1"
+            @click="v = 'compact'" aria-label="Compact rows"
+            class="flex size-8 items-center justify-center rounded-md transition"
+            :class="v === 'compact' ? 'bg-white shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+      <i data-lucide="align-justify" class="size-4"></i>
+    </button>
+    <button type="button" role="radio" :aria-checked="v === 'comfortable'" :tabindex="v === 'comfortable' ? 0 : -1"
+            @click="v = 'comfortable'" aria-label="Comfortable rows"
+            class="flex size-8 items-center justify-center rounded-md transition"
+            :class="v === 'comfortable' ? 'bg-white shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+      <i data-lucide="menu" class="size-4"></i>
+    </button>
+  </div>
+
+  <div role="group" aria-label="Table view" class="inline-flex rounded-lg border border-zinc-200 bg-white">
+    <button type="button" aria-label="Freeze first column" aria-pressed="true"
+            class="flex size-8 items-center justify-center rounded-l-lg bg-zinc-200 hover:bg-zinc-300">
+      <i data-lucide="pin" class="size-4"></i>
+    </button>
+    <button type="button" aria-label="Show totals row" aria-pressed="false"
+            class="flex size-8 items-center justify-center border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+      <i data-lucide="sigma" class="size-4"></i>
+    </button>
+    <button type="button" aria-label="Wrap long text" aria-pressed="false"
+            class="flex size-8 items-center justify-center rounded-r-lg border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+      <i data-lucide="wrap-text" class="size-4"></i>
+    </button>
+  </div>
+</div>

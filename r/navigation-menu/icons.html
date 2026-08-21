@@ -1,0 +1,132 @@
+<!-- An icon per row, in a tinted well. The well is a shape, so it takes
+     bg-zinc-200 with a zinc-300 ring; bg-zinc-100 would be the surface colour
+     and would measure identical against the white panel with nothing to hold
+     its edge.
+
+     Every well is the same size and every icon sits in one, including the rows
+     where the icon is weak, because the labels only form a readable column if
+     their left edge never moves. The moment one row has no well the whole list
+     reads as two lists.
+
+     The icons carry no label of their own. Each one repeats what the text
+     beside it already says, and a screen reader announcing "package, Stock on
+     hand" for six rows in a row is noise. If an icon needs explaining it is
+     not naming a destination, and the answer is to drop it rather than to
+     search Lucide for something vaguer.
+
+     No Alpine binding goes on the <i data-lucide>. createIcons() replaces that
+     element with an <svg> and takes the binding with it; the rotating chevron
+     on the trigger is bound on the span around it for the same reason. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <a href="/dashboard/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+    </li>
+
+    <li class="relative">
+      <button type="button" x-ref="inv" id="nmi-t-inv"
+              aria-controls="nmi-p-inv" :aria-expanded="open === 'inv'"
+              @mouseenter="hover('inv')"
+              @click="open === 'inv' ? shut($refs.inv) : jump('inv')"
+              @keydown.arrow-down.prevent="jump('inv')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'inv' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Inventory
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'inv' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="invPanel" x-show="open === 'inv'" x-cloak
+           id="nmi-p-inv" aria-labelledby="nmi-t-inv"
+           class="absolute top-full left-0 z-40 pt-2">
+        <ul class="w-72 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <li>
+            <a href="/inventory/stock/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="package" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Stock on hand</span>
+                <span class="block text-[12px]/4 text-zinc-600">By store and bin</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="/inventory/grn/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="truck" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Goods receipt</span>
+                <span class="block text-[12px]/4 text-zinc-600">Post a GRN against an order</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="/inventory/transfers/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="arrow-left-right" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Transfers</span>
+                <span class="block text-[12px]/4 text-zinc-600">Vasai to Silvassa</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="/inventory/counts/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="clipboard-list" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Stock counts</span>
+                <span class="block text-[12px]/4 text-zinc-600">Cycle counts and adjustments</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="/inventory/ledger/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="file-text" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Item ledger</span>
+                <span class="block text-[12px]/4 text-zinc-600">Every movement, by item</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+    <li>
+      <a href="/reports/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+</nav>

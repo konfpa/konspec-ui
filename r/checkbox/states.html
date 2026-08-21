@@ -1,0 +1,48 @@
+<div class="max-w-xl space-y-5">
+  <!-- disabled: out of the Tab order and out of the POST -->
+  <div>
+    <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+      <input type="checkbox" disabled class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Auto-close the order on a full GRN</span>
+    </label>
+    <p class="mt-1 pl-[26px] text-[12px]/4 text-zinc-500">Locked by plant policy. It changes on the rate contract, not here.</p>
+  </div>
+
+  <!-- ticked and locked. disabled submits nothing at all, so a value that is
+       already true and still has to reach the server travels in a hidden input
+       beside the box. -->
+  <div>
+    <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+      <input type="checkbox" checked disabled class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Three-way match against the invoice</span>
+    </label>
+    <input type="hidden" name="three_way_match" value="1">
+    <p class="mt-1 pl-[26px] text-[12px]/4 tabular-nums text-zinc-500">Compulsory above ₹10,00,000.</p>
+  </div>
+
+  <!-- There is no read-only checkbox: readonly does nothing on one, so a box
+       left readonly is a box anyone can still tick. A value nobody may change is
+       not a control — render it. -->
+  <div>
+    <p class="text-[13px]/5 font-medium text-zinc-600">Partial receipt</p>
+    <p class="mt-1 flex items-center gap-2 text-[14px]/5">
+      <i data-lucide="check" class="size-4 shrink-0 text-zinc-600"></i>
+      Allowed — set when the order was released
+    </p>
+  </div>
+
+  <!-- required and unticked. The asterisk is decoration; required and
+       aria-invalid are what is actually announced. -->
+  <div>
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" id="cb-declare" name="declared" required
+             aria-invalid="true" aria-describedby="cb-declare-err"
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="tabular-nums">I have counted this material against GRN-24-0912 <span class="text-red-600">*</span></span>
+    </label>
+    <p id="cb-declare-err" class="mt-1 flex items-start gap-1.5 pl-[26px] text-[12px]/4 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
+      The declaration has to be ticked before the GRN can be posted.
+    </p>
+  </div>
+</div>

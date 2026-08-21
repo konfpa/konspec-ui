@@ -1,0 +1,118 @@
+<!-- The keyboard runs over one flattened list in the order the rows are drawn,
+     not group by group. Index within a group and arrow-down at the bottom of
+     Maharashtra has nowhere to go: the highlight sticks there and Gujarat is
+     unreachable without a mouse.
+
+     Each group is role="group" with an aria-label, because a listbox may only
+     contain options and groups. The visible heading is aria-hidden — the group
+     is already named, and the heading would otherwise be read as a row.
+
+     A sticky heading needs a background of its own. Left transparent, the rows
+     scroll straight through the text and neither is readable. A group whose
+     options are all filtered out goes with its heading. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: 'Nashik Steel Traders', sel: 'nashik-steel', ai: 0,
+       groups: [
+         { state: 'Maharashtra', options: [
+           { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'Nashik' },
+           { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'Nashik' },
+           { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', meta: 'Pune' },
+           { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'Ratnagiri' }
+         ] },
+         { state: 'Gujarat', options: [
+           { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'Vadodara' },
+           { id: 'baroda-fasteners', label: 'Baroda Fasteners', meta: 'Vadodara' },
+           { id: 'rajkot-forge', label: 'Rajkot Forge and Machining', meta: 'Rajkot' }
+         ] },
+         { state: 'Tamil Nadu', options: [
+           { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', meta: 'Coimbatore' },
+           { id: 'madurai-rubber', label: 'Madurai Rubber Works', meta: 'Madurai' }
+         ] }
+       ],
+       get all() { return this.groups.flatMap(g => g.options); },
+       match(g) {
+         if (!this.typed) return g.options;
+         const s = this.q.trim().toLowerCase();
+         return g.options.filter(o => (o.label + ' ' + o.meta + ' ' + g.state).toLowerCase().includes(s));
+       },
+       get list() { return this.groups.flatMap(g => this.match(g)); },
+       rowId(o) { return 'cb-state-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(o => o.id === this.sel));
+         this.scroll();
+       },
+       close() {
+         this.open = false; this.typed = false;
+         const o = this.all.find(x => x.id === this.sel);
+         this.q = o ? o.label : '';
+       },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-state" class="mb-1.5 block text-[13px]/5 font-medium">Ship-from vendor</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-state" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-state-list"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Search a vendor or a state"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <input type="hidden" name="vendor" :value="sel || ''">
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-state-list" role="listbox" aria-label="Vendors by state" class="max-h-72 overflow-y-auto pb-1">
+      <template x-for="g in groups" :key="g.state">
+        <div role="group" :aria-label="g.state" x-show="match(g).length">
+          <p aria-hidden="true"
+             class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+             x-text="g.state"></p>
+          <template x-for="o in match(g)" :key="o.id">
+            <div :id="rowId(o)" role="option" :aria-selected="o.id === sel"
+                 @mousedown.prevent @click="pick(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+                 :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+                 class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+              <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+              <span class="shrink-0 text-[12px]/4 text-zinc-500" x-text="o.meta"></span>
+              <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+                <i data-lucide="check" class="size-4 text-zinc-600"></i>
+              </span>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 text-zinc-500">Try a state — Maharashtra, Gujarat, Tamil Nadu.</p>
+    </div>
+  </div>
+</div>

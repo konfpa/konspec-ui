@@ -1,0 +1,100 @@
+<!-- Two native date inputs, which is exactly where a popover that closes on a
+     bare focusout falls apart. Clicking the calendar glyph in an
+     input[type=date] opens browser chrome, focus leaves the document, and
+     Chromium reports focusout with relatedTarget null; the guard on
+     relatedTarget is the whole reason this panel survives being used.
+
+     Escape is two presses here and that is correct, not a bug. The open picker
+     swallows the first one whole — the popup closes and no keydown reaches the
+     page at all — and the second reaches the root handler and closes the panel.
+     Do not add a guard that skips Escape when the target is a date field: that
+     would break Escape closing the panel while such a field merely has focus,
+     which works today.
+
+     The presets are buttons and not radios. A preset is an action that writes
+     both fields, not a value the form holds — pick one and then nudge From by a
+     day and the radio is still lit next to a range it no longer describes.
+
+     Apply is the only write. The trigger label is the committed range, so a
+     panel dismissed by a click on the page leaves the label saying what the
+     register is actually showing. -->
+<div class="relative inline-block"
+     x-data="{
+       open: false,
+       applied: { from: '2026-08-01', to: '2026-08-31', label: '01 Aug 2026 – 31 Aug 2026' },
+       draft: { from: '2026-08-01', to: '2026-08-31' },
+       preset(from, to) { this.draft.from = from; this.draft.to = to; this.$refs.from.focus() },
+       fmt(v) {
+         const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+         const p = v.split('-');
+         return p[2] + ' ' + m[Number(p[1]) - 1] + ' ' + p[0];
+       },
+       show() {
+         this.draft = { from: this.applied.from, to: this.applied.to };
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs.from.focus()));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       apply() {
+         this.applied = { from: this.draft.from, to: this.draft.to,
+                          label: this.fmt(this.draft.from) + ' – ' + this.fmt(this.draft.to) };
+         this.close();
+       }
+     }"
+     @click.outside="close(false)"
+     @focusout="if ($event.relatedTarget && !$root.contains($event.relatedTarget)) close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          :aria-expanded="open" aria-controls="pop-dt"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="calendar" class="size-4 text-zinc-600"></i>
+    <span x-text="applied.label">01 Aug 2026 – 31 Aug 2026</span>
+  </button>
+
+  <div id="pop-dt" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
+       role="dialog" tabindex="-1" aria-labelledby="pop-dt-title"
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+    <div class="space-y-3 px-4 py-3.5">
+      <p id="pop-dt-title" class="text-[13px]/5 font-medium">Delivery date between</p>
+
+      <div class="flex flex-wrap gap-1.5">
+        <button type="button" @click="preset('2026-08-01', '2026-08-31')"
+                class="rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">This month</button>
+        <button type="button" @click="preset('2026-07-22', '2026-08-21')"
+                class="rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px]/4 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Last 30 days</button>
+        <button type="button" @click="preset('2026-07-01', '2026-09-30')"
+                class="rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Q2 FY 26-27</button>
+      </div>
+
+      <div class="flex items-end gap-2">
+        <div class="min-w-0 flex-1">
+          <label for="dt-from" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">From</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input id="dt-from" x-ref="from" type="date" x-model="draft.from" :max="draft.to"
+                   class="w-full bg-transparent px-2.5 py-2 text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </div>
+        <span class="pb-2.5 text-[12px]/4 text-zinc-500">to</span>
+        <div class="min-w-0 flex-1">
+          <label for="dt-to" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">To</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input id="dt-to" type="date" x-model="draft.to" :min="draft.from"
+                   class="w-full bg-transparent px-2.5 py-2 text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
+      <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Cancel</button>
+      <button type="button" @click="apply()"
+              class="rounded-lg bg-zinc-700 px-3.5 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Apply</button>
+    </div>
+  </div>
+</div>

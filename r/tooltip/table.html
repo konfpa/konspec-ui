@@ -1,0 +1,97 @@
+<!-- Abbreviated column headers are the one place a tooltip earns its keep in
+     a register: MFI and Ash mean nothing to a new joiner and spelling them out
+     would make the header three lines deep on a table that already has eight
+     columns.
+
+     The trigger is a real button, not a span with a dotted underline. Anything
+     that shows content on hover has to be reachable on focus, and only a real
+     control is. The underline is decoration-dotted rather than solid so it does
+     not read as a link — this one does not navigate.
+
+     Each header button already has a name, the abbreviation itself, so the
+     bubble is a description: aria-describedby, never aria-labelledby, or the
+     header is announced as the whole method sentence in every row summary.
+
+     Bubbles hang below the header because there is nothing above it but the
+     card edge, and the card is not overflow-hidden — rounded header cells
+     instead — or every one of them is clipped at the top row.
+
+     The spec limits are printed under the table, which is what makes the
+     tooltip on the failing result legal. It is a shortcut to something already
+     on the page, not the only copy of it. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, timer: 0,
+       show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
+       hide() { clearTimeout(this.timer); this.open = null }
+     }"
+     @keydown.escape.window="hide()">
+  <table class="w-full text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="rounded-tl-xl px-3 py-2 font-medium">Batch</th>
+        <th scope="col" class="px-3 py-2 text-right font-medium">
+          <span class="relative inline-flex">
+            <button type="button" aria-describedby="tt-mfi"
+                    @mouseenter="show('mfi')" @mouseleave="hide()"
+                    @focus="if ($event.target.matches(':focus-visible')) show('mfi', 0)" @blur="hide()"
+                    class="underline decoration-dotted underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MFI</button>
+            <span id="tt-mfi" role="tooltip" x-show="open === 'mfi'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute top-full right-0 z-40 mt-1.5 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tracking-normal whitespace-nowrap text-white normal-case">Melt flow index, g/10 min at 190 °C</span>
+          </span>
+        </th>
+        <th scope="col" class="px-3 py-2 text-right font-medium">
+          <span class="relative inline-flex">
+            <button type="button" aria-describedby="tt-ash"
+                    @mouseenter="show('ash')" @mouseleave="hide()"
+                    @focus="if ($event.target.matches(':focus-visible')) show('ash', 0)" @blur="hide()"
+                    class="underline decoration-dotted underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Ash</button>
+            <span id="tt-ash" role="tooltip" x-show="open === 'ash'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute top-full right-0 z-40 mt-1.5 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tracking-normal whitespace-nowrap text-white normal-case">Residue on ignition, % by mass</span>
+          </span>
+        </th>
+        <th scope="col" class="rounded-tr-xl px-3 py-2 font-medium">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5 font-medium tabular-nums">B-2608-14</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">2.41</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">0.62</td>
+        <td class="px-3 py-1.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Pass
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5 font-medium tabular-nums">B-2608-15</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">3.18</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">0.71</td>
+        <td class="px-3 py-1.5">
+          <span class="relative inline-flex">
+            <button type="button" aria-label="Failed" aria-describedby="tt-fail"
+                    @mouseenter="show('fail')" @mouseleave="hide()"
+                    @focus="if ($event.target.matches(':focus-visible')) show('fail', 0)" @blur="hide()"
+                    class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Fail
+            </button>
+            <span id="tt-fail" role="tooltip" x-show="open === 'fail'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute bottom-full left-0 z-40 mb-1.5 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white">MFI 3.18 is over the 3.00 limit</span>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-3 py-1.5 font-medium tabular-nums">B-2608-16</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">2.87</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">0.58</td>
+        <td class="px-3 py-1.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Pass
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="border-t border-zinc-100 px-3 py-2 text-[12px]/4 tabular-nums text-zinc-500">Spec: MFI 2.00–3.00 g/10 min · Ash 0.80 % max</p>
+</div>

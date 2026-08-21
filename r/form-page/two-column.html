@@ -1,0 +1,250 @@
+<!-- The whole screen: page header, one h1, the required key stated once, two
+     cards of fields, and an action bar that sticks to the bottom of the
+     scrolling column.
+
+     The dirty flag is armed by input and change and by nothing else. Focus is
+     not an edit — arm it on focusin and tabbing through the form to read it
+     leaves the guard set, so Cancel raises a dialog about changes nobody made,
+     and after the third time people press Discard without reading it.
+
+     send() clears the flag before it navigates, or the form raises the
+     unsaved-changes dialog against its own Save.
+
+     beforeunload covers the tab closing and a real navigation away. The browser
+     ignores any string you return, so there is nothing to write there — the
+     preventDefault is the whole handler, and it only prompts because a person
+     actually typed something. -->
+<div class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+     x-data="{
+       dirty: false, leaving: false,
+       arm(e) { if (e.target.matches('input, select, textarea')) this.dirty = true },
+       cancel() { if (this.dirty) { this.leaving = true } else { this.$refs.cancel.focus() } },
+       discard() { this.dirty = false; this.leaving = false; this.$nextTick(() => this.$refs.cancel.focus()) },
+       send() { this.dirty = false }
+     }"
+     @beforeunload.window="if (dirty) $event.preventDefault()">
+
+  <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
+
+    <!-- page-header, unchanged -->
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <a href="#" class="hover:text-zinc-900">Procurement</a>
+          <span class="text-zinc-500">/</span>
+          <a href="#" class="hover:text-zinc-900">Purchase orders</a>
+          <span class="text-zinc-500">/</span>
+          <span class="font-medium text-zinc-900">New</span>
+        </nav>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">New purchase order</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Silvassa plant · FY 2026–27 · raised by Akshay Prabhu</p>
+      </div>
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full bg-zinc-400" aria-hidden="true"></span>Draft
+      </span>
+    </div>
+
+    <form class="mt-5" @input="arm($event)" @change="arm($event)" @submit.prevent="send()">
+
+      <!-- said once, and backed by the required attribute on every control -->
+      <p class="text-[12px]/4 text-zinc-600">
+        Every field is required unless its label says <span class="font-medium text-zinc-900">Optional</span>.
+      </p>
+
+      <div class="mt-3 space-y-4">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 class="text-[16px]/6 font-semibold">Order</h2>
+          </div>
+          <div class="px-5 py-4">
+            <div class="grid gap-4 sm:grid-cols-2">
+
+              <div class="min-w-0">
+                <label for="tc-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="tc-vendor" name="vendor" required aria-describedby="tc-vendor-msg"
+                          class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="">Choose a vendor</option>
+                    <option value="v-0288">Sharma Steel &amp; Alloys — VEN-0288</option>
+                    <option value="v-0142">Gujarat Polymers Ltd — VEN-0142</option>
+                    <option value="v-0219">Deccan Fasteners Pvt Ltd — VEN-0219</option>
+                  </select>
+                </div>
+                <p id="tc-vendor-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+                  Only vendors with a live rate contract are listed.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="tc-centre" class="mb-1.5 block text-[13px]/5 font-medium">Cost centre</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="tc-centre" name="cost_centre" required
+                          class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="">Choose a cost centre</option>
+                    <option value="cc-1200">Fabrication — Silvassa</option>
+                    <option value="cc-1100">Injection moulding — Silvassa</option>
+                    <option value="cc-2200">Maintenance — Vapi</option>
+                  </select>
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0 sm:col-span-2">
+                <label for="tc-title" class="mb-1.5 block text-[13px]/5 font-medium">Order title</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="tc-title" name="title" required aria-describedby="tc-title-msg"
+                         value="MS angles and plates — August lot"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                </div>
+                <p id="tc-title-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+                  Printed on the order and used as the subject of the vendor email.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="tc-value" class="mb-1.5 block text-[13px]/5 font-medium">Estimated value (₹)</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+                  <input id="tc-value" name="value" required inputmode="decimal" value="18,42,000"
+                         aria-describedby="tc-value-msg"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                  <span aria-hidden="true" class="flex items-center pr-3 text-[14px]/5 text-zinc-500">.00</span>
+                </div>
+                <p id="tc-value-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+                  Above ₹5,00,000 this goes to a second approver.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="tc-ref" class="mb-1.5 flex items-baseline gap-2 text-[13px]/5 font-medium">
+                  Buyer reference
+                  <span aria-hidden="true" class="font-normal text-zinc-500">Optional</span>
+                </label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="tc-ref" name="buyer_ref" aria-describedby="tc-ref-msg"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p id="tc-ref-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+                  Quoted back on the vendor invoice.
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 class="text-[16px]/6 font-semibold">Delivery</h2>
+          </div>
+          <div class="px-5 py-4">
+            <div class="grid gap-4 sm:grid-cols-2">
+
+              <div class="min-w-0">
+                <label for="tc-need" class="mb-1.5 block text-[13px]/5 font-medium">Required by</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <i data-lucide="calendar" aria-hidden="true" class="ml-3 size-4 shrink-0 self-center text-zinc-500"></i>
+                  <input id="tc-need" name="required_by" type="date" required value="2026-09-04"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-2 text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0 sm:col-span-2">
+                <div class="mb-1.5 flex items-baseline justify-between gap-3">
+                  <label for="tc-ship" class="text-[13px]/5 font-medium">Delivery address</label>
+                  <button type="button" class="shrink-0 text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    Same as plant
+                  </button>
+                </div>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <textarea id="tc-ship" name="ship_to" rows="3" required aria-describedby="tc-ship-msg"
+                            class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none">Konspec Industries, Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</textarea>
+                </div>
+                <p id="tc-ship-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+                  Printed on the order and on the gate pass.
+                </p>
+              </div>
+
+              <!-- a genuine group: three answers to one question, and no single
+                   control for a <label for> to point at. The grid is on a div
+                   inside the fieldset, never on the fieldset itself. -->
+              <fieldset class="min-w-0 sm:col-span-2" aria-describedby="tc-freight-msg">
+                <legend class="mb-2 text-[13px]/5 font-medium">Freight terms</legend>
+                <div class="grid gap-2 sm:grid-cols-3">
+                  <label class="flex items-start gap-2.5 text-[14px]/5">
+                    <input type="radio" name="freight" value="exw" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                    <span>Ex works</span>
+                  </label>
+                  <label class="flex items-start gap-2.5 text-[14px]/5">
+                    <input type="radio" name="freight" value="for" checked required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                    <span>FOR Silvassa</span>
+                  </label>
+                  <label class="flex items-start gap-2.5 text-[14px]/5">
+                    <input type="radio" name="freight" value="cif" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                    <span>Delivered, duty paid</span>
+                  </label>
+                </div>
+                <p id="tc-freight-msg" class="mt-2 min-h-4 text-[12px]/4 text-zinc-500">
+                  Described on the fieldset, so it is read once on entry rather than once per arrow key.
+                </p>
+              </fieldset>
+
+              <div class="sm:col-span-2">
+                <label class="flex items-start gap-2.5 text-[14px]/5">
+                  <input type="checkbox" name="notify" checked class="mt-0.5 size-4 shrink-0 rounded accent-zinc-700">
+                  <span>Email the vendor when this order is approved
+                    <span class="mt-0.5 block text-[12px]/4 text-zinc-500">Goes to purchase@sharmasteel.in</span>
+                  </span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- opaque, top-bordered, stuck to the bottom of the scrolling column.
+           Transparent, the last field scrolls under it and reads as clipped. -->
+      <div class="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+        <p class="text-[12px]/4 tabular-nums text-zinc-600">
+          <span x-show="!dirty">Draft saved at 14:02. Nothing changed since.</span>
+          <span x-show="dirty" x-cloak class="flex items-center gap-1.5 font-medium text-zinc-900">
+            <i data-lucide="pencil" class="size-3.5 shrink-0 text-zinc-600"></i>Unsaved changes
+          </span>
+        </p>
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <button type="button" x-ref="cancel" @click="cancel()"
+                  class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Cancel</button>
+          <button type="button"
+                  class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Save draft</button>
+          <button type="submit"
+                  class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Send for approval</button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <!-- three answers, because forcing a two-way choice makes people pick the
+       destructive one to get out. absolute inset-0 against the preview frame;
+       fixed inset-0 as a real page. -->
+  <div x-show="leaving" x-cloak x-trap.noscroll="leaving" @keydown.escape.window="leaving = false"
+       class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="tc-leave-t" aria-describedby="tc-leave-b"
+         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+      <h2 id="tc-leave-t" class="text-[16px]/6 font-semibold">Leave without saving?</h2>
+      <p id="tc-leave-b" class="mt-1.5 text-[13px]/5 text-zinc-600">
+        This draft has changes that have not been saved. Leaving now loses them.
+      </p>
+      <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="leaving = false"
+                class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Keep editing</button>
+        <button type="button" @click="discard()"
+                class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Discard changes</button>
+        <button type="button" @click="send(); leaving = false"
+                class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save and leave</button>
+      </div>
+    </div>
+  </div>
+</div>

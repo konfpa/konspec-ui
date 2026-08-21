@@ -1,0 +1,127 @@
+<!-- The assembled thing: 1,438 purchase orders, 58 pages at 25 rows, every
+     control wired to the same three numbers. Page to 58 and back and the number
+     row is seven squares wide the whole way — that is the fixed window doing its
+     job, and it is the reason Next is still under the pointer on the tenth click.
+
+     Both gaps carry their own key. A slot list with '…' in it twice, keyed on
+     the slot value, renders six squares instead of seven — measured — and the
+     width rule fails quietly in the one variant where it matters most.
+
+     The size select resets to page one. Page 30 at 25 rows is row 726; page 30
+     at 100 rows is row 2,901, which is past the end of this register, so keeping
+     the number would land somebody on an empty page after asking to see more.
+
+     Below md the seven squares are display:none and "Page 12 of 58" stands in
+     for them, the range wraps to its own line, and the footer of a table that
+     was restacked into cards does not scroll sideways on its own.
+
+     In a real screen the three numbers come from the server and the page goes in
+     the URL — ?page=12&size=25 — so a record opened from row four can be closed
+     with Back and land on page 12 again. Client state is what this snippet
+     demonstrates and what a register screen should not ship. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       page: 12, size: 25,
+       rows: Array.from({ length: 1438 }, (_, i) => ({
+         po: 'PO-24-' + (1187 + i),
+         vendor: ['Sharma Extrusions', 'Nashik Steel Traders', 'Gujarat Polymers Ltd', 'Qureshi Metals'][i % 4],
+         amount: 42000 + (i * 81371) % 5400000,
+         status: ['Open', 'Approved', 'Overdue', 'Closed', 'Draft'][i % 5]
+       })),
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get total() { return this.rows.length },
+       get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
+       get shown() { return this.rows.slice((this.page - 1) * this.size, (this.page - 1) * this.size + 4) },
+       get from() { return this.total ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get slots() {
+         const n = this.pages, p = this.page;
+         if (n <= 7) return Array.from({ length: n }, (_, i) => i + 1);
+         if (p <= 4) return [1, 2, 3, 4, 5, 'gap-end', n];
+         if (p >= n - 3) return [1, 'gap-start', n - 4, n - 3, n - 2, n - 1, n];
+         return [1, 'gap-start', p - 1, p, p + 1, 'gap-end', n];
+       },
+       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) },
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
+     }">
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5">Status</th>
+        <th scope="col" class="px-4 py-2.5 text-right">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in shown" :key="r.po">
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+      <tr>
+        <td colspan="4" class="px-4 py-2.5 text-[12px]/4 text-zinc-500 tabular-nums">…and 21 more rows on this page</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <nav aria-label="Order register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div class="flex items-center gap-2">
+        <label for="order-pager-size" class="text-[13px]/5 text-zinc-600">Rows</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="order-pager-size" x-model.number="size" @change="page = 1"
+                  class="h-9 bg-transparent px-2 text-[13px]/5 tabular-nums outline-none">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+      <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+         x-text="from.toLocaleString('en-IN') + '–' + to.toLocaleString('en-IN') + ' of ' + total.toLocaleString('en-IN') + ' orders'">276–300 of 1,438 orders</p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden" x-text="'Page ' + page + ' of ' + pages">Page 12 of 58</span>
+
+      <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
+              class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+
+      <ul role="list" class="hidden items-center gap-1 md:flex">
+        <template x-for="s in slots" :key="s">
+          <li>
+            <template x-if="typeof s === 'number'">
+              <button type="button" @click="go(s)" :aria-label="'Page ' + s" :aria-current="s === page ? 'page' : false"
+                      class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                      :class="s === page ? 'bg-zinc-700 font-medium text-white' : 'hover:bg-zinc-100'"
+                      x-text="s"></button>
+            </template>
+            <template x-if="typeof s !== 'number'">
+              <span aria-hidden="true" class="flex size-9 items-center justify-center text-[13px]/5 text-zinc-500">…</span>
+            </template>
+          </li>
+        </template>
+      </ul>
+
+      <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
+              class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>

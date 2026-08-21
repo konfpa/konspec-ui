@@ -1,0 +1,60 @@
+<!-- The record exists and this account may not open it, which is a different
+     screen from the one that says nothing is there. It has to answer two
+     questions or it is a dead end: which scope is closed, and who opens it. A
+     name and a role, never "your administrator".
+
+     Sending a 403 at all is a decision made per model, because a 403 admits the
+     record exists. Where existence is itself confidential the handler returns
+     404 and the user gets the not-found screen instead.
+
+     The secondary route is the request for access, addressed to the person the
+     paragraph just named, with the cost centre and the order already in the
+     subject so the mail that arrives is actionable.
+
+     The signed-in address is in the footer and it is doing real work here: on a
+     shared terminal in QC the commonest cause of a 403 is that the last person
+     never signed out, and the way out of that is the second link, not the
+     first. -->
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+
+  <header class="flex items-center justify-between gap-3">
+    <a href="/" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+      <span class="text-[14px]/5 font-semibold">Konspec Operations</span>
+    </a>
+    <p class="hidden text-[12px]/4 text-zinc-500 sm:block">Silvassa · procurement</p>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center py-10">
+    <div class="w-full max-w-md text-center">
+      <span class="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="lock" class="size-5 text-zinc-600" aria-hidden="true"></i>
+      </span>
+
+      <p class="mt-4 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Error 403</p>
+      <h1 tabindex="-1" class="mt-1 text-[20px]/7 font-semibold tracking-tight">You cannot open this order</h1>
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600">
+        PO-24-1187 belongs to the Fabrication cost centre. Your account reads Moulding and Dispatch only, so the order is there and it is not yours to open.
+      </p>
+      <p class="mx-auto mt-3 max-w-md text-[13px]/5 text-zinc-600">
+        Read access to Fabrication is granted by Nilesh Patil, Head of Procurement, on the cost centre access form. It takes a working day.
+      </p>
+
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+        <a href="/orders/"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          Back to your purchase orders
+        </a>
+        <a href="mailto:nilesh.patil@konspec.com?subject=Fabrication%20cost%20centre%20access%20%E2%80%94%20PO-24-1187"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Request Fabrication access
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-zinc-200 pt-4 text-center text-[11px]/4 text-zinc-500">
+    Signed in as akshay.prabhu@konspec.com ·
+    <a href="/accounts/login/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">sign in as someone else</a>
+  </footer>
+</div>

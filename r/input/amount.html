@@ -1,0 +1,54 @@
+<!-- type="number" is the wrong control for money, and the reasons are not
+     cosmetic. The scroll wheel edits a focused number input in Chrome and
+     Safari, so a rate changes when somebody scrolls the page past it and
+     nothing on screen says it happened. Grouping separators are not a valid
+     number, so 18,42,000 makes the field invalid and .value comes back as an
+     empty string — the digits are visible and unreadable to script. The
+     decimal separator follows the browser locale, so one keystroke means 1.5
+     in one browser and 15 in another. And the spinner is two 12px targets.
+
+     type="text" with inputmode="decimal" gives the phone the numeric keypad,
+     which was the only part of type="number" worth having, and leaves the
+     parsing where it belongs.
+
+     Grouping is Indian, not thousands: a three-digit regex produces 1,842,000,
+     which is wrong on an order printed in Silvassa. toLocaleString with en-IN
+     gives 18,42,000. It groups on blur and ungroups on focus, because editing
+     a string with commas in it means counting commas to find the digit you
+     want. The hidden input is what posts — never the formatted string. -->
+<div class="max-w-xl space-y-5"
+     x-data="{
+       amount: '18,42,000',
+       strip() { this.amount = this.amount.replace(/[^0-9.]/g, ''); },
+       group() {
+         const n = Number(this.amount.replace(/[^0-9.]/g, ''));
+         if (!this.amount.trim() || Number.isNaN(n)) return;
+         this.amount = n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+       },
+       get raw() { return this.amount.replace(/[^0-9.]/g, ''); }
+     }">
+  <div>
+    <label for="in-amt" class="mb-1.5 block text-[13px]/5 font-medium">Order value <span class="text-red-600">*</span></label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+      <input id="in-amt" x-model="amount" @focus="strip()" @blur="group()"
+             inputmode="decimal" autocomplete="off" aria-describedby="in-amt-help"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <!-- the digits, with nothing dressed onto them -->
+    <input type="hidden" name="order_value" :value="raw">
+    <p id="in-amt-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+      Rupees, excluding GST. Posted as <span class="font-mono" x-text="raw || '0'"></span>.
+    </p>
+  </div>
+
+  <div>
+    <label for="in-qty" class="mb-1.5 block text-[13px]/5 font-medium">Quantity ordered</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="in-qty" name="qty" value="12.500" inputmode="decimal" aria-describedby="in-qty-help"
+             class="w-full min-w-0 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      <span class="pr-3 shrink-0 text-[14px]/5 text-zinc-600">MT</span>
+    </div>
+    <p id="in-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Three decimal places. 12.500 MT against a contracted 15.000 MT.</p>
+  </div>
+</div>

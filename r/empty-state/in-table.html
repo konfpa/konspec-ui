@@ -1,0 +1,67 @@
+<!-- One <tr> with one full-width <td colspan>, inside the <tbody>. Not a div
+     after the </table>: a sibling div is outside the table in the
+     accessibility tree, so somebody reading with table navigation walks a table
+     of zero rows and is never told why. As a cell it is a row, and it is read
+     in place.
+
+     The colspan is bound, not typed. Hide the Received column from the menu and
+     a hardcoded colspan="4" stretches the cell one column past the header, so
+     the panel edge lands in the middle of the sentence. It is bound to the
+     count of columns actually rendered and cannot drift from them.
+
+     The header row stays, because the emptiness here is a query result: the
+     sort and the column choices are still in force and the header is where the
+     user goes to undo them. On a register that has never held a record the
+     whole table goes instead — a row of column names describing nothing is the
+     empty table that reads as a bug.
+
+     Below md the header is hidden rather than scrolled. Four columns do not fit
+     at 390px, and with the thead gone the table is one row of one cell, which
+     does. Restacking, not sideways scroll.
+
+     Padding, not a margin: py-12 on the cell keeps the panel at the height it
+     had with rows in it, and cannot collapse against a sibling. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white"
+     x-data="{ cols: { received: true, status: true },
+               get span() { return 2 + (this.cols.received ? 1 : 0) + (this.cols.status ? 1 : 0) } }">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Goods receipts</h2>
+    <div class="ml-auto flex flex-wrap items-center gap-3 text-[12px]/4">
+      <label class="flex items-center gap-2">
+        <input type="checkbox" x-model="cols.received" class="size-4 shrink-0 accent-zinc-700">Received
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" x-model="cols.status" class="size-4 shrink-0 accent-zinc-700">Status
+      </label>
+    </div>
+  </div>
+
+  <table class="w-full text-[13px]/5">
+    <thead class="hidden md:table-header-group">
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">GRN number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th x-show="cols.received" scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
+        <th x-show="cols.status" scope="col" class="px-4 py-2.5 font-medium">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td :colspan="span" class="px-6 py-12 text-center">
+          <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
+          </span>
+          <h3 class="mt-3 text-[16px]/6 font-semibold">No receipts in this date range</h3>
+          <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+            Nothing was received at Silvassa between 01 and 12 Aug. The last receipt before that window was GRN-26-0431 on 28 Jul.
+          </p>
+          <button type="button"
+                  class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Widen to the last 90 days
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

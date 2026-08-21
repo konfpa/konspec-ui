@@ -1,0 +1,94 @@
+<!-- Planned, so the screen states a window with a real end. "Back shortly" is
+     what makes a plant supervisor phone IT; a clock time is what makes them
+     wait.
+
+     The absolute time is server-rendered into <time datetime> and the countdown
+     is derived from it, not written in the markup twice. On a real page the
+     init line is
+       until = new Date($refs.back.dateTime).getTime()
+     and nothing else changes; here it is offset from now so the preview does
+     not go stale in a fortnight.
+
+     The overrun branch is the half everybody forgets. Once the stated time
+     passes the copy changes to say the work is running late and offers a check,
+     rather than counting into negative numbers or freezing at zero — both of
+     which read as a page that has stopped being maintained by anyone.
+
+     Nothing reloads on a timer. A page that refreshes itself every thirty
+     seconds while somebody is reading the window is a page they cannot finish
+     reading.
+
+     Say what is not affected. In a plant that is most of the operation: the
+     weighbridge and the DCS do not go down with the console, and receipts taken
+     on paper are keyed in afterwards against the same challan.
+
+     The countdown is not a live region. Announcing a two-hour window every
+     thirty seconds buries everything else on the screen. -->
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+     x-data="{
+       until: 0, left: '', late: false, checking: false,
+       tick() {
+         const ms = this.until - Date.now();
+         this.late = ms <= 0;
+         const m = Math.max(0, Math.round(ms / 60000));
+         this.left = m >= 60 ? Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : m + ' min';
+       },
+       check() { this.checking = true; setTimeout(() => this.checking = false, 1400) }
+     }"
+     x-init="until = Date.now() + 42 * 60000; tick(); setInterval(() => tick(), 30000);
+             $nextTick(() => { $refs.back.dateTime = new Date(until).toISOString();
+                               $refs.back.textContent = new Date(until).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' IST' })">
+
+  <header class="flex items-center justify-between gap-3">
+    <span class="inline-flex items-center gap-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+      <span class="text-[14px]/5 font-semibold">Konspec Operations</span>
+    </span>
+    <p class="hidden text-[12px]/4 text-zinc-500 sm:block">Retry-After: 2520</p>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center py-10">
+    <div class="w-full max-w-md text-center">
+      <span class="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="wrench" class="size-5 text-zinc-600" aria-hidden="true"></i>
+      </span>
+
+      <p class="mt-4 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Error 503</p>
+      <h1 tabindex="-1" class="mt-1 text-[20px]/7 font-semibold tracking-tight">Closed for the quarterly upgrade</h1>
+
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600" x-show="!late">
+        The database is being upgraded. Everything posted before 01:00 is safe and nothing can be entered until the console is back.
+      </p>
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600" x-show="late" x-cloak>
+        The upgrade is running past its window. Nothing is lost and nothing can be entered yet — IT is on it, and the console comes back on its own.
+      </p>
+
+      <p class="mt-4 inline-block rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[12px]/4 tabular-nums text-zinc-600">
+        Window 01:00–<time x-ref="back" datetime="2026-08-23T03:00:00+05:30" class="font-medium text-zinc-900">03:00 IST</time>
+        <span x-show="!late"> · about <span class="font-medium text-zinc-900" x-text="left"></span> from now</span>
+        <span x-show="late" x-cloak> · running late</span>
+      </p>
+
+      <p class="mx-auto mt-4 max-w-md text-[13px]/5 text-zinc-600">
+        The Gate 2 weighbridge terminal and the plant DCS are not affected. Take receipts on paper against the delivery challan and key them in afterwards.
+      </p>
+
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+        <!-- on a real page this is @click="location.reload()" -->
+        <button type="button" @click="check()" :disabled="checking" :aria-busy="checking"
+                class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          <span x-show="checking" x-cloak class="flex size-4 animate-spin items-center justify-center"><i data-lucide="loader-circle" class="size-4" aria-hidden="true"></i></span>
+          <span x-text="checking ? 'Checking' : 'Check again'">Check again</span>
+        </button>
+        <a href="tel:+912602640102"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Call the IT desk
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-zinc-200 pt-4 text-center text-[11px]/4 text-zinc-500">
+    Planned work KIS-CHG-2026-118 · notified 18 Aug to all plant heads
+  </footer>
+</div>

@@ -1,0 +1,44 @@
+<!-- items-start is the whole point. A grid stretches its children to the
+     tallest by default, which pads the short cards with dead space at the
+     bottom and makes them read as though data is missing.
+
+     Let them size to their content and the ragged bottom edge is honest. -->
+<div class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3.5">
+      <h3 class="text-[14px]/5 font-semibold">Vendor</h3>
+    </div>
+    <div class="px-5 py-4 text-[13px]/5">
+      <p class="font-medium">Gujarat Polymers Ltd</p>
+      <p class="mt-0.5 text-zinc-600">Vapi, Gujarat</p>
+      <p class="mt-2 text-zinc-600">GSTIN <span class="tabular-nums">24AABCG1234M1Z5</span></p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3.5">
+      <h3 class="text-[14px]/5 font-semibold">Delivery</h3>
+    </div>
+    <div class="px-5 py-4 text-[13px]/5">
+      <p>FOR Silvassa plant</p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3.5">
+      <h3 class="text-[14px]/5 font-semibold">Approvals</h3>
+    </div>
+    <div class="divide-y divide-zinc-100 text-[13px]/5">
+      <div class="flex items-center gap-3 px-5 py-2.5">
+        <span class="inline-flex size-7 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">NP</span>
+        <span class="min-w-0 flex-1 truncate">Nilesh Patil</span>
+        <span class="text-[12px]/4 tabular-nums text-zinc-500">14 Aug</span>
+      </div>
+      <div class="flex items-center gap-3 px-5 py-2.5">
+        <span class="inline-flex size-7 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">RD</span>
+        <span class="min-w-0 flex-1 truncate">Ritu Deshpande</span>
+        <span class="text-[12px]/4 tabular-nums text-zinc-500">15 Aug</span>
+      </div>
+    </div>
+  </div>
+</div>

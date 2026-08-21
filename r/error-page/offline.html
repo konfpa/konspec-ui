@@ -1,0 +1,90 @@
+<!-- The request never reached the server, so there is no status code to show
+     and no incident for support to look up. What there is instead is a retry
+     that resolves on this screen: press it, the button goes busy, the attempt
+     count and the time of the last attempt update in place, and either the
+     connection is back or the same screen says so again.
+
+     The browser's own online event is a real signal and this screen listens to
+     it. What it does not do is navigate when it fires: coming back online while
+     somebody is reading enables the way back and says the connection returned.
+     Reloading out from under them is how a person loses the sentence that told
+     them what to do.
+
+     The third paragraph exists because of the rule this screen depends on: a
+     page holding unsaved input is never replaced with an error screen. If the
+     user was typing, they are still on that page, looking at an alert. This
+     screen is for a navigation that failed, so it can say plainly that nothing
+     was being saved.
+
+     This is the one variant that arrives by swap rather than by document load —
+     nothing loaded, so nothing read a title. The message block carries
+     role="alert" and x-init moves focus to the h1, which has tabindex="-1", so
+     the heading is spoken and Tab restarts at the top of the message instead of
+     wherever the abandoned page left it. -->
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+     x-data="{
+       state: 'offline', tries: 2, last: '14:07',
+       retry() {
+         this.state = 'checking';
+         setTimeout(() => {
+           this.tries++;
+           this.last = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+           this.state = navigator.onLine ? 'online' : 'offline';
+         }, 1200)
+       }
+     }"
+     x-init="$nextTick(() => $refs.h1.focus())"
+     @online.window="state = 'online'"
+     @offline.window="state = 'offline'">
+
+  <header class="flex items-center justify-between gap-3">
+    <span class="inline-flex items-center gap-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+      <span class="text-[14px]/5 font-semibold">Konspec Operations</span>
+    </span>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center py-10">
+    <div class="w-full max-w-md text-center" role="alert">
+      <span class="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <span x-show="state !== 'online'"><i data-lucide="wifi-off" class="size-5 text-amber-700" aria-hidden="true"></i></span>
+        <span x-show="state === 'online'" x-cloak><i data-lucide="wifi" class="size-5 text-emerald-600" aria-hidden="true"></i></span>
+      </span>
+
+      <p class="mt-4 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">No connection</p>
+      <h1 x-ref="h1" tabindex="-1" class="mt-1 text-[20px]/7 font-semibold tracking-tight"
+          x-text="state === 'online' ? 'The connection is back' : 'This page could not be reached'">This page could not be reached</h1>
+
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600" x-show="state !== 'online'">
+        The browser could not reach operations.konspec.internal. The shop-floor Wi-Fi drops at the far end of the moulding bay; the wired points in QC and stores hold.
+      </p>
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600" x-show="state === 'online'" x-cloak>
+        The network is back. Open the receipt register again and carry on where you left off.
+      </p>
+
+      <p class="mx-auto mt-3 max-w-md text-[13px]/5 text-zinc-600">
+        Nothing was being saved. This screen replaced a page you were reading, not a form you were filling — anything half-typed is still on the page it was typed into.
+      </p>
+
+      <p class="mt-4 text-[12px]/4 tabular-nums text-zinc-500">
+        <span x-text="tries"></span> attempts · last at <span x-text="last"></span>
+      </p>
+
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+        <button type="button" @click="retry()" :disabled="state === 'checking'" :aria-busy="state === 'checking'"
+                class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:opacity-60 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          <span x-show="state === 'checking'" x-cloak class="flex size-4 animate-spin items-center justify-center"><i data-lucide="loader-circle" class="size-4" aria-hidden="true"></i></span>
+          <span x-text="state === 'checking' ? 'Trying' : 'Try again'">Try again</span>
+        </button>
+        <a href="/grn/" x-show="state === 'online'" x-cloak
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Back to goods receipts
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-zinc-200 pt-4 text-center text-[11px]/4 text-zinc-500">
+    Wi-Fi faults go to the plant network desk on ext 4180, not to IT support
+  </footer>
+</div>

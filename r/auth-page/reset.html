@@ -1,0 +1,120 @@
+<!-- The readonly account field is the load-bearing part and it is the one
+     everybody leaves out. A password manager saves a credential as a pair, so a
+     form carrying only two new-password boxes saves the new secret against
+     nothing and offers the old one back a fortnight later. Rendering the
+     username hidden with display:none does not fix it — several managers skip
+     fields they cannot see — so it is a real readonly input on the locked
+     surface, visible, labelled, and carrying autocomplete="username".
+
+     Both boxes are autocomplete="new-password". Using current-password on the
+     first makes the manager fill it with the password being replaced.
+
+     The rules are a checklist, not a strength meter. A meter puts length,
+     character classes and a dictionary check on one 0–100 scale and then cannot
+     say which of them is failing; the checklist is the same information with
+     the answer attached. It is pointed at by aria-describedby so it is read on
+     entry, and it is deliberately not a live region — three rules re-announced
+     on every keystroke is a reason to switch the screen reader off.
+
+     The submit stays enabled. A disabled button with no explanation is a dead
+     end for anybody who cannot see which rule is still grey; the form validates
+     and says so. -->
+<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+     x-data="{
+       pw: '', pw2: '', show: false, touched: false,
+       get long() { return this.pw.length &gt;= 12 },
+       get mixed() { return /[a-zA-Z]/.test(this.pw) &amp;&amp; /[0-9]/.test(this.pw) },
+       get fresh() { return this.pw.length &gt; 0 &amp;&amp; this.pw.toLowerCase().indexOf('konspec') === -1 },
+       get mismatch() { return this.touched &amp;&amp; this.pw2.length &gt; 0 &amp;&amp; this.pw !== this.pw2 }
+     }">
+  <main class="w-full max-w-sm">
+
+    <div class="flex items-center justify-center gap-2.5">
+      <span class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[14px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec Operations</span>
+    </div>
+
+    <form method="post" action="/accounts/reset/set-password/"
+          class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Set a new password</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">This link works once and expires at 14:20 IST.</p>
+
+      <div class="mt-5">
+        <label for="rp-username" class="mb-1.5 block text-[13px]/5 font-medium">Account</label>
+        <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+          <input id="rp-username" name="username" type="email" value="akshay.prabhu@konspec.com"
+                 autocomplete="username" readonly aria-describedby="rp-username-help"
+                 class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+        </div>
+        <p id="rp-username-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Taken from the link. This is the credential your password manager will update.</p>
+      </div>
+
+      <div class="mt-4">
+        <label for="rp-pw" class="mb-1.5 block text-[13px]/5 font-medium">New password</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="rp-pw" name="new_password1" :type="show ? 'text' : 'password'" x-model="pw"
+                 autocomplete="new-password" required minlength="12" spellcheck="false"
+                 aria-describedby="rp-rules"
+                 class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          <button type="button" @click="show = !show" :aria-label="show ? 'Hide password' : 'Show password'"
+                  class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+            <span x-show="!show" class="flex"><i data-lucide="eye" class="size-4"></i></span>
+            <span x-show="show" x-cloak class="flex"><i data-lucide="eye-off" class="size-4"></i></span>
+          </button>
+        </div>
+        <p role="status" class="sr-only" x-text="show ? 'Password is visible' : ''"></p>
+
+        <ul id="rp-rules" class="mt-2 space-y-1 text-[12px]/4 text-zinc-600">
+          <li class="flex items-start gap-2">
+            <span class="mt-px flex size-3.5 shrink-0 items-center justify-center">
+              <span x-show="long" x-cloak class="flex"><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+              <span x-show="!long" class="size-1.5 rounded-full bg-zinc-400"></span>
+            </span>
+            <span>At least 12 characters</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="mt-px flex size-3.5 shrink-0 items-center justify-center">
+              <span x-show="mixed" x-cloak class="flex"><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+              <span x-show="!mixed" class="size-1.5 rounded-full bg-zinc-400"></span>
+            </span>
+            <span>Letters and at least one number</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="mt-px flex size-3.5 shrink-0 items-center justify-center">
+              <span x-show="fresh" x-cloak class="flex"><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+              <span x-show="!fresh" class="size-1.5 rounded-full bg-zinc-400"></span>
+            </span>
+            <span>Does not contain "konspec"</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="mt-4">
+        <label for="rp-pw2" class="mb-1.5 block text-[13px]/5 font-medium">Confirm new password</label>
+        <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+             :class="mismatch ? 'border-red-600 focus-within:outline-red-600/15'
+                              : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+          <input id="rp-pw2" name="new_password2" :type="show ? 'text' : 'password'" x-model="pw2"
+                 @blur="touched = true" autocomplete="new-password" required minlength="12" spellcheck="false"
+                 aria-describedby="rp-pw2-msg" :aria-invalid="mismatch ? 'true' : 'false'"
+                 class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+        </div>
+        <p id="rp-pw2-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+          <span x-show="!mismatch" class="block text-zinc-500">Type it a second time so a typo cannot lock you out.</span>
+          <span x-show="mismatch" x-cloak class="flex items-start gap-1.5 font-medium text-red-600">
+            <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>The two passwords do not match.
+          </span>
+        </p>
+      </div>
+
+      <button type="submit"
+              class="mt-4 inline-flex h-10 w-full items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save and sign in</button>
+
+      <p class="mt-4 border-t border-zinc-100 pt-4 text-[12px]/4 text-zinc-600">
+        Every other device signed in as this account is signed out when the password changes.
+      </p>
+    </form>
+
+    <p class="mt-4 text-center text-[11px]/4 text-zinc-500">Konspec Industries · internal system · activity is logged</p>
+  </main>
+</div>

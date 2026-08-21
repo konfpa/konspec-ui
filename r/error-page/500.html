@@ -1,0 +1,82 @@
+<!-- The reference code is the component. Everything else on this screen is
+     apology; the code is the only part that makes the failure actionable, so it
+     is tabular-nums, it is selectable, it has a copy button, and it is repeated
+     in the support mailto for the user who copies nothing.
+
+     It is minted in the handler and written to the log before the page renders.
+     A code generated in the browser matches nothing on the server, which is
+     worse than no code, because support then spends twenty minutes grepping for
+     a string that was never logged.
+
+     The second paragraph answers the question the user is actually asking:
+     whether the receipt posted. Answer it as a fact or say it cannot be known
+     and name the record to check. "Please try again" over an operation that
+     half completed is how a plant books one delivery twice.
+
+     Nothing about the internals reaches this page. The traceback is in the log
+     beside the code.
+
+     The copy button swaps its icon, which is announced by nothing, so the
+     confirmation is an sr-only live region and the button's own name changes
+     with it. Two spans with x-show, never a binding on the <i> — createIcons()
+     replaces that node and takes the binding with it.
+
+     The well is graphite and the tone is the glyph alone. A red screen for a
+     failure that changed nothing makes a two-minute fault look like data loss. -->
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+     x-data="{ done: false, t: null,
+               copy() { navigator.clipboard?.writeText(this.$refs.ref.textContent.trim());
+                        this.done = true;
+                        clearTimeout(this.t);
+                        this.t = setTimeout(() => this.done = false, 2000) } }">
+
+  <header class="flex items-center justify-between gap-3">
+    <a href="/" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+      <span class="text-[14px]/5 font-semibold">Konspec Operations</span>
+    </a>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center py-10">
+    <div class="w-full max-w-md text-center">
+      <span class="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="alert-circle" class="size-5 text-red-600" aria-hidden="true"></i>
+      </span>
+
+      <p class="mt-4 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Error 500</p>
+      <h1 tabindex="-1" class="mt-1 text-[20px]/7 font-semibold tracking-tight">The goods receipt did not post</h1>
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600">
+        Something on our side failed while writing GRN-24-0912. Nothing reached the item ledger and no stock moved, so the receipt can be entered again from the register against the same challan.
+      </p>
+
+      <div class="mx-auto mt-5 max-w-sm rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-left">
+        <p class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Support reference</p>
+        <div class="mt-1.5 flex items-center gap-2">
+          <span x-ref="ref" class="min-w-0 flex-1 select-all break-all font-mono text-[13px]/5 font-medium tabular-nums">INC-2608-4471</span>
+          <button type="button" @click="copy()" :aria-label="done ? 'Reference copied' : 'Copy the support reference'"
+                  class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span x-show="!done"><i data-lucide="copy" class="size-4 text-zinc-600" aria-hidden="true"></i></span>
+            <span x-show="done" x-cloak><i data-lucide="check" class="size-4 text-emerald-600" aria-hidden="true"></i></span>
+          </button>
+          <span class="sr-only" aria-live="polite" x-text="done ? 'Reference copied' : ''"></span>
+        </div>
+        <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Logged 21 Aug 2026 at 14:07 IST. Quote it and IT opens the exact failure.</p>
+      </div>
+
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+        <a href="/grn/"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          Back to goods receipts
+        </a>
+        <a href="mailto:it@konspec.com?subject=INC-2608-4471%20%E2%80%94%20goods%20receipt%20failed"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Email IT with this reference
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-zinc-200 pt-4 text-center text-[11px]/4 text-zinc-500">
+    IT support · it@konspec.com · ext 4102 · weekdays 08:00–20:00 IST
+  </footer>
+</div>

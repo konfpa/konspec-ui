@@ -1,0 +1,110 @@
+<!-- The strip as it actually ships, at the top of the procurement dashboard.
+
+     The heading and the as-of line belong to the strip, not to the tiles. Four
+     copies of "read at 09:12" is four chances for the tiles to disagree about
+     when they were read, and the scope — three plants — is the same for all of
+     them.
+
+     Every tile here is an anchor, because every one of these numbers has a
+     register behind it and the tile is how people get there. That is the only
+     reason any of them carries hover:border-zinc-400. Where a metric has no
+     destination the tile stays a <div> with no hover at all, and you do not fake
+     one for consistency: a strip where two of four tiles keep the promise trains
+     people to stop trying any of them.
+
+     One anchor per tile, wrapping everything, and nothing else focusable inside
+     it — a button nested in an anchor cannot be reached from the keyboard and is
+     ambiguous with a mouse. Tab therefore walks the strip in four stops, and each
+     accessible name is the whole tile: "Overdue value, ₹27.10 L, up ₹4.10 L vs.
+     12 Aug".
+
+     Focus is an outline, never a ring. ring-* is a box-shadow and forced-colours
+     mode drops every box-shadow, which takes the focus indicator away from the
+     people who need it most.
+
+     The chevron is aria-hidden and sits in the label row rather than beside the
+     figure, so it never shifts the number. It is a Lucide <i> carrying a plain
+     group-hover: class and no Alpine binding — createIcons() replaces the <i>
+     with an <svg> and keeps the class attribute, but it would destroy an
+     x-bind:class written on it.
+
+     Two of the four deltas are red and both point up. Overdue value rising and
+     QC holds rising are unwelcome; the arrow follows the number and the tone
+     follows the metric's own direction of good. -->
+<div class="max-w-5xl space-y-3">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h2 class="text-[16px]/6 font-semibold">Procurement</h2>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa, Vapi and Daman · read at 09:12</p>
+  </div>
+
+  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
+    <a href="#" class="group block rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <dl>
+        <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <span>Open orders</span>
+          <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+        </dt>
+        <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">148</dd>
+        <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+          <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+            <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+11
+          </span>
+          <span class="text-zinc-500">vs. July</span>
+        </dd>
+      </dl>
+    </a>
+
+    <a href="#" class="group block rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <dl>
+        <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <span>Overdue value</span>
+          <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+        </dt>
+        <dd class="mt-1.5 flex items-baseline gap-1">
+          <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+          <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">27.10 L</span>
+        </dd>
+        <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+          <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+            <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+₹4.10 L
+          </span>
+          <span class="text-zinc-500">vs. 12 Aug</span>
+        </dd>
+      </dl>
+    </a>
+
+    <a href="#" class="group block rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <dl>
+        <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <span>GRNs posted today</span>
+          <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+        </dt>
+        <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">12</dd>
+        <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+          <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+            <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+4
+          </span>
+          <span class="text-zinc-500">vs. same time yesterday</span>
+        </dd>
+      </dl>
+    </a>
+
+    <a href="#" class="group block rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <dl>
+        <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <span>QC holds open</span>
+          <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+        </dt>
+        <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">3</dd>
+        <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+          <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+            <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+2
+          </span>
+          <span class="text-zinc-500">since yesterday</span>
+        </dd>
+      </dl>
+    </a>
+  </div>
+</div>

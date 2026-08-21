@@ -1,0 +1,33 @@
+<!-- A label names one control. This is three, and the question they answer
+     belongs to the set — so it is a legend inside a fieldset, and there is no
+     for on it because the fieldset is the scope.
+
+     The legend is the first child of the fieldset. Wrap it in a div for
+     alignment, or put anything above it, and it is no longer the group's name:
+     it renders as ordinary text and the group is announced with no question
+     attached. Browsers already say "Passed, radio button, 1 of 3"; without the
+     legend, 1 of 3 of what is a guess.
+
+     The help line under the group is one line for the whole set, not one per
+     option — per-option help attaches to its own option with
+     aria-describedby, and is read back on every arrow-key pass. -->
+<fieldset class="max-w-xl">
+  <legend class="mb-2 text-[13px]/5 font-medium tabular-nums">Lab result — batch 24-0912</legend>
+
+  <div class="space-y-2">
+    <label class="flex items-start gap-2.5 py-1 text-[14px]/5">
+      <input type="radio" name="lb-qc" value="pass" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Passed — release to stores</span>
+    </label>
+    <label class="flex items-start gap-2.5 py-1 text-[14px]/5">
+      <input type="radio" name="lb-qc" value="deviation" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Passed on deviation — needs the plant head</span>
+    </label>
+    <label class="flex items-start gap-2.5 py-1 text-[14px]/5">
+      <input type="radio" name="lb-qc" value="reject" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Rejected — raise a debit note</span>
+    </label>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500">Locks the lot against issue until a result is recorded.</p>
+</fieldset>

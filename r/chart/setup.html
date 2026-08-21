@@ -1,0 +1,15 @@
+<!-- once per page, in the head, after Alpine and before your charts.
+     Pin the version: Chart.js ships breaking changes in minors. -->
+<script src="https://unpkg.com/chart.js@4.4.7/dist/chart.umd.js"></script>
+<script>
+  /* Behaviour only. Nothing here reads the DOM: a head script runs before the
+     stylesheet has been applied, so getComputedStyle would hand back Times.
+     The font face is read per chart at init, where the colours are read too. */
+  Chart.defaults.font.size = 12;
+  Chart.defaults.plugins.legend.display = false;
+  Chart.defaults.plugins.tooltip.displayColors = false;
+  Chart.defaults.plugins.tooltip.padding = 8;
+  Chart.defaults.animation = matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? false
+    : { duration: 250 };
+</script>

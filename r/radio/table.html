@@ -1,0 +1,87 @@
+<!-- One name across every row is what makes this pick-one. Give each row its
+     own name and every row becomes independently selectable; put a radio group
+     inside each row of a nested list and the name needs the line id in it, or
+     the whole table is one group.
+
+     The rows are rendered once and columns drop out below md. A checkbox
+     register can render a second copy for phones and keep the selection in
+     Alpine, but a radio group cannot: two copies sharing a name are one group,
+     and the checked option in the display:none copy is the one that wins.
+
+     No select-all and no bulk bar. The answer is a single record, so it is named
+     in the footer instead — the filled dot alone is not readable at a glance. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white"
+     x-data="{ po: 'PO-24-1191' }">
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-10 px-4 py-2.5"><span class="sr-only">Raise against</span></th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Order</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium md:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Pending</th>
+        <th scope="col" class="hidden px-4 py-2.5 text-right font-medium md:table-cell">Due</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+        <td class="px-4 py-2.5">
+          <input type="radio" name="grn_against" value="PO-24-1187" x-model="po"
+                 aria-label="Raise the GRN against PO-24-1187"
+                 class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187
+          <span class="mt-0.5 block font-normal text-zinc-600 md:hidden">Sharma Extrusions</span>
+        </td>
+        <td class="hidden px-4 py-2.5 md:table-cell">Sharma Extrusions</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">2,000 kg</td>
+        <td class="hidden px-4 py-2.5 text-right tabular-nums text-zinc-600 md:table-cell">12 Aug</td>
+      </tr>
+      <tr class="border-b border-zinc-100 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+        <td class="px-4 py-2.5">
+          <input type="radio" name="grn_against" value="PO-24-1191" x-model="po"
+                 aria-label="Raise the GRN against PO-24-1191"
+                 class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1191
+          <span class="mt-0.5 block font-normal text-zinc-600 md:hidden">Nashik Steel Traders</span>
+        </td>
+        <td class="hidden px-4 py-2.5 md:table-cell">Nashik Steel Traders</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">18 MT</td>
+        <td class="hidden px-4 py-2.5 text-right tabular-nums text-zinc-600 md:table-cell">19 Aug</td>
+      </tr>
+      <tr class="border-b border-zinc-100 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+        <td class="px-4 py-2.5">
+          <input type="radio" name="grn_against" value="PO-24-1194" x-model="po"
+                 aria-label="Raise the GRN against PO-24-1194"
+                 class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194
+          <span class="mt-0.5 block font-normal text-zinc-600 md:hidden">Gujarat Polymers Ltd</span>
+        </td>
+        <td class="hidden px-4 py-2.5 md:table-cell">Gujarat Polymers Ltd</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">4,500 kg</td>
+        <td class="hidden px-4 py-2.5 text-right tabular-nums text-zinc-600 md:table-cell">02 Aug</td>
+      </tr>
+      <!-- closed to receipt, and still in its place: dropping the row would
+           change the shape of a list people scan by position -->
+      <tr class="[&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+        <td class="px-4 py-2.5">
+          <input type="radio" name="grn_against" value="PO-24-1203" disabled
+                 aria-label="PO-24-1203, fully received, cannot be picked"
+                 class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums text-zinc-500">PO-24-1203
+          <span class="mt-0.5 block font-normal text-zinc-500 md:hidden">Sharma Extrusions</span>
+        </td>
+        <td class="hidden px-4 py-2.5 text-zinc-500 md:table-cell">Sharma Extrusions</td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-500">Fully received</td>
+        <td class="hidden px-4 py-2.5 text-right tabular-nums text-zinc-500 md:table-cell">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
+    <span class="text-[13px]/5 tabular-nums">Raising GRN against <span class="font-medium" x-text="po"></span></span>
+    <button type="button" class="shrink-0 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Continue</button>
+  </div>
+</div>

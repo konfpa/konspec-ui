@@ -1,0 +1,156 @@
+<!-- Two things decide which side this opens on, and neither is a guess.
+
+     At sm and above the panel flies out sideways, and the side is measured
+     before it is shown: the trigger's rect plus 216px — the w-52 panel and its
+     4px gap, written down because a display:none panel measures 0 and every
+     test against it concludes there is room on the right. The measurement runs
+     before sub is set, so the panel is painted on the correct side rather than
+     jumping there a frame later. The trigger here is right-aligned, so the flip
+     is the normal case rather than the edge case.
+
+     Below sm neither side fits. A 208px panel hanging off a 208px panel needs
+     416px and a phone gives 390, so flipping only moves the overflow from one
+     edge to the other. The shape has to change instead: static, full width,
+     indented, on a zinc-100 surface — a drill-down inside the parent panel.
+     All the flyout positioning is sm:-prefixed, so one set of markup is both.
+
+     Hover intent runs on pointerenter, guarded on pointerType === 'mouse'. On a
+     phone a tap synthesises a mouseenter before the click, so an unguarded
+     handler opens the submenu on enter and the click then closes it again, and
+     the drill-down looks broken. 120ms in stops the panel flashing on every
+     pass down the menu; 220ms out is the diagonal from the trigger to the
+     panel. The close is abandoned if the submenu contains document.activeElement
+     — a keyboard user who has arrowed in must not lose the panel, and their
+     focus with it, because the pointer drifted off it.
+
+     items() filters to elements whose nearest role="menu" is this one, so the
+     parent's arrow walk stops at the submenu trigger instead of falling through
+     into its contents. The submenu is its own scope: Right or Enter enters it,
+     Left or Escape steps back out onto the trigger, and its arrow handlers stop
+     propagation so the parent does not act on the same key.
+
+     $event.detail === 0 is how a click from Enter is told from a click from the
+     mouse. Enter should open the submenu and land on its first item; a real
+     click should open it and leave the pointer in charge. Both arrive as click,
+     and detail is the click count, which is 0 for a synthesised one. -->
+<div class="flex justify-end">
+  <div class="relative"
+       x-data="{
+         open: false, sub: false, flip: false, t: null,
+         items() {
+           const m = this.$refs.menu;
+           return [...m.querySelectorAll('[role=menuitem]')].filter(el => el.closest('[role=menu]') === m);
+         },
+         subItems() { return [...this.$refs.sub.querySelectorAll('[role=menuitem]')] },
+         show(last = false) {
+           this.open = true;
+           this.$nextTick(() => requestAnimationFrame(() => {
+             const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+           }));
+         },
+         close(toTrigger = true) {
+           if (!this.open) return;
+           clearTimeout(this.t); this.sub = false; this.open = false;
+           if (toTrigger) this.$refs.trigger.focus();
+         },
+         move(step) {
+           const i = this.items(), at = i.indexOf(document.activeElement);
+           i[(at + step + i.length) % i.length]?.focus();
+         },
+         openSub(focusFirst) {
+           clearTimeout(this.t);
+           this.flip = this.$refs.subtrigger.getBoundingClientRect().right + 216 > window.innerWidth;
+           this.sub = true;
+           if (focusFirst) this.$nextTick(() => requestAnimationFrame(() => this.subItems()[0]?.focus()));
+         },
+         closeSub(toTrigger = false) {
+           clearTimeout(this.t);
+           if (!this.sub) return;
+           this.sub = false;
+           if (toTrigger) this.$refs.subtrigger.focus();
+         },
+         moveSub(step) {
+           const i = this.subItems(), at = i.indexOf(document.activeElement);
+           i[(at + step + i.length) % i.length]?.focus();
+         },
+         hoverIn(e) {
+           if (e.pointerType !== 'mouse') return;
+           clearTimeout(this.t); this.t = setTimeout(() => this.openSub(false), 120);
+         },
+         hoverOut(e) {
+           if (e.pointerType !== 'mouse') return;
+           clearTimeout(this.t);
+           this.t = setTimeout(() => {
+             if (!this.$refs.sub.contains(document.activeElement)) this.sub = false;
+           }, 220);
+         }
+       }"
+       @click.outside="close(false)"
+       @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+    <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+            :aria-expanded="open" aria-haspopup="menu"
+            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+      <i data-lucide="download" class="size-4"></i>Export
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </button>
+
+    <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Export the order register"
+         @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+         @keydown.tab="close(false)"
+         class="absolute right-0 z-40 mt-1 w-52 rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+      <button type="button" role="menuitem" tabindex="-1" @click="close()" @pointerenter="closeSub()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="sheet" class="size-4 text-zinc-600"></i>Excel (.xlsx)
+      </button>
+      <button type="button" role="menuitem" tabindex="-1" @click="close()" @pointerenter="closeSub()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="file-text" class="size-4 text-zinc-600"></i>CSV
+      </button>
+
+      <div class="relative" @pointerenter="hoverIn($event)" @pointerleave="hoverOut($event)">
+        <button type="button" role="menuitem" tabindex="-1" x-ref="subtrigger"
+                aria-haspopup="menu" :aria-expanded="sub"
+                @click="sub ? closeSub(true) : openSub($event.detail === 0)"
+                @keydown.arrow-right.prevent.stop="openSub(true)"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="mail" class="size-4 text-zinc-600"></i>Email a copy to
+          <span class="ml-auto flex text-zinc-600 transition-transform motion-reduce:transition-none"
+                :class="sub ? 'rotate-90 sm:rotate-0' : ''">
+            <i data-lucide="chevron-right" class="size-3.5"></i>
+          </span>
+        </button>
+
+        <div x-show="sub" x-cloak x-ref="sub" role="menu" aria-label="Email a copy to"
+             @keydown.arrow-down.prevent.stop="moveSub(1)" @keydown.arrow-up.prevent.stop="moveSub(-1)"
+             @keydown.arrow-left.prevent.stop="closeSub(true)"
+             @keydown.escape.stop="closeSub(true)"
+             @keydown.tab="close(false)"
+             :class="flip ? 'sm:right-full sm:mr-1' : 'sm:left-full sm:ml-1'"
+             class="mt-1 w-full rounded-lg bg-zinc-100 py-1 sm:absolute sm:top-0 sm:z-50 sm:mt-0 sm:w-52 sm:rounded-xl sm:border sm:border-zinc-200 sm:bg-white sm:shadow-lg">
+          <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                  class="flex w-full items-center gap-2.5 py-2 pr-3 pl-9 text-left text-[13px]/5 hover:bg-zinc-200 focus:bg-zinc-200 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:pl-3 sm:hover:bg-zinc-100 sm:focus:bg-zinc-100">
+            <i data-lucide="user" class="size-4 text-zinc-600"></i>Ritu Deshpande
+          </button>
+          <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                  class="flex w-full items-center gap-2.5 py-2 pr-3 pl-9 text-left text-[13px]/5 hover:bg-zinc-200 focus:bg-zinc-200 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:pl-3 sm:hover:bg-zinc-100 sm:focus:bg-zinc-100">
+            <i data-lucide="building-2" class="size-4 text-zinc-600"></i>Vendor contact
+          </button>
+          <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                  class="flex w-full items-center gap-2.5 py-2 pr-3 pl-9 text-left text-[13px]/5 hover:bg-zinc-200 focus:bg-zinc-200 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:pl-3 sm:hover:bg-zinc-100 sm:focus:bg-zinc-100">
+            <i data-lucide="indian-rupee" class="size-4 text-zinc-600"></i>Accounts payable
+          </button>
+        </div>
+      </div>
+
+      <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+      <button type="button" role="menuitem" tabindex="-1" @click="close()" @pointerenter="closeSub()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="calendar-clock" class="size-4 text-zinc-600"></i>Schedule monthly
+      </button>
+    </div>
+  </div>
+</div>

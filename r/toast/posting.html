@@ -1,0 +1,112 @@
+<!-- The assembled case. Post the receipt, the toast confirms it, Undo reverses
+     it inside the window the server allows.
+
+     The card behind the toast is the point. Posting flips the row to Closed with
+     the GRN number on it before the toast is raised, and undoing flips it back,
+     so the toast is a convenience over a screen that is already correct. Delete
+     the toast from this snippet and nothing is lost except the shortcut — that
+     is the test for whether an outcome may be reported in a toast at all.
+
+     Eight seconds, matching the server's undo window. Hovering or tabbing into
+     the toast clears the timer; under prefers-reduced-motion no timer is set and
+     it waits to be dismissed.
+
+     Status colour is the locked mapping and lives in the dot: zinc-500 Open,
+     emerald-600 Closed. The pill around it never changes. -->
+<div class="max-w-xl"
+     x-data="{
+       posted: false, grn: null, toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       post() {
+         this.posted = true; this.grn = 4417;
+         this.push({ text: 'GRN ' + this.grn + ' posted against PO-24-1187', meta: 'Nashik Steel Traders · 12.480 MT · ₹4,26,500' });
+       },
+       undo(id) {
+         this.posted = false; this.grn = null;
+         this.close(id);
+       },
+       push(t) {
+         const n = { id: ++this.seq, ms: 8000, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+      <div class="min-w-0 flex-1">
+        <h3 class="text-[16px]/6 font-semibold">Receipt against PO-24-1187</h3>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-600">Nashik Steel Traders · gate entry 20 Aug 2024, 09:15</p>
+      </div>
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full" :class="posted ? 'bg-emerald-600' : 'bg-zinc-500'" aria-hidden="true"></span>
+        <span x-text="posted ? 'Closed' : 'Open'"></span>
+      </span>
+    </div>
+
+    <dl class="divide-y divide-zinc-100 text-[13px]/5">
+      <div class="flex items-center justify-between gap-4 px-4 py-2.5">
+        <dt class="text-zinc-600">MS plate 10 mm</dt>
+        <dd class="shrink-0 tabular-nums">12.480 MT</dd>
+      </div>
+      <div class="flex items-center justify-between gap-4 px-4 py-2.5">
+        <dt class="text-zinc-600">Receipt value</dt>
+        <dd class="shrink-0 tabular-nums">₹4,26,500</dd>
+      </div>
+      <div class="flex items-center justify-between gap-4 px-4 py-2.5">
+        <dt class="text-zinc-600">GRN</dt>
+        <dd class="shrink-0">
+          <a x-show="posted" x-cloak :href="'/grn/' + grn + '/'" class="rounded-sm tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="grn"></a>
+          <span x-show="!posted" class="text-zinc-500">Not posted</span>
+        </dd>
+      </div>
+    </dl>
+
+    <div class="flex justify-end gap-2 border-t border-zinc-200 px-4 py-3">
+      <button type="button" x-ref="fire" @click="post()" :disabled="posted"
+              class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Post GRN
+      </button>
+    </div>
+  </div>
+
+  <!-- empty at first paint, and never created on demand -->
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           @mouseenter="pause(t)" @mouseleave="start(t)"
+           @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+        </div>
+        <button type="button"
+                @click="undo(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="shrink-0 rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Undo
+        </button>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+<!-- The border being on the wrapper is what keeps the error state in the
+     template. The widget class is written once in forms.py and never has to be
+     rewritten in __init__ to add a red border, because the red border is not on
+     the widget.
+
+     # forms.py
+     class OrderNoteForm(forms.ModelForm):
+         class Meta:
+             model = OrderNote
+             fields = ['body']
+             widgets = {
+                 'body': forms.Textarea(attrs={
+                     'rows': 4,
+                     'placeholder': 'Add a note for whoever picks this up next',
+                     'class': 'block w-full bg-transparent px-3 py-2 text-[14px]/5 '
+                              'outline-none placeholder:text-zinc-500',
+                 })
+             }
+
+     A max_length on the model renders as maxlength on the widget, which
+     truncates a paste in silence. Either drop it from the widget and let
+     clean() reject the value with a message, or say the number in help_text
+     before anyone reaches it. form.body.field.max_length is the number. -->
+<form method="post" class="max-w-xl">
+  {% csrf_token %}
+  <div>
+    <label for="{{ form.body.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.body.label }}{% if form.body.field.required %} <span class="text-red-600">*</span>{% endif %}
+    </label>
+
+    <div class="rounded-lg bg-white {% if form.body.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.body }}
+    </div>
+
+    {% if form.body.errors %}
+      <p class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>{{ form.body.errors.0 }}
+      </p>
+    {% elif form.body.help_text %}
+      <p class="mt-1.5 text-[12px]/4 text-zinc-500">{{ form.body.help_text }}</p>
+    {% endif %}
+  </div>
+
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Post note</button>
+</form>

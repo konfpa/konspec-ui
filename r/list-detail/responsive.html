@@ -1,0 +1,218 @@
+<!-- The narrow form, where the two panes stop being panes. Below md the list is
+     the screen and the detail is the screen; there is no split, because 390px
+     divided in two is two columns neither of which holds a record.
+
+     The switch is one boolean bound with the object form of :class. x-show
+     writes an inline display:none, inline styles beat md:flex, and the detail
+     pane would then never come back on a wide screen once it had been closed on
+     a narrow one. The static class attribute repeats the initial state so the
+     frame is right on the first paint, before Alpine has booted — and the object
+     form is what then corrects it, because the string form only ever adds
+     classes and the static hidden would survive to beat the flex it added.
+
+     Three ways out of the detail and all three land in the same place. The Back
+     button is md:hidden and first in the header, with words on it rather than a
+     bare chevron. Escape is bound on the detail section and not on the window,
+     so a dialog opened over it still gets its own Escape first. And both call
+     back(), which puts focus on the option that was opened — leave that out and
+     the phone user is at the top of the document with the queue somewhere below
+     them and no announcement that anything happened.
+
+     Opening moves focus into the detail region, whose accessible name is the
+     record heading, so the swap is announced by the mechanism that already
+     exists rather than by a live region firing on every arrow key.
+
+     Nothing scrolls sideways. The summary grid is two columns at 390px and four
+     from sm; the lines table is a stack of cards below md and a table above it,
+     which is the same restack the table entry uses. -->
+<main class="flex h-[600px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false,
+        grns: [
+          { grn: 'GRN-26-0442', vendor: 'Sharma Extrusions', po: 'PO-24-1187', qty: '12,000 kg', gate: '21 Aug 06:40', status: 'Open', gap: 'Short by 400 kg against the challan' },
+          { grn: 'GRN-26-0443', vendor: 'Nashik Steel Traders', po: 'PO-24-1203', qty: '640 kg', gate: '21 Aug 08:15', status: 'Approved', gap: 'Weighbridge slip missing' },
+          { grn: 'GRN-26-0444', vendor: 'Gujarat Polymers Ltd', po: 'PO-24-1191', qty: '3,200 kg', gate: '21 Aug 09:02', status: 'Open', gap: 'No exception' },
+          { grn: 'GRN-26-0445', vendor: 'Qureshi Metals', po: 'PO-24-1207', qty: '1,850 kg', gate: '21 Aug 10:30', status: 'Overdue', gap: 'Held 4 hours at the gate' },
+          { grn: 'GRN-26-0446', vendor: 'Konkan Packaging Co', po: 'PO-24-1198', qty: '900 nos', gate: '21 Aug 11:12', status: 'Closed', gap: 'No exception' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.grns[this.sel] },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.grns.length - 1)) },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) }
+      }">
+
+  <div class="flex shrink-0 items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0" :class="detail && 'hidden md:block'">
+      <h1 class="text-[16px]/6 font-semibold">Gate receipts</h1>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Silvassa · 21 Aug 2026 · 5 logged</p>
+    </div>
+    <!-- The record identity, not a second h1. There is one h1 in the document
+         and it is the screen; the record is the detail pane's own h2, and
+         repeating it here as a heading would put two h1s in one page. -->
+    <div class="min-w-0 md:hidden" :class="detail ? 'block' : 'hidden'">
+      <p class="text-[16px]/6 font-semibold tabular-nums" x-text="rec.grn"></p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500" x-text="'Record ' + (sel + 1) + ' of ' + grns.length"></p>
+    </div>
+  </div>
+
+  <div class="flex min-h-0 flex-1">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">Today at the gate</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="(sel + 1) + ' of ' + grns.length"></p>
+      </div>
+
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(grns.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(g, i) in grns" :key="g.grn">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[g.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="g.grn"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="g.qty"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="g.status"></span> · <span x-text="g.vendor"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500" x-text="'At the gate ' + g.gate"></span>
+            </span>
+            <!-- The chevron is decoration on a phone and absent from the option
+                 name; the option is the target, and there is no second control
+                 inside it to be unreachable. -->
+            <span class="flex h-5 shrink-0 items-center text-zinc-400 md:hidden" aria-hidden="true">
+              <i data-lucide="chevron-right" class="size-4"></i>
+            </span>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+             @keydown.escape="back()"
+             class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+             :class="{ 'hidden': !detail, 'flex': detail }">
+
+      <div class="shrink-0 border-b border-zinc-200 px-4 py-3 md:px-5">
+        <button type="button" @click="back()"
+                class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+          <i data-lucide="chevron-left" class="size-4"></i>Back to the queue
+        </button>
+        <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+          <span class="tabular-nums" x-text="rec.grn"></span>
+          <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+          </span>
+        </h2>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-600" x-text="rec.vendor + ' · against ' + rec.po"></p>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-4 py-4 md:px-5">
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Received</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.qty"></dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">At the gate</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.gate"></dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Order</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.po"></dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Vehicle</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums">MH-15-DQ-4412</dd>
+          </div>
+        </dl>
+
+        <div class="mt-4 rounded-xl border border-zinc-200 p-4">
+          <div class="flex items-start gap-2.5">
+            <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+            <div class="min-w-0">
+              <p class="text-[13px]/5 font-medium">Exception on this receipt</p>
+              <p class="mt-0.5 text-[13px]/5 text-zinc-600" x-text="rec.gap"></p>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="mt-5 text-[13px]/5 font-medium">Lines received</h3>
+
+        <!-- Cards below md, a table from md. The same restack the table entry
+             uses, and the reason nothing here scrolls sideways at 390px. -->
+        <ul role="list" class="mt-2 space-y-2 md:hidden">
+          <li class="rounded-xl border border-zinc-200 p-3">
+            <p class="text-[13px]/5 font-medium">HDPE granules, natural</p>
+            <dl class="mt-2 grid grid-cols-2 gap-2 text-[12px]/4">
+              <div class="flex gap-2"><dt class="text-zinc-600">Challan</dt><dd class="tabular-nums">12,400 kg</dd></div>
+              <div class="flex gap-2"><dt class="text-zinc-600">Weighed</dt><dd class="tabular-nums">12,000 kg</dd></div>
+            </dl>
+          </li>
+          <li class="rounded-xl border border-zinc-200 p-3">
+            <p class="text-[13px]/5 font-medium">Masterbatch, blue</p>
+            <dl class="mt-2 grid grid-cols-2 gap-2 text-[12px]/4">
+              <div class="flex gap-2"><dt class="text-zinc-600">Challan</dt><dd class="tabular-nums">200 kg</dd></div>
+              <div class="flex gap-2"><dt class="text-zinc-600">Weighed</dt><dd class="tabular-nums">200 kg</dd></div>
+            </dl>
+          </li>
+        </ul>
+
+        <div class="mt-2 hidden overflow-hidden rounded-xl border border-zinc-200 md:block">
+          <table class="w-full text-[13px]/5">
+            <thead>
+              <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="px-3 py-2 font-medium">Material</th>
+                <th scope="col" class="px-3 py-2 text-right font-medium">Challan</th>
+                <th scope="col" class="px-3 py-2 text-right font-medium">Weighed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100">
+                <td class="px-3 py-2">HDPE granules, natural</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">12,400 kg</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">12,000 kg</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Masterbatch, blue</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">200 kg</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">200 kg</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="flex shrink-0 gap-2 border-t border-zinc-200 px-4 py-3 md:px-5">
+        <button type="button" class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:h-9 md:flex-none">
+          Raise a debit note
+        </button>
+        <button type="button" class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:h-9 md:flex-none">
+          <i data-lucide="check" class="size-4"></i>Post the receipt
+        </button>
+      </div>
+    </section>
+  </div>
+</main>

@@ -1,0 +1,25 @@
+<!-- When the message is about a set of rows, name them. "4 invoices failed"
+     with no list means someone has to go hunting for which four. -->
+<div class="rounded-lg border border-zinc-200 bg-white px-4 py-3" role="alert">
+  <div class="flex items-start gap-3">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 font-medium">3 invoices could not be matched to a GRN.</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-600">They stay out of the payment run until a GRN is posted against each one.</p>
+    </div>
+  </div>
+  <ul class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3 text-[12px]/4">
+    <li class="flex items-center justify-between gap-4">
+      <a href="#" class="truncate text-zinc-900 underline underline-offset-2">INV-8841 · Nashik Steel Traders</a>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹4,26,500</span>
+    </li>
+    <li class="flex items-center justify-between gap-4">
+      <a href="#" class="truncate text-zinc-900 underline underline-offset-2">INV-8836 · Gujarat Polymers Ltd</a>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹1,18,240</span>
+    </li>
+    <li class="flex items-center justify-between gap-4">
+      <a href="#" class="truncate text-zinc-900 underline underline-offset-2">INV-8829 · Sharma Extrusions</a>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹87,900</span>
+    </li>
+  </ul>
+</div>

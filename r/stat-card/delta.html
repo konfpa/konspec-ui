@@ -1,0 +1,69 @@
+<!-- Three tiles, three deltas, and the middle one is the reason this variant
+     exists.
+
+     Direction and desirability are separate. The arrow follows the number; the
+     tone follows whether the movement was wanted. Orders raised going up is
+     emerald with an up arrow. Overdue value going up is red with an up arrow —
+     same direction, opposite news — and a template that picks the tone from
+     Math.sign(delta) gets it exactly backwards while looking correct on the
+     first tile. Carry good: "down" on the metric and choose the tone with
+     delta > 0 === (good === "up").
+
+     Every delta here is an arrow, a sign and a period. The arrow is aria-hidden,
+     so the sign is what is left for a screen reader and for forced-colours mode,
+     where the emerald and the red are both gone. The period is not optional:
+     "+11" against what?
+
+     The third tile is flat, and flat is graphite with a minus — never a green
+     zero. Emerald means something finished; nothing finished here. The same
+     applies below the noise floor of the measure: 0.4% on committed value is
+     one release note landing early and is reported as no change.
+
+     Note the second delta is absolute rather than percent. On a base of nine
+     approvals "+33%" claims a precision nine records do not have. -->
+<div class="grid gap-3 sm:grid-cols-3">
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Orders raised</dt>
+      <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">148</dd>
+      <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+11
+        </span>
+        <span class="text-zinc-500">vs. July</span>
+      </dd>
+    </dl>
+  </div>
+
+  <!-- up is bad. Same arrow as the tile on the left, opposite tone, and the
+       label is what makes it legible with no tone at all. -->
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue value</dt>
+      <dd class="mt-1.5 flex items-baseline gap-1">
+        <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+        <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">27.10 L</span>
+      </dd>
+      <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+₹4.10 L
+        </span>
+        <span class="text-zinc-500">vs. 12 Aug</span>
+      </dd>
+    </dl>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Awaiting approval</dt>
+      <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">9</dd>
+      <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium text-zinc-600">
+          <i data-lucide="minus" class="size-3.5" aria-hidden="true"></i>No change
+        </span>
+        <span class="text-zinc-500">since 12 Aug</span>
+      </dd>
+    </dl>
+  </div>
+</div>

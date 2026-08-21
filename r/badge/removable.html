@@ -1,0 +1,17 @@
+<!-- Only for tags the user applied. A status is not removable — it describes
+     the record rather than decorating it, and an x on it promises an edit that
+     is not going to happen. -->
+<div class="flex flex-wrap items-center gap-2" x-data="{ tags: ['Sharma Extrusions', 'Open', '₹1,00,000+'] }">
+  <template x-for="tag in tags" :key="tag">
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium ring-1 ring-inset ring-zinc-300">
+      <span x-text="tag"></span>
+      <button type="button" @click="tags = tags.filter(t => t !== tag)" :aria-label="'Remove ' + tag"
+              class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+        <i data-lucide="x" class="size-3"></i>
+      </button>
+    </span>
+  </template>
+  <button type="button" x-show="tags.length" x-cloak @click="tags = []"
+          class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Clear all</button>
+  <p x-show="!tags.length" x-cloak class="text-[12px]/4 text-zinc-600">No filters applied.</p>
+</div>

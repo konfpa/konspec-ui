@@ -1,0 +1,28 @@
+<!-- The simplest form, and still the component: four destinations, no panels
+     and no JavaScript at all. Reach for this first and add a panel only when a
+     section has pages worth listing.
+
+     aria-current="page" is the state. The zinc-100 tint is what you see, but it
+     is the attribute that is announced, and writing only the tint gives a
+     sighted user a marker and everybody else nothing.
+
+     The items are not underlined. That is the exception breadcrumbs take too:
+     interactive text is zinc-900 plus an underline everywhere else in this
+     system, and four underlined labels in a row read as a fence rather than a
+     bar. The hover tint carries it. -->
+<nav aria-label="Main" class="rounded-xl border border-zinc-200 bg-white p-1">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <a href="/dashboard/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+    </li>
+    <li>
+      <a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a>
+    </li>
+    <li>
+      <a href="/inventory/grn/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a>
+    </li>
+    <li>
+      <a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a>
+    </li>
+  </ul>
+</nav>

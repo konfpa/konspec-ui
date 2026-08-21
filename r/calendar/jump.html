@@ -1,0 +1,118 @@
+<!-- Chevrons are fine for next week and useless for March 2019 — that is 84
+     clicks. The header doubles as two selects, so any month in a twelve-year
+     window is one gesture.
+
+     The year list is built around the current year rather than hard-coded, so
+     this markup does not quietly expire. -->
+<div class="inline-block rounded-xl border border-zinc-200 bg-white p-3"
+     x-data="{
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       sel: null,
+       months: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+       years: (() => { const y = new Date().getFullYear(); const a = []; for (let i = y - 8; i <= y + 3; i++) a.push(i); return a; })(),
+       vy: new Date().getFullYear(),
+       vm: new Date().getMonth(),
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
+       title(o) { return new Date(this.vy, this.vm + o, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       long(s) { return this.parse(s).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); },
+       fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
+       weeks(o) {
+         const y = this.vy, m = this.vm + o;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) {
+           const dt = new Date(y, m, d);
+           cells.push({ iso: this.iso(dt.getFullYear(), dt.getMonth(), d), day: d, dow: dt.getDay() });
+         }
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       },
+       shift(n) { const v = new Date(this.vy, this.vm + n, 1); this.vy = v.getFullYear(); this.vm = v.getMonth(); this.clamp(); },
+       clamp() {
+         if (!this.focus) return;
+         const f = this.parse(this.focus);
+         if (f.getFullYear() === this.vy && f.getMonth() === this.vm) return;
+         const last = new Date(this.vy, this.vm + 1, 0).getDate();
+         this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
+       },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
+       cls(s) {
+         if (s === this.sel) return 'bg-zinc-700 font-medium text-white hover:bg-zinc-800';
+         if (s === this.today) return 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300';
+         return 'text-zinc-900 hover:bg-zinc-200';
+       }
+     }">
+  <div class="flex items-center gap-1.5 pb-2">
+    <button type="button" @click="shift(-1)" aria-label="Previous month"
+            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+
+    <label for="cal-month" class="sr-only">Month</label>
+    <select id="cal-month" x-model.number="vm" @change="$nextTick(() => clamp())"
+            class="h-8 min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+      <template x-for="(m, i) in months" :key="m">
+        <option :value="i" x-text="m"></option>
+      </template>
+    </select>
+
+    <label for="cal-year" class="sr-only">Year</label>
+    <select id="cal-year" x-model.number="vy" @change="$nextTick(() => clamp())"
+            class="h-8 shrink-0 rounded-lg border border-zinc-200 bg-white px-2 text-[13px]/5 font-medium tabular-nums focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+      <template x-for="y in years" :key="y">
+        <option :value="y" x-text="y"></option>
+      </template>
+    </select>
+
+    <button type="button" @click="shift(1)" aria-label="Next month"
+            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+  <table x-ref="grid" class="border-collapse"
+           @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+             @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+             @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
+    <caption class="sr-only" x-text="'Calendar, ' + title(0)"></caption>
+    <thead>
+      <tr>
+        <template x-for="h in head" :key="h">
+          <th scope="col" class="size-9 text-[11px]/4 font-medium text-zinc-500" x-text="h"></th>
+        </template>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="(week, wi) in weeks(0)" :key="wi">
+        <tr>
+          <template x-for="(c, ci) in week" :key="ci">
+            <td class="p-0">
+              <template x-if="c">
+                <button type="button" @click="sel = c.iso; focus = c.iso"
+                        :aria-label="long(c.iso)" :aria-pressed="c.iso === sel"
+                        :aria-current="c.iso === today ? 'date' : null"
+                        :tabindex="c.iso === focus ? 0 : -1"
+                        :data-focus="c.iso === focus ? '1' : null"
+                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                        :class="cls(c.iso)" x-text="c.day"></button>
+              </template>
+              <template x-if="!c"><span class="block size-9"></span></template>
+            </td>
+          </template>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+</div>

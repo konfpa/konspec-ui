@@ -1,0 +1,52 @@
+<!-- Labels in a left gutter, and the binding is still for and id — the grid
+     puts the two cells side by side but they are not nested, so wrapping was
+     never available here. This is the layout that most often ends up with a
+     label that is merely near its control.
+
+     sm:pt-2 on each label matches the input's py-2, so the two sit on the same
+     line of text. items-center would centre a one-line label against a control
+     that is 38px tall and leave it a pixel or two low, which is visible down a
+     column of six.
+
+     Below sm the whole thing stacks and the label goes back above its control.
+     A 10rem gutter at 390px leaves the name wrapping to four lines beside a box
+     barely wider than it, and the eye stops being able to pair them. -->
+<div class="max-w-2xl divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+  <div class="px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium">Order defaults — Gujarat Polymers Ltd</h3>
+  </div>
+
+  <div class="space-y-3 px-4 py-3 sm:space-y-2.5">
+    <div class="sm:grid sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-start sm:gap-4">
+      <label for="lb-h-terms" class="mb-1.5 block text-[13px]/5 font-medium sm:mb-0 sm:pt-2">Payment terms</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="lb-h-terms" name="terms" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+          <option>45 days from invoice date</option>
+          <option>30 days from GRN</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sm:grid sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-start sm:gap-4">
+      <label for="lb-h-limit" class="mb-1.5 block text-[13px]/5 font-medium sm:mb-0 sm:pt-2">Approval limit</label>
+      <div class="flex items-center rounded-lg border border-zinc-200 bg-white pl-3 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <span class="shrink-0 text-[14px]/5 text-zinc-500">₹</span>
+        <input id="lb-h-limit" name="limit" value="50,000" inputmode="numeric"
+               class="w-full bg-transparent px-2 py-2 text-[14px]/5 tabular-nums outline-none">
+      </div>
+    </div>
+
+    <div class="sm:grid sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-start sm:gap-4">
+      <label for="lb-h-buyer" class="mb-1.5 block text-[13px]/5 font-medium sm:mb-0 sm:pt-2">Default buyer</label>
+      <div>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="lb-h-buyer" name="buyer" aria-describedby="lb-h-buyer-help" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            <option>Ritu Deshpande</option>
+            <option>Anil Kulkarni</option>
+          </select>
+        </div>
+        <p id="lb-h-buyer-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Help text lives in the control column, not the label gutter.</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,263 @@
+<!-- Five sections and a rail that says where you are in them. The rail is a
+     <nav> with a name, not a tablist: every section stays on the page, Ctrl+F
+     finds all of it, and it prints in one pass. A form that hides four of five
+     sections behind tabs is a form nobody can proofread before signing.
+
+     Each link is a real <a href="#sec-…"> and each target is a <section> with
+     tabindex="-1". A fragment moves focus only when the target is focusable, so
+     without the tabindex the page scrolls and the keyboard stays in the rail —
+     the next Tab then walks back down the nav instead of into the fields.
+
+     scroll-mt-4 keeps the heading off the top edge of the scroller when the
+     fragment lands.
+
+     The spy reads position out of the DOM on scroll rather than tracking it
+     separately, so a click, a wheel and a Tab into an off-screen field all
+     agree. It is scoped to $el, not to document, because two copies of a
+     snippet on one page would otherwise fight over the same section ids.
+
+     Below lg the rail is gone. There is one column on a phone and the fields
+     own it; the section headings and the scroll are the navigation, and a rail
+     folded into a sideways strip above the form is the one thing this system
+     does not allow. -->
+<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+     x-data="{
+       active: 'sec-identity',
+       spy() {
+         const line = this.$el.getBoundingClientRect().top + 96;
+         let cur = '';
+         this.$el.querySelectorAll('section[id]').forEach(s => { if (s.getBoundingClientRect().top <= line) cur = s.id });
+         this.active = cur || 'sec-identity';
+       }
+     }"
+     @scroll="spy()">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Master data</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Vendors</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">New</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Onboard a vendor</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">Five sections. Nothing is sent to the vendor until the whole form is saved.</p>
+    </div>
+
+    <p class="mt-4 text-[12px]/4 text-zinc-600">
+      Every field is required unless its label says <span class="font-medium text-zinc-900">Optional</span>.
+    </p>
+
+    <div class="mt-3 lg:grid lg:items-start lg:gap-6 lg:grid-cols-[200px_minmax(0,1fr)]">
+
+      <nav aria-label="Sections of this form" class="hidden lg:sticky lg:top-6 lg:block lg:self-start">
+        <ul class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li><a href="#sec-identity" :aria-current="active === 'sec-identity'"
+                 class="-ml-px block border-l-2 py-1.5 pl-3"
+                 :class="active === 'sec-identity' ? 'border-zinc-700 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">Identity</a></li>
+          <li><a href="#sec-tax" :aria-current="active === 'sec-tax'"
+                 class="-ml-px block border-l-2 py-1.5 pl-3"
+                 :class="active === 'sec-tax' ? 'border-zinc-700 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">Tax registration</a></li>
+          <li><a href="#sec-bank" :aria-current="active === 'sec-bank'"
+                 class="-ml-px block border-l-2 py-1.5 pl-3"
+                 :class="active === 'sec-bank' ? 'border-zinc-700 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">Banking</a></li>
+          <li><a href="#sec-contact" :aria-current="active === 'sec-contact'"
+                 class="-ml-px block border-l-2 py-1.5 pl-3"
+                 :class="active === 'sec-contact' ? 'border-zinc-700 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">Contacts</a></li>
+          <li><a href="#sec-docs" :aria-current="active === 'sec-docs'"
+                 class="-ml-px block border-l-2 py-1.5 pl-3"
+                 :class="active === 'sec-docs' ? 'border-zinc-700 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">Documents</a></li>
+        </ul>
+      </nav>
+
+      <form class="min-w-0 space-y-4">
+
+        <section id="sec-identity" tabindex="-1" aria-labelledby="sec-identity-h"
+                 class="scroll-mt-4 overflow-hidden rounded-xl border border-zinc-200 bg-white focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="sec-identity-h" class="text-[16px]/6 font-semibold">Identity</h2>
+          </div>
+          <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+            <div class="min-w-0 sm:col-span-2">
+              <label for="sc-name" class="mb-1.5 block text-[13px]/5 font-medium">Registered name</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="sc-name" name="name" required value="Baroda Fasteners Pvt Ltd" aria-describedby="sc-name-msg"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              </div>
+              <p id="sc-name-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">Exactly as it appears on the GST certificate.</p>
+            </div>
+            <div class="min-w-0">
+              <label for="sc-type" class="mb-1.5 block text-[13px]/5 font-medium">Constitution</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select id="sc-type" name="constitution" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                  <option value="">Choose one</option>
+                  <option value="pvt" selected>Private limited</option>
+                  <option value="llp">LLP</option>
+                  <option value="prop">Proprietorship</option>
+                </select>
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+            <div class="min-w-0">
+              <label for="sc-cat" class="mb-1.5 block text-[13px]/5 font-medium">Supply category</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select id="sc-cat" name="category" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                  <option value="">Choose one</option>
+                  <option value="raw">Raw material</option>
+                  <option value="hw" selected>Hardware and fasteners</option>
+                  <option value="svc">Services</option>
+                </select>
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-tax" tabindex="-1" aria-labelledby="sec-tax-h"
+                 class="scroll-mt-4 overflow-hidden rounded-xl border border-zinc-200 bg-white focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="sec-tax-h" class="text-[16px]/6 font-semibold">Tax registration</h2>
+          </div>
+          <div class="px-5 py-4">
+            <!-- two fields that are one question: characters 3 to 12 of the
+                 GSTIN are the PAN, so a mismatch belongs to the pair and not to
+                 whichever of the two was touched last. -->
+            <fieldset aria-describedby="sc-tax-msg">
+              <legend class="mb-2 text-[13px]/5 font-medium">GST and PAN</legend>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div class="min-w-0">
+                  <label for="sc-pan" class="mb-1.5 block text-[12px]/4 text-zinc-600">PAN</label>
+                  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                    <input id="sc-pan" name="pan" required value="AABCB4417K"
+                           class="w-full bg-transparent px-3 py-2 text-[14px]/5 uppercase tabular-nums outline-none">
+                  </div>
+                </div>
+                <div class="min-w-0">
+                  <label for="sc-gstin" class="mb-1.5 block text-[12px]/4 text-zinc-600">GSTIN</label>
+                  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                    <input id="sc-gstin" name="gstin" required maxlength="15" value="24AABCB4417K1ZQ"
+                           class="w-full bg-transparent px-3 py-2 text-[14px]/5 uppercase tabular-nums outline-none">
+                  </div>
+                </div>
+              </div>
+              <p id="sc-tax-msg" class="mt-2 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+                15 characters. Characters 3 to 12 have to be the PAN above.
+              </p>
+            </fieldset>
+            <div class="mt-4">
+              <label class="flex items-start gap-2.5 text-[14px]/5">
+                <input type="checkbox" name="msme" checked class="mt-0.5 size-4 shrink-0 rounded accent-zinc-700">
+                <span>Registered under MSME
+                  <span class="mt-0.5 block text-[12px]/4 text-zinc-500">Payment terms are capped at 45 days by statute.</span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-bank" tabindex="-1" aria-labelledby="sec-bank-h"
+                 class="scroll-mt-4 overflow-hidden rounded-xl border border-zinc-200 bg-white focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="sec-bank-h" class="text-[16px]/6 font-semibold">Banking</h2>
+          </div>
+          <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+            <div class="min-w-0">
+              <label for="sc-acct" class="mb-1.5 block text-[13px]/5 font-medium">Account number</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="sc-acct" name="account" required inputmode="numeric" value="50200041188207"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+            <div class="min-w-0">
+              <label for="sc-ifsc" class="mb-1.5 block text-[13px]/5 font-medium">IFSC</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="sc-ifsc" name="ifsc" required maxlength="11" value="HDFC0001842" aria-describedby="sc-ifsc-msg"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 uppercase tabular-nums outline-none">
+              </div>
+              <p id="sc-ifsc-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">HDFC Bank, Alkapuri, Vadodara.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-contact" tabindex="-1" aria-labelledby="sec-contact-h"
+                 class="scroll-mt-4 overflow-hidden rounded-xl border border-zinc-200 bg-white focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="sec-contact-h" class="text-[16px]/6 font-semibold">Contacts</h2>
+          </div>
+          <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+            <div class="min-w-0">
+              <label for="sc-person" class="mb-1.5 block text-[13px]/5 font-medium">Sales contact</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="sc-person" name="contact" required value="Mehul Trivedi"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+            <div class="min-w-0">
+              <label for="sc-phone" class="mb-1.5 block text-[13px]/5 font-medium">Phone</label>
+              <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <span id="sc-phone-cc" class="flex shrink-0 items-center rounded-l-[7px] border-r border-zinc-200 bg-zinc-100 px-3 text-[14px]/5 tabular-nums text-zinc-600">+91</span>
+                <input id="sc-phone" name="phone" required inputmode="tel" value="98250 41187" aria-describedby="sc-phone-cc"
+                       class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+            <div class="min-w-0 sm:col-span-2">
+              <label for="sc-email" class="mb-1.5 block text-[13px]/5 font-medium">Email for purchase orders</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="sc-email" name="email" type="email" required value="sales@barodafasteners.in" aria-describedby="sc-email-msg"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              </div>
+              <p id="sc-email-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">Every approved order is sent here automatically.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-docs" tabindex="-1" aria-labelledby="sec-docs-h"
+                 class="scroll-mt-4 overflow-hidden rounded-xl border border-zinc-200 bg-white focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="sec-docs-h" class="text-[16px]/6 font-semibold">Documents</h2>
+          </div>
+          <div class="px-5 py-4" x-data="{ depth: 0 }">
+            <label class="mb-1.5 block text-[13px]/5 font-medium">GST certificate and cancelled cheque</label>
+            <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
+                 class="rounded-lg border border-dashed px-4 py-5 transition"
+                 :class="depth > 0 ? 'border-zinc-700 bg-white' : 'border-zinc-200 bg-zinc-100'">
+              <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
+                <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
+                <span class="text-[13px]/5 text-zinc-600">Drag files here or</span>
+                <input type="file" id="sc-files" name="documents" multiple class="peer sr-only">
+                <label for="sc-files"
+                       class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+                  Browse files
+                </label>
+                <span class="text-[12px]/4 text-zinc-500">PDF or JPG · up to 10 MB each</span>
+              </div>
+            </div>
+            <ul class="mt-2 space-y-2">
+              <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-[13px]/5 font-medium">gst-certificate-24aabcb4417k1zq.pdf</p>
+                  <p class="text-[12px]/4 tabular-nums text-zinc-500">312 KB · queued · not yet uploaded</p>
+                </div>
+                <button type="button" aria-label="Remove gst-certificate-24aabcb4417k1zq.pdf"
+                        class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+                  <i data-lucide="x" class="size-4"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <div class="sticky bottom-0 flex flex-wrap items-center justify-end gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+          <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Cancel</button>
+          <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Create vendor</button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>

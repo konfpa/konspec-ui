@@ -1,0 +1,49 @@
+<div x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+    <i data-lucide="plus" class="size-4"></i>Record GRN
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="grn-title"
+         class="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+        <div class="min-w-0">
+          <h2 id="grn-title" class="text-[16px]/6 font-semibold">Record GRN</h2>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">PO-24-1187 · Sharma Extrusions</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <div>
+          <label for="grn-qty" class="mb-1.5 block text-[13px]/5 font-medium">Quantity received <span class="text-red-600">*</span></label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <!-- x-trap opens focus on [autofocus] if the panel has one, otherwise on the close button -->
+            <input id="grn-qty" autofocus value="4,200" class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+            <span class="pr-3 text-[13px]/5 text-zinc-600">kg</span>
+          </div>
+          <p class="mt-1.5 text-[12px]/4 text-zinc-500">Ordered 12,000 kg, received 7,800 kg so far.</p>
+        </div>
+
+        <div class="mt-4">
+          <label for="grn-date" class="mb-1.5 block text-[13px]/5 font-medium">Receipt date <span class="text-red-600">*</span></label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input id="grn-date" type="date" value="2024-08-19" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex shrink-0 flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+        <button type="button" @click="open = false"
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

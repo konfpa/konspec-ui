@@ -1,0 +1,87 @@
+<!-- Which one you mark depends on the ratio, and it is a decision about the
+     form rather than about the field. Two required out of nine: mark them.
+     Seven out of nine: an asterisk on seven fields is wallpaper, so the marking
+     moves to the exceptions and the word Optional goes in their labels.
+
+     Either way it is stated once at the top and never repeated beside every
+     field, and either way it is backed by the required attribute — the asterisk
+     and the word are both aria-hidden decoration that only helps a person
+     scanning the form for what they still have to fill in.
+
+     The select is the trap in this variant. required on a select does nothing
+     unless the first option has value="" — a select whose first option is a
+     real vendor is never empty, so the constraint is satisfied on a form
+     nobody has touched and the field submits whatever happened to be first. -->
+<div class="max-w-sm space-y-6">
+  <div>
+    <p class="mb-3 text-[12px]/4 text-zinc-600">
+      Two of the nine fields on this form are required. <span aria-hidden="true" class="text-red-600">*</span> marks them.
+    </p>
+
+    <div class="space-y-4">
+      <div>
+        <label for="fq-vendor" class="mb-1.5 block text-[13px]/5 font-medium">
+          Vendor <span aria-hidden="true" class="text-red-600">*</span>
+        </label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="fq-vendor" name="vendor" required aria-describedby="fq-vendor-msg"
+                  class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            <option value="">Choose a vendor</option>
+            <option value="v-0412">Gujarat Polymers Ltd</option>
+            <option value="v-0288">Sharma Steel &amp; Alloys</option>
+            <option value="v-0517">Deccan Bearings Pvt Ltd</option>
+          </select>
+        </div>
+        <p id="fq-vendor-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+          The empty first option is what makes required mean anything here.
+        </p>
+      </div>
+
+      <div>
+        <label for="fq-ref" class="mb-1.5 block text-[13px]/5 font-medium">Buyer reference</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="fq-ref" name="buyer_ref" aria-describedby="fq-ref-msg"
+                 class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+        </div>
+        <p id="fq-ref-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+          No marker, because it is not required and most of this form is not.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t border-zinc-200 pt-6">
+    <p class="mb-3 text-[12px]/4 text-zinc-600">
+      Seven of the nine are required on the approval form, so the marking moves to the three that are not.
+    </p>
+
+    <div class="space-y-4">
+      <div>
+        <label for="fq-approver" class="mb-1.5 block text-[13px]/5 font-medium">Second approver</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="fq-approver" name="approver" required
+                  class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            <option value="">Choose an approver</option>
+            <option value="rd">Ritu Deshpande — purchase</option>
+            <option value="ak">Anil Kulkarni — stores</option>
+          </select>
+        </div>
+        <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+      </div>
+
+      <div>
+        <label for="fq-note" class="mb-1.5 flex items-baseline gap-2 text-[13px]/5 font-medium">
+          Note to the approver
+          <span aria-hidden="true" class="font-normal text-zinc-500">Optional</span>
+        </label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="fq-note" name="note" aria-describedby="fq-note-msg"
+                 class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+        </div>
+        <p id="fq-note-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+          Goes into the approval mail above the order lines.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

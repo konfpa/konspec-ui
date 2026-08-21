@@ -1,0 +1,59 @@
+<!-- The size select and the pager are one control and read left to right: how
+     much is on a page, where in the register that page falls, and the arrows.
+     They keep that order at every width — swapping the halves below md moves the
+     thing somebody is about to press.
+
+     Changing the size returns to page one, always. Page 7 at 25 rows is rows
+     151–175 and page 7 at 100 rows is rows 601–700, so keeping the number sends
+     somebody who asked to see more rows four hundred rows further down a list
+     they were in the middle of reading. The range recomputes and the status
+     region says the new one; nothing tries to hold the scroll position, because
+     this control does not own it.
+
+     A real <select> in a bordered wrapper, with a real <label for>. The wrapper
+     draws the focus outline, which is the one case where outline-none on the
+     control itself is allowed — the outline belongs to the enclosure, and
+     leaving it on the select as well would draw two.
+
+     x-model.number, not x-model. A select yields a string, so page arithmetic on
+     it silently concatenates: '25' * 3 is 75 but (page - 1) * '25' + 1 is fine
+     while total / '25' is fine and '25' + 1 is '251'. One of those turns up. -->
+<nav aria-label="Order register pages"
+     x-data="{
+       page: 2, size: 25, total: 148,
+       get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
+       get from() { return this.total ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
+     }"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+
+  <div class="flex items-center gap-2">
+    <label for="pager-size" class="text-[13px]/5 text-zinc-600">Rows per page</label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <select id="pager-size" x-model.number="size" @change="page = 1"
+              class="h-9 bg-transparent px-2 text-[13px]/5 tabular-nums outline-none">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+       x-text="from + '–' + to + ' of ' + total + ' orders'">26–50 of 148 orders</p>
+    <div class="flex items-center gap-1">
+      <span class="mr-1 text-[13px]/5 tabular-nums text-zinc-600" x-text="'Page ' + page + ' of ' + pages">Page 2 of 6</span>
+      <button type="button" aria-label="Previous page" @click="go(page - 1)" :disabled="page === 1"
+              class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+      <button type="button" aria-label="Next page" @click="go(page + 1)" :disabled="page === pages"
+              class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </div>
+</nav>

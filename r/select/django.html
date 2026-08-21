@@ -1,0 +1,122 @@
+<!-- forms.py
+     class OrderForm(forms.Form):
+         # ChoiceField renders the <select> and, more to the point, validates
+         # the POSTed value against choices. That check is the only thing
+         # between a DOM anybody can edit and the database — which is also why
+         # the listbox variants above are still ChoiceFields on the server, just
+         # with HiddenInput on them.
+         vendor = forms.ChoiceField(
+             choices=[('', 'Choose a vendor')] + VENDOR_CHOICES,
+             widget=PlaceholderSelect(attrs={
+                 'class': 'block w-full min-w-0 appearance-none bg-transparent '
+                          'py-2 pr-9 pl-3 text-[14px]/5 outline-none'}),
+             help_text='Only vendors with a live rate contract are listed.')
+
+         # Nested choices are what render <optgroup>. One level and no more.
+         item = forms.ChoiceField(choices=[
+             ('', 'Choose an item'),
+             ('Polymers',  [('ITM-1042', 'HDPE granules — natural'),
+                            ('ITM-1078', 'LDPE granules — 22FA002')]),
+             ('Fasteners', [('ITM-3310', 'M12 hex bolt — 8.8 zinc')])])
+
+         # disabled=True is the server half of the locked field: the widget
+         # renders disabled AND the field ignores request.POST for this key
+         # entirely, cleaning from initial instead. That is why a Django form
+         # does not need the hidden input the plain-HTML read-only field needs —
+         # nothing is trusted from the browser for it at all.
+         plant = forms.ChoiceField(choices=PLANT_CHOICES, disabled=True)
+
+         # Multiple. The widget is what parses the POST: SelectMultiple calls
+         # data.getlist(name). A plain ChoiceField calls data.get(name), takes
+         # the last value and drops the rest without erroring.
+         plants = forms.MultipleChoiceField(choices=PLANT_CHOICES, required=False)
+
+         def __init__(self, *args, **kwargs):
+             super().__init__(*args, **kwargs)
+             # aria-invalid and aria-describedby cannot be decided in the
+             # template — the widget attrs are fixed before it renders — and
+             # this is the only place that knows both the errors and the ids.
+             for name in self.fields:
+                 bf, attrs = self[name], self.fields[name].widget.attrs
+                 attrs['aria-describedby'] = bf.auto_id + ('-err' if bf.errors else '-help')
+                 if bf.errors:
+                     attrs['aria-invalid'] = 'true'
+
+     widgets.py
+         class PlaceholderSelect(forms.Select):
+             # Django renders its empty choice as a plain selectable option that
+             # submits an empty string. required catches it, but only after a
+             # round trip, and the user can select it back afterwards.
+             # create_option is the only hook that reaches a single <option>.
+             def create_option(self, name, value, *args, **kwargs):
+                 option = super().create_option(name, value, *args, **kwargs)
+                 if value in ('', None):
+                     option['attrs']['disabled'] = True
+                     option['attrs']['hidden'] = True
+                 return option
+
+     views.py
+         def contract_options(request):
+             rows = RateContract.objects.filter(
+                 vendor__slug=request.GET.get('vendor', ''), is_live=True)
+             # the fragment only: options, and nothing around them
+             return render(request, 'orders/_contract_options.html', {'rows': rows})
+
+     urls.py
+         path('rate-contracts/options/', views.contract_options,
+              name='contract-options'),
+
+     The widget renders the <select> and only the <select>. The wrapper, the
+     chevron and the focus outline are template markup, so {{ form.vendor }} on
+     its own is never the whole field — which is the one thing that catches
+     everybody who has used a crispy-forms style renderer before. -->
+<form method="post" class="max-w-md space-y-5">
+  {% csrf_token %}
+
+  <div>
+    <label for="{{ form.vendor.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.vendor.label }} <span class="text-red-600">*</span>
+    </label>
+
+    <div class="relative rounded-lg bg-white {% if form.vendor.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.vendor }}
+      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </div>
+
+    {% if form.vendor.errors %}
+      <p id="{{ form.vendor.auto_id }}-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.vendor.errors.0 }}
+      </p>
+    {% else %}
+      <p id="{{ form.vendor.auto_id }}-help" class="mt-1.5 text-[12px]/4 text-zinc-500">{{ form.vendor.help_text }}</p>
+    {% endif %}
+  </div>
+
+  {# disabled=True on the field: it renders disabled, it posts nothing, and the #}
+  {# form cleans it from initial regardless of what the browser sends. No       #}
+  {# hidden input, and no chevron — nothing here is going to open.              #}
+  <div>
+    <label for="{{ form.plant.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">{{ form.plant.label }}</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-100">{{ form.plant }}</div>
+    <p id="{{ form.plant.auto_id }}-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
+  </div>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+    Raise order
+  </button>
+</form>
+
+{# orders/_contract_options.html — the whole response for the cascade variant. #}
+{# It leads with the placeholder again, because hx-swap="innerHTML" on a       #}
+{# <select> resets the selection to whatever ends up first. The empty case is  #}
+{# a disabled option that says so, never an empty fragment.                    #}
+{% if rows %}
+  <option value="" disabled selected hidden>Choose a rate contract</option>
+  {% for r in rows %}
+    <option value="{{ r.pk }}" data-live>{{ r.number }} — {{ r.rate }}/kg to {{ r.valid_to|date:"d M Y" }}</option>
+  {% endfor %}
+{% else %}
+  <option value="" disabled selected>No live rate contract for this vendor</option>
+{% endif %}

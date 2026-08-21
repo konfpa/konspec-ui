@@ -1,0 +1,110 @@
+{
+  "id": "badge",
+  "name": "Badge",
+  "category": "feedback",
+  "description": "A small pill that labels a record — status, tag or count. Every pill is the same graphite shape; a 6px dot carries the colour.",
+  "when_to_use": "One word about what a record is. If it needs a sentence it is not a badge, and if it does something when clicked it is a button wearing a pill.",
+  "rules": [
+    "The status mapping is fixed and lives in the dot: Open zinc-500, Approved amber-500, Overdue red-600, Closed emerald-600, Draft zinc-400. Approved is amber because it is waiting on someone; Closed is green because it is finished. Do not reinterpret it per screen.",
+    "The pill itself never takes a hue. bg-zinc-200, ring-zinc-300, text-zinc-700 on all five — a column of tinted pills reads as a traffic light and stops meaning anything by the twelfth row.",
+    "The fill is bg-zinc-200 with ring-zinc-300 — the chip fill, the same one an avatar takes. bg-zinc-100 is the surface fill, so a pill wearing it is the identical colour as the selected row underneath it and vanishes into it.",
+    "Solid pills take no ring. A graphite or red count badge already has an edge, and a pale ring around a dark pill reads as a rendering fault.",
+    "Keep one label per state across the whole app. \"Open\" in one table and \"Pending\" in another reads as two different things.",
+    "Counts are numbers — tabular-nums, and cap the display at 99+ so the pill cannot widen and reflow its row.",
+    "The small size is for table cells and dense toolbars only. Everywhere else is the default size; there is no third."
+  ],
+  "anatomy": [
+    {
+      "part": "Pill",
+      "description": "rounded-full, bg-zinc-200, the same on every state. It is the shape that says \"this is a state\"; it is not what says which one."
+    },
+    {
+      "part": "Ring",
+      "description": "ring-zinc-300, one step deeper than the fill. It is a ring rather than a border so adding it reflows nothing."
+    },
+    {
+      "part": "Dot",
+      "description": "The 6px marker that carries the state. Not optional on a status pill — without it every state looks the same."
+    },
+    {
+      "part": "Label",
+      "description": "One word, sentence case, from a fixed vocabulary. Not a sentence and not a number with units."
+    },
+    {
+      "part": "Count",
+      "description": "tabular-nums, capped at 99+ so the pill cannot grow and reflow its row."
+    },
+    {
+      "part": "Remove",
+      "description": "Only on tags the user applied. A status is not removable, because it describes the record rather than decorating it."
+    }
+  ],
+  "behaviour": [
+    "One label per state across the whole application. \"Open\" in one table and \"Pending\" in another reads as two different things.",
+    "The dot colour comes from the locked mapping and is not reinterpreted per screen. The pill around it never changes.",
+    "Counts cap at 99+ rather than widening, so a row does not reflow when a number crosses a hundred.",
+    "A removable tag removes on click without a confirmation — it is cheap to reapply.",
+    "A badge that filters is a real button and shows its selected state as a solid fill, not as a slightly darker tint nobody can see.",
+    "Badges do not wrap. A row of them scrolls or truncates; a badge broken across two lines stops reading as one object."
+  ],
+  "accessibility": [
+    "The label is real text inside the pill, so colour is never the only carrier of the state.",
+    "The dot is decorative and aria-hidden; the word beside it is the information.",
+    "A count badge on a control is included in that control's accessible name — \"Notifications, 99 or more unread\" — because \"bell, 99+\" is not a sentence.",
+    "A remove control is a real button with aria-label naming its tag.",
+    "A filter badge is a button with aria-pressed, so its on state is announced and not merely filled in.",
+    "Status pills are not interactive and are not focusable, so they do not appear in the Tab order as dead stops."
+  ],
+  "related": [
+    "table",
+    "alert",
+    "avatar"
+  ],
+  "variants": [
+    {
+      "id": "status",
+      "name": "Status pills",
+      "html": "<!-- The locked mapping. One pill class on all five; the dot is the only thing\n     that differs. Copy these verbatim, and do not invent a sixth colour for a\n     sixth state — add the state to this list or reuse Open. -->\n<div class=\"flex flex-wrap items-center gap-2\">\n  <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n    <span class=\"size-1.5 rounded-full bg-zinc-500\" aria-hidden=\"true\"></span>Open\n  </span>\n  <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n    <span class=\"size-1.5 rounded-full bg-amber-500\" aria-hidden=\"true\"></span>Approved\n  </span>\n  <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n    <span class=\"size-1.5 rounded-full bg-red-600\" aria-hidden=\"true\"></span>Overdue\n  </span>\n  <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n    <span class=\"size-1.5 rounded-full bg-emerald-600\" aria-hidden=\"true\"></span>Closed\n  </span>\n  <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300\">\n    <span class=\"size-1.5 rounded-full bg-zinc-400\" aria-hidden=\"true\"></span>Draft\n  </span>\n</div>"
+    },
+    {
+      "id": "inline",
+      "name": "Inline, without the pill",
+      "html": "<!-- The same locked dot with no pill around it. Use this where there is one\n     status and nothing to line it up with — a detail header, a card meta line.\n     The pill exists to give a column of states a shared left edge; one state on\n     its own has no column, so the shape is doing nothing but adding weight. -->\n<div class=\"max-w-md rounded-xl border border-zinc-200 bg-white p-4\">\n  <div class=\"flex items-baseline justify-between gap-3\">\n    <h3 class=\"text-[16px]/6 font-semibold\">PO-24-1187</h3>\n    <span class=\"text-[13px]/5 tabular-nums text-zinc-600\">₹4,82,000</span>\n  </div>\n  <dl class=\"mt-3 space-y-1.5 text-[13px]/5\">\n    <div class=\"flex gap-3\">\n      <dt class=\"w-20 shrink-0 text-zinc-600\">Supplier</dt>\n      <dd>Sharma Extrusions</dd>\n    </div>\n    <div class=\"flex gap-3\">\n      <dt class=\"w-20 shrink-0 text-zinc-600\">Status</dt>\n      <dd class=\"inline-flex items-center gap-2 font-medium text-zinc-700\">\n        <span class=\"size-1.5 rounded-full bg-red-600\" aria-hidden=\"true\"></span>Overdue\n      </dd>\n    </div>\n    <div class=\"flex gap-3\">\n      <dt class=\"w-20 shrink-0 text-zinc-600\">Raised</dt>\n      <dd class=\"tabular-nums\">14 Aug 2026</dd>\n    </div>\n  </dl>\n</div>"
+    },
+    {
+      "id": "sizes",
+      "name": "Sizes",
+      "html": "<!-- Two sizes and no third. Small is for table cells and dense toolbars, where\n     the default pill makes the row taller than its text needs. The dot stays\n     1.5 at both sizes — shrinking it is how a state stops being visible. -->\n<div class=\"flex flex-wrap items-center gap-4\">\n  <div class=\"flex items-center gap-2\">\n    <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n      <span class=\"size-1.5 rounded-full bg-zinc-500\" aria-hidden=\"true\"></span>Open\n    </span>\n    <span class=\"text-[12px]/4 text-zinc-600\">Small — inside table rows</span>\n  </div>\n  <div class=\"flex items-center gap-2\">\n    <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n      <span class=\"size-1.5 rounded-full bg-zinc-500\" aria-hidden=\"true\"></span>Open\n    </span>\n    <span class=\"text-[12px]/4 text-zinc-600\">Default — everywhere else</span>\n  </div>\n</div>"
+    },
+    {
+      "id": "icon",
+      "name": "With an icon",
+      "html": "<!-- An icon belongs on a badge that names a kind, not a state. States already\n     have the five colours; a kind has nothing else to distinguish it. -->\n<div class=\"flex flex-wrap items-center gap-2\">\n  <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-2.5 pl-2 text-[12px]/4 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300\">\n    <i data-lucide=\"mail\" class=\"size-3 text-zinc-600\"></i>Email\n  </span>\n  <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-2.5 pl-2 text-[12px]/4 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300\">\n    <i data-lucide=\"phone\" class=\"size-3 text-zinc-600\"></i>Phone\n  </span>\n  <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-2.5 pl-2 text-[12px]/4 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300\">\n    <i data-lucide=\"map-pin\" class=\"size-3 text-zinc-600\"></i>Site visit\n  </span>\n  <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-2.5 pl-2 text-[12px]/4 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300\">\n    <i data-lucide=\"paperclip\" class=\"size-3 text-zinc-600\"></i>3 files\n  </span>\n</div>"
+    },
+    {
+      "id": "filter",
+      "name": "Filter chips",
+      "html": "<!-- A badge that does something is a button. Selected is a solid fill, because\n     a marginally darker tint is not a state anyone can see across a toolbar.\n     aria-pressed carries the same fact to a screen reader. -->\n<div class=\"flex flex-wrap items-center gap-2\" x-data=\"{ on: ['overdue'] }\">\n  <template x-for=\"f in [{ id: 'mine', label: 'My orders' }, { id: 'overdue', label: 'Overdue' }, { id: 'unapproved', label: 'Awaiting approval' }, { id: 'month', label: 'This month' }]\" :key=\"f.id\">\n    <button type=\"button\"\n            @click=\"on = on.includes(f.id) ? on.filter(x => x !== f.id) : [...on, f.id]\"\n            :aria-pressed=\"on.includes(f.id)\"\n            class=\"rounded-full px-2.5 py-1 text-[12px]/4 font-medium\"\n            :class=\"on.includes(f.id)\n              ? 'bg-zinc-700 text-white hover:bg-zinc-800'\n              : 'bg-white text-zinc-600 ring-1 ring-inset ring-zinc-200 hover:bg-zinc-100'\">\n      <span x-text=\"f.label\"></span>\n    </button>\n  </template>\n  <button type=\"button\" x-show=\"on.length\" x-cloak @click=\"on = []\"\n          class=\"text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2\">Clear</button>\n</div>"
+    },
+    {
+      "id": "removable",
+      "name": "Removable tag",
+      "html": "<!-- Only for tags the user applied. A status is not removable — it describes\n     the record rather than decorating it, and an x on it promises an edit that\n     is not going to happen. -->\n<div class=\"flex flex-wrap items-center gap-2\" x-data=\"{ tags: ['Sharma Extrusions', 'Open', '₹1,00,000+'] }\">\n  <template x-for=\"tag in tags\" :key=\"tag\">\n    <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium ring-1 ring-inset ring-zinc-300\">\n      <span x-text=\"tag\"></span>\n      <button type=\"button\" @click=\"tags = tags.filter(t => t !== tag)\" :aria-label=\"'Remove ' + tag\"\n              class=\"flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900\">\n        <i data-lucide=\"x\" class=\"size-3\"></i>\n      </button>\n    </span>\n  </template>\n  <button type=\"button\" x-show=\"tags.length\" x-cloak @click=\"tags = []\"\n          class=\"text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2\">Clear all</button>\n  <p x-show=\"!tags.length\" x-cloak class=\"text-[12px]/4 text-zinc-600\">No filters applied.</p>\n</div>"
+    },
+    {
+      "id": "count",
+      "name": "Count badge",
+      "html": "<!-- Counts are numbers: tabular-nums, and capped at 99+ so the pill cannot\n     widen and shove the rest of the toolbar sideways. The count is part of the\n     control's accessible name, not a separate announcement.\n\n     A count is not a state, so it takes no hue — the word next to it already\n     says \"Overdue\". Solid graphite is for the one badge that must be seen from\n     across the toolbar, and solid shapes take no ring. -->\n<div class=\"flex flex-wrap items-center gap-4\">\n  <button type=\"button\" class=\"flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">\n    Pending approval\n    <span class=\"rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tabular-nums ring-1 ring-inset ring-zinc-300\">12</span>\n  </button>\n\n  <button type=\"button\" class=\"flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">\n    Overdue\n    <span class=\"rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300\">3</span>\n  </button>\n\n  <button type=\"button\" aria-label=\"Notifications, 99 or more unread\"\n          class=\"relative flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100\">\n    <i data-lucide=\"bell\" class=\"size-4\"></i>\n    <span class=\"absolute -top-1.5 -right-1.5 rounded-full bg-zinc-700 px-1.5 text-[11px]/4 font-medium tabular-nums text-white\">99+</span>\n  </button>\n</div>"
+    },
+    {
+      "id": "table",
+      "name": "In a table",
+      "html": "<!-- Where a status pill actually lives, and the reason the pill is graphite.\n     Read the status column top to bottom: four identical shapes, and the eye\n     goes straight to the red dot. Tint the pills instead and the column becomes\n     a stripe of colour with nothing standing out of it.\n\n     Supplier and Value drop below sm rather than the table scrolling sideways —\n     nothing scrolls sideways on a phone, and table-fixed with declared widths\n     has a minimum that a phone cannot meet. The full small-screen treatment,\n     where rows become stacked cards, belongs to the table component. -->\n<div class=\"overflow-hidden rounded-xl border border-zinc-200 bg-white\">\n  <table class=\"w-full table-fixed text-left text-[13px]/5\">\n    <thead class=\"border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase\">\n      <tr>\n        <th scope=\"col\" class=\"px-4 py-2 font-medium sm:w-32\">Order</th>\n        <th scope=\"col\" class=\"hidden px-4 py-2 font-medium sm:table-cell\">Supplier</th>\n        <th scope=\"col\" class=\"px-4 py-2 font-medium sm:w-28\">Status</th>\n        <th scope=\"col\" class=\"hidden px-4 py-2 text-right font-medium sm:table-cell sm:w-32\">Value</th>\n      </tr>\n    </thead>\n    <tbody>\n        <tr class=\"border-b border-zinc-100\">\n          <td class=\"px-4 py-2.5 font-medium tabular-nums\">PO-24-1187</td>\n          <td class=\"hidden truncate px-4 py-2.5 sm:table-cell\">Sharma Extrusions</td>\n          <td class=\"px-4 py-2.5\">\n            <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n              <span class=\"size-1.5 rounded-full bg-red-600\" aria-hidden=\"true\"></span>Overdue\n            </span>\n          </td>\n          <td class=\"hidden px-4 py-2.5 text-right tabular-nums sm:table-cell\">₹4,82,000</td>\n        </tr>\n        <tr class=\"border-b border-zinc-100 bg-zinc-100\">\n          <td class=\"px-4 py-2.5 font-medium tabular-nums\">PO-24-1186</td>\n          <td class=\"hidden truncate px-4 py-2.5 sm:table-cell\">Konkan Fabricators</td>\n          <td class=\"px-4 py-2.5\">\n            <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n              <span class=\"size-1.5 rounded-full bg-zinc-500\" aria-hidden=\"true\"></span>Open\n            </span>\n          </td>\n          <td class=\"hidden px-4 py-2.5 text-right tabular-nums sm:table-cell\">₹1,15,400</td>\n        </tr>\n        <tr class=\"border-b border-zinc-100\">\n          <td class=\"px-4 py-2.5 font-medium tabular-nums\">PO-24-1185</td>\n          <td class=\"hidden truncate px-4 py-2.5 sm:table-cell\">Deshpande Traders</td>\n          <td class=\"px-4 py-2.5\">\n            <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n              <span class=\"size-1.5 rounded-full bg-amber-500\" aria-hidden=\"true\"></span>Approved\n            </span>\n          </td>\n          <td class=\"hidden px-4 py-2.5 text-right tabular-nums sm:table-cell\">₹96,750</td>\n        </tr>\n        <tr>\n          <td class=\"px-4 py-2.5 font-medium tabular-nums\">PO-24-1184</td>\n          <td class=\"hidden truncate px-4 py-2.5 sm:table-cell\">Qureshi Metals</td>\n          <td class=\"px-4 py-2.5\">\n            <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n              <span class=\"size-1.5 rounded-full bg-emerald-600\" aria-hidden=\"true\"></span>Closed\n            </span>\n          </td>\n          <td class=\"hidden px-4 py-2.5 text-right tabular-nums sm:table-cell\">₹2,30,000</td>\n        </tr>\n      </tbody>\n  </table>\n</div>"
+    },
+    {
+      "id": "django",
+      "name": "Django status field",
+      "html": "<!-- Because the pill is identical on every state, the template needs one\n     lookup and it returns a single colour. Put it in one place — a filter over\n     the field's raw value — never repeated per template. Repeating it is\n     exactly how one screen ends up amber and another green for the same record.\n\n     # templatetags/ui.py\n     DOT = {\n         'open':     'bg-zinc-400',\n         'approved': 'bg-amber-500',\n         'overdue':  'bg-red-600',\n         'closed':   'bg-emerald-600',\n         'draft':    'bg-zinc-300',\n     }\n\n     @register.filter\n     def status_dot(value):\n         return DOT.get(value, DOT['open'])\n\n     The label comes from get_status_display, so it follows the model's choices\n     and reads identically on every screen. -->\n{% load ui %}\n<span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n  <span class=\"size-1.5 rounded-full {{ order.status|status_dot }}\" aria-hidden=\"true\"></span>\n  {{ order.get_status_display }}\n</span>"
+    }
+  ]
+}

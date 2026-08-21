@@ -1,0 +1,46 @@
+<!-- appearance-none is the whole trade. Leave it off and the browser draws its
+     own arrow, so a chevron of yours sits beside it and the control has two.
+     Take it and the select has no arrow at all, so one is drawn on top —
+     absolutely positioned against the wrapper, with pr-9 on the select so a
+     long vendor name never runs underneath.
+
+     The chevron span carries pointer-events-none. It sits over the right end of
+     the control, which is exactly where people click to open a select, and
+     without it the click lands on the span and nothing happens. The defect
+     reads as "the dropdown only opens sometimes", because clicking the text
+     still works. It goes on the wrapping span rather than the <i>, because
+     createIcons() replaces the <i> with an <svg> and a class on a span is one
+     nobody has to think about again.
+
+     inset-y-0 with flex items-center rather than a top-1/2 translate: it
+     centres at any control height without knowing what that height is.
+
+     The border and the focus outline live on the wrapper as they do for an
+     input, so this and the fields above it are the same object at the same
+     height. outline-none on the select is the carve-out rule 8 allows. -->
+<div class="max-w-sm">
+  <label for="sel-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+
+  <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <!-- the value is the option carrying selected. There is no value attribute
+         on <select>: written there it renders, it validates, and it does
+         nothing, and the field posts whichever option came first. -->
+    <select id="sel-vendor" name="vendor" required aria-describedby="sel-vendor-help"
+            class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+      <option value="gujarat-polymers" selected>Gujarat Polymers Ltd</option>
+      <option value="sharma-extrusions">Sharma Extrusions</option>
+      <option value="nashik-steel">Nashik Steel Traders</option>
+      <option value="deccan-fasteners">Deccan Fasteners Pvt Ltd</option>
+      <option value="konkan-chemicals">Konkan Chemicals Pvt Ltd</option>
+      <option value="baroda-fasteners">Baroda Fasteners</option>
+    </select>
+
+    <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+      <i data-lucide="chevron-down" class="size-4"></i>
+    </span>
+  </div>
+
+  <p id="sel-vendor-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Six vendors hold a live rate contract for this item. Typing g on the focused control jumps to Gujarat.
+  </p>
+</div>

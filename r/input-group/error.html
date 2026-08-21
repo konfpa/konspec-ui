@@ -1,0 +1,39 @@
+<!-- The red edge belongs to the wrapper, because the wrapper is the field. Put
+     border-red-600 on the input and the rule is drawn round the number alone,
+     leaving the unit select outside it in zinc — an error that looks like it
+     belongs to one part of a value rather than to the value.
+
+     The border stays red-600 while the group has focus. The obvious version,
+     focus-within:border-zinc-700 left in place beside it, wipes the error the
+     instant somebody clicks in to fix it, which is the one moment they are
+     looking at it. Only the halo changes, from zinc-700/15 to red-600/15.
+
+     aria-invalid is on the control that is wrong and on nothing else. Here the
+     number is out of range and MT is the right unit, so the select is
+     untouched; mark both and one mistake is reported as two.
+
+     Nothing else inside goes red. The divider stays zinc-200 because it
+     separates two controls and has no opinion about the value, and a red unit
+     would read as the wrong unit the way a red ₹ reads as a negative amount.
+     The red text is the message under the box, and it says the number it is
+     comparing against — "invalid" tells nobody what to type instead. -->
+<div class="max-w-xl">
+  <label for="ig8-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity <span class="text-red-600">*</span></label>
+
+  <div class="flex items-stretch rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+    <input id="ig8-qty" name="qty" inputmode="decimal" value="4,200.000"
+           aria-invalid="true" aria-describedby="ig8-qty-err"
+           class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+    <label for="ig8-uom" class="sr-only">Unit of measure</label>
+    <select id="ig8-uom" name="uom"
+            class="shrink-0 rounded-r-[7px] border-l border-zinc-200 bg-transparent py-2 pr-2 pl-3 text-[14px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+      <option>MT</option>
+      <option>kg</option>
+    </select>
+  </div>
+
+  <p id="ig8-qty-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+    <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
+    <span class="tabular-nums">Over PO-24-1187 by 4,157.500 MT. The order is for 42.500 MT and over-receipt is capped at 2%.</span>
+  </p>
+</div>

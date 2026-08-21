@@ -1,0 +1,49 @@
+<!-- There is no element for a <label for> to point at. A radio group is four
+     inputs and a question, and the question is not attached to any one of them.
+     Wrapping a <label> round the whole block is the tempting fix and it is
+     actively harmful: a label associates with the first labelable element
+     inside it, so clicking what looks like the group heading selects "Accept in
+     full" without a word about it.
+
+     fieldset and legend is the whole answer, and every radio inside keeps its
+     own label because the legend names the question, not the answers.
+
+     The description sits on the fieldset rather than on each input. Repeated on
+     the inputs it is read again on every arrow key, so moving through four
+     options plays the same sentence four times.
+
+     The locked option keeps its place and goes disabled rather than
+     disappearing. A list that changes length is one nobody can scan by
+     position. -->
+<fieldset class="max-w-md" aria-describedby="fc-msg">
+  <legend class="mb-2 text-[13px]/5 font-medium">
+    Receipt outcome <span aria-hidden="true" class="text-red-600">*</span>
+  </legend>
+
+  <div class="space-y-2">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="outcome" value="accept" checked required
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Accept in full — 2,000 kg</span>
+    </label>
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="outcome" value="short" required
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Accept short — record what arrived and keep the balance open</span>
+    </label>
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="outcome" value="hold" required
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Hold for inspection</span>
+    </label>
+    <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+      <input type="radio" name="outcome" value="reject" disabled
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="tabular-nums">Reject — needs a QC result against GRN-24-0912</span>
+    </label>
+  </div>
+
+  <p id="fc-msg" class="mt-2 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+    Posts against PO-24-1187. Short receipts leave the balance open for a second GRN.
+  </p>
+</fieldset>

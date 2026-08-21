@@ -1,0 +1,153 @@
+<!-- The state the pane is in before anybody has picked anything, and the
+     question underneath it is whether to auto-select the first record at all.
+
+     On a queue with consequences the answer is no. Auto-selecting the top batch
+     of an approval run marks it opened, puts a decision in front of somebody who
+     has not chosen to look at it, and on a phone opens a record nobody asked for
+     over the list they were reading. Auto-select is right only where the detail
+     is free, already on the page, and reading it changes nothing — a vendor
+     master, a rate contract. Everywhere else the pane starts empty and the first
+     arrow key or the first click fills it.
+
+     This is a fifth shading of empty-state, and it deliberately does not offer a
+     button. The other four each have one control that answers them; the answer
+     here is the list beside it, which is already on screen, already focusable
+     and already the thing being pointed at. A "Pick a record" button under the
+     sentence would be a control that either does nothing or picks for the user,
+     and both of those are worse than the sentence.
+
+     The shape is empty-state's own — one size-10 graphite well, one glyph, a
+     heading and a max-w-sm line — and the pane keeps the full height a loaded
+     record would take, so nothing moves when one lands.
+
+     The keyboard entry point is the whole reason the hint names a key. With no
+     selection the listbox still needs one Tab stop, so the first option carries
+     tabindex="0" while sel is null and Down from there selects rather than
+     moves. -->
+<main class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: null, detail: false,
+        rows: [
+          { id: 'REQ-26-0311', who: 'Meera Joshi', what: 'Compounding · masterbatch, blue', value: '₹4,10,500', age: 'raised 3 days ago', status: 'Approved' },
+          { id: 'REQ-26-0314', who: 'Nilesh Patil', what: 'Dispatch · stretch film 500 mm', value: '₹68,400', age: 'raised 2 days ago', status: 'Approved' },
+          { id: 'REQ-26-0317', who: 'Akshay Prabhu', what: 'Maintenance · bearing 6208 ZZ', value: '₹22,750', age: 'raised yesterday', status: 'Approved' },
+          { id: 'REQ-26-0319', who: 'Meera Joshi', what: 'Fabrication · MS plate 10 mm', value: '₹1,86,200', age: 'raised yesterday', status: 'Approved' },
+          { id: 'REQ-26-0322', who: 'Nilesh Patil', what: 'Tooling · carbide insert CNMG', value: '₹94,300', age: 'raised today', status: 'Open' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        move(step) {
+          if (this.sel === null) return this.go(0);
+          this.go(Math.min(Math.max(this.sel + step, 0), this.rows.length - 1));
+        },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+          });
+        },
+        open() { if (this.sel !== null) { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) } },
+        back() { this.detail = false; if (this.sel !== null) this.go(this.sel) }
+      }">
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3">
+    <h1 class="text-[16px]/6 font-semibold">Requisitions awaiting your approval</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">5 requisitions · oldest raised 3 days ago</p>
+  </div>
+
+  <div class="flex min-h-0 flex-1">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r lg:w-[22rem]"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="shrink-0 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">The queue</h2>
+      </div>
+
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(rows.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(r, i) in rows" :key="r.id">
+          <li role="option" :aria-selected="sel === i"
+              :tabindex="sel === i || (sel === null && i === 0) ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[r.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="r.id"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="r.value"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="r.status"></span> · <span x-text="r.who"></span> · <span x-text="r.age"></span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+             @keydown.escape="back()"
+             class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+             :class="{ 'hidden': !detail, 'flex': detail }">
+
+      <!-- Nothing selected. Same box a loaded record would fill, so the pane does
+           not change height when one arrives. Below md there is no empty pane to
+           show at all — the list is the screen, so "nothing selected" is the list
+           itself and the detail only exists once a record has been opened. -->
+      <div x-show="sel === null" class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="file-text" class="size-5 text-zinc-600"></i>
+        </span>
+        <h2 :id="$id('rec')" class="mt-3 text-[16px]/6 font-semibold">No requisition open</h2>
+        <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+          Pick one from the queue and it opens here. Nothing is selected on purpose — approving is a decision, so the first requisition is not put in front of you before you have asked for it.
+        </p>
+        <p class="mt-3 text-[12px]/4 text-zinc-500">
+          Tab to the queue, then <kbd class="rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4">↓</kbd> to walk it.
+        </p>
+      </div>
+
+      <div x-show="sel !== null" x-cloak class="flex min-h-0 flex-1 flex-col">
+        <div class="shrink-0 border-b border-zinc-200 px-5 py-4">
+          <button type="button" @click="back()"
+                  class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+            <i data-lucide="chevron-left" class="size-4"></i>Back to the queue
+          </button>
+          <h2 :id="$id('rec')" class="text-[16px]/6 font-semibold tabular-nums" x-text="sel === null ? '' : rows[sel].id"></h2>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600" x-text="sel === null ? '' : rows[sel].what + ' · ' + rows[sel].who"></p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check" class="size-4"></i>Approve
+            </button>
+            <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Send back
+            </button>
+          </div>
+        </div>
+        <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          <dl class="grid grid-cols-2 gap-x-4 gap-y-3">
+            <div>
+              <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Estimated value</dt>
+              <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="sel === null ? '' : rows[sel].value"></dd>
+            </div>
+            <div>
+              <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Raised</dt>
+              <dd class="mt-1 text-[13px]/5 font-semibold" x-text="sel === null ? '' : rows[sel].age"></dd>
+            </div>
+          </dl>
+          <p class="mt-4 text-[13px]/5 text-zinc-600">Budget line has ₹12,40,000 uncommitted for the quarter. No rate contract covers this material, so a comparative quote is needed before the order is raised.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>

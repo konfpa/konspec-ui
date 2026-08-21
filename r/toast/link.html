@@ -1,0 +1,63 @@
+<!-- The record was created somewhere the user is not. The toast says so and
+     offers the way there, as a real anchor: middle-click, ctrl-click and open
+     in new tab all have to work, which is the whole reason it is not a button
+     with a location.href handler on it.
+
+     The link is a shortcut, never the only route. The GRN is in the register
+     the moment it exists, so a toast that expires unread costs nothing — which
+     is exactly the test for whether a message may be a toast at all.
+
+     Ten seconds rather than five, because the user has to read the number,
+     decide, and travel to a target that is not under the pointer. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, ms: 10000, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }">
+
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'GRN 4417 created', meta: 'Against PO-24-1187 · Nashik Steel Traders', href: '/grn/4417/', cta: 'Open GRN 4417' })"
+          class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Create GRN
+  </button>
+
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           @mouseenter="pause(t)" @mouseleave="start(t)"
+           @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600" x-text="t.meta"></p>
+          <a :href="t.href" x-text="t.cta"
+             class="mt-1.5 inline-block rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></a>
+        </div>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>

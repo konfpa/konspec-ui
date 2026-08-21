@@ -1,0 +1,77 @@
+<!-- Three things that all look like "a field you cannot type in" and are not
+     the same thing.
+
+     Read-only is still a field. readonly keeps it in the tab order, keeps the
+     value selectable, and still posts it. disabled does none of those, so a
+     disabled order number drops out of the POST and a server that reads absence
+     as a change clears it. The locked surface — bg-zinc-100, no focus outline —
+     is what says you cannot type here; the zinc-900 text is what says the value
+     still matters.
+
+     A derived number is not a control at all. Drawing it as a disabled input
+     promises an edit that will never be allowed; it is <output>, which is one
+     of the labelable elements, so <label for> still binds to it and the value
+     keeps a real name.
+
+     <output> is a live region by default. That is right for a total that
+     changes on a discrete action and wrong for one that recomputes on every
+     keystroke, which is why this one carries aria-live="off" and is read on
+     focus like any other described value. -->
+<div class="max-w-sm space-y-5"
+     x-data="{ qty: 2000, rate: 118.40,
+               get total() { return this.qty * this.rate } }">
+
+  <div>
+    <label for="fr-no" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+      <input id="fr-no" name="number" readonly value="PO-24-1187" aria-describedby="fr-no-msg"
+             class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="fr-no-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+      Allotted when the draft was created on 16 Aug 2026. It stays with the order.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label for="fr-qty" class="mb-1.5 block text-[13px]/5 font-medium">Quantity</label>
+      <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="fr-qty" name="qty" inputmode="numeric" x-model.number="qty" aria-describedby="fr-qty-unit"
+               class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+        <span id="fr-qty-unit" class="pr-3 text-[14px]/5 text-zinc-600">kg</span>
+      </div>
+    </div>
+    <div>
+      <label for="fr-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per kg</label>
+      <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+        <input id="fr-rate" name="rate" inputmode="decimal" x-model.number="rate"
+               class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t border-zinc-200 pt-3">
+    <div class="flex items-baseline justify-between gap-3">
+      <label for="fr-total" class="text-[13px]/5 font-medium">Line value</label>
+      <output id="fr-total" for="fr-qty fr-rate" aria-live="off" aria-describedby="fr-total-msg"
+              class="text-[14px]/5 font-semibold tabular-nums"
+              x-text="'₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })">₹2,36,800.00</output>
+    </div>
+    <p id="fr-total-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+      Quantity times rate. Nothing is posted for it — the server multiplies the same two numbers again.
+    </p>
+  </div>
+
+  <div>
+    <label for="fr-contract" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Rate contract</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+      <input id="fr-contract" disabled value="Not applicable — spot purchase" aria-describedby="fr-contract-msg"
+             class="w-full bg-transparent px-3 py-2 text-[14px]/5 text-zinc-400">
+    </div>
+    <p id="fr-contract-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+      Disabled, so it is out of the tab order and out of the POST. Read-only would have submitted this text as the contract.
+    </p>
+  </div>
+
+</div>

@@ -1,0 +1,56 @@
+<!-- Four pages, so both ends are one click away and the rule is visible rather
+     than described. First and Previous go dead together on page one; Next and
+     Last go dead together on page four.
+
+     They disable rather than disappear. Take Previous out of the DOM on page one
+     and everything to its right slides left by 36px plus a gap, so the button
+     under the pointer on the second click is not the one that was there on the
+     first — the user pages twice and lands somewhere they did not ask for.
+
+     enabled:hover: rather than hover:. A plain hover: on a disabled button still
+     paints zinc-100 under the cursor, which is the one signal that says a
+     control can be pressed, offered by a control that cannot.
+
+     Focus is the half of this that gets missed. A browser blurs a disabled
+     element to the body, so pressing Previous into page one drops the keyboard
+     user at the top of the document with the register somewhere below them. Each
+     handler checks whether the control it lives on has just gone dead and hands
+     focus to its opposite number — Previous to Next, Last to Previous. Nothing
+     moves for a mouse; everything is preserved for a keyboard.
+
+     First and Last earn their place on a register deep enough that Last is a
+     real question — "what is the oldest thing in here". On a five-page list they
+     are two more controls saying what Previous and Next already said. -->
+<nav aria-label="Receipt register pages"
+     x-data="{
+       page: 2, pages: 4,
+       first() { this.page = 1; this.$refs.next.focus() },
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() },
+       last() { this.page = this.pages; this.$refs.prev.focus() }
+     }"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+
+  <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+     x-text="((page - 1) * 25 + 1) + '–' + Math.min(page * 25, 94) + ' of 94 receipts'">26–50 of 94 receipts</p>
+
+  <div class="flex items-center gap-1">
+    <button type="button" aria-label="First page" @click="first()" :disabled="page === 1"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevrons-left" class="size-4"></i>
+    </button>
+    <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+    <span class="px-2 text-[13px]/5 tabular-nums text-zinc-600" x-text="'Page ' + page + ' of ' + pages">Page 2 of 4</span>
+    <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+    <button type="button" aria-label="Last page" @click="last()" :disabled="page === pages"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevrons-right" class="size-4"></i>
+    </button>
+  </div>
+</nav>

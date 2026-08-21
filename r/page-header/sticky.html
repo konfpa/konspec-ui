@@ -1,0 +1,76 @@
+<!-- The expensive form, and the one to reach for only on a record long enough
+     that the actions are out of sight at the foot of it. Everything else repeats
+     the actions at the bottom of the form instead, which costs nothing.
+
+     Three rules hold it together. The bottom border is drawn as
+     border-transparent from the first frame and only its colour changes — add
+     the border on scroll and every row below moves down a pixel and the page
+     twitches under the cursor. The band carries an opaque bg-white, because a
+     transparent sticky element slides legible text under legible text. And the
+     h1 is the same element in both states, changing only its size class: swap
+     it for a smaller sibling and the accessibility tree loses and regains the
+     page title on every scroll.
+
+     The listener is on the element that actually scrolls. Here that is the
+     preview wrapper; inside app-shell it is <main>, because the shell is a
+     fixed-height flex frame where the document never scrolls at all and a
+     listener on window never fires. It condenses once at a fixed threshold, and
+     since the condensed band is shorter than that threshold, shrinking it can
+     never pull the scroll position back under and start it oscillating.
+
+     To ship it: keep the <header> as written, drop the wrapper's height,
+     overflow, rounding and border, and move @scroll onto whichever element
+     scrolls on that page. -->
+<div class="h-[420px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100"
+     x-data="{ shrunk: false }"
+     @scroll.self="shrunk = $event.target.scrollTop > 56">
+  <header class="sticky top-0 z-20 border-b border-transparent bg-white transition-colors"
+          :class="shrunk && 'border-zinc-200'">
+    <div class="mx-auto max-w-[1600px] px-4 transition-all duration-150 lg:px-6"
+         :class="shrunk ? 'py-2' : 'py-4'">
+      <nav aria-label="Breadcrumb" x-show="!shrunk">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">REQ-26-0771</span></li>
+        </ol>
+      </nav>
+
+      <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2" :class="!shrunk && 'mt-2'">
+        <div class="min-w-0 grow basis-72">
+          <div class="flex min-w-0 items-center gap-x-3">
+            <h1 class="min-w-0 truncate font-semibold tracking-tight tabular-nums transition-all duration-150"
+                :class="shrunk ? 'text-[16px]/6' : 'text-[24px]/7'">REQ-26-0771</h1>
+            <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Awaiting level 2
+            </span>
+          </div>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600" x-show="!shrunk">Raised 16 Aug 2026 by Nilesh Patil · Silvassa maintenance · 24 lines · ₹6,84,200</p>
+        </div>
+
+        <div class="flex shrink-0 flex-wrap items-center gap-2">
+          <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="corner-up-left" class="size-4"></i>Send back
+          </button>
+          <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="check" class="size-4"></i>Approve
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1600px] space-y-2 px-4 py-4 lg:px-6">
+    <p class="text-[13px]/5 text-zinc-500">Scroll this panel — the band condenses once, past 56 pixels.</p>
+    <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px]/5 tabular-nums">Line 1 · Bearing 6205-2RS · 40 nos · ₹18,400</div>
+    <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px]/5 tabular-nums">Line 2 · V-belt B-88 · 24 nos · ₹9,120</div>
+    <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px]/5 tabular-nums">Line 3 · Hydraulic hose 1/2 in · 60 m · ₹42,600</div>
+    <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px]/5 tabular-nums">Line 4 · Gearbox oil EP-320 · 8 drums · ₹1,04,000</div>
+    <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px]/5 tabular-nums">Line 5 · Proximity switch M18 · 16 nos · ₹27,840</div>
+    <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px]/5 tabular-nums">Line 6 · SS 304 sheet 2 mm · 1,200 kg · ₹2,88,000</div>
+    <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px]/5 tabular-nums">Line 7 · Welding electrode 3.15 mm · 90 kg · ₹16,650</div>
+    <div class="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px]/5 tabular-nums">Line 8 · Safety harness · 12 nos · ₹38,400</div>
+  </div>
+</div>

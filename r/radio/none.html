@@ -1,0 +1,38 @@
+<!-- A radio cannot be unticked. Clicking "Gujarat Polymers Ltd" a second time
+     leaves it chosen, and a Clear button that unchecks it in script leaves the
+     group posting no key at all — which the server cannot tell apart from a
+     filter that was never on the page.
+
+     So the way out is an option. "Any vendor" carries a value like every other
+     option, is the checked default, and is the only thing that makes this group
+     clearable at all. -->
+<fieldset class="max-w-xs">
+  <legend class="mb-2 text-[13px]/5 font-medium">Vendor</legend>
+
+  <div class="space-y-2">
+    <label class="flex items-center gap-2.5 text-[13px]/5">
+      <input type="radio" name="vendor" value="" checked class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">Any vendor</span>
+      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">1,438</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[13px]/5">
+      <input type="radio" name="vendor" value="gujarat-polymers" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">Gujarat Polymers Ltd</span>
+      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">128</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[13px]/5">
+      <input type="radio" name="vendor" value="sharma-extrusions" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">Sharma Extrusions</span>
+      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">96</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[13px]/5">
+      <input type="radio" name="vendor" value="silvassa-packaging" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">Silvassa Packaging and Allied Products</span>
+      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">41</span>
+    </label>
+  </div>
+
+  <!-- The empty value is deliberate: it posts vendor= rather than nothing, so
+       the view can tell "cleared the filter" from "never sent one". -->
+  <p class="mt-2 text-[12px]/4 text-zinc-500">One vendor at a time. To compare two, use the checkbox filter list.</p>
+</fieldset>

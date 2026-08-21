@@ -1,0 +1,49 @@
+<!-- The half of the component that is not a button, in the five states a real
+     register puts it through. It is the only thing on the strip that says how
+     much is left, so every one of these is worth getting right.
+
+     "21–40 of 1,438 orders" and not "Showing 21–40 of 1,438". The verb adds a
+     word to a line that is read a hundred times a day and says nothing the
+     numbers had not already said; the noun is what earns its place, because
+     "of 1,438" alone leaves the reader to remember what is being counted.
+
+     An en dash between the two ends, not a hyphen. A hyphen joins, a dash spans,
+     and in tabular figures the hyphen sits low and short enough to read as a
+     minus in a ledger.
+
+     Filtering keeps both numbers. "148 orders · filtered from 1,438" is what
+     stops somebody concluding the register has lost fourteen hundred records,
+     and it is the line that makes a search box safe to leave switched on.
+
+     A count that is genuinely expensive gets an honest "about". A register that
+     renders "of 0" while the count is still in flight, and fills it in a second
+     later, is a bug report from whoever saw it first.
+
+     One page of results does not get a range at all. "1–14 of 14 orders" is
+     three numbers to say fourteen. -->
+<div class="max-w-xl space-y-2">
+  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">21–40 of 1,438 orders</p>
+    <p class="mt-1 text-[12px]/4 text-zinc-500">The ordinary case. Where you are, how much there is, and what is being counted.</p>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">21–40 of 148 orders <span class="text-zinc-500">· filtered from 1,438</span></p>
+    <p class="mt-1 text-[12px]/4 text-zinc-500">A filter is on. Both totals stay, or the register looks like it has lost 1,290 records.</p>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">All 14 orders</p>
+    <p class="mt-1 text-[12px]/4 text-zinc-500">One page. A range of 1–14 of 14 is three numbers to say fourteen.</p>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">21–40 of about 1,400 orders</p>
+    <p class="mt-1 text-[12px]/4 text-zinc-500">The count is a slow scan over a partitioned ledger. Say "about" rather than block the page on an exact figure nobody is reading.</p>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+    <p class="text-[13px]/5 text-zinc-600">No orders match this filter</p>
+    <p class="mt-1 text-[12px]/4 text-zinc-500">Zero is a sentence, not "0–0 of 0". The rows above it are an empty-state, and the pager keeps its ends disabled rather than vanishing.</p>
+  </div>
+</div>

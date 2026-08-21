@@ -1,0 +1,52 @@
+<!-- This field crosses records and takes you to one. The box above the register
+     narrows the rows already on screen and never leaves the page. They are two
+     different things and the placeholder is what tells them apart: this one
+     names what it crosses, the register's one names what it filters —
+     "Filter 1,438 orders". Give both the word Search and somebody types a PO
+     number into the wrong one and reports the order missing.
+
+     It is a real <form role="search"> with a real label, so Enter submits and
+     the field works with the script off. The border lives on the wrapper and
+     the input carries outline-none, so the icon and the ⌘K hint sit inside one
+     focus outline instead of beside it. outline-none is only safe because this
+     element has no focus outline of its own to silence — put it on the same
+     element as a focus-visible:outline-* and Tailwind resolves outline-style
+     through a variable and kills the outline while leaving its width set.
+
+     Below lg it becomes a button, not a narrower field. An input under about
+     200px shows four characters of a placeholder and none of what was typed,
+     and what is typed here is a document number copied off a printout.
+
+     Show hits under the field and this stops being an input: it is a combobox,
+     with an owned listbox, aria-activedescendant and rows that cannot be tab
+     stops. That is a different component. If the command palette is also on
+     this page, only one of the two may bind ⌘K — bind it twice and the winner
+     depends on script order. -->
+<header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+        x-data="{ q: '' }"
+        @keydown.window.meta.k.prevent="$refs.q.focus()" @keydown.window.ctrl.k.prevent="$refs.q.focus()">
+
+  <p class="min-w-0 shrink truncate text-[13px]/5 font-medium">Purchase orders</p>
+
+  <button type="button" aria-label="Search the application"
+          class="ml-auto flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+    <i data-lucide="search" class="size-[18px]"></i>
+  </button>
+
+  <form role="search" action="#" class="ml-auto hidden lg:block">
+    <label for="tb-search" class="sr-only">Search orders, vendors and materials</label>
+    <div class="flex w-80 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-2.5 size-4 shrink-0 text-zinc-500"></i>
+      <input id="tb-search" x-ref="q" x-model="q" name="q" type="search" autocomplete="off"
+             placeholder="Search orders, vendors, materials"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500">
+      <button type="button" x-show="q" x-cloak @click="q = ''; $refs.q.focus()" aria-label="Clear search"
+              class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="x" class="size-3.5"></i>
+      </button>
+      <kbd x-show="!q" aria-hidden="true" class="mr-2 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-600">⌘K</kbd>
+    </div>
+  </form>
+
+  <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RM</span>
+</header>

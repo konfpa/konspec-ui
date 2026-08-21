@@ -1,0 +1,136 @@
+<!-- A filter select applies on change. There is no Apply button, for the same
+     reason a settings switch has no Save: put one there and half the users
+     press it and half do not, and the two groups get different lists out of the
+     same gesture.
+
+     The empty option here is a real choice, not a placeholder. "All statuses"
+     is selectable and carries no disabled, because clearing a filter is a thing
+     people do; a form field's placeholder is the opposite. Confuse the two and
+     you get either a filter that cannot be cleared or a form that submits its
+     own prompt.
+
+     Dense is 34px — py-1.5 on 13px/5 text, chevron at right-2.5 and pr-8. It is
+     the only second size, and it exists because a filter row sits above a table
+     of 13px cells where a 38px control is taller than everything around it.
+
+     The count is the confirmation, so it is a role="status" in the document
+     from first paint — a live region rendered inside an x-show block, with its
+     text already in it, announces nothing on the change that mattered. It is
+     visible text rather than sr-only because a filter bar owes the number to
+     everybody.
+
+     At 390px the three selects are a two-column grid, not a row that scrolls.
+     min-w-0 on each, or a long vendor name pushes the grid past the viewport. -->
+<div x-data="{
+       status: '', vendor: '', plant: '',
+       orders: [
+         { no: 'PO-24-1187', vendor: 'gujarat-polymers', vname: 'Gujarat Polymers Ltd', plant: 'silvassa', status: 'overdue', amount: '₹18,42,000', due: '02 Aug 2026' },
+         { no: 'PO-24-1192', vendor: 'sharma-extrusions', vname: 'Sharma Extrusions', plant: 'silvassa', status: 'open', amount: '₹4,68,500', due: '28 Aug 2026' },
+         { no: 'PO-24-1203', vendor: 'gujarat-polymers', vname: 'Gujarat Polymers Ltd', plant: 'nashik', status: 'approved', amount: '₹96,750', due: '31 Aug 2026' },
+         { no: 'PO-24-1211', vendor: 'nashik-steel', vname: 'Nashik Steel Traders', plant: 'nashik', status: 'open', amount: '₹2,14,300', due: '04 Sep 2026' },
+         { no: 'PO-24-1218', vendor: 'konkan-chemicals', vname: 'Konkan Chemicals Pvt Ltd', plant: 'vadodara', status: 'closed', amount: '₹1,32,900', due: '19 Aug 2026' },
+         { no: 'PO-24-1224', vendor: 'sharma-extrusions', vname: 'Sharma Extrusions', plant: 'vadodara', status: 'overdue', amount: '₹7,80,000', due: '11 Aug 2026' },
+         { no: 'PO-24-1231', vendor: 'nashik-steel', vname: 'Nashik Steel Traders', plant: 'silvassa', status: 'approved', amount: '₹55,400', due: '06 Sep 2026' },
+         { no: 'PO-24-1240', vendor: 'konkan-chemicals', vname: 'Konkan Chemicals Pvt Ltd', plant: 'nashik', status: 'open', amount: '₹12,05,600', due: '14 Sep 2026' }
+       ],
+       get rows() {
+         return this.orders.filter(o =>
+           (!this.status || o.status === this.status) &&
+           (!this.vendor || o.vendor === this.vendor) &&
+           (!this.plant || o.plant === this.plant));
+       },
+       get applied() { return [this.status, this.vendor, this.plant].filter(Boolean).length; },
+       clear() { this.status = ''; this.vendor = ''; this.plant = ''; },
+       dot(s) { return { overdue: 'bg-red-600', approved: 'bg-amber-500', closed: 'bg-emerald-600', open: 'bg-zinc-500' }[s]; },
+       name(s) { return { overdue: 'Overdue', approved: 'Approved', closed: 'Closed', open: 'Open' }[s]; }
+     }">
+
+  <div class="rounded-xl border border-zinc-200 bg-white px-3 py-3">
+    <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+
+      <div class="min-w-0">
+        <label for="sf-status" class="sr-only">Status</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="sf-status" x-model="status"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+            <option value="">All statuses</option>
+            <option value="open">Open</option>
+            <option value="approved">Approved</option>
+            <option value="overdue">Overdue</option>
+            <option value="closed">Closed</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-3.5"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="min-w-0">
+        <label for="sf-vendor" class="sr-only">Vendor</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="sf-vendor" x-model="vendor"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+            <option value="">All vendors</option>
+            <option value="gujarat-polymers">Gujarat Polymers Ltd</option>
+            <option value="sharma-extrusions">Sharma Extrusions</option>
+            <option value="nashik-steel">Nashik Steel Traders</option>
+            <option value="konkan-chemicals">Konkan Chemicals Pvt Ltd</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-3.5"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="col-span-2 min-w-0 sm:col-span-1">
+        <label for="sf-plant" class="sr-only">Plant</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="sf-plant" x-model="plant"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+            <option value="">All plants</option>
+            <option value="silvassa">Silvassa</option>
+            <option value="nashik">Nashik</option>
+            <option value="vadodara">Vadodara</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-3.5"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-zinc-100 pt-2.5">
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-600"
+         x-text="rows.length === orders.length
+                   ? orders.length + ' purchase orders'
+                   : rows.length + ' of ' + orders.length + ' purchase orders'"></p>
+      <button type="button" x-show="applied" x-cloak @click="clear()"
+              class="text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2">
+        Clear <span x-text="applied"></span> filters
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+    <template x-for="o in rows" :key="o.no">
+      <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2.5">
+        <div class="min-w-0">
+          <p class="text-[13px]/5 font-medium tabular-nums" x-text="o.no"></p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500" x-text="o.vname"></p>
+        </div>
+        <div class="flex shrink-0 items-center gap-2.5">
+          <span class="text-[13px]/5 tabular-nums" x-text="o.amount"></span>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full" :class="dot(o.status)"></span>
+            <span x-text="name(o.status)"></span>
+          </span>
+        </div>
+      </div>
+    </template>
+
+    <div x-show="!rows.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No purchase order matches these filters</p>
+      <p class="mt-1 tabular-nums text-[12px]/4 text-zinc-500">Clear one of the three and eight orders come back.</p>
+    </div>
+  </div>
+</div>

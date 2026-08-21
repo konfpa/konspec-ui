@@ -1,0 +1,77 @@
+<!-- Two triggers, one at each end of the row. The right-hand one would hang
+     off the screen if the panel simply opened left-aligned, and near the foot
+     of a long register both of them would open below the fold.
+
+     place() runs inside $nextTick, after x-show has restored display, which is
+     the first moment the panel can be measured and still before the browser
+     paints — so the flip costs no visible jump. It shifts the panel rather
+     than changing its width: a card that is a different shape depending on
+     where it opened cannot be read at speed.
+
+     The shift is written as left, not as a translate, and that is not a
+     preference. x-transition caches the element's transform when it starts and
+     restores it when it finishes, so a bound :style transform on the same
+     element is overwritten the moment the fade ends — and because dx has not
+     changed since Alpine last read it, the binding never re-runs to correct it.
+     Measured at 390px: the clamp computed dx -195 and the card sat correctly on
+     screen for one frame, then settled at translateX(0) and hung 183px past the
+     right edge for as long as it stayed open. left is not a transform, so the
+     transition does not touch it and the fade and the clamp can coexist. The
+     other way out is to keep the transform on this element and move x-show and
+     x-transition to a child, which costs a wrapper. -->
+<div class="flex items-center justify-between gap-4"
+     x-data="{ orders: [
+       { id: 'PO-24-1187', vendor: 'Gujarat Polymers Ltd', value: '₹18,42,000', due: '28 Aug 2026' },
+       { id: 'PO-24-1191', vendor: 'Nashik Steel Traders',  value: '₹6,04,750',  due: '02 Aug 2026' }
+     ] }">
+  <template x-for="po in orders" :key="po.id">
+    <span class="relative inline-block"
+          x-data="{
+            open: false, timer: 0, up: false, dx: 0,
+            place() {
+              const r = this.$root.getBoundingClientRect(), p = this.$refs.panel, m = 12;
+              this.up = r.bottom + p.offsetHeight > innerHeight - m && r.top - p.offsetHeight > m;
+              this.dx = Math.round(Math.max(m, Math.min(r.left, innerWidth - m - p.offsetWidth)) - r.left);
+            },
+            show(d = 350) {
+              clearTimeout(this.timer);
+              this.timer = setTimeout(() => {
+                this.open = true;
+                this.$nextTick(() => this.place());
+                window.dispatchEvent(new CustomEvent('hovercard-open', { detail: this.$root }));
+              }, d);
+            },
+            hide() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = false, 200); },
+            shut() { clearTimeout(this.timer); this.open = false; }
+          }"
+          @mouseenter="show()" @mouseleave="hide()"
+          @focusin="show(0)" @focusout="hide()"
+          @keydown.escape.window="shut()"
+          @hovercard-open.window="if ($event.detail !== $root) shut()"
+          @resize.window.debounce="open && place()">
+
+      <a :href="'/orders/' + po.id + '/'" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums" x-text="po.id"></a>
+
+      <div x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.150ms
+           :class="up ? 'bottom-full pb-2' : 'top-full pt-2'"
+           :style="'left: ' + dx + 'px'"
+           class="absolute left-0 z-40">
+        <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+          <p class="truncate text-[14px]/5 font-semibold tabular-nums" x-text="po.id"></p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600" x-text="po.vendor"></p>
+          <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-[12px]/4 text-zinc-600">Value</dt>
+              <dd class="text-[12px]/4 font-medium tabular-nums" x-text="po.value"></dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-[12px]/4 text-zinc-600">Delivery</dt>
+              <dd class="text-[12px]/4 tabular-nums" x-text="po.due"></dd>
+            </div>
+          </dl>
+          <p class="mt-3 border-t border-zinc-100 pt-3 text-[12px]/4 text-zinc-500">Opens above the trigger near the foot of the page, and shifts left rather than off the edge.</p>
+        </div>
+      </div>
+    </span>
+  </template>
+</div>

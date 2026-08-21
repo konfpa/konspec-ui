@@ -1,0 +1,58 @@
+<!-- One x-data, on the nearest element that contains both. A trigger with its
+     own x-data and a panel with another are two copies of open that never see
+     each other — the button toggles a variable nothing is watching, and the
+     panel never moves.
+
+     No chevron here. The label already flips between Show and Hide, and a
+     rotating arrow beside it is the same fact twice.
+
+     With the trigger away from the panel, aria-controls is the only thing tying
+     them together and it is doing real work. Keep the panel after the trigger
+     in document order so Tab reaches it next. -->
+<div x-data="{ open: false }" class="space-y-4">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="min-w-0">
+      <h2 class="text-[20px]/7 font-semibold tracking-tight">GRN-3391</h2>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Gujarat Polymers Ltd · posted 11/08/2026</p>
+    </div>
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-lines"
+            class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">
+      <i data-lucide="list" class="size-4 shrink-0 text-zinc-600"></i>
+      <span x-text="open ? 'Hide line detail' : 'Show line detail'">Show line detail</span>
+    </button>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <dl class="grid grid-cols-2 gap-x-6 gap-y-3 px-4 py-3 sm:grid-cols-4">
+      <div><dt class="text-[12px]/4 text-zinc-600">Lines</dt><dd class="text-[14px]/5 tabular-nums">4</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Received</dt><dd class="text-[14px]/5 tabular-nums">8,400 kg</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Short</dt><dd class="text-[14px]/5 tabular-nums">200 kg</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Value</dt><dd class="text-[14px]/5 tabular-nums">₹6,18,400</dd></div>
+    </dl>
+
+    <div id="col-lines" x-show="open" x-cloak x-collapse.duration.200ms>
+      <ul class="divide-y divide-zinc-100 border-t border-zinc-100">
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">HDPE granules — grade M60075</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">8,400 kg</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹5,04,000</span>
+        </li>
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">Masterbatch — white 20%</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">300 kg</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹72,000</span>
+        </li>
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">Antioxidant additive</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">40 kg</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹28,400</span>
+        </li>
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">Packing — HDPE liner bags</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">168 nos</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹14,000</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

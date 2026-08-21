@@ -1,0 +1,52 @@
+<!-- Some tiles answer "what state is it in" rather than "how many". The value is
+     a word, and the shape of the tile does not change: label above, value at the
+     display slot, the qualifying line below.
+
+     The word is set at text-[20px]/7 rather than 24px, because a status is read
+     and a number is scanned, and it is zinc-900 like every other value. The
+     colour is in the dot, from the locked mapping — red-600 for the alarm state,
+     amber-500 for waiting on somebody, emerald-600 for finished. That is the
+     badge rule at tile scale.
+
+     It is a dot and not a pill. A status pill blown up to the display step is a
+     lozenge with four words of padding round two words of data, and a row of them
+     reads as a traffic light rather than as three tiles. The dot does the same
+     job at 8px and leaves the word legible.
+
+     Every dot is aria-hidden. The word is the data — remove the colour entirely
+     and "Held", "Awaiting release" and "Filed" still say everything. -->
+<div class="grid gap-3 sm:grid-cols-3">
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Compounding line 3</dt>
+      <dd class="mt-1.5 flex items-center gap-2">
+        <span class="size-2 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+        <span class="text-[20px]/7 font-semibold tracking-tight">Held</span>
+      </dd>
+    </dl>
+    <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Since 09:40 · batch B-24-0912</p>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Batch B-24-0918</dt>
+      <dd class="mt-1.5 flex items-center gap-2">
+        <span class="size-2 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+        <span class="text-[20px]/7 font-semibold tracking-tight">Awaiting release</span>
+      </dd>
+    </dl>
+    <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Melt flow logged 08:15 · with QC 1 h 12 m</p>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">GSTR-1 · July</dt>
+      <dd class="mt-1.5 flex items-center gap-2">
+        <span class="size-2 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+        <span class="text-[20px]/7 font-semibold tracking-tight">Filed</span>
+      </dd>
+    </dl>
+    <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">11 Aug · ARN AA2708240094317</p>
+  </div>
+</div>

@@ -1,0 +1,82 @@
+<!-- Nothing here is a form control. A signed sheet built out of disabled
+     inputs looks right and posts nothing, so any other action on the page
+     re-saves the record with every answer cleared — and there is no readonly on
+     a radio or a checkbox to reach for instead. Rendered as text it also
+     prints, which is the form this sheet is actually filed in, and it is the
+     reason a questionnaire never hides answered questions behind a wizard: the
+     countersigner has to read all of them at once.
+
+     Two signatures, and the second is what the GRN is waiting on. Both are the
+     same graphite pill — only the 6px dot separates signed from waiting,
+     because a column of tinted pills stops meaning anything and the dot is
+     readable at a glance.
+
+     The attestation is kept verbatim rather than reduced to a boolean. What was
+     certified, by whom and when is the record; "attested = true" is not.
+     Reopening is a named action that gets logged against the GRN, never an edit
+     in place. -->
+<div class="max-w-2xl overflow-hidden rounded-xl border border-zinc-200 bg-white">
+  <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-zinc-200 px-5 py-4">
+    <div class="min-w-0">
+      <h2 class="text-[16px]/6 font-semibold">Incoming inspection — GRN-24-0912</h2>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">HDPE granules, natural · lot 24-HD-118 · 18 parameters · 1 failed</p>
+    </div>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Signed
+    </span>
+  </div>
+
+  <dl class="divide-y divide-zinc-100 px-5">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+      <dt class="min-w-0 flex-1 text-[13px]/5 text-zinc-600">Bag markings legible on every bag</dt>
+      <dd class="shrink-0 text-[13px]/5 font-medium">Pass</dd>
+    </div>
+    <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+      <dt class="min-w-0 flex-1 text-[13px]/5 text-zinc-600">Bags sealed, no tears or damp patches</dt>
+      <dd class="shrink-0 text-[13px]/5 font-medium">Pass</dd>
+    </div>
+    <div class="py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+        <dt class="min-w-0 flex-1 text-[13px]/5 text-zinc-600">Test certificate lot number matches the bags</dt>
+        <dd class="shrink-0 text-[13px]/5 font-medium">Fail</dd>
+      </div>
+      <dd class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 tabular-nums text-red-600">
+        <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>NC-24-0117 raised — certificate is for lot 24-HD-116.
+      </dd>
+    </div>
+    <div class="py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+        <dt class="min-w-0 flex-1 text-[13px]/5 tabular-nums text-zinc-600">Melt flow index, spec 0.28 – 0.42 g/10 min</dt>
+        <dd class="shrink-0 text-[13px]/5 font-medium tabular-nums">0.46 g/10 min</dd>
+      </div>
+      <dd class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 text-amber-700">
+        <i data-lucide="alert-triangle" class="mt-px size-3.5 shrink-0"></i>Accepted on deviation.
+      </dd>
+    </div>
+    <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+      <dt class="min-w-0 flex-1 text-[13px]/5 text-zinc-600">Retention sample drawn and labelled</dt>
+      <dd class="shrink-0 text-[13px]/5 text-zinc-500">N/A</dd>
+    </div>
+  </dl>
+
+  <div class="grid gap-6 border-t border-zinc-200 px-5 py-4 sm:grid-cols-2">
+    <div>
+      <p class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Inspected by</p>
+      <p class="mt-2 text-[14px]/5 font-medium">Ritu Deshpande</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">QC, Silvassa · 16 Aug 2026, 11:42</p>
+      <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-600">
+        &ldquo;I inspected the material listed above on 16 Aug 2026 and the results are as recorded.&rdquo;
+      </p>
+    </div>
+
+    <div>
+      <p class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Countersigned by</p>
+      <p class="mt-2 text-[14px]/5 text-zinc-500">Sandeep Kulkarni</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">Plant head</p>
+      <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>Waiting
+      </span>
+      <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-600">GRN-24-0912 cannot be posted to stores until this is signed.</p>
+    </div>
+  </div>
+</div>

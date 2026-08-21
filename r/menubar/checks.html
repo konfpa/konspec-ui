@@ -1,0 +1,188 @@
+<!-- One View menu carrying both kinds of state, behaving differently on
+     purpose. The column toggles are role="menuitemcheckbox" and do not close
+     the menu: nobody opens View to show exactly one column, and a menu that
+     shuts after every tick is reopened three times to do one job. The density
+     options are role="menuitemradio" and do close, because one of a set is a
+     finished decision the moment it is made.
+
+     Leaving it open is only safe because focus stays on the item pressed.
+     aria-checked changes on the focused element, which is announced; change it
+     on an element nobody is on and the tick is silent. Nothing writes
+     aria-checked as a literal — bound, or it goes stale the first time the
+     item is used and the menu announces the opposite of what it shows.
+
+     Every row starts with a fixed size-4 marker slot, empty or not. Add the
+     tick only when checked and the label column shifts 24px as the state
+     changes. State is a check and a 6px disc rather than a tinted row, because
+     a tinted row cannot be told from the row the arrows are on.
+
+     The visible group headings are aria-hidden — a bare <p> is not a permitted
+     child of role="menu", and role="group" already carries the name. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       cols: { hsn: true, contract: false, tax: true },
+       density: 'comfortable',
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Bill of materials commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save revision
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="sheet" class="size-4 text-zinc-600"></i>Export to Excel
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="view"
+              :aria-expanded="open === 'view'" :tabindex="at === 'view' ? 0 : -1"
+              @click="open === 'view' ? close() : show('view')"
+              @mouseenter="if (open !== null) to('view')"
+              @keydown.arrow-down.prevent="show('view')" @keydown.arrow-up.prevent="show('view', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'view' && 'bg-zinc-100 text-zinc-900'">View</button>
+
+      <div x-show="open === 'view'" x-cloak data-panel="view" role="menu" aria-label="View"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+        <div role="group" aria-label="Columns" class="py-1">
+          <p aria-hidden="true" class="px-3 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Columns</p>
+
+          <button type="button" role="menuitemcheckbox" tabindex="-1" :aria-checked="cols.hsn" @click="cols.hsn = !cols.hsn"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+              <span x-show="cols.hsn" x-cloak class="flex"><i data-lucide="check" class="size-4"></i></span>
+            </span>HSN code
+          </button>
+          <button type="button" role="menuitemcheckbox" tabindex="-1" :aria-checked="cols.contract" @click="cols.contract = !cols.contract"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+              <span x-show="cols.contract" x-cloak class="flex"><i data-lucide="check" class="size-4"></i></span>
+            </span>Rate contract
+          </button>
+          <button type="button" role="menuitemcheckbox" tabindex="-1" :aria-checked="cols.tax" @click="cols.tax = !cols.tax"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+              <span x-show="cols.tax" x-cloak class="flex"><i data-lucide="check" class="size-4"></i></span>
+            </span>Tax breakup
+          </button>
+        </div>
+
+        <div role="group" aria-label="Density" class="border-t border-zinc-100 py-1">
+          <p aria-hidden="true" class="px-3 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Density</p>
+
+          <button type="button" role="menuitemradio" tabindex="-1" :aria-checked="density === 'comfortable'" @click="density = 'comfortable'; close()"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center">
+              <span x-show="density === 'comfortable'" x-cloak class="size-1.5 rounded-full bg-zinc-700"></span>
+            </span>Comfortable
+          </button>
+          <button type="button" role="menuitemradio" tabindex="-1" :aria-checked="density === 'compact'" @click="density = 'compact'; close()"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center">
+              <span x-show="density === 'compact'" x-cloak class="size-1.5 rounded-full bg-zinc-700"></span>
+            </span>Compact
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="help"
+              :aria-expanded="open === 'help'" :tabindex="at === 'help' ? 0 : -1"
+              @click="open === 'help' ? close() : show('help')"
+              @mouseenter="if (open !== null) to('help')"
+              @keydown.arrow-down.prevent="show('help')" @keydown.arrow-up.prevent="show('help', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'help' && 'bg-zinc-100 text-zinc-900'">Help</button>
+
+      <div x-show="open === 'help'" x-cloak data-panel="help" role="menu" aria-label="Help"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="keyboard" class="size-4 text-zinc-600"></i>Keyboard shortcuts
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 py-3 text-[13px]/5 tabular-nums text-zinc-600">
+    BOM-HDPE-08 · 22 components ·
+    <span x-text="density === 'compact' ? 'compact' : 'comfortable'"></span> rows ·
+    <span x-text="[cols.hsn && 'HSN', cols.contract && 'rate contract', cols.tax && 'tax'].filter(Boolean).join(', ') || 'no optional columns'"></span>
+  </div>
+</div>

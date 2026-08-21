@@ -1,0 +1,94 @@
+<!-- At 390px this stops being a hover bar and becomes a disclosure list, and
+     that is a different piece of markup rather than the same one reflowed. In
+     an app this carries sm:hidden and the bar carries hidden sm:block; here it
+     stands alone so it can be read on its own.
+
+     There is no hover to open with, no room for four section names on one
+     line, and no pointer that can travel a bridge. So every open is a tap, and
+     all the hover-intent machinery is gone rather than left in place doing
+     nothing — code that only runs on a device the component is not on is code
+     nobody will ever check.
+
+     Sections push the page down instead of floating over it. A floating panel
+     on a phone covers the content and then needs its own dismiss affordance,
+     a backdrop and a scroll lock, at which point it is a sheet and should be
+     built as one.
+
+     Several sections can be open at once. Closing one as another opens shifts
+     every link below it by the height of the section that just collapsed, and
+     on a touch screen the finger is already on its way down to a target that
+     has moved. That is worth a longer list.
+
+     x-cloak sits on the whole list and on each section body: without it the
+     entire route map is on screen for the frame before Alpine boots, which on
+     a phone is most of a screenful.
+
+     The menu and close icons are two elements with x-show on the spans around
+     them, not one <i> with the name bound. createIcons() replaces the <i> with
+     an <svg> and any binding on it goes with the element; a name that never
+     changes survives being read once, and one that toggles does not. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{ nav: false, open: { proc: true, inv: false, rep: false } }">
+  <div class="flex h-12 items-center justify-between gap-3 px-3">
+    <span class="text-[13px]/5 font-medium">Konspec Operations</span>
+    <button type="button" @click="nav = !nav" :aria-expanded="nav" aria-controls="nmph-list"
+            class="flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            :aria-label="nav ? 'Close navigation' : 'Open navigation'">
+      <span x-show="!nav" class="flex"><i data-lucide="menu" class="size-4 text-zinc-600"></i></span>
+      <span x-show="nav" x-cloak class="flex"><i data-lucide="x" class="size-4 text-zinc-600"></i></span>
+    </button>
+  </div>
+
+  <nav id="nmph-list" aria-label="Main" x-show="nav" x-cloak class="border-t border-zinc-200 p-2">
+    <ul class="space-y-0.5">
+      <li>
+        <a href="/dashboard/" class="block rounded-lg px-3 py-2.5 text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+      </li>
+
+      <li>
+        <button type="button" @click="open.proc = !open.proc" :aria-expanded="open.proc" aria-controls="nmph-proc"
+                class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Procurement
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.proc && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+          </span>
+        </button>
+        <ul id="nmph-proc" x-show="open.proc" class="mt-0.5 ml-3 space-y-0.5 border-l border-zinc-200 pl-3">
+          <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
+          <li><a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+          <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
+          <li><a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <button type="button" @click="open.inv = !open.inv" :aria-expanded="open.inv" aria-controls="nmph-inv"
+                class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Inventory
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.inv && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+          </span>
+        </button>
+        <ul id="nmph-inv" x-show="open.inv" x-cloak class="mt-0.5 ml-3 space-y-0.5 border-l border-zinc-200 pl-3">
+          <li><a href="/inventory/stock/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stock on hand</a></li>
+          <li><a href="/inventory/grn/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a></li>
+          <li><a href="/inventory/transfers/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Transfers</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <button type="button" @click="open.rep = !open.rep" :aria-expanded="open.rep" aria-controls="nmph-rep"
+                class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Reports
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.rep && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+          </span>
+        </button>
+        <ul id="nmph-rep" x-show="open.rep" x-cloak class="mt-0.5 ml-3 space-y-0.5 border-l border-zinc-200 pl-3">
+          <li><a href="/reports/consumption/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Consumption</a></li>
+          <li><a href="/reports/ageing/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Invoice ageing</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>

@@ -1,0 +1,49 @@
+<!-- The header and the footer are outside the panel, so the number this card is
+     about is on screen in both states. Collapse the body and the row still says
+     which invoice it is and what it comes to — collapse the total with it and
+     the closed card is a label with no value.
+
+     This one starts open, so it must not carry x-cloak: x-cloak would hold it
+     hidden until Alpine boots and the card would assemble itself in front of
+     the user.
+
+     The trigger is icon-only, so its name says what it opens rather than what
+     it does — aria-expanded already announces expanded or collapsed, and a
+     button called "Expand" in a page with four of them names nothing. -->
+<div class="max-w-xl rounded-xl border border-zinc-200 bg-white" x-data="{ open: true }">
+  <div class="flex min-h-14 items-center gap-3 px-4 py-3">
+    <div class="min-w-0 flex-1">
+      <h3 class="truncate text-[16px]/6 font-semibold">GST breakup</h3>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Invoice INV-7741 · 12/08/2026 · Gujarat Polymers Ltd</p>
+    </div>
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-gst"
+            aria-label="GST breakup"
+            class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-zinc-100">
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+  </div>
+
+  <div id="col-gst" x-show="open" x-collapse.duration.200ms>
+    <dl class="divide-y divide-zinc-100 border-t border-zinc-100 px-4 text-[14px]/5">
+      <div class="flex items-center justify-between gap-3 py-2.5">
+        <dt class="text-zinc-600">Taxable value</dt><dd class="tabular-nums">₹18,42,000.00</dd>
+      </div>
+      <div class="flex items-center justify-between gap-3 py-2.5">
+        <dt class="text-zinc-600">CGST @ 9%</dt><dd class="tabular-nums">₹1,65,780.00</dd>
+      </div>
+      <div class="flex items-center justify-between gap-3 py-2.5">
+        <dt class="text-zinc-600">SGST @ 9%</dt><dd class="tabular-nums">₹1,65,780.00</dd>
+      </div>
+      <div class="flex items-center justify-between gap-3 py-2.5">
+        <dt class="text-zinc-600">Round off</dt><dd class="tabular-nums">₹0.40</dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="flex items-center justify-between gap-3 border-t border-zinc-200 px-4 py-3">
+    <span class="text-[13px]/5 font-medium">Invoice total</span>
+    <span class="text-[16px]/6 font-semibold tabular-nums">₹21,73,560</span>
+  </div>
+</div>

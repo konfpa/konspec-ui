@@ -1,0 +1,45 @@
+<!-- Each description sits outside its label. Inside it, it becomes part of that
+     option's accessible name, and the whole sentence is read back every time the
+     arrow keys pass over the option — which, in a group, is on the way to every
+     option after it. -->
+<fieldset class="max-w-xl">
+  <legend class="mb-2 text-[13px]/5 font-medium">How this order is priced</legend>
+
+  <div class="space-y-3">
+    <div>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" id="rd-rc" name="pricing" value="contract" checked
+               aria-describedby="rd-rc-help"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Rate contract</span>
+      </label>
+      <p id="rd-rc-help" class="mt-1 pl-[26px] text-[12px]/4 tabular-nums text-zinc-500">
+        RC-2024-11 with Gujarat Polymers Ltd, valid to 31 Mar 2025. Rates are locked and the buyer cannot edit them.
+      </p>
+    </div>
+
+    <div>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" id="rd-qt" name="pricing" value="quotation"
+               aria-describedby="rd-qt-help"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Against a quotation</span>
+      </label>
+      <p id="rd-qt-help" class="mt-1 pl-[26px] text-[12px]/4 tabular-nums text-zinc-500">
+        QT-24-0388, received 04 Aug. Expires 30 days from receipt.
+      </p>
+    </div>
+
+    <div>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" id="rd-manual" name="pricing" value="manual"
+               aria-describedby="rd-manual-help"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Manual rate</span>
+      </label>
+      <p id="rd-manual-help" class="mt-1 pl-[26px] text-[12px]/4 tabular-nums text-zinc-500">
+        Needs a second approval above ₹2,00,000 and a reason on the order.
+      </p>
+    </div>
+  </div>
+</fieldset>

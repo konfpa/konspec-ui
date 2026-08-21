@@ -1,0 +1,31 @@
+<!-- One card per record, and the empty case handled by {% empty %} rather than
+     by a separate {% if %} further up the template — the two get out of step
+     otherwise, and the page renders an empty grid with a heading over it.
+
+     get_absolute_url on the model, not a hard-coded path, so the card keeps
+     working when the URL conf moves. Nothing else in the card is a link. -->
+<div class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
+  {% for order in orders %}
+    <a href="{{ order.get_absolute_url }}"
+       class="group rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-400">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <h3 class="truncate text-[14px]/5 font-semibold tabular-nums">{{ order.number }}</h3>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">{{ order.vendor.name }}</p>
+        </div>
+        <i data-lucide="chevron-right" class="size-4 shrink-0 text-zinc-500 transition group-hover:text-zinc-900" aria-hidden="true"></i>
+      </div>
+      <div class="mt-3 flex items-center justify-between gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>{{ order.get_status_display }}
+        </span>
+        <span class="text-[13px]/5 font-medium tabular-nums">₹{{ order.value|intcomma }}</span>
+      </div>
+    </a>
+  {% empty %}
+    <div class="rounded-xl border border-zinc-200 bg-white px-5 py-10 text-center sm:col-span-2 lg:col-span-3">
+      <p class="text-[14px]/5 font-medium">No orders match this filter</p>
+      <p class="mx-auto mt-1 max-w-[38ch] text-[13px]/5 text-zinc-600">Clear the filters, or widen the date range.</p>
+    </div>
+  {% endfor %}
+</div>

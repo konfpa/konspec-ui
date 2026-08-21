@@ -1,0 +1,28 @@
+<!-- table-fixed is what makes truncate work. Under the default auto layout a
+     cell grows to fit its content, so a long name widens the column and pushes
+     the amount off the right edge instead of ellipsing. Widths are declared on
+     the first row. -->
+<table class="w-full table-fixed">
+  <tbody class="divide-y divide-zinc-100">
+    <tr>
+      <td class="w-[7.5rem] py-2.5 pr-4 text-[13px]/5 font-medium tabular-nums">PO-24-1187</td>
+      <td class="py-2.5 pr-4">
+        <div class="flex items-center gap-2">
+          <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[11px]/4 font-medium text-zinc-600" aria-hidden="true">RD</span>
+          <span class="min-w-0 truncate text-[13px]/5">Ritu Deshpande</span>
+        </div>
+      </td>
+      <td class="w-[7.5rem] py-2.5 text-right text-[13px]/5 tabular-nums">₹18,42,000</td>
+    </tr>
+    <tr>
+      <td class="py-2.5 pr-4 text-[13px]/5 font-medium tabular-nums">PO-24-1163</td>
+      <td class="py-2.5 pr-4">
+        <div class="flex items-center gap-2">
+          <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[11px]/4 font-medium text-zinc-600" aria-hidden="true">SM</span>
+          <span class="min-w-0 truncate text-[13px]/5">Venkataraman Balasubramanian Krishnamurthy</span>
+        </div>
+      </td>
+      <td class="py-2.5 text-right text-[13px]/5 tabular-nums">₹4,26,500</td>
+    </tr>
+  </tbody>
+</table>

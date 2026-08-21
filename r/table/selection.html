@@ -1,0 +1,70 @@
+<div x-data="{ all: ['PO-24-1187','PO-24-1191','PO-24-1194'], sel: [] }"
+     class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+  <div x-show="sel.length" x-cloak
+       class="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-zinc-100 px-4 py-2">
+    <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
+    <div class="flex flex-wrap items-center gap-2">
+      <button class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
+      <button class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
+      <button class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Cancel orders</button>
+    </div>
+    <button @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-600 underline underline-offset-2">Clear</button>
+  </div>
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-10 px-4 py-2.5">
+          <input type="checkbox" aria-label="Select all three orders" class="size-4 rounded accent-zinc-700"
+                 :checked="sel.length === all.length"
+                 x-effect="$el.indeterminate = sel.length > 0 && sel.length < all.length"
+                 @change="sel = $event.target.checked ? [...all] : []">
+        </th>
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100" :class="sel.includes('PO-24-1187') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+        <td class="px-4 py-2.5">
+          <input type="checkbox" value="PO-24-1187" x-model="sel" aria-label="Select PO-24-1187" class="size-4 rounded accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
+        <td class="px-4 py-2.5">Sharma Extrusions</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">₹18,42,000</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-900">
+            <span class="size-1.5 rounded-full bg-zinc-700"></span>Open
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100" :class="sel.includes('PO-24-1191') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+        <td class="px-4 py-2.5">
+          <input type="checkbox" value="PO-24-1191" x-model="sel" aria-label="Select PO-24-1191" class="size-4 rounded accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1191</td>
+        <td class="px-4 py-2.5">Nashik Steel Traders</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">₹4,68,500</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-700">
+            <span class="size-1.5 rounded-full bg-amber-500"></span>Approved
+          </span>
+        </td>
+      </tr>
+      <tr :class="sel.includes('PO-24-1194') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+        <td class="px-4 py-2.5">
+          <input type="checkbox" value="PO-24-1194" x-model="sel" aria-label="Select PO-24-1194" class="size-4 rounded accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194</td>
+        <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">₹27,10,400</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-700">
+            <span class="size-1.5 rounded-full bg-red-600"></span>Overdue
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

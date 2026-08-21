@@ -1,0 +1,45 @@
+<!-- The icon is size-4 shrink-0 mt-0.5, which is the alert icon exactly. 16px
+     into a 20px line is 2px of offset and 2px is a step on the scale, so the
+     icon takes a margin where the 6px dot took a box — the dot's 7px is not a
+     step and mt-[7px] would be right for one type size only.
+
+     Every icon is aria-hidden. Nine items read out as circle-check, circle-
+     check, circle-check is noise, and the list already announces its own count.
+     But hiding the icon without putting the word back deletes the only carrier
+     of Failed, so each item opens with a sr-only word — the two go together and
+     neither half is optional on its own.
+
+     Colour lives in the icon and nowhere else: no tinted row, no coloured text,
+     no fill behind the line. Three of these six are graphite, which is what
+     makes the red one findable. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+  <h3 class="text-[13px]/5 font-medium">Three-way match — INV-8841</h3>
+  <p class="mt-0.5 text-[12px]/4 text-zinc-500">Nashik Steel Traders · checked 16 Aug 2026, 11:04</p>
+
+  <ul role="list" class="mt-3 space-y-2 text-[13px]/5 text-zinc-600">
+    <li class="flex items-start gap-2.5">
+      <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+      <span class="min-w-0 tabular-nums"><span class="sr-only">Passed — </span>Invoice value ₹4,26,500 matches the order.</span>
+    </li>
+    <li class="flex items-start gap-2.5">
+      <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+      <span class="min-w-0"><span class="sr-only">Passed — </span>GSTIN on the invoice matches the vendor master.</span>
+    </li>
+    <li class="flex items-start gap-2.5">
+      <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600" aria-hidden="true"></i>
+      <span class="min-w-0 tabular-nums"><span class="sr-only">Failed — </span>Received quantity is 2,400 kg against 3,000 kg invoiced.</span>
+    </li>
+    <li class="flex items-start gap-2.5">
+      <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+      <span class="min-w-0 tabular-nums"><span class="sr-only">Waiting — </span>Freight of ₹8,200 is not on the rate contract and needs a buyer's note.</span>
+    </li>
+    <li class="flex items-start gap-2.5">
+      <i data-lucide="circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      <span class="min-w-0"><span class="sr-only">Not started — </span>Quality release against the lot certificate.</span>
+    </li>
+    <li class="flex items-start gap-2.5">
+      <i data-lucide="circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      <span class="min-w-0"><span class="sr-only">Not started — </span>Approval by the plant head.</span>
+    </li>
+  </ul>
+</div>

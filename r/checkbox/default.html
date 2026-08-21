@@ -1,0 +1,14 @@
+<!-- The help text sits outside the label. Inside it, it becomes part of the
+     box's accessible name, and the whole sentence is read back every time focus
+     lands on the box. -->
+<div class="max-w-xl">
+  <label class="flex items-start gap-2.5 text-[14px]/5">
+    <input type="checkbox" id="cb-notify" name="notify_vendor" value="1" checked
+           aria-describedby="cb-notify-help"
+           class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+    <span>Email the vendor when this order is approved</span>
+  </label>
+  <p id="cb-notify-help" class="mt-1 pl-[26px] text-[12px]/4 text-zinc-500">
+    Goes to the contact on the rate contract, with the order PDF attached.
+  </p>
+</div>

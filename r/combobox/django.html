@@ -1,0 +1,174 @@
+<!-- forms.py
+     class RfqForm(forms.Form):
+         # Single select. The widget is never rendered — the template below draws
+         # the field — but the field still validates the id against the queryset,
+         # which is the only thing between a hidden input and any primary key
+         # somebody cares to type into it with the dev tools open.
+         vendor = forms.ModelChoiceField(
+             queryset=Vendor.objects.filter(is_active=True),
+             widget=forms.HiddenInput,
+             label='Vendor')
+
+         # Multiselect. The widget matters here even unrendered, because it is
+         # what parses the POST. MultipleHiddenInput.value_from_datadict calls
+         # data.getlist(name); a plain HiddenInput calls data.get(name), which
+         # returns the last hidden input and drops every other vendor the user
+         # picked. SelectMultiple works, for the same reason.
+         recipients = forms.ModelMultipleChoiceField(
+             queryset=Vendor.objects.filter(is_active=True),
+             widget=forms.MultipleHiddenInput,
+             required=False,
+             label='Send this RFQ to')
+
+     views.py
+         def rfq_new(request):
+             form = RfqForm(request.POST or None)
+             vendors = list(Vendor.objects.filter(is_active=True)
+                                          .values('id', 'name', 'code'))
+             return render(request, 'rfq/new.html',
+                           {'form': form, 'vendors': vendors})
+
+         def vendor_search(request):
+             q = request.GET.get('q', '').strip()
+             hits = (Vendor.objects.filter(is_active=True)
+                     .filter(Q(name__icontains=q) | Q(code__icontains=q)
+                             | Q(gstin__icontains=q))[:20]
+                     if len(q) > 1 else Vendor.objects.none())
+             # the fragment only: no base template, no <html>
+             return render(request, 'rfq/_vendor_options.html', {'hits': hits})
+
+     urls.py
+         path('rfq/new/', views.rfq_new, name='rfq-new'),
+         path('vendors/search/', views.vendor_search, name='vendor-search'),
+
+     The options go through json_script. Never interpolate a queryset into an
+     x-data attribute: one vendor called M/s D'Souza Traders ends the attribute
+     early and the whole component stops parsing. json_script escapes for
+     exactly that and leaves the JSON somewhere Alpine can read it.
+
+     The search endpoint is a GET and needs no CSRF token. A combobox that has
+     to POST its search — a long query, a complex filter set — needs
+     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' on the input, or Django
+     answers 403. -->
+
+{{ vendors|json_script:"vendor-options" }}
+{{ form.recipients.value|default:''|json_script:"rfq-recipients" }}
+
+<form method="post" class="max-w-md">
+  {% csrf_token %}
+
+  <div class="relative"
+       x-data="{
+         open: false, typed: false, ai: 0, q: '',
+         sel: '{{ form.vendor.value|default:'' }}',
+         options: JSON.parse(document.getElementById('vendor-options').textContent),
+         get list() {
+           if (!this.typed) return this.options;
+           const s = this.q.trim().toLowerCase();
+           return this.options.filter(o => (o.name + ' ' + o.code).toLowerCase().includes(s));
+         },
+         get chosen() { return this.options.find(o => String(o.id) === String(this.sel)) || null; },
+         rowId(o) { return 'dj-vendor-' + o.id; },
+         get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+         scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+         show() {
+           if (this.open) return;
+           this.open = true; this.typed = false;
+           this.ai = Math.max(0, this.list.findIndex(o => String(o.id) === String(this.sel)));
+           this.scroll();
+         },
+         close() { this.open = false; this.typed = false; this.q = this.chosen ? this.chosen.name : ''; },
+         move(n) {
+           if (!this.open) { this.show(); return; }
+           if (!this.list.length) return;
+           this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+           this.scroll();
+         },
+         pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
+         commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+       }"
+       x-init="q = chosen ? chosen.name : ''"
+       @click.outside="close()"
+       @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+    <label for="{{ form.vendor.id_for_label }}-q" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.vendor.label }} <span class="text-red-600">*</span>
+    </label>
+
+    <div class="flex items-center rounded-lg bg-white {% if form.vendor.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <!-- the search box has no name. Give it the field's name and the typed
+           text posts beside the id, and the form cleans whichever came last. -->
+      <input id="{{ form.vendor.id_for_label }}-q" x-ref="q" x-model="q" type="text"
+             role="combobox" autocomplete="off" aria-autocomplete="list"
+             aria-controls="dj-vendor-list"
+             {% if form.vendor.errors %}aria-invalid="true" aria-describedby="dj-vendor-err"{% endif %}
+             :aria-expanded="open" :aria-activedescendant="activeId"
+             placeholder="Search vendors"
+             @click="show()"
+             @input="typed = true; open = true; ai = 0"
+             @keydown.arrow-down.prevent="move(1)"
+             @keydown.arrow-up.prevent="move(-1)"
+             @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+             @keydown.tab="close()"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+
+    <!-- the field itself: one hidden input, named for the bound field -->
+    <input type="hidden" name="{{ form.vendor.html_name }}" :value="sel">
+
+    {% if form.vendor.errors %}
+      <p id="dj-vendor-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.vendor.errors.0 }}
+      </p>
+    {% endif %}
+
+    <p role="status" class="sr-only"
+       x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+      <div id="dj-vendor-list" role="listbox" aria-label="{{ form.vendor.label }}" class="max-h-64 overflow-y-auto py-1">
+        <template x-for="(o, i) in list" :key="o.id">
+          <div :id="rowId(o)" role="option" :aria-selected="String(o.id) === String(sel)"
+               @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+               :class="i === ai ? 'bg-zinc-100' : ''"
+               class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="min-w-0 flex-1 truncate" x-text="o.name"></span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.code"></span>
+          </div>
+        </template>
+      </div>
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- The multiselect posts one hidden input per value, all sharing html_name,
+       which is what MultipleHiddenInput.value_from_datadict reads with getlist.
+       The initial selection comes out of the bound field through json_script
+       for the same escaping reason. The field and the popup are the multi
+       variant, unchanged. -->
+  <div class="mt-6" x-data="{ sel: JSON.parse(document.getElementById('rfq-recipients').textContent) || [] }">
+    <template x-for="id in sel" :key="id">
+      <input type="hidden" name="{{ form.recipients.html_name }}" :value="id">
+    </template>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="sel.length + ' vendors will receive this RFQ'"></p>
+  </div>
+
+  <button type="submit" class="mt-5 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Send RFQ</button>
+</form>
+
+<!-- rfq/_vendor_options.html — the whole response for the remote variant, and
+     nothing around it, because hx-swap is innerHTML. The ids come from the
+     server and still have to be unique: aria-activedescendant on the input
+     points at one of them. -->
+{% for v in hits %}
+  <div id="cb-remote-{{ v.pk }}" role="option" aria-selected="false"
+       data-value="{{ v.pk }}" data-label="{{ v.name }}"
+       class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+    <span class="min-w-0 flex-1 truncate">{{ v.name }}</span>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">{{ v.code }}</span>
+  </div>
+{% endfor %}

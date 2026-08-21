@@ -1,0 +1,67 @@
+<!-- The one screen where the wording is the security control. Whatever is
+     typed here, the next screen says the same sentence: "If an account exists
+     for that address, we have sent a link." No "we could not find that email",
+     no different button state for a known address, and the send queued off the
+     request so a stopwatch cannot tell the two apart either.
+
+     The field still carries autocomplete="username" and name="username". It is
+     the account identifier, not a contact field, and the manager the user keeps
+     it in should offer it here the same way it does on sign in.
+
+     The Entra note is the honest exception and it leaks nothing: it is a fact
+     about the domain, not about the address. Somebody who signs in through SSO
+     has no password to reset, and without this line they type their address,
+     get the confirmation screen, and wait for an email that will never come. -->
+<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+     x-data="{ busy: false }">
+  <main class="w-full max-w-sm">
+
+    <div class="flex items-center justify-center gap-2.5">
+      <span class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[14px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec Operations</span>
+    </div>
+
+    <form method="post" action="/accounts/password_reset/" @submit="busy = true"
+          class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Reset your password</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">Enter your work email and we will send a link to set a new one.</p>
+
+      <div class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5">
+        <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+        <p class="text-[12px]/4 text-zinc-600">
+          Accounts on <span class="font-medium text-zinc-900">konspec.com</span> that sign in through Microsoft Entra ID have no password here — reset it in Entra instead.
+        </p>
+      </div>
+
+      <div class="mt-4">
+        <label for="fg-username" class="mb-1.5 block text-[13px]/5 font-medium">Work email</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="fg-username" name="username" type="email" autocomplete="username" required autofocus
+                 spellcheck="false" autocapitalize="none" placeholder="you@konspec.com"
+                 aria-describedby="fg-username-help"
+                 class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        </div>
+        <p id="fg-username-help" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+          If an account exists for that address, a link goes to it. We do not say either way.
+        </p>
+      </div>
+
+      <button type="submit" :disabled="busy" :aria-busy="busy"
+              class="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:hover:bg-zinc-700">
+        <span x-show="busy" x-cloak class="flex"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+        <span class="grid">
+          <span class="col-start-1 row-start-1" :class="busy &amp;&amp; 'invisible'">Email me a reset link</span>
+          <span class="col-start-1 row-start-1" :class="!busy &amp;&amp; 'invisible'" aria-hidden="true">Sending…</span>
+        </span>
+      </button>
+
+      <p class="mt-4 border-t border-zinc-100 pt-4 text-[12px]/4">
+        <a href="/accounts/login/" class="inline-flex items-center gap-1.5 font-medium text-zinc-900 underline underline-offset-2">
+          <i data-lucide="arrow-left" class="size-3.5"></i>Back to sign in
+        </a>
+      </p>
+    </form>
+
+    <p class="mt-4 text-center text-[11px]/4 text-zinc-500">Konspec Industries · internal system · activity is logged</p>
+  </main>
+</div>

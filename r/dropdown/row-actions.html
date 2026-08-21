@@ -1,0 +1,110 @@
+<!-- The panel is right-0, and that is not a preference. The trigger sits about
+     20px from the right edge of the register; a 192px panel anchored left-0
+     would run 170px past it, and on a phone the page would either scroll
+     sideways or clip the menu, depending on what the nearest overflow is. The
+     rule is that the panel aligns to the edge of the trigger that has the room,
+     which for the last column is always the right one.
+
+     Nothing in the chain above the panel may be overflow-hidden either. The
+     obvious place to put it is the card that rounds the table corners, and the
+     moment you do, the menu on the last row is cut off at the card edge — so
+     the wrapper keeps its border and radius and loses the clip, and the row
+     hover tint is painted on the cells rather than on the tr so it does not
+     square the bottom corners off.
+
+     Each row owns its own x-data, so the state is per row and nothing has to be
+     keyed by index. The trigger is an icon, so it needs a name of its own:
+     :aria-label="'Actions for ' + r.po", because a register of buttons all
+     called More tells a screen reader nothing about which row the cursor is on
+     and the row it belongs to is three cells away.
+
+     The vendor column goes below sm rather than being scrolled to. Two figures
+     and a menu is what fits at 390px, and hiding a column somebody can still
+     reach on the record page is better than a table that moves sideways. -->
+<div x-data="{
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '18,42,000' },
+         { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: '4,68,500' },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: '27,10,400' }
+       ]
+     }"
+     class="rounded-xl border border-zinc-200 bg-white">
+  <table class="w-full text-[13px]/5">
+    <caption class="sr-only">Purchase orders awaiting approval</caption>
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" class="w-12 px-2 py-2.5"><span class="sr-only">Row actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in rows" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0 hover:[&>td]:bg-zinc-100">
+          <td class="px-4 py-2 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2 sm:table-cell" x-text="r.vendor"></td>
+          <td class="px-4 py-2 text-right tabular-nums">₹<span x-text="r.amount"></span></td>
+          <td class="w-12 px-2 py-2">
+            <div class="relative flex justify-end"
+                 x-data="{
+                   open: false,
+                   items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+                   show(last = false) {
+                     this.open = true;
+                     this.$nextTick(() => requestAnimationFrame(() => {
+                       const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+                     }));
+                   },
+                   close(toTrigger = true) {
+                     if (!this.open) return;
+                     this.open = false;
+                     if (toTrigger) this.$refs.trigger.focus();
+                   },
+                   move(step) {
+                     const i = this.items(), at = i.indexOf(document.activeElement);
+                     i[(at + step + i.length) % i.length]?.focus();
+                   },
+                   edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+                 }"
+                 @click.outside="close(false)"
+                 @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+              <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+                      @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+                      :aria-expanded="open" aria-haspopup="menu" :aria-label="'Actions for ' + r.po"
+                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="more-horizontal" class="size-4"></i>
+              </button>
+
+              <div x-show="open" x-cloak x-ref="menu" role="menu" :aria-label="'Actions for ' + r.po"
+                   @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+                   @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+                   @keydown.tab="close(false)"
+                   class="absolute top-full right-0 z-40 mt-1 w-48 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 text-left shadow-lg">
+                <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                        class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                  <i data-lucide="eye" class="size-4 text-zinc-600"></i>Open order
+                </button>
+                <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                        class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                  <i data-lucide="check-check" class="size-4 text-zinc-600"></i>Approve
+                </button>
+                <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                        class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                  <i data-lucide="package-check" class="size-4 text-zinc-600"></i>Post GRN
+                </button>
+
+                <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+                <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                        class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                  <i data-lucide="x-circle" class="size-4"></i>Cancel order
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+</div>

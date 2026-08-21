@@ -1,0 +1,41 @@
+<!-- Three controls in one strip and three different answers.
+
+     The search box has a real label with sr-only. The card is already headed
+     Purchase orders and the icon says search, so a visible name would repeat
+     what is on screen twice — but the element is still there, still bound with
+     for, and clicking the icon still focuses the field. The placeholder is an
+     example of the format, not the name. Some readers do fall back to it when
+     nothing else is there, which is exactly why placeholder-as-label looks like
+     it works: it survives the screen-reader check and then vanishes the moment
+     anything is typed, at a contrast nobody chose.
+
+     The select takes aria-label instead. There is no text to hide, its options
+     already read as Status, and an sr-only label here would be a second name
+     for the same string.
+
+     The icon-only button has no text at all, so aria-label is the only name it
+     can have — and it names the action, Export, not the icon, download. Do not
+     add aria-label to the search box as well: it would replace the visible
+     label with a string nobody can see, and a voice-control user saying the
+     words on screen would be addressing a control that is not called that. -->
+<div class="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+  <h3 class="mr-auto text-[13px]/5 font-medium">Purchase orders</h3>
+
+  <label for="lb-search" class="sr-only">Search purchase orders</label>
+  <div class="flex min-w-40 flex-1 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <i data-lucide="search" class="size-4 shrink-0 text-zinc-400"></i>
+    <input id="lb-search" name="q" placeholder="PO number or vendor"
+           class="w-full bg-transparent py-1.5 text-[13px]/5 outline-none">
+  </div>
+
+  <select aria-label="Status" class="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[13px]/5 focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <option>All statuses</option>
+    <option>Open</option>
+    <option>Overdue</option>
+  </select>
+
+  <button type="button" aria-label="Export to CSV"
+          class="rounded-lg border border-zinc-200 bg-white p-1.5 hover:bg-zinc-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="download" class="size-4 text-zinc-600"></i>
+  </button>
+</div>

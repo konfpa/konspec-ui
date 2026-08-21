@@ -1,0 +1,85 @@
+<!-- The handoff. One job, two shapes, and the thing that decides which is
+     whether a denominator exists yet.
+
+     While the import is still counting rows there is no bar, and there is no
+     indeterminate bar to fall back on either. ARIA does define one — role=
+     "progressbar" with aria-valuenow omitted — but drawing it needs a chunk that
+     slides along the rail, and stock Tailwind has no keyframe that does that:
+     animate-pulse fades opacity, animate-bounce translates on Y, animate-spin
+     rotates. Writing the keyframe means the custom CSS this system does not
+     have. And the cheap substitute is worse than nothing — a full-width rail
+     under animate-pulse is a bar sitting at 100% that happens to be breathing,
+     which is a value, and a wrong one. So the unknown phase is the spinner, which
+     is the component whose entire job is to say that work is in flight without
+     claiming how much of it is left.
+
+     The bar appears at its real value, not at zero with a run-up. The rows that
+     were already processed while the count finished are progress that happened,
+     and replaying the fill from zero is the same defect as animating a
+     server-rendered bar in on every page load.
+
+     The spinner's ring is aria-hidden and the announcement is the text inside the
+     role="status", which is on the panel and outside both branches so it survives
+     the swap between them. The bar itself takes no aria-live — a value repainting
+     every 400ms under a live region queues announcements faster than they can be
+     spoken — so the status carries milestones only, at every 25%.
+
+     x-cloak on the branch hidden at first paint, because Alpine boots after the
+     HTML renders and without it the bar flashes under the spinner on load. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-4"
+     x-data="{
+       phase: 'counting', done: 0, total: 0, said: 0, timer: null,
+       pct() { return this.total ? Math.round(this.done / this.total * 100) : 0 },
+       run() {
+         clearInterval(this.timer);
+         this.phase = 'counting'; this.done = 0; this.total = 0; this.said = 0;
+         setTimeout(() => {
+           this.total = 3100; this.done = 240; this.phase = 'running';
+           this.timer = setInterval(() => {
+             this.done = Math.min(this.total, this.done + 290);
+             if (this.pct() >= this.said + 25) this.said = Math.floor(this.pct() / 25) * 25;
+             if (this.done >= this.total) { clearInterval(this.timer); this.phase = 'done' }
+           }, 400);
+         }, 2400);
+       }
+     }"
+     x-init="run()"
+     :aria-busy="phase !== 'done'">
+
+  <div class="flex items-baseline justify-between gap-3">
+    <h3 id="pg-import" class="text-[13px]/5 font-medium">Importing the August rate card</h3>
+    <button type="button" @click="run()" :disabled="phase !== 'done'"
+            class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Run again
+    </button>
+  </div>
+
+  <!-- no total yet: a spinner, and not a bar at a number nobody has -->
+  <div x-show="phase === 'counting'" class="mt-3 flex items-center gap-3">
+    <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <span class="text-[13px]/5 text-zinc-600">Counting the rows in the upload</span>
+  </div>
+
+  <!-- the total exists: the bar takes over, at the value the job is actually at -->
+  <div x-show="phase !== 'counting'" x-cloak class="mt-3">
+    <div class="h-1.5 overflow-hidden rounded-full bg-zinc-100"
+         role="progressbar" aria-labelledby="pg-import"
+         :aria-valuenow="done" aria-valuemin="0" :aria-valuemax="total"
+         :aria-valuetext="done.toLocaleString('en-IN') + ' of ' + total.toLocaleString('en-IN') + ' rows imported'">
+      <div class="h-full min-w-[2px] rounded-full transition-[width] duration-300 motion-reduce:transition-none"
+           :class="phase === 'done' ? 'bg-emerald-600' : 'bg-zinc-700'"
+           :style="'width: ' + pct() + '%'"></div>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+      <span x-text="done.toLocaleString('en-IN')"></span> of <span x-text="total.toLocaleString('en-IN')"></span> rows ·
+      <span x-text="phase === 'done' ? 'finished' : 'you can leave this page, it keeps running'"></span>
+    </p>
+  </div>
+
+  <!-- milestones only. On the panel, outside both branches, so it is in the
+       document before either message lands. -->
+  <p role="status" class="sr-only"
+     x-text="phase === 'counting' ? 'Counting the rows in the upload'
+             : phase === 'done' ? 'Import finished, 3,100 rows'
+             : said + ' per cent imported'"></p>
+</div>

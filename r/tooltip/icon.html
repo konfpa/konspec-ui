@@ -1,0 +1,59 @@
+<!-- Two icon buttons, two naming recipes, and they are not interchangeable.
+
+     Left: the bubble is the name. aria-labelledby points at the bubble id and
+     the button carries no aria-label of its own, so there is exactly one copy
+     of the string. A referenced element is read even while x-show has it at
+     display:none — name computation reaches hidden nodes deliberately — so the
+     button is named all session, not only while the bubble is up.
+
+     Right: the name lives in aria-label and the bubble is aria-hidden. Two
+     copies of one string, which is what the sidebar rail does and is right
+     while the string is short and static.
+
+     What is wrong is one button wearing an aria-label AND a bubble its name is
+     computed from: that control is announced twice. Equally wrong is
+     aria-describedby on a button with no other name — it reads as "button",
+     and the name turns up late as a description or not at all.
+
+     The handlers sit on the button, not on the wrapper. A hovercard watches
+     its wrapper because the pointer is meant to get into the panel; nothing
+     here can be entered, so the trigger is the whole surface being tracked.
+     Escape is bound on window, because a tooltip opened by the pointer has no
+     focus inside it and a root-scoped keydown would never fire. -->
+<div class="flex items-center gap-3">
+
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @keydown.escape.window="hide()">
+    <button type="button" aria-labelledby="tt-duplicate"
+            @mouseenter="show()" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="copy" class="size-4"></i>
+    </button>
+    <span id="tt-duplicate" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Duplicate order</span>
+  </span>
+
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @keydown.escape.window="hide()">
+    <button type="button" aria-label="Print order"
+            @mouseenter="show()" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="printer" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Print order</span>
+  </span>
+
+</div>

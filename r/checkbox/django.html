@@ -1,0 +1,79 @@
+<!-- forms.py
+     class ApprovalForm(forms.Form):
+         # required=True on a BooleanField means "must be ticked", so a flag that
+         # is allowed to be off is required=False. Left at the default, the form
+         # comes back invalid with "This field is required" the first time
+         # somebody leaves the box alone.
+         notify_vendor = forms.BooleanField(
+             required=False, initial=True,
+             label='Email the vendor when this order is approved',
+             help_text='Goes to the contact on the rate contract.',
+             widget=forms.CheckboxInput(attrs={
+                 'class': 'mt-0.5 size-4 shrink-0 accent-zinc-700',
+             }))
+
+         notify = forms.MultipleChoiceField(
+             required=False, choices=NOTIFY_CHOICES, label='Also notify',
+             widget=forms.CheckboxSelectMultiple(attrs={
+                 'class': 'mt-0.5 size-4 shrink-0 accent-zinc-700',
+             }))
+
+     An unticked box sends nothing at all — the name is simply absent from the
+     POST, and CheckboxInput.value_from_datadict reads that absence as False.
+     That is only safe while the form renders every field it cleans: a POST
+     assembled from a subset of the fields clears every boolean it left out.
+
+     Loop the bound field rather than printing {{ form.notify }}. The widget
+     brings its own wrapper markup — a div per option since Django 4.0, a ul
+     before that — and no amount of attrs will lay it out. Each iteration yields
+     the input as {{ choice.tag }} and its text as {{ choice.choice_label }}. -->
+<form method="post" class="max-w-xl">
+  {% csrf_token %}
+
+  <div>
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      {{ form.notify_vendor }}<span>{{ form.notify_vendor.label }}</span>
+    </label>
+    {% if form.notify_vendor.help_text %}
+      <p class="mt-1 pl-[26px] text-[12px]/4 text-zinc-500">{{ form.notify_vendor.help_text }}</p>
+    {% endif %}
+  </div>
+
+  <fieldset class="mt-5">
+    <legend class="mb-2 text-[13px]/5 font-medium">{{ form.notify.label }}</legend>
+    <div class="space-y-2">
+      {% for choice in form.notify %}
+        <label class="flex items-start gap-2.5 text-[14px]/5">
+          {{ choice.tag }}<span>{{ choice.choice_label }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    {% if form.notify.errors %}
+      <p class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.notify.errors.0 }}
+      </p>
+    {% endif %}
+  </fieldset>
+
+  <!-- Row selection is one repeated name, read back with
+       request.POST.getlist('ids'). .get('ids') returns the last one and drops
+       every other tick on the page. This list is rendered once — render it a
+       second time for a phone layout and every ticked row posts twice, because a
+       display:none checkbox still submits. -->
+  <fieldset class="mt-5">
+    <legend class="mb-2 text-[13px]/5 font-medium">Orders to approve</legend>
+    <div class="space-y-2">
+      {% for order in page_obj %}
+        <label class="flex items-center gap-2.5 text-[13px]/5">
+          <input type="checkbox" name="ids" value="{{ order.number }}"
+                 {% if order.number in selected %}checked{% endif %}
+                 class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 truncate tabular-nums">{{ order.number }} · {{ order.vendor }}</span>
+          <span class="shrink-0 tabular-nums text-zinc-600">₹{{ order.amount }}</span>
+        </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve selected</button>
+</form>

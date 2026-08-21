@@ -1,0 +1,108 @@
+<!-- The name-and-email block is not a menu item and cannot live inside the
+     role="menu". A menu permits menuitem, menuitemcheckbox, menuitemradio,
+     group and separator, and a div holding an avatar is none of them — dropped
+     in anyway it is announced as a stray node in a list of commands, or
+     silently skipped, depending on the screen reader. So the panel is a plain
+     div that carries the keyboard handlers, the header sits in it as ordinary
+     content, and role="menu" starts at the list below. items() reads from
+     x-ref="menu", which is the inner list, so the header is outside the walk
+     without anything being excluded by hand.
+
+     The email is the point of the header. On an application with a test tenant
+     and a live one, the only question anybody asks this menu is which account
+     they are signed into, and a name alone does not answer it. truncate rather
+     than a wrap, because a two-line email pushes the first item off the panel
+     on a phone.
+
+     Sign out is a state change, so in Django it is a POST rather than a link.
+     A <form> is not a permitted child of role="menu" either, so the form goes
+     after the panel and the item points at it:
+
+       <button type="submit" form="signout" role="menuitem" tabindex="-1">
+       <form id="signout" method="post" action="{% url 'logout' %}" hidden>{% csrf_token %}</form>
+
+     A GET link would be followed by every link prefetcher and mail scanner that
+     ever sees the page, and the user is signed out by a robot. -->
+<div class="flex justify-end">
+  <div class="relative"
+       x-data="{
+         open: false,
+         items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+         show(last = false) {
+           this.open = true;
+           this.$nextTick(() => requestAnimationFrame(() => {
+             const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+           }));
+         },
+         close(toTrigger = true) {
+           if (!this.open) return;
+           this.open = false;
+           if (toTrigger) this.$refs.trigger.focus();
+         },
+         move(step) {
+           const i = this.items(), at = i.indexOf(document.activeElement);
+           i[(at + step + i.length) % i.length]?.focus();
+         },
+         edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+       }"
+       @click.outside="close(false)"
+       @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+    <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+            :aria-expanded="open" aria-haspopup="menu"
+            class="flex items-center gap-2 rounded-lg py-1 pr-2 pl-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[12px]/4 font-medium text-white">RD</span>
+      <span class="text-[13px]/5 font-medium">Ritu Deshpande</span>
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </button>
+
+    <div x-show="open" x-cloak
+         @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+         @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+         @keydown.tab="close(false)"
+         class="absolute right-0 z-40 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+      <div class="flex items-start gap-2.5 px-3 py-2">
+        <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RD</span>
+        <div class="min-w-0">
+          <p class="truncate text-[13px]/5 font-medium">Ritu Deshpande</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">ritu.deshpande@konspec.com</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500">Nashik plant · Procurement</p>
+        </div>
+      </div>
+
+      <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+      <div x-ref="menu" role="menu" aria-label="Account">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="user" class="size-4 text-zinc-600"></i>Your profile
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="bell" class="size-4 text-zinc-600"></i>Notification settings
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="building-2" class="size-4 text-zinc-600"></i>Switch plant
+          <span class="ml-auto shrink-0 text-[12px]/4 text-zinc-500">Nashik</span>
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="life-buoy" class="size-4 text-zinc-600"></i>Help and support
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

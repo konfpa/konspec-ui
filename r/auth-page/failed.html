@@ -1,0 +1,97 @@
+<!-- One message for both halves. It does not say which of the address and the
+     password was wrong, and there is no "2 attempts left" beside it, because a
+     counter only exists for an account that exists — the counter is the leak,
+     told slowly. The lockout sentence is scoped to the device in front of you,
+     which is true of any address typed into it and therefore says nothing about
+     this one.
+
+     Three things happen on failure and all three are needed. The alert appears
+     above the form; the two fields go aria-invalid; focus moves to the alert. A
+     role="alert" sitting in the DOM at first paint is announced by nothing at
+     all — a live region reports mutations and a page load is not one — so on a
+     server-rendered failure the focus is the announcement, and the role is what
+     covers an htmx swap where the page never reloads. On a real POST render,
+     add x-init="$el.focus()" to the alert; here the focus moves on submit
+     instead, so a gallery of variants does not fight over the caret.
+
+     aria-invalid clears as soon as the value is edited, and the alert does not.
+     The mark describes this value; the alert describes an attempt that
+     happened. Bind the mark to a string — written once by the server it
+     survives the correction, and the field then announces as invalid all
+     session while its border is grey again. -->
+<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+     x-data="{
+       failed: true, edited: false, show: false,
+       get bad() { return this.failed &amp;&amp; !this.edited },
+       fail() {
+         this.failed = false;
+         this.edited = false;
+         this.$nextTick(() => { this.failed = true; this.$nextTick(() => this.$refs.err.focus()) });
+       }
+     }">
+  <main class="w-full max-w-sm">
+
+    <div class="flex items-center justify-center gap-2.5">
+      <span class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[14px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec Operations</span>
+    </div>
+
+    <form method="post" action="/accounts/login/" @submit.prevent="fail()"
+          class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Sign in</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">Use your Konspec Industries email address.</p>
+
+      <div x-show="failed" x-ref="err" role="alert" tabindex="-1"
+           class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 outline-none">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+        <div class="min-w-0">
+          <p class="text-[13px]/5 font-medium">That email address and password do not match an active account.</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Repeated failures lock sign-in from this device for 15 minutes.</p>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <label for="sf-username" class="mb-1.5 block text-[13px]/5 font-medium">Work email</label>
+        <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+             :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                         : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+          <input id="sf-username" name="username" type="email" autocomplete="username" required
+                 spellcheck="false" autocapitalize="none" value="akshay.prabhu@konspec.com"
+                 @input="edited = true" :aria-invalid="bad ? 'true' : 'false'"
+                 class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="mb-1.5 flex items-baseline justify-between gap-3">
+          <label for="sf-password" class="text-[13px]/5 font-medium">Password</label>
+          <a href="/accounts/password_reset/" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Forgot password</a>
+        </div>
+        <div class="flex items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+             :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                         : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+          <input id="sf-password" name="password" :type="show ? 'text' : 'password'" autocomplete="current-password"
+                 required spellcheck="false" value="silvassa-2026"
+                 @input="edited = true" :aria-invalid="bad ? 'true' : 'false'"
+                 class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          <button type="button" @click="show = !show" :aria-label="show ? 'Hide password' : 'Show password'"
+                  class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+            <span x-show="!show" class="flex"><i data-lucide="eye" class="size-4"></i></span>
+            <span x-show="show" x-cloak class="flex"><i data-lucide="eye-off" class="size-4"></i></span>
+          </button>
+        </div>
+        <p role="status" class="sr-only" x-text="show ? 'Password is visible' : ''"></p>
+      </div>
+
+      <button type="submit"
+              class="mt-5 inline-flex h-10 w-full items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Sign in</button>
+
+      <p class="mt-4 border-t border-zinc-100 pt-4 text-[12px]/4 text-zinc-600">
+        Locked out or on a new device?
+        <a href="mailto:it@konspec.com" class="font-medium text-zinc-900 underline underline-offset-2">Email it@konspec.com</a>
+      </p>
+    </form>
+
+    <p class="mt-4 text-center text-[11px]/4 text-zinc-500">Konspec Industries · internal system · activity is logged</p>
+  </main>
+</div>

@@ -1,0 +1,60 @@
+<!-- Add line is the group's action, so it is filled, and a filled child takes
+     no divider — the colour change is the join. A border-zinc-200 rule against
+     zinc-700 reads as a crack in the fill rather than a seam, which is why the
+     split button in button-group uses a border one step off its own fill
+     instead.
+
+     Its focus indicator inverts to white. The shape is unchanged, still 2px and
+     still inset; only the colour moves, because zinc-700 on zinc-700 is not an
+     indicator.
+
+     Enter has to do what the button does. This is a form and the button is
+     type="submit", so Enter already fires it. Standalone the field needs the
+     key bound, because typing a code and pressing Enter is the gesture and
+     reaching for the button beside the box is not.
+
+     Apply, in the second group, is not filled. There is one primary button on a
+     screen and it is never a field's helper: an outline addon says this does
+     something to the field, a filled one says this is what the page is for, and
+     two filled groups on one form makes both of them wrong. -->
+<div class="max-w-xl space-y-5">
+  <form @submit.prevent="add()"
+        x-data="{ code: '', lines: 3, msg: '',
+                  add() { const c = this.code.trim().toUpperCase();
+                          if (!c) return;
+                          this.lines++;
+                          this.msg = c + ' added as line ' + this.lines + ' of PO-24-1187.';
+                          this.code = '' } }">
+    <label for="ig5-code" class="mb-1.5 block text-[13px]/5 font-medium">Add an item to this order</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="ig5-code" name="item_code" x-model="code" placeholder="Item code, e.g. HDPE-BLM-5502"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+      <button type="submit" :disabled="!code.trim()"
+              class="inline-flex shrink-0 items-center gap-2 rounded-r-[7px] bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:bg-zinc-200 disabled:text-zinc-400">
+        <i data-lucide="plus" class="size-4"></i>Add line
+      </button>
+    </div>
+    <p role="status" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500"
+       x-text="msg || 'PO-24-1187 has 3 lines. Rates come from RC-26-041.'"></p>
+  </form>
+
+  <div x-data="{ pct: '2.5', applied: false }">
+    <label for="ig5-pct" class="mb-1.5 block text-[13px]/5 font-medium">Line discount (%)</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="ig5-pct" name="discount" x-model="pct" inputmode="decimal"
+             @keydown.enter.prevent="applied = true"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      <span aria-hidden="true" class="flex items-center pr-3 pl-1 text-[14px]/5 text-zinc-500">%</span>
+      <button type="button" @click="applied = true"
+              class="inline-flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+        Apply
+      </button>
+    </div>
+    <p role="status" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+      <span x-show="!applied">Applies to all 3 lines. The vendor sees the net rate, not the discount.</span>
+      <span x-show="applied" x-cloak class="flex items-center gap-1.5">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Applied. Order value is now ₹17,96,950.
+      </span>
+    </p>
+  </div>
+</div>

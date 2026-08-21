@@ -1,0 +1,57 @@
+<!-- A size-10 well, a 16px headline, two lines of explanation and a 36px
+     button is roughly 200px of content, which is more than a dashboard tile
+     has. Compact drops the well to size-8, the headline to 13px, the
+     explanation to one line and the action to a link, and the whole thing sits
+     in about 110px.
+
+     What it does not drop is the distinction between the states. The first tile
+     has nothing yet and offers the create route; the second has rows that a
+     filter is hiding and offers to clear it; the third failed and offers Retry.
+     Shrinking the box is not a reason to collapse four messages into "No data".
+
+     No min-height here. A tile sized to a fixed grid row already has its height
+     from the grid, and adding one on top of it is how a dashboard ends up with
+     one tile taller than the three beside it. -->
+<div class="grid gap-4 sm:grid-cols-3">
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <h3 class="text-[13px]/5 font-medium">Pending QC</h3>
+    <div class="mt-3 flex flex-col items-center py-4 text-center">
+      <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="flask-conical" class="size-4 text-zinc-600"></i>
+      </span>
+      <p class="mt-2 text-[13px]/5 font-medium">Nothing awaiting QC</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">Batches land here when the gate posts a receipt.</p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <h3 class="text-[13px]/5 font-medium">Overdue orders</h3>
+    <div class="mt-3 flex flex-col items-center py-4 text-center">
+      <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="filter-x" class="size-4 text-zinc-600"></i>
+      </span>
+      <p class="mt-2 text-[13px]/5 font-medium">None for Dispatch</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">Seven overdue across the other cost centres.</p>
+      <button type="button"
+              class="mt-2 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Show all cost centres
+      </button>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <h3 class="text-[13px]/5 font-medium">Committed value</h3>
+    <div class="mt-3 flex flex-col items-center py-4 text-center">
+      <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="alert-circle" class="size-4 text-red-600"></i>
+      </span>
+      <p class="mt-2 text-[13px]/5 font-medium">This tile did not load</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">The figure is unavailable, not zero.</p>
+      <button type="button"
+              class="mt-2 inline-flex h-8 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<!-- Wrapped, not bound with for. Both make the text clickable, but only
+     wrapping makes the padding clickable too, and the padding is most of the
+     row: the box is 16px against the 24px WCAG 2.2 asks for, and it is the
+     label's own py-1 and gap that close the gap.
+
+     The input is the label's direct child. Wrapping it in a div for layout
+     still toggles correctly, so nothing appears broken — but the base cursor
+     rule matches label:has(> input[type="checkbox"]) and the pointer silently
+     goes. Put the flex on the label itself.
+
+     items-start with mt-0.5 on the box, because the second row wraps to two
+     lines at 390px and items-center would float a 16px square against the
+     middle of the block. -->
+<div class="max-w-xl space-y-2">
+  <label class="flex items-start gap-2.5 py-1 text-[14px]/5">
+    <input type="checkbox" name="notify" value="buyer" checked
+           class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+    <span>Email Ritu Deshpande when this GRN is posted</span>
+  </label>
+
+  <label class="flex items-start gap-2.5 py-1 text-[14px]/5">
+    <input type="checkbox" name="notify" value="qc" checked
+           class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+    <span class="tabular-nums">Hold the lot for QC until the lab clears batch 24-0912</span>
+  </label>
+</div>

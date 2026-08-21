@@ -1,0 +1,266 @@
+<!-- The assembled screen, and the whole reason the layout exists: eleven batches
+     on hold, a decision on each, and the next one already on screen.
+
+     Deciding removes the record from the queue, and that is the part everybody
+     gets wrong. Focus is on an option that is about to stop existing, and when
+     it does the browser drops focus to the body — the user is at the top of the
+     document with the queue somewhere below them and nothing said about it. So
+     decide() splices, clamps the selection to what is left, moves focus onto the
+     record that took its place, and writes what happened into the status region.
+     That last one is not decoration: the pane changed without focus moving into
+     it, so the region is the only thing that says which batch is now open.
+
+     No single-key shortcuts on the decision buttons. A layout this keyboard-
+     driven invites them, and R for release is a regulated batch cleared by a
+     keystroke somebody meant for the search box. The buttons are ordinary Tab
+     stops in the detail pane, on a record the user has already committed to by
+     pressing Enter, and Release is the one filled button on the screen.
+
+     The tabs across the detail are the underline form from the tabs entry, and
+     they are a widget with their own arrow keys — which is safe here only
+     because the listbox arrows are bound on the listbox and not on the window.
+     Two widgets answering Down at once is what a global handler produces.
+
+     Pass and Fail on the results table are the semantic colour table, not the
+     status mapping. A lab verdict is not a record status, so it does not take
+     one of the five locked words — but it takes the same graphite pill and the
+     same two shades those words would have used, emerald-600 for success and
+     red-600 for danger, so nothing new is invented and nothing is reinterpreted.
+
+     Progress is stated rather than implied. "3 of 11 decided" in the list header
+     is what tells somebody whether the shift ends before the queue does, and it
+     is the reason the count is written out instead of left to the length of a
+     scrollbar.
+
+     As a real page: drop the border and h-[640px], put h-screen overflow-hidden
+     on <body>, and render this in app-shell's main column. -->
+<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec', 'tab', 'panel']"
+      x-data="{
+        sel: 0, detail: false, decided: 3, tab: 'results', said: '',
+        queue: [
+          { id: 'BN-26-0418', item: 'PP copolymer, black', qty: '1,800 kg', held: '6 days', status: 'Overdue', line: 'EX-04', made: '15 Aug 2026', reason: 'Melt flow index out of specification', results: [ ['Melt flow index, g/10 min', '2.8 – 3.6', '4.1', 'Fail'], ['Moisture, %', '≤ 0.05', '0.03', 'Pass'], ['Ash content, %', '≤ 0.20', '0.14', 'Pass'], ['Tensile strength, MPa', '≥ 24.0', '25.6', 'Pass'] ] },
+          { id: 'BN-26-0421', item: 'Masterbatch, blue', qty: '320 kg', held: '2 days', status: 'Approved', line: 'CM-01', made: '19 Aug 2026', reason: 'Dispersion rated 3 on the filter test', results: [ ['Dispersion rating', '≤ 2', '3', 'Fail'], ['Moisture, %', '≤ 0.10', '0.06', 'Pass'], ['Colour ΔE', '≤ 1.0', '0.4', 'Pass'] ] },
+          { id: 'BN-26-0424', item: 'LDPE film grade', qty: '5,600 kg', held: '1 day', status: 'Open', line: 'EX-02', made: '20 Aug 2026', reason: 'Moisture above the drying limit', results: [ ['Moisture, %', '≤ 0.05', '0.09', 'Fail'], ['Melt flow index, g/10 min', '0.8 – 1.2', '1.0', 'Pass'], ['Ash content, %', '≤ 0.20', '0.11', 'Pass'] ] },
+          { id: 'BN-26-0427', item: 'PP homopolymer, natural', qty: '3,200 kg', held: '1 day', status: 'Open', line: 'EX-04', made: '20 Aug 2026', reason: 'Ash content result outstanding', results: [ ['Ash content, %', '≤ 0.20', 'Pending', 'Open'], ['Melt flow index, g/10 min', '2.8 – 3.6', '3.2', 'Pass'], ['Moisture, %', '≤ 0.05', '0.02', 'Pass'] ] },
+          { id: 'BN-26-0430', item: 'HDPE compound, black', qty: '900 kg', held: 'today', status: 'Approved', line: 'CM-02', made: '21 Aug 2026', reason: 'Tensile result outstanding', results: [ ['Tensile strength, MPa', '≥ 24.0', 'Pending', 'Open'], ['Moisture, %', '≤ 0.05', '0.04', 'Pass'], ['Carbon black, %', '2.0 – 2.6', '2.3', 'Pass'] ] }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        verdict: { Pass: 'bg-emerald-600', Fail: 'bg-red-600', Open: 'bg-zinc-500' },
+        get rec() { return this.queue[this.sel] },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.queue.length - 1)) },
+        go(i) {
+          this.sel = i; this.tab = 'results';
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) },
+        decide(word) {
+          const gone = this.rec.id;
+          this.queue.splice(this.sel, 1);
+          this.decided++;
+          if (!this.queue.length) { this.said = gone + ' ' + word + '. The hold queue is clear.'; this.detail = false; return }
+          this.sel = Math.min(this.sel, this.queue.length - 1);
+          this.said = gone + ' ' + word + '. ' + this.rec.id + ', ' + this.rec.item + ', is now open. ' + this.queue.length + ' left on hold.';
+          this.go(this.sel);
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <h1 class="text-[16px]/6 font-semibold">Quality holds</h1>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Silvassa · shift B · 21 Aug 2026</p>
+    </div>
+    <p class="ml-auto shrink-0 text-[12px]/4 tabular-nums text-zinc-600"
+       x-text="decided + ' decided · ' + queue.length + ' left'"></p>
+  </div>
+
+  <div class="flex min-h-0 flex-1">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r lg:w-[22rem]"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">On hold</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="queue.length ? (sel + 1) + ' of ' + queue.length : 'none left'"></p>
+      </div>
+
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')"
+          x-show="queue.length"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(queue.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(b, i) in queue" :key="b.id">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[b.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="b.id"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="b.qty"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="b.status"></span> · <span x-text="b.item"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500" x-text="'Held ' + b.held + ' · line ' + b.line"></span>
+            </span>
+          </li>
+        </template>
+      </ul>
+
+      <!-- The queue drains. Nothing-yet rather than no-results: this is a scope
+           somebody emptied by working through it, and the create action would be
+           putting a batch back on hold, which is not what finishing looks like. -->
+      <div x-show="!queue.length" x-cloak class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+        </span>
+        <h3 class="mt-3 text-[14px]/5 font-semibold">Nothing left on hold</h3>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-text="'All ' + decided + ' batches decided this shift.'"></p>
+      </div>
+    </section>
+
+    <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+             @keydown.escape="back()"
+             class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+             :class="{ 'hidden': !detail, 'flex': detail }">
+
+      <template x-if="queue.length">
+        <div class="flex min-h-0 flex-1 flex-col">
+
+          <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <button type="button" @click="back()"
+                    class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+              <i data-lucide="chevron-left" class="size-4"></i>Back to the queue
+            </button>
+            <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+              <span class="tabular-nums" x-text="rec.id"></span>
+              <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+              </span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.item + ' · ' + rec.qty + ' · line ' + rec.line + ' · made ' + rec.made"></p>
+          </div>
+
+          <div class="shrink-0 border-b border-zinc-200 px-4 lg:px-5">
+            <div x-ref="tabs" role="tablist" aria-label="Batch sections"
+                 @keydown.arrow-right.prevent="tab = tab === 'results' ? 'deviation' : tab === 'deviation' ? 'history' : 'results'; $nextTick(() => $refs.tabs.querySelector('[aria-selected=true]').focus())"
+                 @keydown.arrow-left.prevent="tab = tab === 'results' ? 'history' : tab === 'history' ? 'deviation' : 'results'; $nextTick(() => $refs.tabs.querySelector('[aria-selected=true]').focus())"
+                 class="-mb-px flex gap-6">
+              <template x-for="t in [{ id: 'results', label: 'Lab results' }, { id: 'deviation', label: 'Deviation' }, { id: 'history', label: 'History' }]" :key="t.id">
+                <button type="button" role="tab" :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+                        :aria-selected="tab === t.id" :tabindex="tab === t.id ? 0 : -1"
+                        @click="tab = t.id"
+                        class="shrink-0 rounded-t border-b-2 pb-2.5 pt-3 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                        :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
+                        x-text="t.label"></button>
+              </template>
+            </div>
+          </div>
+
+          <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+
+            <div role="tabpanel" :id="$id('panel', 'results')" :aria-labelledby="$id('tab', 'results')" x-show="tab === 'results'">
+              <div class="overflow-hidden rounded-xl border border-zinc-200">
+                <table class="w-full text-[13px]/5">
+                  <thead>
+                    <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">
+                      <th scope="col" class="px-3 py-2 font-medium">Parameter</th>
+                      <th scope="col" class="px-3 py-2 text-right font-medium">Specification</th>
+                      <th scope="col" class="px-3 py-2 text-right font-medium">Result</th>
+                      <th scope="col" class="px-3 py-2 font-medium">Verdict</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="r in rec.results" :key="r[0]">
+                      <tr class="border-b border-zinc-100 last:border-0">
+                        <td class="px-3 py-2" x-text="r[0]"></td>
+                        <td class="px-3 py-2 text-right tabular-nums text-zinc-600" x-text="r[1]"></td>
+                        <td class="px-3 py-2 text-right font-medium tabular-nums" x-text="r[2]"></td>
+                        <td class="px-3 py-2">
+                          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                            <span class="size-1.5 shrink-0 rounded-full" :class="verdict[r[3]]" aria-hidden="true"></span><span x-text="r[3]"></span>
+                          </span>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div role="tabpanel" :id="$id('panel', 'deviation')" :aria-labelledby="$id('tab', 'deviation')" x-show="tab === 'deviation'" x-cloak>
+              <div class="rounded-xl border border-zinc-200 p-4">
+                <div class="flex items-start gap-2.5">
+                  <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+                  <div class="min-w-0">
+                    <p class="text-[13px]/5 font-medium">Why this batch is held</p>
+                    <p class="mt-0.5 text-[13px]/5 text-zinc-600" x-text="rec.reason"></p>
+                  </div>
+                </div>
+              </div>
+              <p class="mt-4 text-[13px]/5 text-zinc-600">A deviation note is required before release. Releasing on concession records the out-of-specification result against the batch and against the customer order it is allocated to.</p>
+            </div>
+
+            <div role="tabpanel" :id="$id('panel', 'history')" :aria-labelledby="$id('tab', 'history')" x-show="tab === 'history'" x-cloak>
+              <ul role="list" class="space-y-2.5">
+                <li class="flex items-start gap-2.5">
+                  <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+                  <p class="text-[13px]/5 tabular-nums text-zinc-600" x-text="'Held ' + rec.held + ' ago by S. Rane, quality.'"></p>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+                  <p class="text-[13px]/5 tabular-nums text-zinc-600">Retest requested on the failing parameter, sample drawn from three bags.</p>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+                  <p class="text-[13px]/5 tabular-nums text-zinc-600" x-text="'Produced ' + rec.made + ' on line ' + rec.line + ', shift B.'"></p>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Ordinary Tab stops and no shortcut key. A regulated release fired
+               by a stray R is the reason this layout does not get one. -->
+          <div class="flex shrink-0 flex-wrap items-center gap-2 border-t border-zinc-200 px-4 py-3 lg:px-5">
+            <button type="button" @click="decide('rejected')"
+                    class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="alert-circle" class="size-4 text-red-600"></i>Reject the batch
+            </button>
+            <button type="button" @click="decide('kept on hold')"
+                    class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Extend the hold
+            </button>
+            <button type="button" @click="decide('released')"
+                    class="ml-auto inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check" class="size-4"></i>Release
+            </button>
+          </div>
+        </div>
+      </template>
+
+      <template x-if="!queue.length">
+        <div class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 text-center">
+          <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+          </span>
+          <h2 :id="$id('rec')" class="mt-3 text-[16px]/6 font-semibold">The hold queue is clear</h2>
+          <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">Every batch held at Silvassa has been decided this shift. New holds appear here as the lab posts results.</p>
+        </div>
+      </template>
+    </section>
+  </div>
+</main>

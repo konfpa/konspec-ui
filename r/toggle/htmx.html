@@ -1,0 +1,59 @@
+<!-- htmx does the writing, because Alpine does not fetch. The optimistic paint
+     is free: the track reads the input's own checked state, so the switch has
+     already moved before the request leaves. The only code here is the undo.
+
+     want is captured before the request, so Try again re-applies what the user
+     asked for rather than re-posting the value the failure reverted to.
+
+     hx-sync="this:replace" drops a write still in flight, so two toggles inside
+     a second cannot land out of order and settle on the older reply.
+     hx-swap="none" because the row already looks the way it should; the
+     response only has to say whether it worked.
+
+     One endpoint per setting is what makes the POST readable. An unticked
+     checkbox posts nothing at all, so a body carrying only this field says off
+     by its absence — the same absence inside a twelve-field form cannot be told
+     from a field that was never rendered. Django also needs the CSRF token on
+     the request; that is in the django variant.
+
+     The status line is role="status" because the revert is script setting
+     checked, and a programmatic change is announced by nothing. Without it the
+     only sign the setting did not stick is a pixel moving back. -->
+<div class="max-w-xl rounded-xl border border-zinc-200 bg-white px-4 py-2.5"
+     x-data="{ state: 'idle', want: true }"
+     @htmx:before-request.camel="want = $refs.sw.checked; state = 'saving'"
+     @htmx:after-request.camel="
+       if ($event.detail.successful) { state = 'saved' }
+       else { $refs.sw.checked = !want; state = 'failed' }">
+
+  <label class="flex items-start justify-between gap-4 py-1">
+    <span class="text-[14px]/5 tabular-nums">Auto-approve orders under ₹50,000</span>
+    <input type="checkbox" role="switch" x-ref="sw" name="on" value="1" checked
+           hx-post="/vendors/gujarat-polymers/settings/auto-approve/"
+           hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+           class="peer sr-only">
+    <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+      <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+    </span>
+  </label>
+
+  <p role="status" class="mt-1 pr-13 text-[12px]/4">
+    <span x-show="state === 'idle'" class="tabular-nums text-zinc-500">Last changed 16 Aug 2026, 11:04 by Ritu Deshpande</span>
+
+    <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+    </span>
+
+    <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+      <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+    </span>
+
+    <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged
+      </span>
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+              @click="$refs.sw.checked = want; $refs.sw.dispatchEvent(new Event('change'))">Try again</button>
+    </span>
+  </p>
+</div>

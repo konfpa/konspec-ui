@@ -1,0 +1,89 @@
+<!-- The state between the click and the rows. The nav goes aria-busy, the table
+     above goes inert, and the buttons stay exactly as they were.
+
+     Do not disable the controls while the fetch is running. The button somebody
+     just pressed is the one that would be disabled, and a browser blurs a
+     disabled element to the body — so the keyboard user who pressed Next is now
+     at the top of the document and the second press that would have fetched the
+     page after this one goes nowhere. Guard the handler instead: a press while
+     busy returns, which stops the double fetch without taking the control away
+     from the person holding it.
+
+     The ring is the spinner component's, borders and not a Lucide loader, and
+     it is aria-hidden. It appears at 500ms, not at zero: the delay lives in the
+     bound class with a delay-0 base, because a delay left in the base class
+     delays the fade out as well and the ring is still turning half a second
+     after the rows have landed. Most page fetches answer first and it never
+     paints, which is what stops a register flickering on every click.
+
+     Measured through one cycle: computed opacity was 0 at 100ms into a 1.4s
+     fetch, 1 by 900ms, and back to 0 as the rows landed. Focus stayed on Next
+     the whole way, and aria-busy came off by itself, because Alpine removes a
+     false aria-busy rather than writing the string "false".
+
+     It holds its box while invisible — opacity, never x-show — so the row does
+     not widen when it arrives and take the button out from under the cursor.
+
+     The announcement is the range, not the wait. It is already a role="status",
+     it already changes when the page lands, and a second region saying "Loading"
+     is a second thing talking over the first. The ring is for the eye.
+
+     inert on the rows, not on the nav. A scrim stops a mouse and nothing else —
+     Tab still walks into rows that are being replaced and Enter still fires a
+     row action against them. Alpine treats inert as a boolean attribute, so a
+     false value removes it rather than writing inert="false", which is a truthy
+     string that would leave the table permanently unreachable. -->
+<div class="max-w-xl rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       page: 2, pages: 6, size: 3, total: 18, busy: false, t: null,
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get rows() { return [0, 1, 2].map(i => 'GRN-26-0' + (440 + (this.page - 1) * 3 + i)) },
+       go(n) {
+         if (this.busy || n < 1 || n > this.pages) return;
+         this.busy = true;
+         clearTimeout(this.t);
+         this.t = setTimeout(() => { this.page = n; this.busy = false }, 1400);
+       }
+     }">
+
+  <div :inert="busy">
+    <table class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="px-4 py-2.5">Receipt</th>
+          <th scope="col" class="px-4 py-2.5">Vendor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="g in rows" :key="g">
+          <tr class="border-b border-zinc-100 last:border-0">
+            <td class="px-4 py-2.5 font-medium tabular-nums" x-text="g"></td>
+            <td class="px-4 py-2.5 text-zinc-600">Sharma Extrusions</td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+
+  <nav aria-label="Receipt register pages" :aria-busy="busy"
+       class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <div class="flex items-center gap-2">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 opacity-0 transition-opacity delay-0"
+            :class="busy && 'opacity-100 delay-500'" aria-hidden="true"></span>
+      <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+         x-text="from + '–' + to + ' of ' + total + ' receipts'">4–6 of 18 receipts</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 tabular-nums text-zinc-600" x-text="'Page ' + page + ' of ' + pages">Page 2 of 6</span>
+      <button type="button" @click="go(page - 1)" :disabled="page === 1"
+              class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" @click="go(page + 1)" :disabled="page === pages"
+              class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>

@@ -1,0 +1,87 @@
+{
+  "id": "alert-dialog",
+  "name": "Alert dialog",
+  "category": "feedback",
+  "description": "A dialog that interrupts to ask one question with two answers. Unlike a plain dialog it does not dismiss on a backdrop click — the user has to choose.",
+  "when_to_use": "Anything destructive, irreversible, or expensive to undo: deleting a record, closing an order, discarding unsaved work, acting on a selection. If the answer does not matter much, do not interrupt at all.",
+  "rules": [
+    "No @click.self on the backdrop. A dialog dismisses on a stray backdrop click; an alert dialog must not — the user is being asked a question and a misplaced click is not an answer.",
+    "Escape still closes, and it means cancel. Taking that away makes the dialog a trap, which is a worse failure than an accidental dismissal.",
+    "role=\"alertdialog\", not role=\"dialog\". It tells a screen reader to announce the body immediately instead of waiting for the user to navigate to it — which only works if aria-describedby points at that body.",
+    "x-trap.noscroll does three jobs: it traps Tab inside the dialog, it returns focus to the trigger on close, and it locks the page behind. Without it Tab walks straight out into the page underneath, which is still fully interactive.",
+    "The focus trap lands on the first focusable element, so order the DOM to make that the safe one — Cancel, or the input in a typed confirmation. Focus must never open on the button that deletes something, even though it is the last one visually.",
+    "Name the record in the heading. \"Are you sure?\" tells the user nothing about what they are about to lose.",
+    "Say what else goes with it. If deleting the order also deletes a GRN and two approvals, that belongs in the dialog, not in a toast afterwards.",
+    "The confirm button repeats the verb — \"Delete order\", never \"OK\". Someone who reads only the buttons still knows what is about to happen."
+  ],
+  "anatomy": [
+    {
+      "part": "Backdrop",
+      "description": "Dims the page and centres the panel. It carries no click handler at all — that is the whole difference from a dialog."
+    },
+    {
+      "part": "Container",
+      "description": "role=\"alertdialog\" and aria-modal=\"true\", labelled by the heading and described by the consequence line."
+    },
+    {
+      "part": "Heading",
+      "description": "The verb and the record, in one line. \"Delete PO-24-1187\", not \"Confirm deletion\"."
+    },
+    {
+      "part": "Consequence",
+      "description": "What else changes, and whether it can be undone. The only place colour appears in the dialog."
+    },
+    {
+      "part": "Actions",
+      "description": "Two, or three when there is a middle answer. Cancel is first in the DOM so it takes focus; the confirm button carries the verb."
+    }
+  ],
+  "behaviour": [
+    "Opening moves focus into the dialog and onto the safe action, not the confirm.",
+    "Tab and Shift+Tab cycle inside the dialog only. Nothing behind it is reachable.",
+    "Escape cancels. A backdrop click does nothing.",
+    "Closing returns focus to the control that opened it, so the keyboard does not lose its place.",
+    "The page behind does not scroll while the dialog is open.",
+    "Where a precondition exists, the confirm button stays genuinely disabled until it is met — not enabled-but-ignored."
+  ],
+  "accessibility": [
+    "role=\"alertdialog\" with aria-modal=\"true\", so assistive tech treats the rest of the page as inert.",
+    "aria-labelledby points at the heading and aria-describedby at the consequence text. Without the second one the reason is never announced.",
+    "Focus enters on the safe action and cannot leave the dialog while it is open.",
+    "Focus returns to the trigger when the dialog closes.",
+    "Escape closes the dialog from anywhere inside it.",
+    "A blocked confirm is a real disabled button, so the keyboard skips it and a screen reader says it is unavailable, rather than it silently doing nothing."
+  ],
+  "related": [
+    "dialog",
+    "alert",
+    "sheet"
+  ],
+  "variants": [
+    {
+      "id": "confirm",
+      "name": "Confirm",
+      "html": "<div x-data=\"{ open: false }\">\n  <button type=\"button\" @click=\"open = true\"\n          class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">Close order</button>\n\n  <!-- no @click.self here, and that is deliberate: the backdrop does not answer for the user -->\n  <div x-show=\"open\" x-cloak x-trap.noscroll=\"open\" @keydown.escape.window=\"open = false\"\n       class=\"fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4\">\n    <div role=\"alertdialog\" aria-modal=\"true\" aria-labelledby=\"close-title\" aria-describedby=\"close-body\"\n         class=\"w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg\">\n      <h2 id=\"close-title\" class=\"text-[16px]/6 font-semibold\">Close PO-24-1187?</h2>\n      <p id=\"close-body\" class=\"mt-1.5 text-[13px]/5 text-zinc-600\">\n        Sharma Extrusions · <span class=\"tabular-nums\">₹18,42,000</span>. All 6 lines are fully received.\n        Closing stops any further GRN against this order. You can reopen it from the order page.\n      </p>\n      <div class=\"mt-5 flex flex-wrap justify-end gap-2\">\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">Cancel</button>\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Close order</button>\n      </div>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "destructive",
+      "name": "Destructive",
+      "html": "<div x-data=\"{ open: false }\">\n  <button type=\"button\" @click=\"open = true\"\n          class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100\">Delete order</button>\n\n  <div x-show=\"open\" x-cloak x-trap.noscroll=\"open\" @keydown.escape.window=\"open = false\"\n       class=\"fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4\">\n    <div role=\"alertdialog\" aria-modal=\"true\" aria-labelledby=\"del-title\" aria-describedby=\"del-body\"\n         class=\"w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg\">\n      <div class=\"flex items-start gap-3\">\n        <i data-lucide=\"alert-circle\" class=\"mt-0.5 size-4 shrink-0 text-red-600\"></i>\n        <div class=\"min-w-0\">\n          <h2 id=\"del-title\" class=\"text-[16px]/6 font-semibold\">Delete PO-24-1187</h2>\n          <p class=\"mt-1.5 text-[13px]/5 text-zinc-600\">\n            Nashik Steel Traders · <span class=\"tabular-nums\">₹18,42,000</span> · raised 04 Aug 2024.\n          </p>\n          <p id=\"del-body\" class=\"mt-2 text-[13px]/5 font-medium text-red-600\">\n            GRN 1142 and 2 approvals are linked to this order and will be deleted with it. This cannot be undone.\n          </p>\n        </div>\n      </div>\n      <div class=\"mt-5 flex flex-wrap justify-end gap-2\">\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">Cancel</button>\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg bg-red-600 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-red-700\">Delete order</button>\n      </div>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "typed",
+      "name": "Typed confirmation",
+      "html": "<!-- For the small number of actions that cannot be undone at all. Do not reach\n     for this every time something is deleted — if every dialog asks for typing,\n     people learn to type without reading. -->\n<div x-data=\"{ open: false, typed: '', target: 'SHARMA-EXT' }\">\n  <button type=\"button\" @click=\"open = true; typed = ''\"\n          class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100\">Delete vendor</button>\n\n  <div x-show=\"open\" x-cloak x-trap.noscroll=\"open\" @keydown.escape.window=\"open = false\"\n       class=\"fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4\">\n    <div role=\"alertdialog\" aria-modal=\"true\" aria-labelledby=\"wipe-title\" aria-describedby=\"wipe-body\"\n         class=\"w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg\">\n      <h2 id=\"wipe-title\" class=\"text-[16px]/6 font-semibold\">Delete Sharma Extrusions</h2>\n      <p id=\"wipe-body\" class=\"mt-1.5 text-[13px]/5 text-zinc-600\">\n        <span class=\"font-medium text-red-600\">34 orders, 61 invoices and the rate contract</span>\n        are attached to this vendor and go with it. There is no recycle bin and no undo.\n      </p>\n\n      <div class=\"mt-4\">\n        <label for=\"wipe-code\" class=\"mb-1.5 block text-[13px]/5 font-medium\">\n          Type <code class=\"rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4\" x-text=\"target\"></code> to confirm\n        </label>\n        <div class=\"rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n          <input id=\"wipe-code\" x-model=\"typed\" :placeholder=\"target\" autocomplete=\"off\" spellcheck=\"false\"\n                 class=\"w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 outline-none placeholder:text-zinc-500\">\n        </div>\n      </div>\n\n      <div class=\"mt-5 flex flex-wrap justify-end gap-2\">\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">Cancel</button>\n        <button type=\"button\" @click=\"open = false\" :disabled=\"typed !== target\"\n                class=\"rounded-lg px-4 py-2 text-[13px]/5 font-medium\"\n                :class=\"typed === target ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-zinc-200 text-zinc-500'\">\n          Delete vendor\n        </button>\n      </div>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "bulk",
+      "name": "Bulk action",
+      "html": "<!-- Acting on a selection. Say how many, and say which ones will not go\n     through — a bulk action that silently skips rows is the worst kind. -->\n<div x-data=\"{ open: false }\">\n  <button type=\"button\" @click=\"open = true\"\n          class=\"rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Approve 12 selected</button>\n\n  <div x-show=\"open\" x-cloak x-trap.noscroll=\"open\" @keydown.escape.window=\"open = false\"\n       class=\"fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4\">\n    <div role=\"alertdialog\" aria-modal=\"true\" aria-labelledby=\"bulk-title\" aria-describedby=\"bulk-body\"\n         class=\"w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg\">\n      <h2 id=\"bulk-title\" class=\"text-[16px]/6 font-semibold\">Approve 12 purchase orders</h2>\n      <p id=\"bulk-body\" class=\"mt-1.5 text-[13px]/5 text-zinc-600\">\n        Total value <span class=\"font-medium tabular-nums text-zinc-900\">₹94,18,600</span>.\n        Each vendor is emailed a copy as soon as the order is approved.\n      </p>\n\n      <dl class=\"mt-4 space-y-2 rounded-lg border border-zinc-200 px-4 py-3 text-[13px]/5\">\n        <div class=\"flex items-center justify-between gap-4\">\n          <dt class=\"flex items-center gap-2 text-zinc-600\">\n            <i data-lucide=\"check-circle-2\" class=\"size-4 shrink-0 text-emerald-600\"></i>Ready to approve\n          </dt>\n          <dd class=\"shrink-0 font-medium tabular-nums\">9</dd>\n        </div>\n        <div class=\"flex items-center justify-between gap-4\">\n          <dt class=\"flex items-center gap-2 text-zinc-600\">\n            <i data-lucide=\"alert-triangle\" class=\"size-4 shrink-0 text-amber-700\"></i>Above your limit, will route on\n          </dt>\n          <dd class=\"shrink-0 font-medium tabular-nums\">3</dd>\n        </div>\n      </dl>\n\n      <div class=\"mt-5 flex flex-wrap justify-end gap-2\">\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">Cancel</button>\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Approve 12 orders</button>\n      </div>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "unsaved",
+      "name": "Three answers",
+      "html": "<!-- Discard / Cancel / Save. When there is a middle answer, offer it — forcing\n     a two-way choice makes people pick the destructive one to get out. -->\n<div x-data=\"{ open: false }\">\n  <button type=\"button\" @click=\"open = true\"\n          class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">Leave page</button>\n\n  <div x-show=\"open\" x-cloak x-trap.noscroll=\"open\" @keydown.escape.window=\"open = false\"\n       class=\"fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4\">\n    <div role=\"alertdialog\" aria-modal=\"true\" aria-labelledby=\"leave-title\" aria-describedby=\"leave-body\"\n         class=\"w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg\">\n      <h2 id=\"leave-title\" class=\"text-[16px]/6 font-semibold\">Leave without saving?</h2>\n      <p id=\"leave-body\" class=\"mt-1.5 text-[13px]/5 text-zinc-600\">\n        PO-24-1187 has 4 unsaved line items and a changed delivery date. Leaving now loses them.\n      </p>\n      <div class=\"mt-5 flex flex-wrap items-center justify-end gap-2\">\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">Keep editing</button>\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100\">Discard changes</button>\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Save and leave</button>\n      </div>\n    </div>\n  </div>\n</div>"
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{# templates/orders/_collapsible.html
+
+   Three things the server decides that the browser cannot.
+
+   1. Whether the panel starts open. Rendered in the x-data, and the x-cloak
+      goes on only when it starts closed — a panel that starts open and carries
+      x-cloak stays hidden until Alpine boots, which is the exact flash x-cloak
+      exists to prevent.
+
+   2. Whether the panel exists at all. A collapsed panel is not a permission
+      boundary: x-show renders the markup and hides it, so a cost breakup behind
+      a trigger is in the page source of every user who can load the page. The
+      {% if perms %} is what actually withholds it.
+
+   3. The panel id. Rendered in a loop it takes the record key, or the second
+      trigger's aria-controls points at the first panel and both rows open the
+      same thing. #}
+
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{ open: {% if section_open %}true{% else %}false{% endif %} }">
+  <button type="button" @click="open = !open" :aria-expanded="open"
+          aria-controls="col-lines-{{ order.pk }}"
+          class="flex h-12 w-full items-center gap-3 px-4 text-left">
+    <span class="flex-1 text-[14px]/5 font-medium">Order lines</span>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500">{{ order.lines.count }} lines · ₹{{ order.total|floatformat:0 }}</span>
+    <span class="flex transition-transform" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </button>
+
+  <div id="col-lines-{{ order.pk }}" x-show="open"
+       {% if not section_open %}x-cloak{% endif %} x-collapse.duration.200ms>
+    <ul class="divide-y divide-zinc-100 border-t border-zinc-100">
+      {% for line in order.lines.all %}
+        <li class="flex items-baseline gap-3 px-4 py-3">
+          <span class="min-w-0 flex-1 truncate text-[13px]/5">{{ line.item }}</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">{{ line.qty }} {{ line.uom }}</span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹{{ line.amount|floatformat:0 }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{# The panel a user may not read is not rendered, hidden or otherwise. #}
+{% if perms.purchasing.view_cost %}
+  <div class="mt-4 rounded-xl border border-zinc-200 bg-white" x-data="{ open: false }">
+    <button type="button" @click="open = !open" :aria-expanded="open"
+            aria-controls="col-cost-{{ order.pk }}"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left">
+      <span class="flex-1 text-[14px]/5 font-medium">Cost breakup</span>
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+    <div id="col-cost-{{ order.pk }}" x-show="open" x-cloak x-collapse.duration.200ms>
+      <div class="border-t border-zinc-100 px-4 py-3 text-[14px]/5">
+        {% include 'orders/_cost_breakup.html' %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{# A filter panel has to survive the reload its own Apply button causes, so the
+   open state is a GET parameter and not Alpine state — Alpine is reconstructed
+   from scratch on every page load and remembers nothing.
+
+   views.py
+       context['filters_open'] = bool(request.GET.get('f') or form.has_changed())
+
+   The hidden f=1 keeps the panel open through the submit; the count on the
+   trigger is what the closed row says, and without it a filtered register reads
+   as the whole register. #}
+<form method="get" class="mt-4 rounded-xl border border-zinc-200 bg-white"
+      x-data="{ open: {% if filters_open %}true{% else %}false{% endif %} }">
+  <input type="hidden" name="f" value="1">
+  <div class="flex h-12 items-center gap-3 px-4">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-filters"
+            class="-mx-2 flex h-9 items-center gap-2 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+      <i data-lucide="sliders-horizontal" class="size-4 shrink-0 text-zinc-600"></i>
+      Filters
+      {% if active_filters %}
+        <span class="inline-flex items-center rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">{{ active_filters|length }}</span>
+      {% endif %}
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+    <p class="ml-auto shrink-0 text-[13px]/5 tabular-nums text-zinc-600">{{ page_obj.paginator.count }} of {{ total_orders }} orders</p>
+  </div>
+  <div id="col-filters" x-show="open" {% if not filters_open %}x-cloak{% endif %} x-collapse.duration.200ms>
+    <div class="border-t border-zinc-100 px-4 py-4">
+      {{ form.as_div }}
+      <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Apply filters</button>
+    </div>
+  </div>
+</form>
+
+{# A panel expensive enough to be worth not rendering until it is opened.
+   Alpine does not fetch — htmx does. intersect fires the first time the element
+   is genuinely on screen, and a display:none element never intersects, so the
+   request goes out on the first open and once only.
+
+   urls.py
+       path('orders/<int:pk>/audit/', OrderAudit.as_view(), name='order-audit')
+
+   Keep the placeholder roughly the height of what replaces it. x-collapse
+   finishes the panel at height auto, so a swap landing after the animation
+   reflows correctly, but one landing inside those 200ms leaves the panel
+   measuring the placeholder. #}
+<div class="mt-4 rounded-xl border border-zinc-200 bg-white" x-data="{ open: false }">
+  <button type="button" @click="open = !open" :aria-expanded="open"
+          aria-controls="col-audit-{{ order.pk }}"
+          class="flex h-12 w-full items-center gap-3 px-4 text-left">
+    <span class="flex-1 text-[14px]/5 font-medium">Audit trail</span>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500">{{ order.events.count }} events</span>
+    <span class="flex transition-transform" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </button>
+  <div id="col-audit-{{ order.pk }}" x-show="open" x-cloak x-collapse.duration.200ms>
+    <div class="border-t border-zinc-100 px-4 py-3"
+         hx-get="{% url 'order-audit' order.pk %}" hx-trigger="intersect once" hx-swap="innerHTML">
+      <p class="text-[13px]/5 text-zinc-500">Loading the audit trail…</p>
+    </div>
+  </div>
+</div>

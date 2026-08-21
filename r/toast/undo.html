@@ -1,0 +1,68 @@
+<!-- Eight seconds, because that is how long the server will accept the undo.
+     The two numbers are one number: hold the toast longer than the window and
+     the button is a lie by the time it is pressed; shorter and the offer expires
+     while it is still on the screen.
+
+     Undo posts to a real endpoint — hx-post="/orders/1187/lines/4/restore/" —
+     it is not a client-side rollback of something the server already wrote. And
+     it is a shortcut, not the only route: the removed line is still on the
+     order's history page after the toast has gone.
+
+     The timer clears on focusin as well as on hover, so tabbing towards Undo
+     does not make it disappear on the way, and it never runs at all under
+     prefers-reduced-motion. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, ms: 8000, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }">
+
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'Line 4 removed from PO-24-1187', meta: 'MS plate 10 mm · 4.200 MT · ₹1,08,400' })"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="trash-2" class="size-4 text-zinc-600"></i>Remove line
+  </button>
+
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           @mouseenter="pause(t)" @mouseleave="start(t)"
+           @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-zinc-500"><i data-lucide="trash-2" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+        </div>
+        <button type="button"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="shrink-0 rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Undo
+        </button>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>

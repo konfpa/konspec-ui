@@ -1,0 +1,42 @@
+<!-- Three controls in one enclosure, and the DOM order is the tab order:
+     scope, box, submit. Writing the scope select last and floating it left with
+     order-first would look right and tab backwards, which nobody notices until
+     somebody uses the keyboard.
+
+     type="search" earns its place on a phone, where it labels the return key
+     Search — and Chrome draws its own clear cross inside the control, which is
+     why this group does not add one. Two crosses in one enclosure, one of them
+     yours and one of them not, is worse than none at all.
+
+     role="search" goes on the form. The wrapper is a border and has no
+     semantics to give away.
+
+     The submit is icon-only so it carries the whole name, and the name says
+     what is being searched. A screen full of search boxes otherwise hands a
+     screen-reader user four buttons called Search and no way to tell them
+     apart.
+
+     The scope options are one word each because the select is as wide as its
+     longest one, and every pixel it takes comes off the box at 390px. -->
+<form role="search" action="/search/" class="max-w-xl">
+  <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <label for="ig6-scope" class="sr-only">Search in</label>
+    <select id="ig6-scope" name="scope"
+            class="shrink-0 rounded-l-[7px] border-r border-zinc-200 bg-zinc-100 py-2 pr-2 pl-3 text-[13px]/5 font-medium text-zinc-600 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+      <option value="all">All</option>
+      <option value="po">Orders</option>
+      <option value="grn">GRNs</option>
+      <option value="vendors">Vendors</option>
+    </select>
+
+    <label for="ig6-q" class="sr-only">Search orders, GRNs and vendors</label>
+    <input id="ig6-q" name="q" type="search" placeholder="PO-24-1187, HDPE, Gujarat Polymers"
+           class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+
+    <button type="submit" aria-label="Search orders, GRNs and vendors"
+            class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+      <i data-lucide="search" class="size-4 text-zinc-600"></i>
+    </button>
+  </div>
+  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Scoping is what keeps 1,438 open orders out of a vendor lookup.</p>
+</form>

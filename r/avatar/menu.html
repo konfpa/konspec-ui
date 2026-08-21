@@ -1,0 +1,29 @@
+<!-- The circle is inside a real button carrying its own name. An avatar that
+     is the only clickable thing gives the keyboard nothing to land on. -->
+<div class="flex justify-end">
+  <div class="relative inline-block" x-data="{ open: false }" @click.outside="open = false">
+  <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="menu"
+          class="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 hover:bg-zinc-100">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[12px]/4 font-medium text-white" aria-hidden="true">RD</span>
+    <span class="hidden text-[13px]/5 font-medium sm:block">Ritu Deshpande</span>
+    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+  </button>
+
+  <div x-show="open" x-cloak role="menu"
+       class="absolute right-0 z-40 mt-1 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+    <div class="border-b border-zinc-200 px-3 py-2">
+      <p class="truncate text-[13px]/5 font-medium">Ritu Deshpande</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">ritu.deshpande@konspec.com</p>
+    </div>
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+      <i data-lucide="user" class="size-4 text-zinc-600"></i>Profile
+    </button>
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+      <i data-lucide="settings" class="size-4 text-zinc-600"></i>Preferences
+    </button>
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 border-t border-zinc-200 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+      <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
+    </button>
+    </div>
+  </div>
+</div>

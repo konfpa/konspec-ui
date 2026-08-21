@@ -1,0 +1,33 @@
+<!-- One button, two halves. The left half approves; the right half opens the
+     variations. Clicking the left half never opens the menu — that is the whole
+     reason for splitting it rather than making the entire thing a dropdown.
+
+     The chevron carries its own aria-label because "Approve" is already the
+     name of the half beside it, and its own aria-expanded because it is the
+     half that opens something. The divider is border-zinc-600, one step
+     lighter than the fill, because a zinc-200 rule on a dark button reads as a
+     crack rather than a join. -->
+<div class="relative inline-flex" x-data="{ open: false }"
+     @click.outside="open = false" @keydown.escape.window="open = false">
+  <button type="button" class="inline-flex h-9 items-center rounded-l-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+    Approve
+  </button>
+  <button type="button" @click.stop="open = !open"
+          aria-label="More approval options" :aria-expanded="open" aria-haspopup="menu"
+          class="inline-flex h-9 items-center rounded-r-lg border-l border-zinc-600 bg-zinc-700 px-2 text-white hover:bg-zinc-800">
+    <i data-lucide="chevron-down" class="size-4"></i>
+  </button>
+
+  <div x-show="open" x-cloak @click.stop role="menu"
+       class="absolute top-full right-0 z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+      <i data-lucide="check-check" class="size-4 text-zinc-600"></i>Approve and close
+    </button>
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
+      <i data-lucide="user-round-plus" class="size-4 text-zinc-600"></i>Approve and forward
+    </button>
+    <button type="button" role="menuitem" class="flex w-full items-center gap-2.5 border-t border-zinc-200 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-red-50">
+      <i data-lucide="circle-x" class="size-4"></i>Reject
+    </button>
+  </div>
+</div>

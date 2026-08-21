@@ -1,0 +1,58 @@
+<!-- The lock is on the device, not on the account, and the wording has to keep
+     it there. "This account is locked" confirms the account exists to whoever
+     was guessing at it; "too many sign-in attempts from this device" is true of
+     any address typed into this browser and says nothing about any of them. The
+     figure counts down from the same throttle the server is enforcing, so the
+     user is not sitting on a screen that lies about when it will let them back.
+
+     Reset is the primary action rather than Wait, because it is the one route
+     that does not require the countdown to finish — and it is the honest guess
+     about why somebody failed four times in a row.
+
+     A password that expired on a rotation is a different screen: it is not a
+     failure, the user is already authenticated, and it routes straight to the
+     reset variant with the old password as the first field.
+
+     The reference is selectable text. Somebody stuck here cannot raise a ticket
+     in the app, so the one identifier support will ask for has to be copyable
+     off this page. -->
+<div class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+     x-data="{ left: 822 }"
+     x-init="setInterval(() => { if (left &gt; 0) left-- }, 1000)">
+  <main class="w-full max-w-sm">
+
+    <div class="flex items-center justify-center gap-2.5">
+      <span class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[14px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec Operations</span>
+    </div>
+
+    <div class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6 text-center">
+      <span class="mx-auto flex size-11 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="lock" class="size-5 text-zinc-600"></i>
+      </span>
+
+      <h1 class="mt-4 text-[20px]/7 font-semibold tracking-tight">Sign-in is paused</h1>
+      <p class="mt-2 text-[13px]/5 text-zinc-600">
+        Too many sign-in attempts from this device. Sign-in from here is blocked for 15 minutes, whichever address is used.
+      </p>
+
+      <p class="mt-4 rounded-lg border border-zinc-200 px-4 py-3 text-[24px]/7 font-semibold tabular-nums tracking-tight"
+         x-text="Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0')">13:42</p>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-500">Until this device may try again</p>
+
+      <div class="mt-5 space-y-2">
+        <a href="/accounts/password_reset/"
+           class="inline-flex h-10 w-full items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Reset your password instead</a>
+        <a href="mailto:it@konspec.com?subject=Sign-in%20blocked%20(SEC-4471)"
+           class="inline-flex h-10 w-full items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Email IT to unblock now</a>
+      </div>
+
+      <p class="mt-4 border-t border-zinc-100 pt-4 text-left text-[12px]/4 text-zinc-600">
+        Quote reference <span class="font-mono font-medium tabular-nums text-zinc-900 select-all">SEC-4471</span> —
+        IT can see the attempts against it without needing your password.
+      </p>
+    </div>
+
+    <p class="mt-4 text-center text-[11px]/4 text-zinc-500">Konspec Industries · internal system · activity is logged</p>
+  </main>
+</div>

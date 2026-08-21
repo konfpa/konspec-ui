@@ -1,0 +1,69 @@
+<!-- The tab becomes part of the record's address, so a link to "the receipts of
+     PO-24-1187" exists and a reload lands where you left.
+
+     replaceState, not pushState. With pushState, Back walks the user through
+     every tab they touched before it finally leaves the record, which is not
+     what Back means to anyone. If a tab genuinely is a place you can go back
+     to, it is a page, and that is the django variant. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'lines',
+       items: [
+         { id: 'lines',    label: 'Lines' },
+         { id: 'receipts', label: 'Receipts' },
+         { id: 'history',  label: 'History' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       init() {
+         const q = new URLSearchParams(location.search).get('tab');
+         if (this.items.some(t => t.id === q)) this.tab = q;
+       },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         const u = new URL(location.href);
+         u.searchParams.set('tab', id);
+         history.replaceState(null, '', u);
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }">
+  <div class="border-b border-zinc-200">
+    <div x-ref="list" role="tablist" aria-label="Purchase order sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="pick(items[0].id)"
+         @keydown.end.prevent="pick(items[items.length - 1].id)"
+         class="-mb-px flex gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :tabindex="tab === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
+                x-text="t.label"></button>
+      </template>
+    </div>
+  </div>
+
+  <div class="pt-4 text-[14px]/5">
+    <template x-for="t in items" :key="t.id">
+      <div role="tabpanel" tabindex="0" :id="$id('panel', t.id)" :aria-labelledby="$id('tab', t.id)"
+           x-show="tab === t.id" x-cloak
+           class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <p class="text-zinc-600">
+          <span class="font-medium text-zinc-900" x-text="t.label"></span> of PO-24-1187.
+          The address now ends <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600" x-text="'?tab=' + t.id"></code>.
+        </p>
+      </div>
+    </template>
+  </div>
+</div>

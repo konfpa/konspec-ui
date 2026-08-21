@@ -1,0 +1,30 @@
+<!-- One name across the group. Two ticks post notify twice; no ticks post
+     nothing at all, and the server reads that absence off the form definition
+     rather than off the request. -->
+<fieldset class="max-w-xl">
+  <legend class="mb-2 text-[13px]/5 font-medium">Notify when this order is approved</legend>
+
+  <div class="space-y-2">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="notify" value="buyer" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Ritu Deshpande — buyer</span>
+    </label>
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="notify" value="stores" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Anil Kulkarni — stores</span>
+    </label>
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="notify" value="vendor" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Gujarat Polymers Ltd — vendor</span>
+    </label>
+    <!-- locked, and still in its place: dropping it would change the shape of a
+         list people scan by position -->
+    <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+      <input type="checkbox" name="notify" value="plant_head" disabled class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="tabular-nums">Plant head — orders above ₹10,00,000 only</span>
+    </label>
+  </div>
+
+  <!-- one help line under the group, never one under each option -->
+  <p class="mt-2 text-[12px]/4 text-zinc-500">Everyone ticked gets the approved order as a PDF within the hour.</p>
+</fieldset>

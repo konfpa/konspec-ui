@@ -1,0 +1,81 @@
+<div class="rounded-xl border border-zinc-200 bg-white p-5"
+     x-data="{
+       chart: null,
+       init() { this.wait(() => this.draw()); },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. */
+       wait(fn) {
+         const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+         probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const grid = getComputedStyle(this.$root).borderTopColor;
+         const ink  = getComputedStyle(this.$refs.legend).color;
+         const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                           .map(el => getComputedStyle(el).backgroundColor);
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'bar',
+           data: {
+             labels: ['Gujarat Polymers Ltd', 'Nashik Steel Traders', 'Sharma Extrusions', 'Deshpande Traders', 'Vasai Packaging'],
+             datasets: [{
+               label: 'Committed value',
+               data: [4820000, 3140000, 2270000, 1480000, 910000],
+               backgroundColor: tone[0], borderRadius: 4, maxBarThickness: 18
+             }]
+           },
+           options: {
+             indexAxis: 'y',
+             responsive: true, maintainAspectRatio: false,
+             scales: {
+               x: {
+                 beginAtZero: true,
+                 grid: { color: grid }, border: { display: false },
+                 ticks: { color: ink, callback: v => (v / 100000).toFixed(1).replace('.0', '') + 'L' }
+               },
+               y: { grid: { display: false }, border: { color: grid }, ticks: { color: ink } }
+             },
+             plugins: {
+               tooltip: { callbacks: { label: c => '₹' + c.parsed.x.toLocaleString('en-IN') } }
+             }
+           }
+         });
+       },
+       destroy() { this.chart && this.chart.destroy(); }
+     }">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold">Top suppliers by committed value</h3>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Financial year 2026-27, to date</p>
+  </div>
+
+  <ul x-ref="legend" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5">
+      <span data-series class="size-2 rounded-full bg-zinc-600" aria-hidden="true"></span>Committed value
+    </li>
+  </ul>
+
+  <div class="mt-4 h-64">
+    <canvas x-ref="canvas" role="img"
+            aria-label="Top five suppliers by committed value. Gujarat Polymers leads at ₹48.2 lakh, ahead of Nashik Steel Traders at ₹31.4 lakh."></canvas>
+  </div>
+
+  <div class="sr-only">
+    <table>
+      <caption>Top suppliers by committed value, financial year 2026-27 to date</caption>
+      <thead><tr><th scope="col">Supplier</th><th scope="col">Committed value</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Gujarat Polymers Ltd</th><td>₹48,20,000</td></tr>
+        <tr><th scope="row">Nashik Steel Traders</th><td>₹31,40,000</td></tr>
+        <tr><th scope="row">Sharma Extrusions</th><td>₹22,70,000</td></tr>
+        <tr><th scope="row">Deshpande Traders</th><td>₹14,80,000</td></tr>
+        <tr><th scope="row">Vasai Packaging</th><td>₹9,10,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

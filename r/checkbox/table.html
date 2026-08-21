@@ -1,0 +1,260 @@
+<!-- Selection is an array of PO numbers on the root, and the row tint is
+     has-[:checked] reading the box itself, so the two cannot drift apart.
+
+     The boxes carry no name on purpose: the table and the stacked cards are both
+     in the DOM below md, one of them display:none, and a display:none checkbox
+     still posts. Two renderings of one row with one name post that row twice.
+
+     Shift-click runs from the last box touched to the one clicked and takes the
+     state of the box clicked, so a run can be cleared as easily as set. The
+     browser draws a text selection across the rows while it does that, which the
+     handler clears.
+
+     Select-all means this page. The other 4,312 are a second, deliberate click,
+     because a bulk approve that quietly took every match cannot be undone. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       ids: ['PO-24-1187', 'PO-24-1191', 'PO-24-1194', 'PO-24-1203', 'PO-24-1206'],
+       sel: ['PO-24-1191'],
+       last: null,
+       scope: 'page',
+       get every() { return this.sel.length === this.ids.length; },
+       get some() { return this.sel.length > 0 && !this.every; },
+       has(id) { return this.sel.includes(id); },
+       set(id, on) {
+         const at = this.sel.indexOf(id);
+         if (on && at < 0) this.sel.push(id);
+         if (!on && at > -1) this.sel.splice(at, 1);
+       },
+       pick(i, e) {
+         const on = e.target.checked;
+         const from = (e.shiftKey && this.last !== null) ? this.last : i;
+         for (let k = Math.min(from, i); k <= Math.max(from, i); k++) this.set(this.ids[k], on);
+         if (e.shiftKey) window.getSelection().removeAllRanges();
+         this.last = i;
+         this.scope = 'page';
+       },
+       page(on) { this.sel = on ? [...this.ids] : []; this.last = null; this.scope = 'page'; },
+       clear() { this.sel = []; this.last = null; this.scope = 'page'; }
+     }">
+
+  <div x-show="sel.length" x-cloak
+       class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 bg-zinc-100 px-4 py-2">
+    <span class="text-[13px]/5 font-medium tabular-nums">
+      <span x-show="scope === 'page'"><span x-text="sel.length"></span> of 5 on this page selected</span>
+      <span x-show="scope === 'query'" x-cloak>All 4,312 matching orders selected</span>
+    </span>
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
+      <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
+      <button type="button" class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Cancel orders</button>
+    </div>
+    <button type="button" x-show="every && scope === 'page'" x-cloak @click="scope = 'query'"
+            class="text-[13px]/5 tabular-nums text-zinc-900 underline underline-offset-2">Select all 4,312 matching orders</button>
+    <button type="button" @click="clear()" class="ml-auto shrink-0 text-[13px]/5 text-zinc-600 underline underline-offset-2">Clear</button>
+  </div>
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-10 px-4 py-2.5">
+          <input type="checkbox" aria-label="Select all 5 orders on this page"
+                 :checked="every" x-effect="$el.indeterminate = some"
+                 @change="page($event.target.checked)"
+                 class="size-4 accent-zinc-700">
+        </th>
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Due</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+        <td class="px-4 py-2.5">
+          <input type="checkbox" aria-label="Select PO-24-1187"
+                 :checked="has('PO-24-1187')" @click="pick(0, $event)" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
+        <td class="px-4 py-2.5">Sharma Extrusions</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">₹18,42,000</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+        </td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-600">12 Aug</td>
+      </tr>
+      <tr class="border-b border-zinc-100 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+        <td class="px-4 py-2.5">
+          <input type="checkbox" aria-label="Select PO-24-1191"
+                 :checked="has('PO-24-1191')" @click="pick(1, $event)" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1191</td>
+        <td class="px-4 py-2.5">Nashik Steel Traders</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">₹4,68,500</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+          </span>
+        </td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-600">19 Aug</td>
+      </tr>
+      <tr class="border-b border-zinc-100 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+        <td class="px-4 py-2.5">
+          <input type="checkbox" aria-label="Select PO-24-1194"
+                 :checked="has('PO-24-1194')" @click="pick(2, $event)" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194</td>
+        <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">₹27,10,400</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+          </span>
+        </td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-600">02 Aug</td>
+      </tr>
+      <tr class="border-b border-zinc-100 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+        <td class="px-4 py-2.5">
+          <input type="checkbox" aria-label="Select PO-24-1203"
+                 :checked="has('PO-24-1203')" @click="pick(3, $event)" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1203</td>
+        <td class="px-4 py-2.5">Sharma Extrusions</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">₹96,750</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Closed
+          </span>
+        </td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-600">28 Jul</td>
+      </tr>
+      <tr class="[&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+        <td class="px-4 py-2.5">
+          <input type="checkbox" aria-label="Select PO-24-1206"
+                 :checked="has('PO-24-1206')" @click="pick(4, $event)" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1206</td>
+        <td class="px-4 py-2.5">Nashik Steel Traders</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">₹1,32,900</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-600 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-400" aria-hidden="true"></span>Draft
+          </span>
+        </td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-zinc-500">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- below md the same five records, as cards. Same fields, same order, no
+       sideways scroll, and the select-all comes with them. -->
+  <div class="border-b border-zinc-200 px-4 py-2.5 md:hidden">
+    <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
+      <input type="checkbox" aria-label="Select all 5 orders on this page"
+             :checked="every" x-effect="$el.indeterminate = some"
+             @change="page($event.target.checked)"
+             class="size-4 shrink-0 accent-zinc-700">
+      <span class="tabular-nums">All 5 on this page</span>
+    </label>
+  </div>
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="[&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <label class="flex items-start gap-3 px-4 py-3">
+        <input type="checkbox" aria-label="Select PO-24-1187"
+               :checked="has('PO-24-1187')" @click="pick(0, $event)" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1">
+          <span class="flex items-baseline justify-between gap-3">
+            <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1187</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</span>
+          </span>
+          <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Sharma Extrusions</span>
+          <span class="mt-2 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+            </span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-500">Due 12 Aug</span>
+          </span>
+        </span>
+      </label>
+    </li>
+    <li class="[&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <label class="flex items-start gap-3 px-4 py-3">
+        <input type="checkbox" aria-label="Select PO-24-1191"
+               :checked="has('PO-24-1191')" @click="pick(1, $event)" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1">
+          <span class="flex items-baseline justify-between gap-3">
+            <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1191</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹4,68,500</span>
+          </span>
+          <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Nashik Steel Traders</span>
+          <span class="mt-2 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+            </span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-500">Due 19 Aug</span>
+          </span>
+        </span>
+      </label>
+    </li>
+    <li class="[&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <label class="flex items-start gap-3 px-4 py-3">
+        <input type="checkbox" aria-label="Select PO-24-1194"
+               :checked="has('PO-24-1194')" @click="pick(2, $event)" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1">
+          <span class="flex items-baseline justify-between gap-3">
+            <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1194</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹27,10,400</span>
+          </span>
+          <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd</span>
+          <span class="mt-2 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+            </span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-500">Due 02 Aug</span>
+          </span>
+        </span>
+      </label>
+    </li>
+    <li class="[&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <label class="flex items-start gap-3 px-4 py-3">
+        <input type="checkbox" aria-label="Select PO-24-1203"
+               :checked="has('PO-24-1203')" @click="pick(3, $event)" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1">
+          <span class="flex items-baseline justify-between gap-3">
+            <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1203</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹96,750</span>
+          </span>
+          <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Sharma Extrusions</span>
+          <span class="mt-2 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Closed
+            </span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-500">Due 28 Jul</span>
+          </span>
+        </span>
+      </label>
+    </li>
+    <li class="[&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <label class="flex items-start gap-3 px-4 py-3">
+        <input type="checkbox" aria-label="Select PO-24-1206"
+               :checked="has('PO-24-1206')" @click="pick(4, $event)" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1">
+          <span class="flex items-baseline justify-between gap-3">
+            <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1206</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹1,32,900</span>
+          </span>
+          <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Nashik Steel Traders</span>
+          <span class="mt-2 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-600 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-zinc-400" aria-hidden="true"></span>Draft
+            </span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-500">No due date</span>
+          </span>
+        </span>
+      </label>
+    </li>
+  </ul>
+</div>

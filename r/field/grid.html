@@ -1,0 +1,103 @@
+<!-- Every field in the grid keeps its message line whether or not it has
+     anything to say, and that is the whole point of the variant. Grid rows are
+     sized by their tallest cell, so one field growing 22px on submit does not
+     just move itself — it moves its neighbour's neighbour, every row below it,
+     and the Save button. Reserve the line and the error swaps in without a
+     pixel of movement anywhere on the page.
+
+     The price is 22px of nothing under the fields with no help text. That is
+     the trade, and it is worth it on any form that validates, because the
+     alternative is a page that rearranges itself at the exact moment the user
+     is reading it to find out what went wrong.
+
+     Anything long spans both columns. A delivery note squeezed into one column
+     of a two-column grid wraps every four words.
+
+     Tab order is DOM order and nothing here reorders visually, so what the eye
+     follows and what Tab follows are the same. At 390px it is one column, which
+     is why the dates are labelled Effective from and Effective to rather than
+     one date and the word "to" between them. -->
+<div class="max-w-2xl"
+     x-data="{ rate: '118.40', floor: 95, touched: true,
+               get bad() { return this.touched && Number(this.rate) < this.floor } }">
+  <div class="grid gap-4 sm:grid-cols-2">
+
+    <div class="sm:col-span-2">
+      <label for="fx-material" class="mb-1.5 block text-[13px]/5 font-medium">
+        Material <span aria-hidden="true" class="text-red-600">*</span>
+      </label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="fx-material" name="material" required
+                class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          <option value="">Choose a material</option>
+          <option value="m-hdpe">HDPE granules — natural, grade M60075</option>
+          <option value="m-ldpe">LDPE granules — grade 24FS040</option>
+        </select>
+      </div>
+      <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+    </div>
+
+    <div>
+      <label for="fx-rate" class="mb-1.5 block text-[13px]/5 font-medium">
+        Rate per kg <span aria-hidden="true" class="text-red-600">*</span>
+      </label>
+      <div class="flex items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+           :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                       : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+        <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+        <input id="fx-rate" name="rate" inputmode="decimal" required
+               x-model="rate" @blur="touched = true"
+               aria-describedby="fx-rate-msg"
+               :aria-invalid="bad ? 'true' : 'false'"
+               class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      </div>
+      <p id="fx-rate-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+        <span x-show="!bad" x-cloak class="block tabular-nums text-zinc-500">Last agreed ₹114.20 on 12 Mar 2026.</span>
+        <span x-show="bad" x-cloak class="flex items-start gap-1.5 font-medium text-red-600">
+          <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+          <span class="tabular-nums">Below the ₹95.00 floor for this grade.</span>
+        </span>
+      </p>
+    </div>
+
+    <div>
+      <label for="fx-moq" class="mb-1.5 block text-[13px]/5 font-medium">Minimum order</label>
+      <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="fx-moq" name="moq" value="500" inputmode="numeric" aria-describedby="fx-moq-unit"
+               class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+        <span id="fx-moq-unit" class="pr-3 text-[14px]/5 text-zinc-600">kg</span>
+      </div>
+      <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+    </div>
+
+    <div>
+      <label for="fx-from" class="mb-1.5 block text-[13px]/5 font-medium">Effective from</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="fx-from" name="from" type="date" value="2026-09-01"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+      </div>
+      <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+    </div>
+
+    <div>
+      <label for="fx-to" class="mb-1.5 block text-[13px]/5 font-medium">Effective to</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="fx-to" name="to" type="date" value="2027-03-31"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+      </div>
+      <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+    </div>
+
+    <div class="sm:col-span-2">
+      <label for="fx-remarks" class="mb-1.5 block text-[13px]/5 font-medium">Remarks</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <textarea id="fx-remarks" name="remarks" rows="3" aria-describedby="fx-remarks-msg"
+                  class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none">Rate held against the Q3 tender. Freight to Silvassa included.</textarea>
+      </div>
+      <p id="fx-remarks-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+        Spans both columns — in one column of two it wraps every four words.
+      </p>
+    </div>
+
+  </div>
+</div>

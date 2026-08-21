@@ -1,0 +1,72 @@
+{
+  "id": "accordion",
+  "name": "Accordion",
+  "category": "navigation",
+  "description": "Sections of content that collapse to their heading. The heading is a button that toggles the panel below it.",
+  "when_to_use": "Long forms broken into stages, or reference detail most people will not open. Never hide something the user has to act on.",
+  "rules": [
+    "x-collapse needs the Alpine collapse plugin loaded before Alpine core. Without it the directive is ignored and the panel never shows — drop x-collapse and the plain x-show still works, it just snaps open instead of animating.",
+    "The rotate binding goes on a wrapping <span>, never on the <i data-lucide>. Lucide replaces that element with an <svg> and the binding dies with it.",
+    "Rotation needs a block-level box in Tailwind v4 — the wrapping span is flex for that reason.",
+    "Give the header a fixed height. If it grows when open, the second click lands somewhere else.",
+    "Every panel needs an id, and its button needs aria-controls pointing at it. Without that pairing a screen reader announces a button that expands nothing.",
+    "Never put padding on the element x-collapse animates. box-sizing is border-box, so height:0 cannot go below the padding — the panel bottoms out at the padding height and then x-show removes it in a single frame, which reads as a snap. Put the padding on an inner div."
+  ],
+  "anatomy": [
+    {
+      "part": "Root",
+      "description": "Holds the open state. One x-data for the whole group when only one panel may be open, one per item when several may."
+    },
+    {
+      "part": "Header",
+      "description": "A real button at a fixed height, wrapped in a heading element so the group appears in the document outline."
+    },
+    {
+      "part": "Indicator",
+      "description": "A chevron in a flex span. The rotation class goes on the span, never on the icon."
+    },
+    {
+      "part": "Panel",
+      "description": "The collapsible region, carrying an id the header points at through aria-controls."
+    },
+    {
+      "part": "Meta",
+      "description": "Optional right-aligned summary — a count, an amount, a status — so the row is useful while closed."
+    }
+  ],
+  "behaviour": [
+    "Clicking the header toggles its own panel. Clicking an open header closes it.",
+    "In single-open mode, opening one panel closes the others. Track the open item by id, not by index, so reordering does not move the open state.",
+    "A panel that starts closed needs x-cloak. A panel that starts open must not have it, or it stays hidden until Alpine boots.",
+    "The header height does not change between states, so a second click always lands on the same control."
+  ],
+  "accessibility": [
+    "The header is a button, never a div with a click handler.",
+    "aria-expanded reflects the open state and is bound, not hardcoded.",
+    "aria-controls on the button matches the id on the panel.",
+    "Wrap the header in h3, or whichever level fits the page outline, so screen readers can jump between sections.",
+    "The chevron is decorative and carries no label — the heading text alone says what the section is."
+  ],
+  "related": [
+    "collapsible",
+    "tabs",
+    "card"
+  ],
+  "variants": [
+    {
+      "id": "default",
+      "name": "Default",
+      "html": "<div class=\"rounded-xl border border-zinc-200 bg-white\" x-data=\"{ open: true }\">\n  <h3>\n    <button @click=\"open = !open\" :aria-expanded=\"open\" aria-controls=\"acc-delivery\"\n            class=\"flex h-12 w-full items-center gap-3 px-4 text-left\">\n      <span class=\"flex-1 text-[14px]/5 font-medium\">Delivery and freight</span>\n      <span class=\"text-[12px]/4 text-zinc-500\">3 of 3 filled</span>\n      <span class=\"flex transition-transform\" :class=\"open && 'rotate-180'\">\n        <i data-lucide=\"chevron-down\" class=\"size-4 text-zinc-600\"></i>\n      </span>\n    </button>\n  </h3>\n  <div id=\"acc-delivery\" x-show=\"open\" class=\"border-t border-zinc-100 px-4 py-3 text-[14px]/5\">\n    <dl class=\"grid gap-2 sm:grid-cols-2\">\n      <div><dt class=\"text-[12px]/4 text-zinc-600\">Deliver to</dt><dd>Site store — Vasai plant</dd></div>\n      <div><dt class=\"text-[12px]/4 text-zinc-600\">Promised date</dt><dd class=\"tabular-nums\">22 August 2026</dd></div>\n      <div><dt class=\"text-[12px]/4 text-zinc-600\">Freight</dt><dd class=\"tabular-nums\">₹14,500 — to pay</dd></div>\n    </dl>\n  </div>\n</div>"
+    },
+    {
+      "id": "single",
+      "name": "Single-open",
+      "html": "<div class=\"divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white\" x-data=\"{ open: 'terms' }\">\n  <div>\n    <h3>\n      <button @click=\"open = open === 'terms' ? '' : 'terms'\" :aria-expanded=\"open === 'terms'\" aria-controls=\"acc-terms\"\n              class=\"flex h-12 w-full items-center gap-3 px-4 text-left\">\n        <span class=\"flex-1 text-[14px]/5 font-medium\">Payment terms</span>\n        <span class=\"flex transition-transform\" :class=\"open === 'terms' && 'rotate-180'\">\n          <i data-lucide=\"chevron-down\" class=\"size-4 text-zinc-600\"></i>\n        </span>\n      </button>\n    </h3>\n    <div id=\"acc-terms\" x-show=\"open === 'terms'\" x-collapse.duration.200ms>\n      <div class=\"px-4 pb-3 text-[14px]/5 text-zinc-600\">\n        45 days from GRN posting. 2% early-payment discount inside 10 days.\n      </div>\n    </div>\n  </div>\n  <div>\n    <h3>\n      <button @click=\"open = open === 'tax' ? '' : 'tax'\" :aria-expanded=\"open === 'tax'\" aria-controls=\"acc-tax\"\n              class=\"flex h-12 w-full items-center gap-3 px-4 text-left\">\n        <span class=\"flex-1 text-[14px]/5 font-medium\">Tax and GST</span>\n        <span class=\"flex transition-transform\" :class=\"open === 'tax' && 'rotate-180'\">\n          <i data-lucide=\"chevron-down\" class=\"size-4 text-zinc-600\"></i>\n        </span>\n      </button>\n    </h3>\n    <div id=\"acc-tax\" x-show=\"open === 'tax'\" x-cloak x-collapse.duration.200ms>\n      <div class=\"px-4 pb-3 text-[14px]/5 text-zinc-600\">\n        IGST 18% on <span class=\"tabular-nums\">₹18,42,000</span>. Vendor GSTIN 24AABCG1429P1ZK verified 12 July.\n      </div>\n    </div>\n  </div>\n  <div>\n    <h3>\n      <button @click=\"open = open === 'qc' ? '' : 'qc'\" :aria-expanded=\"open === 'qc'\" aria-controls=\"acc-qc\"\n              class=\"flex h-12 w-full items-center gap-3 px-4 text-left\">\n        <span class=\"flex-1 text-[14px]/5 font-medium\">Inspection</span>\n        <span class=\"flex transition-transform\" :class=\"open === 'qc' && 'rotate-180'\">\n          <i data-lucide=\"chevron-down\" class=\"size-4 text-zinc-600\"></i>\n        </span>\n      </button>\n    </h3>\n    <div id=\"acc-qc\" x-show=\"open === 'qc'\" x-cloak x-collapse.duration.200ms>\n      <div class=\"px-4 pb-3 text-[14px]/5 text-zinc-600\">\n        Mill test certificate required per heat number. Reject on hardness outside 190–240 BHN.\n      </div>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "cards",
+      "name": "Bordered card list",
+      "html": "<div x-data=\"{ open: 'grn-3391' }\" class=\"space-y-2\">\n  <div class=\"rounded-xl border border-zinc-200 bg-white\">\n    <h3>\n      <button @click=\"open = open === 'grn-3391' ? '' : 'grn-3391'\" :aria-expanded=\"open === 'grn-3391'\" aria-controls=\"acc-grn-3391\"\n              class=\"flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left\">\n        <span class=\"flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100\">\n          <i data-lucide=\"package-check\" class=\"size-4 text-zinc-600\"></i>\n        </span>\n        <span class=\"min-w-0 flex-1\">\n          <span class=\"block truncate text-[14px]/5 font-medium\">GRN-3391 — Gujarat Polymers Ltd</span>\n          <span class=\"block text-[12px]/4 text-zinc-600\">Posted 11 August · 4 lines</span>\n        </span>\n        <span class=\"hidden text-[13px]/5 tabular-nums sm:block\">₹6,18,400</span>\n        <span class=\"flex transition-transform\" :class=\"open === 'grn-3391' && 'rotate-180'\">\n          <i data-lucide=\"chevron-down\" class=\"size-4 text-zinc-600\"></i>\n        </span>\n      </button>\n    </h3>\n    <div id=\"acc-grn-3391\" x-show=\"open === 'grn-3391'\" class=\"border-t border-zinc-100 px-4 py-3 text-[14px]/5 text-zinc-600\">\n      HDPE granules 8,400 kg received against 8,600 kg ordered. Short-closed by R. Menon.\n    </div>\n  </div>\n\n  <div class=\"rounded-xl border border-zinc-200 bg-white\">\n    <h3>\n      <button @click=\"open = open === 'grn-3388' ? '' : 'grn-3388'\" :aria-expanded=\"open === 'grn-3388'\" aria-controls=\"acc-grn-3388\"\n              class=\"flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left\">\n        <span class=\"flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100\">\n          <i data-lucide=\"package-check\" class=\"size-4 text-zinc-600\"></i>\n        </span>\n        <span class=\"min-w-0 flex-1\">\n          <span class=\"block truncate text-[14px]/5 font-medium\">GRN-3388 — Sharma Steel Traders</span>\n          <span class=\"block text-[12px]/4 text-zinc-600\">Posted 8 August · 2 lines</span>\n        </span>\n        <span class=\"hidden text-[13px]/5 tabular-nums sm:block\">₹2,74,900</span>\n        <span class=\"flex transition-transform\" :class=\"open === 'grn-3388' && 'rotate-180'\">\n          <i data-lucide=\"chevron-down\" class=\"size-4 text-zinc-600\"></i>\n        </span>\n      </button>\n    </h3>\n    <div id=\"acc-grn-3388\" x-show=\"open === 'grn-3388'\" x-cloak class=\"border-t border-zinc-100 px-4 py-3 text-[14px]/5 text-zinc-600\">\n      MS angle 50×50×6 — 12.4 t accepted, mill test certificates on file.\n    </div>\n  </div>\n</div>"
+    }
+  ]
+}

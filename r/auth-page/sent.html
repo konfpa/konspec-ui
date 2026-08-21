@@ -1,0 +1,71 @@
+<!-- This screen renders for every address, including one with no account
+     behind it. That is the whole point of it: it is the only answer the reset
+     endpoint gives, so nothing on it may be conditional on whether the account
+     exists. Echoing the address back is fine — the user typed it — but the
+     sentence stays "if an account exists".
+
+     The icon well is bg-zinc-200 with ring-zinc-300 like every other tinted
+     shape in the system. It does not take a tint of its own because the state
+     is not an error, and a green or amber disc here would be colour used as
+     decoration.
+
+     Resend is a real form POST behind a visible countdown, and the countdown is
+     plain text. Making it a live region announces one fact sixty times. The
+     button is disabled while it runs, which is only acceptable because the
+     figure beside it says exactly what it is waiting for. -->
+<div class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+     x-data="{ left: 45 }"
+     x-init="setInterval(() => { if (left &gt; 0) left-- }, 1000)">
+  <main class="w-full max-w-sm">
+
+    <div class="flex items-center justify-center gap-2.5">
+      <span class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[14px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec Operations</span>
+    </div>
+
+    <div class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6 text-center">
+      <span class="mx-auto flex size-11 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="mail-check" class="size-5 text-zinc-600"></i>
+      </span>
+
+      <h1 class="mt-4 text-[20px]/7 font-semibold tracking-tight">Check your email</h1>
+      <p class="mt-2 text-[13px]/5 text-zinc-600">
+        If an account exists for <span class="font-medium text-zinc-900">akshay.prabhu@konspec.com</span>, we have sent a link to it.
+      </p>
+
+      <dl class="mt-5 space-y-2 rounded-lg border border-zinc-200 px-4 py-3 text-left">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Link expires</dt>
+          <dd class="text-[12px]/4 font-medium tabular-nums">30 minutes after sending</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Uses</dt>
+          <dd class="text-[12px]/4 font-medium tabular-nums">Once</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Sender</dt>
+          <dd class="text-[12px]/4 font-medium">no-reply@konspec.com</dd>
+        </div>
+      </dl>
+
+      <p class="mt-4 text-[12px]/4 text-zinc-500">Nothing after a minute? Check the junk folder before resending — a second link cancels the first.</p>
+
+      <form method="post" action="/accounts/password_reset/" class="mt-4">
+        <input type="hidden" name="username" value="akshay.prabhu@konspec.com">
+        <button type="submit" :disabled="left &gt; 0"
+                class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
+          <span x-show="left === 0" x-cloak>Resend the link</span>
+          <span x-show="left &gt; 0" class="tabular-nums">Resend in <span x-text="left"></span>s</span>
+        </button>
+      </form>
+
+      <p class="mt-4 border-t border-zinc-100 pt-4 text-[12px]/4">
+        <a href="/accounts/login/" class="inline-flex items-center gap-1.5 font-medium text-zinc-900 underline underline-offset-2">
+          <i data-lucide="arrow-left" class="size-3.5"></i>Back to sign in
+        </a>
+      </p>
+    </div>
+
+    <p class="mt-4 text-center text-[11px]/4 text-zinc-500">Konspec Industries · internal system · activity is logged</p>
+  </main>
+</div>

@@ -1,0 +1,130 @@
+<!-- Assembled: the Silvassa gate at 11:04 on a day nothing has arrived. Three
+     receipts were logged yesterday, so this is not a new register and it is not
+     a filter hiding anything either — it is a scope with nothing in it, and
+     that is a fifth shading of nothing-yet with its own two answers. Widen the
+     scope, or log the receipt that is standing at the gate.
+
+     Both answers are on the panel and only one of them is filled. Log a goods
+     receipt is the create action and it is safe here in a way it never is under
+     a filtered register: the scope is a day, the count for that day is zero,
+     and nothing is being hidden that a second receipt could duplicate.
+
+     The status region is the sentence beside the title. It was rendered with
+     the panel, before any scope button was pressed, so writing the new count
+     into it is a change and gets read out. The scope buttons are the segmented
+     control from the button-group entry, copied rather than reinvented: a real
+     radiogroup with one Tab stop, a roving tabindex and aria-checked, so which
+     day is showing is announced and not only tinted.
+
+     The empty state replaces the table rather than sitting inside it, because
+     the emptiness is the scope and not a query — there is no sort and no column
+     choice to preserve, so a header row over it would be four column names
+     describing a day on which nothing happened.
+
+     The footer keeps its place and says "No receipts to show" rather than
+     disappearing, so the panel holds its height and the pager does not jump up
+     under the cursor when the scope changes. Below md the rows are cards; at
+     390px nothing here scrolls sideways. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       scope: 'today',
+       all: {
+         today: [],
+         yesterday: [
+           { grn: 'GRN-26-0442', vendor: 'Sharma Extrusions', qty: '12,000 kg', status: 'Closed' },
+           { grn: 'GRN-26-0443', vendor: 'Nashik Steel Traders', qty: '640 kg', status: 'Open' },
+           { grn: 'GRN-26-0444', vendor: 'Gujarat Polymers Ltd', qty: '3,200 kg', status: 'Approved' }
+         ]
+       },
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       get rows() { return this.all[this.scope] },
+       get label() { return this.scope === 'today' ? '21 Aug' : '20 Aug' }
+     }">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <h2 class="text-[14px]/5 font-semibold">Goods receipts · Silvassa</h2>
+      <p role="status" class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums"
+         x-text="rows.length ? rows.length + ' receipts on ' + label : 'No goods receipts on ' + label"></p>
+    </div>
+    <div role="radiogroup" aria-label="Date scope" x-ref="grp"
+         @keydown.arrow-right.prevent="scope = scope === 'today' ? 'yesterday' : 'today'; $nextTick(() => $refs.grp.querySelector('[aria-checked=true]').focus())"
+         @keydown.arrow-left.prevent="scope = scope === 'today' ? 'yesterday' : 'today'; $nextTick(() => $refs.grp.querySelector('[aria-checked=true]').focus())"
+         class="ml-auto inline-flex rounded-lg bg-zinc-200 p-0.5">
+      <button type="button" role="radio" @click="scope = 'today'"
+              :aria-checked="scope === 'today'" :tabindex="scope === 'today' ? 0 : -1"
+              class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="scope === 'today' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">Today</button>
+      <button type="button" role="radio" @click="scope = 'yesterday'"
+              :aria-checked="scope === 'yesterday'" :tabindex="scope === 'yesterday' ? 0 : -1"
+              class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="scope === 'yesterday' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">Yesterday</button>
+    </div>
+  </div>
+
+  <table x-show="rows.length" x-cloak class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">GRN number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in rows" :key="r.grn">
+        <tr class="border-b border-zinc-100 last:border-0">
+          <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.grn"></td>
+          <td class="px-4 py-2.5" x-text="r.vendor"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="r.qty"></td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+            </span>
+          </td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <ul x-show="rows.length" x-cloak role="list" class="divide-y divide-zinc-100 md:hidden">
+    <template x-for="r in rows" :key="r.grn">
+      <li class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <span class="text-[14px]/5 font-medium tabular-nums" x-text="r.grn"></span>
+          <span class="text-[14px]/5 tabular-nums" x-text="r.qty"></span>
+        </div>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600" x-text="r.vendor"></p>
+        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+        </span>
+      </li>
+    </template>
+  </ul>
+
+  <div x-show="!rows.length" class="flex min-h-72 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="inbox" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">No goods receipts on 21 Aug</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      Nothing has come through the Silvassa gate today. Three receipts were logged yesterday, the last of them at 17:40.
+    </p>
+    <div class="mt-4 flex w-full max-w-xs flex-col items-center gap-3 sm:w-auto sm:max-w-none sm:flex-row">
+      <button type="button"
+              class="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30 sm:w-auto">
+        <i data-lucide="truck" class="size-4"></i>Log a goods receipt
+      </button>
+      <button type="button" @click="scope = 'yesterday'"
+              class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Show yesterday instead
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 text-zinc-500 tabular-nums"
+       x-text="rows.length ? '1–' + rows.length + ' of ' + rows.length + ' receipts' : 'No receipts to show'"></p>
+    <p class="text-[12px]/4 text-zinc-500 tabular-nums">Gate closes 18:00</p>
+  </div>
+</div>

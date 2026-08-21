@@ -1,0 +1,68 @@
+<!-- A page of switches has no Save button, and the header says so once rather
+     than once per row. Each row is a label naming the setting — never its state
+     — with the explanation outside the label and pointed at by
+     aria-describedby.
+
+     One locked row keeps its place and its position. Dropping it would change
+     the shape of a list people scan by position, and repainting it to the off
+     fill would say the setting is off when it is on and out of their hands. -->
+<div class="max-w-xl rounded-xl border border-zinc-200 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium">Notifications — Gujarat Polymers Ltd</h3>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Each switch applies as you set it. There is nothing to save.</p>
+  </div>
+
+  <div class="divide-y divide-zinc-100">
+    <div class="px-4 py-2.5">
+      <label class="flex items-start justify-between gap-4 py-1">
+        <span class="text-[14px]/5">Email the vendor when an order is approved</span>
+        <input type="checkbox" role="switch" name="notify_approved" value="1" checked
+               aria-describedby="sw-approved-help" class="peer sr-only">
+        <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+          <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+        </span>
+      </label>
+      <p id="sw-approved-help" class="mt-1 pr-13 text-[12px]/4 text-zinc-500">Goes to the contact on the rate contract, with the order PDF attached.</p>
+    </div>
+
+    <div class="px-4 py-2.5">
+      <label class="flex items-start justify-between gap-4 py-1">
+        <span class="text-[14px]/5">Email the buyer when a GRN is posted</span>
+        <input type="checkbox" role="switch" name="notify_grn" value="1" checked
+               aria-describedby="sw-grn-help" class="peer sr-only">
+        <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+          <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+        </span>
+      </label>
+      <p id="sw-grn-help" class="mt-1 pr-13 text-[12px]/4 text-zinc-500">Short receipts are flagged in the same mail.</p>
+    </div>
+
+    <div class="px-4 py-2.5">
+      <label class="flex items-start justify-between gap-4 py-1">
+        <span class="text-[14px]/5 tabular-nums">Warn 30 days before the rate contract expires</span>
+        <input type="checkbox" role="switch" name="notify_contract" value="1"
+               aria-describedby="sw-contract-help" class="peer sr-only">
+        <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+          <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+        </span>
+      </label>
+      <p id="sw-contract-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">Current contract runs to 31 Mar 2027.</p>
+    </div>
+
+    <div class="px-4 py-2.5">
+      <label class="flex items-start justify-between gap-4 py-1 has-[:disabled]:text-zinc-500">
+        <span class="text-[14px]/5">Three-way match against the invoice</span>
+        <input type="checkbox" role="switch" checked disabled
+               aria-describedby="sw-match-help" class="peer sr-only">
+        <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+          <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+        </span>
+      </label>
+      <p id="sw-match-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">Compulsory above ₹10,00,000. It changes on the rate contract, not here.</p>
+    </div>
+  </div>
+
+  <div class="border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Last changed 16 Aug 2026, 11:04 by Ritu Deshpande</p>
+  </div>
+</div>

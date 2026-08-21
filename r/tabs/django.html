@@ -1,0 +1,38 @@
+<!-- When each tab is its own URL and its own view, this is not a tablist at
+     all. It is a nav of links that happens to be drawn as tabs, and the
+     difference is not cosmetic: role="tab" would promise a screen reader that
+     the arrows move between panels in this document and that Tab jumps into
+     one, and then neither is true, because every click is a page load.
+
+     So: <a> not <button>, aria-current="page" not aria-selected, no roles, no
+     roving tabindex, no key bindings. The browser already knows how to move
+     between links.
+
+     Choose this over the Alpine variants when the panel is expensive, when the
+     tab has to be bookmarkable and back-navigable, or when the server already
+     has a view per section. Choose the Alpine ones when the panels are cheap
+     and the record is one thing.
+
+     # urls.py
+     path('orders/<int:pk>/<slug:section>/', OrderDetail.as_view(), name='order-detail')
+
+     # views.py — section comes straight out of the URL, so the template needs
+     # no if-chain to work out which tab is on
+     class OrderDetail(DetailView):
+         def get_context_data(self, **kw):
+             return super().get_context_data(**kw) | {'section': self.kwargs['section']} -->
+<nav aria-label="Purchase order sections" class="border-b border-zinc-200">
+  <div class="-mb-px flex gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    {% for key, label in sections %}
+      <a href="{% url 'order-detail' order.pk key %}"
+         {% if key == section %}aria-current="page"{% endif %}
+         class="shrink-0 whitespace-nowrap rounded-t border-b-2 pb-2.5 text-[13px]/5 {% if key == section %}border-zinc-900 font-semibold text-zinc-900{% else %}border-transparent text-zinc-600 hover:text-zinc-900{% endif %}">
+        {{ label }}
+      </a>
+    {% endfor %}
+  </div>
+</nav>
+
+<div class="pt-4 text-[14px]/5">
+  {% block section %}{% endblock %}
+</div>

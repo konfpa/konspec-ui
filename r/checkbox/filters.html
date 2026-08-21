@@ -1,0 +1,55 @@
+<!-- A facet list: one repeated name, a count against each option, and a ceiling
+     on the height so twenty vendors do not push the register off the screen. The
+     vendor name truncates and the count is shrink-0, so nothing reflows at
+     390px and the digits still line up. -->
+<div class="max-w-xs rounded-xl border border-zinc-200 bg-white"
+     x-data="{ sel: ['gujarat-polymers', 'sharma-extrusions'] }">
+  <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+    <h3 class="text-[13px]/5 font-medium">Vendor</h3>
+    <button type="button" x-show="sel.length" x-cloak @click="sel = []"
+            class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600 underline underline-offset-2">
+      Clear <span x-text="sel.length"></span>
+    </button>
+  </div>
+
+  <fieldset class="max-h-56 overflow-y-auto px-4 py-3">
+    <legend class="sr-only">Filter orders by vendor</legend>
+    <div class="space-y-2">
+      <label class="flex items-center gap-2.5 text-[13px]/5">
+        <input type="checkbox" name="vendor" value="gujarat-polymers" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1 truncate">Gujarat Polymers Ltd</span>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">128</span>
+      </label>
+      <label class="flex items-center gap-2.5 text-[13px]/5">
+        <input type="checkbox" name="vendor" value="sharma-extrusions" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1 truncate">Sharma Extrusions</span>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">96</span>
+      </label>
+      <label class="flex items-center gap-2.5 text-[13px]/5">
+        <input type="checkbox" name="vendor" value="nashik-steel" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1 truncate">Nashik Steel Traders</span>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">74</span>
+      </label>
+      <label class="flex items-center gap-2.5 text-[13px]/5">
+        <input type="checkbox" name="vendor" value="silvassa-packaging" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1 truncate">Silvassa Packaging and Allied Products</span>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">41</span>
+      </label>
+      <label class="flex items-center gap-2.5 text-[13px]/5">
+        <input type="checkbox" name="vendor" value="konkan-chemicals" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1 truncate">Konkan Chemicals Pvt Ltd</span>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">18</span>
+      </label>
+      <label class="flex items-center gap-2.5 text-[13px]/5">
+        <input type="checkbox" name="vendor" value="baroda-fasteners" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1 truncate">Baroda Fasteners</span>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">9</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500"
+       x-text="sel.length ? sel.length + ' of 6 vendors' : 'No vendor filter · all 1,438 orders'"></p>
+  </div>
+</div>

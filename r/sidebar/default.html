@@ -1,0 +1,133 @@
+<!-- The panel is three rows in a flex column and only the middle one scrolls.
+     min-h-0 on the nav is the load-bearing half: a flex item defaults to
+     min-height:auto, so without it the nav refuses to shrink below its content,
+     the column grows past 560px, and the footer is pushed off the bottom edge —
+     with no scrollbar anywhere, because nothing ever overflowed.
+
+     Both edges exist from the first frame as border-transparent and only the
+     colour changes. Adding a border on scroll moves every row below it down one
+     pixel and the nav twitches under the cursor.
+
+     The panel is bg-white so the active row has a step to move into. Tint the
+     panel zinc-100 and bg-zinc-100 on the current item measures 1.00 against its
+     own container: not low contrast, the same colour. Hover paints that tint
+     too, so weight is what separates "you are here" from "the pointer is here".
+
+     The counts sit inside the anchor, which is why they need no aria work — the
+     name is already "Purchase orders, 148". Lift one out into a span positioned
+     beside the link and it becomes a number with nothing attached to it. -->
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{ scrolled: false, more: true }">
+
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-transparent px-4 transition-colors"
+       :class="scrolled && 'border-zinc-200'">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="min-w-0 flex-1">
+      <span class="block truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+      <span class="block truncate text-[11px]/4 text-zinc-500">Vasai plant</span>
+    </span>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2"
+       @scroll="scrolled = $el.scrollTop > 0; more = $el.scrollHeight - $el.scrollTop - $el.clientHeight > 1">
+
+    <p id="sb1-g1" class="px-2.5 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Procurement</p>
+    <ul role="list" aria-labelledby="sb1-g1" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Overview</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Purchase orders</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">148</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="clipboard-list" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Requisitions</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">62</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="truck" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Goods receipt</span>
+          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="receipt" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Invoices</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">9</span>
+        </a>
+      </li>
+    </ul>
+
+    <p id="sb1-g2" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Master data</p>
+    <ul role="list" aria-labelledby="sb1-g2" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Vendors</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="package" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Materials</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">2,418</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="scale" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Rate contracts</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">24</span>
+        </a>
+      </li>
+    </ul>
+
+    <p id="sb1-g3" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Saved views</p>
+    <ul role="list" aria-labelledby="sb1-g3" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Overdue over 7 days</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">18</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">27</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-zinc-400" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">My approvals</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">4</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="shrink-0 border-t border-transparent p-2 transition-colors" :class="more && 'border-zinc-200'">
+    <button type="button" class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
+        <span class="block truncate text-[11px]/4 text-zinc-500">Level 2 approver</span>
+      </span>
+      <i data-lucide="chevrons-up-down" class="size-4 shrink-0 text-zinc-500"></i>
+    </button>
+  </div>
+</div>

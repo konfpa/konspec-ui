@@ -1,0 +1,58 @@
+<!-- Radios with numbers on them, not stars. A star has no defined meaning, so
+     three stars from one assessor and three from another are not the same
+     judgement; it announces as "3 stars" with no scale attached; half stars
+     claim a precision nobody measured; and the whole widget needs its keyboard
+     behaviour written by hand, which is exactly the machinery a native radio
+     group already has and gets right.
+
+     Both ends are worded and the words sit under the row rather than inside the
+     tiles, so five tiles stay five equal squares and still fit at 390px. An
+     unworded scale is a mood, and the midpoint of an unworded scale is where
+     every assessor who does not want to commit puts the answer.
+
+     The anchors are referenced only from the two options they describe. Attach
+     them to all five and the sentence is read out again on every arrow keypress
+     across the group.
+
+     Not applicable sits below a rule and outside the scale, because it is not a
+     low score. Folded in as a sixth tile it joins the ordering and starts
+     getting averaged with the rest. -->
+<fieldset class="max-w-lg">
+  <legend>
+    <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Vendor assessment · Deccan Bearings Pvt Ltd</span>
+    <span class="mt-1.5 block text-[14px]/5 font-medium">Documentation control — drawings, test certificates and revision history</span>
+  </legend>
+
+  <div class="mt-3 grid grid-cols-5 gap-2">
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="va_docs" value="1" aria-describedby="qs-low" class="size-4 shrink-0 accent-zinc-700">
+      <span class="text-[13px]/5 tabular-nums">1</span>
+    </label>
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="va_docs" value="2" class="size-4 shrink-0 accent-zinc-700">
+      <span class="text-[13px]/5 tabular-nums">2</span>
+    </label>
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="va_docs" value="3" checked class="size-4 shrink-0 accent-zinc-700">
+      <span class="text-[13px]/5 tabular-nums">3</span>
+    </label>
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="va_docs" value="4" class="size-4 shrink-0 accent-zinc-700">
+      <span class="text-[13px]/5 tabular-nums">4</span>
+    </label>
+    <label class="flex flex-col items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="va_docs" value="5" aria-describedby="qs-high" class="size-4 shrink-0 accent-zinc-700">
+      <span class="text-[13px]/5 tabular-nums">5</span>
+    </label>
+  </div>
+
+  <div class="mt-2 flex justify-between gap-4 text-[12px]/4 text-zinc-500">
+    <span id="qs-low" class="max-w-[45%]">1 — No controlled documents</span>
+    <span id="qs-high" class="max-w-[45%] text-right">5 — Controlled and audited</span>
+  </div>
+
+  <label class="mt-4 flex items-center gap-2.5 border-t border-zinc-100 pt-3.5 text-[13px]/5">
+    <input type="radio" name="va_docs" value="na" class="size-4 shrink-0 accent-zinc-700">
+    <span>Not applicable — supplies to our drawing only</span>
+  </label>
+</fieldset>

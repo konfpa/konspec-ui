@@ -1,0 +1,24 @@
+<!-- The plain tile: what the number is, the number, and when it was read. No
+     delta, because not every metric has a comparable previous period and a tile
+     is allowed to be one fact.
+
+     It is a <div> and it has no hover state. A border that darkens under the
+     cursor promises a destination and this tile has none — the dashboard variant
+     below is the case where the whole tile navigates.
+
+     dt then dd, so the label and the figure are one unit in the accessibility
+     tree rather than two paragraphs that happen to be adjacent.
+
+     The rupee mark is its own span one step down. Set it at 24px semibold and
+     four tiles in a row start their digits at four different x positions, which
+     is the whole reason the figure is tabular-nums in the first place. -->
+<div class="max-w-xs rounded-xl border border-zinc-200 bg-white p-4">
+  <dl>
+    <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open order value · all plants</dt>
+    <dd class="mt-1.5 flex items-baseline gap-1">
+      <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+      <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">1.84 Cr</span>
+    </dd>
+  </dl>
+  <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Read at 09:00 from the order register</p>
+</div>

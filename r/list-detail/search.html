@@ -1,0 +1,242 @@
+<!-- The list gets a header that filters it, and the interesting problem is what
+     happens to the record already in the detail pane when the filter excludes it.
+
+     Three answers are on offer and two of them are wrong. Blanking the pane
+     deletes the record somebody is reading because they typed in a box. Jumping
+     to the first match opens a record nobody asked for, and on a decision queue
+     that is a record put in front of a user without their say-so. The third is
+     what this does: keep it, and say so in a line above it. The detail is what
+     you are working on; the list is how you found it, and re-filtering the list
+     is not an instruction about the record.
+
+     The keyboard hand-off is one binding and it runs one way only. Down in the
+     search box moves focus to the first result, because that is the gesture the
+     field already implies. The listbox arrows stay on the listbox, so the caret
+     keys inside the box are the field's own and typing is never intercepted —
+     which is also why there is no type-ahead on the list. A listbox that jumps
+     on a keystroke while a search box sits above it is two search boxes, and the
+     one that eats letters silently is the one nobody asked for.
+
+     There is no type-ahead and there is no wrap. Escape clears the box and stops
+     propagating, so it does not also close a sheet this list is sitting in.
+
+     When the filter matches nothing the rows are replaced by empty-state's
+     no-results shape, in the box the rows would have filled, with no create
+     button on it — the records exist and the query is hiding them. The count
+     line is a role="status" that was on the panel before the first keystroke,
+     which is the condition a live region has to meet to be heard at all.
+
+     The pager under the list is pagination's dense form. It pages the queue and
+     nothing else: the selection survives it, which is why the detail can still
+     be showing a record from page one while page two is on screen. -->
+<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        q: '', plant: 'all', sel: 'BN-26-0418', page: 1, size: 4, detail: false,
+        batches: [
+          { id: 'BN-26-0411', item: 'HDPE compound, natural', plant: 'Silvassa', qty: '2,400 kg', status: 'Closed', held: 'Released 20 Aug', reason: 'Passed on retest' },
+          { id: 'BN-26-0418', item: 'PP copolymer, black', plant: 'Silvassa', qty: '1,800 kg', status: 'Overdue', held: 'On hold 6 days', reason: 'MFI 4.1 against a spec of 2.8–3.6' },
+          { id: 'BN-26-0421', item: 'Masterbatch, blue', plant: 'Vapi', qty: '320 kg', status: 'Approved', held: 'On hold 2 days', reason: 'Dispersion rated 3 on the filter test' },
+          { id: 'BN-26-0424', item: 'LDPE film grade', plant: 'Silvassa', qty: '5,600 kg', status: 'Open', held: 'On hold 1 day', reason: 'Moisture 0.09% against a limit of 0.05%' },
+          { id: 'BN-26-0427', item: 'PP homopolymer, natural', plant: 'Vapi', qty: '3,200 kg', status: 'Open', held: 'On hold 1 day', reason: 'Ash content pending' },
+          { id: 'BN-26-0430', item: 'HDPE compound, black', plant: 'Silvassa', qty: '900 kg', status: 'Approved', held: 'On hold today', reason: 'Awaiting the tensile result' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get matched() {
+          const q = this.q.trim().toLowerCase();
+          return this.batches.filter(b =>
+            (this.plant === 'all' || b.plant === this.plant) &&
+            (!q || (b.id + ' ' + b.item).toLowerCase().includes(q)));
+        },
+        get pages() { return Math.max(1, Math.ceil(this.matched.length / this.size)) },
+        get shown() { return this.matched.slice((this.page - 1) * this.size, this.page * this.size) },
+        get rec() { return this.batches.find(b => b.id === this.sel) },
+        get outside() { return this.rec && !this.matched.some(b => b.id === this.sel) },
+        move(step) {
+          const list = this.shown;
+          const i = list.findIndex(b => b.id === this.sel);
+          const next = Math.min(Math.max((i < 0 ? 0 : i + step), 0), list.length - 1);
+          if (list[next]) this.go(list[next].id);
+        },
+        go(id) {
+          this.sel = id;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+          });
+        },
+        first() { if (this.shown.length) this.go(this.shown[0].id) },
+        clear() { this.q = ''; this.plant = 'all'; this.page = 1; this.$refs.q.focus() },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) }
+      }"
+      x-effect="if (page > pages) page = pages">
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3">
+    <h1 class="text-[16px]/6 font-semibold">Batches on quality hold</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 batches held across two plants</p>
+  </div>
+
+  <div class="flex min-h-0 flex-1">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r lg:w-[22rem]"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+
+      <div class="shrink-0 space-y-2.5 border-b border-zinc-200 px-4 py-3">
+        <h2 :id="$id('q')" class="sr-only">Held batches</h2>
+
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+          <input x-ref="q" x-model="q" type="search" aria-label="Search held batches"
+                 autocomplete="off" spellcheck="false" enterkeyhint="search"
+                 @input="page = 1"
+                 @keydown.arrow-down.prevent="first()"
+                 @keydown.escape="if (q) { $event.stopPropagation(); q = '' }"
+                 placeholder="Batch number or material"
+                 class="w-full min-w-0 bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500 [&::-webkit-search-cancel-button]:appearance-none">
+        </div>
+
+        <div class="flex flex-wrap items-center gap-1.5">
+          <template x-for="p in ['all', 'Silvassa', 'Vapi']" :key="p">
+            <button type="button" @click="plant = p; page = 1" :aria-pressed="plant === p"
+                    class="inline-flex h-7 items-center rounded-full px-2.5 text-[12px]/4 font-medium ring-1 ring-inset focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="plant === p ? 'bg-zinc-700 text-white ring-zinc-700' : 'bg-zinc-200 text-zinc-700 ring-zinc-300 hover:bg-zinc-300'"
+                    x-text="p === 'all' ? 'All plants' : p"></button>
+          </template>
+        </div>
+
+        <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+           x-text="matched.length ? matched.length + ' of ' + batches.length + ' batches' : 'No batches match this search'"></p>
+      </div>
+
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')"
+          x-show="matched.length"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="first()"
+          @keydown.end.prevent="if (shown.length) go(shown[shown.length - 1].id)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="b in shown" :key="b.id">
+          <li role="option" :aria-selected="sel === b.id" :tabindex="sel === b.id ? 0 : -1"
+              @click="go(b.id); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === b.id && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[b.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="b.id"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="b.qty"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="b.status"></span> · <span x-text="b.item"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 text-zinc-500" x-text="b.plant + ' · ' + b.held"></span>
+            </span>
+          </li>
+        </template>
+      </ul>
+
+      <!-- Same box the rows would have filled, and no create button on it: the
+           batches exist and the query is hiding them. -->
+      <div x-show="!matched.length" x-cloak class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
+        </span>
+        <h3 class="mt-3 text-[14px]/5 font-semibold">No batches match</h3>
+        <p class="mt-1 text-[12px]/4 text-zinc-600">The search covers the batch number and the material. The plant filter is still on.</p>
+        <button type="button" @click="clear()"
+                class="mt-3 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Clear the search and filters
+        </button>
+      </div>
+
+      <nav aria-label="Held batch pages" class="flex shrink-0 items-center justify-between gap-2 border-t border-zinc-200 px-3 py-2">
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="'Page ' + page + ' of ' + pages"></p>
+        <div class="flex gap-1">
+          <button type="button" aria-label="Previous page of held batches" @click="page = Math.max(page - 1, 1)" :disabled="page === 1"
+                  class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="chevron-left" class="size-4"></i>
+          </button>
+          <button type="button" aria-label="Next page of held batches" @click="page = Math.min(page + 1, pages)" :disabled="page === pages"
+                  class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="chevron-right" class="size-4"></i>
+          </button>
+        </div>
+      </nav>
+    </section>
+
+    <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+             @keydown.escape="back()"
+             class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+             :class="{ 'hidden': !detail, 'flex': detail }">
+      <div class="shrink-0 border-b border-zinc-200 px-4 py-3 md:px-5 md:py-4">
+        <button type="button" @click="back()"
+                class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+          <i data-lucide="chevron-left" class="size-4"></i>Back to the queue
+        </button>
+        <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+          <span class="tabular-nums" x-text="rec.id"></span>
+          <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+          </span>
+        </h2>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-600" x-text="rec.item + ' · ' + rec.plant + ' · ' + rec.qty"></p>
+      </div>
+
+      <!-- The record stays put when the filter drops it, and a line says why it
+           is no longer in the list beside it. Blanking the pane deletes what
+           somebody is reading because they typed in a box. -->
+      <p x-show="outside" x-cloak role="status"
+         class="flex shrink-0 items-start gap-2 border-b border-zinc-200 bg-zinc-100 px-5 py-2.5 text-[12px]/4 text-zinc-600">
+        <i data-lucide="filter" class="mt-px size-3.5 shrink-0 text-zinc-600"></i>
+        <span><span class="font-medium text-zinc-900" x-text="rec.id"></span> is still open here but is outside the current search and filters.</span>
+      </p>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <div class="rounded-xl border border-zinc-200 p-4">
+          <div class="flex items-start gap-2.5">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            <div class="min-w-0">
+              <p class="text-[13px]/5 font-medium">Why this batch is held</p>
+              <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600" x-text="rec.reason"></p>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="mt-5 text-[13px]/5 font-medium">Lab results</h3>
+        <div class="mt-2 overflow-hidden rounded-xl border border-zinc-200">
+          <table class="w-full text-[13px]/5">
+            <thead>
+              <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="px-3 py-2 font-medium">Parameter</th>
+                <th scope="col" class="px-3 py-2 text-right font-medium">Spec</th>
+                <th scope="col" class="px-3 py-2 text-right font-medium">Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100">
+                <td class="px-3 py-2">Melt flow index, g/10 min</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">2.8 – 3.6</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">4.1</td>
+              </tr>
+              <tr class="border-b border-zinc-100">
+                <td class="px-3 py-2">Moisture, %</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">≤ 0.05</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">0.03</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Ash content, %</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">≤ 0.20</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">0.14</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>

@@ -1,0 +1,52 @@
+<!-- Both buttons run the same request; only one of them is slow enough to be
+     worth a spinner. Below about 300ms the ring answers before the eye has
+     resolved it and all anyone sees is a flicker where the number was.
+
+     The floor needs no timer. The ring sits at opacity-0 and picks up
+     transition-opacity delay-500 only while the flag is on, so the fade does not
+     begin until 500ms after the click. A request that answers in 120ms turns the
+     flag off again during the delay, the computed opacity goes from 0 to 0, and
+     nothing was ever painted. Measured: opacity never left 0 on the fast button
+     and reached 1 at 683ms on the slow one.
+
+     The delay is in the bound class, not the base class. Left in the base it
+     delays the fade *out* too — measured, the ring was still at full opacity
+     520ms after a 1.6s request had landed its content, which reads as a panel
+     still loading something it has finished drawing. Written this way it was
+     gone 196ms after the work stopped.
+
+     opacity and not x-show, because opacity keeps the box. A spinner that
+     appears with display widens the row 500ms after the click and moves the
+     button out from under the cursor.
+
+     The floor cannot reach the live region: x-text fires the moment the flag
+     flips, so the announcement gets its own 500ms timer. Without it a 120ms
+     request that never painted a ring is still announced as a wait. -->
+<div class="rounded-xl border border-zinc-200 bg-white p-4"
+     x-data="{
+       busy: false, late: false, timer: null,
+       run(ms) {
+         this.busy = true; this.late = false;
+         clearTimeout(this.timer);
+         this.timer = setTimeout(() => { this.late = this.busy }, 500);
+         setTimeout(() => { this.busy = false; this.late = false; clearTimeout(this.timer) }, ms);
+       }
+     }">
+  <p class="text-[13px]/5 font-medium">Recalculate committed value</p>
+  <p class="mt-1 text-[12px]/4 text-zinc-500">One plant answers in 120ms and never shows a ring. All five take 1.6s and do.</p>
+
+  <div class="mt-3 flex flex-wrap items-center gap-3">
+    <button type="button" @click="run(120)"
+            class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Nashik only</button>
+    <button type="button" @click="run(1600)"
+            class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">All five plants</button>
+
+    <span class="flex items-center gap-2 opacity-0 transition-opacity delay-0 duration-150"
+          :class="busy && 'opacity-100 delay-500'">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <span class="text-[13px]/5 text-zinc-600">Recalculating</span>
+    </span>
+  </div>
+
+  <p role="status" class="sr-only" x-text="late ? 'Recalculating committed value' : ''"></p>
+</div>

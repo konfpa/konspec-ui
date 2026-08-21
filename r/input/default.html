@@ -1,0 +1,22 @@
+<!-- The border, the fill and the focus outline are on the wrapper. The input
+     inside it is bg-transparent with outline-none and draws nothing at all.
+
+     outline-none on the control is only legal because of that. Tailwind
+     resolves outline-style through a variable, so writing outline-none on the
+     same element that carries focus-visible:outline-3 sets the width and the
+     colour and then removes the style — it inspects as styled and renders as
+     nothing. One element per outline: here it is the wrapper.
+
+     w-full makes the whole box a click target rather than just the text.
+     min-w-0 is what lets the input shrink at 390px; without it an input holds
+     a min-content width of about twenty characters and pushes anything beside
+     it out through the border. -->
+<div class="max-w-xl">
+  <label for="in-title" class="mb-1.5 block text-[13px]/5 font-medium">Order title <span class="text-red-600">*</span></label>
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <input id="in-title" name="title" value="MS angles and plates — August lot"
+           aria-describedby="in-title-help"
+           class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+  <p id="in-title-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Printed on the order and used as the subject of the vendor email.</p>
+</div>

@@ -1,0 +1,60 @@
+<!-- The route resolved to nothing. The single most useful thing on the screen
+     is the path that was asked for, because the usual cause is a link in an
+     email older than the last numbering change, and seeing the old prefix is
+     what tells the user that.
+
+     The path is selectable and break-all: an unbroken 60-character URL is the
+     one string on this page that will push a 390px screen sideways.
+
+     The primary action goes to the register the record would have been in, not
+     to the home page. Back to purchase orders keeps everything the user knew
+     about where they were; back to the dashboard throws it away.
+
+     No shell, so the wordmark is the only navigation and it is a real link. No
+     search box: the register the button lands on has one, and it has the
+     filters that go with it. -->
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+
+  <header class="flex items-center justify-between gap-3">
+    <a href="/" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+      <span class="text-[14px]/5 font-semibold">Konspec Operations</span>
+    </a>
+    <p class="hidden text-[12px]/4 text-zinc-500 sm:block">Silvassa · procurement</p>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center py-10">
+    <div class="w-full max-w-md text-center">
+      <span class="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="file-question" class="size-5 text-zinc-600" aria-hidden="true"></i>
+      </span>
+
+      <p class="mt-4 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Error 404</p>
+      <h1 tabindex="-1" class="mt-1 text-[20px]/7 font-semibold tracking-tight">This page does not exist</h1>
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600">
+        Nothing is served at this address. PO-24-9910 was either cancelled before it was approved, or the link came from an email older than the numbering change, when Silvassa orders moved to the KIS/PO/24 series.
+      </p>
+
+      <p class="mt-4 inline-block max-w-full break-all rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-left text-[12px]/4">
+        <span class="select-all font-mono text-zinc-600">/orders/PO-24-9910/</span>
+      </p>
+
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+        <a href="/orders/"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          Back to purchase orders
+        </a>
+        <a href="mailto:it@konspec.com?subject=Broken%20link%20%2Forders%2FPO-24-9910%2F"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Report the link
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-zinc-200 pt-4 text-center text-[11px]/4 text-zinc-500">
+    Signed in as akshay.prabhu@konspec.com · IT support
+    <a href="mailto:it@konspec.com" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">it@konspec.com</a>
+    · ext 4102
+  </footer>
+</div>

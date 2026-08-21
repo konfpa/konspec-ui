@@ -1,0 +1,72 @@
+<!-- The same 6px dot the badge uses, with no pill round it. The pill exists to
+     give a scattered set of states a shared shape; a list already has a shared
+     left edge and the marks already form a column, so the pill is weight for
+     nothing. The locked mapping is unchanged — zinc-500 open, amber-500
+     waiting, red-600 overdue, emerald-600 done.
+
+     Four of the five here are graphite, which is the point. Colour one mark per
+     row and the column is a stripe of traffic lights by the twelfth row and the
+     overdue one is no longer the thing your eye lands on.
+
+     The dot is aria-hidden and the status is a sr-only word at the front of the
+     meta line, so the state is not colour alone. The link is the label, never
+     the mark — a 6px disc is 6px of hit area with no accessible name. -->
+<div class="max-w-md overflow-hidden rounded-xl border border-zinc-200 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium">Orders awaiting receipt</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">5 of 1,438 · sorted by due date</p>
+  </div>
+
+  <ul role="list" class="divide-y divide-zinc-100">
+    <li class="flex items-start gap-2.5 px-4 py-3">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-red-600"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1187 · Sharma Extrusions</a>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">₹4,82,000</span>
+        </div>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Overdue — </span>Due 12 Aug 2026 · 9 days late</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-3">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1186 · Konkan Fabricators</a>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">₹1,15,400</span>
+        </div>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Approved — </span>With the plant head since 14 Aug 2026</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-3">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1194 · Gujarat Polymers Ltd</a>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">₹18,42,000</span>
+        </div>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Due 28 Aug 2026 · part received</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-3">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1201 · Qureshi Metals</a>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">₹2,30,000</span>
+        </div>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Due 02 Sep 2026</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-3">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="truncate text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1203 · Deshpande Traders</a>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">₹96,750</span>
+        </div>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Due 05 Sep 2026</p>
+      </div>
+    </li>
+  </ul>
+</div>

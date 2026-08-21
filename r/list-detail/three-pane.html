@@ -1,0 +1,241 @@
+<!-- Three panes, three scrollers, and the rule that makes it work is that each
+     one is a Tab stop of its own and none of them steals the others' keys. The
+     filter rail is a set of ordinary radios and checkboxes walked by Tab; the
+     list is a listbox walked by the arrows; the detail is a region focus lands
+     on when a record is committed. Give the rail arrow-key navigation too and
+     the user has three widgets that all answer Down and no way to know which one
+     has it.
+
+     The rail is an <aside> with a name, because at three landmarks in a row the
+     landmark list is how somebody moves between them. Its width is fixed at
+     14rem: a filter column that flexes gets wider on a 27-inch screen and puts
+     forty pixels between a checkbox and its label.
+
+     Three panes need real width, so the rail is hidden below lg rather than
+     squeezed. What replaces it is not nothing: the filters that are set show as
+     chips in the list header, and the Filters button opens the drawer component
+     over the list at that width. A rail that silently disappears takes the state
+     it holds with it, and the user cannot tell why the list is short.
+
+     Only the panes scroll. The frame is a fixed-height flex row and every child
+     in the chain carries min-h-0, or the panes refuse to shrink, the frame grows
+     past its own height and the page scrolls instead of any of them.
+
+     As a real page: drop h-[640px] and the wrapper border, put h-screen
+     overflow-hidden on <body>, and let the rail sit beside app-shell's sidebar
+     rather than inside it — one is where you are in the application and the
+     other is what you are looking at in this screen. -->
+<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, view: 'mine', tones: { Overdue: true, Approved: true, Open: true },
+        entries: [
+          { id: 'INV-26-2210', vendor: 'Sharma Extrusions', amount: '₹18,42,000', due: '22 Aug', age: '46 days', status: 'Overdue', po: 'PO-24-1187', match: 'Three-way match failed: invoiced 12,400 kg against a receipt of 12,000 kg' },
+          { id: 'INV-26-2214', vendor: 'Gujarat Polymers Ltd', amount: '₹7,15,600', due: '28 Aug', age: '31 days', status: 'Approved', po: 'PO-24-1191', match: 'Matched to the receipt, awaiting the plant head' },
+          { id: 'INV-26-2219', vendor: 'Deccan Bearings Pvt Ltd', amount: '₹2,84,300', due: '01 Sep', age: '18 days', status: 'Open', po: 'PO-24-1194', match: 'Matched to the receipt' },
+          { id: 'INV-26-2223', vendor: 'Nashik Steel Traders', amount: '₹96,750', due: '05 Sep', age: '12 days', status: 'Open', po: 'PO-24-1203', match: 'Matched to the receipt' },
+          { id: 'INV-26-2227', vendor: 'Qureshi Metals', amount: '₹5,46,000', due: '09 Sep', age: '9 days', status: 'Overdue', po: 'PO-24-1207', match: 'Three-way match failed: rate is ₹4.20 a kg above the contract' },
+          { id: 'INV-26-2231', vendor: 'Konkan Packaging Co', amount: '₹1,09,750', due: '11 Sep', age: '6 days', status: 'Approved', po: 'PO-24-1198', match: 'Matched to the receipt, awaiting finance' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rows() { return this.entries.filter(e => this.tones[e.status]) },
+        get rec() { return this.rows[this.sel] || this.rows[0] },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.rows.length - 1)) },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) }
+      }"
+      x-effect="if (sel > rows.length - 1) sel = Math.max(rows.length - 1, 0)">
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3">
+    <h1 class="text-[16px]/6 font-semibold">Vendor invoices to clear</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 invoices · ₹35,94,400 outstanding</p>
+  </div>
+
+  <div class="flex min-h-0 flex-1">
+
+    <!-- filters -->
+    <aside aria-label="Invoice filters" class="hidden w-56 shrink-0 flex-col border-r border-zinc-200 lg:flex">
+      <div class="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-4">
+        <fieldset>
+          <legend class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Saved views</legend>
+          <div class="mt-2 space-y-1.5">
+            <label class="flex items-center gap-2.5 text-[13px]/5">
+              <input type="radio" name="ld-view" value="mine" x-model="view" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span>Waiting on me</span>
+            </label>
+            <label class="flex items-center gap-2.5 text-[13px]/5">
+              <input type="radio" name="ld-view" value="plant" x-model="view" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span>Silvassa, all buyers</span>
+            </label>
+            <label class="flex items-center gap-2.5 text-[13px]/5">
+              <input type="radio" name="ld-view" value="mismatch" x-model="view" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span>Failed three-way match</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Status</legend>
+          <div class="mt-2 space-y-1.5">
+            <template x-for="s in ['Overdue', 'Approved', 'Open']" :key="s">
+              <label class="flex items-center gap-2.5 text-[13px]/5">
+                <input type="checkbox" :checked="tones[s]" @change="tones[s] = $event.target.checked" class="size-4 shrink-0 rounded accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="flex items-center gap-2">
+                  <span class="size-1.5 shrink-0 rounded-full" :class="dot[s]" aria-hidden="true"></span>
+                  <span x-text="s"></span>
+                </span>
+                <span class="ml-auto text-[12px]/4 tabular-nums text-zinc-500" x-text="entries.filter(e => e.status === s).length"></span>
+              </label>
+            </template>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Ageing</legend>
+          <div class="mt-2 space-y-1.5">
+            <label class="flex items-center gap-2.5 text-[13px]/5">
+              <input type="checkbox" class="size-4 shrink-0 rounded accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span>Over 30 days</span>
+            </label>
+            <label class="flex items-center gap-2.5 text-[13px]/5">
+              <input type="checkbox" class="size-4 shrink-0 rounded accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span>Over 60 days</span>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+    </aside>
+
+    <!-- list -->
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r lg:w-[22rem]"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">Invoices</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="rows.length + ' shown'"></p>
+        <!-- Below lg the rail is gone, so what it holds shows here and the
+             Filters button opens the drawer over the list. -->
+        <button type="button" class="ml-auto inline-flex h-7 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+          <i data-lucide="sliders-horizontal" class="size-3.5 text-zinc-600"></i>Filters
+          <span class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="Object.values(tones).filter(Boolean).length"></span>
+        </button>
+      </div>
+
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(rows.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(e, i) in rows" :key="e.id">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[e.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="e.id"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="e.amount"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-500">
+                <span x-text="e.status"></span> · <span x-text="e.vendor"></span> · <span x-text="e.age"></span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- detail -->
+    <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+             @keydown.escape="back()"
+             class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+             :class="{ 'hidden': !detail, 'flex': detail }">
+      <div class="shrink-0 border-b border-zinc-200 px-4 py-3 md:px-5 md:py-4">
+        <button type="button" @click="back()"
+                class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+          <i data-lucide="chevron-left" class="size-4"></i>Back to the queue
+        </button>
+        <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+          <span class="tabular-nums" x-text="rec.id"></span>
+          <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+          </span>
+        </h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.vendor + ' · against ' + rec.po"></p>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Invoice value</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.amount"></dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Payable by</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.due"></dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Ageing</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.age"></dd>
+          </div>
+        </dl>
+
+        <div class="mt-4 rounded-xl border border-zinc-200 p-4">
+          <p class="text-[13px]/5 font-medium">Three-way match</p>
+          <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600" x-text="rec.match"></p>
+        </div>
+
+        <h3 class="mt-5 text-[13px]/5 font-medium">Ledger entries</h3>
+        <div class="mt-2 overflow-hidden rounded-xl border border-zinc-200">
+          <table class="w-full text-[13px]/5">
+            <thead>
+              <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="px-3 py-2 font-medium">Posted</th>
+                <th scope="col" class="px-3 py-2 font-medium">Account</th>
+                <th scope="col" class="px-3 py-2 text-right font-medium">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100">
+                <td class="px-3 py-2 tabular-nums">14 Aug 2026</td>
+                <td class="px-3 py-2">Raw material purchases</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">₹15,61,017</td>
+              </tr>
+              <tr class="border-b border-zinc-100">
+                <td class="px-3 py-2 tabular-nums">14 Aug 2026</td>
+                <td class="px-3 py-2">Input GST receivable</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">₹2,80,983</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2 tabular-nums">14 Aug 2026</td>
+                <td class="px-3 py-2">Sundry creditors</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">₹18,42,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="flex shrink-0 gap-2 border-t border-zinc-200 px-5 py-3">
+        <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Query with the vendor
+        </button>
+        <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="check" class="size-4"></i>Clear for payment
+        </button>
+      </div>
+    </section>
+  </div>
+</main>

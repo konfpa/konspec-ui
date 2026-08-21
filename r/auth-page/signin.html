@@ -1,0 +1,87 @@
+<!-- The tokens are the whole component. autocomplete="username" on the
+     identifier and autocomplete="current-password" on the secret is the pair a
+     password manager matches on; autocomplete="email" is the near miss that
+     looks right, does not pair with anything, and quietly fills neither field.
+     name="username" and name="password" carry the same weight, because the
+     heuristics that run when the tokens are absent look for those two words —
+     and they are what Django's AuthenticationForm posts.
+
+     It is a real form with a real submit, so Enter works from either field and
+     the browser offers to save what was typed. Add {% csrf_token %} inside the
+     form and keep the hidden next input; validate next server-side against a
+     list of allowed paths, or it is an open redirect on the one page that is
+     reachable without signing in.
+
+     No sign-up link. Konspec accounts are created by IT, so the dead end is the
+     support address rather than a register page that would 403 anyone who
+     reached it. -->
+<div class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+     x-data="{ show: false, busy: false }">
+  <main class="w-full max-w-sm">
+
+    <div class="flex items-center justify-center gap-2.5">
+      <span class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[14px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec Operations</span>
+    </div>
+
+    <form method="post" action="/accounts/login/" @submit="busy = true"
+          class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Sign in</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">Use your Konspec Industries email address.</p>
+
+      <input type="hidden" name="next" value="/procurement/orders/">
+
+      <div class="mt-5">
+        <label for="si-username" class="mb-1.5 block text-[13px]/5 font-medium">Work email</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="si-username" name="username" type="email" autocomplete="username" required autofocus
+                 spellcheck="false" autocapitalize="none" placeholder="you@konspec.com"
+                 class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="mb-1.5 flex items-baseline justify-between gap-3">
+          <label for="si-password" class="text-[13px]/5 font-medium">Password</label>
+          <a href="/accounts/password_reset/" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Forgot password</a>
+        </div>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="si-password" name="password" :type="show ? 'text' : 'password'" autocomplete="current-password"
+                 required spellcheck="false"
+                 class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          <button type="button" @click="show = !show" :aria-label="show ? 'Hide password' : 'Show password'"
+                  class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+            <span x-show="!show" class="flex"><i data-lucide="eye" class="size-4"></i></span>
+            <span x-show="show" x-cloak class="flex"><i data-lucide="eye-off" class="size-4"></i></span>
+          </button>
+        </div>
+        <p role="status" class="sr-only" x-text="show ? 'Password is visible' : ''"></p>
+      </div>
+
+      <label class="mt-4 flex items-start gap-2.5 text-[13px]/5">
+        <input type="checkbox" name="remember" value="1" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Keep me signed in on this device</span>
+      </label>
+
+      <!-- disabled is what stops the second click; aria-busy is what says why.
+           A double-click here is a second authentication attempt, and the
+           server counts it against the lockout as though it were a retry. -->
+      <button type="submit" :disabled="busy" :aria-busy="busy"
+              class="mt-5 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:hover:bg-zinc-700">
+        <span x-show="busy" x-cloak class="flex"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+        <span class="grid">
+          <span class="col-start-1 row-start-1" :class="busy &amp;&amp; 'invisible'">Sign in</span>
+          <span class="col-start-1 row-start-1" :class="!busy &amp;&amp; 'invisible'" aria-hidden="true">Signing in…</span>
+        </span>
+      </button>
+
+      <p class="mt-4 border-t border-zinc-100 pt-4 text-[12px]/4 text-zinc-600">
+        Accounts are created by IT.
+        <a href="mailto:it@konspec.com" class="font-medium text-zinc-900 underline underline-offset-2">Email it@konspec.com</a>
+        if you do not have one.
+      </p>
+    </form>
+
+    <p class="mt-4 text-center text-[11px]/4 text-zinc-500">Konspec Industries · internal system · activity is logged</p>
+  </main>
+</div>

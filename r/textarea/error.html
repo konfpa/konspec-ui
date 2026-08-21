@@ -1,0 +1,11 @@
+<div class="max-w-xl">
+  <label for="ta-bad" class="mb-1.5 block text-[13px]/5 font-medium">Rejection reason <span class="text-red-600">*</span></label>
+  <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+    <textarea id="ta-bad" name="reason" rows="4" aria-invalid="true" aria-describedby="ta-bad-err"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none"></textarea>
+  </div>
+  <!-- the error replaces the help text, it does not stack under it -->
+  <p id="ta-bad-err" class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
+    <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>A reason is required before an order can be rejected.
+  </p>
+</div>

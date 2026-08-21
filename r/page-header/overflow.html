@@ -1,0 +1,114 @@
+<!-- Six actions on a record, and never two filled buttons: the primary stays a
+     real button at every width and everything else collapses. At lg the two most
+     used are lifted out of the menu as bordered buttons; below lg they are back
+     inside it and only More and Record GRN are on the row. Nothing is dropped —
+     an action missing from the phone build is a job the phone cannot do, and
+     nobody finds that out until somebody is standing at a weighbridge.
+
+     Both copies of Print and Amend sit in the DOM, and that is safe only because
+     hidden and lg:flex compile to display:none, which takes the inactive copy out
+     of the accessibility tree as well as off the screen. It is also why items()
+     filters on offsetParent: querySelectorAll returns the hidden twins too, and
+     focus() on a display:none element is a silent no-op that leaves the arrow
+     keys apparently dead.
+
+     No overflow-hidden on the band. The menu opens out of the bottom of it, and
+     clipped to the band's own height it renders as a sliver that reads as a
+     script that failed to load. That is also why this preview wrapper does not
+     clip: the rounded-t-xl on the <header> and the deep bottom padding are the
+     frame giving the menu somewhere to open, and both come off on a real page.
+     The destructive item is last, under a real role="separator". -->
+<div class="rounded-xl border border-zinc-200 bg-zinc-100">
+  <header class="rounded-t-xl border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+      <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight tabular-nums">PO-24-1206</h1>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+            </span>
+          </div>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Gujarat Polymers Ltd · Daman · promised 12 Aug 2026 · 9 days late · ₹7,64,500</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2"
+             x-data="{
+               open: false,
+               items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')].filter(el => el.offsetParent !== null) },
+               show(last = false) {
+                 this.open = true;
+                 this.$nextTick(() => requestAnimationFrame(() => {
+                   const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+                 }));
+               },
+               close(toTrigger = true) {
+                 if (!this.open) return;
+                 this.open = false;
+                 if (toTrigger) this.$refs.trigger.focus();
+               },
+               move(step) {
+                 const i = this.items(), at = i.indexOf(document.activeElement);
+                 i[(at + step + i.length) % i.length]?.focus();
+               },
+               edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+             }"
+             @click.outside="close(false)"
+             @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+          <button type="button" class="hidden items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:flex">
+            <i data-lucide="printer" class="size-4"></i>Print
+          </button>
+          <button type="button" class="hidden items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:flex">
+            <i data-lucide="pencil" class="size-4"></i>Amend
+          </button>
+
+          <div class="relative">
+            <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+                    @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+                    :aria-expanded="open" aria-haspopup="menu" aria-label="More actions for PO-24-1206"
+                    class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="more-horizontal" class="size-4"></i><span class="hidden sm:inline">More</span>
+            </button>
+
+            <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Purchase order actions"
+                 @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+                 @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+                 @keydown.tab="close(false)"
+                 class="absolute right-0 top-full z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 lg:hidden">
+                <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+              </button>
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 lg:hidden">
+                <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Amend
+              </button>
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="copy" class="size-4 text-zinc-600"></i>Duplicate order
+              </button>
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="mail" class="size-4 text-zinc-600"></i>Chase the vendor
+              </button>
+
+              <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="circle-x" class="size-4"></i>Cancel order
+              </button>
+            </div>
+          </div>
+
+          <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="truck" class="size-4"></i>Record GRN
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <p class="mx-auto max-w-[1600px] px-4 pb-56 pt-6 text-[13px]/5 text-zinc-500 lg:px-6">Narrow the window past lg and Print and Amend move into the menu.</p>
+</div>

@@ -1,0 +1,99 @@
+<!-- The whole machine, on the smallest thing that needs it. Read this one and
+     the rest of the variants are the same root with different panel contents.
+
+     Two delays and they are not the same length. 140ms before opening filters
+     out a pointer crossing the bar on its way to the scrollbar; 280ms before
+     closing is the grace period in which the pointer leaves the trigger, is
+     over nothing for a frame or two, and lands in the panel. The nav's own
+     mouseenter clears the pending close, so overshooting the panel edge and
+     coming back finds it still open.
+
+     The gap is pt-2 on the positioned wrapper, never mt-2 on the panel: a
+     margin belongs to nothing, so the pointer is outside the component halfway
+     across it. And because the panel is a DOM child of the nav, mouseleave on
+     the nav does not fire when the pointer moves into it — mouseleave counts
+     descendants in the tree, not boxes.
+
+     The trigger is a button, not a link, because it reveals rather than
+     navigates and aria-expanded on a link is a lie. The page it looks like it
+     should point at is the first link inside the panel instead.
+
+     Click opens the panel and moves focus to the first link, which is why
+     nothing is bound to Enter or Space: a native button turns both into a
+     click. Focus is moved on the animation frame after $nextTick, because
+     x-show has not written display yet inside the tick and focus() on a hidden
+     element is a silent no-op — the same trap the dropdown documents.
+
+     fine is the touch guard. A tap fires a synthetic mouseenter and then a
+     click, so without it the panel opens on the first and closes on the second
+     and the section cannot be reached by tapping it. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <a href="/dashboard/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+    </li>
+
+    <li class="relative">
+      <button type="button" x-ref="vendors" id="nmp-t-vendors"
+              aria-controls="nmp-p-vendors" :aria-expanded="open === 'vendors'"
+              @mouseenter="hover('vendors')"
+              @click="open === 'vendors' ? shut($refs.vendors) : jump('vendors')"
+              @keydown.arrow-down.prevent="jump('vendors')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'vendors' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Vendors
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'vendors' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="vendorsPanel" x-show="open === 'vendors'" x-cloak
+           id="nmp-p-vendors" aria-labelledby="nmp-t-vendors"
+           class="absolute top-full left-0 z-40 pt-2">
+        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <li>
+            <a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All vendors</a>
+          </li>
+          <li>
+            <a href="/vendors/approved/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approved suppliers</a>
+          </li>
+          <li>
+            <a href="/vendors/contracts/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rate contracts</a>
+          </li>
+          <li>
+            <a href="/vendors/onboarding/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Onboarding queue</a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+    <li>
+      <a href="/reports/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+</nav>

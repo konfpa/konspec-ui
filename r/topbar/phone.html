@@ -1,0 +1,67 @@
+<!-- Nothing shrinks and nothing scrolls sideways. Pieces are dropped whole:
+     the search becomes a button, the trail keeps its last crumb only, the
+     context label goes and the plant survives as a pill under the bar where
+     there is room for it. Squeeze the same five things into 390px instead and
+     the search field is four characters wide and the avatar is 24px.
+
+     Three things keep their full 40px hit target at this width and are all
+     shrink-0: the hamburger, the search button and the avatar. They are the
+     controls a thumb aims at, and a 32px target beside a 32px target is two
+     mistaps a day.
+
+     The bar stays h-14. It is the anchor for [id] { scroll-margin-top: 88px },
+     and a phone-only height means every anchor target on a phone lands under
+     the bar by the difference.
+
+     The trail is the parent and the current page, never four crumbs. Four
+     crumbs at 390px either wrap onto a second line or push the page sideways,
+     and both are worse than showing two. The last crumb is the one that is
+     never truncated — it is the one that says where you are. -->
+<div class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-2">
+    <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="tb-ph-nav"
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="menu" class="size-5"></i>
+    </button>
+
+    <nav aria-label="Breadcrumb" class="min-w-0 flex-1">
+      <ol class="flex items-center gap-1.5 text-[13px]/5">
+        <li class="min-w-0"><span aria-current="page" class="block truncate font-medium">Goods receipt</span></li>
+      </ol>
+    </nav>
+
+    <button type="button" aria-label="Search the application"
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="search" class="size-[18px]"></i>
+    </button>
+
+    <button type="button" aria-label="Notifications, 3 unread"
+            class="relative flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="bell" class="size-[18px]"></i>
+      <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
+    </button>
+
+    <button type="button" aria-label="Account — Rajesh Menon" aria-haspopup="menu" aria-expanded="false"
+            class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      RM
+    </button>
+  </header>
+
+  <div class="flex flex-wrap items-center gap-1.5 border-b border-zinc-200 bg-white px-3 pb-2">
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">Vasai plant</span>
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>FY 2024-25
+    </span>
+  </div>
+
+  <div class="space-y-2 p-3">
+    <div class="rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+      <p class="text-[13px]/5 font-medium tabular-nums">GRN-8842 · Gujarat Polymers Ltd</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">4 lines · posted 11/08/2026</p>
+    </div>
+    <div class="rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+      <p class="text-[13px]/5 font-medium tabular-nums">GRN-8843 · Sharma Extrusions</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">2 lines · awaiting QC</p>
+    </div>
+  </div>
+</div>

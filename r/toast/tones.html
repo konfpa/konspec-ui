@@ -1,0 +1,94 @@
+<!-- The same four tones as an alert, from the same table: info zinc-500,
+     success emerald-600, warning amber-700, danger red-600. The tone is the
+     icon and nothing else — no tinted card, no coloured border.
+
+     Two regions, both empty at first paint. Ordinary toasts go into the polite
+     one and wait for a pause; danger goes into the assertive one and interrupts.
+     Rewriting aria-live on a single region per message does not work, because
+     the value is read when the region is registered — the change lands after the
+     announcement it was meant to change. Routing everything through assertive is
+     the same mistake in reverse: a save confirmation cutting off the sentence
+     someone was listening to.
+
+     push() forces ms: 0 on the danger tone whatever the call site asked for. A
+     failure is not removed by a timer. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       icon: { info: 'info', success: 'check-circle-2', warning: 'alert-triangle', danger: 'alert-circle' },
+       hue: { info: 'text-zinc-500', success: 'text-emerald-600', warning: 'text-amber-700', danger: 'text-red-600' },
+       push(t) {
+         const n = { id: ++this.seq, tone: 'info', ms: 5000, timer: 0, ...t };
+         if (n.tone === 'danger') n.ms = 0;
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       },
+       bucket(name) { return this.toasts.filter(t => (t.tone === 'danger') === (name === 'danger')); }
+     }">
+
+  <div class="flex flex-wrap gap-2">
+    <button type="button" x-ref="fire" @click="push({ tone: 'info', text: 'Rate card refreshed', meta: 'August 2024 · 3,100 rows' })"
+            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Info</button>
+    <button type="button" @click="push({ tone: 'success', text: 'PO-24-1187 emailed to Sharma Extrusions', meta: 'Sent 11:42' })"
+            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Success</button>
+    <button type="button" @click="push({ tone: 'warning', text: 'Saved, but 2 lines are over the rate contract', meta: 'MS plate 10 mm · MS angle 50×50' })"
+            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Warning</button>
+    <button type="button" @click="push({ tone: 'danger', text: 'PO-24-1187 could not be emailed', meta: 'The vendor has no contact address on file' })"
+            class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
+  </div>
+
+  <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <!-- both regions are in the DOM from first paint, both empty -->
+    <div role="alert" aria-live="assertive" class="flex flex-col gap-2">
+      <template x-for="t in bucket('danger')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+             @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0" :class="hue[t.tone]"><i :data-lucide="icon[t.tone]" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+          </div>
+          <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div role="status" aria-live="polite" class="flex flex-col gap-2">
+      <template x-for="t in bucket('polite')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+             @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0" :class="hue[t.tone]"><i :data-lucide="icon[t.tone]" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+          </div>
+          <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>

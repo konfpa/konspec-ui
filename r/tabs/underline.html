@@ -1,0 +1,75 @@
+<!-- The default. Automatic activation, because all four panels are already in
+     the page and there is nothing to wait for.
+
+     tabEls() filters on [role=tab] rather than reading children: x-for leaves a
+     <template> in the DOM and it counts as an element child. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'lines',
+       items: [
+         { id: 'summary',  label: 'Summary' },
+         { id: 'lines',    label: 'Lines',    count: 14 },
+         { id: 'receipts', label: 'Receipts', count: 3 },
+         { id: 'history',  label: 'History' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }">
+  <div class="border-b border-zinc-200">
+    <div x-ref="list" role="tablist" aria-label="Purchase order sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="pick(items[0].id)"
+         @keydown.end.prevent="pick(items[items.length - 1].id)"
+         class="-mb-px flex gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :tabindex="tab === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
+          <span x-text="t.label"></span>
+          <template x-if="t.count">
+            <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="t.count"></span>
+          </template>
+        </button>
+      </template>
+    </div>
+  </div>
+
+  <div class="pt-4 text-[14px]/5">
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'summary')" :aria-labelledby="$id('tab', 'summary')"
+         x-show="tab === 'summary'" x-cloak
+         class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <p class="text-zinc-600">PO-24-1187 raised for Gujarat Polymers Ltd on 4 August, payment 45 days from GRN.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'lines')" :aria-labelledby="$id('tab', 'lines')"
+         x-show="tab === 'lines'"
+         class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <p>14 lines, <span class="font-medium tabular-nums">₹18,42,000</span> before tax.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'receipts')" :aria-labelledby="$id('tab', 'receipts')"
+         x-show="tab === 'receipts'" x-cloak
+         class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <p class="text-zinc-600">3 GRNs posted, 2 lines still short.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'history')" :aria-labelledby="$id('tab', 'history')"
+         x-show="tab === 'history'" x-cloak
+         class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <p class="text-zinc-600">Approved by R. Menon on 5 August, revised once.</p>
+    </div>
+  </div>
+</div>

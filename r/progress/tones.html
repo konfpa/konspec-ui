@@ -1,0 +1,82 @@
+<!-- The three cases where a bar stops being graphite, and the one where it does
+     not. Colour here is the record's state, taken from the dot-or-bar column of
+     the semantic table — bg-emerald-600, bg-amber-500, bg-red-600 — and never
+     from the column beside it. text-amber-700 is the shade for a 1.5px stroke you
+     have to read and it goes muddy as a 6px block; amber-500 is the shade for a
+     disc or a bar and it is illegible as a stroke. The figures beside the bars
+     take the reading shades, which is why the breached row is text-red-600 above
+     a bg-red-600 fill.
+
+     Delhi Traders sits at 41% and stays zinc-700. Most bars on most screens are
+     that row, and colouring them to fill out the palette is what makes the red
+     one on the last row stop being noticed.
+
+     Colour is never the only carrier. Every row says its state in words —
+     "within limit", "approaching limit", "over limit" — because the fill is
+     invisible to a screen reader, indistinguishable in greyscale, and dropped in
+     forced-colours mode, which is three separate ways to lose the one fact the
+     panel exists to show.
+
+     The bar is graphite again the moment the breach is cleared. A red rail is a
+     description of what the account is doing now, not a mark against it. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Credit limit utilisation</h2>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Outstanding against sanctioned limit · as at 20 Aug</p>
+  </div>
+  <ul role="list" class="divide-y divide-zinc-100">
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-tone-a" class="text-[13px]/5 font-medium">Delhi Traders Pvt Ltd</h3>
+        <p class="text-[13px]/5 tabular-nums text-zinc-600">41%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+           role="progressbar" aria-labelledby="pg-tone-a"
+           aria-valuenow="41" aria-valuemin="0" aria-valuemax="100">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 41%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">₹8,20,000 of ₹20,00,000 · within limit</p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-tone-b" class="text-[13px]/5 font-medium">Gujarat Polymers Ltd</h3>
+        <p class="text-[13px]/5 tabular-nums text-amber-700">92%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+           role="progressbar" aria-labelledby="pg-tone-b"
+           aria-valuenow="92" aria-valuemin="0" aria-valuemax="100">
+        <div class="h-full min-w-[2px] rounded-full bg-amber-500" style="width: 92%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">₹13,80,000 of ₹15,00,000 · approaching limit, ₹1,20,000 left</p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-tone-c" class="text-[13px]/5 font-medium">Nashik Steel Traders</h3>
+        <p class="text-[13px]/5 tabular-nums text-red-600">118%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+           role="progressbar" aria-labelledby="pg-tone-c"
+           aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+           aria-valuetext="118% of limit, over by 1,44,000 rupees">
+        <div class="h-full min-w-[2px] rounded-full bg-red-600" style="width: 100%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">₹9,44,000 of ₹8,00,000 · over limit by ₹1,44,000, new orders blocked</p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-tone-d" class="text-[13px]/5 font-medium">Aurangabad Castings</h3>
+        <p class="text-[13px]/5 tabular-nums text-zinc-600">0%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100"
+           role="progressbar" aria-labelledby="pg-tone-d"
+           aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      <p class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <i data-lucide="check-circle-2" class="size-3.5 shrink-0 text-emerald-600"></i>Settled in full on 14 Aug · ₹0 of ₹6,00,000
+      </p>
+    </li>
+  </ul>
+</div>

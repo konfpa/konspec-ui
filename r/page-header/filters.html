@@ -1,0 +1,93 @@
+<!-- A register band: the title row, then a second row inside the band holding
+     the query and what it currently is. This box filters the list underneath and
+     never leaves the page, which is why its placeholder says Filter 1,438
+     orders and the topbar's says Search orders, vendors, materials. Give them
+     the same words and somebody types a PO number into the wrong one and
+     reports the order missing.
+
+     Below md the row restacks: the search takes the full width and the two
+     selects share a line. Nothing here scrolls sideways.
+
+     Each chip's remove button names what it removes, because six buttons all
+     called Remove is what a screen reader reads out otherwise. The count is
+     plain text and not a live region — it changes on a page of results, not on
+     a keystroke. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100"
+     x-data="{ q: '' }">
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+      <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div class="min-w-0">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight">Goods receipt notes</h1>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Every receipt posted against a Konspec plant since 1 Apr 2026</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="download" class="size-4"></i>Export
+          </button>
+          <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="plus" class="size-4"></i>New GRN
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <form role="search" @submit.prevent class="md:max-w-sm md:flex-1">
+          <label for="ph-grn-q" class="sr-only">Filter goods receipt notes</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+            <input id="ph-grn-q" x-ref="q" x-model="q" type="search" enterkeyhint="search"
+                   autocomplete="off" spellcheck="false"
+                   @keydown.escape="if (q) { $event.stopPropagation(); q = '' }"
+                   placeholder="Filter 1,438 receipts"
+                   class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500 [&::-webkit-search-cancel-button]:appearance-none">
+            <button type="button" x-show="q" x-cloak @click="q = ''; $refs.q.focus()" aria-label="Clear the receipt filter"
+                    class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-4"></i>
+            </button>
+          </div>
+        </form>
+
+        <div class="grid grid-cols-2 gap-2 md:flex md:shrink-0">
+          <div>
+            <label for="ph-grn-status" class="sr-only">Status</label>
+            <select id="ph-grn-status" class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 md:w-auto">
+              <option>Status: all</option>
+              <option selected>Status: awaiting QC</option>
+              <option>Status: posted</option>
+              <option>Status: rejected</option>
+            </select>
+          </div>
+          <div>
+            <label for="ph-grn-plant" class="sr-only">Plant</label>
+            <select id="ph-grn-plant" class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 md:w-auto">
+              <option>Plant: all</option>
+              <option selected>Plant: Silvassa</option>
+              <option>Plant: Vapi</option>
+              <option>Plant: Daman</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pl-3 pr-1.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          Status: awaiting QC
+          <button type="button" aria-label="Remove filter Status: awaiting QC" class="rounded-full p-0.5 text-zinc-600 hover:bg-white hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="x" class="size-3"></i></button>
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pl-3 pr-1.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          Plant: Silvassa
+          <button type="button" aria-label="Remove filter Plant: Silvassa" class="rounded-full p-0.5 text-zinc-600 hover:bg-white hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="x" class="size-3"></i></button>
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pl-3 pr-1.5 text-[12px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          Received after 01 Aug 2026
+          <button type="button" aria-label="Remove filter Received after 01 Aug 2026" class="rounded-full p-0.5 text-zinc-600 hover:bg-white hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="x" class="size-3"></i></button>
+        </span>
+        <button type="button" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+        <span class="ml-auto text-[12px]/4 tabular-nums text-zinc-600">27 of 1,438 receipts · 4,182 lines</span>
+      </div>
+    </div>
+  </header>
+
+  <p class="mx-auto max-w-[1600px] px-4 py-6 text-[13px]/5 text-zinc-500 lg:px-6">The 27 matching receipts render below the band.</p>
+</div>

@@ -1,0 +1,236 @@
+<!-- The rail reads and the form acts. Its figures are computed from the same
+     state the fields are bound to, so the summary and the values cannot
+     disagree — a rail fed from its own copy of the numbers is a rail that goes
+     stale on the one edit nobody re-checked.
+
+     The moment the user has to operate something in the rail, that control
+     belongs in the form. A rail with a button in it is a second form standing
+     beside the first, and Tab reaches it after every field on the page.
+
+     The rail is an <aside> with an accessible name so it can be skipped, and it
+     comes after the form in the DOM as well as to the right of it, so the tab
+     order is the form and then its context.
+
+     lg:sticky lg:self-start is what keeps the total in view down a long form.
+     Without self-start the aside stretches to the row height and sticky has
+     nothing to travel inside.
+
+     The commitment total is an <output>, not a disabled input: nobody was ever
+     going to edit it. aria-live="off" because it recomputes on every keystroke,
+     and an <output> is a live region by default. -->
+<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+     x-data="{
+       qty: 45000, rate: 118.40, freight: 0.85,
+       get goods() { return Number(this.qty) * Number(this.rate) },
+       get carriage() { return Number(this.qty) * Number(this.freight) },
+       get gst() { return (this.goods + this.carriage) * 0.18 },
+       money(n) { return '₹' + (isFinite(n) ? n : 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
+     }">
+
+  <main class="mx-auto max-w-6xl p-4 pb-6 lg:p-6">
+
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <a href="#" class="hover:text-zinc-900">Master data</a>
+          <span class="text-zinc-500">/</span>
+          <a href="#" class="hover:text-zinc-900">Rate contracts</a>
+          <span class="text-zinc-500">/</span>
+          <span class="font-medium text-zinc-900">New</span>
+        </nav>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">New rate contract</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Gujarat Polymers Ltd · VEN-0142 · Vapi, Gujarat</p>
+      </div>
+    </div>
+
+    <p class="mt-4 text-[12px]/4 text-zinc-600">
+      Every field is required unless its label says <span class="font-medium text-zinc-900">Optional</span>.
+    </p>
+
+    <div class="mt-3 grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+
+      <form class="min-w-0 space-y-4">
+        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 class="text-[16px]/6 font-semibold">Commitment</h2>
+          </div>
+          <div class="px-5 py-4">
+            <div class="grid gap-4 sm:grid-cols-2">
+
+              <div class="min-w-0 sm:col-span-2">
+                <label for="sr-material" class="mb-1.5 block text-[13px]/5 font-medium">Material</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="sr-material" name="material" required aria-describedby="sr-material-msg"
+                          class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="">Choose a material</option>
+                    <option value="m-hdpe" selected>HDPE granules — natural, grade M60075</option>
+                    <option value="m-ldpe">LDPE granules — grade 24FS040</option>
+                    <option value="m-ppcp">PP copolymer — black, grade 3120MA</option>
+                  </select>
+                </div>
+                <p id="sr-material-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+                  One material per contract. A second grade is a second contract.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sr-qty" class="mb-1.5 block text-[13px]/5 font-medium">Committed quantity (kg)</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sr-qty" name="qty" required inputmode="numeric" x-model.number="qty"
+                         aria-describedby="sr-qty-msg"
+                         class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                  <span aria-hidden="true" class="flex items-center pr-3 text-[14px]/5 text-zinc-600">kg</span>
+                </div>
+                <p id="sr-qty-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+                  Whole kilograms. 1 MT is 1,000.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sr-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per kg (₹)</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+                  <input id="sr-rate" name="rate" required inputmode="decimal" x-model.number="rate"
+                         aria-describedby="sr-rate-msg"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p id="sr-rate-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+                  Last agreed ₹114.20 on 12 Mar 2026.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sr-freight" class="mb-1.5 block text-[13px]/5 font-medium">Carriage per kg (₹)</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+                  <input id="sr-freight" name="freight" required inputmode="decimal" x-model.number="freight"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sr-terms" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="sr-terms" name="terms" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="">Choose the terms</option>
+                    <option value="grn30" selected>30 days from GRN</option>
+                    <option value="inv45">45 days from invoice</option>
+                    <option value="del">Against delivery</option>
+                  </select>
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sr-from" class="mb-1.5 block text-[13px]/5 font-medium">Effective from</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sr-from" name="from" type="date" required value="2026-09-01"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sr-to" class="mb-1.5 block text-[13px]/5 font-medium">Effective to</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sr-to" name="to" type="date" required value="2027-03-31"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0 sm:col-span-2">
+                <label for="sr-notes" class="mb-1.5 flex items-baseline gap-2 text-[13px]/5 font-medium">
+                  Notes for the buyer
+                  <span aria-hidden="true" class="font-normal text-zinc-500">Optional</span>
+                </label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <textarea id="sr-notes" name="notes" rows="3" aria-describedby="sr-notes-msg"
+                            class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                            placeholder="Escalation contact, packing requirement, test certificate"></textarea>
+                </div>
+                <p id="sr-notes-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+                  Shown to the buyer on every order raised against this contract.
+                </p>
+              </div>
+
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Cancel</button>
+            <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save contract</button>
+          </div>
+        </div>
+      </form>
+
+      <aside aria-labelledby="sr-rail-h" class="min-w-0 space-y-4 lg:sticky lg:top-6 lg:self-start">
+
+        <div class="rounded-xl border border-zinc-200 bg-white px-4 py-4">
+          <h2 id="sr-rail-h" class="text-[13px]/5 font-semibold">What this contract commits</h2>
+          <dl class="mt-3 space-y-2.5 text-[13px]/5">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Goods</dt>
+              <dd><output aria-live="off" class="font-medium tabular-nums" x-text="money(goods)">₹53,28,000.00</output></dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Carriage</dt>
+              <dd><output aria-live="off" class="font-medium tabular-nums" x-text="money(carriage)">₹38,250.00</output></dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">GST at 18%</dt>
+              <dd><output aria-live="off" class="font-medium tabular-nums" x-text="money(gst)">₹9,65,925.00</output></dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-2.5">
+              <dt class="font-medium">Total commitment</dt>
+              <dd><output aria-live="off" class="text-[16px]/6 font-semibold tabular-nums" x-text="money(goods + carriage + gst)">₹63,32,175.00</output></dd>
+            </div>
+          </dl>
+          <p class="mt-3 text-[12px]/4 tabular-nums text-zinc-500">
+            Recomputed from the fields as they are typed. Nothing here is posted — the server multiplies the same numbers again.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-zinc-200 bg-white px-4 py-4">
+          <h3 class="text-[13px]/5 font-semibold">Gujarat Polymers Ltd</h3>
+          <dl class="mt-3 space-y-2.5 text-[13px]/5">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Average rate paid</dt><dd class="font-medium tabular-nums">₹121.75</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Bought last 90 days</dt><dd class="font-medium tabular-nums">38,200 kg</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">On-time delivery</dt><dd class="font-medium tabular-nums">91%</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Open commitment</dt><dd class="font-medium tabular-nums">₹27,10,400</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="rounded-xl border border-zinc-200 bg-white px-4 py-4">
+          <h3 class="text-[13px]/5 font-semibold">Approval route</h3>
+          <ol class="mt-3 space-y-3 text-[13px]/5">
+            <li class="flex items-start gap-2.5">
+              <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">1</span>
+              <span>Ritu Deshpande <span class="block text-[12px]/4 text-zinc-500">Purchase — any value</span></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">2</span>
+              <span>Anil Kulkarni <span class="block text-[12px]/4 tabular-nums text-zinc-500">Plant head — above ₹25,00,000</span></span>
+            </li>
+          </ol>
+        </div>
+
+        <!-- alert's shape: neutral body, colour only in the icon -->
+        <div class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+          <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+          <p class="text-[13px]/5 text-zinc-700">
+            The current contract for HDPE granules runs to 31 Aug 2026. Saving this one supersedes it from 01 Sep.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>

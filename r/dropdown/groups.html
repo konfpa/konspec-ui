@@ -1,0 +1,100 @@
+<!-- Eleven items in one column is a list nobody reads to the end of. Three
+     named sections of three or four is the same eleven items scanned by
+     heading, which is the only reason a menu this long is allowed at all.
+
+     The heading is a div inside the role="group", carrying aria-hidden, and the
+     group is named with aria-label instead. Two reasons: a bare paragraph is
+     not a permitted child of a role="menu", so left announced it is a stray
+     node in a list of menuitems; and if the group is named by the heading and
+     the heading is also read as content, the section name arrives twice.
+
+     There is no separator between the groups. A label already draws the
+     boundary, and a rule as well is two separators for one edge — the panel
+     starts to look like a form. The rule is kept for the one place a label
+     would be wrong: above the destructive item, where the point is distance,
+     not a name. -->
+<div class="relative"
+     x-data="{
+       open: false,
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         i[(at + step + i.length) % i.length]?.focus();
+       },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+          :aria-expanded="open" aria-haspopup="menu"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    Actions
+    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+  </button>
+
+  <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Actions on PO-24-1187"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+       @keydown.tab="close(false)"
+       class="absolute left-0 z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+    <div role="group" aria-label="Order">
+      <div aria-hidden="true" class="px-3 pt-1.5 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Order</div>
+      <button type="button" role="menuitem" tabindex="-1" @click="close()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Edit lines
+      </button>
+      <button type="button" role="menuitem" tabindex="-1" @click="close()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="copy" class="size-4 text-zinc-600"></i>Duplicate as new PO
+      </button>
+      <button type="button" role="menuitem" tabindex="-1" @click="close()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print order
+      </button>
+    </div>
+
+    <div role="group" aria-label="Approval">
+      <div aria-hidden="true" class="px-3 pt-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Approval</div>
+      <button type="button" role="menuitem" tabindex="-1" @click="close()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="send" class="size-4 text-zinc-600"></i>Send for approval
+      </button>
+      <button type="button" role="menuitem" tabindex="-1" @click="close()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="user-plus" class="size-4 text-zinc-600"></i>Add an approver
+      </button>
+    </div>
+
+    <div role="group" aria-label="Records">
+      <div aria-hidden="true" class="px-3 pt-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Records</div>
+      <button type="button" role="menuitem" tabindex="-1" @click="close()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="paperclip" class="size-4 text-zinc-600"></i>Attach a document
+      </button>
+      <button type="button" role="menuitem" tabindex="-1" @click="close()"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <i data-lucide="package-check" class="size-4 text-zinc-600"></i>Goods receipts (3)
+      </button>
+    </div>
+
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="x-circle" class="size-4"></i>Cancel order
+    </button>
+  </div>
+</div>

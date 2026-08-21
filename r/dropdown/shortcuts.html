@@ -1,0 +1,91 @@
+<!-- The hint is aria-hidden and the shortcut itself lives in
+     aria-keyshortcuts. Glyphs are the reason: VoiceOver reads ⌘ as "place of
+     interest sign" and ⇧ as "upwards white arrow", so leaving the kbd in the
+     accessible name turns Print order into a riddle. aria-keyshortcuts takes
+     the machine form — Control+P — and the browser reads it back in whatever
+     wording the platform uses.
+
+     The menu does not listen for any of these keys, and must not. They are the
+     application's own bindings, registered once at window level, and a menu
+     that also binds them fires the action twice whenever it happens to be open:
+
+       @keydown.window.ctrl.p.prevent="printOrder()"
+
+     Ctrl and not ⌘, because these are Windows desktops in a plant office. If
+     you do serve both, swap the label from navigator.platform at boot rather
+     than printing both — a hint showing two keys teaches neither.
+
+     Do not label a shortcut nobody has bound yet. A menu is the only place
+     most people will ever read them, so a hint here is a promise the window
+     handler has to keep. -->
+<div class="relative"
+     x-data="{
+       open: false,
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         i[(at + step + i.length) % i.length]?.focus();
+       },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+          :aria-expanded="open" aria-haspopup="menu"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="file-text" class="size-4"></i>PO-24-1187
+    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+  </button>
+
+  <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Actions on PO-24-1187"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+       @keydown.tab="close(false)"
+       class="absolute left-0 z-40 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+    <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+P" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print order
+      <kbd aria-hidden="true" class="ml-auto shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">Ctrl P</kbd>
+    </button>
+
+    <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+D" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="copy" class="size-4 text-zinc-600"></i>Duplicate as new PO
+      <kbd aria-hidden="true" class="ml-auto shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">Ctrl D</kbd>
+    </button>
+
+    <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+E" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="download" class="size-4 text-zinc-600"></i>Export lines
+      <kbd aria-hidden="true" class="ml-auto shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">Ctrl E</kbd>
+    </button>
+
+    <!-- no hint on this one, because nothing is bound to it. A blank right
+         column is honest; an invented key is not -->
+    <button type="button" role="menuitem" tabindex="-1" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="paperclip" class="size-4 text-zinc-600"></i>Attach a document
+    </button>
+
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+    <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+Shift+A" @click="close()"
+            class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+      <i data-lucide="send" class="size-4 text-zinc-600"></i>Send for approval
+      <kbd aria-hidden="true" class="ml-auto shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">Ctrl Shift A</kbd>
+    </button>
+  </div>
+</div>

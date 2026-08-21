@@ -1,0 +1,228 @@
+<!-- One set of markup that is a five-column grid above md and one card per
+     line below it. Two copies — a <table> for the desktop and a list for the
+     phone — is the obvious build and it is wrong here: every control would need
+     two ids, and duplicate ids break every <label for> and every focus call on
+     the page. One line, one id, restacked by grid-cols.
+
+     Each line is a <fieldset> with an sr-only legend naming it, which is what
+     turns eleven controls called Quantity into "line 4, Quantity". Labelling
+     each cell "Quantity, line 4" instead means the visible label below md reads
+     the line number twice. No padding on the fieldset — a rendered legend is
+     laid out in the block-start border area, so padding-top applies below it —
+     and the grid goes on a div inside.
+
+     The column headings above md are aria-hidden. They are a visual ruler for
+     a grid that is not a table; left readable they are a stray row of words
+     announced before the first field.
+
+     Removing a line destroys the button that was pressed, and a browser drops
+     focus from a removed element to <body>, so the next Tab restarts at the top
+     of the document. The handler moves focus to the next line's remove button,
+     or to Add line when the last one goes. Adding a line focuses the new line's
+     first field, because a row that appears with focus still on the button is a
+     row nobody typed into.
+
+     The names are a Django formset — lines-0-material, lines-1-qty — and the
+     management form is what makes them arrive as a formset rather than as
+     unrelated keys. TOTAL_FORMS is bound, because it is the count after the
+     user finished adding and deleting.
+
+     The totals are <output>, not disabled inputs: nobody was ever going to edit
+     them. aria-live="off" because they recompute on every keystroke. -->
+<div class="h-[640px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+     x-data="{
+       seq: 3,
+       lines: [
+         { id: 1, mat: 'ms-ang', qty: 4200, rate: 62.40 },
+         { id: 2, mat: 'ms-plt', qty: 1800, rate: 58.90 },
+         { id: 3, mat: 'hw-bolt', qty: 600, rate: 18.50 }
+       ],
+       cat: { 'ms-ang': 'MS angle 50 × 50 × 6 mm', 'ms-plt': 'MS plate 10 mm, IS 2062 E250', 'hw-bolt': 'HT bolt M16 × 60, grade 8.8', '': 'Not chosen' },
+       value(l) { return Number(l.qty || 0) * Number(l.rate || 0) },
+       get goods() { return this.lines.reduce((s, l) => s + this.value(l), 0) },
+       get gst() { return this.goods * 0.18 },
+       money(n) { return '₹' + (isFinite(n) ? n : 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+       add() {
+         const l = { id: ++this.seq, mat: '', qty: 0, rate: 0 };
+         this.lines.push(l);
+         this.$nextTick(() => { const el = document.getElementById('li-mat-' + l.id); if (el) el.focus() });
+       },
+       remove(i) {
+         const near = this.lines[i + 1] || this.lines[i - 1];
+         this.lines.splice(i, 1);
+         this.$nextTick(() => {
+           const el = near ? document.getElementById('li-del-' + near.id) : this.$refs.add;
+           if (el) el.focus();
+         });
+       }
+     }">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <a href="#" class="hover:text-zinc-900">Procurement</a>
+          <span class="text-zinc-500">/</span>
+          <a href="#" class="hover:text-zinc-900">Purchase orders</a>
+          <span class="text-zinc-500">/</span>
+          <span class="font-medium text-zinc-900">New</span>
+        </nav>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">New purchase order</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · VEN-0288 · Fabrication — Silvassa</p>
+      </div>
+    </div>
+
+    <p class="mt-4 text-[12px]/4 text-zinc-600">
+      Every field is required unless its label says <span class="font-medium text-zinc-900">Optional</span>.
+    </p>
+
+    <form class="mt-3 space-y-4">
+
+      <input type="hidden" name="lines-TOTAL_FORMS" :value="lines.length">
+      <input type="hidden" name="lines-INITIAL_FORMS" value="3">
+      <input type="hidden" name="lines-MIN_NUM_FORMS" value="1">
+      <input type="hidden" name="lines-MAX_NUM_FORMS" value="50">
+
+      <div class="rounded-xl border border-zinc-200 bg-white">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold">Order lines</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600" x-text="lines.length + (lines.length === 1 ? ' line' : ' lines')">3 lines</p>
+        </div>
+
+        <div aria-hidden="true"
+             class="hidden gap-2 border-b border-zinc-200 px-4 py-2 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600 md:grid md:grid-cols-[minmax(0,1fr)_7rem_7rem_7.5rem_2.25rem]">
+          <span>Material</span>
+          <span class="text-right">Quantity</span>
+          <span class="text-right">Rate</span>
+          <span class="text-right">Line value</span>
+          <span></span>
+        </div>
+
+        <div>
+          <template x-for="(l, i) in lines" :key="l.id">
+            <fieldset class="border-b border-zinc-100 last:border-0">
+              <legend class="sr-only" x-text="'Line ' + (i + 1)"></legend>
+
+              <div class="grid gap-3 px-4 py-3 md:grid-cols-[minmax(0,1fr)_7rem_7rem_7.5rem_2.25rem] md:items-start md:gap-2 md:py-2">
+
+                <div>
+                  <label :for="'li-mat-' + l.id" class="mb-1 block text-[12px]/4 text-zinc-600 md:sr-only">Material</label>
+                  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                    <select :id="'li-mat-' + l.id" :name="'lines-' + i + '-material'" x-model="l.mat" required
+                            class="w-full bg-transparent px-3 py-1.5 text-[14px]/5 outline-none md:text-[13px]/5">
+                      <option value="">Choose a material</option>
+                      <option value="ms-ang">MS angle 50 × 50 × 6 mm</option>
+                      <option value="ms-plt">MS plate 10 mm, IS 2062 E250</option>
+                      <option value="hw-bolt">HT bolt M16 × 60, grade 8.8</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label :for="'li-qty-' + l.id" class="mb-1 block text-[12px]/4 text-zinc-600 md:sr-only">Quantity (kg)</label>
+                  <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                    <input :id="'li-qty-' + l.id" :name="'lines-' + i + '-qty'" x-model.number="l.qty" required inputmode="numeric"
+                           class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[14px]/5 tabular-nums outline-none md:text-[13px]/5">
+                    <span aria-hidden="true" class="flex items-center pr-2 text-[12px]/4 text-zinc-500">kg</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label :for="'li-rate-' + l.id" class="mb-1 block text-[12px]/4 text-zinc-600 md:sr-only">Rate per kg (₹)</label>
+                  <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                    <span aria-hidden="true" class="flex items-center pl-2 text-[12px]/4 text-zinc-500">₹</span>
+                    <input :id="'li-rate-' + l.id" :name="'lines-' + i + '-rate'" x-model.number="l.rate" required inputmode="decimal"
+                           class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[14px]/5 tabular-nums outline-none md:text-[13px]/5">
+                  </div>
+                </div>
+
+                <div class="flex items-baseline justify-between gap-3 md:block md:pt-2 md:text-right">
+                  <label :for="'li-val-' + l.id" class="text-[12px]/4 text-zinc-600 md:sr-only">Line value</label>
+                  <output :id="'li-val-' + l.id" aria-live="off"
+                          class="text-[14px]/5 font-medium tabular-nums md:text-[13px]/5"
+                          x-text="money(value(l))"></output>
+                </div>
+
+                <div class="md:pt-0.5">
+                  <button type="button" :id="'li-del-' + l.id" @click="remove(i)"
+                          :aria-label="'Remove line ' + (i + 1) + ' — ' + cat[l.mat]"
+                          class="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-100 hover:text-red-600 md:size-9 md:w-auto md:border-transparent">
+                    <i data-lucide="trash-2" class="size-4"></i>
+                    <span class="md:hidden">Remove this line</span>
+                  </button>
+                </div>
+
+              </div>
+            </fieldset>
+          </template>
+        </div>
+
+        <!-- empty-state's shape: what to do, not "No lines" -->
+        <div x-show="!lines.length" x-cloak class="px-4 py-10 text-center">
+          <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="package" class="size-5 text-zinc-600"></i>
+          </span>
+          <p class="mt-3 text-[14px]/5 font-semibold">No lines on this order yet</p>
+          <p class="mx-auto mt-1 max-w-[46ch] text-[12px]/4 text-zinc-600">
+            An order needs at least one line before it can be sent for approval. Add the material, the quantity and the agreed rate.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-3">
+          <button type="button" x-ref="add" @click="add()"
+                  class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+            <i data-lucide="plus" class="size-4"></i>Add line
+          </button>
+          <dl class="w-full space-y-1.5 text-[13px]/5 sm:w-64">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Goods</dt>
+              <dd><output aria-live="off" class="font-medium tabular-nums" x-text="money(goods)"></output></dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">GST at 18%</dt>
+              <dd><output aria-live="off" class="font-medium tabular-nums" x-text="money(gst)"></output></dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-1.5">
+              <dt class="font-medium">Order value</dt>
+              <dd><output aria-live="off" class="text-[16px]/6 font-semibold tabular-nums" x-text="money(goods + gst)"></output></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold">Delivery</h2>
+        </div>
+        <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+          <div class="min-w-0">
+            <label for="li-need" class="mb-1.5 block text-[13px]/5 font-medium">Required by</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="li-need" name="required_by" type="date" required value="2026-09-04"
+                     class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+            <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+          </div>
+          <div class="min-w-0">
+            <label for="li-terms" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select id="li-terms" name="terms" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                <option value="">Choose the terms</option>
+                <option value="grn30" selected>30 days from GRN</option>
+                <option value="inv45">45 days from invoice</option>
+              </select>
+            </div>
+            <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sticky bottom-0 flex flex-wrap items-center justify-end gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+        <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Cancel</button>
+        <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Save draft</button>
+        <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Send for approval</button>
+      </div>
+    </form>
+  </main>
+</div>

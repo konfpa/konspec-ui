@@ -1,0 +1,130 @@
+<!-- One open key, not two booleans. Two independent flags let both panels sit
+     open at once, stacked over each other, and the click that should have
+     closed the first one opens the second.
+
+     The two panels are different kinds of thing and are marked up differently.
+     Notifications is a list of links to records, so it is a plain div holding a
+     <ul> of anchors — role="menu" on it would strip the link role, which is the
+     one word the user needed, and promise arrow keys that do not exist. The
+     account panel is a set of commands, so it gets role="menu" with real focus
+     moved item to item — but the name-and-email block is not a permitted child
+     of a menu, so the panel is a plain div and role="menu" starts at the list
+     below it.
+
+     The email is why the header block is there. On a tenant that has a sandbox
+     twin, the only question this menu is ever opened to answer is which account
+     is signed in, and a name alone does not answer it.
+
+     Unread is not a data state, so the dot is graphite. Red is spent on
+     overdue, failed and destructive; a bell that is red every morning has
+     nothing left to say on the morning something is genuinely late. The dot is
+     aria-hidden and the state is in the button's name — a disc announces
+     nothing. -->
+<header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
+        x-data="{
+          open: '',
+          items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+          show() {
+            this.open = 'account';
+            this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus()));
+          },
+          close(toTrigger = true) {
+            if (!this.open) return;
+            const was = this.open; this.open = '';
+            if (toTrigger && was === 'account') this.$refs.account.focus();
+          },
+          move(step) {
+            const i = this.items(), at = i.indexOf(document.activeElement);
+            i[(at + step + i.length) % i.length]?.focus();
+          }
+        }"
+        @click.outside="close(false)"
+        @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <p class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">Goods receipt</p>
+
+  <div class="relative shrink-0">
+    <button type="button" @click="open = open === 'bell' ? '' : 'bell'"
+            :aria-expanded="open === 'bell'" aria-controls="tb-alerts" aria-label="Notifications, 3 unread"
+            class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            :class="open === 'bell' && 'bg-zinc-100 text-zinc-900'">
+      <i data-lucide="bell" class="size-[18px]"></i>
+      <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
+    </button>
+
+    <div id="tb-alerts" x-show="open === 'bell'" x-cloak
+         class="absolute right-0 z-40 mt-1 w-80 max-w-[calc(100vw-1.5rem)] rounded-xl border border-zinc-200 bg-white shadow-lg">
+      <div class="flex items-center justify-between gap-2 border-b border-zinc-100 px-3 py-2">
+        <p class="text-[13px]/5 font-medium">Notifications</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">3 unread</p>
+      </div>
+      <ul role="list" class="max-h-72 overflow-y-auto overscroll-contain py-1">
+        <li>
+          <a href="#" class="flex gap-2.5 px-3 py-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span aria-hidden="true" class="mt-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="alert-circle" class="size-3.5 text-red-600"></i></span>
+            <span class="min-w-0">
+              <span class="block text-[13px]/5 tabular-nums">PO-24-1187 is 4 days past its promised date</span>
+              <span class="block text-[12px]/4 tabular-nums text-zinc-500">Gujarat Polymers Ltd · 2 h ago</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex gap-2.5 px-3 py-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span aria-hidden="true" class="mt-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="alert-triangle" class="size-3.5 text-amber-700"></i></span>
+            <span class="min-w-0">
+              <span class="block text-[13px]/5 tabular-nums">GRN-8842 is waiting on your approval</span>
+              <span class="block text-[12px]/4 tabular-nums text-zinc-500">Vasai plant · 5 h ago</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex gap-2.5 px-3 py-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span aria-hidden="true" class="mt-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="check-circle-2" class="size-3.5 text-emerald-600"></i></span>
+            <span class="min-w-0">
+              <span class="block text-[13px]/5 tabular-nums">Invoice INV-24-0912 posted to the ledger</span>
+              <span class="block text-[12px]/4 tabular-nums text-zinc-500">Sharma Extrusions · yesterday</span>
+            </span>
+          </a>
+        </li>
+      </ul>
+      <div class="border-t border-zinc-100 px-3 py-2">
+        <a href="#" class="text-[13px]/5 text-zinc-900 underline underline-offset-2">All notifications</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative shrink-0">
+    <button type="button" x-ref="account" @click="open === 'account' ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()"
+            :aria-expanded="open === 'account'" aria-haspopup="menu" aria-label="Account — Rajesh Menon"
+            class="flex size-9 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      RM
+    </button>
+
+    <div x-show="open === 'account'" x-cloak
+         @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.tab="close(false)"
+         class="absolute right-0 z-40 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+      <div class="px-3 py-2">
+        <p class="truncate text-[13px]/5 font-medium">Rajesh Menon</p>
+        <p class="truncate text-[12px]/4 text-zinc-500">rajesh.menon@konspec.com</p>
+        <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500">Vasai plant · Procurement</p>
+      </div>
+      <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+      <div x-ref="menu" role="menu" aria-label="Account">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="user" class="size-4 text-zinc-600"></i>Your profile
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Preferences
+        </button>
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

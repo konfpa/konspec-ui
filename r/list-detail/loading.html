@@ -1,0 +1,269 @@
+<!-- The pane costs a request and the queue does not stop while it is in flight.
+     Three things have to be true for that to work.
+
+     The list stays interactive. The arrows keep moving, the options keep their
+     roving tabindex, and nothing is disabled — disabling the list while the
+     detail loads takes the control away from the person holding it, and on a
+     slow connection that is the whole session.
+
+     Out-of-order responses are dropped. Every request carries a token and the
+     handler returns unless its token is still the current one, so arrowing
+     three records down in half a second paints the third record and not
+     whichever request happened to come back last. Without it the pane and the
+     selection disagree and the user is reading the wrong batch under the right
+     heading, which is the worst failure this layout has.
+
+     What the page already knows is drawn for real. The batch number, the
+     material and the status came from the row that was clicked, so they are on
+     the header the whole time — grey them out and the pane flashes its own title
+     away and lands it again, which reads as a navigation that went wrong. Only
+     the three regions waiting on the query are skeleton, each at the height the
+     loaded version takes, so nothing moves on arrival.
+
+     One aria-busy on the pane, one sr-only role="status" outside the pulse
+     wrappers, and each wrapper carries its own aria-hidden and
+     motion-reduce:animate-none. The status region is where this layout does need
+     a live region: the pane resolves without focus moving, so nothing else would
+     say it had. -->
+<main class="flex h-[600px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 1, detail: false, loading: false, token: 0, said: '',
+        batches: [
+          { id: 'BN-26-0411', item: 'HDPE compound, natural', qty: '2,400 kg', status: 'Closed' },
+          { id: 'BN-26-0418', item: 'PP copolymer, black', qty: '1,800 kg', status: 'Overdue' },
+          { id: 'BN-26-0421', item: 'Masterbatch, blue', qty: '320 kg', status: 'Approved' },
+          { id: 'BN-26-0424', item: 'LDPE film grade', qty: '5,600 kg', status: 'Open' },
+          { id: 'BN-26-0427', item: 'PP homopolymer, natural', qty: '3,200 kg', status: 'Open' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.batches[this.sel] },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.batches.length - 1)) },
+        go(i) { this.sel = i; this.reveal(); this.load() },
+        reveal() {
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.reveal() },
+        load() {
+          const t = ++this.token;
+          this.loading = true;
+          this.said = '';
+          setTimeout(() => {
+            if (t !== this.token) return;
+            this.loading = false;
+            this.said = this.rec.id + ' loaded, ' + this.rec.item;
+          }, 1400);
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <h1 class="text-[16px]/6 font-semibold">Batch traceability</h1>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Silvassa · 5 batches in the last 24 hours</p>
+    </div>
+    <button type="button" @click="load()"
+            class="ml-auto inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="refresh-cw" class="size-4 text-zinc-600"></i>Reload the pane
+    </button>
+  </div>
+
+  <div class="flex min-h-0 flex-1">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">Batches</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="(sel + 1) + ' of ' + batches.length"></p>
+      </div>
+
+      <!-- Not disabled while the pane loads. Arrow away and the request in
+           flight is abandoned by its token, not by taking the keys away. -->
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(batches.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(b, i) in batches" :key="b.id">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[b.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="b.id"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="b.qty"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="b.status"></span> · <span x-text="b.item"></span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')" :aria-busy="loading"
+             @keydown.escape="back()"
+             class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+             :class="{ 'hidden': !detail, 'flex': detail }">
+
+      <!-- Drawn for real through the wait: all of it came from the row. -->
+      <div class="shrink-0 border-b border-zinc-200 px-4 py-3 md:px-5 md:py-4">
+        <button type="button" @click="back()"
+                class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+          <i data-lucide="chevron-left" class="size-4"></i>Back to the queue
+        </button>
+        <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+          <span class="tabular-nums" x-text="rec.id"></span>
+          <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+          </span>
+        </h2>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-600" x-text="rec.item + ' · ' + rec.qty"></p>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+
+        <!-- loading -->
+        <div x-show="loading">
+          <div class="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+            <div>
+              <p class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Produced</p>
+              <div class="mt-1.5 flex h-5 items-center" aria-hidden="true"><div class="h-2.5 w-24 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div></div>
+            </div>
+            <div>
+              <p class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Line</p>
+              <div class="mt-1.5 flex h-5 items-center" aria-hidden="true"><div class="h-2.5 w-16 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div></div>
+            </div>
+            <div>
+              <p class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Shift</p>
+              <div class="mt-1.5 flex h-5 items-center" aria-hidden="true"><div class="h-2.5 w-20 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div></div>
+            </div>
+            <div>
+              <p class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Operator</p>
+              <div class="mt-1.5 flex h-5 items-center" aria-hidden="true"><div class="h-2.5 w-28 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div></div>
+            </div>
+          </div>
+
+          <h3 class="mt-5 text-[13px]/5 font-medium">Consumed against this batch</h3>
+          <div class="mt-2 overflow-hidden rounded-xl border border-zinc-200">
+            <table class="w-full text-[13px]/5">
+              <thead>
+                <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">
+                  <th scope="col" class="px-3 py-2 font-medium">Material</th>
+                  <th scope="col" class="px-3 py-2 text-right font-medium">Lot</th>
+                  <th scope="col" class="px-3 py-2 text-right font-medium">Quantity</th>
+                </tr>
+              </thead>
+              <tbody class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+                <tr class="border-b border-zinc-100">
+                  <td class="px-3 py-2"><div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div></td>
+                  <td class="px-3 py-2"><div class="flex h-5 items-center justify-end"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+                  <td class="px-3 py-2"><div class="flex h-5 items-center justify-end"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+                </tr>
+                <tr class="border-b border-zinc-100">
+                  <td class="px-3 py-2"><div class="flex h-5 items-center"><div class="h-2.5 w-32 rounded bg-zinc-200"></div></div></td>
+                  <td class="px-3 py-2"><div class="flex h-5 items-center justify-end"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+                  <td class="px-3 py-2"><div class="flex h-5 items-center justify-end"><div class="h-2.5 w-14 rounded bg-zinc-200"></div></div></td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2"><div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div></td>
+                  <td class="px-3 py-2"><div class="flex h-5 items-center justify-end"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+                  <td class="px-3 py-2"><div class="flex h-5 items-center justify-end"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="mt-5 text-[13px]/5 font-medium">Where it went</h3>
+          <div class="mt-2 animate-pulse space-y-2.5 motion-reduce:animate-none" aria-hidden="true">
+            <div class="flex items-start gap-2.5">
+              <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+              <div class="flex h-5 flex-1 items-center"><div class="h-2.5 w-full rounded bg-zinc-200"></div></div>
+            </div>
+            <div class="flex items-start gap-2.5">
+              <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+              <div class="flex h-5 flex-1 items-center"><div class="h-2.5 w-3/4 rounded bg-zinc-200"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- loaded -->
+        <div x-show="!loading" x-cloak>
+          <dl class="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+            <div>
+              <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Produced</dt>
+              <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums">19 Aug 2026</dd>
+            </div>
+            <div>
+              <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Line</dt>
+              <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums">EX-04</dd>
+            </div>
+            <div>
+              <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Shift</dt>
+              <dd class="mt-1 text-[13px]/5 font-semibold">B</dd>
+            </div>
+            <div>
+              <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Operator</dt>
+              <dd class="mt-1 text-[13px]/5 font-semibold">R. Kadam</dd>
+            </div>
+          </dl>
+
+          <h3 class="mt-5 text-[13px]/5 font-medium">Consumed against this batch</h3>
+          <div class="mt-2 overflow-hidden rounded-xl border border-zinc-200">
+            <table class="w-full text-[13px]/5">
+              <thead>
+                <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">
+                  <th scope="col" class="px-3 py-2 font-medium">Material</th>
+                  <th scope="col" class="px-3 py-2 text-right font-medium">Lot</th>
+                  <th scope="col" class="px-3 py-2 text-right font-medium">Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-zinc-100">
+                  <td class="px-3 py-2">PP copolymer resin</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-zinc-600">LOT-8841</td>
+                  <td class="px-3 py-2 text-right font-medium tabular-nums">1,620 kg</td>
+                </tr>
+                <tr class="border-b border-zinc-100">
+                  <td class="px-3 py-2">Carbon black masterbatch</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-zinc-600">LOT-8802</td>
+                  <td class="px-3 py-2 text-right font-medium tabular-nums">126 kg</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2">Antioxidant blend</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-zinc-600">LOT-8790</td>
+                  <td class="px-3 py-2 text-right font-medium tabular-nums">54 kg</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="mt-5 text-[13px]/5 font-medium">Where it went</h3>
+          <ul role="list" class="mt-2 space-y-2.5">
+            <li class="flex items-start gap-2.5">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+              <p class="text-[13px]/5 tabular-nums text-zinc-600">1,200 kg issued to work order WO-26-0912 on 20 Aug 2026.</p>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+              <p class="text-[13px]/5 tabular-nums text-zinc-600">600 kg still in stores at Silvassa, bin C-14.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>

@@ -1,0 +1,80 @@
+<!-- The submit was live and it failed, which is the design. Disabling the
+     button until the sheet is complete says the form is not ready and nothing
+     about which of eighteen parameters is missing, so the user scrolls the
+     whole sheet hunting for the gap. The browser's own required validation is
+     no better here: it reports one control at a time in a bubble that
+     disappears, and the seventeen behind it stay invisible.
+
+     The summary takes focus and deliberately does not carry role="alert".
+     Focusing it is what reads it; a live region on top of that reads the whole
+     list twice, the first time before the user has any idea where they are.
+
+     Each entry links to the question block, which carries tabindex="-1".
+     Without the tabindex the fragment scrolls the question into view but leaves
+     focus on the summary, so the next Tab walks down the rest of the links
+     instead of entering the group. Linking to the first radio instead does move
+     focus, but scrolls that control to the top of the viewport with its own
+     question above the fold.
+
+     This is also the one place a question number earns its keep, because the
+     link and the row it points at have to be recognisably the same thing.
+
+     aria-invalid and the aria-describedby go on every option in the group, not
+     just the first. Only the focused radio's attributes are announced, so
+     marking one leaves the message unread for anybody who arrows onto the
+     second. -->
+<div class="max-w-2xl">
+  <div id="qv-summary" tabindex="-1" class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3.5">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <h2 class="text-[13px]/5 font-medium tabular-nums">Not signed — 2 of 18 parameters are unanswered</h2>
+      <p class="mt-1 text-[12px]/4 text-zinc-600">Everything you have already answered is still here. Nothing was submitted.</p>
+      <ul class="mt-2.5 space-y-1.5 text-[13px]/5 tabular-nums">
+        <li><a href="#qv-q4" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Q4 · Moisture on the hand-held meter</a></li>
+        <li><a href="#qv-q9" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Q9 · Pallet count against the delivery challan</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-5 divide-y divide-zinc-100">
+    <fieldset id="qv-q4" tabindex="-1" class="py-4 first:pt-0">
+      <legend class="text-[13px]/5 font-medium tabular-nums">
+        Q4 · Moisture on the hand-held meter at or below 0.05% <span class="text-red-600">*</span>
+      </legend>
+      <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qv_moisture" value="pass" required aria-invalid="true" aria-describedby="qv-q4-err" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qv_moisture" value="fail" required aria-invalid="true" aria-describedby="qv-q4-err" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qv_moisture" value="na" required aria-invalid="true" aria-describedby="qv-q4-err" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+      <p id="qv-q4-err" class="mt-2.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>If the meter was not available, that is N/A — not blank.
+      </p>
+    </fieldset>
+
+    <fieldset id="qv-q9" tabindex="-1" class="py-4">
+      <legend class="text-[13px]/5 font-medium tabular-nums">
+        Q9 · Pallet count matches the delivery challan <span class="text-red-600">*</span>
+      </legend>
+      <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qv_pallets" value="pass" required aria-invalid="true" aria-describedby="qv-q9-err" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qv_pallets" value="fail" required aria-invalid="true" aria-describedby="qv-q9-err" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qv_pallets" value="na" required aria-invalid="true" aria-describedby="qv-q9-err" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+      <p id="qv-q9-err" class="mt-2.5 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-red-600">
+        <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>Challan DC-8871 says 14 pallets.
+      </p>
+    </fieldset>
+  </div>
+</div>

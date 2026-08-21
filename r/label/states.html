@@ -1,0 +1,51 @@
+<!-- has- and peer- are not a choice, they are decided by the order of the
+     markup. The label comes first in the top two rows, so peer-disabled on it
+     matches nothing at all and fails silently — peer only reaches forward to
+     siblings. has-[:disabled] on the wrapper around both is the one that works.
+     In the switch row the painted track follows the input, so peer-disabled is
+     correct there, which is why the checkbox and toggle entries use it and this
+     one mostly does not.
+
+     Deriving it beats writing text-zinc-500 on the label by hand: the moment
+     disabled becomes a server-rendered condition, a hardcoded class is a grey
+     label on a live field.
+
+     Read-only greys the surface and not the label. The value still matters and
+     still has to be copied out, so it stays at full contrast — dim it and you
+     have said the order number does not count. And it is written outright, not
+     with has-[:read-only]: the CSS :read-only pseudo-class matches every
+     element that is not user-alterable, which includes the label and the
+     paragraph inside the wrapper, so the wrapper matches always. Match the
+     attribute — has-[[readonly]] — or write the classes, as here. -->
+<div class="max-w-xl space-y-5">
+  <div class="has-[:disabled]:text-zinc-500">
+    <label for="lb-off" class="mb-1.5 block text-[13px]/5 font-medium">Rate contract</label>
+    <div class="rounded-lg border border-zinc-200 bg-white has-[:disabled]:bg-zinc-100">
+      <input id="lb-off" value="RC-2026-014 — Gujarat Polymers Ltd" disabled
+             class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums disabled:text-zinc-400">
+    </div>
+    <p class="mt-1.5 text-[12px]/4">Changed on the contract, not on the order.</p>
+  </div>
+
+  <div>
+    <label for="lb-ro" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+      <input id="lb-ro" value="PO-24-1187" readonly
+             class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Allotted on save. Quote it on the invoice.</p>
+  </div>
+
+  <label class="flex items-start gap-2.5 py-1 text-[14px]/5 has-[:disabled]:text-zinc-500">
+    <input type="checkbox" checked disabled class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+    <span class="tabular-nums">Three-way match against the invoice — compulsory above ₹10,00,000</span>
+  </label>
+
+  <label class="flex items-center justify-between gap-4 py-1 has-[:disabled]:text-zinc-500">
+    <span class="text-[14px]/5">Auto-approve — locked by plant policy</span>
+    <input type="checkbox" role="switch" checked disabled class="peer sr-only">
+    <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-disabled:opacity-60 forced-colors:border">
+      <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm forced-colors:border"></span>
+    </span>
+  </label>
+</div>

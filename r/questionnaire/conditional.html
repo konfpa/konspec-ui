@@ -1,0 +1,59 @@
+<!-- The trap this variant exists for: x-show is display:none, and a
+     display:none input is still in the form and still posts. Answer Fail, type
+     the note, change the answer back to Pass, and without the disabled binding
+     the sheet submits qc_ppe=pass alongside a note describing the failure —
+     worse than either answer alone, because the record now contradicts itself
+     and nothing on screen showed it happen.
+
+     :disabled bound to the inverse of the show condition fixes both halves at
+     once. A disabled control is excluded from submission and is also barred
+     from constraint validation, which is why required beside it can stay a
+     plain static attribute. Written the other way round, a required field
+     inside a display:none block makes the form silently unsubmittable: the
+     browser logs "An invalid form control is not focusable" and shows the user
+     nothing, because it cannot scroll to a control it is not painting.
+
+     The follow-up is a <label for>, not a fieldset with a legend, because its
+     answer is exactly one control. It sits immediately after the answer that
+     revealed it so the next Tab lands on it, and it is indented behind a rule
+     rather than dropped into a tinted panel — the rule says "this belongs to
+     the question above" without adding a second slab to the page.
+
+     It counts as a question, which is why the eyebrow above says 5 while it is
+     open and 4 when it is not. A denominator that ignores conditionals either
+     cannot be reached on a clean sheet or is exceeded on a failed one. -->
+<div class="max-w-xl" x-data="{ ppe: 'fail' }">
+  <fieldset>
+    <legend>
+      <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">
+        Safety audit · question 7 of <span x-text="ppe === 'fail' ? 5 : 4"></span>
+      </span>
+      <span class="mt-1.5 block text-[14px]/5 font-medium">Every person on the unloading bay was wearing helmet, safety shoes and hi-vis</span>
+    </legend>
+
+    <div class="mt-3 grid max-w-sm grid-cols-3 gap-2">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="qc_ppe" value="pass" x-model="ppe" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="qc_ppe" value="fail" x-model="ppe" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="qc_ppe" value="na" x-model="ppe" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div x-show="ppe === 'fail'" x-cloak class="mt-4 border-l-2 border-zinc-200 pl-4">
+    <label for="qf-note" class="block text-[13px]/5 font-medium">
+      Who was missing what, and what was done <span class="text-red-600">*</span>
+    </label>
+    <div class="mt-1.5 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <textarea id="qf-note" name="qc_ppe_note" rows="3" required :disabled="ppe !== 'fail'"
+                aria-describedby="qf-note-help"
+                placeholder="Two unloaders from Sharma Transport, no safety shoes. Sent to the gate store."
+                class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
+    </div>
+    <p id="qf-note-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Goes to the safety officer and onto the contractor gate pass record.</p>
+  </div>
+</div>

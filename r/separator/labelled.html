@@ -1,0 +1,31 @@
+<!-- The label is a heading, not a separator with a name. It says what follows,
+     which is what a heading is for, and it then appears in the page outline for
+     anyone skimming by heading — measured, this one resolves as a level-3
+     heading while the two lines beside it resolve to nothing at all. Wrapping
+     the row in role="separator" with an aria-label reads the same words out and
+     leaves the outline empty.
+
+     flex-1 on the lines and shrink-0 on the label: the label keeps its width
+     and the lines take whatever is left, so at 390px there is still a visible
+     rule on both sides rather than one line and a stub.
+
+     The second one is the exception — a label that names a choice rather than a
+     section. "or" is plain text with no role, because that is exactly what it
+     is; only the lines are hidden. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+  <p class="text-[13px]/5 text-zinc-600">Nine lines released to the vendor on 04 Aug 2026.</p>
+
+  <div class="mt-5 flex items-center gap-3">
+    <span class="h-px flex-1 bg-zinc-200" aria-hidden="true"></span>
+    <h3 class="shrink-0 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Amendments</h3>
+    <span class="h-px flex-1 bg-zinc-200" aria-hidden="true"></span>
+  </div>
+
+  <p class="mt-3 text-[13px]/5 text-zinc-600">Rev C moved the delivery date to 28 Aug 2026.</p>
+
+  <div class="mt-5 flex items-center gap-3">
+    <span class="h-px flex-1 bg-zinc-200" aria-hidden="true"></span>
+    <span class="shrink-0 text-[12px]/4 text-zinc-500">or</span>
+    <span class="h-px flex-1 bg-zinc-200" aria-hidden="true"></span>
+  </div>
+</div>

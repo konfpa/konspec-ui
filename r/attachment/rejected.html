@@ -1,0 +1,29 @@
+<!-- The rejected file stays visible with its reason. Removing it from the list
+     silently is how users end up believing something uploaded when it did not. -->
+<ul class="space-y-2">
+  <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+    <div class="min-w-0 flex-1">
+      <p class="truncate text-[13px]/5 font-medium">quotation-sharma-extrusions-aug.pdf</p>
+      <p class="text-[12px]/4 text-zinc-500">248 KB · Ritu Deshpande · 19 Aug 2024</p>
+    </div>
+    <button type="button" aria-label="Remove quotation-sharma-extrusions-aug.pdf"
+            class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+      <i data-lucide="x" class="size-4"></i>
+    </button>
+  </li>
+  <li class="flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file" class="size-4 text-zinc-500"></i></span>
+    <div class="min-w-0 flex-1">
+      <p class="truncate text-[13px]/5 font-medium text-zinc-600 line-through">plant-layout-revised.dwg</p>
+      <p id="reject-dwg" class="mt-0.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>
+        DWG is not accepted. Attach a PDF export instead.
+      </p>
+    </div>
+    <button type="button" aria-label="Dismiss plant-layout-revised.dwg" aria-describedby="reject-dwg"
+            class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+      <i data-lucide="x" class="size-4"></i>
+    </button>
+  </li>
+</ul>

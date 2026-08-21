@@ -1,0 +1,73 @@
+<!-- A tooltip on every cell in the column is a column that flashes at the
+     pointer for no reason. Measure the text at hover — scrollWidth against
+     clientWidth on the truncating element — and open nothing when it fits.
+     The second row here fits and never shows a bubble.
+
+     Measure at hover and not at x-init. Column widths change with the
+     viewport, with the sidebar collapsing and with the user dragging a column,
+     so a flag computed once is wrong by the first resize. The comparison
+     carries a one-pixel tolerance because both properties are rounded to
+     integers and a cell that fits exactly measures as clipped often enough to
+     matter.
+
+     No aria-describedby and the bubble is aria-hidden. Truncation is a
+     CSS effect: the whole string is in the DOM and a screen reader already
+     reads all of it. Wiring the bubble into the name would read it twice.
+
+     This is the one tooltip here with no keyboard route, and deliberately so.
+     A tabindex="0" on the cell text would put a tab stop on every row of the
+     register — fifty stops on something that is not a control — to reveal a
+     string a reader was already given in full. Everywhere else the bubble is
+     the only copy of a name, so focus has to open it; here it is a second
+     copy, so the pointer is enough.
+
+     The card is not overflow-hidden — that is what clips a bubble at the row
+     it opens on — so the header cells are rounded instead. truncate on the
+     cell itself would clip it too, which is why the ellipsis lives on an inner
+     span and the positioned wrapper around it does no clipping of its own. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, timer: 0,
+       show(id, el, d = 150) {
+         clearTimeout(this.timer);
+         if (el.scrollWidth <= el.clientWidth + 1) return;
+         this.timer = setTimeout(() => this.open = id, d);
+       },
+       hide() { clearTimeout(this.timer); this.open = null }
+     }"
+     @keydown.escape.window="hide()">
+  <table class="w-full table-fixed text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="rounded-tl-xl px-4 py-2 font-medium sm:w-32">Order</th>
+        <th scope="col" class="rounded-tr-xl px-4 py-2 font-medium">Line description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
+        <td class="px-4 py-2.5">
+          <span class="relative block">
+            <span x-ref="long"
+                  @mouseenter="show('long', $refs.long)" @mouseleave="hide()"
+                  class="block truncate text-zinc-600">MS angles 50×50×6 and plates 10 mm, IS 2062 E250 BR, Waluj plant August lot</span>
+            <span aria-hidden="true" x-show="open === 'long'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute top-full left-0 z-40 mt-1.5 max-w-sm rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white">MS angles 50×50×6 and plates 10 mm, IS 2062 E250 BR, Waluj plant August lot</span>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1163</td>
+        <td class="px-4 py-2.5">
+          <span class="relative block">
+            <span x-ref="short"
+                  @mouseenter="show('short', $refs.short)" @mouseleave="hide()"
+                  class="block truncate text-zinc-600">HR coil 2.5 mm</span>
+            <span aria-hidden="true" x-show="open === 'short'" x-cloak x-transition.opacity.duration.100ms
+                  class="pointer-events-none absolute top-full left-0 z-40 mt-1.5 max-w-sm rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white">HR coil 2.5 mm</span>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

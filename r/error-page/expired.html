@@ -1,0 +1,66 @@
+<!-- Not an error the user caused and not one support can help with, so the
+     screen has exactly one job: get them signed in again and back to the page
+     they were on. The primary action carries next, encoded, so the round trip
+     ends where it started rather than on the dashboard.
+
+     Encoding is not optional. A next holding a query string — a filtered
+     register, a ledger scoped to a date range — loses everything after the
+     first ampersand unencoded, and the user lands on an unfiltered list
+     believing their filters were forgotten. The server then has to validate it
+     as a same-origin relative path (Django has url_has_allowed_host_and_scheme
+     for exactly this), or the login page will forward anyone who is sent a
+     crafted link to any host on the internet.
+
+     Say when it expired and say what that cost. Somebody who was typing wants
+     to know whether it is still there, and it is not.
+
+     Nothing redirects on its own. A five-second bounce to the sign-in page
+     takes the explanation away before it has been read and lands a screen
+     reader in the middle of a form it was never told about.
+
+     The second link is the shared-terminal case, and on a plant floor it is the
+     common one: the address in the message is not always the address of the
+     person now standing at the screen. -->
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+     x-data="{ next: '/grn/GRN-24-0912/?tab=lines' }">
+
+  <header class="flex items-center justify-between gap-3">
+    <span class="inline-flex items-center gap-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+      <span class="text-[14px]/5 font-semibold">Konspec Operations</span>
+    </span>
+    <p class="hidden text-[12px]/4 text-zinc-500 sm:block">Session timeout 30 min</p>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center py-10">
+    <div class="w-full max-w-md text-center">
+      <span class="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="log-out" class="size-5 text-zinc-600" aria-hidden="true"></i>
+      </span>
+
+      <p class="mt-4 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Signed out</p>
+      <h1 tabindex="-1" class="mt-1 text-[20px]/7 font-semibold tracking-tight">Your session has expired</h1>
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600">
+        Konspec Operations signs you out after 30 minutes without activity. Yours ended at 14:02, so this request was made without a session behind it.
+      </p>
+      <p class="mx-auto mt-3 max-w-md text-[13px]/5 text-zinc-600">
+        Signing in again returns you to GRN-24-0912. Anything typed into that screen and not saved has gone with the session.
+      </p>
+
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+        <a :href="'/accounts/login/?next=' + encodeURIComponent(next)"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          Sign in and go back to GRN-24-0912
+        </a>
+        <a href="/accounts/login/"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Sign in as someone else
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-zinc-200 pt-4 text-center text-[11px]/4 text-zinc-500">
+    The expired session belonged to akshay.prabhu@konspec.com · shared terminals sign out after 5 minutes
+  </footer>
+</div>

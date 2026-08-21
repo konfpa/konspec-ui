@@ -1,0 +1,132 @@
+<!-- A promoted destination beside the list — here the record the buyer had
+     open before lunch, which in a procurement console is the most likely next
+     click by a wide margin.
+
+     The rail is first in the DOM, and that is a decision rather than a layout:
+     DOM order is keyboard order, so Down from the trigger lands on the record
+     rather than on All of Procurement. That is right only because the record
+     really is the likeliest destination. Put anything promotional there and it
+     becomes an advertisement standing between a keyboard user and the menu, in
+     which case it goes last in the DOM and the grid puts it back on the left
+     with sm:order-first — visual order is free to move, tab order is not.
+
+     The rail is bg-zinc-100, a surface, and the pill inside it is bg-zinc-200
+     with a zinc-300 ring, one step deeper. Give the pill the surface fill and
+     it measures identical against the rail and disappears.
+
+     The rail is a single anchor wrapping four lines, so the whole block is the
+     target. Splitting the amount out into a sibling would leave the largest
+     thing on the card unclickable, which is exactly the part people aim at. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <button type="button" x-ref="proc" id="nmf-t-proc"
+              aria-controls="nmf-p-proc" :aria-expanded="open === 'proc'"
+              @mouseenter="hover('proc')"
+              @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
+              @keydown.arrow-down.prevent="jump('proc')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'proc' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Procurement
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+    </li>
+    <li>
+      <a href="/inventory/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Inventory</a>
+    </li>
+    <li>
+      <a href="/reports/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+
+  <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
+       id="nmf-p-proc" aria-labelledby="nmf-t-proc"
+       class="absolute top-full left-0 z-40 w-full pt-2">
+    <div class="rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
+      <div class="grid gap-3 sm:grid-cols-3">
+        <a href="/procurement/orders/1187/"
+           class="block rounded-lg bg-zinc-100 p-3 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Back to where you were</span>
+          <span class="mt-2 block text-[14px]/5 font-semibold tabular-nums text-zinc-900">PO-24-1187</span>
+          <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Gujarat Polymers Ltd</span>
+          <span class="mt-2 flex items-center justify-between gap-2">
+            <span class="text-[13px]/5 font-medium tabular-nums text-zinc-900">₹18,42,000</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Awaiting GRN
+            </span>
+          </span>
+          <span class="mt-2 block text-[12px]/4 tabular-nums text-zinc-500">Opened 16 Aug 2026, 11:04</span>
+        </a>
+
+        <div class="sm:col-span-2">
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Procurement</h3>
+          <ul class="grid sm:grid-cols-2">
+            <li>
+              <a href="/procurement/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">All of Procurement</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">The section overview</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/orders/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Purchase orders</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-600">31 open, 4 overdue</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/requisitions/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Requisitions</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Indents from the sites</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/contracts/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Rate contracts</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Agreed prices and validity</span>
+              </a>
+            </li>
+            <li>
+              <a href="/vendors/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Vendors</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Suppliers and contacts</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/invoices/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Invoices</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Three-way match queue</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

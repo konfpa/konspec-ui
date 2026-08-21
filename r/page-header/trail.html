@@ -1,0 +1,40 @@
+<!-- The trail sits above the title, not beside it, and the h1 repeats the last
+     crumb. That repetition is correct: the crumb is navigation and the h1 is the
+     page. Copy the trail from breadcrumbs — an <ol>, the separators aria-hidden,
+     aria-current="page" on the last item, which is a <span> and not a link.
+
+     Render this here only if the topbar does not carry a trail. One of the two,
+     decided once for the application; on screen twice, the second one is the one
+     that goes stale. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100">
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">GRN-26-0418</span></li>
+        </ol>
+      </nav>
+
+      <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div class="min-w-0">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight tabular-nums">GRN-26-0418</h1>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Against PO-24-1187 · Sharma Steel &amp; Alloys · received 18 Aug 2026 at Silvassa · 9 lines</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="printer" class="size-4"></i>Print
+          </button>
+          <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="check" class="size-4"></i>Post to ledger
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <p class="mx-auto max-w-[1600px] px-4 py-6 text-[13px]/5 text-zinc-500 lg:px-6">The receipt lines render below the band, in this gutter.</p>
+</div>

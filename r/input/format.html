@@ -1,0 +1,44 @@
+<!-- pattern is checked by the browser, and :user-invalid is what draws the
+     result. Not :invalid — that matches from first paint, so a required field
+     is red before anyone has touched it and a create form opens covered in
+     errors nobody has made. :user-invalid waits until the field has been
+     interacted with and left.
+
+     The red rules have to be written in their focused form as well.
+     focus-within:border-zinc-700 and has-[:user-invalid]:border-red-600 carry
+     the same specificity, so which one wins comes down to the order Tailwind
+     emitted them in; stacking has-[:user-invalid]:focus-within:border-red-600
+     settles it rather than leaving it to chance.
+
+     uppercase is a paint. The value posted is exactly what was typed, so a
+     field that looks like GRN-24-0912 can post grn-24-0912 and fail a pattern
+     of [A-Z]{3} while the screen shows a perfectly good code. The blur handler
+     is what makes the value agree with the rendering.
+
+     type="date" always posts yyyy-mm-dd whatever it displays, and what it
+     displays is the browser's locale — so the hint says what the date means,
+     not what it should look like. -->
+<div class="max-w-xl space-y-5" x-data="{ ref: 'GRN-24-0912' }">
+  <div>
+    <label for="in-ref" class="mb-1.5 block text-[13px]/5 font-medium">GRN reference</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 has-[:user-invalid]:border-red-600 has-[:user-invalid]:focus-within:border-red-600 has-[:user-invalid]:focus-within:outline-red-600/15">
+      <input id="in-ref" name="grn_ref" x-model="ref" @blur="ref = ref.toUpperCase().trim()"
+             pattern="GRN-[0-9]{2}-[0-9]{4}"
+             title="Three letters, two digits, four digits — GRN-24-0912"
+             autocomplete="off" spellcheck="false" aria-describedby="in-ref-help"
+             placeholder="GRN-24-0912"
+             class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 uppercase tabular-nums outline-none placeholder:normal-case placeholder:text-zinc-500">
+    </div>
+    <p id="in-ref-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Top right of the receipt note, as GRN-24-0912.</p>
+  </div>
+
+  <div>
+    <label for="in-date" class="mb-1.5 block text-[13px]/5 font-medium">Invoice date</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="in-date" name="invoice_date" type="date" value="2026-08-16"
+             max="2026-08-21" aria-describedby="in-date-help"
+             class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="in-date-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">The date on the vendor invoice, not the date it was received. Cannot be in the future.</p>
+  </div>
+</div>

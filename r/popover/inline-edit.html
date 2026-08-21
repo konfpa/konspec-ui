@@ -1,0 +1,161 @@
+<!-- The register scrolls sideways at 390px, so the wrapper is overflow-x-auto,
+     and that is what an absolutely positioned panel inside a cell cannot
+     survive: the scroller is its clipping ancestor and the panel is cut off at
+     the edge of the table. overflow-hidden on the wrapper does the same thing
+     one row down. Either drop the clipping and round the header cells by hand,
+     which is what the hovercard does, or make the panel position: fixed — which
+     is the only answer when the container genuinely has to scroll.
+
+     Fixed brings its own trap. Any ancestor carrying transform, filter,
+     backdrop-filter, contain or will-change becomes the containing block, and
+     the panel then anchors to that element instead of the viewport and lands
+     somewhere nobody predicted. Nothing above these cells may take a transform.
+
+     A fixed panel has no anchor of its own, so place() computes left and top
+     from the trigger's rect and re-runs on scroll. scroll does not bubble, so
+     the window listener never hears the table's own scrollbar; the scroller
+     dispatches its own event, which does bubble, and every open panel listens
+     for it. Repositioning rather than closing is deliberate — closing on scroll
+     throws away what the user has typed.
+
+     left and top are a bound :style, so these panels carry no x-transition —
+     a transition restores the style attribute it cached before it ran, which
+     would pin the panel at the position it had on the previous open and leave
+     it there after a scroll. The placement variant has the measurement.
+
+     htmx does the writing, because Alpine does not fetch. The response replaces
+     the cell text only, so nothing about the row is rebuilt and the trigger the
+     panel belongs to survives the swap; Alpine closes the panel and hands focus
+     back to that trigger on a successful request, and leaves it open with the
+     text intact on a failure. -->
+<div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white"
+     x-data @scroll="$dispatch('rail-scroll')">
+  <table class="w-full min-w-[34rem] text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="px-4 py-2 font-medium">Item</th>
+        <th scope="col" class="px-4 py-2 text-right font-medium">Qty</th>
+        <th scope="col" class="px-4 py-2 text-right font-medium">Rate</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2 text-zinc-600">MS angle 50×50×6</td>
+        <td class="px-4 py-2 text-right tabular-nums">12,000 kg</td>
+        <td class="px-4 py-2 text-right"
+            x-data="{
+              open: false, x: 0, y: 0,
+              place() {
+                const r = this.$refs.trigger.getBoundingClientRect(), p = this.$refs.panel, m = 12;
+                this.x = Math.round(Math.max(m, Math.min(r.right - p.offsetWidth, innerWidth - m - p.offsetWidth)));
+                this.y = Math.round(r.bottom + p.offsetHeight + m > innerHeight && r.top - p.offsetHeight > m
+                                    ? r.top - p.offsetHeight - 6 : r.bottom + 6);
+              },
+              show() {
+                this.open = true;
+                this.$nextTick(() => requestAnimationFrame(() => { this.place(); this.$refs.rate.focus(); this.$refs.rate.select() }));
+              },
+              close(toTrigger = true) {
+                if (!this.open) return;
+                this.open = false;
+                if (toTrigger) this.$refs.trigger.focus();
+              }
+            }"
+            @click.outside="close(false)"
+            @focusout="if ($event.relatedTarget && !$root.contains($event.relatedTarget)) close(false)"
+            @keydown.escape="if (open) { $event.stopPropagation(); close() }"
+            @scroll.window="open && place()"
+            @rail-scroll.window="open && place()"
+            @resize.window.debounce="open && place()"
+            @htmx:after-request.camel="if ($event.detail.successful) close()">
+
+          <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+                  :aria-expanded="open" aria-controls="pop-ed1" aria-label="Edit rate for MS angle 50×50×6"
+                  class="-mr-2 inline-flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span id="ed1-val" class="tabular-nums">₹57.00</span>
+            <i data-lucide="pencil" class="size-3.5 text-zinc-500"></i>
+          </button>
+
+          <div id="pop-ed1" x-ref="panel" x-show="open" x-cloak
+               :style="'left: ' + x + 'px; top: ' + y + 'px'"
+               role="dialog" tabindex="-1" aria-labelledby="pop-ed1-title"
+               class="fixed z-40 w-64 rounded-xl border border-zinc-200 bg-white p-3 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <form hx-post="/orders/1187/lines/1/rate/" hx-target="#ed1-val" hx-swap="innerHTML">
+              <p id="pop-ed1-title" class="text-[12px]/4 font-medium text-zinc-600">Rate per kg</p>
+              <div class="mt-1.5 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <span class="pl-3 text-[13px]/5 text-zinc-500">₹</span>
+                <input x-ref="rate" name="rate" value="57.00" inputmode="decimal" aria-label="Rate per kg"
+                       class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+              </div>
+              <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Rate contract RC-118 · ₹54.00 to ₹60.00</p>
+              <div class="mt-2.5 flex items-center justify-end gap-2">
+                <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Cancel</button>
+                <button type="submit"
+                        class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save</button>
+              </div>
+            </form>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="px-4 py-2 text-zinc-600">MS plate 10 mm</td>
+        <td class="px-4 py-2 text-right tabular-nums">4,000 kg</td>
+        <td class="px-4 py-2 text-right"
+            x-data="{
+              open: false, x: 0, y: 0,
+              place() {
+                const r = this.$refs.trigger.getBoundingClientRect(), p = this.$refs.panel, m = 12;
+                this.x = Math.round(Math.max(m, Math.min(r.right - p.offsetWidth, innerWidth - m - p.offsetWidth)));
+                this.y = Math.round(r.bottom + p.offsetHeight + m > innerHeight && r.top - p.offsetHeight > m
+                                    ? r.top - p.offsetHeight - 6 : r.bottom + 6);
+              },
+              show() {
+                this.open = true;
+                this.$nextTick(() => requestAnimationFrame(() => { this.place(); this.$refs.rate.focus(); this.$refs.rate.select() }));
+              },
+              close(toTrigger = true) {
+                if (!this.open) return;
+                this.open = false;
+                if (toTrigger) this.$refs.trigger.focus();
+              }
+            }"
+            @click.outside="close(false)"
+            @focusout="if ($event.relatedTarget && !$root.contains($event.relatedTarget)) close(false)"
+            @keydown.escape="if (open) { $event.stopPropagation(); close() }"
+            @scroll.window="open && place()"
+            @rail-scroll.window="open && place()"
+            @resize.window.debounce="open && place()"
+            @htmx:after-request.camel="if ($event.detail.successful) close()">
+
+          <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+                  :aria-expanded="open" aria-controls="pop-ed2" aria-label="Edit rate for MS plate 10 mm"
+                  class="-mr-2 inline-flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span id="ed2-val" class="tabular-nums">₹78.00</span>
+            <i data-lucide="pencil" class="size-3.5 text-zinc-500"></i>
+          </button>
+
+          <div id="pop-ed2" x-ref="panel" x-show="open" x-cloak
+               :style="'left: ' + x + 'px; top: ' + y + 'px'"
+               role="dialog" tabindex="-1" aria-labelledby="pop-ed2-title"
+               class="fixed z-40 w-64 rounded-xl border border-zinc-200 bg-white p-3 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <form hx-post="/orders/1187/lines/2/rate/" hx-target="#ed2-val" hx-swap="innerHTML">
+              <p id="pop-ed2-title" class="text-[12px]/4 font-medium text-zinc-600">Rate per kg</p>
+              <div class="mt-1.5 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <span class="pl-3 text-[13px]/5 text-zinc-500">₹</span>
+                <input x-ref="rate" name="rate" value="78.00" inputmode="decimal" aria-label="Rate per kg"
+                       class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+              </div>
+              <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Rate contract RC-118 · ₹74.00 to ₹82.00</p>
+              <div class="mt-2.5 flex items-center justify-end gap-2">
+                <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Cancel</button>
+                <button type="submit"
+                        class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save</button>
+              </div>
+            </form>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

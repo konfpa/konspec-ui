@@ -1,0 +1,108 @@
+<!-- The create row is a real option: last in the list, reachable by arrow key,
+     committed by Enter. It appears only when there is a query and no exact
+     match, so it never sits under a list somebody is still reading.
+
+     It posts as text in a second field, never as an invented id. Send
+     vendor=new-konkan-industries and the server cannot tell a record that
+     exists from one that does not; send an empty vendor with vendor_new set and
+     the view knows to create one, and can put it behind whatever approval a new
+     vendor needs.
+
+     This is also why the arrows clamp rather than wrap. A list that wrapped
+     would land on Add new vendor every time somebody overshot the bottom. -->
+<div class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: '', sel: '', fresh: '', ai: 0,
+       options: [
+         { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'VEN-0142' },
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'VEN-0187' },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'VEN-0203' },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'VEN-0244' }
+       ],
+       get term() { return this.q.trim(); },
+       get found() {
+         if (!this.typed) return this.options;
+         const s = this.term.toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       get creating() {
+         return this.term.length > 0 &&
+                !this.options.some(o => o.label.toLowerCase() === this.term.toLowerCase());
+       },
+       get list() {
+         return this.creating ? [...this.found, { id: '__new', label: this.term, isNew: true }] : this.found;
+       },
+       rowId(o) { return 'cb-new-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { if (!this.open) { this.open = true; this.typed = false; this.ai = 0; this.scroll(); } },
+       close() {
+         this.open = false; this.typed = false;
+         const o = this.options.find(x => x.id === this.sel);
+         this.q = o ? o.label : this.fresh;
+       },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) {
+         if (o.isNew) { this.sel = ''; this.fresh = o.label; }
+         else { this.sel = o.id; this.fresh = ''; }
+         this.close();
+         this.$refs.q.focus();
+       },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-new" class="mb-1.5 block text-[13px]/5 font-medium">Vendor on the quotation</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-new" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-new-list" aria-describedby="cb-new-help"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Search, or type a new vendor name"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <!-- an id for a record that exists, or the raw text for one that does not.
+       Never a made-up id. -->
+  <input type="hidden" name="vendor" :value="sel">
+  <input type="hidden" name="vendor_new" :value="fresh">
+
+  <p id="cb-new-help" class="mt-1.5 text-[12px]/4" :class="fresh ? 'text-amber-700' : 'text-zinc-500'"
+     x-text="fresh ? 'New vendor — this order cannot be released until purchase approves it.' : 'Pick an approved vendor, or add one and send it for approval.'"></p>
+
+  <p role="status" class="sr-only"
+     x-text="open ? (found.length === 1 ? '1 vendor matches' : found.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-new-list" role="listbox" aria-label="Vendors" class="max-h-64 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="!o.isNew && o.id === sel"
+             @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+             :class="[i === ai ? 'bg-zinc-100' : '', o.isNew ? 'border-t border-zinc-100' : '']"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+          <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.isNew" x-cloak>
+            <i data-lucide="plus" class="size-4 text-zinc-600"></i>
+          </span>
+          <span class="min-w-0 flex-1 truncate"
+                x-text="o.isNew ? 'Add new vendor: “' + o.label + '”' : o.label"></span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-show="!o.isNew" x-text="o.meta"></span>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>

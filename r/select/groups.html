@@ -1,0 +1,54 @@
+<!-- Four attributes on one option and each does exactly one job.
+
+     value="" is what lets required fire, because constraint validation counts
+     an empty value as missing. selected is what makes it the initial state —
+     leave it off and the browser selects the first enabled option instead, so
+     a form nobody touched posts HDPE granules and reads as though somebody
+     chose them. disabled is what stops anyone selecting it back once they have
+     moved off it. hidden drops the row out of the open list where it is
+     honoured and is ignored where it is not, which is the only reason it is
+     safe to write at all.
+
+     A placeholder with a real value — "none", "0" — defeats required and leaves
+     the server knowing that one of its own choices means no choice.
+
+     The placeholder sits before the first optgroup, not inside one. Inside, it
+     is a member of Polymers and is announced as one.
+
+     <optgroup> is a heading and never a value. One level, a label attribute and
+     nothing else: no count, no icon, no second line. Wanting any of those is
+     the signal to move to the listbox variants below. -->
+<div class="max-w-sm">
+  <label for="sel-item" class="mb-1.5 block text-[13px]/5 font-medium">Item <span class="text-red-600">*</span></label>
+
+  <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <select id="sel-item" name="item" required aria-describedby="sel-item-help"
+            class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+      <option value="" disabled selected hidden>Choose an item</option>
+
+      <optgroup label="Polymers">
+        <option value="ITM-1042">HDPE granules — natural</option>
+        <option value="ITM-1078">LDPE granules — 22FA002</option>
+        <option value="ITM-1091">Masterbatch — white 60%</option>
+      </optgroup>
+
+      <optgroup label="Fasteners">
+        <option value="ITM-3310">M12 hex bolt — 8.8 zinc</option>
+        <option value="ITM-3344">M12 nylock nut — 8.8 zinc</option>
+      </optgroup>
+
+      <optgroup label="Packaging">
+        <option value="ITM-5120">HDPE liner — 25 kg</option>
+        <option value="ITM-5140">Stretch film — 23 micron</option>
+      </optgroup>
+    </select>
+
+    <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+      <i data-lucide="chevron-down" class="size-4"></i>
+    </span>
+  </div>
+
+  <p id="sel-item-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Seven items across three groups. Above about fifteen this becomes a combobox, because the answer stops being findable by scrolling.
+  </p>
+</div>

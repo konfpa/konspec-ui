@@ -1,0 +1,104 @@
+<!-- The two menus open in opposite directions and neither choice is cosmetic.
+     The switcher hangs below its trigger because there are 480 pixels of nav
+     under it. The account menu opens upward from bottom-full because there is
+     nothing under it but the bottom of the screen, and a menu anchored downward
+     there is a menu whose last three items are off the page.
+
+     Both are anchored inside the panel, so the panel cannot be overflow-hidden.
+     Add it to tidy the rounded corners and both menus are cut off at the edge of
+     the sidebar.
+
+     One open key, not two booleans. Two independent flags let both menus sit
+     open at once, stacked over each other, and the click that should have closed
+     the first one opens the second.
+
+     Neither survives the rail as-is: a 240px menu hanging off a 40px avatar
+     looks unattached, so at 68px both become right-side flyouts anchored to the
+     icon. The switcher marks the selected plant with a check rather than a tint,
+     because a tinted row in a menu is the hover state and a permanently tinted
+     one reads as permanently hovered. -->
+<div class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{ menu: '' }" @keydown.escape.window="menu = ''">
+
+  <div class="shrink-0 border-b border-zinc-200 p-2">
+    <div class="relative">
+      <button type="button" @click="menu = menu === 'plant' ? '' : 'plant'"
+              :aria-expanded="menu === 'plant'" aria-haspopup="true" aria-controls="sb8-plant"
+              class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0 flex-1">
+          <span class="block truncate text-[13px]/5 font-medium">Konspec Operations</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Vasai plant · FY 2026–27</span>
+        </span>
+        <i data-lucide="chevrons-up-down" class="size-4 shrink-0 text-zinc-500"></i>
+      </button>
+
+      <div id="sb8-plant" x-show="menu === 'plant'" x-cloak @click.outside="menu = ''"
+           class="absolute top-full right-0 left-0 z-50 mt-1 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+        <p class="px-2.5 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Plants</p>
+        <button type="button" @click="menu = ''" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="min-w-0 flex-1 truncate font-medium">Vasai plant</span>
+          <i data-lucide="check" class="size-4 shrink-0 text-zinc-600"></i>
+        </button>
+        <button type="button" @click="menu = ''" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="min-w-0 flex-1 truncate">Waluj MIDC plant</span>
+        </button>
+        <button type="button" @click="menu = ''" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="min-w-0 flex-1 truncate">Silvassa unit</span>
+        </button>
+        <div class="my-1 border-t border-zinc-100"></div>
+        <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="settings" class="size-4 shrink-0"></i>Plant settings
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+    <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Overview</span>
+    </a>
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="file-text" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Purchase orders</span>
+      <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">148</span>
+    </a>
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="truck" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Goods receipt</span>
+      <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
+    </a>
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="building-2" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Vendors</span>
+      <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+    </a>
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="package" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Materials</span>
+    </a>
+  </nav>
+
+  <div class="relative shrink-0 border-t border-zinc-200 p-2">
+    <button type="button" @click="menu = menu === 'user' ? '' : 'user'"
+            :aria-expanded="menu === 'user'" aria-haspopup="true" aria-controls="sb8-user"
+            class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
+        <span class="block truncate text-[11px]/4 text-zinc-500">Level 2 approver</span>
+      </span>
+      <i data-lucide="chevrons-up-down" class="size-4 shrink-0 text-zinc-500"></i>
+    </button>
+
+    <div id="sb8-user" x-show="menu === 'user'" x-cloak @click.outside="menu = ''"
+         class="absolute right-2 bottom-full left-2 z-50 mb-1 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+      <div class="px-2.5 py-2">
+        <p class="truncate text-[13px]/5 font-medium">Akshay Prabhu</p>
+        <p class="truncate text-[12px]/4 text-zinc-500">akshay.prabhu@konspec.com</p>
+      </div>
+      <div class="my-1 border-t border-zinc-100"></div>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="user" class="size-4 shrink-0"></i>My profile</a>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="sliders-horizontal" class="size-4 shrink-0"></i>Preferences</a>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="stamp" class="size-4 shrink-0"></i>Approval limits</a>
+      <div class="my-1 border-t border-zinc-100"></div>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
+    </div>
+  </div>
+</div>

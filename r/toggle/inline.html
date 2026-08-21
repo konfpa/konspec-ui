@@ -1,0 +1,26 @@
+<!-- A filter is the honest inline switch: it applies the moment it is touched,
+     the register below re-runs, and the count is the confirmation. A filter
+     that only takes effect on an Apply button is a checkbox, and drawing it as
+     a switch promises a write that never happens.
+
+     The small track is 16px tall, so the label carries py-1.5 to bring the
+     target to 28px. aria-label is not needed here — the text beside it is the
+     label, and it names the filter rather than its state. -->
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+  <h3 class="text-[13px]/5 font-medium">Purchase orders</h3>
+  <span class="text-[12px]/4 tabular-nums text-zinc-500">1,438 open · 84 overdue</span>
+
+  <label class="ml-auto inline-flex items-center gap-2.5 py-1.5 text-[13px]/5">
+    <span>Only overdue</span>
+    <input type="checkbox" role="switch" name="overdue" value="1"
+           hx-get="/orders/" hx-trigger="change" hx-target="#po-rows" hx-swap="innerHTML"
+           hx-push-url="true" class="peer sr-only">
+    <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+      <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+    </span>
+  </label>
+</div>
+
+<div id="po-rows" class="mt-3 rounded-xl border border-zinc-200 bg-white px-4 py-3">
+  <p class="text-[13px]/5 tabular-nums text-zinc-600">PO-24-1187 · Gujarat Polymers Ltd · ₹18,42,000</p>
+</div>

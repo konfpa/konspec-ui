@@ -1,0 +1,23 @@
+<!-- The busy button is the same width as the idle one. "Approve" and
+     "Approving…" are different lengths, so the label is held at its widest with
+     a grid overlay: both strings occupy the same cell, only one is visible, and
+     the cell is as wide as the longer of the two. Without that the row shifts
+     under the cursor the instant it is clicked.
+
+     Busy keeps disabled as well as aria-busy — aria-busy announces the wait,
+     disabled is what actually stops the second click. -->
+<div class="flex flex-wrap items-center gap-3" x-data="{ busy: false }">
+  <button type="button" @click="busy = true; setTimeout(() => busy = false, 2200)"
+          :disabled="busy" :aria-busy="busy"
+          class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:hover:bg-zinc-700">
+    <i x-show="!busy" data-lucide="check" class="size-4"></i>
+    <i x-show="busy" x-cloak data-lucide="loader-circle" class="size-4 animate-spin"></i>
+    <span class="grid">
+      <span class="col-start-1 row-start-1" :class="busy && 'invisible'">Approve</span>
+      <span class="col-start-1 row-start-1" :class="!busy && 'invisible'" aria-hidden="true">Approving…</span>
+    </span>
+  </button>
+
+  <button type="button" disabled class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-200 px-4 text-[13px]/5 font-medium text-zinc-400">Disabled</button>
+  <button type="button" disabled class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium text-zinc-400">Disabled secondary</button>
+</div>

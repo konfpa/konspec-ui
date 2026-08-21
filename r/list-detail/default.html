@@ -1,0 +1,239 @@
+<!-- The reference implementation of the keyboard model, and everything else in
+     this entry is a variation on it.
+
+     The list is a listbox, not a set of links, because nothing here changes the
+     address bar: Enter commits a selection into the pane beside it. Anchors
+     carrying role="option" announce as one thing and behave as another, and are
+     the commonest way this layout is got wrong.
+
+     The arrow handler is on the listbox and not on the window. Bound globally it
+     eats the caret keys in the search box above the list, so correcting a
+     mistyped PO number walks the queue instead of moving the cursor. .prevent
+     stops the page scrolling under the selection at the same time.
+
+     reveal() focuses with preventScroll and then scrollIntoView block:"nearest".
+     focus() alone scrolls the row to wherever the browser likes, which is the
+     middle of the pane, so every press jerks a list that was already showing the
+     next twenty rows.
+
+     move() clamps. A tab strip wraps because it is a closed set of four; a queue
+     has a bottom, and wrapping hands somebody the order they cleared first.
+
+     Both panes bind with :class in the object form and never with x-show, and
+     three things ride on that. x-show writes an inline display:none that beats
+     md:flex, so the detail would never come back on a wide screen. The static
+     class attribute carries the initial state, or the first paint before Alpine
+     boots stacks both panes on a phone. And the object form is what removes a
+     falsy key from classList — the string form only adds, so the static hidden
+     survives and beats the flex the binding adds, and the pane stays shut.
+
+     min-h-0 on every flex item in the chain is what keeps the frame from
+     growing: a flex item defaults to min-height:auto, and without it the panes
+     refuse to shrink and the whole page scrolls instead of either of them.
+
+     As a real page: drop the wrapper border and h-[640px], put h-screen
+     overflow-hidden on <body>, and render this inside app-shell's main column
+     with the shell's own header above it. -->
+<main class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, said: '',
+        orders: [
+          { po: 'PO-24-1187', vendor: 'Sharma Extrusions', dept: 'Fabrication', value: '₹18,42,000', lines: 9, due: '22 Aug', raised: '04 Aug 2026', buyer: 'Akshay Prabhu', status: 'Overdue', pct: 62, note: '4 of 9 lines received · 9 days past the promised date' },
+          { po: 'PO-24-1191', vendor: 'Gujarat Polymers Ltd', dept: 'Compounding', value: '₹7,15,600', lines: 4, due: '28 Aug', raised: '07 Aug 2026', buyer: 'Meera Joshi', status: 'Open', pct: 25, note: '1 of 4 lines received' },
+          { po: 'PO-24-1194', vendor: 'Deccan Bearings Pvt Ltd', dept: 'Maintenance', value: '₹2,84,300', lines: 12, due: '01 Sep', raised: '09 Aug 2026', buyer: 'Akshay Prabhu', status: 'Approved', pct: 0, note: 'Nothing received yet · with the plant head since 14 Aug' },
+          { po: 'PO-24-1198', vendor: 'Konkan Packaging Co', dept: 'Dispatch', value: '₹1,09,750', lines: 3, due: '18 Aug', raised: '11 Aug 2026', buyer: 'Nilesh Patil', status: 'Closed', pct: 100, note: 'All 3 lines received on 17 Aug' },
+          { po: 'PO-24-1203', vendor: 'Nashik Steel Traders', dept: 'Tooling', value: '₹96,750', lines: 2, due: '05 Sep', raised: '12 Aug 2026', buyer: 'Meera Joshi', status: 'Open', pct: 50, note: '1 of 2 lines received' },
+          { po: 'PO-24-1207', vendor: 'Qureshi Metals', dept: 'Fabrication', value: '₹5,46,000', lines: 7, due: '09 Sep', raised: '13 Aug 2026', buyer: 'Akshay Prabhu', status: 'Open', pct: 0, note: 'Nothing received yet' },
+          { po: 'PO-24-1211', vendor: 'Deshpande Traders', dept: 'Dispatch', value: '₹2,14,300', lines: 5, due: '11 Sep', raised: '14 Aug 2026', buyer: 'Nilesh Patil', status: 'Draft', pct: 0, note: 'Not released to the vendor' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.orders[this.sel] },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.orders.length - 1)) },
+        go(i) { this.sel = i; this.reveal() },
+        reveal() {
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (!el) return;
+            el.focus({ preventScroll: true });
+            el.scrollIntoView({ block: 'nearest' });
+            this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.reveal() }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <h1 class="text-[16px]/6 font-semibold">Goods receipt queue</h1>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Silvassa · 7 orders awaiting receipt</p>
+    </div>
+    <button type="button" class="ml-auto inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Filters
+    </button>
+  </div>
+
+  <div class="flex min-h-0 flex-1">
+
+    <!-- list pane -->
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r lg:w-[22rem]"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">Awaiting receipt</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="(sel + 1) + ' of ' + orders.length"></p>
+      </div>
+
+      <!-- One Tab stop. The selected option holds tabindex 0 and moves it with
+           the selection, so tabbing out to the detail and back returns to the
+           record you were on rather than to the top of the queue. -->
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(orders.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(o, i) in orders" :key="o.po">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[o.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium" x-text="o.vendor"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="o.value"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-500">
+                <span x-text="o.status"></span> · <span x-text="o.po"></span> · due <span x-text="o.due"></span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- detail pane -->
+    <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+             class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+             @keydown.escape="back()"
+             :class="{ 'hidden': !detail, 'flex': detail }">
+
+      <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <button type="button" @click="back()"
+                class="-ml-1 mb-2 inline-flex h-8 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+          <i data-lucide="chevron-left" class="size-4"></i>Back to the queue
+        </button>
+
+        <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+          <div class="min-w-0">
+            <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+              <span class="tabular-nums" x-text="rec.po"></span>
+              <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+              </span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600" x-text="rec.vendor + ' · ' + rec.dept + ' · raised ' + rec.raised + ' by ' + rec.buyer"></p>
+          </div>
+          <div class="flex shrink-0 gap-2">
+            <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="external-link" class="size-4 text-zinc-600"></i>Full record
+            </button>
+            <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="package-check" class="size-4"></i>Record GRN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Only this scrolls. The header above and the record identity in it stay
+           on screen at line 40 of a long order. -->
+      <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Order value</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.value"></dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Lines</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.lines"></dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Promised</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.due"></dd>
+          </div>
+          <div>
+            <dt class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Buyer</dt>
+            <dd class="mt-1 text-[13px]/5 font-semibold" x-text="rec.buyer"></dd>
+          </div>
+        </dl>
+
+        <div class="mt-4 rounded-xl border border-zinc-200 p-4">
+          <div class="flex flex-wrap items-baseline justify-between gap-2 text-[12px]/4">
+            <span class="text-zinc-600" x-text="rec.note"></span>
+            <span class="font-medium tabular-nums" x-text="rec.pct + '% received'"></span>
+          </div>
+          <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-100">
+            <div class="h-full rounded-full bg-zinc-700" :style="'width:' + rec.pct + '%'"></div>
+          </div>
+        </div>
+
+        <h3 class="mt-5 text-[13px]/5 font-medium">Order lines</h3>
+        <div class="mt-2 overflow-hidden rounded-xl border border-zinc-200">
+          <table class="w-full text-[13px]/5">
+            <thead>
+              <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="px-3 py-2 font-medium">Material</th>
+                <th scope="col" class="px-3 py-2 text-right font-medium">Ordered</th>
+                <th scope="col" class="px-3 py-2 text-right font-medium">Received</th>
+                <th scope="col" class="px-3 py-2 text-right font-medium">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100">
+                <td class="px-3 py-2">MS angle 50×50×6</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">420 kg</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">420 kg</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">₹26,208</td>
+              </tr>
+              <tr class="border-b border-zinc-100">
+                <td class="px-3 py-2">MS plate 8 mm</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">180 kg</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">90 kg</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">₹12,798</td>
+              </tr>
+              <tr>
+                <td class="px-3 py-2">Hex bolt M12×60</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">1,200 nos</td>
+                <td class="px-3 py-2 text-right tabular-nums text-zinc-600">—</td>
+                <td class="px-3 py-2 text-right font-medium tabular-nums">₹14,220</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="mt-5 text-[13px]/5 font-medium">Recent activity</h3>
+        <ul role="list" class="mt-2 space-y-2.5">
+          <li class="flex items-start gap-2.5">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <p class="text-[13px]/5 tabular-nums text-zinc-600">18 Aug 2026 — partial receipt logged against 4 lines by Nilesh Patil.</p>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <p class="text-[13px]/5 tabular-nums text-zinc-600">11 Aug 2026 — delivery date revised from 15 Aug to 22 Aug by the vendor.</p>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <p class="text-[13px]/5 tabular-nums text-zinc-600">04 Aug 2026 — order released to the vendor by Akshay Prabhu.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</main>

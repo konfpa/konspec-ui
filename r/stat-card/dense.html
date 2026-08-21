@@ -1,0 +1,67 @@
+<!-- The dense form, for the strip that sits above a register where the table is
+     the subject and the numbers are context. One card holding four cells instead
+     of four cards: at this size four separate borders and four gaps is more
+     furniture than data.
+
+     The rules are hairlines drawn by gap-px over a zinc-100 background rather
+     than by divide-x. divide-x has to be undone at every breakpoint where the
+     column count changes, and it draws nothing between the two rows at 390px;
+     the gap paints both axes at any column count and reflows nothing, because a
+     1px gap is a gap and not a border.
+
+     The figure drops to text-[16px]/6 and takes no tracking-tight — that pairing
+     starts at 20px. The delta comes up onto the same line as the figure and
+     loses its own comparison clause, which moves to one line under the whole
+     strip. Four copies of "vs. July" at 11px is four chances to disagree with
+     itself and nothing gained.
+
+     Below sm it is two columns, not one: at this size two 16px figures fit side
+     by side on a 390px screen, and eight rows of one number each is a list
+     nobody scrolls. -->
+<div class="max-w-3xl">
+  <div class="overflow-hidden rounded-xl border border-zinc-200">
+    <dl class="grid grid-cols-2 gap-px bg-zinc-100 sm:grid-cols-4">
+
+      <div class="bg-white px-3 py-2.5">
+        <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open</dt>
+        <dd class="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+          <span class="text-[16px]/6 font-semibold tabular-nums">148</span>
+          <span class="inline-flex items-center gap-0.5 text-[11px]/4 font-medium tabular-nums text-emerald-600">
+            <i data-lucide="trending-up" class="size-3" aria-hidden="true"></i>+11
+          </span>
+        </dd>
+      </div>
+
+      <div class="bg-white px-3 py-2.5">
+        <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue</dt>
+        <dd class="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+          <span class="text-[16px]/6 font-semibold tabular-nums">12</span>
+          <span class="inline-flex items-center gap-0.5 text-[11px]/4 font-medium tabular-nums text-red-600">
+            <i data-lucide="trending-up" class="size-3" aria-hidden="true"></i>+3
+          </span>
+        </dd>
+      </div>
+
+      <div class="bg-white px-3 py-2.5">
+        <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Value</dt>
+        <dd class="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+          <span class="text-[16px]/6 font-semibold tabular-nums">₹1.84 Cr</span>
+          <span class="inline-flex items-center gap-0.5 text-[11px]/4 font-medium tabular-nums text-emerald-600">
+            <i data-lucide="trending-up" class="size-3" aria-hidden="true"></i>+8.4%
+          </span>
+        </dd>
+      </div>
+
+      <div class="bg-white px-3 py-2.5">
+        <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Awaiting</dt>
+        <dd class="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+          <span class="text-[16px]/6 font-semibold tabular-nums">9</span>
+          <span class="inline-flex items-center gap-0.5 text-[11px]/4 font-medium text-zinc-600">
+            <i data-lucide="minus" class="size-3" aria-hidden="true"></i>Flat
+          </span>
+        </dd>
+      </div>
+    </dl>
+  </div>
+  <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">All plants · change vs. July · read at 09:12</p>
+</div>

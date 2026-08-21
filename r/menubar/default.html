@@ -1,0 +1,229 @@
+<!-- The whole bar is one tab stop. Every trigger is tabindex -1 except the one
+     roving focus is on, so Tab enters the bar once and the next Tab lands in
+     the form below rather than on the Edit menu. That is the entire reason the
+     menubar roles exist; a row of four ordinary buttons is four stops.
+
+     to(id) is the only way focus moves along the bar, and the order matters:
+     set the tab stop, focus the trigger synchronously, and only then write the
+     new open id. Alpine flushes x-show after the handler returns, so the old
+     panel is still visible at the moment focus lands. Write open first and the
+     panel holding document.activeElement is hidden underneath it, focus falls
+     to <body>, and the next Tab restarts at the top of the document.
+
+     show() has to defer instead, because it focuses an item in a panel that is
+     not displayed yet. $nextTick is too early — x-show has not written display
+     when it runs, and focus() on a hidden button is a silent no-op — so the
+     call sits in a requestAnimationFrame after it, as in the dropdown.
+
+     Hover switches menus but never opens one: the guard is open !== null.
+     Escape only stops propagating when it actually closed something, so a
+     second Escape reaches the dialog this editor may be sitting in. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="file-plus" class="size-4 text-zinc-600"></i>New purchase order
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save draft
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="send" class="size-4 text-zinc-600"></i>Submit for approval
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="file-text" class="size-4 text-zinc-600"></i>Export as PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="edit"
+              :aria-expanded="open === 'edit'" :tabindex="at === 'edit' ? 0 : -1"
+              @click="open === 'edit' ? close() : show('edit')"
+              @mouseenter="if (open !== null) to('edit')"
+              @keydown.arrow-down.prevent="show('edit')" @keydown.arrow-up.prevent="show('edit', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+
+      <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="undo-2" class="size-4 text-zinc-600"></i>Undo
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="redo-2" class="size-4 text-zinc-600"></i>Redo
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="rows-3" class="size-4 text-zinc-600"></i>Insert line
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="copy" class="size-4 text-zinc-600"></i>Duplicate line
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="search" class="size-4 text-zinc-600"></i>Find item code
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="view"
+              :aria-expanded="open === 'view'" :tabindex="at === 'view' ? 0 : -1"
+              @click="open === 'view' ? close() : show('view')"
+              @mouseenter="if (open !== null) to('view')"
+              @keydown.arrow-down.prevent="show('view')" @keydown.arrow-up.prevent="show('view', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'view' && 'bg-zinc-100 text-zinc-900'">View</button>
+
+      <div x-show="open === 'view'" x-cloak data-panel="view" role="menu" aria-label="View"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="percent" class="size-4 text-zinc-600"></i>Tax breakup
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="history" class="size-4 text-zinc-600"></i>Revision history
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="help"
+              :aria-expanded="open === 'help'" :tabindex="at === 'help' ? 0 : -1"
+              @click="open === 'help' ? close() : show('help')"
+              @mouseenter="if (open !== null) to('help')"
+              @keydown.arrow-down.prevent="show('help')" @keydown.arrow-up.prevent="show('help', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'help' && 'bg-zinc-100 text-zinc-900'">Help</button>
+
+      <!-- Every panel is left-0, including this one, and the phone case is
+           handled by the wrapper instead: relative max-md:static. Below md the
+           menu wrapper stops being a containing block, so left-0 resolves
+           against the bar and every menu opens flush under its left edge
+           regardless of how far along the bar its trigger sits. Measured at
+           390px, a 240px panel hung off a trigger 250px along runs 100px off
+           the screen and the page scrolls sideways to find it; right-0 fixes
+           that trigger and breaks the first one, which then hangs off the left.
+           The wrapper trick has no such asymmetry and needs no per-menu
+           class. -->
+      <div x-show="open === 'help'" x-cloak data-panel="help" role="menu" aria-label="Help"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="keyboard" class="size-4 text-zinc-600"></i>Keyboard shortcuts
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="scale" class="size-4 text-zinc-600"></i>Approval policy
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Draft · 14 lines · ₹18,42,000 before tax · raised 16 Aug 2026 by Ritu Deshpande</p>
+  </div>
+</div>

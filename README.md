@@ -2,7 +2,7 @@
 
 A component library for internal data applications, written for the agents that build them.
 
-**[konfpa.github.io/konspec-ui](https://konfpa.github.io/konspec-ui/)** · [llms.txt](https://konfpa.github.io/konspec-ui/llms.txt) · [registry.json](https://konfpa.github.io/konspec-ui/registry.json)
+**[konfpa.github.io/konspec-ui](https://konfpa.github.io/konspec-ui/)** · [llms.txt](https://konfpa.github.io/konspec-ui/llms.txt) · [r/index.json](https://konfpa.github.io/konspec-ui/r/index.json)
 
 Tailwind CSS v4, Alpine.js, htmx and Lucide. No build step, no npm install, no design tokens to import — the Tailwind class *is* the token. Every component is HTML you copy.
 
@@ -13,14 +13,30 @@ Tailwind CSS v4, Alpine.js, htmx and Lucide. No build step, no npm install, no d
 Three steps, in order. Do not skip the first.
 
 ```
-1. Read  https://konfpa.github.io/konspec-ui/llms.txt          the rules, tokens and status colours
-2. Fetch https://konfpa.github.io/konspec-ui/registry.json     every component, every variant, exact HTML
-3. Copy  registry.json → components[id].variants[].html        verbatim, then change the copy
+1. Read   https://konfpa.github.io/konspec-ui/llms.txt
+          rules, tokens, and every component with its variant ids
+
+2. Fetch  https://konfpa.github.io/konspec-ui/r/<id>/<variant>.html
+          the markup, one variant at a time. The body IS the markup.
+
+3. Copy   the response body verbatim, then change the copy
+
+Component rules, anatomy, accessibility:  /r/<id>.json
+Arrived without reading llms.txt:         /r/index.json
+Never fetch /registry.json — the whole system in one file, ~725k tokens.
 ```
 
-`llms.txt` is 29 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, and the locked status mapping. `registry.json` carries the markup.
+`llms.txt` is 33 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
+
+**Every signed-in screen is `app-shell`.** That one is not a choice to weigh. If a
+signed-in user can reach the page, the page is the shell with your content inside
+`<main>`. `auth-page` and `error-page` are the only two screens that sit outside it.
+Do not assemble a substitute out of `sidebar` and `topbar`, and do not start a page at
+`<main>` because the screen looked simple — the shell carries the skip link, the nav
+landmark, the off-canvas focus trap, the command palette and the keyboard shortcuts,
+and a page without it drops all of them without ever looking wrong. See rule 2.
 
 ## If you are a person
 
@@ -41,7 +57,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**55 components · 417 variants · 55 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
+**55 components · 417 variants · 55 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
 
 ### Actions
 
@@ -142,7 +158,7 @@ python3 serve.py 8051          # http://localhost:8051
 
 ## Changing something
 
-`assets/spec.js` and `assets/reg/*.js` are the only sources. Everything else — `registry.json`, `llms.txt`, `assets/counts.js`, the component table above — is generated.
+`assets/spec.js` and `assets/reg/*.js` are the only sources. Everything else — `r/`, `registry.json`, `llms.txt`, `assets/counts.js`, the component table above — is generated. `r/` is wiped and rewritten on every build, so a renamed variant cannot leave a stale endpoint behind serving markup that no longer exists.
 
 ```bash
 node tools/build.js            # regenerate

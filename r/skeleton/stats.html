@@ -1,0 +1,55 @@
+<!-- Four tiles in the dashboard's own grid, at the dashboard's own gap, and the
+     labels are real text. The labels come from the dashboard definition and not
+     from the query, so they were never waiting: greying them makes the strip
+     flash its own headings away and land them again half a second later, and it
+     takes away the one thing this state is good for, which is that somebody can
+     work out which tile they came to read before the figures arrive.
+
+     Each tile is the loaded tile's geometry, mt-* for mt-*: an 11px uppercase
+     label, then mt-1.5 and an h-4 bar in an h-7 box for the text-[24px]/7
+     figure, then mt-1.5 and an h-2 bar in an h-4 box for the delta line. Tile
+     height is identical loaded and loading, which is what stops the whole page
+     below the strip stepping down on arrival.
+
+     Figure widths differ across the tiles because the figures do — a count and
+     a rupee value are not the same width, and four identical bars read as a
+     placeholder graphic rather than as four numbers.
+
+     The delta never gets a colour here. Red and green say what a record is
+     doing and no record has said anything yet; an emerald bar in a skeleton is
+     a claim that the number went the right way, made before it was read. -->
+<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-busy="true">
+  <p role="status" class="sr-only">Loading the order summary figures</p>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open orders</p>
+    <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-16 rounded bg-zinc-200"></div></div>
+      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open value</p>
+    <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-40 rounded bg-zinc-200"></div></div>
+      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue</p>
+    <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-36 rounded bg-zinc-200"></div></div>
+      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-28 rounded bg-zinc-200"></div></div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white p-4">
+    <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Awaiting approval</p>
+    <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-12 rounded bg-zinc-200"></div></div>
+      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-24 rounded bg-zinc-200"></div></div>
+    </div>
+  </div>
+</div>

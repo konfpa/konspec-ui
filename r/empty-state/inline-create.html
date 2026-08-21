@@ -1,0 +1,48 @@
+<!-- The lines of a draft order, before anybody has added one. The affordance
+     sits where the first line will land, so when the row arrives the eye does
+     not have to move and the button steps down to the next empty position
+     rather than disappearing.
+
+     It is a real <button> that happens to be drawn as a dashed row, not a
+     dashed div with a click handler. Full width, control height, and it takes
+     the focus outline every other button here takes — a dashed rectangle with
+     no tab stop in it is a control nobody can reach.
+
+     A dashed border, not a solid one, and this is the one place in the system
+     that earns it: the outline is a slot waiting to be filled rather than an
+     object, and a solid bordered row at the foot of a list reads as a record
+     that is already there.
+
+     One sentence above it, no icon well. The panel title says what the list is
+     and the button says what to do, so a glyph between them is a third thing
+     saying nothing. Once there are lines the sentence goes and the button
+     stays. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{ lines: [] }">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Order lines</h2>
+    <p role="status" class="text-[12px]/4 text-zinc-500 tabular-nums"
+       x-text="lines.length ? lines.length + ' lines' : 'No lines on this order yet'"></p>
+  </div>
+
+  <ul x-show="lines.length" x-cloak role="list" class="divide-y divide-zinc-100 text-[13px]/5">
+    <template x-for="l in lines" :key="l.no">
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 px-4 py-2.5">
+        <span class="tabular-nums"><span class="font-medium" x-text="'Line ' + l.no"></span> · <span x-text="l.item"></span></span>
+        <span class="text-zinc-600 tabular-nums" x-text="l.qty"></span>
+      </li>
+    </template>
+  </ul>
+
+  <div class="p-4">
+    <p x-show="!lines.length" class="mb-3 text-center text-[13px]/5 text-zinc-600">
+      An order needs at least one line before it can be sent to the vendor. Rates come from the Sharma Extrusions contract dated 04 Apr 2026.
+    </p>
+    <button type="button"
+            @click="lines.push({ no: (lines.length + 1) * 10, item: 'HDPE granules, natural', qty: '2,000 kg' })"
+            class="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-zinc-300 px-4 py-3 text-[13px]/5 font-medium text-zinc-600 hover:border-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="plus" class="size-4"></i>Add the first line
+    </button>
+  </div>
+</div>

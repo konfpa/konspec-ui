@@ -1,0 +1,61 @@
+<!-- <details> and <summary>, and nothing else. What this buys:
+
+     It works before Alpine boots and with scripting off, so no x-cloak and no
+     first-paint flash. The summary is already exposed as a button with an
+     expanded state, so there is nothing to wire and nothing to keep in sync —
+     adding role, aria-expanded or aria-controls here overwrites something the
+     browser gets right for free. And Ctrl-F reaches inside it: Chrome and
+     Safari open a closed <details> to reveal a find-in-page match, which an
+     x-show panel can never do, because display:none text is not text as far as
+     the browser is concerned.
+
+     What it costs: no height animation. <details> and x-collapse do not
+     combine — the browser owns the open attribute and drops the content to
+     display:none the instant it changes, leaving no frame to animate in, and
+     the two end up fighting over the same element. The open state also cannot
+     be driven from anywhere else on the page without script, and anything
+     interactive inside the summary toggles the panel when it is clicked.
+
+     So: reference text somebody may search — an audit trail, terms, a policy
+     note. Use the Alpine version when the panel holds form controls, when the
+     trigger lives somewhere else, or when the movement is worth the plugin.
+
+     list-none plus the webkit pseudo removes the disclosure triangle; display
+     flex on the summary already does it in Chrome, and Safari needs the
+     pseudo. group-open on the wrapping span is what rotates the chevron —
+     still a span, never the <i>, because Lucide replaces that element. -->
+<details class="group max-w-xl rounded-xl border border-zinc-200 bg-white">
+  <summary class="flex h-12 list-none items-center gap-3 px-4 [&::-webkit-details-marker]:hidden">
+    <i data-lucide="history" class="size-4 shrink-0 text-zinc-600"></i>
+    <span class="flex-1 text-[14px]/5 font-medium">Audit trail</span>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">7 events</span>
+    <span class="flex shrink-0 transition-transform group-open:rotate-180">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </summary>
+
+  <div class="border-t border-zinc-100 px-4 py-3">
+    <ol class="space-y-3 text-[13px]/5">
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">11/08/2026</span>
+        <span class="min-w-0">GRN-3391 posted against 4 lines — <span class="text-zinc-600">S. Kulkarni, stores</span></span>
+      </li>
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">09/08/2026</span>
+        <span class="min-w-0">Delivery date moved to 22/08/2026 — <span class="text-zinc-600">vendor email</span></span>
+      </li>
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">04/08/2026</span>
+        <span class="min-w-0">Order released — <span class="text-zinc-600">R. Menon</span></span>
+      </li>
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">02/08/2026</span>
+        <span class="min-w-0">Approved at <span class="tabular-nums">₹18,42,000</span> — <span class="text-zinc-600">A. Deshmukh, plant head</span></span>
+      </li>
+      <li class="flex gap-3">
+        <span class="w-20 shrink-0 tabular-nums text-zinc-500">01/08/2026</span>
+        <span class="min-w-0">Raised from requisition REQ-24-0884 — <span class="text-zinc-600">R. Menon</span></span>
+      </li>
+    </ol>
+  </div>
+</details>

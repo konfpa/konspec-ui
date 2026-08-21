@@ -1,0 +1,75 @@
+<div class="rounded-xl border border-zinc-200 bg-white p-5"
+     x-data="{
+       chart: null,
+       init() { this.wait(() => this.draw()); },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. */
+       wait(fn) {
+         const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+         probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                           .map(el => getComputedStyle(el).backgroundColor);
+         const ring = getComputedStyle(this.$root).backgroundColor;
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'doughnut',
+           data: {
+             labels: ['Closed', 'Open', 'Overdue'],
+             datasets: [{ data: [72, 49, 7], backgroundColor: tone, borderColor: ring, borderWidth: 2 }]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false, cutout: '68%',
+             plugins: { tooltip: { callbacks: { label: c => c.label + ': ' + c.parsed + ' orders' } } }
+           }
+         });
+       },
+       destroy() { this.chart && this.chart.destroy(); }
+     }">
+
+  <h3 class="text-[14px]/5 font-semibold">Open order book</h3>
+  <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">As at 20 Aug 2026</p>
+
+  <div class="mt-4 flex flex-col items-center gap-5 sm:flex-row sm:gap-6">
+    <div class="relative h-40 w-40 shrink-0">
+      <canvas x-ref="canvas" role="img"
+              aria-label="Open order book of 128 orders: 72 closed, 49 open and 7 overdue."></canvas>
+      <!-- the total is HTML over the canvas, not painted into it, so it is text -->
+      <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+        <span class="text-[20px]/7 font-semibold tabular-nums">128</span>
+        <span class="text-[11px]/4 text-zinc-500">orders</span>
+      </div>
+    </div>
+
+    <!-- the legend carries the values, so this chart needs no sr-only table -->
+    <ul x-ref="legend" class="w-full min-w-0 flex-1 divide-y divide-zinc-100 text-[13px]/5 text-zinc-600">
+      <li class="flex items-center justify-between gap-3 py-1.5">
+        <span class="flex min-w-0 items-center gap-2">
+          <span data-series class="size-2 shrink-0 rounded-full bg-zinc-200" aria-hidden="true"></span>
+          <span class="truncate">Closed</span>
+        </span>
+        <span class="shrink-0 font-medium tabular-nums text-zinc-900">72</span>
+      </li>
+      <li class="flex items-center justify-between gap-3 py-1.5">
+        <span class="flex min-w-0 items-center gap-2">
+          <span data-series class="size-2 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+          <span class="truncate">Open</span>
+        </span>
+        <span class="shrink-0 font-medium tabular-nums text-zinc-900">49</span>
+      </li>
+      <li class="flex items-center justify-between gap-3 py-1.5">
+        <span class="flex min-w-0 items-center gap-2">
+          <span data-series class="size-2 shrink-0 rounded-full bg-zinc-800" aria-hidden="true"></span>
+          <span class="truncate">Overdue</span>
+        </span>
+        <span class="shrink-0 font-medium tabular-nums text-zinc-900">7</span>
+      </li>
+    </ul>
+  </div>
+</div>

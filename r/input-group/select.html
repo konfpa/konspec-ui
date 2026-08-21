@@ -1,0 +1,53 @@
+<!-- Two controls under one border, which is the case the focus rules were
+     written for. The number delegates its outline to the wrapper; the select
+     cannot, or focus-within would light the same enclosure whichever of the two
+     the keyboard was on and nothing would say which. The select keeps an inset
+     outline of its own.
+
+     Both controls carry a name, because a quantity without a unit is not a
+     quantity, and both carry a label — the wrapper's border names nothing, and
+     a select with no label of its own is announced as an unnamed combobox.
+
+     The select is shrink-0 and its options are codes. A native select is as
+     wide as its longest option and that width comes straight off the field:
+     spell out "Metric tonnes" and at 390px the quantity box is four characters
+     across.
+
+     The number is right of the select in one group and left of it in the other,
+     and that is not a preference. A unit follows its quantity and a country
+     code precedes its number; reverse either and the value reads back as
+     something nobody would write down. -->
+<div class="max-w-xl space-y-5">
+  <div>
+    <label for="ig4-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="ig4-qty" name="qty" inputmode="decimal" value="42.500"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      <label for="ig4-uom" class="sr-only">Unit of measure</label>
+      <select id="ig4-uom" name="uom"
+              class="shrink-0 rounded-r-[7px] border-l border-zinc-200 bg-transparent py-2 pr-2 pl-3 text-[14px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+        <option>MT</option>
+        <option>kg</option>
+        <option>nos</option>
+        <option>L</option>
+      </select>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ordered 42.500 MT on rate contract RC-26-041.</p>
+  </div>
+
+  <div>
+    <label for="ig4-phone" class="mb-1.5 block text-[13px]/5 font-medium">Vendor contact number</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <label for="ig4-cc" class="sr-only">Country code</label>
+      <select id="ig4-cc" name="country_code"
+              class="shrink-0 rounded-l-[7px] border-r border-zinc-200 bg-zinc-100 py-2 pr-2 pl-3 text-[14px]/5 tabular-nums text-zinc-600 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+        <option>+91</option>
+        <option>+971</option>
+        <option>+65</option>
+      </select>
+      <input id="ig4-phone" name="phone" type="tel" inputmode="tel" value="98250 41163"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Ritu Deshpande, Gujarat Polymers Ltd. Used for despatch confirmations.</p>
+  </div>
+</div>

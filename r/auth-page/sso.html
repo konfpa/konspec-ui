@@ -1,0 +1,70 @@
+<!-- Where the domain mandates SSO, do not render a password box. A field that
+     collects a secret the application will discard is worse than no field: the
+     user's manager saves it, the value is now in a second place, and the next
+     rotation leaves a stale copy behind. The address is still collected,
+     because it routes the request to the right tenant and it is what the
+     manager fills.
+
+     Say why, and say it in one line. "Sign-in is managed by IT" with no further
+     explanation reads as an outage to somebody who signed in with a password
+     last week.
+
+     The vendor portal line is the escape hatch. Contractors and vendors are not
+     in Entra, so without it every one of them mails IT to ask why the password
+     box has gone. One primary action, one route out, nothing else. -->
+<div class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+     x-data="{ busy: false }">
+  <main class="w-full max-w-sm">
+
+    <div class="flex items-center justify-center gap-2.5">
+      <span class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[14px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec Operations</span>
+    </div>
+
+    <form method="post" action="/accounts/sso/start/" @submit="busy = true"
+          class="mt-6 rounded-xl border border-zinc-200 bg-white px-6 py-6">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Sign in</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">
+        <span class="font-medium text-zinc-900">konspec.com</span> signs in through Microsoft Entra ID. There is no separate password for this system.
+      </p>
+
+      <input type="hidden" name="next" value="/procurement/orders/">
+
+      <div class="mt-5">
+        <label for="so-username" class="mb-1.5 block text-[13px]/5 font-medium">Work email</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="so-username" name="username" type="email" autocomplete="username" required autofocus
+                 spellcheck="false" autocapitalize="none" placeholder="you@konspec.com"
+                 aria-describedby="so-username-help"
+                 class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        </div>
+        <p id="so-username-help" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">Used to pick the right tenant. You will type your password on the Microsoft page.</p>
+      </div>
+
+      <button type="submit" :disabled="busy" :aria-busy="busy"
+              class="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:hover:bg-zinc-700">
+        <span x-show="!busy" class="flex"><i data-lucide="shield-check" class="size-4"></i></span>
+        <span x-show="busy" x-cloak class="flex"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+        <span class="grid">
+          <span class="col-start-1 row-start-1" :class="busy &amp;&amp; 'invisible'">Continue with Microsoft Entra ID</span>
+          <span class="col-start-1 row-start-1" :class="!busy &amp;&amp; 'invisible'" aria-hidden="true">Redirecting…</span>
+        </span>
+      </button>
+
+      <div class="mt-5 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5">
+        <i data-lucide="building-2" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+        <p class="text-[12px]/4 text-zinc-600">
+          Vendors and contractors are not in Entra ID and still sign in with a password on the
+          <a href="https://vendors.konspec.com/" class="font-medium text-zinc-900 underline underline-offset-2">vendor portal</a>.
+        </p>
+      </div>
+
+      <p class="mt-4 border-t border-zinc-100 pt-4 text-[12px]/4 text-zinc-600">
+        Entra ID unreachable from a plant network?
+        <a href="mailto:it@konspec.com" class="font-medium text-zinc-900 underline underline-offset-2">Email it@konspec.com</a>
+      </p>
+    </form>
+
+    <p class="mt-4 text-center text-[11px]/4 text-zinc-500">Konspec Industries · internal system · activity is logged</p>
+  </main>
+</div>

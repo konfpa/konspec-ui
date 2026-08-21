@@ -1,0 +1,40 @@
+<!-- The claim the whole component rests on, made checkable: toggle it and
+     nothing below the card moves. The skeleton is four line boxes at h-6 and
+     the paragraph is four lines of text-[14px]/6, so both are 96px, and the
+     button under them stays where it is.
+
+     Every bar sits inside a box one line tall rather than being stacked with a
+     margin. Four h-2.5 bars in a space-y-2 stack measure 72px against the
+     paragraph's 96px — the card would grow by a line and a half on arrival.
+     h-6 is the leading already written in text-[14px]/6, so the two cannot
+     drift apart; a margin picked by eye is right for one type size only.
+
+     The last bar is short. Real paragraphs end mid-line, and four bars at
+     w-full is a picture of a table rather than of prose. The widths are written
+     into the markup and never generated: a width from Math.random changes
+     between two paints of the same wait.
+
+     aria-busy on the card, aria-hidden on the pulse wrapper, and the sr-only
+     status outside that wrapper — inside it, it would be hidden along with the
+     bars and the wait would be announced to nobody. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5" x-data="{ loaded: false }" :aria-busy="!loaded">
+  <h3 class="text-[13px]/5 font-medium">Vendor note · Sharma Extrusions</h3>
+
+  <div class="mt-3">
+    <p role="status" class="sr-only" x-text="loaded ? 'Vendor note loaded' : 'Loading the vendor note'"></p>
+
+    <div x-show="!loaded" class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <div class="flex h-6 items-center"><div class="h-2.5 w-full rounded bg-zinc-200"></div></div>
+      <div class="flex h-6 items-center"><div class="h-2.5 w-full rounded bg-zinc-200"></div></div>
+      <div class="flex h-6 items-center"><div class="h-2.5 w-full rounded bg-zinc-200"></div></div>
+      <div class="flex h-6 items-center"><div class="h-2.5 w-2/5 rounded bg-zinc-200"></div></div>
+    </div>
+
+    <p x-show="loaded" x-cloak class="text-[14px]/6 text-zinc-600">Rates hold to 31 Mar 2027 and are quoted ex-works Nashik. Freight is billed at actuals against the transporter's receipt and does not carry the contract discount. Any revision needs a signed amendment.</p>
+  </div>
+
+  <button type="button" @click="loaded = !loaded"
+          class="mt-4 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="repeat" class="size-3.5 text-zinc-600"></i><span x-text="loaded ? 'Back to loading' : 'Land the note'">Land the note</span>
+  </button>
+</div>

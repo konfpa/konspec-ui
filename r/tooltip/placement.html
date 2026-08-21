@@ -1,0 +1,73 @@
+<!-- Top is the default and the other three are answers to a specific
+     obstruction, not a taste.
+
+     Top — the resting cursor and the hand holding the mouse cover what is
+     below and to the right of the hotspot, so a bubble under the trigger is
+     the one place it is least readable.
+
+     Right — a vertical icon rail. There is nothing above or below an item but
+     the next item, so a top bubble covers the thing the pointer is travelling
+     towards. This is what the sidebar rail uses.
+
+     Bottom — a control in the top row of a card or a topbar, where above the
+     trigger is off the card and behind the page header.
+
+     Left — the last button of a right-aligned action column, where a centred
+     bubble runs past the edge of the card and takes the page sideways with it.
+
+     One x-data for all four, because a pointer is only ever in one place and
+     an open id is cheaper than four booleans. Escape is bound once, on the
+     root, with .window so it fires whether or not anything here has focus. -->
+<div class="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white p-10"
+     x-data="{
+       open: null, timer: 0,
+       show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
+       hide() { clearTimeout(this.timer); this.open = null }
+     }"
+     @keydown.escape.window="hide()">
+
+  <span class="relative inline-flex">
+    <button type="button" aria-labelledby="tt-place-top"
+            @mouseenter="show('top')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('top', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="arrow-up" class="size-4"></i>
+    </button>
+    <span id="tt-place-top" role="tooltip" x-show="open === 'top'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Top — the default</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-labelledby="tt-place-right"
+            @mouseenter="show('right')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('right', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="arrow-right" class="size-4"></i>
+    </button>
+    <span id="tt-place-right" role="tooltip" x-show="open === 'right'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Right — icon rails</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-labelledby="tt-place-bottom"
+            @mouseenter="show('bottom')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('bottom', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="arrow-down" class="size-4"></i>
+    </button>
+    <span id="tt-place-bottom" role="tooltip" x-show="open === 'bottom'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute top-full left-1/2 z-40 mt-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Bottom — topbars</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-labelledby="tt-place-left"
+            @mouseenter="show('left')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('left', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="arrow-left" class="size-4"></i>
+    </button>
+    <span id="tt-place-left" role="tooltip" x-show="open === 'left'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute top-1/2 right-full z-40 mr-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Left — the last column</span>
+  </span>
+
+</div>

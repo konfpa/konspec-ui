@@ -1,0 +1,57 @@
+<!-- A disabled button fires no pointer events, so mouseenter on it never
+     happens and a tooltip bound to the button is dead markup. Two ways out,
+     and they are not equal.
+
+     Left, the wrapper trick: the handlers move to the span around the button,
+     which is not disabled and does see the pointer. The button stays properly
+     disabled. Do not put tabindex="0" on that span to "fix" the keyboard — it
+     adds a tab stop announced as nothing, in front of a control that cannot be
+     operated. This form is pointer-only by construction, which is fine when
+     the reason is a reminder rather than news.
+
+     Right, and the better answer whenever the reason actually matters: leave
+     the button enabled in the DOM, mark it aria-disabled="true" and neutralise
+     the click. It keeps its tab stop, it is announced as dimmed, the tooltip
+     opens on focus like any other, and aria-describedby carries the reason
+     into the name computation. The disabled: variants do not apply to it, so
+     the flat look is written as plain classes.
+
+     Either way the reason is on the page as well. A rule that decides whether
+     somebody can post a receipt is not something to hide behind a hover. -->
+<div class="flex flex-wrap items-center gap-3">
+
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @mouseenter="show()" @mouseleave="hide()"
+        @keydown.escape.window="hide()">
+    <button type="button" disabled aria-describedby="tt-void"
+            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 disabled:pointer-events-none">
+      <i data-lucide="ban" class="size-4"></i>Void GRN
+    </button>
+    <span id="tt-void" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Already invoiced — voiding is closed</span>
+  </span>
+
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @keydown.escape.window="hide()">
+    <button type="button" aria-disabled="true" aria-describedby="tt-post"
+            @click.prevent
+            @mouseenter="show()" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
+            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="check-circle-2" class="size-4"></i>Post to stock
+    </button>
+    <span id="tt-post" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Needs a Level 2 approver</span>
+  </span>
+
+</div>

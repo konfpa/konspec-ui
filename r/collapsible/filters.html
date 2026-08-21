@@ -1,0 +1,89 @@
+<!-- Two things keep a folded filter panel honest. The count on the trigger, so
+     the closed row admits the register is filtered; and the applied chips
+     outside the panel, so folding it cannot hide what is applied. Without both,
+     someone reports a missing purchase order that was never missing — it was
+     three filters away.
+
+     The result count sits beside the trigger for the same reason: 218 of 1,438
+     is the sentence that stops the phone call. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: false,
+       active: [
+         { id: 'vendor', label: 'Vendor: Gujarat Polymers' },
+         { id: 'status', label: 'Status: Awaiting GRN' },
+         { id: 'value',  label: 'Value: above ₹5,00,000' }
+       ],
+       drop(id) { this.active = this.active.filter(f => f.id !== id); }
+     }">
+  <div class="flex h-12 items-center gap-3 px-4">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-filters"
+            class="-mx-2 flex h-9 items-center gap-2 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+      <i data-lucide="sliders-horizontal" class="size-4 shrink-0 text-zinc-600"></i>
+      Filters
+      <span x-show="active.length"
+            class="inline-flex items-center rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300"
+            x-text="active.length">3</span>
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+    <p class="ml-auto shrink-0 text-[13px]/5 tabular-nums text-zinc-600"
+       x-text="active.length ? '218 of 1,438 orders' : '1,438 orders'">218 of 1,438 orders</p>
+  </div>
+
+  <!-- outside the panel on purpose: closing the filters must not hide them -->
+  <div x-show="active.length" class="flex flex-wrap items-center gap-2 border-t border-zinc-100 px-4 py-2.5">
+    <template x-for="f in active" :key="f.id">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pl-2.5 pr-1 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span x-text="f.label"></span>
+        <button type="button" @click="drop(f.id)" :aria-label="'Remove filter ' + f.label"
+                class="flex size-4 items-center justify-center rounded-full hover:bg-zinc-300">
+          <i data-lucide="x" class="size-3"></i>
+        </button>
+      </span>
+    </template>
+    <button type="button" @click="active = []" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Clear all</button>
+  </div>
+
+  <div id="col-filters" x-show="open" x-cloak x-collapse.duration.200ms>
+    <div class="border-t border-zinc-100 px-4 py-4">
+      <div class="grid gap-4 sm:grid-cols-3">
+        <div>
+          <label for="fl-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="fl-vendor" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              <option>All vendors</option>
+              <option selected>Gujarat Polymers Ltd</option>
+              <option>Sharma Extrusions</option>
+              <option>Nashik Steel Traders</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="fl-status" class="mb-1.5 block text-[13px]/5 font-medium">Status</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="fl-status" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              <option>Any status</option>
+              <option>Open</option>
+              <option selected>Awaiting GRN</option>
+              <option>Closed</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="fl-value" class="mb-1.5 block text-[13px]/5 font-medium">Value above</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+            <input id="fl-value" value="5,00,000" inputmode="numeric"
+                   class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Apply filters</button>
+        <button type="button" @click="open = false" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

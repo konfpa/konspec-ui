@@ -1,0 +1,76 @@
+<!-- A purchase order detail header: the trail, the number as the title, the
+     state, and the five facts that identify the record. The status pill is
+     badge's locked shape — one graphite pill, colour only in the 6px dot, the
+     word readable with the dot ignored — and Approved takes amber because it
+     means waiting on someone, not because it is good news.
+
+     The facts are a real <dl>. Written as one middot-joined sentence they are a
+     string; as a definition list each value has a name that survives being read
+     out on its own. Every figure is tabular-nums so the band does not reflow
+     when the order is amended and the value changes width. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100">
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">PO-24-1187</span></li>
+        </ol>
+      </nav>
+
+      <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight tabular-nums">PO-24-1187</h1>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+            </span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>3 lines past promise
+            </span>
+          </div>
+
+          <dl class="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-1.5 text-[13px]/5">
+            <div class="flex items-baseline gap-1.5">
+              <dt class="text-zinc-500">Vendor</dt>
+              <dd class="font-medium text-zinc-900">Sharma Steel &amp; Alloys</dd>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <dt class="text-zinc-500">Plant</dt>
+              <dd class="font-medium text-zinc-900">Silvassa</dd>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <dt class="text-zinc-500">Raised</dt>
+              <dd class="font-medium tabular-nums text-zinc-900">04 Aug 2026</dd>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <dt class="text-zinc-500">Promised</dt>
+              <dd class="font-medium tabular-nums text-zinc-900">22 Aug 2026</dd>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <dt class="text-zinc-500">Value</dt>
+              <dd class="font-semibold tabular-nums text-zinc-900">₹18,42,000</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="printer" class="size-4"></i>Print
+          </button>
+          <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="pencil" class="size-4"></i>Amend
+          </button>
+          <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="truck" class="size-4"></i>Record GRN
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <p class="mx-auto max-w-[1600px] px-4 py-6 text-[13px]/5 text-zinc-500 lg:px-6">The order lines and the receipt history render below the band.</p>
+</div>

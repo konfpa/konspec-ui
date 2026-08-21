@@ -1,0 +1,25 @@
+<!-- The help text is a paragraph with an id, not a placeholder. A placeholder
+     disappears the moment typing starts, which is exactly when the format
+     matters, and it is not a description — it is the value the browser shows
+     when there isn't one.
+
+     The id is on the paragraph and aria-describedby points at it. Help text
+     that merely sits under the field is read only if somebody happens to
+     browse past it, and never when they tab into the control.
+
+     The asterisk carries aria-hidden. required is what announces required; the
+     asterisk is how you find the field by scanning, and without the hidden flag
+     the field introduces itself as "Order title star". -->
+<div class="max-w-sm">
+  <label for="fd-title" class="mb-1.5 block text-[13px]/5 font-medium">
+    Order title <span aria-hidden="true" class="text-red-600">*</span>
+  </label>
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <input id="fd-title" name="title" required aria-describedby="fd-title-msg"
+           value="MS angles and plates — August lot"
+           class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+  </div>
+  <p id="fd-title-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+    Printed on the order and used as the subject of the vendor email.
+  </p>
+</div>

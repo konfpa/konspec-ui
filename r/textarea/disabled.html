@@ -1,0 +1,24 @@
+<div class="max-w-xl space-y-5">
+  <div>
+    <label for="ta-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Terms and conditions</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+      <textarea id="ta-off" rows="3" disabled
+                class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 text-zinc-400">Set by the rate contract. Editable only on the contract itself.</textarea>
+    </div>
+  </div>
+
+  <div>
+    <!-- Same locked surface as disabled, and deliberately so: a filled, ringless
+         box reads as a field that is closed. The only thing separating the two
+         is the text, zinc-900 here against zinc-400 above, because a read-only
+         value still matters and still has to be selectable and copyable. On a
+         white bordered box with a focus ring, nothing says read-only until you
+         click into it and nothing happens. -->
+    <label for="ta-ro" class="mb-1.5 block text-[13px]/5 font-medium">Vendor reply</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+      <textarea id="ta-ro" rows="3" readonly
+                class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Balance 40 kg dispatched on 18 August by Gati, LR 4471029.
+Test certificate follows by email.</textarea>
+    </div>
+  </div>
+</div>

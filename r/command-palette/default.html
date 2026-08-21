@@ -1,0 +1,135 @@
+<!-- A palette has a text box, so it is a combobox and not a menu: real focus
+     stays in the input and the highlight is carried by aria-activedescendant.
+     That is why the rows are divs with role="option" rather than buttons —
+     nothing inside an option may be focusable.
+
+     Row ids come from the record, never from the loop index. Filtering
+     renumbers the rows, and an index-derived id leaves aria-activedescendant
+     naming whichever record moved into that slot.
+
+     x-trap does the focusing and the returning, which is why show() sets
+     three fields and nothing else. It opens focus on [autofocus], so the
+     caret lands in the query rather than on the Esc button, and it restores
+     document.activeElement on close, which matters because ⌘K fires from
+     wherever the caret already was and the trigger is not always what opened
+     the palette. Focusing by hand here would race the trap: x-show has not
+     written display when $nextTick runs, so focus() on the input is a silent
+     no-op.
+
+     The letters on the action rows are the application's own shortcuts, shown
+     so people learn them. The palette does not listen for them: inside a
+     search box, N has to type an N. -->
+<div x-data="{
+       open: false, q: '', ai: 0,
+       groups: [
+         { name: 'Actions', items: [
+           { id: 'new-po',    label: 'New purchase order', icon: 'plus',          key: 'N' },
+           { id: 'post-grn',  label: 'Post goods receipt', icon: 'package-check', key: 'G' },
+           { id: 'approvals', label: 'Go to my approvals', icon: 'check-check',   key: 'A' }
+         ] },
+         { name: 'Recent records', items: [
+           { id: 'po-1187', label: 'PO-24-1187 — Gujarat Polymers Ltd', sub: 'HDPE granules · 14 lines', icon: 'file-text', amount: '₹18,42,000' },
+           { id: 'po-1179', label: 'PO-24-1179 — Sharma Steel Traders', sub: 'MS angle 50×50×6', flag: 'overdue 9 days', icon: 'file-text', amount: '₹2,74,900' },
+           { id: 'ven-deccan', label: 'Deccan Fasteners Pvt Ltd', sub: 'Vendor · rate contract to 31 March 2027', icon: 'building-2' }
+         ] }
+       ],
+       match(g) {
+         const s = this.q.trim().toLowerCase();
+         if (!s) return g.items;
+         return g.items.filter(o => (o.label + ' ' + (o.sub || '') + ' ' + (o.flag || '') + ' ' + g.name).toLowerCase().includes(s));
+       },
+       get list() { return this.groups.flatMap(g => this.match(g)); },
+       rowId(o) { return 'cp-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { this.open = true; this.q = ''; this.ai = 0; },
+       hide() { this.open = false; this.q = ''; this.ai = 0; },
+       move(n) {
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { this.hide(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @keydown.window.meta.k.prevent="show()"
+     @keydown.window.ctrl.k.prevent="show()"
+     @keydown.escape.window="hide()">
+
+  <button type="button" @click="show()"
+          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-100">
+    <i data-lucide="search" class="size-4 text-zinc-600"></i>
+    <span class="flex-1 text-left">Search Konspec Operations</span>
+    <kbd class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/30 px-3 pt-16 sm:pt-24">
+    <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
+         class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+      <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
+        <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+        <label for="cp-q" class="sr-only">Search orders, vendors and actions</label>
+        <input id="cp-q" x-model="q" type="text" role="combobox" autocomplete="off" autofocus
+               aria-autocomplete="list" aria-controls="cp-list"
+               :aria-expanded="open" :aria-activedescendant="activeId"
+               placeholder="Search orders, vendors, actions…"
+               @input="ai = 0"
+               @keydown.arrow-down.prevent="move(1)"
+               @keydown.arrow-up.prevent="move(-1)"
+               @keydown.enter.prevent="commit()"
+               class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        <button type="button" @click="hide()" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">Esc</button>
+      </div>
+
+      <div id="cp-list" role="listbox" aria-label="Results" class="max-h-80 overflow-y-auto pb-1">
+        <template x-for="g in groups" :key="g.name">
+          <div role="group" :aria-label="g.name" x-show="match(g).length">
+            <!-- a sticky heading with no background of its own lets the rows
+                 scroll through the text and neither is readable -->
+            <p aria-hidden="true"
+               class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+               x-text="g.name"></p>
+            <template x-for="o in match(g)" :key="o.id">
+              <div :id="rowId(o)" role="option"
+                   @mousedown.prevent @click="pick(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+                   :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+                   class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+                <span class="flex size-4 shrink-0 items-center justify-center text-zinc-600">
+                  <i :data-lucide="o.icon" class="size-4"></i>
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate" x-text="o.label"></span>
+                  <span x-show="o.sub" class="block truncate text-[12px]/4 text-zinc-500"><span x-text="o.sub"></span><span
+                        x-show="o.flag" class="font-medium text-red-600"> · <span x-text="o.flag"></span></span></span>
+                </span>
+                <span x-show="o.amount" class="hidden shrink-0 text-[12px]/4 tabular-nums text-zinc-600 sm:block" x-text="o.amount"></span>
+                <kbd x-show="o.key" class="shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500" x-text="o.key"></kbd>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <!-- an empty panel reads as a component that broke; this reads as a
+           search that found nothing -->
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">Nothing matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Try an order number — PO-24-1187 — or a vendor name.</p>
+      </div>
+
+      <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
+        <span class="ml-auto">Konspec Operations</span>
+      </div>
+
+      <!-- inside the dialog, because aria-modal hides everything outside it
+           from a screen reader, and a live region it cannot see announces
+           nothing at all. -->
+      <p role="status" class="sr-only"
+         x-text="open ? (list.length === 1 ? '1 result' : list.length + ' results') : ''"></p>
+    </div>
+  </div>
+</div>

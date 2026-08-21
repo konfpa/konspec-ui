@@ -1,0 +1,163 @@
+<!-- Below md the bar is gone and one Menu button stands in its place. A
+     wrapped menubar is not a menubar: the second row reads as a separate
+     control, and Left and Right stop matching what the eye sees. Scrolling it
+     sideways is worse — the claim of the pattern is that the commands are all
+     visible at once.
+
+     The collapsed form drops role="menubar" with the bar. What is left is one
+     button and one role="menu", the menu names carried by role="group" labels
+     inside it. A menubar with one item in it is a lie: a screen reader
+     announces a bar of menus, there is only ever one, and Left and Right do
+     nothing when the user tries them. The roles change with the shape.
+
+     Both forms come out of the same menus array, which is the only way they
+     stay in step — a command added to File on the desktop bar and forgotten on
+     the phone is invisible to exactly the people who cannot find it elsewhere.
+     The cost is real: every command exists twice in the DOM, once hidden. Fine
+     for four menus of five items, not for forty commands, where the phone
+     answer is a page.
+
+     The breakpoint is md, not sm: what overflows is the count, not the width. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', sheet: false, typed: '', clock: null,
+       menus: [
+         { id: 'file', label: 'File', items: [
+           { label: 'New purchase order', icon: 'file-plus' },
+           { label: 'Save draft', icon: 'save' },
+           { label: 'Submit for approval', icon: 'send' }
+         ] },
+         { id: 'edit', label: 'Edit', items: [
+           { label: 'Insert line', icon: 'rows-3' },
+           { label: 'Duplicate line', icon: 'copy' }
+         ] },
+         { id: 'view', label: 'View', items: [
+           { label: 'Tax breakup', icon: 'percent' },
+           { label: 'Revision history', icon: 'history' }
+         ] }
+       ],
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       },
+       sItems() { return [...this.$refs.sheet.querySelectorAll('[role^=menuitem]')] },
+       sShow(last = false) {
+         this.sheet = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.sItems(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       sClose(back = true) {
+         if (!this.sheet) return;
+         this.sheet = false;
+         if (back) this.$refs.sTrigger.focus();
+       },
+       sMove(n) { const i = this.sItems(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       sEdge(last) { const i = this.sItems(); (last ? i[i.length - 1] : i[0])?.focus() }
+     }"
+     @click.outside="close(false); sClose(false)"
+     @keydown="type($event)"
+     @keydown.escape="
+       if (open !== null) { $event.stopPropagation(); close() }
+       else if (sheet) { $event.stopPropagation(); sClose() }">
+
+  <div class="flex items-center border-b border-zinc-100 px-1 py-1">
+
+    <div x-ref="bar" role="menubar" aria-label="Purchase order commands" class="relative hidden items-center gap-0.5 md:flex">
+      <template x-for="m in menus" :key="m.id">
+        <div class="relative max-md:static">
+          <button type="button" role="menuitem" aria-haspopup="menu" :data-menu="m.id"
+                  :aria-expanded="open === m.id" :tabindex="at === m.id ? 0 : -1"
+                  @click="open === m.id ? close() : show(m.id)"
+                  @mouseenter="if (open !== null) to(m.id)"
+                  @keydown.arrow-down.prevent="show(m.id)" @keydown.arrow-up.prevent="show(m.id, true)"
+                  @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+                  @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+                  class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+
+          <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
+               @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+               @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+               @keydown.tab="close()"
+               class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+            <template x-for="it in m.items" :key="it.label">
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+                <span x-text="it.label"></span>
+              </button>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="relative md:hidden">
+      <button type="button" x-ref="sTrigger" aria-haspopup="menu" :aria-expanded="sheet"
+              @click="sheet ? sClose(false) : sShow()"
+              @keydown.arrow-down.prevent="sShow()" @keydown.arrow-up.prevent="sShow(true)"
+              class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sheet && 'bg-zinc-100 text-zinc-900'">
+        <i data-lucide="menu" class="size-4"></i>Menu
+      </button>
+
+      <div x-show="sheet" x-cloak x-ref="sheet" role="menu" aria-label="Purchase order commands"
+           @keydown.arrow-down.prevent="sMove(1)" @keydown.arrow-up.prevent="sMove(-1)"
+           @keydown.home.prevent="sEdge(false)" @keydown.end.prevent="sEdge(true)"
+           @keydown.tab="sClose()"
+           class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <template x-for="m in menus" :key="m.id">
+          <div role="group" :aria-label="m.label" class="border-t border-zinc-100 py-1 first:border-t-0">
+            <p aria-hidden="true" class="px-3 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase" x-text="m.label"></p>
+            <template x-for="it in m.items" :key="it.label">
+              <button type="button" role="menuitem" tabindex="-1" @click="sClose()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+                <span x-text="it.label"></span>
+              </button>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Draft · 14 lines · ₹18,42,000 before tax</p>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+<!-- Use this once per screen or not at all. A ring is worse than a rail at the
+     job a bar is usually doing: two rings side by side cannot be compared, a
+     column of them cannot be scanned, and the shape costs 112px of height to
+     carry one number that a 4px rail under a figure carries for free. It earns
+     its place in exactly one place — a single headline figure that stands alone,
+     where the ring is the tile rather than a decoration inside it.
+
+     r="15.9155" is the whole trick: the circumference is 2πr = 100.000 to three
+     places, so stroke-dasharray="68 100" is the percentage written literally and
+     there is no arithmetic in the template to get wrong. -rotate-90 puts the
+     start at twelve o'clock; the default transform origin is the centre, so no
+     origin utility is needed.
+
+     Butt caps, not round. stroke-linecap="round" paints a visible dot at
+     dasharray="0 100", so a plant that has despatched nothing shows a mark saying
+     it has started.
+
+     The track is stroke-zinc-200, one step darker than the zinc-100 a rail uses.
+     At 4px on white, zinc-100 reads as a groove; at 9px it is a wide pale band
+     that vanishes into a white card, which is the same reason the spinner's ring
+     takes zinc-200.
+
+     The colours are stroke-* classes, not a conic-gradient. A gradient needs the
+     hex written into the style attribute, and arbitrary values are for one-off
+     sizes and never for colour — the width comes out of the data, the colour
+     comes out of the token table.
+
+     role and the values go on the wrapper and the svg is aria-hidden, because
+     Firefox has historically mishandled ARIA on inline SVG roots and because the
+     percentage in the middle is a real text node either way. -->
+<div class="flex max-w-xs flex-col items-center rounded-xl border border-zinc-200 bg-white p-5 text-center">
+  <h3 id="pg-radial" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Despatch against plan</h3>
+
+  <div class="relative mt-3 flex size-28 items-center justify-center"
+       role="progressbar" aria-labelledby="pg-radial"
+       aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">
+    <svg viewBox="0 0 36 36" class="size-28 -rotate-90" aria-hidden="true">
+      <circle cx="18" cy="18" r="15.9155" stroke-width="3" class="fill-none stroke-zinc-200"></circle>
+      <circle cx="18" cy="18" r="15.9155" stroke-width="3" stroke-dasharray="68 100" class="fill-none stroke-zinc-700"></circle>
+    </svg>
+    <span class="absolute text-[24px]/7 font-semibold tracking-tight tabular-nums">68%</span>
+  </div>
+
+  <p class="mt-3 text-[13px]/5 tabular-nums">8,160 of 12,000 kg despatched</p>
+  <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">August plan · Nashik · 9 working days left</p>
+</div>

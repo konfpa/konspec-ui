@@ -1,0 +1,27 @@
+<!-- One name across the three options is the entire mechanism. Mistype it on
+     one of them and that option quietly stops excluding the others.
+
+     Nothing is preselected: this goes on the printed order, so it is a choice
+     somebody has to make rather than one that makes itself for anybody who
+     never read the question. -->
+<fieldset class="max-w-xl">
+  <legend class="mb-2 text-[13px]/5 font-medium">Payment terms</legend>
+
+  <div class="space-y-2">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="terms" value="grn30" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="tabular-nums">30 days from GRN</span>
+    </label>
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="terms" value="inv45" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="tabular-nums">45 days from invoice date</span>
+    </label>
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="terms" value="advance" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Advance against proforma</span>
+    </label>
+  </div>
+
+  <!-- one help line under the group; per-option help goes under its own option -->
+  <p class="mt-2 text-[12px]/4 text-zinc-500">Printed on the order. Anything outside these three needs an amendment to the rate contract.</p>
+</fieldset>

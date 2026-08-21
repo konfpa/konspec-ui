@@ -1,0 +1,61 @@
+<!-- The bar is a real <header> and the trail inside it is a real <nav> with a
+     name, so the landmark list reads Banner, Navigation "Breadcrumb", Main
+     instead of three unlabelled regions. The sidebar's nav is the one called
+     Main; two navs with the same name in one document give a landmark list two
+     identical rows and no way to choose between them.
+
+     The skip link is first in the DOM and first in the tab order, and #main
+     carries tabindex="-1" because a link to a plain div scrolls the page and
+     leaves focus at the top of the document — the next Tab then starts at the
+     skip link again and the keyboard user is in a loop.
+
+     z-30 is not a guess. sticky with a z-index makes this element a stacking
+     context, so the z-40 on the account panel below only orders it against its
+     siblings inside the header; against the page it inherits this 30. So this
+     number has to clear the content — sticky table heads at z-10 and z-20 — and
+     has to stay under the z-50 that every dialog, sheet and drawer overlay
+     takes, or an open dialog is pierced by a white strip.
+
+     Add one base rule to the page while you are here:
+       [id] { scroll-margin-top: 88px }
+     Without it, following #line-14 out of an error summary scrolls the row to
+     the top of the viewport, which is underneath this bar. -->
+<div class="relative min-h-64 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
+    <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="tb-nav"
+            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+      <i data-lucide="menu" class="size-5"></i>
+    </button>
+
+    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white lg:hidden">K</span>
+
+    <nav aria-label="Breadcrumb" class="min-w-0">
+      <ol class="flex items-center gap-1.5 text-[13px]/5">
+        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
+        <li aria-hidden="true" class="hidden text-zinc-400 sm:block">/</li>
+        <li class="min-w-0"><span aria-current="page" class="block truncate font-medium">Purchase orders</span></li>
+      </ol>
+    </nav>
+
+    <div class="ml-auto flex shrink-0 items-center gap-1">
+      <button type="button" aria-label="Notifications, 3 unread"
+              class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="bell" class="size-[18px]"></i>
+        <span aria-hidden="true" class="absolute top-2 right-2 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
+      </button>
+      <button type="button" aria-label="Account — Rajesh Menon" aria-haspopup="menu" aria-expanded="false"
+              class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        RM
+      </button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1" class="p-4">
+    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · promised 22 Aug 2026</p>
+    </div>
+  </main>
+</div>

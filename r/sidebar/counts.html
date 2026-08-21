@@ -1,0 +1,111 @@
+<!-- Three kinds of number and the difference between them is what they are
+     asking for. A plain figure is the size of the list — 187 vendors is context,
+     not a task. A tinted pill is a queue this user owns and is expected to
+     empty; it is a shape, so it takes bg-zinc-200 with its ring rather than the
+     zinc-100 surface, which would measure identical to the active row behind it.
+     A dot is a state with no useful count, and it is the only place colour is
+     allowed to appear in this panel.
+
+     Put a pill on every row and the column reads as a traffic light by the
+     eighth item and stops meaning anything. One pill in twelve rows is read.
+
+     99+ is a real cap, not a nicety. Invoices on hold runs to four digits at
+     month end, and a four-digit pill pushes the label into a truncation that
+     makes half the nav read as "Purchase or…".
+
+     The group action stays visible instead of appearing on hover. A control that
+     needs a pointer to exist does not exist on a phone at all, and the opacity-0
+     version is worse than useless: it stays in the Tab order, so a keyboard user
+     lands on a button that paints nothing. -->
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+    <div class="flex items-center gap-1 pt-1 pb-1">
+      <p id="sb2-g1" class="min-w-0 flex-1 truncate px-2.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">My queues</p>
+      <button type="button" aria-label="New purchase order"
+              class="flex size-6 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-3.5"></i>
+      </button>
+    </div>
+    <ul role="list" aria-labelledby="sb2-g1" class="space-y-0.5">
+      <li>
+        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="truck" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
+          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="stamp" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Pending my approval</span>
+          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="receipt" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Invoices on hold</span>
+          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">99+</span>
+        </a>
+      </li>
+    </ul>
+
+    <p id="sb2-g2" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Registers</p>
+    <ul role="list" aria-labelledby="sb2-g2" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Purchase orders</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">1,438</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Vendors</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="book-open" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Item ledger</span>
+        </a>
+      </li>
+    </ul>
+
+    <p id="sb2-g3" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Saved views</p>
+    <ul role="list" aria-labelledby="sb2-g3" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Overdue over 7 days</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">18</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Rate contracts expiring</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">6</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Closed this month</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">212</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Counts as at 16 Aug 2026, 11:04</p>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<!-- This one is here so it can be refused with the reasons to hand.
+
+     A native multiple select needs ctrl-click or cmd-click to add a second
+     value, which nothing on screen says, and one ordinary click on a row wipes
+     everything else the user had picked. Its height is the size attribute, so
+     it either scrolls at six rows or takes over the form. And the selection can
+     only be read by scrolling the box, so the answer to "which plants did I
+     pick" is not on screen at the moment it is being asked.
+
+     appearance-none does almost nothing here — a multiple select is already a
+     list box rather than a popup — so the border goes straight on the element,
+     the focus outline with it, and there is no chevron and no wrapper to hang
+     one on. That is the one place in this entry where the wrapper is wrong.
+
+     Under about ten options the replacement is a checkbox group: every choice
+     and every state visible at once, no modifier key, and the same name
+     repeated. Above ten it is a combobox multi with chips in the field. Both
+     post the same shape, so it is a template change and not a data one, and
+     Django needs MultipleChoiceField either way — its widget reads the POST
+     with getlist, and a plain ChoiceField takes the last value and silently
+     drops the rest. -->
+<div class="max-w-sm space-y-6">
+
+  <div>
+    <label for="sel-multi" class="mb-1.5 block text-[13px]/5 font-medium">Plants — the control to avoid</label>
+    <select id="sel-multi" name="plant_native" multiple size="5" aria-describedby="sel-multi-help"
+            class="block w-full min-w-0 rounded-lg border border-zinc-200 bg-white px-1 py-1 text-[14px]/5 focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+      <option value="silvassa-1" selected>Silvassa — Unit I</option>
+      <option value="silvassa-2">Silvassa — Unit II</option>
+      <option value="vadodara">Vadodara</option>
+      <option value="nashik">Nashik</option>
+      <option value="coimbatore">Coimbatore</option>
+      <option value="rajkot">Rajkot</option>
+    </select>
+    <p id="sel-multi-help" class="mt-1.5 text-[12px]/4 text-zinc-500">
+      Nothing here says that a plain click discards the other five, and nothing here shows the selection once the box has scrolled.
+    </p>
+  </div>
+
+  <fieldset class="border-t border-zinc-200 pt-5">
+    <legend class="mb-2 text-[13px]/5 font-medium">Plants — what to write instead</legend>
+    <div class="space-y-2">
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="checkbox" name="plant" value="silvassa-1" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Silvassa — Unit I</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="checkbox" name="plant" value="silvassa-2" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Silvassa — Unit II</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="checkbox" name="plant" value="vadodara" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Vadodara</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="checkbox" name="plant" value="nashik" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Nashik</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="checkbox" name="plant" value="coimbatore" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Coimbatore</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="checkbox" name="plant" value="rajkot" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Rajkot</span>
+      </label>
+    </div>
+    <p class="mt-2 text-[12px]/4 text-zinc-500">Six boxes, six states, no modifier key, and request.POST.getlist reads it exactly the same way.</p>
+  </fieldset>
+</div>

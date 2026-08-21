@@ -1,0 +1,72 @@
+<!-- templates/404.html, and the shape 403.html takes as well. Three things
+     make these files different from every other template in the project.
+
+     They do not {% extends "base.html" %}. base.html reads the nav, the counts
+     and the signed-in user out of context, and the request that just failed may
+     have none of it; a base that raises while rendering the error page drops
+     the user on Django's own bare page instead. So each handler is a whole
+     document with its own <head>:
+
+       <title>Page not found · Konspec Operations</title>
+
+     The failure leads the title, because on a document load that string is the
+     announcement — the h1 is only read once somebody navigates to it.
+
+     What context each one gets differs, and it is the trap. page_not_found
+     renders with the request and passes {{ request_path }}; permission_denied
+     passes {{ exception }}, which is whatever string the raising view typed and
+     is written for a log, so it is never printed raw. server_error is
+     template.render() with no context and no request at all: no context
+     processors run, {{ user.email }} and {{ request.path }} both come out as
+     empty strings, and the incident id cannot be templated. Either every value
+     on 500.html is literal, or you register your own handler500 that renders
+     with a context of its own. Tags do not need context, so {% url %} and
+     {% static %} keep working in all three — which is what keeps the way back
+     from being a hard-coded path.
+
+     And none of them render at all until DEBUG is False, which is why they are
+     the templates that ship broken. -->
+<div class="flex min-h-[560px] flex-col rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+
+  <header class="flex items-center gap-2.5">
+    <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+      <span class="text-[14px]/5 font-semibold">Konspec Operations</span>
+    </a>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center py-10">
+    <div class="w-full max-w-md text-center">
+      <span class="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="file-question" class="size-5 text-zinc-600" aria-hidden="true"></i>
+      </span>
+
+      <p class="mt-4 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Error 404</p>
+      <h1 tabindex="-1" class="mt-1 text-[20px]/7 font-semibold tracking-tight">This page does not exist</h1>
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600">
+        Nothing is served at this address. The record may have been cancelled, or the link may be older than the last change to the numbering series.
+      </p>
+
+      {# request_path is already URL-quoted by page_not_found; escape it anyway and never mark it safe #}
+      <p class="mt-4 inline-block max-w-full break-all rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-left text-[12px]/4">
+        <span class="select-all font-mono text-zinc-600">{{ request_path }}</span>
+      </p>
+
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+        <a href="{% url 'orders:list' %}"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          Back to purchase orders
+        </a>
+        <a href="mailto:it@konspec.com?subject=Broken%20link"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Report the link
+        </a>
+      </div>
+    </div>
+  </main>
+
+  {# on 500.html this whole footer is literal text: no user, no context, no variables #}
+  <footer class="border-t border-zinc-200 pt-4 text-center text-[11px]/4 text-zinc-500">
+    {% if user.is_authenticated %}Signed in as {{ user.email }} · {% endif %}IT support · it@konspec.com · ext 4102
+  </footer>
+</div>

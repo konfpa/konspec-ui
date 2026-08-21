@@ -1,0 +1,71 @@
+<!-- Not an empty state in disguise. "No goods receipts found" after a
+     thirty-second timeout tells somebody their receipts are gone, and the
+     conscientious ones go and enter them again.
+
+     Three things belong in the copy and only the first is usually written.
+     What failed, in words. Whether anything was changed, which is the question
+     anybody who has just pressed Save is actually asking. And a reference that
+     support can search for, because "it broke" and a timestamp is not a ticket.
+
+     The well is graphite here as everywhere else — bg-zinc-200 with a zinc-300
+     ring — and the tone is the glyph alone at text-red-600. A red field behind
+     the text shouts louder than the overdue rows it is failing to show, and it
+     makes a transient network fault look like data loss.
+
+     Retry is a real button and it resolves. Pressing it hands the slot to a
+     spinner at the height the panel already had, and the spinner hands it back
+     to the rows. A retry that leaves the ring turning is the failure mode this
+     variant exists to close: at forty seconds a turning ring is
+     indistinguishable from a hung page, and the only move left is a reload,
+     which on a form means posting it twice. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       state: 'failed',
+       retry() { this.state = 'busy'; setTimeout(() => this.state = 'ok', 1400) }
+     }"
+     :aria-busy="state === 'busy'">
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Goods receipts</h2>
+  </div>
+
+  <div x-show="state === 'failed'" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="alert-circle" class="size-5 text-red-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">The receipt register did not load</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      The request timed out after 30 seconds. Nothing was changed and no receipt was lost — this is the list failing to read, not the records failing to exist.
+    </p>
+    <p class="mt-1 text-[12px]/4 text-zinc-500 tabular-nums">Reference 8f21c4 · 21 Aug 2026, 11:04</p>
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+      <button type="button" @click="retry()"
+              class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+        <i data-lucide="rotate-cw" class="size-4"></i>Retry
+      </button>
+      <a href="mailto:it@konspec.com?subject=Receipt%20register%208f21c4"
+         class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Report this
+      </a>
+    </div>
+  </div>
+
+  <div x-show="state === 'busy'" x-cloak class="flex min-h-64 flex-col items-center justify-center gap-3 px-6 py-12 text-center">
+    <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <p class="text-[13px]/5 text-zinc-600">Loading the receipt register</p>
+  </div>
+
+  <div x-show="state === 'ok'" x-cloak class="min-h-64">
+    <ul class="divide-y divide-zinc-100 text-[13px]/5">
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+        <span class="font-medium tabular-nums">GRN-26-0442</span><span class="text-zinc-600">Sharma Extrusions · 12,000 kg</span>
+      </li>
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+        <span class="font-medium tabular-nums">GRN-26-0443</span><span class="text-zinc-600">Nashik Steel Traders · 640 kg</span>
+      </li>
+    </ul>
+  </div>
+
+  <p role="status" class="sr-only"
+     x-text="state === 'busy' ? 'Retrying the receipt register' : state === 'ok' ? 'Receipt register loaded, 2 receipts' : ''"></p>
+</div>

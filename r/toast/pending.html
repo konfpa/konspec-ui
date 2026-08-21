@@ -1,0 +1,81 @@
+<!-- One toast, patched in place. The same id and the same node: the text and
+     the icon are swapped when the request settles, so the stack does not
+     reshuffle under the pointer and the region announces the change rather than
+     a second message. The default aria-relevant covers text changes, which is
+     what makes updating in place work at all.
+
+     No timer while it is pending — a toast that expires with the request still
+     in flight leaves the user with no answer either way. The timer is set when
+     the reply lands, and only if the reply is good news.
+
+     The spinner is the border ring, not a Lucide loader. An <i data-lucide> has
+     no box until createIcons() has run over it, which is exactly what an element
+     appended after page load cannot count on.
+
+     Two seconds of waiting belongs here. A job that outlives the request belongs
+     in an alert on the page with a progress bar, because the user will navigate
+     away and the toast will not survive it. -->
+<div x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, tone: 'pending', ms: 0, timer: 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => { if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons(); });
+         return n.id;
+       },
+       settle(id, patch) {
+         const t = this.toasts.find(x => x.id === id);
+         if (!t) return;
+         Object.assign(t, patch);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(t);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       },
+       post() {
+         const id = this.push({ text: 'Posting GRN 4417', meta: 'Against PO-24-1187' });
+         setTimeout(() => this.settle(id, { tone: 'success', text: 'GRN 4417 posted', meta: '12.480 MT received · ₹4,26,500', ms: 5000 }), 2000);
+       }
+     }">
+
+  <button type="button" x-ref="fire" @click="post()"
+          class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Post GRN
+  </button>
+
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3.5 py-3 shadow-lg"
+           @mouseenter="pause(t)" @mouseleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <template x-if="t.tone === 'pending'">
+          <span class="mt-0.5 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+        </template>
+        <template x-if="t.tone === 'success'">
+          <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        </template>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+        </div>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<!-- The replacement, and everything after this is a variation on it. The list
+     needs no list-none — preflight took the marker away already — but it does
+     need role="list" put back, because WebKit reads a list-style of none as
+     "not a list" and VoiceOver then announces four unrelated paragraphs with no
+     count in front of them.
+
+     items-start, not items-center. On a one-line item the two are identical,
+     which is how items-center gets shipped and survives review; on the last
+     item here it drops the dot to the middle of a three-line block and the
+     column of marks stops being a straight edge. At 390px every one of these
+     wraps, so the wrapped case is the normal one.
+
+     The dot is centred inside a box one line tall rather than pushed down by a
+     margin. A 6px disc on a 20px line wants 7px of offset, 7px is not a step on
+     the scale, and mt-[7px] is correct for exactly one type size. h-5 is the
+     leading of text-[13px]/5, so the box and the text cannot drift apart. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+  <h3 class="text-[13px]/5 font-medium">Exceptions on GRN-26-0442</h3>
+  <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Posted 16 Aug 2026 by Ritu Deshpande</p>
+
+  <ul role="list" class="mt-3 space-y-2 text-[13px]/5 text-zinc-600">
+    <li class="flex items-start gap-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+      <span class="min-w-0 tabular-nums">Short receipt of 600 kg against PO-24-1187.</span>
+    </li>
+    <li class="flex items-start gap-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+      <span class="min-w-0">Lorry receipt number does not match the one on the invoice.</span>
+    </li>
+    <li class="flex items-start gap-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+      <span class="min-w-0 tabular-nums">Two bags opened at the gate; 48 kg written off and charged back to Sharma Extrusions on debit note DN-26-0117 pending the transporter's reply.</span>
+    </li>
+  </ul>
+</div>

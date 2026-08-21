@@ -1,0 +1,39 @@
+<!-- Reach for the pseudo first. Tailwind's marker: variant reaches ::marker on
+     the list and on every item inside it, so a prose list needs one class and
+     no extra elements. Nothing below this line in this entry is worth writing
+     if marker:text-zinc-400 was all you needed.
+
+     Preflight has already set list-style: none on every ul and ol, so a prose
+     list has to ask for its marker back with list-disc or list-decimal and the
+     padding that hangs it outside the text. Bare lists in this system start
+     with no marker at all, which is why role="list" matters everywhere else.
+
+     What the pseudo refuses is the reason for the rest of this entry: no width,
+     no height, no padding, no background, no position, and no say in the gap.
+     marker:bg-zinc-200 compiles, ships and paints nothing. font-size is allowed
+     and does shrink the disc, but the disc is whatever fraction of the em the
+     font chose and the font-size moves the marker box with it, so sizing a
+     bullet that way is right on one machine.
+
+     marker:tabular-nums earns its place on any ordered list that runs past
+     nine: outside markers align to their right edge on their own, but
+     proportional figures still make 9 and 11 different widths. -->
+<div class="max-w-md space-y-5 rounded-xl border border-zinc-200 bg-white p-5">
+  <div>
+    <h3 class="text-[13px]/5 font-medium">Conditions on the rate contract</h3>
+    <ul class="mt-2 list-disc space-y-1 pl-5 text-[14px]/6 text-zinc-600 marker:text-zinc-400">
+      <li>Rates hold to 31 Mar 2027 and are quoted ex-works Nashik.</li>
+      <li>Freight is billed at actuals against the transporter's receipt, and does not carry the contract discount.</li>
+      <li>Any revision needs a signed amendment before the next order is raised.</li>
+    </ul>
+  </div>
+
+  <div>
+    <h3 class="text-[13px]/5 font-medium">Order of precedence</h3>
+    <ol class="mt-2 list-decimal space-y-1 pl-6 text-[14px]/6 text-zinc-600 marker:tabular-nums marker:text-zinc-500">
+      <li>The purchase order and its annexures.</li>
+      <li>The rate contract dated 04 Apr 2026.</li>
+      <li>The vendor's quotation, to the extent it is not overridden above.</li>
+    </ol>
+  </div>
+</div>

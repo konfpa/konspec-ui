@@ -1,0 +1,70 @@
+<!-- readonly does nothing on a select. It parses, it looks right in the markup,
+     and it leaves a fully working control that anybody can change. The only
+     lock is disabled — and a disabled control does not submit, so a read-only
+     value that still has to reach the server needs a hidden input beside it.
+
+     Which leaves the text colour to separate the two, exactly as it does on an
+     input: zinc-900 for a value that still matters and still has to be read off
+     the screen, zinc-400 for one that does not. Both sit on bg-zinc-100 with no
+     focus outline, because neither can be operated.
+
+     The read-only box drops the chevron and takes pr-3 back. An arrow says a
+     list will open; this one will not, and the box then reads as a control that
+     broke rather than as a field with its answer already in it.
+
+     Invalid is drawn on the wrapper and announced by the select: aria-invalid
+     plus aria-describedby pointing at the error paragraph, which replaces the
+     help text rather than stacking under it. Do not reach for the invalid:
+     variant here — :invalid matches from first paint, so every required select
+     on a blank form comes up red before anybody has done anything wrong. -->
+<div class="max-w-sm space-y-6">
+
+  <div>
+    <label for="sel-off" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Currency</label>
+    <div class="relative rounded-lg border border-zinc-200 bg-zinc-100">
+      <select id="sel-off" name="currency" disabled aria-describedby="sel-off-help"
+              class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 text-zinc-400 outline-none">
+        <option selected>INR — Indian rupee</option>
+      </select>
+      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-400">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </div>
+    <p id="sel-off-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Domestic orders are raised in rupees. There is nothing else to pick.</p>
+  </div>
+
+  <div>
+    <label for="sel-ro" class="mb-1.5 block text-[13px]/5 font-medium">Plant</label>
+    <!-- no chevron, so no pr-9 and nothing to position: a plain bordered box -->
+    <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+      <select id="sel-ro" disabled aria-describedby="sel-ro-help"
+              class="block w-full min-w-0 appearance-none bg-transparent px-3 py-2 text-[14px]/5 text-zinc-900 outline-none">
+        <option selected>Silvassa — Unit II</option>
+      </select>
+    </div>
+    <!-- the disabled control posts nothing, so the value travels here -->
+    <input type="hidden" name="plant" value="silvassa-2">
+    <p id="sel-ro-help" class="mt-1.5 tabular-nums text-[12px]/4 text-zinc-500">Fixed when GRN-24-0912 was posted against this order.</p>
+  </div>
+
+  <div>
+    <label for="sel-bad" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms <span class="text-red-600">*</span></label>
+    <div class="relative rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+      <select id="sel-bad" name="terms" required aria-invalid="true" aria-describedby="sel-bad-err"
+              class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+        <option value="" disabled selected hidden>Choose payment terms</option>
+        <option value="advance">100% advance</option>
+        <option value="net-30">Net 30 days</option>
+        <option value="net-60">Net 60 days</option>
+        <option value="net-90">Net 90 days</option>
+      </select>
+      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </div>
+    <p id="sel-bad-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
+      Gujarat Polymers Ltd is on Net 30 in its rate contract. Anything longer needs finance to approve it.
+    </p>
+  </div>
+</div>

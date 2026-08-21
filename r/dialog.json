@@ -1,0 +1,77 @@
+{
+  "id": "dialog",
+  "name": "Dialog",
+  "category": "feedback",
+  "description": "A centred, dismissible panel over a dimmed page. Use it to take a handful of fields without leaving the list.",
+  "when_to_use": "Short forms and anything the user can walk away from. A form longer than about six fields belongs on its own page; a record to read belongs in a sheet; a question that must be answered belongs in an alert dialog.",
+  "rules": [
+    "Close on escape and on a backdrop click with @click.self. A dialog with no way out except the button is a trap.",
+    "A native picker inside the panel needs no guard against the escape handler. A select popup and a date picker both swallow Escape whole: the popup closes and no keydown reaches the page at all, so @keydown.escape.window never fires and the panel stays open. A second Escape then closes the panel, which is the same two-stage handling the combobox does deliberately. Measured in Chromium against a select and an input[type=date] opened with showPicker. Do not add a guard that skips Escape when the target is a picker field: that would break Escape closing the panel while such a field merely has focus, which works today.",
+    "x-cloak on the overlay, otherwise it flashes over the page on load.",
+    "x-trap.noscroll on the backdrop, exactly as the alert dialog uses it: Tab stays inside the panel, focus returns to the trigger on close, and the page behind stops scrolling. @click.self sits on the same element and still fires — the focus plugin runs with allowOutsideClick, and a click on the backdrop is inside the trap anyway.",
+    "x-trap opens focus on the first element inside the panel carrying autofocus, and on the first focusable element when there is none. Put autofocus on the first field when the panel exists to be typed into; leave it off when the panel is only read, and focus lands on the close button, which is the safe one.",
+    "A dialog is dismissible by definition. The moment a stray backdrop click would lose the user something, it is an alert dialog and it belongs in that component instead."
+  ],
+  "anatomy": [
+    {
+      "part": "Backdrop",
+      "description": "A zinc-900/40 field that dims the page and carries @click.self to dismiss, plus x-trap.noscroll to hold focus and lock the page behind."
+    },
+    {
+      "part": "Panel",
+      "description": "Centred, rounded-xl, max-w-md for a form and max-w-lg when the body scrolls. Capped at 80vh in every variant."
+    },
+    {
+      "part": "Header",
+      "description": "The title and a close button, on a bordered strip that does not scroll."
+    },
+    {
+      "part": "Body",
+      "description": "The fields, or the content. This is the only part that scrolls."
+    },
+    {
+      "part": "Footer",
+      "description": "Cancel and the primary action, right-aligned on a zinc-100 strip that does not scroll."
+    }
+  ],
+  "behaviour": [
+    "Escape closes, a backdrop click closes, and the close button closes. All three, always.",
+    "Opening moves focus into the panel: onto the first field where there is one to fill in, otherwise onto the close button.",
+    "Tab and Shift+Tab cycle inside the panel only. Nothing behind it is reachable while it is open.",
+    "Closing returns focus to the control that opened it, so the keyboard does not lose its place.",
+    "In the scrolling variant only the body moves; the header and footer stay, so the primary action never scrolls out of reach.",
+    "Every panel is capped at 80vh with the body scrolling inside it, so a dialog never grows past the viewport on a laptop or in landscape on a phone.",
+    "The page behind does not scroll while the dialog is open, and it does not jump sideways when its scrollbar goes — x-trap.noscroll pads for the width it removes.",
+    "A form longer than about six fields belongs on a page. A dialog that scrolls a long form is a page in a costume."
+  ],
+  "accessibility": [
+    "role=\"dialog\" with aria-modal=\"true\" and aria-labelledby pointing at the heading.",
+    "Focus moves into the panel on open and returns to the trigger on close — x-trap from @alpinejs/focus does both, the same as the alert dialog.",
+    "Focus is trapped inside while it is open, so Tab cannot walk out into the page underneath, which is still fully rendered.",
+    "A form dialog opens on its first field, marked with autofocus, which x-trap honours. A read-only one opens on the close button.",
+    "The close button carries aria-label=\"Close\".",
+    "Escape works from anywhere inside the panel, including from within a focused input."
+  ],
+  "related": [
+    "alert-dialog",
+    "sheet",
+    "form-page"
+  ],
+  "variants": [
+    {
+      "id": "form",
+      "name": "Form dialog",
+      "html": "<div x-data=\"{ open: false }\">\n  <button type=\"button\" @click=\"open = true\"\n          class=\"flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">\n    <i data-lucide=\"plus\" class=\"size-4\"></i>Record GRN\n  </button>\n\n  <div x-show=\"open\" x-cloak x-trap.noscroll=\"open\" @keydown.escape.window=\"open = false\" @click.self=\"open = false\"\n       class=\"fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4\">\n    <div role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"grn-title\"\n         class=\"flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg\">\n      <div class=\"flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4\">\n        <div class=\"min-w-0\">\n          <h2 id=\"grn-title\" class=\"text-[16px]/6 font-semibold\">Record GRN</h2>\n          <p class=\"mt-0.5 truncate text-[12px]/4 text-zinc-600\">PO-24-1187 · Sharma Extrusions</p>\n        </div>\n        <button type=\"button\" @click=\"open = false\" aria-label=\"Close\"\n                class=\"-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900\">\n          <i data-lucide=\"x\" class=\"size-4\"></i>\n        </button>\n      </div>\n\n      <div class=\"min-h-0 flex-1 overflow-y-auto px-5 py-4\">\n        <div>\n          <label for=\"grn-qty\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Quantity received <span class=\"text-red-600\">*</span></label>\n          <div class=\"flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n            <!-- x-trap opens focus on [autofocus] if the panel has one, otherwise on the close button -->\n            <input id=\"grn-qty\" autofocus value=\"4,200\" class=\"w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none\">\n            <span class=\"pr-3 text-[13px]/5 text-zinc-600\">kg</span>\n          </div>\n          <p class=\"mt-1.5 text-[12px]/4 text-zinc-500\">Ordered 12,000 kg, received 7,800 kg so far.</p>\n        </div>\n\n        <div class=\"mt-4\">\n          <label for=\"grn-date\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Receipt date <span class=\"text-red-600\">*</span></label>\n          <div class=\"rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15\">\n            <input id=\"grn-date\" type=\"date\" value=\"2024-08-19\" class=\"w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none\">\n          </div>\n        </div>\n      </div>\n\n      <div class=\"flex shrink-0 flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3\">\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">Cancel</button>\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Save</button>\n      </div>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "scrolling",
+      "name": "Scrolling body",
+      "html": "<!-- Header and footer stay put, only the middle scrolls. max-h on the panel,\n     overflow-y on the body, and min-h-0 so the flex child is allowed to shrink. -->\n<div x-data=\"{ open: false }\">\n  <button type=\"button\" @click=\"open = true\"\n          class=\"rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">Review 6 lines</button>\n\n  <div x-show=\"open\" x-cloak x-trap.noscroll=\"open\" @keydown.escape.window=\"open = false\" @click.self=\"open = false\"\n       class=\"fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4\">\n    <div role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"lines-title\"\n         class=\"flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg\">\n      <div class=\"flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4\">\n        <div class=\"min-w-0\">\n          <h2 id=\"lines-title\" class=\"text-[16px]/6 font-semibold\">Order lines</h2>\n          <p class=\"mt-0.5 truncate text-[12px]/4 text-zinc-600\">PO-24-1187 · Sharma Extrusions · 6 lines</p>\n        </div>\n        <button type=\"button\" @click=\"open = false\" aria-label=\"Close\"\n                class=\"-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900\">\n          <i data-lucide=\"x\" class=\"size-4\"></i>\n        </button>\n      </div>\n\n      <div class=\"min-h-0 flex-1 overflow-y-auto px-5 py-2\">\n        <div class=\"flex items-center justify-between gap-4 border-b border-zinc-100 py-3\">\n          <div class=\"min-w-0\"><p class=\"truncate text-[13px]/5 font-medium\">MS angle 50×50×6</p><p class=\"text-[12px]/4 text-zinc-600\">12,000 kg · received 7,800</p></div>\n          <span class=\"shrink-0 text-[13px]/5 tabular-nums\">₹6,84,000</span>\n        </div>\n        <div class=\"flex items-center justify-between gap-4 border-b border-zinc-100 py-3\">\n          <div class=\"min-w-0\"><p class=\"truncate text-[13px]/5 font-medium\">MS plate 10 mm</p><p class=\"text-[12px]/4 text-zinc-600\">4,000 kg · received 4,000</p></div>\n          <span class=\"shrink-0 text-[13px]/5 tabular-nums\">₹3,12,000</span>\n        </div>\n        <div class=\"flex items-center justify-between gap-4 border-b border-zinc-100 py-3\">\n          <div class=\"min-w-0\"><p class=\"truncate text-[13px]/5 font-medium\">MS channel 100×50</p><p class=\"text-[12px]/4 text-zinc-600\">6,500 kg · received 6,500</p></div>\n          <span class=\"shrink-0 text-[13px]/5 tabular-nums\">₹4,41,000</span>\n        </div>\n        <div class=\"flex items-center justify-between gap-4 border-b border-zinc-100 py-3\">\n          <div class=\"min-w-0\"><p class=\"truncate text-[13px]/5 font-medium\">MS flat 40×6</p><p class=\"text-[12px]/4 text-zinc-600\">2,200 kg · received 2,200</p></div>\n          <span class=\"shrink-0 text-[13px]/5 tabular-nums\">₹1,54,000</span>\n        </div>\n        <div class=\"flex items-center justify-between gap-4 border-b border-zinc-100 py-3\">\n          <div class=\"min-w-0\"><p class=\"truncate text-[13px]/5 font-medium\">MS round bar 20 mm</p><p class=\"text-[12px]/4 text-zinc-600\">3,100 kg · received 3,100</p></div>\n          <span class=\"shrink-0 text-[13px]/5 tabular-nums\">₹2,17,000</span>\n        </div>\n        <div class=\"flex items-center justify-between gap-4 py-3\">\n          <div class=\"min-w-0\"><p class=\"truncate text-[13px]/5 font-medium\">MS square tube 40×40</p><p class=\"text-[12px]/4 text-zinc-600\">900 kg · received 900</p></div>\n          <span class=\"shrink-0 text-[13px]/5 tabular-nums\">₹34,000</span>\n        </div>\n      </div>\n\n      <div class=\"flex shrink-0 items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-5 py-3\">\n        <span class=\"text-[13px]/5 text-zinc-600\">Total <span class=\"font-medium tabular-nums text-zinc-900\">₹18,42,000</span></span>\n        <button type=\"button\" @click=\"open = false\"\n                class=\"rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Done</button>\n      </div>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "reference",
+      "name": "Reference panel",
+      "html": "<!-- Read-only, nothing to submit, so the only control is a close button. -->\n<div x-data=\"{ open: false }\">\n  <button type=\"button\" @click=\"open = true\"\n          class=\"flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100\">\n    <i data-lucide=\"keyboard\" class=\"size-4\"></i>Shortcuts\n  </button>\n\n  <div x-show=\"open\" x-cloak x-trap.noscroll=\"open\" @keydown.escape.window=\"open = false\" @click.self=\"open = false\"\n       class=\"fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4\">\n    <div role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"keys-title\"\n         class=\"flex max-h-[80vh] w-full max-w-sm flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg\">\n      <div class=\"flex shrink-0 items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4\">\n        <h2 id=\"keys-title\" class=\"text-[16px]/6 font-semibold\">Keyboard shortcuts</h2>\n        <button type=\"button\" @click=\"open = false\" aria-label=\"Close\"\n                class=\"-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900\">\n          <i data-lucide=\"x\" class=\"size-4\"></i>\n        </button>\n      </div>\n      <dl class=\"min-h-0 flex-1 overflow-y-auto px-5 py-2\">\n        <div class=\"flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5\">\n          <dt class=\"text-[13px]/5 text-zinc-600\">Search orders</dt>\n          <dd><kbd class=\"rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600\">/</kbd></dd>\n        </div>\n        <div class=\"flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5\">\n          <dt class=\"text-[13px]/5 text-zinc-600\">New purchase order</dt>\n          <dd><kbd class=\"rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600\">N</kbd></dd>\n        </div>\n        <div class=\"flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5\">\n          <dt class=\"text-[13px]/5 text-zinc-600\">Select all rows</dt>\n          <dd><kbd class=\"rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600\">Ctrl A</kbd></dd>\n        </div>\n        <div class=\"flex items-center justify-between gap-4 py-2.5\">\n          <dt class=\"text-[13px]/5 text-zinc-600\">Close this dialog</dt>\n          <dd><kbd class=\"rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600\">Esc</kbd></dd>\n        </div>\n      </dl>\n    </div>\n  </div>\n</div>"
+    }
+  ]
+}

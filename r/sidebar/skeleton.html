@@ -1,0 +1,78 @@
+<!-- A nav filtered by permission cannot be guessed and then corrected. Render an
+     optimistic list and a buyer sees Approvals for half a second before it is
+     taken away, which reads as a permissions bug and generates a ticket. So the
+     body loads and the frame does not.
+
+     Only the body is skeleton. The workspace and the signed-in user are already
+     known to the page that rendered this, so they are drawn for real, and
+     keeping them out of the loading state is also what stops the header and
+     footer moving when the list lands.
+
+     The block count is a guess, so it is pinned to a guess that cannot hurt: the
+     skeleton is exactly as tall as the shortest nav any role gets. Guess high and
+     the panel shrinks on arrival; guess low and it grows, but growth inside a
+     scrolling body moves nothing outside it.
+
+     aria-busy on the container and aria-hidden on the blocks, plus one sr-only
+     role="status" line. Without the live region the arrival is silent — the
+     blocks are decorative and the links appear with nothing announcing them.
+     Nothing in here is focusable, so a Tab during the wait skips straight past
+     to the footer rather than landing on a grey rectangle. -->
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-y-auto px-3 py-2" aria-busy="true"
+       hx-get="/nav/" hx-trigger="load" hx-swap="outerHTML">
+    <p class="sr-only" role="status">Loading navigation</p>
+
+    <div class="animate-pulse space-y-0.5 motion-reduce:animate-none" aria-hidden="true">
+      <div class="px-2.5 pt-1 pb-2"><div class="h-2 w-20 rounded bg-zinc-200"></div></div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-32 rounded bg-zinc-200"></div>
+        <div class="ml-auto h-2.5 w-6 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+        <div class="ml-auto h-2.5 w-5 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-28 rounded bg-zinc-200"></div>
+      </div>
+
+      <div class="px-2.5 pt-5 pb-2"><div class="h-2 w-16 rounded bg-zinc-200"></div></div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+        <div class="ml-auto h-2.5 w-6 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-28 rounded bg-zinc-200"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shrink-0 border-t border-zinc-200 p-2">
+    <div class="flex items-center gap-2.5 px-2 py-2">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
+        <span class="block truncate text-[11px]/4 text-zinc-500">Level 2 approver</span>
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<!-- Two prefixes doing two different jobs, and the difference is whether the
+     text is information.
+
+     ₹ and .00 are decoration. The label already says the field is in rupees and
+     .00 says nothing at all, so both spans are aria-hidden and the input posts
+     a bare number. KIL/26-27/ is information — it is the first half of the
+     invoice number and the label does not say it — so it keeps an id and
+     aria-describedby points at it.
+
+     The fixed prefix is not in the value either way. The input posts the serial
+     alone, so a hidden input carries the series and the server joins them.
+     Leave that out and the record is saved as 0148 while the person entering it
+     watched a full invoice number on screen the whole time.
+
+     The tinted prefix is bg-zinc-100 with a divider and no ring. It is a region
+     of the enclosure rather than a shape floating on it: three of its edges are
+     the wrapper's own border and the fourth is the divider, so a ring inside it
+     would draw a second rule one pixel in from the first. Neither ₹ nor .00
+     takes a divider — a rule there would say the glyph is a control. -->
+<div class="max-w-xl space-y-5">
+  <div>
+    <label for="ig1-value" class="mb-1.5 block text-[13px]/5 font-medium">Order value (₹)</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+      <input id="ig1-value" name="value" inputmode="decimal" value="18,42,000"
+             class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      <span aria-hidden="true" class="flex items-center pr-3 text-[14px]/5 text-zinc-500">.00</span>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Excluding GST. PO-24-1187, Gujarat Polymers Ltd.</p>
+  </div>
+
+  <div>
+    <label for="ig1-inv" class="mb-1.5 block text-[13px]/5 font-medium">Invoice number</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <span id="ig1-inv-series" class="flex shrink-0 items-center rounded-l-[7px] border-r border-zinc-200 bg-zinc-100 px-3 text-[14px]/5 tabular-nums text-zinc-600">KIL/26-27/</span>
+      <input id="ig1-inv" name="invoice_serial" value="0148" inputmode="numeric"
+             aria-describedby="ig1-inv-series ig1-inv-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+      <input type="hidden" name="invoice_series" value="KIL/26-27/">
+    </div>
+    <p id="ig1-inv-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">The series is fixed for the financial year. Type the serial only.</p>
+  </div>
+</div>

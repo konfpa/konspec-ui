@@ -1,0 +1,94 @@
+<!-- One x-data for the whole toolbar, holding the open id and a warm flag.
+
+     The first label costs 400ms, which is what stops a pointer crossing the
+     toolbar on its way to the scrollbar from firing five bubbles. Every label
+     after it opens at once, because the user has already asked this row of
+     buttons a question and re-paying the delay on each one leaves the labels
+     trailing the pointer by half a step. The group goes cold 800ms after the
+     pointer leaves, so coming back to it later pays the delay again.
+
+     This is the case a per-button x-data cannot serve. The warm flag has to be
+     shared, and sharing it by writing to a parent scope from a nested x-data
+     silently creates a shadowing own property on the child instead. One
+     component over the whole toolbar, and open holds an id rather than each
+     button holding a boolean.
+
+     Focus opens with no delay and warms the group too: a Tab lands on one
+     button deliberately and waiting 400ms after a keypress reads as lag.
+
+     The five buttons are written out rather than looped with x-for, because
+     the icon name would have to become :data-lucide — a binding on the one
+     node createIcons() is about to replace with an svg. -->
+
+<div class="inline-flex items-center gap-1 rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null, warm: false, timer: 0, cool: 0,
+       show(id, now = false) {
+         clearTimeout(this.timer); clearTimeout(this.cool);
+         if (now || this.warm) { this.open = id; this.warm = true; return }
+         this.timer = setTimeout(() => { this.open = id; this.warm = true }, 400);
+       },
+       hide() {
+         clearTimeout(this.timer);
+         this.open = null;
+         this.cool = setTimeout(() => this.warm = false, 800);
+       }
+     }"
+     @keydown.escape.window="hide()">
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Bold"
+            @mouseenter="show('bold')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('bold', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="bold" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'bold'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Bold</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Italic"
+            @mouseenter="show('italic')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('italic', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="italic" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'italic'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Italic</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Bulleted list"
+            @mouseenter="show('list')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('list', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="list" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'list'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Bulleted list</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Insert link"
+            @mouseenter="show('link')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('link', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="link" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'link'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Insert link</span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Clear formatting"
+            @mouseenter="show('clear')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('clear', true)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="eraser" class="size-4"></i>
+    </button>
+    <span aria-hidden="true" x-show="open === 'clear'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Clear formatting</span>
+  </span>
+
+</div>

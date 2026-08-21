@@ -1,0 +1,45 @@
+<!-- One paragraph, one id, and the contents swap. The alternative — a help
+     element and an error element with an id each — means aria-describedby has
+     to be rewritten on every state change, and the two ways of getting that
+     wrong are both silent: describe the hidden one and the user hears the
+     format hint while the field is red, describe an id that is not rendered
+     and the whole description is dropped without a word.
+
+     mt-1.5 min-h-4 is the reserved line. An empty paragraph collapses to zero,
+     so without it the field grows 22px the moment it errors and a form that
+     fails on four fields lifts Save out from under the pointer.
+
+     Validation waits for blur, then goes live, which lines up with how
+     descriptions are read: aria-describedby is announced when focus arrives,
+     so an error written on blur is already there when they tab back.
+
+     aria-invalid is bound, and bound to a string — written once in the markup
+     it survives the correction and the field stays invalid all session, and
+     aria-invalid="false" is the valid state rather than a missing attribute.
+     The icon sits inside x-show rather than x-if: Lucide hydrates once at load
+     and never sees markup x-if inserts later. -->
+<div class="max-w-sm"
+     x-data="{ gstin: '24AAACG4171B1Z', touched: true,
+               get bad() { return this.touched && this.gstin.trim().length !== 15 } }">
+  <label for="fe-gstin" class="mb-1.5 block text-[13px]/5 font-medium">
+    GSTIN <span aria-hidden="true" class="text-red-600">*</span>
+  </label>
+
+  <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+       :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                   : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+    <input id="fe-gstin" name="gstin" required maxlength="15"
+           x-model="gstin" @blur="touched = true"
+           aria-describedby="fe-gstin-msg"
+           :aria-invalid="bad ? 'true' : 'false'"
+           class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+  </div>
+
+  <p id="fe-gstin-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+    <span x-show="!bad" x-cloak class="block text-zinc-500">15 characters, as printed on the vendor's certificate.</span>
+    <span x-show="bad" x-cloak class="flex items-start gap-1.5 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+      <span x-text="gstin.trim().length + ' of 15 characters. Check it against the certificate.'"></span>
+    </span>
+  </p>
+</div>

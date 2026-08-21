@@ -1,0 +1,79 @@
+<div x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
+    <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 text-[11px]/4 font-medium tabular-nums">2</span>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex justify-end bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="filters-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-x-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-x-full"
+         class="flex h-full w-full flex-col border-l border-zinc-200 bg-white shadow-lg sm:w-96">
+
+      <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+        <h2 id="filters-title" class="text-[16px]/6 font-semibold">Filter orders</h2>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto px-5 py-4">
+        <div>
+          <label for="f-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="f-vendor" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              <option>All vendors</option>
+              <option selected>Sharma Extrusions</option>
+              <option>Nashik Steel Traders</option>
+              <option>Gujarat Polymers Ltd</option>
+            </select>
+          </div>
+        </div>
+
+        <fieldset class="mt-4">
+          <legend class="mb-2 text-[13px]/5 font-medium">Status</legend>
+          <label class="flex items-center gap-2.5 text-[14px]/5"><input type="checkbox" checked class="size-4 rounded accent-zinc-700">Open</label>
+          <label class="mt-2 flex items-center gap-2.5 text-[14px]/5"><input type="checkbox" class="size-4 rounded accent-zinc-700">Approved</label>
+          <label class="mt-2 flex items-center gap-2.5 text-[14px]/5"><input type="checkbox" class="size-4 rounded accent-zinc-700">Closed</label>
+        </fieldset>
+
+        <div class="mt-4">
+          <label for="f-from" class="mb-1.5 block text-[13px]/5 font-medium">Raised between</label>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="min-w-[8rem] flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="f-from" type="date" value="2024-08-01" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            </div>
+            <span class="text-[13px]/5 text-zinc-500">to</span>
+            <div class="min-w-[8rem] flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="f-to" aria-label="Raised to" type="date" value="2024-08-31" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label for="f-min" class="mb-1.5 block text-[13px]/5 font-medium">Minimum value</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+            <input id="f-min" value="1,00,000" class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+          </div>
+        </div>
+
+        <label class="mt-4 flex items-center gap-2.5 text-[14px]/5">
+          <input type="checkbox" checked class="size-4 rounded accent-zinc-700">Only orders with a pending GRN
+        </label>
+      </div>
+
+      <div class="flex flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-white">Reset</button>
+        <button type="button" @click="open = false"
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Apply filters</button>
+      </div>
+    </div>
+  </div>
+</div>

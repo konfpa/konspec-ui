@@ -1,0 +1,43 @@
+<!-- The state most often mislabelled, because the query really does return
+     zero rows once the row-level filter has run, and "No orders yet" is what
+     falls out of a template that only counts. It is a lie that costs a ticket:
+     the user raises an order to fill the emptiness, cannot see that one either,
+     and concludes the save failed.
+
+     Three things make it usable. Which scope is closed — cost centres by name,
+     not "this data". What the account can see instead, so the sentence ends
+     somewhere useful. And who grants access, as a person and a role: "your
+     administrator" is not somewhere anybody can walk to.
+
+     No create button, and not a disabled one either. A disabled control is a
+     dead Tab stop that explains nothing; the explanation is the paragraph. The
+     only action here is a route to the person who can change the answer, and it
+     is a link because it leaves the application. -->
+<div class="rounded-xl border border-zinc-200 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Purchase orders · Fabrication</h2>
+  </div>
+
+  <div class="flex min-h-72 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="lock" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">You cannot see orders for Fabrication</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      There are orders in this register. Your account reads the Moulding and Dispatch cost centres only, so none of them are shown here and no count is given.
+    </p>
+    <p class="mt-2 max-w-sm text-[13px]/5 text-zinc-600">
+      Access to Fabrication is granted by Nilesh Patil, Head of Procurement.
+    </p>
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+      <a href="mailto:nilesh.patil@konspec.com?subject=Access%20to%20Fabrication%20orders"
+         class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="mail" class="size-4 text-zinc-600"></i>Request access
+      </a>
+      <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Go to Moulding
+      </a>
+    </div>
+    <p class="mt-6 text-[11px]/4 text-zinc-500">Signed in as akshay.prabhu@konspec.com</p>
+  </div>
+</div>

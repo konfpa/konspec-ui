@@ -1,0 +1,267 @@
+<!-- The other half of every edit screen, and the one that gets built as a form
+     full of disabled inputs. It should not be a form at all.
+
+     disabled drains the value to zinc-400, takes the control out of the tab
+     order and out of the POST, and promises an edit that is not on offer.
+     readonly is worse in a different direction: it leaves a value nobody may
+     change looking pixel for pixel like a field, and it still submits.
+     A record you are reading is a <dl> — a term and a value, selectable,
+     copyable, findable, and at full contrast because the value is the point.
+
+     View and edit are the same page with the same sections in the same order,
+     so nothing has to be found twice and the eye does not re-learn the record
+     between modes. Only the field block changes shape.
+
+     Switching to edit moves focus to the first field; without it the keyboard
+     is still on the Edit button, which has just been replaced. Leaving edit
+     with nothing changed returns straight to view and puts focus back on Edit —
+     a dialog about changes nobody made is one people learn to dismiss, and then
+     it does not protect the case it exists for.
+
+     The status pill is the locked mapping: one graphite shape, and a 6px dot
+     carrying the state. A column of tinted pills reads as a traffic light and
+     stops meaning anything by the twelfth row.
+
+     Attachments in read mode keep Download and lose Remove. A control that
+     cannot act is a control that should not be drawn. -->
+<div class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+     x-data="{
+       mode: 'view', dirty: false, leaving: false,
+       // focus after a reveal needs a frame as well as a tick: at
+       // $nextTick the panel x-show is about to unhide is still
+       // display:none, and .focus() on an unrendered element is a
+       // silent no-op that leaves the keyboard where it was.
+       focusAfterReveal(get) { this.$nextTick(() => requestAnimationFrame(() => { const el = get(); if (el) el.focus() })) },
+       arm(e) { if (e.target.matches('input, select, textarea')) this.dirty = true },
+       edit() { this.mode = 'edit'; this.focusAfterReveal(() => this.$refs.first) },
+       view() { this.mode = 'view'; this.dirty = false; this.leaving = false; this.focusAfterReveal(() => this.$refs.edit) },
+       cancel() { if (this.dirty) { this.leaving = true } else { this.view() } }
+     }">
+
+  <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
+
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <a href="#" class="hover:text-zinc-900">Procurement</a>
+          <span class="text-zinc-500">/</span>
+          <a href="#" class="hover:text-zinc-900">Purchase orders</a>
+          <span class="text-zinc-500">/</span>
+          <span class="font-medium tabular-nums text-zinc-900">PO-24-1194</span>
+        </nav>
+        <h1 class="mt-1.5 flex flex-wrap items-center gap-2.5 text-[24px]/7 font-semibold tracking-tight">
+          Gujarat Polymers Ltd
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+          </span>
+        </h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">PO-24-1194 · raised 02 Aug 2026 by Ritu Deshpande · ₹27,10,400</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+          <i data-lucide="printer" class="size-4"></i>Print
+        </button>
+        <button type="button" x-ref="edit" @click="edit()" x-show="mode === 'view'"
+                class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+          <i data-lucide="pencil" class="size-4"></i>Amend order
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-5 space-y-4">
+
+      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold">Order</h2>
+          <p x-show="mode === 'edit'" x-cloak class="text-[12px]/4 text-zinc-600">
+            Every field is required unless its label says <span class="font-medium text-zinc-900">Optional</span>.
+          </p>
+        </div>
+
+        <!-- read mode: a description list. No inputs, no disabled boxes. -->
+        <dl x-show="mode === 'view'" class="grid gap-4 px-5 py-4 text-[13px]/5 sm:grid-cols-2">
+          <div>
+            <dt class="text-zinc-600">Vendor</dt>
+            <dd class="mt-0.5 text-[14px]/5 font-medium">Gujarat Polymers Ltd <span class="font-normal tabular-nums text-zinc-600">· VEN-0142</span></dd>
+          </div>
+          <div>
+            <dt class="text-zinc-600">Cost centre</dt>
+            <dd class="mt-0.5 text-[14px]/5 font-medium">Compounding — Silvassa</dd>
+          </div>
+          <div>
+            <dt class="text-zinc-600">Order title</dt>
+            <dd class="mt-0.5 text-[14px]/5 font-medium">HDPE granules — Q2 call-off</dd>
+          </div>
+          <div>
+            <dt class="text-zinc-600">Order value</dt>
+            <dd class="mt-0.5 text-[14px]/5 font-medium tabular-nums">₹27,10,400.00</dd>
+          </div>
+          <div>
+            <dt class="text-zinc-600">Promised delivery</dt>
+            <dd class="mt-0.5 flex items-center gap-1.5 text-[14px]/5 font-medium tabular-nums">
+              02 Aug 2026
+              <i data-lucide="alert-circle" class="size-3.5 shrink-0 text-red-600"></i>
+              <span class="text-[12px]/4 font-normal text-zinc-600">19 days overdue</span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-zinc-600">Payment terms</dt>
+            <dd class="mt-0.5 text-[14px]/5 font-medium tabular-nums">30 days from GRN</dd>
+          </div>
+          <div class="sm:col-span-2">
+            <dt class="text-zinc-600">Delivery address</dt>
+            <dd class="mt-0.5 text-[14px]/5">Konspec Industries, Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</dd>
+          </div>
+        </dl>
+
+        <!-- edit mode: the same six values, the same order, now as fields -->
+        <form x-show="mode === 'edit'" x-cloak @input="arm($event)" @change="arm($event)" @submit.prevent="view()">
+          <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+            <div class="min-w-0">
+              <label for="ro-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select id="ro-vendor" x-ref="first" name="vendor" required aria-describedby="ro-vendor-msg"
+                        class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                  <option value="v-0142" selected>Gujarat Polymers Ltd — VEN-0142</option>
+                  <option value="v-0288">Sharma Steel &amp; Alloys — VEN-0288</option>
+                </select>
+              </div>
+              <p id="ro-vendor-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">Changing the vendor voids the approval.</p>
+            </div>
+            <div class="min-w-0">
+              <label for="ro-centre" class="mb-1.5 block text-[13px]/5 font-medium">Cost centre</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select id="ro-centre" name="cost_centre" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                  <option value="cc-1300" selected>Compounding — Silvassa</option>
+                  <option value="cc-1200">Fabrication — Silvassa</option>
+                </select>
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+            <div class="min-w-0">
+              <label for="ro-title" class="mb-1.5 block text-[13px]/5 font-medium">Order title</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="ro-title" name="title" required value="HDPE granules — Q2 call-off"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+
+            <!-- the one value that is genuinely locked: allotted by the plant
+                 and carried by the order for life. readonly, not disabled, so
+                 it stays in the tab order, stays selectable, and still posts. -->
+            <div class="min-w-0">
+              <label for="ro-number" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
+              <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+                <input id="ro-number" name="number" readonly value="PO-24-1194" aria-describedby="ro-number-msg"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+              </div>
+              <p id="ro-number-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">Allotted 02 Aug 2026. It stays with the order.</p>
+            </div>
+
+            <div class="min-w-0">
+              <label for="ro-promised" class="mb-1.5 block text-[13px]/5 font-medium">Promised delivery</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input id="ro-promised" name="promised" type="date" required value="2026-08-02" aria-describedby="ro-promised-msg"
+                       class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+              </div>
+              <p id="ro-promised-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">Moving this date re-runs the ageing on the register.</p>
+            </div>
+            <div class="min-w-0">
+              <label for="ro-terms" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select id="ro-terms" name="terms" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                  <option value="grn30" selected>30 days from GRN</option>
+                  <option value="inv45">45 days from invoice</option>
+                </select>
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+            <div class="min-w-0 sm:col-span-2">
+              <label for="ro-ship" class="mb-1.5 block text-[13px]/5 font-medium">Delivery address</label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <textarea id="ro-ship" name="ship_to" rows="3" required
+                          class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none">Konspec Industries, Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</textarea>
+              </div>
+              <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <button type="button" @click="cancel()"
+                    class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Cancel</button>
+            <button type="submit"
+                    class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save amendment</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold">Attachments</h2>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="flex items-center gap-3 px-5 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[13px]/5 font-medium">quotation-gujarat-polymers-jul.pdf</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">248 KB · Ritu Deshpande · 28 Jul 2026</p>
+            </div>
+            <a href="#" aria-label="Download quotation-gujarat-polymers-jul.pdf"
+               class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+              <i data-lucide="download" class="size-4"></i>
+            </a>
+          </li>
+          <li class="flex items-center gap-3 px-5 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="sheet" class="size-4 text-zinc-600"></i></span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[13px]/5 font-medium">rate-comparison-q2.xlsx</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">54 KB · Anil Kulkarni · 26 Jul 2026</p>
+            </div>
+            <a href="#" aria-label="Download rate-comparison-q2.xlsx"
+               class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+              <i data-lucide="download" class="size-4"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold">History</h2>
+        </div>
+        <ol class="divide-y divide-zinc-100 text-[13px]/5">
+          <li class="flex items-start gap-3 px-5 py-3">
+            <span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+            <p class="min-w-0 flex-1">Delivery date passed with 0 of 22,000 kg received<span class="block text-[12px]/4 tabular-nums text-zinc-500">03 Aug 2026 · system</span></p>
+          </li>
+          <li class="flex items-start gap-3 px-5 py-3">
+            <span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+            <p class="min-w-0 flex-1">Approved and emailed to sales@gujaratpolymers.in<span class="block text-[12px]/4 tabular-nums text-zinc-500">02 Aug 2026 at 16:20 · Anil Kulkarni</span></p>
+          </li>
+          <li class="flex items-start gap-3 px-5 py-3">
+            <span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-zinc-400" aria-hidden="true"></span>
+            <p class="min-w-0 flex-1">Raised as a draft<span class="block text-[12px]/4 tabular-nums text-zinc-500">02 Aug 2026 at 11:04 · Ritu Deshpande</span></p>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </main>
+
+  <div x-show="leaving" x-cloak x-trap.noscroll="leaving" @keydown.escape.window="leaving = false"
+       class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="ro-leave-t" aria-describedby="ro-leave-b"
+         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+      <h2 id="ro-leave-t" class="text-[16px]/6 font-semibold">Discard this amendment?</h2>
+      <p id="ro-leave-b" class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+        PO-24-1194 has changes that have not been saved. Going back to the record loses them.
+      </p>
+      <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="leaving = false"
+                class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Keep editing</button>
+        <button type="button" @click="view()"
+                class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Discard changes</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<!-- For the small number of actions that cannot be undone at all. Do not reach
+     for this every time something is deleted — if every dialog asks for typing,
+     people learn to type without reading. -->
+<div x-data="{ open: false, typed: '', target: 'SHARMA-EXT' }">
+  <button type="button" @click="open = true; typed = ''"
+          class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">Delete vendor</button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="wipe-title" aria-describedby="wipe-body"
+         class="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-lg">
+      <h2 id="wipe-title" class="text-[16px]/6 font-semibold">Delete Sharma Extrusions</h2>
+      <p id="wipe-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
+        <span class="font-medium text-red-600">34 orders, 61 invoices and the rate contract</span>
+        are attached to this vendor and go with it. There is no recycle bin and no undo.
+      </p>
+
+      <div class="mt-4">
+        <label for="wipe-code" class="mb-1.5 block text-[13px]/5 font-medium">
+          Type <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4" x-text="target"></code> to confirm
+        </label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="wipe-code" x-model="typed" :placeholder="target" autocomplete="off" spellcheck="false"
+                 class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 outline-none placeholder:text-zinc-500">
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-wrap justify-end gap-2">
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+        <button type="button" @click="open = false" :disabled="typed !== target"
+                class="rounded-lg px-4 py-2 text-[13px]/5 font-medium"
+                :class="typed === target ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-zinc-200 text-zinc-500'">
+          Delete vendor
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

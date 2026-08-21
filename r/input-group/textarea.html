@@ -1,0 +1,68 @@
+<!-- The block addons are the whole reason the border sits on the wrapper. A
+     header bar above the box and an action bar below it are inside the same
+     rule and the same focus outline, so the thing reads as one field with
+     furniture rather than a textarea with two toolbars parked against it.
+
+     resize-none, and rows sets the height. A textarea inside an enclosure keeps
+     its resize grabber in its own bottom-right corner, which is now in the
+     middle of the box directly above the footer bar — a drag handle floating
+     over nothing.
+
+     The bars are padded, so the controls inside them are not flush against the
+     enclosure's inner edge and take ordinary rounded-lg corners. The 7px corner
+     is only for a child pressed against that edge.
+
+     Every control in both bars is focusable, so every one takes the inset
+     outline, and the enclosure lights up through focus-within for all of them.
+     That is what focus-within is for here: it says the keyboard is inside this
+     field, and the inset outline says which control.
+
+     Enter writes a newline, because that is what the key is for in a textarea.
+     Ctrl or Cmd plus Enter posts, and the hint says so rather than leaving it
+     to be discovered — and the hint is hidden below sm, because a phone has no
+     Ctrl key. -->
+<div class="max-w-xl" x-data="{ text: '' }">
+  <label for="ig7-note" class="mb-1.5 block text-[13px]/5 font-medium">Remark on GRN-24-0912</label>
+
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-200 px-3 py-2">
+      <span class="flex items-center gap-2">
+        <label for="ig7-kind" class="text-[12px]/4 text-zinc-500">Type</label>
+        <select id="ig7-kind" name="kind"
+                class="rounded-lg bg-transparent py-0.5 pr-1 text-[13px]/5 font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+          <option>Shortage</option>
+          <option>Damage in transit</option>
+          <option>Quality hold</option>
+          <option>General</option>
+        </select>
+      </span>
+      <span class="text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026 · Ritu Deshpande</span>
+    </div>
+
+    <textarea id="ig7-note" name="body" rows="4" x-model="text"
+              @keydown.ctrl.enter="if (text.trim()) $refs.post.click()"
+              @keydown.meta.enter="if (text.trim()) $refs.post.click()"
+              placeholder="What was short, by how much, and what the vendor has promised"
+              class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
+
+    <div class="flex flex-wrap items-center justify-between gap-2 border-t border-zinc-200 px-3 py-2">
+      <button type="button"
+              class="inline-flex items-center gap-1.5 rounded-lg px-1 py-0.5 text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+        <i data-lucide="paperclip" class="size-4"></i>Attach the weighbridge slip
+      </button>
+
+      <span class="flex items-center gap-2">
+        <span class="hidden text-[12px]/4 text-zinc-500 sm:inline">
+          <kbd class="rounded border border-zinc-200 bg-zinc-100 px-1 py-0.5 font-mono text-[10px]/3 text-zinc-600">Ctrl</kbd>
+          <kbd class="rounded border border-zinc-200 bg-zinc-100 px-1 py-0.5 font-mono text-[10px]/3 text-zinc-600">Enter</kbd>
+        </span>
+        <button type="button" x-ref="post" :disabled="!text.trim()"
+                class="inline-flex h-8 shrink-0 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:bg-zinc-200 disabled:text-zinc-400">
+          Post remark
+        </button>
+      </span>
+    </div>
+  </div>
+
+  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Goes on the receipt, visible to the buyer and to stores. It cannot be edited afterwards.</p>
+</div>

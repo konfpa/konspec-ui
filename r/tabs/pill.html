@@ -1,0 +1,59 @@
+<!-- Same widget, different marker: a white pill on a zinc-100 track instead of
+     an underline. Reach for it when the tabs filter a list rather than section a
+     record, and when the row has to sit beside other controls without a rule
+     running under it. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'open',
+       items: [
+         { id: 'open',     label: 'Open' },
+         { id: 'awaiting', label: 'Awaiting GRN' },
+         { id: 'closed',   label: 'Closed' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }">
+  <div x-ref="list" role="tablist" aria-label="Order status"
+       @keydown.arrow-right.prevent="move(1)"
+       @keydown.arrow-left.prevent="move(-1)"
+       @keydown.home.prevent="pick(items[0].id)"
+       @keydown.end.prevent="pick(items[items.length - 1].id)"
+       class="inline-flex rounded-lg bg-zinc-100 p-1">
+    <template x-for="t in items" :key="t.id">
+      <button type="button" role="tab" :data-tab="t.id"
+              :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+              :aria-selected="tab === t.id ? 'true' : 'false'"
+              :tabindex="tab === t.id ? 0 : -1"
+              @click="pick(t.id)"
+              class="rounded-md px-3 py-1.5 text-[13px]/5 whitespace-nowrap focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="tab === t.id ? 'bg-white font-medium text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'"
+              x-text="t.label"></button>
+    </template>
+  </div>
+
+  <div class="pt-4 text-[14px]/5">
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'open')" :aria-labelledby="$id('tab', 'open')"
+         x-show="tab === 'open'" class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <p>48 orders open, <span class="tabular-nums">₹4,12,60,000</span> committed.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'awaiting')" :aria-labelledby="$id('tab', 'awaiting')"
+         x-show="tab === 'awaiting'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <p class="text-zinc-600">27 orders delivered but not yet receipted.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'closed')" :aria-labelledby="$id('tab', 'closed')"
+         x-show="tab === 'closed'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <p class="text-zinc-600">73 orders closed this quarter.</p>
+    </div>
+  </div>
+</div>

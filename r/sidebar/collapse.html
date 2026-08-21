@@ -1,0 +1,103 @@
+<!-- Persisting in JavaScript alone guarantees a flash. x-init runs after the
+     first paint, so the browser draws 256px, Alpine reads localStorage, and the
+     panel snaps to 68px on every navigation. In Django the honest fix is a
+     cookie: the view reads kon-sidebar and the template stamps w-64 or w-[68px]
+     into the class attribute, so the first byte is right and Alpine reads the
+     same cookie rather than a second source of truth. The trade is that the
+     width is now server state — one more thing to get wrong in a cached
+     response, and Vary: Cookie on every page that uses it. With no server it is
+     a blocking head script setting a class on the html element. This variant
+     shows the localStorage form because that is what pastes here, and it flashes.
+
+     ready is the other half: without it the correction from the wrong width to
+     the right one is animated, so the flash becomes a 200ms slide watched on
+     every page load. @alpinejs/persist would do all of this in one directive and
+     is not on the page, so $persist is not an option here.
+
+     Labels hide with a plain hidden so the rail can be seen at 390px; inside
+     app-shell it is lg:hidden, because below lg there is no rail state at all.
+     The control keeps its icon in a fixed 68px box so its centre does not move
+     between the two widths — centre it in the strip and the second click misses. -->
+<div class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{ expanded: true, ready: false }"
+     x-init="expanded = localStorage.getItem('kon-sidebar') !== '0';
+             $nextTick(() => ready = true);
+             $watch('expanded', v => localStorage.setItem('kon-sidebar', v ? '1' : '0'))"
+     @keydown.window="if ($event.key === '[' && !/^(input|textarea|select)$/i.test($event.target.tagName)) expanded = !expanded"
+     :class="[ expanded ? 'w-64' : 'w-[68px]', ready && 'transition-all duration-200 motion-reduce:transition-none' ]">
+
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200" :class="expanded ? 'px-4' : 'justify-center'">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold" :class="!expanded && 'hidden'">Konspec Operations</span>
+  </div>
+
+  <nav id="sb6-nav" aria-label="Main" class="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain py-2" :class="expanded ? 'px-3' : 'px-3.5'">
+    <div class="group relative">
+      <a href="#" aria-current="page" aria-label="Purchase orders, 148 open"
+         class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Purchase orders</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600" :class="!expanded && 'hidden'">148</span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Purchase orders — 148</span>
+    </div>
+
+    <div class="group relative">
+      <a href="#" aria-label="Goods receipt, 12 awaiting GRN"
+         class="relative flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="truck" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Goods receipt</span>
+        <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" :class="!expanded && 'hidden'">12</span>
+        <span x-show="!expanded" x-cloak aria-hidden="true" class="absolute top-1 right-1 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Goods receipt — 12 awaiting</span>
+    </div>
+
+    <div class="group relative">
+      <a href="#" aria-label="Vendors, 187"
+         class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Vendors</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600" :class="!expanded && 'hidden'">187</span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Vendors — 187</span>
+    </div>
+
+    <div class="group relative">
+      <a href="#" aria-label="Materials"
+         class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="package" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Materials</span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Materials</span>
+    </div>
+
+    <div class="group relative">
+      <a href="#" aria-label="Analytics"
+         class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="chart-no-axes-column" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Analytics</span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Analytics</span>
+    </div>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200">
+    <button type="button" @click="expanded = !expanded" :aria-expanded="expanded" aria-controls="sb6-nav"
+            :aria-label="expanded ? 'Collapse sidebar' : 'Expand sidebar'"
+            class="flex h-11 w-full items-center text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex h-11 w-[68px] shrink-0 items-center justify-center">
+        <span class="flex transition-transform motion-reduce:transition-none" :class="!expanded && 'rotate-180'">
+          <i data-lucide="chevrons-left" class="size-4"></i>
+        </span>
+      </span>
+      <span class="flex-1 text-left" :class="!expanded && 'hidden'">Collapse</span>
+      <kbd class="mr-3 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-600" :class="!expanded && 'hidden'">[</kbd>
+    </button>
+  </div>
+</div>

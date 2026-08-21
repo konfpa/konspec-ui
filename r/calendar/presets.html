@@ -1,0 +1,164 @@
+<!-- Nobody clicks their way to "last 30 days". The preset column is what gets
+     used; the grid is there for the once a month it is not enough.
+
+     The financial year runs April to March, so before April "This FY" starts in
+     the previous calendar year — m < 3 is the whole rule. Getting that wrong is
+     a bug that only appears in Q1 and only to accounts.
+
+     Picking a day in the grid clears the preset label, because the range is no
+     longer the thing the preset named. -->
+<div class="relative inline-block"
+     x-data="{
+       open: false,
+       vy: new Date().getFullYear(),
+       vm: new Date().getMonth(),
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
+       title(o) { return new Date(this.vy, this.vm + o, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       long(s) { return this.parse(s).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); },
+       fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
+       weeks(o) {
+         const y = this.vy, m = this.vm + o;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) {
+           const dt = new Date(y, m, d);
+           cells.push({ iso: this.iso(dt.getFullYear(), dt.getMonth(), d), day: d, dow: dt.getDay() });
+         }
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       },
+       shift(n) { const v = new Date(this.vy, this.vm + n, 1); this.vy = v.getFullYear(); this.vm = v.getMonth(); this.clamp(); },
+       clamp() {
+         if (!this.focus) return;
+         const f = this.parse(this.focus);
+         if (f.getFullYear() === this.vy && f.getMonth() === this.vm) return;
+         const last = new Date(this.vy, this.vm + 1, 0).getDate();
+         this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
+       },
+       start: null, end: null, hover: null,
+       pick(s) {
+         if (!this.start || (this.start && this.end)) { this.start = s; this.end = null; return; }
+         if (s < this.start) { this.end = this.start; this.start = s; } else { this.end = s; }
+         this.hover = null;
+       },
+       tail() { return this.end || this.hover; },
+       isEnd(s) { return s === this.start || s === this.end; },
+       span() { return (this.start && this.end) ? Math.round((this.parse(this.end) - this.parse(this.start)) / 86400000) + 1 : 0; },
+       band(s) {
+         const t = this.tail();
+         if (!this.start || !t || this.start === t) return '';
+         const lo = this.start < t ? this.start : t, hi = this.start < t ? t : this.start;
+         if (s < lo || s > hi) return '';
+         if (s === lo) return 'bg-zinc-200 rounded-l-lg';
+         if (s === hi) return 'bg-zinc-200 rounded-r-lg';
+         return 'bg-zinc-200';
+       },
+       cls(s) {
+         if (this.isEnd(s)) return 'bg-zinc-700 font-medium text-white hover:bg-zinc-800';
+         if (s === this.today) return 'font-medium text-zinc-900 ring-1 ring-inset ring-zinc-400 hover:bg-zinc-300';
+         return 'text-zinc-900 hover:bg-zinc-200';
+       }
+       ,
+       presets: ['Today', 'Last 7 days', 'Last 30 days', 'This month', 'Last month', 'This FY'],
+       preset: null,
+       apply(name) {
+         const t = new Date(), y = t.getFullYear(), m = t.getMonth(), d = t.getDate();
+         let a, b;
+         if (name === 'Today')        { a = new Date(y, m, d); b = new Date(y, m, d); }
+         if (name === 'Last 7 days')  { a = new Date(y, m, d - 6); b = new Date(y, m, d); }
+         if (name === 'Last 30 days') { a = new Date(y, m, d - 29); b = new Date(y, m, d); }
+         if (name === 'This month')   { a = new Date(y, m, 1); b = new Date(y, m + 1, 0); }
+         if (name === 'Last month')   { a = new Date(y, m - 1, 1); b = new Date(y, m, 0); }
+         if (name === 'This FY')      { a = new Date(m < 3 ? y - 1 : y, 3, 1); b = new Date(y, m, d); }
+         this.start = this.iso(a.getFullYear(), a.getMonth(), a.getDate());
+         this.end = this.iso(b.getFullYear(), b.getMonth(), b.getDate());
+         this.preset = name;
+         this.vy = a.getFullYear(); this.vm = a.getMonth();
+       },
+       tap(s) { this.preset = null; this.pick(s); }
+     }" @click.outside="open = false" @keydown.escape.window="open = false">
+  <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="dialog"
+          class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="calendar-range" class="size-4 text-zinc-600"></i>
+    <span class="tabular-nums" x-text="preset || (start ? fmt(start) + ' – ' + fmt(end) : 'Select period')"></span>
+    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+  </button>
+
+  <div x-show="open" x-cloak x-trap="open" role="dialog" aria-label="Choose a reporting period"
+       class="absolute left-0 z-40 mt-1 flex flex-col rounded-xl border border-zinc-200 bg-white shadow-lg sm:flex-row">
+    <div class="flex shrink-0 gap-1 overflow-x-auto border-b border-zinc-200 p-2 sm:w-44 sm:flex-col sm:gap-0.5 sm:overflow-visible sm:border-r sm:border-b-0">
+      <template x-for="p in presets" :key="p">
+        <button type="button" @click="apply(p)" :aria-pressed="preset === p"
+                class="inline-flex h-8 shrink-0 items-center rounded-lg px-3 text-left text-[13px]/5 whitespace-nowrap"
+                :class="preset === p ? 'bg-zinc-700 font-medium text-white' : 'text-zinc-900 hover:bg-zinc-200'">
+          <span x-text="p"></span>
+        </button>
+      </template>
+    </div>
+
+    <div class="p-3">
+      <div class="flex items-center justify-between pb-2">
+        <button type="button" @click="shift(-1)" aria-label="Previous month"
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+          <i data-lucide="chevron-left" class="size-4"></i>
+        </button>
+        <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="fmt(start) + ' – ' + fmt(end)"></span>
+        <button type="button" @click="shift(1)" aria-label="Next month"
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+          <i data-lucide="chevron-right" class="size-4"></i>
+        </button>
+      </div>
+      <div class="flex flex-col gap-5 lg:flex-row" @mouseleave="hover = null">
+        <template x-for="o in [0, 1]" :key="o">
+          <div :class="o === 1 && 'hidden lg:block'">
+            <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600" x-text="title(o)"></p>
+            <table class="border-collapse">
+              <caption class="sr-only" x-text="'Calendar, ' + title(o)"></caption>
+              <thead>
+                <tr>
+                  <template x-for="h in head" :key="h">
+                    <th scope="col" class="size-9 text-[11px]/4 font-medium text-zinc-500" x-text="h"></th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="(week, wi) in weeks(o)" :key="wi">
+                  <tr>
+                    <template x-for="(c, ci) in week" :key="ci">
+                      <td class="p-0" :class="c && band(c.iso)">
+                        <template x-if="c">
+                          <button type="button" @click="tap(c.iso)" @mouseenter="if (start && !end) hover = c.iso"
+                                  :aria-label="long(c.iso)" :aria-pressed="isEnd(c.iso)"
+                                  :aria-current="c.iso === today ? 'date' : null"
+                                  class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                                  :class="cls(c.iso)" x-text="c.day"></button>
+                        </template>
+                        <template x-if="!c"><span class="block size-9"></span></template>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </div>
+      <div class="mt-3 flex items-center justify-between gap-3 border-t border-zinc-200 pt-3">
+        <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="span() ? span() + ' days' : 'No period set'"></span>
+        <div class="flex items-center gap-2">
+          <button type="button" @click="start = null; end = null; preset = null"
+                  class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">Clear</button>
+          <button type="button" @click="open = false" :disabled="!start || !end"
+                  class="inline-flex h-8 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

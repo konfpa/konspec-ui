@@ -1,0 +1,80 @@
+<!-- A dense table gets a dense footer or the strip under it is taller than four
+     of its own rows. The rows here are px-3 py-1.5, the pager takes size-7 icon
+     buttons and a text-[12px]/4 range, and the whole strip comes in under 40px.
+
+     Density is a mouse affordance. Below md the controls go back to size-9,
+     because 28px is a target for a pointer and not for a thumb, and the table
+     above has restacked into something with room for them. size-9 md:size-7 is
+     the whole of that rule and it is written once, on the button.
+
+     No numbers at this size. Seven 28px squares in a strip this tight read as a
+     row of specks, and a dense table is a thing you scan rather than a register
+     you navigate — the position line carries what somebody actually needs.
+
+     The panel is not overflow-hidden, so the focus outline at offset-2 is not
+     clipped by the rounded corner. Where a panel has to clip, the pager's
+     buttons take focus-visible:-outline-offset-2 instead and draw inside. -->
+<div class="max-w-xl rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       page: 1, size: 4,
+       rows: [
+         { batch: 'BR-26-0881', item: 'HDPE compound, natural', kg: 4200, status: 'Closed' },
+         { batch: 'BR-26-0882', item: 'HDPE compound, black 5%', kg: 3850, status: 'Closed' },
+         { batch: 'BR-26-0883', item: 'LLDPE film grade', kg: 2600, status: 'Open' },
+         { batch: 'BR-26-0884', item: 'Masterbatch, blue', kg: 480, status: 'Open' },
+         { batch: 'BR-26-0885', item: 'HDPE compound, natural', kg: 4200, status: 'Approved' },
+         { batch: 'BR-26-0886', item: 'Regrind, mixed', kg: 1750, status: 'Overdue' },
+         { batch: 'BR-26-0887', item: 'LLDPE film grade', kg: 2600, status: 'Draft' },
+         { batch: 'BR-26-0888', item: 'Masterbatch, white', kg: 320, status: 'Open' },
+         { batch: 'BR-26-0889', item: 'HDPE compound, black 5%', kg: 3850, status: 'Closed' },
+         { batch: 'BR-26-0890', item: 'Regrind, mixed', kg: 1750, status: 'Open' }
+       ],
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       get pages() { return Math.max(1, Math.ceil(this.rows.length / this.size)) },
+       get shown() { return this.rows.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.rows.length) },
+       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
+     }">
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-1.5">Batch</th>
+        <th scope="col" class="px-3 py-1.5">Item</th>
+        <th scope="col" class="px-3 py-1.5 text-right">Kg</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in shown" :key="r.batch">
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-3 py-1.5 font-medium tabular-nums" x-text="r.batch"></td>
+          <td class="px-3 py-1.5">
+            <span class="flex items-center gap-2">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span>
+              <span class="sr-only" x-text="r.status"></span>
+              <span class="truncate text-zinc-600" x-text="r.item"></span>
+            </span>
+          </td>
+          <td class="px-3 py-1.5 text-right tabular-nums" x-text="r.kg.toLocaleString('en-IN')"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <nav aria-label="Batch register pages" class="flex flex-wrap items-center justify-between gap-2 border-t border-zinc-200 px-3 py-1.5">
+    <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+       x-text="from + '–' + to + ' of ' + rows.length + ' batches'">1–4 of 10 batches</p>
+    <div class="flex items-center gap-1">
+      <span class="mr-1 text-[12px]/4 tabular-nums text-zinc-500" x-text="'Page ' + page + ' of ' + pages">Page 1 of 3</span>
+      <button type="button" aria-label="Previous page" @click="go(page - 1)" :disabled="page === 1"
+              class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:size-7">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+      <button type="button" aria-label="Next page" @click="go(page + 1)" :disabled="page === pages"
+              class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:size-7">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>

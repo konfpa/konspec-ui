@@ -1,0 +1,114 @@
+<!-- The panel batches: nothing is written until Apply, because every keystroke
+     here would re-run a query over the register. That makes the draft the
+     hardest part of the component, not the positioning.
+
+     show() reseeds draft from applied every single time. Light dismiss means a
+     click on the page throws the panel's contents away, so without the reseed
+     the next open shows the edit the user already walked away from, and Apply
+     then commits something they abandoned.
+
+     The status select is the reason @focusout is guarded. Opening a native
+     select popup takes focus out of the document and Chromium reports
+     focusout with relatedTarget null; close on that and the panel vanishes the
+     instant anyone touches the first field in it. Choosing an option produces
+     no document click either, so @click.outside is safe here — it is only
+     unsafe for a child rendered outside the root, which is why nothing in this
+     component is ever portalled.
+
+     Focus opens on the first field rather than on the panel, because the panel
+     exists to be filled in. Shift+Tab from it lands back on the trigger with no
+     tabindex written anywhere, and that only works because the panel is the
+     trigger's next sibling in the DOM.
+
+     The footer sits on a zinc-100 strip, so the panel is overflow-hidden and
+     the panel padding moves onto the sections. That is also why this variant
+     has no arrow: overflow-hidden clips one. -->
+<div class="relative inline-block"
+     x-data="{
+       open: false,
+       applied: { status: 'all', min: '', max: '', overdue: false },
+       draft: { status: 'all', min: '', max: '', overdue: false },
+       count() {
+         let n = 0;
+         if (this.applied.status !== 'all') n++;
+         if (this.applied.min || this.applied.max) n++;
+         if (this.applied.overdue) n++;
+         return n;
+       },
+       show() {
+         this.draft = Object.assign({}, this.applied);
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs.status.focus()));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       apply() { this.applied = Object.assign({}, this.draft); this.close() },
+       clear() { this.draft = { status: 'all', min: '', max: '', overdue: false }; this.$refs.status.focus() }
+     }"
+     @click.outside="close(false)"
+     @focusout="if ($event.relatedTarget && !$root.contains($event.relatedTarget)) close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          :aria-expanded="open" aria-controls="pop-flt"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="filter" class="size-4 text-zinc-600"></i>Filters
+    <span x-show="count() > 0" x-cloak
+          class="inline-flex min-w-5 items-center justify-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300"
+          x-text="count()"></span>
+  </button>
+
+  <div id="pop-flt" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
+       role="dialog" tabindex="-1" aria-labelledby="pop-flt-title"
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+    <div class="space-y-3 px-4 py-3.5">
+      <p id="pop-flt-title" class="text-[13px]/5 font-medium">Filter purchase orders</p>
+
+      <div>
+        <label for="flt-status" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">Status</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="flt-status" x-ref="status" x-model="draft.status" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            <option value="all">Any status</option>
+            <option value="open">Open</option>
+            <option value="approved">Approved</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <span class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">Order value</span>
+        <div class="flex items-center gap-2">
+          <div class="flex flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <span class="pl-3 text-[13px]/5 text-zinc-500">₹</span>
+            <input id="flt-min" x-model="draft.min" inputmode="numeric" placeholder="0" aria-label="Minimum order value"
+                   class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+          </div>
+          <span class="text-[12px]/4 text-zinc-500">to</span>
+          <div class="flex flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <span class="pl-3 text-[13px]/5 text-zinc-500">₹</span>
+            <input id="flt-max" x-model="draft.max" inputmode="numeric" placeholder="Any" aria-label="Maximum order value"
+                   class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+          </div>
+        </div>
+      </div>
+
+      <label class="flex items-center gap-2.5 py-1 text-[13px]/5">
+        <input id="flt-overdue" type="checkbox" x-model="draft.overdue" class="size-4 shrink-0 accent-zinc-700">
+        Only orders past their delivery date
+      </label>
+    </div>
+
+    <div class="flex items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
+      <button type="button" @click="clear()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Clear</button>
+      <button type="button" @click="apply()"
+              class="rounded-lg bg-zinc-700 px-3.5 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Apply</button>
+    </div>
+  </div>
+</div>
+
+<p class="mt-3 text-[12px]/4 tabular-nums text-zinc-500">1,438 orders · nothing is filtered until Apply is pressed.</p>

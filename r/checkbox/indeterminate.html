@@ -1,0 +1,54 @@
+<!-- indeterminate is a property, not an attribute. It cannot be written in
+     markup, so a fieldset rendered server-side with two of four lines ticked
+     comes back with a select-all that reads as plainly unchecked. x-effect sits
+     on the element itself rather than on the fieldset, because $refs is not
+     populated when the root initialises.
+
+     The select-all carries no name: indeterminate changes nothing about what is
+     submitted, so a mixed box with a name posts as if it were simply ticked. -->
+<fieldset class="max-w-xl"
+          x-data="{
+            lines: ['hdpe', 'ldpe', 'mb', 'ao'],
+            sel: ['hdpe', 'mb'],
+            get every() { return this.sel.length === this.lines.length; },
+            get some() { return this.sel.length > 0 && !this.every; },
+            toggleAll(on) { this.sel = on ? [...this.lines] : []; }
+          }">
+  <legend class="mb-2 text-[13px]/5 font-medium tabular-nums">Lines to receive on GRN-24-0912</legend>
+
+  <div class="flex items-center justify-between gap-3 border-b border-zinc-200 pb-2">
+    <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
+      <input type="checkbox" aria-label="Select all four lines"
+             :checked="every" x-effect="$el.indeterminate = some"
+             @change="toggleAll($event.target.checked)"
+             class="size-4 shrink-0 accent-zinc-700">
+      <span>All lines</span>
+    </label>
+    <!-- the count sits outside the label, or it becomes part of the box's name
+         and is read back in full on every toggle -->
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="sel.length + ' of 4 selected'"></span>
+  </div>
+
+  <div class="mt-2 space-y-2">
+    <label class="flex items-center gap-2.5 text-[13px]/5">
+      <input type="checkbox" name="line" value="hdpe" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">HDPE granules — grade M60075</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">2,000 kg</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[13px]/5">
+      <input type="checkbox" name="line" value="ldpe" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">LDPE granules — grade 24FS040</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">800 kg</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[13px]/5">
+      <input type="checkbox" name="line" value="mb" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">Masterbatch, black</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">120 kg</span>
+    </label>
+    <label class="flex items-center gap-2.5 text-[13px]/5">
+      <input type="checkbox" name="line" value="ao" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">Antioxidant AO-168</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">25 kg</span>
+    </label>
+  </div>
+</fieldset>

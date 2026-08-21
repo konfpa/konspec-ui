@@ -1,0 +1,17 @@
+<!-- Two sizes and no third. Small is for table cells and dense toolbars, where
+     the default pill makes the row taller than its text needs. The dot stays
+     1.5 at both sizes — shrinking it is how a state stops being visible. -->
+<div class="flex flex-wrap items-center gap-4">
+  <div class="flex items-center gap-2">
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+    </span>
+    <span class="text-[12px]/4 text-zinc-600">Small — inside table rows</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+    </span>
+    <span class="text-[12px]/4 text-zinc-600">Default — everywhere else</span>
+  </div>
+</div>

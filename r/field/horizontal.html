@@ -1,0 +1,76 @@
+<!-- A settings form reads better with the label beside the control, and it
+     collapses on container width rather than viewport width. sm: is the wrong
+     breakpoint here: the same block goes into a sheet 380px wide on a 1440px
+     screen, sm: is still true there, and the label column squeezes to four
+     characters while the select loses half its text. @container on the wrapper
+     and @md: on the rows measures the space the field actually has.
+
+     The label column is top-aligned with @md:pt-2, matching the py-2 on the
+     control, not centred — a two-line label centred against a 36px input floats
+     away from the field it names.
+
+     The message lives in the control column, never under the label. Under the
+     label it lines up with nothing, and on a field that errors it appears on
+     the opposite side of the form from the red border it belongs to. -->
+<div class="@container max-w-2xl"
+     x-data="{ limit: '750000', touched: true,
+               get bad() { return this.touched && Number(this.limit) > 500000 } }">
+  <div class="space-y-4">
+
+    <div class="@md:grid @md:grid-cols-[minmax(0,10rem)_minmax(0,1fr)] @md:gap-4">
+      <label for="fh-terms" class="mb-1.5 block text-[13px]/5 font-medium @md:mb-0 @md:pt-2">Payment terms</label>
+      <div>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="fh-terms" name="terms" aria-describedby="fh-terms-msg"
+                  class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            <option>30 days from GRN</option>
+            <option>45 days from invoice</option>
+            <option>Against delivery</option>
+          </select>
+        </div>
+        <p id="fh-terms-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+          Applies to new orders. Open orders keep the terms they were raised on.
+        </p>
+      </div>
+    </div>
+
+    <div class="@md:grid @md:grid-cols-[minmax(0,10rem)_minmax(0,1fr)] @md:gap-4">
+      <label for="fh-limit" class="mb-1.5 block text-[13px]/5 font-medium @md:mb-0 @md:pt-2">Credit limit</label>
+      <div>
+        <div class="flex items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+             :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                         : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+          <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+          <input id="fh-limit" name="credit_limit" inputmode="numeric"
+                 x-model="limit" @blur="touched = true"
+                 aria-describedby="fh-limit-msg"
+                 :aria-invalid="bad ? 'true' : 'false'"
+                 class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+        </div>
+        <p id="fh-limit-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+          <span x-show="!bad" x-cloak class="block tabular-nums text-zinc-500">Orders above the limit go to a second approver.</span>
+          <span x-show="bad" x-cloak class="flex items-start gap-1.5 font-medium text-red-600">
+            <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+            <span class="tabular-nums">Above ₹5,00,000 the limit is set by finance, not here.</span>
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="@md:grid @md:grid-cols-[minmax(0,10rem)_minmax(0,1fr)] @md:gap-4">
+      <label for="fh-centre" class="mb-1.5 block text-[13px]/5 font-medium @md:mb-0 @md:pt-2">Default cost centre</label>
+      <div>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="fh-centre" name="cost_centre"
+                  class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            <option>Moulding — Silvassa</option>
+            <option>Fabrication — Silvassa</option>
+            <option>Maintenance — Vapi</option>
+          </select>
+        </div>
+        <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+      </div>
+    </div>
+
+  </div>
+</div>

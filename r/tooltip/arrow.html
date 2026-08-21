@@ -1,0 +1,35 @@
+<!-- The arrow is a size-2 square in the same zinc-900, rotated 45 degrees and
+     pulled half under the bubble edge so only its point shows. It lives inside
+     the bubble, which is what makes pointer-events-none cover it as well.
+
+     Two things it does not survive. The bubble may not be overflow-hidden —
+     that clips the half that is showing, and a bubble with a flat nub on it
+     looks like a rendering fault. And it only holds while the bubble is
+     centred on the trigger: the moment the bubble is shifted sideways to clear
+     a viewport edge, the arrow is pointing at nothing and the honest fix is to
+     drop it, not to reposition it. That is the same rule the popover follows.
+
+     Use it where the trigger is one of several close together and the bubble
+     could plausibly belong to a neighbour. On a lone button it is 8px of
+     decoration on a component whose entire job is to be read and gone. -->
+<div class="flex items-center justify-center rounded-xl border border-zinc-200 bg-white p-10">
+  <span class="relative inline-flex"
+        x-data="{
+          open: false, timer: 0,
+          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+          hide() { clearTimeout(this.timer); this.open = false }
+        }"
+        @keydown.escape.window="hide()">
+    <button type="button" aria-labelledby="tt-arrow"
+            @mouseenter="show()" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="paperclip" class="size-4"></i>
+    </button>
+    <span id="tt-arrow" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-2 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">
+      Attach a document
+      <span aria-hidden="true" class="absolute top-full left-1/2 -mt-1 size-2 -translate-x-1/2 rotate-45 bg-zinc-900"></span>
+    </span>
+  </span>
+</div>

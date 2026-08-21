@@ -1,0 +1,101 @@
+{
+  "id": "button",
+  "name": "Button",
+  "category": "actions",
+  "description": "The standard action control. Exactly one primary button per view; everything else is secondary, ghost or a link.",
+  "when_to_use": "Any action the user takes on this page. Anything that goes to another page is an anchor, not a button.",
+  "rules": [
+    "Tailwind v4 preflight drops cursor:pointer from <button>. One base rule in the page stylesheet restores it for every interactive element — never add cursor-pointer to a button.",
+    "Hover is always one step deeper than the button's own resting fill: zinc-700 to zinc-800, white to zinc-100, red-600 to red-700. Ghost has no fill of its own, so it hovers to zinc-200 — zinc-100 would be invisible on the zinc-100 page background.",
+    "Height is set with h-*, never left to padding, and every variant carries a border — border-transparent on the ones with no visible edge. Padding-derived height cannot match an icon-only button: measured, a bordered secondary came out at 38 against a 36 primary, and a size-9 icon button at 36 against a 38 label. Fixing the height fixes both at once and px-* then controls width alone.",
+    "Danger is reserved for destructive actions that cannot be undone. A red Save is a lie about the stakes.",
+    "One primary per view. Three solid buttons on a screen have told the user nothing about which one matters.",
+    "A submit button is disabled while its request is in flight, and the label does not change width when it does — otherwise the row reflows under the cursor mid-click."
+  ],
+  "anatomy": [
+    {
+      "part": "Label",
+      "description": "A verb and its object. \"Approve order\", not \"OK\" — someone reading only the buttons should know what each one does."
+    },
+    {
+      "part": "Icon",
+      "description": "Optional, left of the label at size-4. It clarifies the verb; it never replaces it except in an icon-only button."
+    },
+    {
+      "part": "Surface",
+      "description": "What the variant actually is: solid zinc-700 for primary, white with a zinc-200 border for secondary, red-600 for danger, nothing at all for ghost."
+    },
+    {
+      "part": "Hit area",
+      "description": "h-7 small, h-9 medium, h-11 large — 28, 36 and 44px. Icon-only is the matching square: size-7, size-9, or size-8 in a dense toolbar beside h-8 labels."
+    },
+    {
+      "part": "Busy state",
+      "description": "A spinning loader in place of the icon while the request is in flight, with the label in the present participle and the width held."
+    }
+  ],
+  "behaviour": [
+    "One primary button per view. A screen with three solid buttons has told the user nothing about which one matters.",
+    "A button that submits stays disabled while the request is in flight, or a double click posts twice.",
+    "The label does not change width between idle and busy states, so the row does not reflow under the cursor.",
+    "Disabled is a real disabled attribute, never a class that only looks disabled — the second kind still fires its handler.",
+    "Anything that navigates is an <a>. A button that changes the URL breaks middle-click, open-in-new-tab and the browser's own history.",
+    "Below sm, buttons in a form or dialog footer go full width and stack. Two 36px buttons side by side on a 390px screen are a thumb-sized problem.",
+    "Every button in a row is the same height, which is why height is declared rather than inferred. Mixed heights in a toolbar read as a rendering fault, not as hierarchy."
+  ],
+  "accessibility": [
+    "An icon-only button carries aria-label, because its only content is decorative.",
+    "The busy state sets aria-busy=\"true\" and keeps the disabled attribute, so the wait is announced and not merely drawn.",
+    "Disabled buttons are skipped by Tab and announced as unavailable, which is why the attribute matters more than the styling.",
+    "The browser's own focus ring is left in place on every variant. Nothing here sets outline:none, and the ghost variant especially depends on it — there is no border to thicken.",
+    "A button that only opens something carries aria-expanded and aria-haspopup, so its state is known before it is pressed.",
+    "type=\"button\" is explicit on every button inside a <form>, because the default is submit and a stray toolbar button will post the form."
+  ],
+  "related": [
+    "button-group",
+    "dropdown",
+    "alert-dialog"
+  ],
+  "variants": [
+    {
+      "id": "variants",
+      "name": "Variants",
+      "html": "<!-- Five, and no others. Primary is the one thing this screen is for; secondary\n     is everything else that acts; ghost is for actions dense enough that a\n     border each would draw a grid; danger cannot be undone; link navigates. -->\n<div class=\"flex flex-wrap items-center gap-3\">\n  <button type=\"button\" class=\"inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Primary</button>\n  <button type=\"button\" class=\"inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100\">Secondary</button>\n  <button type=\"button\" class=\"inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200\">Ghost</button>\n  <button type=\"button\" class=\"inline-flex h-9 items-center rounded-lg border border-transparent bg-red-600 px-4 text-[13px]/5 font-medium text-white hover:bg-red-700\">Danger</button>\n  <a href=\"#\" class=\"text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2\">Link</a>\n</div>"
+    },
+    {
+      "id": "sizes",
+      "name": "Sizes",
+      "html": "<!-- Three, matched to density rather than to importance. Small belongs in a\n     table row or a dense toolbar; large is for the one button on a sign-in card\n     or the primary action of a full-page form. Everything else is medium. -->\n<div class=\"flex flex-wrap items-center gap-3\">\n  <button type=\"button\" class=\"inline-flex h-7 items-center rounded-md border border-transparent bg-zinc-700 px-2.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800\">Small</button>\n  <button type=\"button\" class=\"inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Medium</button>\n  <button type=\"button\" class=\"inline-flex h-11 items-center rounded-lg border border-transparent bg-zinc-700 px-5 text-[14px]/5 font-medium text-white hover:bg-zinc-800\">Large</button>\n</div>"
+    },
+    {
+      "id": "icons",
+      "name": "With icons",
+      "html": "<!-- An icon sits left of the label and clarifies the verb. A chevron is the\n     exception and sits right, because it points at what is about to open.\n\n     Icon-only buttons are square so the hit area stays square, and they carry\n     aria-label — the icon is decorative and contributes nothing to the name. -->\n<div class=\"flex flex-wrap items-center gap-3\">\n  <button type=\"button\" class=\"inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">\n    <i data-lucide=\"plus\" class=\"size-4\"></i>New order\n  </button>\n  <button type=\"button\" class=\"inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100\">\n    <i data-lucide=\"download\" class=\"size-4 text-zinc-600\"></i>Export\n  </button>\n  <button type=\"button\" aria-haspopup=\"menu\" class=\"inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100\">\n    Columns<i data-lucide=\"chevron-down\" class=\"size-3.5 text-zinc-600\"></i>\n  </button>\n  <button type=\"button\" aria-label=\"Edit order\" class=\"inline-flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100\">\n    <i data-lucide=\"pencil\" class=\"size-4\"></i>\n  </button>\n  <button type=\"button\" aria-label=\"More actions\" class=\"inline-flex size-9 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900\">\n    <i data-lucide=\"ellipsis\" class=\"size-4\"></i>\n  </button>\n</div>"
+    },
+    {
+      "id": "states",
+      "name": "Idle, busy, disabled",
+      "html": "<!-- The busy button is the same width as the idle one. \"Approve\" and\n     \"Approving…\" are different lengths, so the label is held at its widest with\n     a grid overlay: both strings occupy the same cell, only one is visible, and\n     the cell is as wide as the longer of the two. Without that the row shifts\n     under the cursor the instant it is clicked.\n\n     Busy keeps disabled as well as aria-busy — aria-busy announces the wait,\n     disabled is what actually stops the second click. -->\n<div class=\"flex flex-wrap items-center gap-3\" x-data=\"{ busy: false }\">\n  <button type=\"button\" @click=\"busy = true; setTimeout(() => busy = false, 2200)\"\n          :disabled=\"busy\" :aria-busy=\"busy\"\n          class=\"inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:hover:bg-zinc-700\">\n    <i x-show=\"!busy\" data-lucide=\"check\" class=\"size-4\"></i>\n    <i x-show=\"busy\" x-cloak data-lucide=\"loader-circle\" class=\"size-4 animate-spin\"></i>\n    <span class=\"grid\">\n      <span class=\"col-start-1 row-start-1\" :class=\"busy && 'invisible'\">Approve</span>\n      <span class=\"col-start-1 row-start-1\" :class=\"!busy && 'invisible'\" aria-hidden=\"true\">Approving…</span>\n    </span>\n  </button>\n\n  <button type=\"button\" disabled class=\"inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-200 px-4 text-[13px]/5 font-medium text-zinc-400\">Disabled</button>\n  <button type=\"button\" disabled class=\"inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium text-zinc-400\">Disabled secondary</button>\n</div>"
+    },
+    {
+      "id": "link",
+      "name": "Navigating, not acting",
+      "html": "<!-- An anchor that looks like a button. If it changes the URL it must be an\n     <a> — a button that calls location.href breaks middle-click, open in new\n     tab, copy link address and the back button, all silently.\n\n     inline-flex rather than flex, because an anchor is inline and a bare flex\n     would stretch it across the row. -->\n<div class=\"flex flex-wrap items-center gap-3\">\n  <a href=\"#\" class=\"inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">\n    <i data-lucide=\"plus\" class=\"size-4\"></i>New purchase order\n  </a>\n  <a href=\"#\" class=\"inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100\">\n    Open in ledger<i data-lucide=\"arrow-up-right\" class=\"size-3.5 text-zinc-600\"></i>\n  </a>\n</div>"
+    },
+    {
+      "id": "full-width",
+      "name": "Full width on a phone",
+      "html": "<!-- A form or dialog footer. Below sm the buttons stack and fill the width;\n     from sm they sit inline and right-aligned. flex-col-reverse is deliberate:\n     the primary is last in the DOM so it is last in the Tab order, but first on\n     screen once stacked, which is where a thumb lands. -->\n<div class=\"max-w-md rounded-xl border border-zinc-200 bg-white p-5\">\n  <p class=\"text-[14px]/5\">Approve PO-24-1187 for ₹4,82,000?</p>\n  <p class=\"mt-1 text-[13px]/5 text-zinc-600\">Gujarat Polymers Ltd · 6 lines</p>\n\n  <div class=\"mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end\">\n    <button type=\"button\" class=\"inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100\">Cancel</button>\n    <button type=\"button\" class=\"inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Approve</button>\n  </div>\n</div>"
+    },
+    {
+      "id": "toolbar",
+      "name": "In a page header",
+      "html": "<!-- Where the one-primary rule earns its keep. Four actions, one solid. The\n     primary sits last, nearest the right edge and the thumb, and matches the\n     order a dialog footer uses so the two never contradict each other. -->\n<div class=\"rounded-xl border border-zinc-200 bg-white px-5 py-4\">\n  <div class=\"flex flex-wrap items-start justify-between gap-3\">\n    <div>\n      <h1 class=\"text-[20px]/7 font-semibold tracking-tight tabular-nums\">PO-24-1187</h1>\n      <p class=\"mt-0.5 text-[13px]/5 text-zinc-600\">Gujarat Polymers Ltd · raised 14 Aug 2026</p>\n    </div>\n    <div class=\"flex flex-wrap items-center gap-2\">\n      <button type=\"button\" class=\"inline-flex h-8 items-center rounded-lg border border-transparent px-3 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200\">Cancel order</button>\n      <button type=\"button\" aria-label=\"Print\" class=\"inline-flex size-8 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100\">\n        <i data-lucide=\"printer\" class=\"size-4\"></i>\n      </button>\n      <button type=\"button\" class=\"inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100\">\n        <i data-lucide=\"download\" class=\"size-4 text-zinc-600\"></i>Export\n      </button>\n      <button type=\"button\" class=\"inline-flex h-8 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Approve</button>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "django",
+      "name": "Django form submits",
+      "html": "<!-- One form, two outcomes. Both buttons submit; name and value tell the view\n     which was pressed, so there is no second form and no JavaScript.\n\n     # views.py\n     if 'action' in request.POST:\n         if request.POST['action'] == 'approve':  order.approve(request.user)\n         elif request.POST['action'] == 'draft':  order.save_draft()\n\n     type=\"submit\" is explicit even though it is the default, because the\n     surrounding toolbar buttons all carry type=\"button\" and the difference is\n     the whole point. -->\n<form method=\"post\" class=\"max-w-md rounded-xl border border-zinc-200 bg-white p-5\">\n  {% csrf_token %}\n  <label for=\"id_remarks\" class=\"mb-1.5 block text-[13px]/5 font-medium\">Approval remarks</label>\n  <textarea name=\"remarks\" id=\"id_remarks\" rows=\"3\"\n            class=\"w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[14px]/5 focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15\"></textarea>\n\n  <div class=\"mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end\">\n    <button type=\"submit\" name=\"action\" value=\"draft\"\n            class=\"inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100\">Save as draft</button>\n    <button type=\"submit\" name=\"action\" value=\"approve\"\n            class=\"inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Approve</button>\n  </div>\n</form>"
+    }
+  ]
+}

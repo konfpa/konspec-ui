@@ -1,0 +1,50 @@
+<!-- Two affordances that both want to live in the field and belong in
+     different places.
+
+     The action goes on the label row, right-aligned. Under the control it
+     competes with the help text for the same 22px and disappears the moment the
+     field errors. It is type="button" — a bare <button> in a form is a submit
+     button, so "Same as plant" sends the half-filled order the first time
+     somebody presses Enter in a field — and it sits outside the <label>,
+     because inside it the click is forwarded to the control and the button's
+     text joins the field's accessible name.
+
+     The unit sits inside the border, so it is inside the focus outline and
+     reads as part of the value rather than as a word next to the box. It is the
+     one case where aria-describedby holds two ids, and the order they are
+     written in is the order they are read in: "fa-qty-unit fa-qty-msg" gives
+     "kilograms, whole kilograms only", the other way round gives "whole
+     kilograms only, kilograms". DOM order has nothing to do with it. -->
+<div class="max-w-sm space-y-5" x-data="{ addr: '' }">
+
+  <div>
+    <div class="mb-1.5 flex items-baseline justify-between gap-3">
+      <label for="fa-ship" class="text-[13px]/5 font-medium">Delivery address</label>
+      <button type="button" class="shrink-0 text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              @click="addr = 'Konspec Industries, Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230'">
+        Same as plant
+      </button>
+    </div>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <textarea id="fa-ship" name="ship_to" rows="3" x-model="addr" aria-describedby="fa-ship-msg"
+                class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none"></textarea>
+    </div>
+    <p id="fa-ship-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+      Printed on the order and on the gate pass.
+    </p>
+  </div>
+
+  <div>
+    <label for="fa-qty" class="mb-1.5 block text-[13px]/5 font-medium">Order quantity</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="fa-qty" name="qty" value="2,000" inputmode="numeric"
+             aria-describedby="fa-qty-unit fa-qty-msg"
+             class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      <span id="fa-qty-unit" class="pr-3 text-[14px]/5 text-zinc-600">kg</span>
+    </div>
+    <p id="fa-qty-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+      Whole kilograms. The rate contract quotes per kg, so 1 MT is 1,000.
+    </p>
+  </div>
+
+</div>

@@ -1,0 +1,39 @@
+<!-- The question is the <legend> of a <fieldset>, not a <label>. The answer is
+     a radio group and a group has no single control to point at, so a
+     <label for> would have to name one of the three options — and clicking the
+     question text would then tick that one. Django agrees in code:
+     RadioSelect.id_for_label returns an empty string on purpose.
+
+     Three equal tiles rather than three inline radios. Inline, each option is
+     as wide as its own word, so every question on a sheet gets a different left
+     edge; equal columns put Fail in the same place on every row and let a
+     column of them be scanned without reading.
+
+     Nothing is preselected, and N/A is an option with a value. Neither is a
+     detail: a parameter that arrives reading Pass is signed off by whoever
+     scrolls past it, and an unanswered group posts no key at all, so "does not
+     apply to this material" and "nobody reached this line" would be the same
+     empty POST. -->
+<fieldset class="max-w-xl">
+  <legend>
+    <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">Question 3 of 18</span>
+    <span class="mt-1.5 block text-[14px]/5 font-medium">Test certificate received, and the lot number on it matches every bag</span>
+  </legend>
+
+  <p id="qq-crit" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Must be for lot 24-HD-118, dated on or before 16 Aug 2026.</p>
+
+  <div class="mt-3 grid max-w-sm grid-cols-3 gap-2">
+    <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="qc_certificate" value="pass" required aria-describedby="qq-crit" class="size-4 shrink-0 accent-zinc-700">
+      <span>Pass</span>
+    </label>
+    <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="qc_certificate" value="fail" required aria-describedby="qq-crit" class="size-4 shrink-0 accent-zinc-700">
+      <span>Fail</span>
+    </label>
+    <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="qc_certificate" value="na" required aria-describedby="qq-crit" class="size-4 shrink-0 accent-zinc-700">
+      <span>N/A</span>
+    </label>
+  </div>
+</fieldset>

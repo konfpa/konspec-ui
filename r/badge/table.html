@@ -1,0 +1,63 @@
+<!-- Where a status pill actually lives, and the reason the pill is graphite.
+     Read the status column top to bottom: four identical shapes, and the eye
+     goes straight to the red dot. Tint the pills instead and the column becomes
+     a stripe of colour with nothing standing out of it.
+
+     Supplier and Value drop below sm rather than the table scrolling sideways —
+     nothing scrolls sideways on a phone, and table-fixed with declared widths
+     has a minimum that a phone cannot meet. The full small-screen treatment,
+     where rows become stacked cards, belongs to the table component. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+  <table class="w-full table-fixed text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="px-4 py-2 font-medium sm:w-32">Order</th>
+        <th scope="col" class="hidden px-4 py-2 font-medium sm:table-cell">Supplier</th>
+        <th scope="col" class="px-4 py-2 font-medium sm:w-28">Status</th>
+        <th scope="col" class="hidden px-4 py-2 text-right font-medium sm:table-cell sm:w-32">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="border-b border-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
+          <td class="hidden truncate px-4 py-2.5 sm:table-cell">Sharma Extrusions</td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+            </span>
+          </td>
+          <td class="hidden px-4 py-2.5 text-right tabular-nums sm:table-cell">₹4,82,000</td>
+        </tr>
+        <tr class="border-b border-zinc-100 bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1186</td>
+          <td class="hidden truncate px-4 py-2.5 sm:table-cell">Konkan Fabricators</td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+            </span>
+          </td>
+          <td class="hidden px-4 py-2.5 text-right tabular-nums sm:table-cell">₹1,15,400</td>
+        </tr>
+        <tr class="border-b border-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1185</td>
+          <td class="hidden truncate px-4 py-2.5 sm:table-cell">Deshpande Traders</td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+            </span>
+          </td>
+          <td class="hidden px-4 py-2.5 text-right tabular-nums sm:table-cell">₹96,750</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1184</td>
+          <td class="hidden truncate px-4 py-2.5 sm:table-cell">Qureshi Metals</td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Closed
+            </span>
+          </td>
+          <td class="hidden px-4 py-2.5 text-right tabular-nums sm:table-cell">₹2,30,000</td>
+        </tr>
+      </tbody>
+  </table>
+</div>

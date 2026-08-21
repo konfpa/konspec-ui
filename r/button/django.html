@@ -1,0 +1,24 @@
+<!-- One form, two outcomes. Both buttons submit; name and value tell the view
+     which was pressed, so there is no second form and no JavaScript.
+
+     # views.py
+     if 'action' in request.POST:
+         if request.POST['action'] == 'approve':  order.approve(request.user)
+         elif request.POST['action'] == 'draft':  order.save_draft()
+
+     type="submit" is explicit even though it is the default, because the
+     surrounding toolbar buttons all carry type="button" and the difference is
+     the whole point. -->
+<form method="post" class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+  {% csrf_token %}
+  <label for="id_remarks" class="mb-1.5 block text-[13px]/5 font-medium">Approval remarks</label>
+  <textarea name="remarks" id="id_remarks" rows="3"
+            class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[14px]/5 focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15"></textarea>
+
+  <div class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    <button type="submit" name="action" value="draft"
+            class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Save as draft</button>
+    <button type="submit" name="action" value="approve"
+            class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
+  </div>
+</form>

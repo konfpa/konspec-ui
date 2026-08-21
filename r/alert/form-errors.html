@@ -1,0 +1,26 @@
+<!-- {{ form.non_field_errors }} plus one line per field that has errors.
+     It summarises; it does not replace the message under each input.
+     x-init focuses it so the keyboard is already at the problem. -->
+<div role="alert" tabindex="-1" x-data x-init="$el.focus()"
+     class="rounded-lg border border-zinc-200 bg-white px-4 py-3 outline-none">
+  <div class="flex items-start gap-3">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 font-medium">This order was not saved — 3 fields need attention.</p>
+      <ul class="mt-2 space-y-1 text-[12px]/4 text-zinc-600">
+        <li>
+          <a href="#id_vendor" class="font-medium text-zinc-900 underline underline-offset-2">Vendor</a>
+          — select a vendor.
+        </li>
+        <li>
+          <a href="#id_delivery_date" class="font-medium text-zinc-900 underline underline-offset-2">Delivery date</a>
+          — cannot be before the order date.
+        </li>
+        <li>
+          <a href="#id_quantity" class="font-medium text-zinc-900 underline underline-offset-2">Quantity</a>
+          — enter a whole number greater than zero.
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

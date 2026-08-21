@@ -1,0 +1,56 @@
+<!-- These buttons already have names — "Save draft" is written on one and in
+     the aria-label of the other — so the bubble is a description and not a
+     label. It is aria-hidden in full, and the key goes in aria-keyshortcuts on
+     the trigger, which is the same split the dropdown's shortcut hints use.
+     Glyphs are the reason: a screen reader reads ⌘ as "place of interest sign",
+     so a key left in the accessible name turns Save draft into a riddle.
+     aria-keyshortcuts takes the machine form and the platform words it.
+
+     Ctrl and not ⌘, because these are Windows desktops in a plant office.
+
+     Do not hint a shortcut nothing is bound to. The window handler is the
+     promise this bubble makes:
+
+       @keydown.window.ctrl.s.prevent="save()"
+
+     And the tooltip is not where a shortcut is discovered — it cannot be
+     reached on a phone and nobody hovers a button hunting for keys. The same
+     accelerators belong in the record's action menu, which is where people
+     actually read them. -->
+<div class="flex flex-wrap items-center gap-3"
+     x-data="{
+       open: null, timer: 0,
+       show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
+       hide() { clearTimeout(this.timer); this.open = null }
+     }"
+     @keydown.escape.window="hide()">
+
+  <span class="relative inline-flex">
+    <button type="button" aria-describedby="tt-save" aria-keyshortcuts="Control+S"
+            @mouseenter="show('save')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('save', 0)" @blur="hide()"
+            class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="save" class="size-4"></i>Save draft
+    </button>
+    <span id="tt-save" role="tooltip" x-show="open === 'save'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">
+      Save without posting
+      <kbd aria-hidden="true" class="rounded border border-zinc-700 px-1 text-[11px]/4 text-zinc-400">Ctrl S</kbd>
+    </span>
+  </span>
+
+  <span class="relative inline-flex">
+    <button type="button" aria-label="Search orders" aria-describedby="tt-search" aria-keyshortcuts="Control+K"
+            @mouseenter="show('search')" @mouseleave="hide()"
+            @focus="if ($event.target.matches(':focus-visible')) show('search', 0)" @blur="hide()"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="search" class="size-4"></i>
+    </button>
+    <span id="tt-search" role="tooltip" x-show="open === 'search'" x-cloak x-transition.opacity.duration.100ms
+          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">
+      Search orders
+      <kbd aria-hidden="true" class="rounded border border-zinc-700 px-1 text-[11px]/4 text-zinc-400">Ctrl K</kbd>
+    </span>
+  </span>
+
+</div>

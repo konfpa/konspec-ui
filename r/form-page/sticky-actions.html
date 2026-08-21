@@ -1,0 +1,245 @@
+<!-- The bar is a sibling of the scroller, not a child of it, so it is out of
+     the scroll entirely rather than sticking near the end of it. The frame is a
+     flex column: <main> takes min-h-0 flex-1 overflow-y-auto, the bar takes
+     shrink-0, and the fields scroll under a bar that has never moved.
+
+     That puts the submit button outside the <form>, which is what the form
+     attribute is for: form="wo-form" on the button submits the form with that
+     id from anywhere on the page. Without it the bar is three buttons that
+     submit nothing and Enter in a field is the only thing that works.
+
+     Do not disable the button while the request is in flight. The control
+     somebody just pressed is the one that would go dead, and a browser moves
+     focus off a disabled element to <body> — so the keyboard user who pressed
+     Save is now at the top of the document. Guard the handler instead: a press
+     while busy returns, which stops the double post without taking the control
+     away from the person holding it.
+
+     inert goes on the fields and stops at the bar. A scrim blocks a mouse and
+     nothing else — Tab still walks into controls that are about to be replaced.
+     Put inert on an ancestor of the focused button instead and it loses focus
+     exactly the way disabled does, which is the bug it was meant to fix. Alpine
+     treats inert as boolean, so a false value removes the attribute rather than
+     writing inert="false", which is a truthy string.
+
+     The ring appears at 500ms, because the delay lives in the bound class over
+     a delay-0 base. Left in the base class it would delay the fade out too, and
+     the ring would still be turning after the save had landed. Most saves
+     answer first and it never paints.
+
+     The button label does not change and the button does not move. A label that
+     swaps to "Saving…" is a different width, and the row reflows under the
+     cursor on the click that caused it.
+
+     Below sm the three buttons go full width and stack, in DOM order. Two 36px
+     buttons side by side at 390px is a thumb-sized problem. -->
+<div class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+     x-data="{
+       busy: false, t: null,
+       save() {
+         if (this.busy) return;
+         this.busy = true;
+         clearTimeout(this.t);
+         this.t = setTimeout(() => this.busy = false, 1800);
+       }
+     }">
+
+  <main class="min-h-0 flex-1 overflow-y-auto">
+    <div class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
+
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="min-w-0">
+          <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+            <a href="#" class="hover:text-zinc-900">Production</a>
+            <span class="text-zinc-500">/</span>
+            <a href="#" class="hover:text-zinc-900">Work orders</a>
+            <span class="text-zinc-500">/</span>
+            <span class="font-medium tabular-nums text-zinc-900">WO-26-0318</span>
+          </nav>
+          <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Edit work order WO-26-0318</h1>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Injection moulding — Silvassa · planned 12 Sep 2026</p>
+        </div>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+        </span>
+      </div>
+
+      <p class="mt-4 text-[12px]/4 text-zinc-600">
+        Every field is required unless its label says <span class="font-medium text-zinc-900">Optional</span>.
+      </p>
+
+      <form id="wo-form" class="mt-3" @submit.prevent="save()">
+        <!-- inert on the fields, and it stops here. The bar below is outside
+             this element, so the button keeps focus through the whole save. -->
+        <div class="space-y-4" :inert="busy">
+
+          <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+            <div class="border-b border-zinc-200 px-5 py-3.5">
+              <h2 class="text-[16px]/6 font-semibold">Plan</h2>
+            </div>
+            <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+              <div class="min-w-0 sm:col-span-2">
+                <label for="sa-item" class="mb-1.5 block text-[13px]/5 font-medium">Item</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="sa-item" name="item" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="">Choose an item</option>
+                    <option value="fg-2210" selected>FG-2210 — crate 600 × 400, HDPE natural</option>
+                    <option value="fg-2214">FG-2214 — crate 600 × 400, HDPE blue</option>
+                    <option value="fg-3180">FG-3180 — pallet 1200 × 1000</option>
+                  </select>
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+              <div class="min-w-0">
+                <label for="sa-qty" class="mb-1.5 block text-[13px]/5 font-medium">Planned quantity</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sa-qty" name="planned" required inputmode="numeric" value="4,800" aria-describedby="sa-qty-unit sa-qty-msg"
+                         class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                  <span id="sa-qty-unit" class="flex items-center pr-3 text-[14px]/5 text-zinc-600">nos</span>
+                </div>
+                <p id="sa-qty-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">1,320 built so far on this order.</p>
+              </div>
+              <div class="min-w-0">
+                <label for="sa-machine" class="mb-1.5 block text-[13px]/5 font-medium">Machine</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="sa-machine" name="machine" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="">Choose a machine</option>
+                    <option value="im-04" selected>IM-04 — 650T Ferromatik</option>
+                    <option value="im-07">IM-07 — 450T Milacron</option>
+                  </select>
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+              <div class="min-w-0">
+                <label for="sa-start" class="mb-1.5 block text-[13px]/5 font-medium">Planned start</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sa-start" name="start" type="date" required value="2026-09-12"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+              <div class="min-w-0">
+                <label for="sa-end" class="mb-1.5 block text-[13px]/5 font-medium">Planned finish</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sa-end" name="end" type="date" required value="2026-09-16"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+            <div class="border-b border-zinc-200 px-5 py-3.5">
+              <h2 class="text-[16px]/6 font-semibold">Shift and supervision</h2>
+            </div>
+            <div class="px-5 py-4">
+              <fieldset aria-describedby="sa-shift-msg">
+                <legend class="mb-2 text-[13px]/5 font-medium">Shift</legend>
+                <div class="grid gap-2 sm:grid-cols-3">
+                  <label class="flex items-start gap-2.5 text-[14px]/5">
+                    <input type="radio" name="shift" value="a" checked required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                    <span class="tabular-nums">A — 06:00 to 14:00</span>
+                  </label>
+                  <label class="flex items-start gap-2.5 text-[14px]/5">
+                    <input type="radio" name="shift" value="b" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                    <span class="tabular-nums">B — 14:00 to 22:00</span>
+                  </label>
+                  <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+                    <input type="radio" name="shift" value="c" disabled class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                    <span class="tabular-nums">C — 22:00 to 06:00</span>
+                  </label>
+                </div>
+                <p id="sa-shift-msg" class="mt-2 min-h-4 text-[12px]/4 text-zinc-500">
+                  C shift is not manned on this line. The option keeps its place rather than disappearing.
+                </p>
+              </fieldset>
+
+              <div class="mt-4">
+                <label for="sa-super" class="mb-1.5 block text-[13px]/5 font-medium">Supervisor</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 sm:max-w-sm">
+                  <select id="sa-super" name="supervisor" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="">Choose a supervisor</option>
+                    <option value="ak" selected>Anil Kulkarni</option>
+                    <option value="fq">Farida Qureshi</option>
+                  </select>
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="mt-4">
+                <label for="sa-note" class="mb-1.5 flex items-baseline gap-2 text-[13px]/5 font-medium">
+                  Instructions for the shift
+                  <span aria-hidden="true" class="font-normal text-zinc-500">Optional</span>
+                </label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <textarea id="sa-note" name="note" rows="3" aria-describedby="sa-note-msg"
+                            class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none">Purge with natural before the run. First-off sample to the lab before 200 shots.</textarea>
+                </div>
+                <p id="sa-note-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">Printed on the job card at the machine.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white" x-data="{ depth: 0 }">
+            <div class="border-b border-zinc-200 px-5 py-3.5">
+              <h2 class="text-[16px]/6 font-semibold">Attachments</h2>
+            </div>
+            <div class="px-5 py-4">
+              <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
+                   class="rounded-lg border border-dashed px-4 py-5 transition"
+                   :class="depth > 0 ? 'border-zinc-700 bg-white' : 'border-zinc-200 bg-zinc-100'">
+                <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
+                  <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
+                  <span class="text-[13px]/5 text-zinc-600">Drag files here or</span>
+                  <input type="file" id="sa-files" name="attachments" multiple class="peer sr-only">
+                  <label for="sa-files"
+                         class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+                    Browse files
+                  </label>
+                  <span class="text-[12px]/4 text-zinc-500">PDF or JPG · up to 10 MB each</span>
+                </div>
+              </div>
+              <ul class="mt-2 space-y-2">
+                <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+                  <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-[13px]/5 font-medium">mould-setting-sheet-fg2210-rev4.pdf</p>
+                    <p class="text-[12px]/4 tabular-nums text-zinc-500">186 KB · Anil Kulkarni · 02 Sep 2026</p>
+                  </div>
+                  <a href="#" aria-label="Download mould-setting-sheet-fg2210-rev4.pdf"
+                     class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                    <i data-lucide="download" class="size-4"></i>
+                  </a>
+                  <button type="button" aria-label="Remove mould-setting-sheet-fg2210-rev4.pdf"
+                          class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+                    <i data-lucide="x" class="size-4"></i>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <div :aria-busy="busy" class="shrink-0 border-t border-zinc-200 bg-white px-4 py-3 lg:px-6">
+    <div class="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 opacity-0 transition-opacity delay-0"
+              :class="busy && 'opacity-100 delay-500'" aria-hidden="true"></span>
+        <p role="status" class="text-[12px]/4 tabular-nums text-zinc-600"
+           x-text="busy ? 'Saving WO-26-0318…' : 'Last saved 11:42 by Anil Kulkarni'">Last saved 11:42 by Anil Kulkarni</p>
+      </div>
+      <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+        <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Cancel</button>
+        <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Save and add another</button>
+        <!-- outside the form, so it names the form it submits -->
+        <button type="submit" form="wo-form"
+                class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

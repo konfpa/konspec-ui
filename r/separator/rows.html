@@ -1,0 +1,46 @@
+<!-- divide-y on the parent, not a border on each row. The rule then belongs to
+     the list rather than to the row, so a row pasted into another container
+     does not take a stray line with it.
+
+     Tailwind v4 compiles divide-y to a border-bottom on & > :not(:last-child),
+     which is a DOM position and not a visibility. Hiding a middle row is
+     therefore fine — measured, the container went 181px to 136px and the
+     remaining rules landed between the visible rows. Hiding the last row is
+     not: the row above it is still not :last-child, so it keeps its border and
+     the card ends on a rule with nothing under it. Measured 137px against
+     136px, and the extra pixel is that line. An x-if does not help either,
+     because Alpine leaves the <template> in the DOM and the template takes the
+     :last-child slot.
+
+     So the conditional block sits outside the divided group and brings its own
+     border. It is border-zinc-200 rather than zinc-100 because it is a strip
+     that ends the card, the same weight as the header above it, not another
+     row. x-cloak because it is hidden at first paint. -->
+<div class="max-w-md overflow-hidden rounded-xl border border-zinc-200 bg-white" x-data="{ cancelled: false }">
+  <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+    <h2 class="text-[14px]/5 font-semibold">Order lines</h2>
+    <button type="button" @click="cancelled = !cancelled"
+            class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2"
+            x-text="cancelled ? 'Hide cancelled' : 'Show cancelled'">Show cancelled</button>
+  </div>
+
+  <dl class="divide-y divide-zinc-100 text-[13px]/5">
+    <div class="flex items-center justify-between gap-4 px-5 py-2.5">
+      <dt class="min-w-0 truncate text-zinc-600">MS angle 50×50×6</dt>
+      <dd class="shrink-0 tabular-nums">₹6,84,000</dd>
+    </div>
+    <div class="flex items-center justify-between gap-4 px-5 py-2.5">
+      <dt class="min-w-0 truncate text-zinc-600">MS plate 8mm</dt>
+      <dd class="shrink-0 tabular-nums">₹5,16,000</dd>
+    </div>
+    <div class="flex items-center justify-between gap-4 px-5 py-2.5">
+      <dt class="min-w-0 truncate text-zinc-600">Channel 100×50</dt>
+      <dd class="shrink-0 tabular-nums">₹3,08,000</dd>
+    </div>
+  </dl>
+
+  <div x-show="cancelled" x-cloak
+       class="border-t border-zinc-200 bg-zinc-100 px-5 py-2.5 text-[12px]/4 text-zinc-600">
+    2 cancelled lines worth <span class="tabular-nums">₹1,04,000</span>, not counted above.
+  </div>
+</div>

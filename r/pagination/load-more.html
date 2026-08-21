@@ -1,0 +1,60 @@
+<!-- Appending rather than paging, and it is a different component wearing the
+     same footer. There is no window any more, only a depth, so the count line
+     changes from a range to "Showing 6 of 21" and nothing here says "page".
+
+     Know what it gives up before reaching for it. There is no page number to put
+     in the URL, so the record somebody opens cannot be returned to with Back;
+     the list cannot be sent to a colleague at the depth they reached; and
+     printing gives you whatever happened to be loaded when they pressed print.
+     That is acceptable for a feed nobody cites — an activity log, a comment
+     thread — and wrong for a register somebody has to work from.
+
+     Do not put infinite scroll on top of it. Auto-loading swallows the footer,
+     and the footer is where the totals, the export and the page size live.
+
+     The count is a role="status", so each batch is announced. Without it the
+     rows arrive below the fold in silence and the only feedback is that the
+     button moved down the page.
+
+     Focus is the trap. When the last batch lands the button is replaced by a
+     line of text, and a browser drops focus from a removed element to the body —
+     so the handler moves focus to the count, which is tabindex="-1" for exactly
+     that reason and is also the sentence that says what just happened. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       shown: 6, step: 6, total: 21,
+       get rows() { return Array.from({ length: this.shown }, (_, i) => ({
+         id: 'ENT-26-' + (3140 + i),
+         who: ['Ritu Deshpande', 'Amit Kulkarni', 'Farida Qureshi'][i % 3],
+         what: ['Approved PO-24-1187', 'Posted GRN-26-0442', 'Raised debit note DN-26-0117'][i % 3]
+       })) },
+       more() {
+         const wasLast = this.shown + this.step >= this.total;
+         this.shown = Math.min(this.shown + this.step, this.total);
+         if (wasLast) this.$refs.count.focus();
+       }
+     }">
+
+  <ul role="list" class="divide-y divide-zinc-100">
+    <template x-for="r in rows" :key="r.id">
+      <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-zinc-900" x-text="r.what"></span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500" x-text="r.who + ' · ' + r.id"></span>
+        </span>
+      </li>
+    </template>
+  </ul>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p role="status" x-ref="count" tabindex="-1"
+       class="text-[13px]/5 tabular-nums text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+       x-text="shown >= total ? 'All ' + total + ' entries shown' : 'Showing ' + shown + ' of ' + total + ' entries'">Showing 6 of 21 entries</p>
+    <button type="button" x-show="shown < total" @click="more()"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-down" class="size-4"></i>
+      <span x-text="'Load ' + Math.min(step, total - shown) + ' more'">Load 6 more</span>
+    </button>
+  </div>
+</div>

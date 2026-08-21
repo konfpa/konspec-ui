@@ -1,0 +1,46 @@
+<!-- size-4 next to anything control-height, because a 20px ring beside a 36px
+     input is louder than the input.
+
+     None of these is a button, and that is deliberate: a button's busy state is
+     already specified in the button entry, which holds the label width with a
+     grid overlay so the row cannot reflow mid-click and keeps the disabled
+     attribute alongside aria-busy so a second click cannot post twice. Copy that
+     one rather than dropping a bare ring into a <button>.
+
+     Each of the three has its own role="status", because each names a different
+     piece of work. One region for the page would have them overwriting each
+     other, and the last one to finish would be the only one ever announced. -->
+<div class="max-w-md space-y-6 rounded-xl border border-zinc-200 bg-white p-4">
+
+  <!-- inside the field's ring, where the input entry puts its icons -->
+  <div>
+    <label for="sp-gstin" class="mb-1.5 block text-[13px]/5 font-medium">Vendor GSTIN</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="sp-gstin" value="27AABCS1429B1ZX" class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 outline-none">
+      <span class="mr-3 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    </div>
+    <p role="status" class="mt-1.5 text-[12px]/4 text-zinc-500">Checking this GSTIN against the GST portal</p>
+  </div>
+
+  <!-- in a cell, where the figure will be. Right-aligned into the same column
+       the number lands in, so the row does not shift when it arrives. -->
+  <div class="border-t border-zinc-100 pt-4">
+    <div class="flex items-baseline justify-between gap-4">
+      <span class="text-[13px]/5 text-zinc-600">Committed value, all plants</span>
+      <span class="flex h-5 items-center">
+        <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      </span>
+    </div>
+    <p role="status" class="mt-1 text-[12px]/4 text-zinc-500">Recalculating committed value</p>
+  </div>
+
+  <!-- a background refresh of something already shown. The stale figure stays
+       legible; the ring says a newer one is on its way. -->
+  <div class="border-t border-zinc-100 pt-4">
+    <p class="text-[20px]/7 font-semibold tracking-tight tabular-nums">1,842</p>
+    <div class="mt-1 flex items-center gap-2">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <span role="status" class="text-[12px]/4 text-zinc-500">Refreshing open orders, last read 11:04</span>
+    </div>
+  </div>
+</div>

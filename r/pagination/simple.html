@@ -1,0 +1,47 @@
+<!-- Prev, next, and the sentence that makes them mean anything. Below about ten
+     pages this is the whole component — numbers earn their space only when
+     somebody has a reason to jump, and on a fifteen-page register nobody does.
+
+     "Next" on its own is a rumour. It does not say whether two rows are left or
+     two thousand, which is the fact that decides whether somebody pages or goes
+     back and filters. The range and the total are the component.
+
+     The range sits in a role="status" because paging swaps the rows underneath
+     in silence: the visual answer arrives and the spoken one never does. The
+     region is in the document before its text changes, which is the condition a
+     live region has to meet, and the fallback text inside it is the state at
+     first paint so nothing is announced on load.
+
+     The ends disable rather than disappear. Remove Previous on page one and Next
+     slides left by a button width, so the control under the pointer on the second
+     click is not the one that was there on the first. enabled:hover: rather than
+     hover:, or the disabled button still lights up under the cursor.
+
+     Pressing Previous into page one disables Previous, and a browser blurs a
+     disabled element to the body — so the handler hands focus to Next. Without
+     it the keyboard user is at the top of the document with no way back but Tab. -->
+<nav aria-label="Order register pages"
+     x-data="{
+       page: 3, size: 10, total: 148,
+       get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
+       get from() { return this.total ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
+     }"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-2.5">
+
+  <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+     x-text="from + '–' + to + ' of ' + total + ' orders'">21–30 of 148 orders</p>
+
+  <div class="flex items-center gap-2">
+    <button type="button" x-ref="prev" @click="prev()" :disabled="page === 1"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>Previous
+    </button>
+    <button type="button" x-ref="next" @click="next()" :disabled="page === pages"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Next<i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+</nav>

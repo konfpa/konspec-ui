@@ -1,0 +1,57 @@
+<!-- The spec sits beside the box before anything is typed into it, not in an
+     error message after the limit has been broken. A range that only appears
+     once it is exceeded is a rule the inspector had to guess at, and the guess
+     is what gets written down.
+
+     Out of spec warns and does not block. The measurement is the entire point
+     of the sheet — a control that refuses an out-of-range number gets an
+     in-range number typed into it instead, and the reading that mattered is
+     gone. It is amber-700 rather than red because it is a fact about a number
+     and not a verdict: whether 0.46 is accepted, accepted on deviation or
+     rejected is a separate question with a separate answer, and this sheet does
+     not decide it.
+
+     type="number" gives a numeric keypad on a phone and silently drops anything
+     that is not a number, which is why the empty string is tested on its own —
+     a blank field is unanswered, not zero.
+
+     The rows are written out rather than looped. A <template x-for> would be
+     shorter, but Lucide hydrates once at load and an icon rendered later by
+     Alpine stays a bare <i>, so the warning icon inside the loop never
+     appears. -->
+<div class="max-w-xl space-y-5"
+     x-data="{
+       thickness: '2.42', mfi: '0.46',
+       out(v, lo, hi) { const n = parseFloat(v); return v !== '' && !isNaN(n) && (lo > n || n > hi) }
+     }">
+
+  <div>
+    <label for="qo-thk" class="block text-[13px]/5 font-medium">Sheet thickness after extrusion</label>
+    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+      <div class="flex w-32 items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
+           :class="out(thickness, 2.35, 2.55) ? 'border-amber-700' : 'border-zinc-200 focus-within:border-zinc-700'">
+        <input id="qo-thk" name="obs_thickness" type="number" step="0.01" inputmode="decimal"
+               x-model="thickness" aria-describedby="qo-spec-thk"
+               class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+        <span class="pr-3 text-[13px]/5 text-zinc-600">mm</span>
+      </div>
+      <span id="qo-spec-thk" class="text-[12px]/4 tabular-nums text-zinc-500">Spec 2.35 – 2.55 mm</span>
+    </div>
+  </div>
+
+  <div>
+    <label for="qo-mfi" class="block text-[13px]/5 font-medium tabular-nums">Melt flow index at 190 °C / 2.16 kg</label>
+    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+      <div class="flex w-32 items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
+           :class="out(mfi, 0.28, 0.42) ? 'border-amber-700' : 'border-zinc-200 focus-within:border-zinc-700'">
+        <input id="qo-mfi" name="obs_mfi" type="number" step="0.01" inputmode="decimal"
+               x-model="mfi" aria-describedby="qo-spec-mfi"
+               class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      </div>
+      <span id="qo-spec-mfi" class="text-[12px]/4 tabular-nums text-zinc-500">Spec 0.28 – 0.42 g/10 min</span>
+    </div>
+    <p x-show="out(mfi, 0.28, 0.42)" x-cloak class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-amber-700">
+      <i data-lucide="alert-triangle" class="mt-px size-3.5 shrink-0"></i>Above the upper limit. Recorded as measured — accepting it is a separate answer.
+    </p>
+  </div>
+</div>

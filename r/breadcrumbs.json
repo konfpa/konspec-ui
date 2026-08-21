@@ -1,0 +1,103 @@
+{
+  "id": "breadcrumbs",
+  "name": "Breadcrumbs",
+  "category": "navigation",
+  "description": "The path from the section root down to the record on screen. The last crumb says where you are and is not a link.",
+  "when_to_use": "Any page two or more levels deep. One level deep does not need a trail — it needs a back link, which is the last variant here.",
+  "rules": [
+    "The separator is a slash, always. There is no chevron variant and no icon variant; a trail that reads \"Home / Procurement / PO-24-1187\" in one file and uses chevrons in another is two components pretending to be one.",
+    "The last crumb is plain text with aria-current=\"page\". Making it a link to itself is a dead control, and users click it and get nothing.",
+    "Never truncate the last crumb. It is the one that says where you are. Truncate the middle, or collapse it into an overflow menu.",
+    "The trail is the information hierarchy, not the browsing history. It does not change based on how the user arrived, so two people on the same record see the same trail.",
+    "Crumbs are not underlined, unlike every other link in the system. Five underlined links in a row is a fence, not a path; the muted colour and the hover carry it instead."
+  ],
+  "anatomy": [
+    {
+      "part": "Trail",
+      "description": "A <nav aria-label=\"Breadcrumb\"> holding an ordered list, because the order is the information and a screen reader needs to be able to skip it."
+    },
+    {
+      "part": "Crumb",
+      "description": "A link to an ancestor page, text-zinc-600, darkening to zinc-900 on hover."
+    },
+    {
+      "part": "Separator",
+      "description": "A zinc-400 slash. Decorative and aria-hidden, so it is never read aloud."
+    },
+    {
+      "part": "Current crumb",
+      "description": "Plain text in zinc-900 font-medium, never a link, carrying aria-current=\"page\"."
+    },
+    {
+      "part": "Overflow",
+      "description": "A menu holding the collapsed middle of a long trail, behind an ellipsis button."
+    },
+    {
+      "part": "Trailing controls",
+      "description": "Anything that belongs to the record rather than the page — a status pill, a copy-id button. They sit after the last crumb, never inside it."
+    }
+  ],
+  "behaviour": [
+    "The last crumb is the current page and is not a link. A link to the page you are on is a dead control.",
+    "The last crumb is never truncated or collapsed — it is the one that says where you are.",
+    "A long trail collapses its middle into an overflow menu rather than wrapping onto two lines.",
+    "Below sm the trail collapses to the parent and the current page. Four crumbs at 390px either wrap or push the page sideways, and both are worse than showing two.",
+    "The trail reflects the hierarchy, not the history, so it does not change based on how the user arrived.",
+    "Crumb labels match the titles of the pages they point at, so following one is not a surprise."
+  ],
+  "accessibility": [
+    "A <nav> with aria-label=\"Breadcrumb\", so assistive technology can identify it and skip past it.",
+    "An ordered list inside, because the sequence carries the meaning.",
+    "Separators are aria-hidden, or a screen reader reads \"slash\" between every crumb.",
+    "The current page carries aria-current=\"page\" — that, not the styling, is what announces it.",
+    "The overflow button has an aria-label naming how many levels it hides, because an ellipsis says nothing on its own.",
+    "The browser's own focus ring is left alone on crumb links; nothing here overrides outline."
+  ],
+  "related": [
+    "page-header",
+    "tabs",
+    "sidebar"
+  ],
+  "variants": [
+    {
+      "id": "default",
+      "name": "Default",
+      "html": "<!-- Three levels, which is the common case. The separator is aria-hidden so a\n     screen reader reads \"Home, Procurement, Purchase orders\" rather than\n     spelling out a slash between each one. -->\n<nav aria-label=\"Breadcrumb\">\n  <ol class=\"flex flex-wrap items-center gap-1.5 text-[13px]/5\">\n    <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Home</a></li>\n    <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n    <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Procurement</a></li>\n    <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n    <li><span aria-current=\"page\" class=\"font-medium text-zinc-900\">Purchase orders</span></li>\n  </ol>\n</nav>"
+    },
+    {
+      "id": "record",
+      "name": "On a record",
+      "html": "<!-- A record page. The status and the copy button belong to the record, not to\n     the trail, so they sit after the last crumb rather than inside it — putting\n     them inside makes the accessible name of the current page read\n     \"PO-24-1187 Awaiting GRN Copy order number\". -->\n<nav aria-label=\"Breadcrumb\">\n  <ol class=\"flex flex-wrap items-center gap-1.5 text-[13px]/5\">\n    <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Home</a></li>\n    <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n    <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Procurement</a></li>\n    <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n    <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Purchase orders</a></li>\n    <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n    <li class=\"flex items-center gap-2\">\n      <span aria-current=\"page\" class=\"font-medium tabular-nums text-zinc-900\">PO-24-1187</span>\n      <span class=\"inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300\">\n        <span class=\"size-1.5 rounded-full bg-amber-500\" aria-hidden=\"true\"></span>Awaiting GRN\n      </span>\n      <button type=\"button\" aria-label=\"Copy order number\" class=\"text-zinc-600 hover:text-zinc-900\">\n        <i data-lucide=\"copy\" class=\"size-3.5\"></i>\n      </button>\n    </li>\n  </ol>\n</nav>"
+    },
+    {
+      "id": "truncated",
+      "name": "Long labels",
+      "html": "<!-- Vendor and project names run long. The middle crumbs truncate; the last one\n     never does. min-w-0 on the <li> is what makes truncate work at all inside a\n     flex row — without it the item refuses to shrink below its content. -->\n<nav aria-label=\"Breadcrumb\">\n  <ol class=\"flex flex-nowrap items-center gap-1.5 text-[13px]/5\">\n    <li class=\"shrink-0\"><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Home</a></li>\n    <li aria-hidden=\"true\" class=\"shrink-0 text-zinc-500\">/</li>\n    <li class=\"min-w-0 max-w-[14ch] shrink\">\n      <a href=\"#\" title=\"Procurement &amp; stores\" class=\"block truncate text-zinc-600 hover:text-zinc-900\">Procurement &amp; stores</a>\n    </li>\n    <li aria-hidden=\"true\" class=\"shrink-0 text-zinc-500\">/</li>\n    <li class=\"min-w-0 max-w-[18ch] shrink\">\n      <a href=\"#\" title=\"Gujarat Polymers Ltd — annual rate contract\" class=\"block truncate text-zinc-600 hover:text-zinc-900\">Gujarat Polymers Ltd — annual rate contract</a>\n    </li>\n    <li aria-hidden=\"true\" class=\"shrink-0 text-zinc-500\">/</li>\n    <li class=\"shrink-0\"><span aria-current=\"page\" class=\"font-medium tabular-nums text-zinc-900\">PO-24-1187</span></li>\n  </ol>\n</nav>"
+    },
+    {
+      "id": "overflow",
+      "name": "Collapsed middle",
+      "html": "<!-- Past four levels the middle collapses behind an ellipsis rather than\n     wrapping onto a second line. The button says how many levels it hides,\n     because an ellipsis on its own announces nothing.\n\n     @click.stop on the button and the panel keeps the document-level handler\n     from closing this menu the moment it opens. -->\n<nav aria-label=\"Breadcrumb\" x-data=\"{ open: false }\" @click.outside=\"open = false\" @keydown.escape.window=\"open = false\">\n  <ol class=\"flex flex-wrap items-center gap-1.5 text-[13px]/5\">\n    <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Home</a></li>\n    <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n    <li class=\"relative\">\n      <button type=\"button\" @click.stop=\"open = !open\"\n              aria-label=\"Show 3 hidden levels\" :aria-expanded=\"open\" aria-haspopup=\"menu\"\n              class=\"rounded-md px-1.5 py-0.5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900\">…</button>\n      <div x-show=\"open\" x-cloak @click.stop role=\"menu\"\n           class=\"absolute left-0 z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg\">\n        <a href=\"#\" role=\"menuitem\" class=\"block truncate px-3 py-2 text-[13px]/5 hover:bg-zinc-100\">Procurement</a>\n        <a href=\"#\" role=\"menuitem\" class=\"block truncate px-3 py-2 text-[13px]/5 hover:bg-zinc-100\">Purchase orders</a>\n        <a href=\"#\" role=\"menuitem\" class=\"block truncate px-3 py-2 text-[13px]/5 hover:bg-zinc-100\">Gujarat Polymers Ltd</a>\n      </div>\n    </li>\n    <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n    <li><a href=\"#\" class=\"tabular-nums text-zinc-600 hover:text-zinc-900\">PO-24-1187</a></li>\n    <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n    <li><span aria-current=\"page\" class=\"font-medium text-zinc-900\">Line 4 — MS angle 50×50×6</span></li>\n  </ol>\n</nav>"
+    },
+    {
+      "id": "responsive",
+      "name": "On a phone",
+      "html": "<!-- The same trail twice, and only one is ever visible. Below sm everything\n     between the root and the parent is dropped and the parent takes a back\n     chevron, because four crumbs at 390px either wrap onto two lines or push\n     the page sideways.\n\n     Both copies sit in the DOM, and that is safe here only because hidden and\n     sm:hidden compile to display:none, which takes the inactive one out of the\n     accessibility tree as well as off the screen. Hide one with opacity or\n     visibility instead and a screen reader reads the path twice. -->\n<div>\n  <!-- phone: parent and current only -->\n  <nav aria-label=\"Breadcrumb\" class=\"sm:hidden\">\n    <ol class=\"flex items-center gap-1.5 text-[13px]/5\">\n      <li class=\"flex items-center gap-1\">\n        <i data-lucide=\"chevron-left\" class=\"size-3.5 text-zinc-600\"></i>\n        <a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Purchase orders</a>\n      </li>\n      <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n      <li class=\"min-w-0\"><span aria-current=\"page\" class=\"block truncate font-medium tabular-nums text-zinc-900\">PO-24-1187</span></li>\n    </ol>\n  </nav>\n\n  <!-- sm and up: the full trail -->\n  <nav aria-label=\"Breadcrumb\" class=\"hidden sm:block\">\n    <ol class=\"flex flex-wrap items-center gap-1.5 text-[13px]/5\">\n      <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Home</a></li>\n      <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n      <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Procurement</a></li>\n      <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n      <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Purchase orders</a></li>\n      <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n      <li><span aria-current=\"page\" class=\"font-medium tabular-nums text-zinc-900\">PO-24-1187</span></li>\n    </ol>\n  </nav>\n</div>"
+    },
+    {
+      "id": "page-header",
+      "name": "Above a page title",
+      "html": "<!-- Where a trail actually lives. It sits above the title, not beside it, and\n     the title repeats the last crumb — that repetition is correct: the crumb is\n     navigation and the h1 is the page. -->\n<div class=\"rounded-xl border border-zinc-200 bg-white px-5 py-4\">\n  <nav aria-label=\"Breadcrumb\">\n    <ol class=\"flex flex-wrap items-center gap-1.5 text-[13px]/5\">\n      <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Home</a></li>\n      <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n      <li><a href=\"#\" class=\"text-zinc-600 hover:text-zinc-900\">Procurement</a></li>\n      <li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>\n      <li><span aria-current=\"page\" class=\"font-medium tabular-nums text-zinc-900\">PO-24-1187</span></li>\n    </ol>\n  </nav>\n\n  <div class=\"mt-2 flex flex-wrap items-start justify-between gap-3\">\n    <div>\n      <h1 class=\"text-[20px]/7 font-semibold tracking-tight tabular-nums\">PO-24-1187</h1>\n      <p class=\"mt-0.5 text-[13px]/5 text-zinc-600\">Gujarat Polymers Ltd · raised 14 Aug 2026 · 6 lines</p>\n    </div>\n    <div class=\"flex shrink-0 items-center gap-2\">\n      <button type=\"button\" class=\"rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100\">Export</button>\n      <button type=\"button\" class=\"rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800\">Approve</button>\n    </div>\n  </div>\n</div>"
+    },
+    {
+      "id": "back",
+      "name": "One level deep",
+      "html": "<!-- Not a breadcrumb, and that is the point. One level deep there is nothing to\n     trace, so a trail of two is ceremony. A back link says the same thing in\n     less space and gives a bigger target on a phone. -->\n<a href=\"#\" class=\"inline-flex items-center gap-1.5 text-[13px]/5 text-zinc-600 hover:text-zinc-900\">\n  <i data-lucide=\"chevron-left\" class=\"size-4\"></i>Purchase orders\n</a>"
+    },
+    {
+      "id": "django",
+      "name": "Django template",
+      "html": "<!-- The trail comes from the view as a list of (label, url) pairs, with the\n     last entry carrying no url. forloop.last is what decides which crumb is\n     plain text, so the template never has to be told twice where it is.\n\n     # views.py\n     context['crumbs'] = [\n         ('Home', reverse('home')),\n         ('Procurement', reverse('procurement:index')),\n         ('Purchase orders', reverse('po:list')),\n         (order.number, None),\n     ]\n\n     Build it in the view, not in the template. A trail assembled from\n     request.path is browsing history wearing a hierarchy's clothes. -->\n<nav aria-label=\"Breadcrumb\">\n  <ol class=\"flex flex-wrap items-center gap-1.5 text-[13px]/5\">\n    {% for label, url in crumbs %}\n      {% if not forloop.first %}<li aria-hidden=\"true\" class=\"text-zinc-500\">/</li>{% endif %}\n      <li>\n        {% if forloop.last %}\n          <span aria-current=\"page\" class=\"font-medium text-zinc-900\">{{ label }}</span>\n        {% else %}\n          <a href=\"{{ url }}\" class=\"text-zinc-600 hover:text-zinc-900\">{{ label }}</a>\n        {% endif %}\n      </li>\n    {% endfor %}\n  </ol>\n</nav>"
+    }
+  ]
+}

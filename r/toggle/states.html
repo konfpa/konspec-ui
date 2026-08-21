@@ -1,0 +1,72 @@
+<!-- Five rows, and the point of the last two is that they look nothing alike.
+     Disabled drains the whole control to 60% and refuses the pointer, because
+     nobody may move it. Pending stays at full strength and still takes another
+     toggle, because it is a write in flight, not a locked control — drain it
+     and you have told the user it is locked when it is not, and hidden which
+     way they just set it.
+
+     The locked row is on and stays on. Repainting a locked switch to the off
+     fill would say the setting is off when it is on and out of their hands.
+
+     The handlers behind Saving and Not saved are in the htmx variant; here the
+     rows are pinned so both states can be read side by side. -->
+<div class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+  <div class="px-4 py-2.5">
+    <label class="flex items-center justify-between gap-4 py-1">
+      <span class="text-[14px]/5">On — the setting is in force</span>
+      <input type="checkbox" role="switch" checked class="peer sr-only">
+      <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+        <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+      </span>
+    </label>
+  </div>
+
+  <div class="px-4 py-2.5">
+    <label class="flex items-center justify-between gap-4 py-1">
+      <span class="text-[14px]/5">Off — a shape with a fill and a ring, not a gap</span>
+      <input type="checkbox" role="switch" class="peer sr-only">
+      <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+        <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+      </span>
+    </label>
+  </div>
+
+  <div class="px-4 py-2.5">
+    <label class="flex items-start justify-between gap-4 py-1 has-[:disabled]:text-zinc-500">
+      <span class="text-[14px]/5">Locked — on, and not yours to change</span>
+      <input type="checkbox" role="switch" checked disabled
+             aria-describedby="sw-locked-help" class="peer sr-only">
+      <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+        <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+      </span>
+    </label>
+    <p id="sw-locked-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">Set by plant policy above ₹10,00,000.</p>
+  </div>
+
+  <div class="px-4 py-2.5">
+    <label class="flex items-start justify-between gap-4 py-1">
+      <span class="text-[14px]/5">Saving — moved, and the write is still out</span>
+      <input type="checkbox" role="switch" checked aria-busy="true" class="peer sr-only">
+      <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+        <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+      </span>
+    </label>
+    <p role="status" class="mt-1 flex items-center gap-1.5 pr-13 text-[12px]/4 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+    </p>
+  </div>
+
+  <div class="px-4 py-2.5">
+    <label class="flex items-start justify-between gap-4 py-1">
+      <span class="text-[14px]/5">Failed — reverted, and said so</span>
+      <input type="checkbox" role="switch" class="peer sr-only">
+      <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+        <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+      </span>
+    </label>
+    <p role="status" class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 pr-13 text-[12px]/4 font-medium text-red-600">
+      <span class="flex items-center gap-1.5"><i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged</span>
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2">Try again</button>
+    </p>
+  </div>
+</div>

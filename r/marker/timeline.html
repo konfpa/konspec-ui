@@ -1,0 +1,61 @@
+<!-- The rail is a flex child of the marker column, not an absolutely
+     positioned line. Positioned absolutely it needs a left offset kept in step
+     with the width of the mark by hand, and a 1px line under an even-width
+     column lands on a half pixel; as a flex child the same items-center that
+     centres the dot centres the rail, and there is no number to maintain.
+
+     It stops at the last item, which is the whole difficulty. One full-height
+     rail on the list overshoots the last mark by the height of that item's
+     text, and that height is not hardcodable because the item wraps. So the
+     rail is per-item: flex-1 fills from under the dot to the bottom of the li,
+     the li's pb-4 is what it bridges, and group-last:hidden with last:pb-0
+     removes both on the final entry.
+
+     Everything in the marker column is aria-hidden. The rail is a picture of
+     the fact that these entries are one sequence; the dates say it in words. -->
+<div class="max-w-md rounded-xl border border-zinc-200 bg-white p-5">
+  <h3 class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · history</h3>
+
+  <ul role="list" class="mt-3">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5">GRN-26-0442 posted against the order.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026, 11:04 · Ritu Deshpande</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5">Order emailed to Sharma Extrusions with the annexure attached.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">09 Aug 2026, 16:20 · Ritu Deshpande</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">Approved at ₹4,82,000 by the plant head, above the buyer's own limit.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">08 Aug 2026, 10:12 · Anil Kulkarni</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5">Raised against the rate contract dated 04 Apr 2026.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">07 Aug 2026, 09:48 · Ritu Deshpande</p>
+      </div>
+    </li>
+  </ul>
+</div>

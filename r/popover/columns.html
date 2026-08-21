@@ -1,0 +1,158 @@
+<!-- The opposite decision from the filter next door, and for a reason that is
+     visible on screen: the effect of a checkbox here is the table behind the
+     open panel changing shape, so there is nothing to confirm and an Apply
+     button would only make the user press it to see what they already saw.
+
+     The search box is where a nested Escape gets settled. Escape with text in
+     the box clears the box and stops there; Escape with the box empty is left
+     alone and travels up to the root handler, which closes the panel. An
+     unconditional .stop makes the popover undismissable for as long as the
+     cursor is in a text field, which is the failure this pattern exists to
+     avoid — it is the same conditional stopPropagation the dropdown uses.
+
+     The last remaining column disables its own checkbox. A table with no
+     columns renders as a stack of empty rows and looks like a data failure, and
+     the user has no way back because the thing they would click is gone.
+
+     x-show on a <td> sets display:none on the cell, which removes it from the
+     row properly; every row hides the same cell so the header and body stay in
+     step.
+
+     Vendor and Raised on additionally carry hidden sm:table-cell, because four
+     columns of this table measure 386px and a 390px screen has about 344px to
+     give it — measured, it pushed the whole page 42px sideways. Two things
+     decide the same cell, so it is worth being exact about which wins, and the
+     four combinations are not symmetrical:
+
+       picker off, any width   → Alpine writes an inline display:none, which
+                                 beats any class, so the cell is gone
+       picker on, below sm     → Alpine removes the display property entirely
+                                 rather than writing table-cell, so the hidden
+                                 class governs and the cell is still gone
+       picker on, sm and up    → no inline style, sm:table-cell wins, visible
+       first paint, picker on  → Alpine has not run, so the class alone decides
+
+     The rule that falls out: hidden wins in every case except picker-on above
+     the breakpoint. It only works because Alpine's show path is
+     removeProperty('display') and not display = 'table-cell'. Had it written a
+     value the inline style would beat the breakpoint and the table would
+     overflow again the moment somebody toggled a column off and back on.
+
+     shown() is left counting what the picker holds, not what is on the screen,
+     so at 390px it reads 4 of 5 while two of those four are not rendered. That
+     is the honest count: the picker is a saved view preference that travels
+     with the user to a desktop, and the last-column guard is protecting them
+     from saving a table with no columns in it — not from a narrow window, which
+     is temporary and which they cannot fix from inside this panel anyway.
+
+     One x-data covers the table and the popover, because the checkboxes and the
+     cells are the same state. That makes the popover wrapper no longer the
+     x-data root, so the focus-out test is $el and not $root: $root here is the
+     whole block including the table, and focus moving from the panel into a row
+     would test as still inside and never close the panel. Every other variant
+     has the handlers on the root and the two are the same element. -->
+
+<div x-data="{
+       open: false, q: '',
+       cols: [
+         { key: 'po', label: 'Order', on: true },
+         { key: 'vendor', label: 'Vendor', on: true },
+         { key: 'raised', label: 'Raised on', on: false },
+         { key: 'value', label: 'Value', on: true },
+         { key: 'status', label: 'Status', on: true }
+       ],
+       on(k) { return this.cols.find(c => c.key === k).on },
+       shown() { return this.cols.filter(c => c.on).length },
+       list() { return this.cols.filter(c => c.label.toLowerCase().includes(this.q.toLowerCase())) },
+       show() {
+         this.q = '';
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs.panel.focus()));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       }
+     }">
+
+  <div class="mb-3 flex items-center justify-between gap-3">
+    <h3 class="text-[13px]/5 font-medium">Purchase orders</h3>
+
+    <div class="relative inline-block"
+         @click.outside="close(false)"
+         @focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) close(false)"
+         @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+      <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+              :aria-expanded="open" aria-controls="pop-col"
+              class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
+        <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="shown() + ' of ' + cols.length"></span>
+      </button>
+
+      <div id="pop-col" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
+           role="dialog" tabindex="-1" aria-labelledby="pop-col-title"
+           class="absolute top-full right-0 z-40 mt-1.5 w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-3 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+        <p id="pop-col-title" class="text-[13px]/5 font-medium">Columns</p>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-500">Each change applies to the table at once.</p>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-500 sm:hidden">Vendor and Raised on are off on a screen this narrow, whatever is ticked here.</p>
+
+        <div class="mt-2.5 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <i data-lucide="search" class="ml-2.5 size-3.5 shrink-0 text-zinc-500"></i>
+          <input id="col-q" type="text" x-model="q" placeholder="Find a column" aria-label="Find a column"
+                 @keydown.escape="if (q) { $event.stopPropagation(); q = '' }"
+                 class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none">
+        </div>
+
+        <div class="mt-2 space-y-0.5">
+          <template x-for="c in list()" :key="c.key">
+            <label class="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-[13px]/5 hover:bg-zinc-100 has-[:disabled]:text-zinc-500">
+              <input type="checkbox" x-model="c.on" :disabled="c.on && shown() === 1" class="size-4 shrink-0 accent-zinc-700">
+              <span x-text="c.label"></span>
+            </label>
+          </template>
+          <p x-show="list().length === 0" x-cloak class="px-1.5 py-2 text-[12px]/4 text-zinc-500">No column matches that.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <table class="w-full text-left text-[13px]/5">
+      <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+        <tr>
+          <th scope="col" x-show="on('po')" class="px-4 py-2 font-medium">Order</th>
+          <th scope="col" x-show="on('vendor')" class="hidden px-4 py-2 font-medium sm:table-cell">Vendor</th>
+          <th scope="col" x-show="on('raised')" x-cloak class="hidden px-4 py-2 font-medium sm:table-cell">Raised on</th>
+          <th scope="col" x-show="on('value')" class="px-4 py-2 text-right font-medium">Value</th>
+          <th scope="col" x-show="on('status')" class="px-4 py-2 font-medium">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-zinc-100">
+          <td x-show="on('po')" class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
+          <td x-show="on('vendor')" class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">Gujarat Polymers Ltd</td>
+          <td x-show="on('raised')" x-cloak class="hidden px-4 py-2.5 tabular-nums text-zinc-600 sm:table-cell">12 Aug 2026</td>
+          <td x-show="on('value')" class="px-4 py-2.5 text-right tabular-nums">₹18,42,000</td>
+          <td x-show="on('status')" class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td x-show="on('po')" class="px-4 py-2.5 font-medium tabular-nums">PO-24-1191</td>
+          <td x-show="on('vendor')" class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">Nashik Steel Traders</td>
+          <td x-show="on('raised')" x-cloak class="hidden px-4 py-2.5 tabular-nums text-zinc-600 sm:table-cell">18 Aug 2026</td>
+          <td x-show="on('value')" class="px-4 py-2.5 text-right tabular-nums">₹6,04,750</td>
+          <td x-show="on('status')" class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

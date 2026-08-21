@@ -1,0 +1,38 @@
+<!-- This is the one bar allowed to carry a title, and it is allowed because
+     the screen underneath has no page-header: a full-height editor — a BOM
+     sheet, a rate-contract editor — where the document fills the column and
+     there is nowhere else for its name and its Save to go. On a register or a
+     dashboard the title and the primary action belong to page-header in the
+     scrolling column, and putting them here as well shows the record name twice
+     and spends 56px of a laptop saying it.
+
+     h-12 rather than h-14, because an editor is a screen somebody sits inside
+     for an hour and every row above the document is a row not spent on it. The
+     h1 is here only when it is here and not below; two h1 elements on one page
+     is a document with two titles as far as a heading outline is concerned.
+
+     Exactly one primary button. The saved state is text, not a toast — a toast
+     for an autosave is a notification of nothing, fired forty times an hour.
+     Below sm the button keeps its icon and drops its label; it does not shrink
+     and the row does not wrap. -->
+<header class="flex h-12 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4">
+  <a href="#" aria-label="Back to rate contracts"
+     class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="arrow-left" class="size-4"></i>
+  </a>
+
+  <h1 class="min-w-0 flex-1 truncate text-[16px]/6 font-semibold tabular-nums">RC-26-0043 — Gujarat Polymers Ltd</h1>
+
+  <p class="hidden shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500 sm:flex">
+    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Saved 2 min ago
+  </p>
+
+  <div class="flex shrink-0 items-center gap-2">
+    <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Preview
+    </button>
+    <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="check" class="size-4"></i><span class="hidden sm:inline">Submit for approval</span>
+    </button>
+  </div>
+</header>

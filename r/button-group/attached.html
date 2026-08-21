@@ -1,0 +1,15 @@
+<!-- A bordered strip, which says "these do different things" — the opposite of
+     the tinted track above. One border around the outside, border-l between,
+     and the radii on the end buttons rather than overflow-hidden on the
+     container, so the focus ring is not clipped off either end. -->
+<div class="inline-flex rounded-lg border border-zinc-200 bg-white">
+  <button type="button" class="inline-flex h-8 items-center gap-2 rounded-l-lg px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Edit
+  </button>
+  <button type="button" class="inline-flex h-8 items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="copy" class="size-4 text-zinc-600"></i>Duplicate
+  </button>
+  <button type="button" class="inline-flex h-8 items-center gap-2 rounded-r-lg border-l border-zinc-200 px-3 text-[13px]/5 font-medium text-red-600 hover:bg-red-50">
+    <i data-lucide="trash-2" class="size-4"></i>Delete
+  </button>
+</div>

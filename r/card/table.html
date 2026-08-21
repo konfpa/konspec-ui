@@ -1,0 +1,54 @@
+<!-- The one case where the body takes no padding. The table sits flush so its
+     rules run into the card's border and the header row meets the corners; add
+     px-5 py-4 here and the whole table floats inside an edge it never touches.
+
+     The footer is the totals row. It belongs in the card rather than the table
+     because it is a summary of the query, not another record. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+  <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200 px-5 py-3.5">
+    <div class="min-w-0">
+      <h2 class="text-[14px]/5 font-semibold">Order lines</h2>
+      <p class="text-[12px]/4 text-zinc-600">4 of 9 lines · PO-24-1187</p>
+    </div>
+    <button type="button" class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">
+      <i data-lucide="download" class="size-4 text-zinc-600"></i>Export
+    </button>
+  </div>
+
+  <table class="w-full table-fixed text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-100 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="px-5 py-2 font-medium">Item</th>
+        <th scope="col" class="hidden w-24 px-5 py-2 text-right font-medium sm:table-cell">Qty</th>
+        <th scope="col" class="w-32 px-5 py-2 text-right font-medium">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="truncate px-5 py-2.5">MS angle 50×50×6</td>
+        <td class="hidden px-5 py-2.5 text-right tabular-nums sm:table-cell">1,200 kg</td>
+        <td class="px-5 py-2.5 text-right tabular-nums">₹6,84,000</td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="truncate px-5 py-2.5">MS plate 8mm</td>
+        <td class="hidden px-5 py-2.5 text-right tabular-nums sm:table-cell">860 kg</td>
+        <td class="px-5 py-2.5 text-right tabular-nums">₹5,16,000</td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="truncate px-5 py-2.5">Channel 100×50</td>
+        <td class="hidden px-5 py-2.5 text-right tabular-nums sm:table-cell">440 kg</td>
+        <td class="px-5 py-2.5 text-right tabular-nums">₹3,08,000</td>
+      </tr>
+      <tr>
+        <td class="truncate px-5 py-2.5">Flat 40×6</td>
+        <td class="hidden px-5 py-2.5 text-right tabular-nums sm:table-cell">390 kg</td>
+        <td class="px-5 py-2.5 text-right tabular-nums">₹1,95,000</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="flex items-center justify-between border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+    <span class="text-[12px]/4 text-zinc-600">Subtotal, 4 of 9 lines</span>
+    <span class="text-[14px]/5 font-semibold tabular-nums">₹17,03,000</span>
+  </div>
+</div>

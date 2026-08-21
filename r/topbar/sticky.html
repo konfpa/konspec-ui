@@ -1,0 +1,69 @@
+<!-- The border exists from the first frame as border-transparent and only its
+     colour changes. Add the border on scroll and every row below it moves down
+     a pixel the moment the page leaves zero, and the whole page twitches under
+     the cursor.
+
+     The listener is on the element that scrolls. In this preview and inside
+     app-shell that is a div — the shell is a fixed-height flex frame where only
+     <main> scrolls, so window.scrollY is always zero there and a @scroll.window
+     handler never fires. On a document-scroll page it is the window instead:
+     @scroll.window="scrolled = window.scrollY > 0". Nothing looks broken when
+     the wrong one ships, which is how the dead listener survives review.
+
+     The translucent surface is bg-white first and
+     supports-[backdrop-filter]:bg-white/80 backdrop-blur after it, never
+     bg-white/80 on its own: where backdrop-filter is off the /80 stays and the
+     blur does not, so the table underneath scrolls through the bar as legible
+     text over legible text. backdrop-filter also makes a stacking context and
+     costs a composited layer repainted on every scroll frame, so it goes on the
+     header and on nothing else.
+
+     Pair this with one base rule on the page:
+       [id] { scroll-margin-top: 88px }
+     A sticky bar hides the anchor it has just scrolled to, so following
+     #line-14 out of an error summary lands on a row underneath this header and
+     the link reads as broken. One rule on [id] rather than scroll-mt-22 on the
+     elements that happen to be targets today. -->
+<div class="h-[420px] overflow-y-auto overscroll-contain rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+     x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0">
+
+  <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-transparent bg-white px-3 backdrop-blur transition-colors supports-[backdrop-filter]:bg-white/80 sm:px-4"
+          :class="scrolled && 'border-zinc-200'">
+    <nav aria-label="Breadcrumb" class="min-w-0">
+      <ol class="flex items-center gap-1.5 text-[13px]/5">
+        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Inventory</a></li>
+        <li aria-hidden="true" class="hidden text-zinc-400 sm:block">/</li>
+        <li class="min-w-0"><span aria-current="page" class="block truncate font-medium">Batch ledger</span></li>
+      </ol>
+    </nav>
+    <span aria-hidden="true" class="ml-auto flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RM</span>
+  </header>
+
+  <div class="space-y-2 p-4">
+    <div id="line-11" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0411 · LDPE 24FS040</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">1,250.000 kg · received 04/08/2026</p>
+    </div>
+    <div id="line-12" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0412 · LDPE 24FS040</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">980.500 kg · received 06/08/2026</p>
+    </div>
+    <div id="line-13" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0413 · HDPE 26HD110</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">2,400.000 kg · received 09/08/2026</p>
+    </div>
+    <div id="line-14" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0414 · HDPE 26HD110</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">1,875.250 kg · received 11/08/2026</p>
+    </div>
+    <div id="line-15" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0415 · PP 26PP220</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">640.000 kg · received 12/08/2026</p>
+    </div>
+    <div id="line-16" class="rounded-xl border border-zinc-200 bg-white px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">B-26-0416 · PP 26PP220</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">1,120.750 kg · received 14/08/2026</p>
+    </div>
+    <p class="pt-2 text-[12px]/4 text-zinc-500">Scroll: the bottom edge appears only once there is something behind it.</p>
+  </div>
+</div>

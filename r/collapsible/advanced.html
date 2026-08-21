@@ -1,0 +1,79 @@
+<!-- type="button" is load-bearing. A button inside a form defaults to submit,
+     so without it the first click on Advanced options posts a half-filled order
+     rather than opening anything.
+
+     The count on the trigger is what the closed row says about itself. Four
+     fields nobody can see is four fields nobody knows are there, and the ones
+     that already differ from the default are exactly the ones somebody has to
+     be told about.
+
+     Everything inside still posts. display:none inputs submit like any other,
+     so folding this section away hides it — it does not clear it. -->
+<form class="max-w-xl" x-data="{ open: false }">
+  <div class="space-y-4">
+    <div>
+      <label for="ao-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="ao-vendor" name="vendor" value="Gujarat Polymers Ltd"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+      </div>
+    </div>
+    <div>
+      <label for="ao-date" class="mb-1.5 block text-[13px]/5 font-medium">Required by</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="ao-date" name="required_by" type="date" value="2026-08-22"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5 rounded-xl border border-zinc-200 bg-white">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-advanced"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left">
+      <i data-lucide="sliders-horizontal" class="size-4 shrink-0 text-zinc-600"></i>
+      <span class="flex-1 text-[14px]/5 font-medium">Advanced options</span>
+      <span class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4 fields</span>
+      <span class="flex transition-transform" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+
+    <div id="col-advanced" x-show="open" x-cloak x-collapse.duration.200ms>
+      <div class="space-y-4 border-t border-zinc-100 px-4 py-4">
+        <div>
+          <label for="ao-freight" class="mb-1.5 block text-[13px]/5 font-medium">Freight terms</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="ao-freight" name="freight" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              <option>To pay — vendor arranges</option>
+              <option selected>Paid — included in rate</option>
+              <option>Ex-works — we collect</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="ao-tol" class="mb-1.5 block text-[13px]/5 font-medium">Receipt tolerance</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input id="ao-tol" name="tolerance" value="2" inputmode="decimal"
+                   class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+            <span class="pr-3 text-[14px]/5 text-zinc-600">%</span>
+          </div>
+          <p class="mt-1 text-[12px]/4 text-zinc-500">Over-receipt allowed against the ordered quantity.</p>
+        </div>
+        <label class="flex items-start gap-2.5 text-[14px]/5">
+          <input type="checkbox" name="inspection" value="1" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+          <span>Hold for inspection before the GRN is posted</span>
+        </label>
+        <div>
+          <label for="ao-note" class="mb-1.5 block text-[13px]/5 font-medium">Remarks printed on the order</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <textarea id="ao-note" name="remarks" rows="3"
+                      class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                      placeholder="Mill test certificate per heat number.">Mill test certificate per heat number.</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Release order</button>
+</form>

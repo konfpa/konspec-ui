@@ -1,0 +1,112 @@
+<!-- Tabs joined to the band's bottom edge. -mb-px on the tab row pulls it one
+     pixel down over the header's border-b, so the active tab's underline meets
+     the rule instead of floating above it.
+
+     This is the tabs component copied verbatim, not a lookalike: role="tablist"
+     with a name, aria-selected and aria-controls out, aria-labelledby back,
+     roving tabindex so Tab enters the row once, and arrow, Home and End all
+     preventing default. A row of styled buttons that merely looks like this
+     promises a screen reader that arrows switch panels, and then nothing does.
+
+     The tab row is the one thing in this band allowed to scroll sideways —
+     four tabs do not fit 390px and a second line of tabs reads as a different
+     control. Its scrollbar is hidden and the focus outline takes a negative
+     offset, because a positive one is clipped by the scroller. -->
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100"
+     x-id="['ph-tab', 'ph-panel']"
+     x-data="{
+       tab: 'orders',
+       items: [
+         { id: 'orders',   label: 'Open orders', count: 12 },
+         { id: 'rates',    label: 'Rate contracts', count: 6 },
+         { id: 'receipts', label: 'Receipts' },
+         { id: 'ledger',   label: 'Ledger' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }">
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 pt-4 lg:px-6">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Master data</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium text-zinc-900">Gujarat Polymers Ltd</span></li>
+        </ol>
+      </nav>
+
+      <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Gujarat Polymers Ltd</h1>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Approved vendor
+            </span>
+          </div>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">V-0412 · GSTIN 24AACCG1234F1ZP · Vapi, Gujarat · onboarded 11 Mar 2021</p>
+        </div>
+        <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4"></i>New order
+        </button>
+      </div>
+
+      <div x-ref="list" role="tablist" aria-label="Vendor sections"
+           @keydown.arrow-right.prevent="move(1)"
+           @keydown.arrow-left.prevent="move(-1)"
+           @keydown.home.prevent="pick(items[0].id)"
+           @keydown.end.prevent="pick(items[items.length - 1].id)"
+           class="-mb-px mt-4 flex gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <template x-for="t in items" :key="t.id">
+          <button type="button" role="tab" :data-tab="t.id"
+                  :id="$id('ph-tab', t.id)" :aria-controls="$id('ph-panel', t.id)"
+                  :aria-selected="tab === t.id ? 'true' : 'false'"
+                  :tabindex="tab === t.id ? 0 : -1"
+                  @click="pick(t.id)"
+                  class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
+            <span x-text="t.label"></span>
+            <template x-if="t.count">
+              <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="t.count"></span>
+            </template>
+          </button>
+        </template>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1600px] px-4 py-5 text-[13px]/5 lg:px-6">
+    <div role="tabpanel" tabindex="0" :id="$id('ph-panel', 'orders')" :aria-labelledby="$id('ph-tab', 'orders')"
+         x-show="tab === 'orders'"
+         class="rounded-lg tabular-nums text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      12 open orders, ₹41,86,400 committed. Oldest is PO-24-0996, promised 09 Aug 2026.
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('ph-panel', 'rates')" :aria-labelledby="$id('ph-tab', 'rates')"
+         x-show="tab === 'rates'" x-cloak
+         class="rounded-lg tabular-nums text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      6 rate contracts, 2 expiring before 31 Oct 2026. HDPE granules held at ₹94.50 per kg.
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('ph-panel', 'receipts')" :aria-labelledby="$id('ph-tab', 'receipts')"
+         x-show="tab === 'receipts'" x-cloak
+         class="rounded-lg tabular-nums text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      48 GRNs posted this financial year, 3 short-received and 1 rejected at QC.
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('ph-panel', 'ledger')" :aria-labelledby="$id('ph-tab', 'ledger')"
+         x-show="tab === 'ledger'" x-cloak
+         class="rounded-lg tabular-nums text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Outstanding ₹7,12,340 against 4 invoices. Oldest is 62 days, terms are 45 from GRN.
+    </div>
+  </div>
+</div>

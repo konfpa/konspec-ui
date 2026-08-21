@@ -1,0 +1,92 @@
+<!-- A 320px panel anchored under a trigger on a 390px screen has 35px of slack,
+     so it is always clamped, always nearly full width, and always covering the
+     row it came from. Below sm the panel stops pretending to be anchored and
+     becomes a bottom sheet: fixed to the bottom edge, full width, rounded on
+     the top corners only. From sm up the same element is the ordinary anchored
+     popover, which is why this is a class swap and not a second component.
+
+     It stays non-modal in both shapes. No backdrop, no focus trap, the page
+     behind still scrolls, and it still closes on a click outside, on focus
+     leaving and on Escape. A panel at the bottom of a phone screen that needs a
+     backdrop and a trap is a drawer, and that is a different entry — the test
+     is whether the page behind must stop, not where the panel sits.
+
+     The arrow is dropped below sm, and there is no version of it that would
+     work: the sheet spans the screen and the trigger could be anywhere along
+     it, so there is nothing for it to point at.
+
+     Buttons in the footer go full width below sm and auto above it. A 44px
+     target across the width of the sheet is what the thumb is reaching for; the
+     same button 90px wide in the corner of a phone screen is the commonest
+     mis-tap in an internal tool.
+
+     fixed inset-x-0 bottom-0 depends on no ancestor carrying a transform,
+     filter or will-change. One of those and the sheet anchors to that element
+     instead of the viewport, and it lands halfway up the page. -->
+<div class="relative inline-block"
+     x-data="{
+       open: false,
+       show() {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs.plant.focus()));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       }
+     }"
+     @click.outside="close(false)"
+     @focusout="if ($event.relatedTarget && !$root.contains($event.relatedTarget)) close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          :aria-expanded="open" aria-controls="pop-sh"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Narrow the GRN list
+  </button>
+
+  <div id="pop-sh" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
+       role="dialog" tabindex="-1" aria-labelledby="pop-sh-title"
+       class="fixed inset-x-0 bottom-0 z-40 w-full overflow-hidden rounded-t-2xl border border-zinc-200 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:absolute sm:inset-auto sm:top-full sm:left-0 sm:mt-1.5 sm:w-80 sm:max-w-[calc(100vw_-_1.5rem)] sm:rounded-xl">
+
+    <div class="flex justify-center pt-2 sm:hidden">
+      <span class="h-1 w-10 rounded-full bg-zinc-300" aria-hidden="true"></span>
+    </div>
+
+    <div class="space-y-3 px-4 py-3.5">
+      <p id="pop-sh-title" class="text-[14px]/5 font-medium sm:text-[13px]/5">Narrow the GRN list</p>
+
+      <div>
+        <label for="sh-plant" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">Plant</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="sh-plant" x-ref="plant" class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 outline-none sm:py-2">
+            <option>All plants</option>
+            <option selected>Waluj</option>
+            <option>Chakan</option>
+            <option>Vapi</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="sh-from" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">Posted on or after</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="sh-from" type="date" value="2026-08-01" class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 tabular-nums outline-none sm:py-2">
+        </div>
+      </div>
+
+      <label class="flex items-center gap-2.5 py-1 text-[14px]/5 sm:text-[13px]/5">
+        <input type="checkbox" checked class="size-4 shrink-0 accent-zinc-700">
+        Short receipts only
+      </label>
+    </div>
+
+    <div class="flex flex-col-reverse gap-2 border-t border-zinc-200 bg-zinc-100 px-4 py-3 pb-4 sm:flex-row sm:items-center sm:justify-between sm:py-2.5">
+      <button type="button" @click="close()"
+              class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px]/4 sm:underline sm:underline-offset-2 sm:hover:bg-transparent">Cancel</button>
+      <button type="button" @click="close()"
+              class="w-full rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:px-3.5 sm:py-1.5">Apply</button>
+    </div>
+  </div>
+</div>

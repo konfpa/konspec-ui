@@ -1,0 +1,78 @@
+<!-- Alpine decides when the card is open; htmx does the fetching, because
+     Alpine does not fetch. The request is a custom event Alpine dispatches at
+     the moment the card actually opens, not on mouseenter — mouseenter fires
+     350ms before there is a card, and a register full of triggers would fetch
+     every row the pointer passed over.
+
+     loaded is what stops the second request. It is set from htmx:afterSwap, so
+     a failed fetch leaves it false and the next open tries again, while a
+     successful one is never fetched a second time for the life of the page.
+     Alpine's .camel modifier is what turns htmx:after-swap in the attribute
+     into the htmx:afterSwap the library really dispatches.
+
+     hx-sync="this:drop" throws away a request raised while one is in flight,
+     which is what a pointer leaving and returning inside 300ms produces. -->
+<div class="rounded-xl border border-zinc-200 bg-white p-4">
+  <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Short receipt against</p>
+  <div class="mt-1">
+    <span class="relative inline-block"
+          x-data="{
+            open: false, timer: 0, loaded: false, failed: false,
+            show(d = 350) {
+              clearTimeout(this.timer);
+              this.timer = setTimeout(() => {
+                this.open = true;
+                if (!this.loaded) this.$refs.body.dispatchEvent(new CustomEvent('hovercard-fetch'));
+                window.dispatchEvent(new CustomEvent('hovercard-open', { detail: this.$root }));
+              }, d);
+            },
+            hide() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = false, 200); },
+            shut() { clearTimeout(this.timer); this.open = false; }
+          }"
+          @mouseenter="show()" @mouseleave="hide()"
+          @focusin="show(0)" @focusout="hide()"
+          @keydown.escape.window="shut()"
+          @hovercard-open.window="if ($event.detail !== $root) shut()"
+          @htmx:after-swap.camel="loaded = true; failed = false"
+          @htmx:response-error.camel="failed = true">
+
+      <a href="/orders/1187/" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums">PO-24-1187</a>
+
+      <div x-show="open" x-cloak x-transition.opacity.duration.150ms
+           class="absolute top-full left-0 z-40 pt-2">
+        <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-lg">
+
+          <!-- the skeleton is the panel's own content until the response
+               replaces it, and it is the shape of the answer, so the card does
+               not resize under the pointer when the data lands -->
+          <div x-ref="body" x-show="!failed"
+               hx-get="/orders/1187/card/" hx-trigger="hovercard-fetch"
+               hx-swap="innerHTML" hx-sync="this:drop"
+               aria-busy="true">
+            <div class="animate-pulse" aria-hidden="true">
+              <div class="h-3 w-28 rounded bg-zinc-200"></div>
+              <div class="mt-2 h-2.5 w-40 rounded bg-zinc-200"></div>
+              <div class="mt-4 space-y-2 border-t border-zinc-100 pt-3">
+                <div class="h-2.5 w-full rounded bg-zinc-200"></div>
+                <div class="h-2.5 w-2/3 rounded bg-zinc-200"></div>
+              </div>
+            </div>
+          </div>
+
+          <div x-show="failed" x-cloak class="flex items-start gap-2.5">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            <div class="min-w-0">
+              <p class="text-[13px]/5 font-medium">Could not load this order</p>
+              <button type="button"
+                      @click="failed = false; $refs.body.dispatchEvent(new CustomEvent('hovercard-fetch'))"
+                      class="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium hover:bg-zinc-100">
+                <i data-lucide="rotate-ccw" class="size-3.5 text-zinc-600"></i>Try again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </span>
+  </div>
+  <p class="mt-2 text-[12px]/4 text-zinc-500 tabular-nums">2 of 3 GRNs posted · last receipt 16 Aug 2026</p>
+</div>

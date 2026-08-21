@@ -1,0 +1,67 @@
+<!-- A refresh of rows somebody is already reading. Replacing them with a centred
+     ring would throw away the scroll position and collapse the panel, so the rows
+     stay and a bg-white/70 scrim goes over them.
+
+     The scrim stops the mouse and nothing else, which is why the content wrapper
+     takes :inert="busy" — without it Tab walks straight into rows that are being
+     replaced and Enter fires their actions against data on the way out. inert is
+     a boolean attribute Alpine knows about, so a false value removes it rather
+     than writing inert="false", which is a truthy string.
+
+     aria-busy is on the panel, and the sr-only status is outside the scrim so it
+     stays in the document across the whole cycle and reports both ends of it.
+
+     busy starts true so the scrim is already there at first paint rather than
+     appearing over rows somebody has begun reading, and x-init runs the cycle
+     once so it resolves. In an application the swap is what clears it. -->
+<div class="relative overflow-hidden rounded-xl border border-zinc-200 bg-white"
+     x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 2400) } }"
+     x-init="run()"
+     :aria-busy="busy">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
+    <p class="text-[14px]/5 font-semibold">Order register</p>
+    <button type="button" @click="run()" :disabled="busy"
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 disabled:text-zinc-400">
+      <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Refresh
+    </button>
+  </div>
+
+  <div :inert="busy">
+    <table class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+          <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+          <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
+          <td class="px-4 py-2.5">Sharma Extrusions</td>
+          <td class="px-4 py-2.5 text-right tabular-nums">₹18,42,000</td>
+        </tr>
+        <tr class="border-b border-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194</td>
+          <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
+          <td class="px-4 py-2.5 text-right tabular-nums">₹4,16,500</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1203</td>
+          <td class="px-4 py-2.5">Nashik Steel Traders</td>
+          <td class="px-4 py-2.5 text-right tabular-nums">₹9,07,250</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div x-show="busy" x-cloak class="absolute inset-0 z-10 flex items-center justify-center bg-white/70 px-4">
+    <span class="flex items-center gap-2.5 rounded-full border border-zinc-200 bg-white px-3.5 py-2 shadow-sm">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <span class="text-[12px]/4 font-medium text-zinc-600">Refreshing 24 orders</span>
+    </span>
+  </div>
+
+  <p role="status" class="sr-only" x-text="busy ? 'Refreshing the order register' : 'Order register updated'"></p>
+</div>

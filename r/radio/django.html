@@ -1,0 +1,104 @@
+<!-- forms.py
+     class GrnForm(forms.Form):
+         QC = [('pass', 'Passed — release to stores'),
+               ('deviation', 'Passed on deviation — needs a plant head note'),
+               ('reject', 'Rejected — raise a debit note')]
+
+         # ChoiceField is required=True by default, which is usually right here:
+         # an unanswered group posts no key at all, value_from_datadict reads it
+         # as None and the form comes back with "This field is required".
+         #
+         # Leave initial off for a consequential choice. An initial= is checked
+         # on first render, which makes it the tab target and makes it the answer
+         # for everybody who submits without reading the question.
+         qc = forms.ChoiceField(
+             choices=QC, label='QC result',
+             widget=forms.RadioSelect(attrs={
+                 'class': 'mt-0.5 size-4 shrink-0 accent-zinc-700',
+             }))
+
+         # "Not required" is an option with a value of its own. A radio cannot be
+         # unticked, so required=False buys nothing on its own — it only means
+         # the form tolerates the empty POST that a group nobody touched sends.
+         # With an option checked by default the group always posts, and "no
+         # inspection" arrives as a decision rather than as silence.
+         INSPECTION = [('none', 'Not required'),
+                       ('gate', 'At the plant gate'),
+                       ('third_party', 'Third-party agency')]
+
+         inspection = forms.ChoiceField(
+             choices=INSPECTION, initial='none', label='Inspection',
+             widget=forms.RadioSelect(attrs={
+                 'class': 'mt-0.5 size-4 shrink-0 accent-zinc-700',
+             }))
+
+     Loop the bound field rather than printing {{ form.qc }}. RadioSelect brings
+     its own wrapper — a <div> per option since Django 4.0, a <ul><li> before
+     that — and attrs will not lay it out: they are inherited into every option
+     and also copied onto that wrapping div, so a size-4 class sizes the
+     container as well as the inputs.
+
+     Each iteration yields {{ choice.tag }} and {{ choice.choice_label }}, and
+     {{ choice.id_for_label }} is that option's own id. On the field itself
+     RadioSelect.id_for_label returns an empty string on purpose — a label
+     pointing at the group would toggle the first option — so the question is a
+     <legend>, never a <label for>.
+
+     required is inherited into every option, which is what the browser needs to
+     block the submit and what a screen reader needs to announce on whichever
+     option has focus. -->
+<form method="post" class="max-w-xl">
+  {% csrf_token %}
+
+  <fieldset>
+    <legend class="mb-2 text-[13px]/5 font-medium">
+      {{ form.qc.label }}{% if form.qc.field.required %} <span class="text-red-600">*</span>{% endif %}
+    </legend>
+    <div class="space-y-2">
+      {% for choice in form.qc %}
+        <label class="flex items-start gap-2.5 text-[14px]/5">
+          {{ choice.tag }}<span>{{ choice.choice_label }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    {% if form.qc.errors %}
+      <p id="qc-err" class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.qc.errors.0 }}
+      </p>
+    {% endif %}
+  </fieldset>
+
+  <fieldset class="mt-6">
+    <legend class="mb-2 text-[13px]/5 font-medium">{{ form.inspection.label }}</legend>
+    <div class="space-y-2">
+      {% for choice in form.inspection %}
+        <label class="flex items-start gap-2.5 text-[14px]/5">
+          {{ choice.tag }}<span>{{ choice.choice_label }}</span>
+        </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <!-- A register picks one record with one name across every row, read back
+       with request.POST.get('grn_against') — .getlist() is the checkbox idiom
+       and returns a one-item list here. Render this list once: a second copy
+       for a phone layout shares the name, so the two are a single group and the
+       checked option in the display:none copy is the one that posts. -->
+  <fieldset class="mt-6">
+    <legend class="mb-2 text-[13px]/5 font-medium">Raise the GRN against</legend>
+    <div class="space-y-2">
+      {% for order in orders %}
+        <label class="flex items-center gap-2.5 text-[13px]/5">
+          <input type="radio" name="grn_against" value="{{ order.number }}"
+                 {% if order.number == chosen %}checked{% endif %}
+                 {% if order.fully_received %}disabled{% endif %}
+                 required class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 truncate tabular-nums">{{ order.number }} · {{ order.vendor }}</span>
+          <span class="shrink-0 tabular-nums text-zinc-600">{{ order.pending }}</span>
+        </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Post GRN</button>
+</form>

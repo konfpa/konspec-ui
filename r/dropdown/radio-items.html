@@ -1,0 +1,87 @@
+<!-- Two radio groups in one panel, which is the case that makes the group
+     wrapper mandatory rather than decorative. Without role="group" around each
+     set, a screen reader sees six menuitemradios in a row and reads the sort
+     options and the density options as one choice of six, where picking a
+     density would appear to un-pick the sort.
+
+     Like the checkbox variant, choosing does not close. These are view
+     settings and they are set in runs — sort, then density, then look at the
+     result. The trigger label carries the current sort so the setting is
+     legible with the menu shut; a settings menu whose trigger says only Sort
+     forces it open again to find out what is in force.
+
+     A radio item is not a toggle: clicking the one already chosen sets it to
+     itself, it does not clear it. There is no "unsorted" here, so there is
+     nothing for a second click to mean, and offering one would just be a way
+     to leave the register in a state it cannot render. -->
+<div class="relative"
+     x-data="{
+       open: false,
+       sort: 'date', dense: 'comfortable',
+       labels: { date: 'Order date', vendor: 'Vendor name', amount: 'Amount', due: 'Due date' },
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitemradio]')] },
+       show(last = false) {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const i = this.items(), at = i.indexOf(document.activeElement);
+         i[(at + step + i.length) % i.length]?.focus();
+       },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+          :aria-expanded="open" aria-haspopup="menu"
+          class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="arrow-down-wide-narrow" class="size-4 text-zinc-600"></i>
+    <span>Sorted by <span x-text="labels[sort]">Order date</span></span>
+    <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+  </button>
+
+  <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="Register view"
+       @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+       @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+       @keydown.tab="close(false)"
+       class="absolute left-0 z-40 mt-1 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+    <div role="group" aria-label="Sort by">
+      <div aria-hidden="true" class="px-3 pt-1.5 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Sort by</div>
+      <template x-for="key in ['date', 'vendor', 'amount', 'due']" :key="key">
+        <button type="button" role="menuitemradio" tabindex="-1" :aria-checked="sort === key" @click="sort = key"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+            <span x-show="sort === key" x-cloak><i data-lucide="check" class="size-4"></i></span>
+          </span><span x-text="labels[key]"></span>
+        </button>
+      </template>
+    </div>
+
+    <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+    <div role="group" aria-label="Row height">
+      <div aria-hidden="true" class="px-3 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Row height</div>
+      <button type="button" role="menuitemradio" tabindex="-1" :aria-checked="dense === 'compact'" @click="dense = 'compact'"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+          <span x-show="dense === 'compact'" x-cloak><i data-lucide="check" class="size-4"></i></span>
+        </span>Compact
+      </button>
+      <button type="button" role="menuitemradio" tabindex="-1" :aria-checked="dense === 'comfortable'" @click="dense = 'comfortable'"
+              class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+        <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+          <span x-show="dense === 'comfortable'" x-cloak><i data-lucide="check" class="size-4"></i></span>
+        </span>Comfortable
+      </button>
+    </div>
+  </div>
+</div>

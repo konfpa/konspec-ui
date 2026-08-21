@@ -1,0 +1,15 @@
+<!-- Full-bleed, above the application header, outside the content column.
+     Graphite — never red. A red bar across the top reads as an outage. -->
+<div x-data="{ show: true }" x-show="show" x-cloak
+     class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-zinc-900 px-4 py-2.5 text-white sm:px-6">
+  <i data-lucide="wrench" class="size-4 shrink-0 text-zinc-500"></i>
+  <p class="min-w-[14rem] flex-1 text-[13px]/5">
+    <span class="font-medium">Scheduled maintenance.</span>
+    <span class="text-zinc-500">Purchase orders are read-only on Sun 24 Aug, 01:00–03:00 IST.</span>
+  </p>
+  <a href="#" class="shrink-0 text-[13px]/5 font-medium underline underline-offset-2">What changes</a>
+  <button type="button" @click="show = false" aria-label="Dismiss"
+          class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-800 hover:text-white">
+    <i data-lucide="x" class="size-4"></i>
+  </button>
+</div>

@@ -1,0 +1,16 @@
+<!-- Nobody is a real state and needs a real rendering. An empty circle reads
+     as a loading bug; a dashed one with a verb reads as an invitation. -->
+<div class="flex flex-wrap items-center gap-6">
+  <div class="flex items-center gap-3">
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-300 text-zinc-500" aria-hidden="true">
+      <i data-lucide="user" class="size-4"></i>
+    </span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 text-zinc-600">Unassigned</p>
+      <p class="truncate text-[12px]/4 text-zinc-500">PO-24-1191 · raised 18 Aug</p>
+    </div>
+  </div>
+  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+    <i data-lucide="user-plus" class="size-4 text-zinc-600"></i>Assign approver
+  </button>
+</div>

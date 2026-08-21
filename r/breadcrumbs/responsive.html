@@ -1,0 +1,35 @@
+<!-- The same trail twice, and only one is ever visible. Below sm everything
+     between the root and the parent is dropped and the parent takes a back
+     chevron, because four crumbs at 390px either wrap onto two lines or push
+     the page sideways.
+
+     Both copies sit in the DOM, and that is safe here only because hidden and
+     sm:hidden compile to display:none, which takes the inactive one out of the
+     accessibility tree as well as off the screen. Hide one with opacity or
+     visibility instead and a screen reader reads the path twice. -->
+<div>
+  <!-- phone: parent and current only -->
+  <nav aria-label="Breadcrumb" class="sm:hidden">
+    <ol class="flex items-center gap-1.5 text-[13px]/5">
+      <li class="flex items-center gap-1">
+        <i data-lucide="chevron-left" class="size-3.5 text-zinc-600"></i>
+        <a href="#" class="text-zinc-600 hover:text-zinc-900">Purchase orders</a>
+      </li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li class="min-w-0"><span aria-current="page" class="block truncate font-medium tabular-nums text-zinc-900">PO-24-1187</span></li>
+    </ol>
+  </nav>
+
+  <!-- sm and up: the full trail -->
+  <nav aria-label="Breadcrumb" class="hidden sm:block">
+    <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Purchase orders</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">PO-24-1187</span></li>
+    </ol>
+  </nav>
+</div>

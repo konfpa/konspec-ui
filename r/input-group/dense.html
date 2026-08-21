@@ -1,0 +1,47 @@
+<!-- Dense means less padding, not a smaller target. py-1.5 against a 13px/5
+     line takes the group to 34px, the same height the dense buttons in a
+     register toolbar take, and that is still comfortably over the 24px WCAG 2.2
+     asks for. Go below it and a native select has nowhere left to draw its
+     chevron and starts clipping the option text instead.
+
+     Nothing in a filter row has a visible label — the column headings under it
+     are what name the filters — so every control carries an sr-only one. The
+     magnifying glass is not a label and neither is the placeholder, which is
+     gone the moment anybody types.
+
+     The row wraps and never scrolls. flex-wrap with basis-56 on the search box
+     gives three groups on a desktop and three full-width rows at 390px; a
+     filter bar that scrolls sideways hides filters that are already applied,
+     which is the one thing a filter bar must never do. min-w-0 is what lets the
+     search box shrink at all — without it the input holds its intrinsic
+     twenty-character width and pushes the row past the screen. -->
+<div class="flex flex-wrap items-center gap-2">
+  <div class="flex min-w-0 flex-1 basis-56 items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <label for="ig9-q" class="sr-only">Search the item ledger</label>
+    <i data-lucide="search" aria-hidden="true" class="ml-2.5 size-4 shrink-0 self-center text-zinc-500"></i>
+    <input id="ig9-q" type="text" placeholder="Item or vendor"
+           class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <label for="ig9-min" class="sr-only">Minimum value in rupees</label>
+    <span aria-hidden="true" class="flex items-center pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+    <input id="ig9-min" name="min_value" inputmode="numeric" placeholder="Min"
+           class="w-24 min-w-0 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+  </div>
+
+  <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <label for="ig9-qty" class="sr-only">Minimum quantity</label>
+    <input id="ig9-qty" name="min_qty" inputmode="decimal" placeholder="Qty"
+           class="w-20 min-w-0 bg-transparent px-2.5 py-1.5 text-right text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+    <label for="ig9-uom" class="sr-only">Unit of measure</label>
+    <select id="ig9-uom" name="uom"
+            class="shrink-0 rounded-r-[7px] border-l border-zinc-200 bg-zinc-100 py-1.5 pr-1.5 pl-2 text-[13px]/5 text-zinc-600 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+      <option>MT</option>
+      <option>kg</option>
+      <option>nos</option>
+    </select>
+  </div>
+</div>
+
+<p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">1,438 ledger entries. Filters apply as they are typed.</p>

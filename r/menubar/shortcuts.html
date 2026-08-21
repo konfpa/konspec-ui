@@ -1,0 +1,125 @@
+<!-- The hint column is aria-hidden and the real claim is aria-keyshortcuts on
+     the item, in its formal syntax — Control+Shift+Z, not the glyphs. Left in
+     the accessible name the item announces as "Redo Ctrl Shift Z" every time
+     the arrows pass over it, and on a Mac build the ⌘ is read as whatever the
+     synthesiser makes of an unmapped codepoint. The attribute is also a
+     promise: it says a handler on this page listens for that chord. If none
+     does, do not write it — the screen reader lists the shortcut in its own
+     inventory and the user presses it into silence.
+
+     The hints say Ctrl because these people are on Windows. An application
+     serving both platforms computes the word once at boot and renders it from
+     the list; writing two columns and hiding one is how a menu ends up
+     claiming Ctrl S on a Mac.
+
+     The panel is a list of groups rather than a flat list with separator
+     elements dropped into it, because the rule is the group boundary. Modelled
+     this way a group that empties out — every command in it hidden by a
+     permission check — takes its own rule with it. role="group" is a permitted
+     child of role="menu"; a bare div is not. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       menus: [
+         { id: 'file', label: 'File', groups: [
+           [ { label: 'New purchase order', icon: 'file-plus', hint: 'Ctrl N', keys: 'Control+N' },
+             { label: 'Save draft',         icon: 'save',      hint: 'Ctrl S', keys: 'Control+S' },
+             { label: 'Submit for approval', icon: 'send' } ],
+           [ { label: 'Print', icon: 'printer', hint: 'Ctrl P', keys: 'Control+P' },
+             { label: 'Export as PDF', icon: 'file-text' } ]
+         ] },
+         { id: 'edit', label: 'Edit', groups: [
+           [ { label: 'Undo', icon: 'undo-2', hint: 'Ctrl Z', keys: 'Control+Z' },
+             { label: 'Redo', icon: 'redo-2', hint: 'Ctrl Shift Z', keys: 'Shift+Control+Z' } ],
+           [ { label: 'Insert line',    icon: 'rows-3', hint: 'Ctrl Enter', keys: 'Control+Enter' },
+             { label: 'Duplicate line', icon: 'copy',   hint: 'Ctrl D',     keys: 'Control+D' },
+             { label: 'Find item code', icon: 'search', hint: 'Ctrl F',     keys: 'Control+F' } ]
+         ] },
+         { id: 'view', label: 'View', groups: [
+           [ { label: 'Tax breakup',      icon: 'percent' },
+             { label: 'Revision history', icon: 'history' } ]
+         ] }
+       ],
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+    <template x-for="m in menus" :key="m.id">
+      <div class="relative max-md:static">
+        <button type="button" role="menuitem" aria-haspopup="menu" :data-menu="m.id"
+                :aria-expanded="open === m.id" :tabindex="at === m.id ? 0 : -1"
+                @click="open === m.id ? close() : show(m.id)"
+                @mouseenter="if (open !== null) to(m.id)"
+                @keydown.arrow-down.prevent="show(m.id)" @keydown.arrow-up.prevent="show(m.id, true)"
+                @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+                @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+                class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+
+        <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
+             @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+             @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+             @keydown.tab="close()"
+             class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+          <template x-for="(g, gi) in m.groups" :key="gi">
+            <div role="group" x-show="g.length" class="border-t border-zinc-100 py-1 first:border-t-0">
+              <template x-for="it in g" :key="it.label">
+                <button type="button" role="menuitem" tabindex="-1" :aria-keyshortcuts="it.keys" @click="close()"
+                        class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                  <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+                  <span x-text="it.label"></span>
+                  <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 tabular-nums text-zinc-500" x-text="it.hint"></span>
+                </button>
+              </template>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Draft · 14 lines · ₹18,42,000 before tax</p>
+  </div>
+</div>

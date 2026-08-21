@@ -1,0 +1,115 @@
+<!-- Nothing here filters or sorts. The register is the server's, and this is
+     only the controls and where they are wired: every one of them is a GET
+     carrying q, sort and page, and htmx swaps the same #register div back in.
+     They are links and a real form first, so the screen still works with the
+     swap turned off, which is also what makes the browser Back button behave.
+
+     The view hands the template one entry per sortable column — its aria value
+     and the query string that would sort by it next — because working that out
+     in the template means writing the same comparison three times and getting
+     aria-sort and the chevron out of step with each other.
+
+     Selection is deliberately absent: which rows are ticked is client state and
+     does not survive a swap. Reach for the full register when you need it. -->
+
+{# orders/register.html #}
+<div id="register" class="rounded-xl border border-zinc-200 bg-white">
+
+  <form method="get" action="{% url 'order-register' %}"
+        class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" name="q" value="{{ q }}" aria-label="Search the order register"
+             placeholder="Search PO, vendor or department"
+             hx-get="{% url 'order-register' %}" hx-trigger="input changed delay:300ms, search"
+             hx-include="closest form" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+    <input type="hidden" name="sort" value="{{ sort }}">
+    <button type="submit" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Search</button>
+  </form>
+
+  {% if page_obj %}
+    <table class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          {% for c in columns %}
+            <th scope="col" aria-sort="{{ c.aria }}" class="px-4 py-2.5 {% if c.numeric %}text-right{% endif %}">
+              <a href="?{{ c.query }}" hx-get="?{{ c.query }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+                 class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 {% if c.numeric %}justify-end{% endif %} {% if c.aria != 'none' %}text-zinc-900{% endif %}">
+                {{ c.label }}
+                {% if c.aria != 'none' %}
+                  <span class="{% if c.aria == 'descending' %}rotate-180{% endif %}"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+                {% endif %}
+              </a>
+            </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in page_obj %}
+          <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+            <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
+            <td class="px-4 py-2.5">{{ o.vendor.name }}</td>
+            <td class="px-4 py-2.5 text-right tabular-nums">₹{{ o.amount|intcomma }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+      <p class="text-[13px]/5 text-zinc-600 tabular-nums">
+        {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} orders
+      </p>
+      <div class="flex items-center gap-2">
+        <span class="text-[13px]/5 text-zinc-600 tabular-nums">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_previous %}
+          <a href="?{{ prev_query }}" hx-get="?{{ prev_query }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+             class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+            <i data-lucide="chevron-left" class="size-4"></i>Previous
+          </a>
+        {% else %}
+          <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+            <i data-lucide="chevron-left" class="size-4"></i>Previous
+          </button>
+        {% endif %}
+        {% if page_obj.has_next %}
+          <a href="?{{ next_query }}" hx-get="?{{ next_query }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+             class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+            Next<i data-lucide="chevron-right" class="size-4"></i>
+          </a>
+        {% else %}
+          <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+            Next<i data-lucide="chevron-right" class="size-4"></i>
+          </button>
+        {% endif %}
+      </div>
+    </nav>
+  {% else %}
+    <div class="px-6 py-12 text-center">
+      <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
+      </span>
+      <p class="mt-3 text-[16px]/6 font-semibold">No orders match this search</p>
+      <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">Nothing in the register matches <span class="font-medium text-zinc-900">{{ q }}</span>. Search on a PO number, a vendor or a department.</p>
+      <a href="{% url 'order-register' %}" hx-get="{% url 'order-register' %}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+         class="mt-4 inline-block rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Clear the search</a>
+    </div>
+  {% endif %}
+</div>
+
+{# orders/views.py — the three query strings the template renders, built once
+
+   def register(request):
+       q = request.GET.get('q', '')
+       sort = request.GET.get('sort', 'number')
+       orders = Order.objects.filter(...).order_by(sort)
+       page_obj = Paginator(orders, 25).get_page(request.GET.get('page'))
+       columns = [column('number', 'PO number', sort, q),
+                  column('vendor__name', 'Vendor', sort, q),
+                  column('amount', 'Amount', sort, q, numeric=True)]
+       ...
+
+   where column() returns {'label', 'query', 'aria', 'numeric'} — query being
+   urlencode({'q': q, 'sort': '-field' if already ascending on it else 'field'}),
+   and aria being 'ascending', 'descending' or 'none'. #}

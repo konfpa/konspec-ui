@@ -1,0 +1,71 @@
+<!-- Seven tabs on a phone. The strip scrolls and the next tab peeks, which is
+     what stops it reading as a row that broke.
+
+     focus() scrolls a hidden element into view on both axes, which on a long
+     page means the whole document jumps to the tab strip. So focus with
+     preventScroll and do the horizontal scroll by hand, on the strip only. -->
+<div x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'grn',
+       items: [
+         { id: 'overview', label: 'Overview' },
+         { id: 'po',       label: 'Purchase orders' },
+         { id: 'req',      label: 'Requisitions' },
+         { id: 'grn',      label: 'Goods receipt' },
+         { id: 'inv',      label: 'Invoices' },
+         { id: 'vendors',  label: 'Vendors' },
+         { id: 'rc',       label: 'Rate contracts' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       init() { this.$nextTick(() => this.reveal(this.tab)); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus({ preventScroll: true });
+           this.reveal(id);
+         });
+       },
+       /* scrollIntoView by hand, so only the strip moves and the neighbour
+          still peeks by 16px */
+       reveal(id) {
+         const s = this.$refs.strip, el = this.tabEls().find(e => e.dataset.tab === id);
+         if (!el) return;
+         const a = el.getBoundingClientRect(), b = s.getBoundingClientRect();
+         if (a.left < b.left + 16) s.scrollBy({ left: a.left - b.left - 16 });
+         else if (a.right > b.right - 16) s.scrollBy({ left: a.right - b.right + 16 });
+       }
+     }">
+  <div x-ref="strip" class="overflow-x-auto border-b border-zinc-200 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div x-ref="list" role="tablist" aria-label="Procurement sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="pick(items[0].id)"
+         @keydown.end.prevent="pick(items[items.length - 1].id)"
+         class="-mb-px flex w-max gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="$id('tab', t.id)" :aria-controls="$id('panel', 'all')"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :tabindex="tab === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                class="shrink-0 whitespace-nowrap rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15"
+                :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
+                x-text="t.label"></button>
+      </template>
+    </div>
+  </div>
+
+  <!-- one panel whose contents change, so aria-labelledby follows the selection -->
+  <div role="tabpanel" tabindex="0" :id="$id('panel', 'all')" :aria-labelledby="$id('tab', tab)"
+       class="rounded-lg pt-4 text-[14px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <p class="text-zinc-600">Showing
+      <span class="font-medium text-zinc-900" x-text="items.find(t => t.id === tab).label"></span>.
+      On a narrow screen, drag the strip or use the arrow keys.</p>
+  </div>
+</div>

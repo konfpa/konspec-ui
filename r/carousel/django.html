@@ -1,0 +1,68 @@
+{% if inspection.photos.exists %}
+<div x-data="{
+       i: 0, n: 0, atStart: true, atEnd: true,
+       slides() { return Array.from(this.$refs.rail.children).filter(el => el.localName !== 'template'); },
+       pad() { return parseFloat(getComputedStyle(this.$refs.rail).scrollPaddingLeft) || 0; },
+       sync() {
+         const r = this.$refs.rail, s = this.slides(), edge = r.getBoundingClientRect().left + this.pad();
+         this.n = s.length;
+         this.atStart = r.scrollLeft < 2;
+         this.atEnd = r.scrollLeft > r.scrollWidth - r.clientWidth - 2;
+         const near = s.map((el, k) => [Math.abs(el.getBoundingClientRect().left - edge), k]).sort((a, b) => a[0] - b[0]);
+         this.i = near.length ? near[0][1] : 0;
+       },
+       go(k) {
+         const r = this.$refs.rail, s = this.slides(), el = s[Math.min(Math.max(k, 0), s.length - 1)];
+         if (!el) return;
+         r.scrollBy({ left: el.getBoundingClientRect().left - r.getBoundingClientRect().left - this.pad(),
+                      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+       }
+     }"
+     x-init="sync()"
+     @resize.window.debounce="sync()">
+
+  <div class="mb-3 flex items-center justify-between gap-3">
+    <h3 class="text-[14px]/5 font-semibold">Photographs</h3>
+    <div class="flex items-center gap-2">
+      <p class="text-[12px]/4 tabular-nums text-zinc-500"><span x-text="i + 1"></span> of <span x-text="n"></span></p>
+      <div class="hidden items-center gap-1 md:flex">
+        <button type="button" @click="go(i - 1)" :disabled="atStart" aria-label="Previous photograph"
+                class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+          <i data-lucide="chevron-left" class="size-4"></i>
+        </button>
+        <button type="button" @click="go(i + 1)" :disabled="atEnd" aria-label="Next photograph"
+                class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+          <i data-lucide="chevron-right" class="size-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {# the loop is server side, so there is no x-for template for slides() to filter out #}
+  <div x-ref="rail" @scroll.passive="sync()" tabindex="0" role="group" aria-label="Photographs on inspection {{ inspection.reference }}"
+       @keydown.arrow-right="if ($event.target === $refs.rail) { $event.preventDefault(); go(i + 1); }"
+       @keydown.arrow-left="if ($event.target === $refs.rail) { $event.preventDefault(); go(i - 1); }"
+       class="flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    {% for photo in inspection.photos.all %}
+      <figure class="shrink-0 basis-full snap-start overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" loading="lazy" decoding="async"
+             class="aspect-video w-full bg-zinc-100 object-cover">
+        <figcaption class="border-t border-zinc-200 px-4 py-2.5">
+          <p class="truncate text-[13px]/5 font-medium">{{ photo.caption }}</p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500 tabular-nums">
+            {{ photo.filename }} · {{ photo.taken_at|date:"d M Y H:i" }} IST
+          </p>
+        </figcaption>
+      </figure>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div class="rounded-xl border border-dashed border-zinc-200 bg-white px-6 py-10 text-center">
+  <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+    <i data-lucide="image" class="size-4 text-zinc-600"></i>
+  </span>
+  <p class="mt-3 text-[14px]/5 font-medium">No photographs on this inspection</p>
+  <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">Photos taken at the gate appear here in the order they were uploaded.</p>
+</div>
+{% endif %}
