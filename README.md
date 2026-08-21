@@ -18,7 +18,7 @@ Three steps, in order. Do not skip the first.
 3. Copy  registry.json → components[id].variants[].html        verbatim, then change the copy
 ```
 
-`llms.txt` is 21 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, and the locked status mapping. `registry.json` carries the markup.
+`llms.txt` is 24 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, and the locked status mapping. `registry.json` carries the markup.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 
@@ -41,7 +41,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**47 components · 239 variants · 29 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
+**55 components · 338 variants · 41 written up.** Every one of them is in [registry.json](https://konfpa.github.io/konspec-ui/registry.json), written up or not — a page is documentation, not a precondition for using the markup.
 
 ### Actions
 
@@ -49,14 +49,17 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 |---|---|--:|---|
 | Button | `button` | 8 | [open](https://konfpa.github.io/konspec-ui/components/button.html) |
 | Button group | `button-group` | 8 | [open](https://konfpa.github.io/konspec-ui/components/button-group.html) |
-| Dropdown menu | `dropdown` | 1 | — |
+| Dropdown menu | `dropdown` | 9 | [open](https://konfpa.github.io/konspec-ui/components/dropdown.html) |
 
 ### Forms
 
 | Component | id | Variants | Page |
 |---|---|--:|---|
-| Field | `field` | 2 | — |
-| Input | `input` | 3 | — |
+| Label | `label` | 9 | [open](https://konfpa.github.io/konspec-ui/components/label.html) |
+| Field | `field` | 9 | [open](https://konfpa.github.io/konspec-ui/components/field.html) |
+| Input | `input` | 9 | [open](https://konfpa.github.io/konspec-ui/components/input.html) |
+| Input group | `input-group` | 9 | [open](https://konfpa.github.io/konspec-ui/components/input-group.html) |
+| Select | `select` | 9 | [open](https://konfpa.github.io/konspec-ui/components/select.html) |
 | Textarea | `textarea` | 8 | [open](https://konfpa.github.io/konspec-ui/components/textarea.html) |
 | Checkbox | `checkbox` | 8 | [open](https://konfpa.github.io/konspec-ui/components/checkbox.html) |
 | Radio | `radio` | 8 | [open](https://konfpa.github.io/konspec-ui/components/radio.html) |
@@ -64,6 +67,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Combobox | `combobox` | 9 | [open](https://konfpa.github.io/konspec-ui/components/combobox.html) |
 | Attachment | `attachment` | 8 | [open](https://konfpa.github.io/konspec-ui/components/attachment.html) |
 | Calendar | `calendar` | 8 | [open](https://konfpa.github.io/konspec-ui/components/calendar.html) |
+| Questionnaire | `questionnaire` | 9 | [open](https://konfpa.github.io/konspec-ui/components/questionnaire.html) |
 
 ### Data display
 
@@ -77,6 +81,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Progress | `progress` | 3 | — |
 | Empty state | `empty-state` | 3 | — |
 | Skeleton | `skeleton` | 3 | — |
+| Marker | `marker` | 9 | [open](https://konfpa.github.io/konspec-ui/components/marker.html) |
 | Spinner | `spinner` | 9 | [open](https://konfpa.github.io/konspec-ui/components/spinner.html) |
 
 ### Feedback
@@ -92,6 +97,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Badge | `badge` | 9 | [open](https://konfpa.github.io/konspec-ui/components/badge.html) |
 | Tooltip | `tooltip` | 2 | — |
 | Hovercard | `hovercard` | 9 | [open](https://konfpa.github.io/konspec-ui/components/hovercard.html) |
+| Popover | `popover` | 9 | [open](https://konfpa.github.io/konspec-ui/components/popover.html) |
 | Avatar | `avatar` | 8 | [open](https://konfpa.github.io/konspec-ui/components/avatar.html) |
 
 ### Navigation
@@ -100,7 +106,9 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 |---|---|--:|---|
 | Tabs | `tabs` | 8 | [open](https://konfpa.github.io/konspec-ui/components/tabs.html) |
 | Breadcrumbs | `breadcrumbs` | 8 | [open](https://konfpa.github.io/konspec-ui/components/breadcrumbs.html) |
-| Sidebar nav | `sidebar-nav` | 3 | — |
+| Menubar | `menubar` | 9 | [open](https://konfpa.github.io/konspec-ui/components/menubar.html) |
+| Navigation menu | `navigation-menu` | 9 | [open](https://konfpa.github.io/konspec-ui/components/navigation-menu.html) |
+| Sidebar | `sidebar` | 9 | [open](https://konfpa.github.io/konspec-ui/components/sidebar.html) |
 | Topbar | `topbar` | 2 | — |
 | Accordion | `accordion` | 3 | [open](https://konfpa.github.io/konspec-ui/components/accordion.html) |
 | Collapsible | `collapsible` | 8 | [open](https://konfpa.github.io/konspec-ui/components/collapsible.html) |

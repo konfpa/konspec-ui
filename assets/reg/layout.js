@@ -33,7 +33,7 @@ register(
       'The off-canvas sidebar traps focus while open on mobile and returns it to the menu button on close.',
       'A skip link to <main> comes first in the DOM, so the keyboard is not walked through the whole nav on every page.'
     ],
-    related: ['sidebar-nav', 'topbar', 'page-header'],
+    related: ['sidebar', 'topbar', 'page-header'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<div class="relative flex h-[640px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"

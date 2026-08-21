@@ -143,12 +143,15 @@ building anything, rather than reconstructing a component from its description.
 
 - **Button** `button` — The standard action control. Exactly one primary button per view; everything else is secondary, ghost or a link. Variants: variants, sizes, icons, states, link, full-width, toolbar, django.
 - **Button group** `button-group` — Several controls joined into one object. Two shapes only: a tinted track for choosing one of a set, and a bordered strip for actions that belong together. Variants: segmented, attached, icon-toolbar, split, input, vertical, responsive, django.
-- **Dropdown menu** `dropdown` — A menu of actions anchored to a trigger. Destructive items sit last, below a divider. Variants: default.
+- **Dropdown menu** `dropdown` — A menu of actions anchored to a trigger. Real focus walks the items one tabindex="-1" at a time; destructive items sit last, below a divider. Variants: default, row-actions, groups, checkbox-items, radio-items, shortcuts, submenu, destructive, account.
 
 ### Forms
 
-- **Field** `field` — Label, control, help text and error in one block. This is the unit every form is built from. Variants: default, error.
-- **Input** `input` — Single-line text entry. The border lives on the wrapper so icons and prefixes sit inside the focus ring. Variants: default, icon, disabled.
+- **Label** `label` — The name of a control, bound to it with for and id or by wrapping it. The smallest component here, and the one that is most often drawn rather than connected. Variants: default, required, wrapping, legend, trailing, hidden, states, horizontal, caption.
+- **Field** `field` — Label, control, help text and error in one block. This is the unit every form is built from, and the thing that owns the wiring between the four. Variants: default, error, required, horizontal, group, choice, action, grid, readonly.
+- **Input** `input` — Single-line text entry. The border lives on the wrapper, not on the control, so an icon, a unit or a clear button sits inside the focus outline instead of beside it. Variants: default, sizes, icon, amount, search, error, format, password, disabled.
+- **Input group** `input-group` — One text field and the things that qualify it — a unit, a currency, a scope select, an action — inside a single bordered enclosure that draws one focus outline for all of them. Variants: default, icon, button, select, action, search, textarea, error, dense.
+- **Select** `select` — One answer out of a short fixed list. A real <select>, styled through its wrapper the way an input is, and an Alpine listbox only for the rows an <option> cannot hold. Variants: default, groups, states, multiple, filter, rich, status, cascade, django.
 - **Textarea** `textarea` — Multi-line text entry. Same bordered wrapper as the input, a height measured in rows, and a counter when there is a limit worth showing. Variants: default, sizes, counter, autogrow, toolbar, error, disabled, django.
 - **Checkbox** `checkbox` — An independent on or off — one flag, a set of options, or the row selection a register's bulk actions run on. A real native box wearing accent-zinc-700. Variants: default, group, indeterminate, cards, filters, table, states, django.
 - **Radio** `radio` — One of a set, and exactly one. Real native radios wearing accent-zinc-700, where the shared name is the group and the only way to mean none is an option that says so. Variants: default, descriptions, cards, inline, none, table, states, django.
@@ -156,6 +159,7 @@ building anything, rather than reconstructing a component from its description.
 - **Combobox** `combobox` — A text box that filters a list of records and commits one of them. The typing is a search; what reaches the server is a hidden input under it. Variants: default, multi, select-all, groups, rich, remote, create, states, django.
 - **Attachment** `attachment` — The documents hanging off a record — a drop zone over the list of what is already there. Every file shows its type, size, who attached it and when. Variants: default, empty, uploading, rejected, readonly, single, images, django.
 - **Calendar** `calendar` — A month grid for picking a date or a range. Monday-first, tabular figures, and the same graphite selection the rest of the system uses. Variants: month, picker, range, jump, constrained, presets, native, django.
+- **Questionnaire** `questionnaire` — A run of questions answered in order on one page — a QC checklist, a vendor assessment, a safety audit. One fieldset per question, the question text as its legend, and three equal tiles carrying the answer so a column of them can be read at a glance. Variants: question, run, observation, conditional, scale, multi, sheet, invalid, signed.
 
 ### Data display
 
@@ -167,6 +171,7 @@ building anything, rather than reconstructing a component from its description.
 - **Progress** `progress` — How far along something is — receipt against an order, a step in a workflow, a fill level in a row. Variants: bar, steps, inline.
 - **Empty state** `empty-state` — What a list shows when it has nothing in it. Says why it is empty and what to do next. Variants: no-results, nothing-yet, error.
 - **Skeleton** `skeleton` — Grey blocks in the shape of the content that is loading. Variants: text, table, card.
+- **Marker** `marker` — The mark that opens a list item — a dot, a number, an icon or a tinted well — drawn as a real element in a box the height of one line, so it holds its place when the item wraps. Variants: prose, dot, numbered, checklist, timeline, register, nested, steps, dense.
 - **Spinner** `spinner` — The indeterminate wait. A graphite ring that turns while work of unknown length is in flight, and a line of text that says what the work is. Variants: default, sizes, label, panel, inline, overlay, delayed, states, django.
 
 ### Feedback
@@ -180,13 +185,16 @@ building anything, rather than reconstructing a component from its description.
 - **Badge** `badge` — A small pill that labels a record — status, tag or count. Every pill is the same graphite shape; a 6px dot carries the colour. Variants: status, inline, sizes, icon, filter, removable, count, table, django.
 - **Tooltip** `tooltip` — A dark bubble on hover, done with group-hover alone — no JS, no Alpine. Variants: icon, truncated.
 - **Hovercard** `hovercard` — A card of record detail that opens under a link on hover or focus, after a deliberate delay, and stays open long enough to be read and clicked. Variants: default, vendor, user, placement, htmx, loading, error, mobile, django.
+- **Popover** `popover` — A panel of controls anchored to a button and opened by a click. It holds things you focus and operate — a filter, a column list, a date range, a two-field edit — and the page behind it keeps working. Variants: default, filter, columns, date-range, inline-edit, arrow, placement, responsive, htmx.
 - **Avatar** `avatar` — Initials in a circle standing in for a person. There are no photographs in this system, so a zinc tint and two letters is the whole thing. Variants: sizes, self, with-name, stacked, in-row, presence, menu, placeholder.
 
 ### Navigation
 
 - **Tabs** `tabs` — Switches between views of the same record without leaving the page. The panel below changes; the row above is a widget, not a menu, and the keyboard has to know the difference. Variants: underline, pill, scrollable, vertical, url, lazy, states, django.
 - **Breadcrumbs** `breadcrumbs` — The path from the section root down to the record on screen. The last crumb says where you are and is not a link. Variants: default, record, truncated, overflow, responsive, page-header, back, django.
-- **Sidebar nav** `sidebar-nav` — The vertical navigation list that lives inside an app shell. This is the list only — the shell, its header and the scroll container belong to the layout. Variants: expanded, rail, nested.
+- **Menubar** `menubar` — A row of menus across the top of a document — File, Edit, View — sharing one tab stop and one keyboard model. A desktop-application affordance, and most internal screens should not have one. Variants: default, shortcuts, checks, submenu, states, dense, collapsed, trailing, htmx.
+- **Navigation menu** `navigation-menu` — A horizontal bar of links to places, some of which open a panel of more links. Every item is an anchor, so the browser's own navigation gestures keep working, and aria-current says which one you are on. Variants: links, panel, columns, featured, icons, mixed, current, phone, htmx.
+- **Sidebar** `sidebar` — The primary navigation panel of the console: a header, grouped menus with counts and submenus, and a footer for the signed-in user. It has three forms — a 256px panel, a 68px icon rail, and an off-canvas sheet over the page. Variants: default, counts, nested, rail, flyout, collapse, mobile, blocks, skeleton.
 - **Topbar** `topbar` — The application header above the page content: where you are, what you can search, and who you are signed in as. Variants: default, compact.
 - **Accordion** `accordion` — Sections of content that collapse to their heading. The heading is a button that toggles the panel below it. Variants: default, single, cards.
 - **Collapsible** `collapsible` — One trigger and one panel. The standalone disclosure — show more, an advanced section at the foot of a form, a filter bar that folds away. Variants: default, advanced, filters, native, card, controlled, states, django.

@@ -39,7 +39,7 @@ register(
       'The panel takes tabindex="0" so it is reachable when it contains nothing focusable, which is most panels made of text.',
       'Ids come from $id(), so two tab sets on one page cannot cross-wire their aria-controls.'
     ],
-    related: ['page-header', 'accordion', 'sidebar-nav'],
+    related: ['page-header', 'accordion', 'sidebar'],
     variants: [
       { id: 'underline', name: 'Underline', code:
 `<!-- The default. Automatic activation, because all four panels are already in
@@ -641,7 +641,7 @@ register(
       'The overflow button has an aria-label naming how many levels it hides, because an ellipsis says nothing on its own.',
       'The browser\'s own focus ring is left alone on crumb links; nothing here overrides outline.'
     ],
-    related: ['page-header', 'tabs', 'sidebar-nav'],
+    related: ['page-header', 'tabs', 'sidebar'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<!-- Three levels, which is the common case. The separator is aria-hidden so a
@@ -836,213 +836,3665 @@ register(
   },
 
   {
-    id: 'sidebar-nav', name: 'Sidebar nav', category: 'navigation',
-    description: 'The vertical navigation list that lives inside an app shell. This is the list only — the shell, its header and the scroll container belong to the layout.',
-    when: 'The primary navigation of a console with more than about five destinations. For two or three destinations use tabs in the topbar.',
+    id: 'menubar', name: 'Menubar', category: 'navigation',
+    description: 'A row of menus across the top of a document — File, Edit, View — sharing one tab stop and one keyboard model. A desktop-application affordance, and most internal screens should not have one.',
+    when: 'A document-shaped screen with a genuine File / Edit / View set of commands that will not fit in a toolbar: a purchase-order editor, a BOM editor, a rate-contract sheet, a report designer — something somebody sits inside for an hour and edits. Almost nothing else. A register, a dashboard or a list has no document and no File menu; what those need is a topbar carrying the page actions and a dropdown of row actions per record, and painting a menubar over them dresses a CRUD screen up as an application it is not. The test is blunt: if you cannot fill three menus with commands that already exist, you do not have a menubar, you have four buttons pretending.',
     notes: [
-      'Exactly one item carries aria-current="page". The bg-zinc-100 tint is the visual half of the same statement — never one without the other.',
-      'Counts are right-aligned and tabular-nums so the column of numbers stays straight.',
-      'In the rail, the tooltip is a sibling span positioned to the right. Do not put the hover binding on the <i data-lucide> — Lucide swaps that element for an <svg> and the binding is lost.',
-      'The rail is 68px so a 40px target keeps 14px either side. Below that the icons start colliding with the edge.'
+      'Reach for this last, not first. A menubar is the right control when the screen is a document and the command set is large enough that a toolbar would need a second row — a purchase-order editor with fifteen line-level commands, a BOM editor, a report designer. It is the wrong control on a register, a dashboard, a settings page or anything whose verbs are Filter, Export and New: there a topbar plus a per-row dropdown says the same thing with a third of the machinery and none of the keyboard model. Fitted to a list screen it costs a tab stop, a hover model and eight roles to hide four buttons that were fine where they were.',
+      'The whole bar is one tab stop, not one per menu. Every trigger takes tabindex="-1" except the one the roving focus is currently on, which takes 0. Skip this and a five-menu bar costs five Tab presses to walk past on the way to the document underneath it, on top of the thirty controls already in the form — which is the precise opposite of why the pattern exists. Tab enters the bar once, Left and Right walk the triggers, Down opens, and the next Tab leaves.',
+      'Open on hover, but only once a menu is already open. Cold hover-opening a menubar means a pointer travelling diagonally from the sidebar to the first field of the form drops a panel over the document on the way past, and the user has to click somewhere harmless to get rid of it. Once something is open the bar is in menu mode and hovering a sibling switches to it without a click, because that is how the user got a menu open in the first place and clicking each one is tedious. The state that gates it is the open menu itself, so there is no timer and nothing to tune.',
+      'When the open menu changes, move focus before the old panel is hidden. Hiding an element that contains document.activeElement drops focus onto <body>, and the next Tab restarts at the top of the document — usually the skip link, occasionally the browser chrome. Every path that changes which menu is open (Left, Right, typeahead, hover-switch) focuses the new trigger synchronously in the handler and only then writes the new open id, which Alpine flushes afterwards. Focus is on a visible element the whole time.',
+      'role="menubar" is not navigation. A row of links to other pages is a <nav> of anchors, whatever it looks like — the menu roles promise a command model where arrow keys walk items, Escape closes and Enter fires an action against the thing on screen, and a link that navigates away honours none of that. Put menuitem on a set of links and a screen reader announces a menu of commands and then the first one leaves the page. That control is navigation-menu; this one is for commands.',
+      'Disabled items stay in the walk. They take aria-disabled="true" and keep tabindex="-1", never the disabled attribute — a disabled button is not focusable and drops out of the query the arrow keys read the item order from, so the third press of Down lands on Duplicate line in one document and Delete line in another depending on whether there was anything to undo. A menubar is learned by position; commands that come and go destroy that. The item is also where the reason belongs: put "Nothing to undo" in the hint column where the shortcut would go, and the greyed row explains itself instead of being a dead end.',
+      'A shortcut hint is aria-keyshortcuts, and the glyphs beside it are decoration. The visible column reads ⌘S or Ctrl S because that is what the user has to press; the attribute takes the formal syntax — aria-keyshortcuts="Control+S" — because that is what assistive technology parses and surfaces in its own shortcut list. Leave the glyphs in the accessible name and the item announces as "Save, command S" with the ⌘ read as whatever the synthesiser makes of an unmapped codepoint, so aria-hidden the span and let the attribute carry it. And the attribute is a claim: if nothing on the page listens for Control+S, do not write it.',
+      'Escape closes the panel, returns focus to the trigger, and stops there. The handler is guarded on the open state and calls stopPropagation only when it actually closed something, so a second Escape does nothing here and passes through to whatever is outside — the dialog or the sheet the editor is sitting in. Without the guard the bar silently eats every Escape on the screen, and the only way out of the dialog is the mouse.',
+      'Panels are x-cloak and z-40, and no ancestor may be overflow-hidden. Wrapping the editor card in overflow-hidden to keep its corners tidy clips every panel to the height of the bar, and the menu opens as a one-pixel sliver that looks like it failed to load. The panels also cannot be overflow-hidden themselves once anything flies out of them, so the rounded corner is protected by the panel\'s own py-1 instead: an item that never touches the corner never pokes a square tint through it.',
+      'Toggling closes, choosing closes, ticking does not. An action item and a radio item both finish a decision the moment they are pressed, so both close the menu and hand focus back to the trigger. A checkbox item does not: nobody opens View to show exactly one column, and a menu that shuts after each tick has to be reopened four times to do one job. Focus stays on the item and aria-checked changes underneath it, which is announced because the item is the focused element.',
+      'Below md it collapses to a single Menu button, and it stops being a menubar when it does. A wrapped bar is not a menubar — the second row reads as a separate control and Left and Right no longer match what the eye sees. The collapsed form drops role="menubar" entirely and becomes one button with one role="menu" panel, sections divided by role="group" labels, because a bar with one item in it is a lie told to a screen reader. Both forms are rendered from the same list in the template; maintained as two hand-written copies they drift within a sprint. The panels below md are a separate problem with a separate answer: give each menu wrapper relative max-md:static so that on a phone the panel anchors to the bar instead of to a trigger halfway along it. Anchor it to the trigger and the fourth menu opens 100px off the right of a 390px screen; anchor the last one right-0 to fix that and the first one hangs off the left.',
+      'Do not let the menubar be the only route to a command. Save lives in File as an accelerator for the people who learn it, and the Save button at the foot of the form is the one everybody else presses. A command reachable only from a menu on a screen that also has a toolbar has been hidden, not organised, and the first support call is somebody insisting the feature was removed.'
     ],
     anatomy: [
-      ['Group', 'An 11px uppercase label over a set of items. Present once the list passes about six entries.'],
-      ['Item', 'Icon, label, and an optional right-aligned count.'],
-      ['Active item', 'bg-zinc-100 plus aria-current="page" — the visual and the semantic halves of one statement.'],
-      ['Count', 'Right-aligned and tabular-nums, so the numbers form a straight column.'],
-      ['Rail tooltip', 'A sibling span shown on hover when the sidebar is collapsed. Never bound on the <i data-lucide>, which Lucide replaces.']
+      ['Bar', 'The role="menubar" strip itself, holding the roving-focus state, the typeahead buffer and which menu is open. It is the strip and nothing else — anything in the same row that is not a menu, a status or a Save button, sits outside it.'],
+      ['Trigger', 'A button with role="menuitem" and aria-haspopup="menu". One of them carries tabindex="0" and the rest -1. While its menu is open it takes a bg-zinc-100 tint, because focus has moved into the panel and the trigger has no focus ring left to say which menu you are in.'],
+      ['Panel', 'Absolutely positioned under its own trigger, z-40, x-cloak, role="menu" and named with the trigger\'s own word. Always left-0: the containing block is what changes on a phone, because the menu wrapper is relative max-md:static and the panel then anchors to the bar rather than to a trigger halfway along it.'],
+      ['Item', 'A full-width button, role="menuitem", tabindex="-1", icon left of the label so the labels form one reading column. Real focus moves item to item; nothing here uses aria-activedescendant.'],
+      ['Shortcut hint', 'A right-aligned 12px zinc-500 column, aria-hidden, with the real claim carried by aria-keyshortcuts on the item. Also where the reason goes on a disabled item, which is not aria-hidden because it is the explanation.'],
+      ['Checkbox and radio item', 'role="menuitemcheckbox" and role="menuitemradio" with aria-checked bound, a fixed size-4 marker slot on the left so the labels stay aligned whether ticked or not, and radios wrapped in a role="group" that names the choice.'],
+      ['Submenu', 'A second panel flying out of an item that carries aria-haspopup and aria-expanded of its own. One level deep, never two, and below md it drops beneath its trigger instead of flying off the side of the screen.'],
+      ['Collapsed trigger', 'The single Menu button the whole bar becomes below md. Not a menubar of one — a plain menu whose sections are role="group" carrying the names the triggers used to have.']
     ],
     behaviour: [
-      'Exactly one item is current at a time, and it carries both the tint and aria-current — never one without the other.',
-      'In the 68px rail, labels are hidden with lg:hidden rather than removed, so the DOM and the tab order do not change.',
-      'The rail is 68px so a 40px target keeps 14px either side; below that the icons start colliding with the edge.',
-      'Hovering a rail item reveals its name in a tooltip, because a column of unlabelled icons is unusable to a new user.',
-      'Groups do not collapse. A navigation list that hides its own items adds a click to every journey.'
+      'Tab enters the bar once and the next Tab leaves it. Left and Right walk the triggers and wrap, Home and End jump to the ends, Down opens the menu onto its first item and Up opens it onto its last.',
+      'Once a menu is open, hovering a sibling trigger switches to it with no click. From cold, hovering a trigger does nothing at all — the bar only enters menu mode when somebody asks it to.',
+      'Left and Right from inside an open panel walk the bar rather than the items: the current menu closes, the next one opens, and focus lands on its trigger. It is the same gesture whether a panel is open or not, which is what makes it learnable, and Down enters the panel that is now open.',
+      'Escape closes the panel and leaves focus on the trigger. Escape again does nothing and is not swallowed, so it reaches the dialog or sheet the editor may be sitting inside.',
+      'Typing a letter on the bar moves to the trigger whose label starts with it, and keeps moving as more letters arrive inside half a second. The typeahead belongs to the bar only — inside an open panel the same keys do nothing, because the item list is short and reading it is faster than guessing at it.',
+      'Choosing an action closes the menu and returns focus to the trigger. Ticking a checkbox item leaves the menu open and focus on the item, because View is opened to change three columns and not one.',
+      'Disabled items keep their place and their keyboard position, and say why in the column where the shortcut would be. Nothing is removed from a menu because the document is in the wrong state; the map stays the same shape.',
+      'Tab from inside a panel closes the menu and continues from the trigger, so the focus order after the bar is the document, not the third item of the File menu.',
+      'Below md the bar collapses to one Menu button. It does not wrap, it does not scroll sideways, and it stops carrying menubar roles when it stops being a bar.'
     ],
     a11y: [
-      'The list is a <nav> with an accessible name, so it is a landmark.',
-      'The current item carries aria-current="page", which is what a screen reader uses — the tint is for everyone else.',
-      'Collapsed items keep an accessible name even with the label visually hidden.',
-      'Counts are part of the item\'s accessible name — "Approvals, 12" rather than an unattached number.',
-      'Group labels are real headings or list captions, so the structure is announced rather than only drawn.'
+      'The strip is role="menubar", each trigger is a button with role="menuitem" and aria-haspopup="menu", and aria-expanded is bound to whether that menu is the open one. The panel is role="menu" and each row role="menuitem", menuitemcheckbox or menuitemradio.',
+      'Exactly one trigger is in the tab order at a time: tabindex="0" on the one roving focus is on, -1 on the rest. This is the same roving tabindex a tablist uses and for the same reason — the set is one widget, so it is one stop.',
+      'Focus is real focus, moved trigger to trigger and item to item. This is where a menu and a combobox part company: a combobox keeps focus in its text box and points at a row with aria-activedescendant, but a menuitem is the thing being operated, so it has to be the thing focused. It also means no path may ever hide a panel while focus is still inside it.',
+      'Each panel is named with aria-label carrying the trigger\'s own word rather than aria-labelledby pointing at the trigger, because ids on a component that can appear twice on one page cross-wire, and the label is one word either way.',
+      'Shortcuts are declared with aria-keyshortcuts in its formal syntax — Control+S, Shift+Control+Z — and the visible glyph column is aria-hidden so it does not join the accessible name. An item announces as "Save" with the shortcut exposed as a property, not as "Save command S".',
+      'Disabled items use aria-disabled="true" and stay focusable. The disabled attribute would take them out of the tab-free arrow walk as well as out of the pointer, which changes the position of every item below them.',
+      'Checkbox and radio items carry aria-checked bound to the state, never written once in markup, and a set of radio items is wrapped in role="group" with an aria-label naming the choice. A visible group heading inside a menu is aria-hidden, because a bare paragraph is not a permitted child of role="menu" and the group is already named.',
+      'Anything in the same strip that is not a menu — a save indicator, a Submit button — sits outside the role="menubar" element. A non-menuitem child of a menubar is either dropped from the announced item count or reported as one of the menus, and both are worse than a plain button beside the bar.'
     ],
-    related: ['app-shell', 'topbar', 'tabs'],
+    related: ['dropdown', 'topbar', 'navigation-menu'],
     variants: [
-      { id: 'expanded', name: 'Expanded', code:
-`<nav aria-label="Main" class="w-60 shrink-0 rounded-xl border border-zinc-200 bg-white p-2">
-  <p class="px-2 pt-1 pb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Operations</p>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="layout-dashboard" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Overview</span>
-  </a>
-  <a href="#" aria-current="page" class="flex items-center gap-2.5 rounded-lg bg-zinc-100 px-2 py-2 text-[13px]/5 font-medium">
-    <i data-lucide="file-text" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Purchase orders</span>
-    <span class="text-[11px]/4 tabular-nums text-zinc-600">148</span>
-  </a>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="clipboard-list" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Requisitions</span>
-    <span class="text-[11px]/4 tabular-nums text-zinc-600">62</span>
-  </a>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="package-check" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Goods receipt</span>
-    <span class="text-[11px]/4 tabular-nums text-zinc-600">27</span>
-  </a>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="receipt" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Invoices</span>
-    <span class="rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700">9</span>
-  </a>
+      { id: 'default', name: 'Default', code:
+`<!-- The whole bar is one tab stop. Every trigger is tabindex -1 except the one
+     roving focus is on, so Tab enters the bar once and the next Tab lands in
+     the form below rather than on the Edit menu. That is the entire reason the
+     menubar roles exist; a row of four ordinary buttons is four stops.
 
-  <p class="px-2 pt-4 pb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Master data</p>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="building-2" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Vendors</span>
-    <span class="text-[11px]/4 tabular-nums text-zinc-600">187</span>
-  </a>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="boxes" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Materials</span>
-  </a>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="file-signature" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Rate contracts</span>
-  </a>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="chart-no-axes-column" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Analytics</span>
-  </a>
+     to(id) is the only way focus moves along the bar, and the order matters:
+     set the tab stop, focus the trigger synchronously, and only then write the
+     new open id. Alpine flushes x-show after the handler returns, so the old
+     panel is still visible at the moment focus lands. Write open first and the
+     panel holding document.activeElement is hidden underneath it, focus falls
+     to <body>, and the next Tab restarts at the top of the document.
 
-  <p class="px-2 pt-4 pb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Saved views</p>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <span class="size-1.5 shrink-0 rounded-full bg-red-600"></span>
-    <span class="flex-1 truncate">Overdue over 7 days</span>
-    <span class="text-[11px]/4 tabular-nums text-zinc-600">18</span>
-  </a>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <span class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>
-    <span class="flex-1 truncate">Awaiting GRN</span>
-    <span class="text-[11px]/4 tabular-nums text-zinc-600">27</span>
-  </a>
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <span class="size-1.5 shrink-0 rounded-full bg-zinc-400"></span>
-    <span class="flex-1 truncate">My approvals</span>
-    <span class="text-[11px]/4 tabular-nums text-zinc-600">6</span>
-  </a>
-</nav>` },
-      { id: 'rail', name: 'Rail', code:
-`<nav aria-label="Main" class="w-[68px] shrink-0 rounded-xl border border-zinc-200 bg-white py-2">
-  <div class="group relative flex justify-center">
-    <a href="#" aria-label="Overview" class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100">
-      <i data-lucide="layout-dashboard" class="size-4 text-zinc-600"></i>
-    </a>
-    <span class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block">Overview</span>
+     show() has to defer instead, because it focuses an item in a panel that is
+     not displayed yet. $nextTick is too early — x-show has not written display
+     when it runs, and focus() on a hidden button is a silent no-op — so the
+     call sits in a requestAnimationFrame after it, as in the dropdown.
+
+     Hover switches menus but never opens one: the guard is open !== null.
+     Escape only stops propagating when it actually closed something, so a
+     second Escape reaches the dialog this editor may be sitting in. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="file-plus" class="size-4 text-zinc-600"></i>New purchase order
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save draft
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="send" class="size-4 text-zinc-600"></i>Submit for approval
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="file-text" class="size-4 text-zinc-600"></i>Export as PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="edit"
+              :aria-expanded="open === 'edit'" :tabindex="at === 'edit' ? 0 : -1"
+              @click="open === 'edit' ? close() : show('edit')"
+              @mouseenter="if (open !== null) to('edit')"
+              @keydown.arrow-down.prevent="show('edit')" @keydown.arrow-up.prevent="show('edit', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+
+      <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="undo-2" class="size-4 text-zinc-600"></i>Undo
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="redo-2" class="size-4 text-zinc-600"></i>Redo
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="rows-3" class="size-4 text-zinc-600"></i>Insert line
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="copy" class="size-4 text-zinc-600"></i>Duplicate line
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="search" class="size-4 text-zinc-600"></i>Find item code
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="view"
+              :aria-expanded="open === 'view'" :tabindex="at === 'view' ? 0 : -1"
+              @click="open === 'view' ? close() : show('view')"
+              @mouseenter="if (open !== null) to('view')"
+              @keydown.arrow-down.prevent="show('view')" @keydown.arrow-up.prevent="show('view', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'view' && 'bg-zinc-100 text-zinc-900'">View</button>
+
+      <div x-show="open === 'view'" x-cloak data-panel="view" role="menu" aria-label="View"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="percent" class="size-4 text-zinc-600"></i>Tax breakup
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="history" class="size-4 text-zinc-600"></i>Revision history
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="help"
+              :aria-expanded="open === 'help'" :tabindex="at === 'help' ? 0 : -1"
+              @click="open === 'help' ? close() : show('help')"
+              @mouseenter="if (open !== null) to('help')"
+              @keydown.arrow-down.prevent="show('help')" @keydown.arrow-up.prevent="show('help', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'help' && 'bg-zinc-100 text-zinc-900'">Help</button>
+
+      <!-- Every panel is left-0, including this one, and the phone case is
+           handled by the wrapper instead: relative max-md:static. Below md the
+           menu wrapper stops being a containing block, so left-0 resolves
+           against the bar and every menu opens flush under its left edge
+           regardless of how far along the bar its trigger sits. Measured at
+           390px, a 240px panel hung off a trigger 250px along runs 100px off
+           the screen and the page scrolls sideways to find it; right-0 fixes
+           that trigger and breaks the first one, which then hangs off the left.
+           The wrapper trick has no such asymmetry and needs no per-menu
+           class. -->
+      <div x-show="open === 'help'" x-cloak data-panel="help" role="menu" aria-label="Help"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="keyboard" class="size-4 text-zinc-600"></i>Keyboard shortcuts
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="scale" class="size-4 text-zinc-600"></i>Approval policy
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="group relative mt-1 flex justify-center">
-    <a href="#" aria-current="page" aria-label="Purchase orders"
-       class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-100">
-      <i data-lucide="file-text" class="size-4 text-zinc-900"></i>
-      <span class="absolute -top-0.5 -right-0.5 rounded-full bg-zinc-700 px-1.5 text-[11px]/4 tabular-nums text-white">148</span>
-    </a>
-    <span class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block">Purchase orders — 148</span>
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Draft · 14 lines · ₹18,42,000 before tax · raised 16 Aug 2026 by Ritu Deshpande</p>
+  </div>
+</div>` },
+
+      { id: 'shortcuts', name: 'With shortcut hints', code:
+`<!-- The hint column is aria-hidden and the real claim is aria-keyshortcuts on
+     the item, in its formal syntax — Control+Shift+Z, not the glyphs. Left in
+     the accessible name the item announces as "Redo Ctrl Shift Z" every time
+     the arrows pass over it, and on a Mac build the ⌘ is read as whatever the
+     synthesiser makes of an unmapped codepoint. The attribute is also a
+     promise: it says a handler on this page listens for that chord. If none
+     does, do not write it — the screen reader lists the shortcut in its own
+     inventory and the user presses it into silence.
+
+     The hints say Ctrl because these people are on Windows. An application
+     serving both platforms computes the word once at boot and renders it from
+     the list; writing two columns and hiding one is how a menu ends up
+     claiming Ctrl S on a Mac.
+
+     The panel is a list of groups rather than a flat list with separator
+     elements dropped into it, because the rule is the group boundary. Modelled
+     this way a group that empties out — every command in it hidden by a
+     permission check — takes its own rule with it. role="group" is a permitted
+     child of role="menu"; a bare div is not. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       menus: [
+         { id: 'file', label: 'File', groups: [
+           [ { label: 'New purchase order', icon: 'file-plus', hint: 'Ctrl N', keys: 'Control+N' },
+             { label: 'Save draft',         icon: 'save',      hint: 'Ctrl S', keys: 'Control+S' },
+             { label: 'Submit for approval', icon: 'send' } ],
+           [ { label: 'Print', icon: 'printer', hint: 'Ctrl P', keys: 'Control+P' },
+             { label: 'Export as PDF', icon: 'file-text' } ]
+         ] },
+         { id: 'edit', label: 'Edit', groups: [
+           [ { label: 'Undo', icon: 'undo-2', hint: 'Ctrl Z', keys: 'Control+Z' },
+             { label: 'Redo', icon: 'redo-2', hint: 'Ctrl Shift Z', keys: 'Shift+Control+Z' } ],
+           [ { label: 'Insert line',    icon: 'rows-3', hint: 'Ctrl Enter', keys: 'Control+Enter' },
+             { label: 'Duplicate line', icon: 'copy',   hint: 'Ctrl D',     keys: 'Control+D' },
+             { label: 'Find item code', icon: 'search', hint: 'Ctrl F',     keys: 'Control+F' } ]
+         ] },
+         { id: 'view', label: 'View', groups: [
+           [ { label: 'Tax breakup',      icon: 'percent' },
+             { label: 'Revision history', icon: 'history' } ]
+         ] }
+       ],
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+    <template x-for="m in menus" :key="m.id">
+      <div class="relative max-md:static">
+        <button type="button" role="menuitem" aria-haspopup="menu" :data-menu="m.id"
+                :aria-expanded="open === m.id" :tabindex="at === m.id ? 0 : -1"
+                @click="open === m.id ? close() : show(m.id)"
+                @mouseenter="if (open !== null) to(m.id)"
+                @keydown.arrow-down.prevent="show(m.id)" @keydown.arrow-up.prevent="show(m.id, true)"
+                @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+                @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+                class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+
+        <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
+             @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+             @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+             @keydown.tab="close()"
+             class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+          <template x-for="(g, gi) in m.groups" :key="gi">
+            <div role="group" x-show="g.length" class="border-t border-zinc-100 py-1 first:border-t-0">
+              <template x-for="it in g" :key="it.label">
+                <button type="button" role="menuitem" tabindex="-1" :aria-keyshortcuts="it.keys" @click="close()"
+                        class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                  <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+                  <span x-text="it.label"></span>
+                  <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 tabular-nums text-zinc-500" x-text="it.hint"></span>
+                </button>
+              </template>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
   </div>
 
-  <div class="group relative mt-1 flex justify-center">
-    <a href="#" aria-label="Requisitions" class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100">
-      <i data-lucide="clipboard-list" class="size-4 text-zinc-600"></i>
-    </a>
-    <span class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block">Requisitions — 62</span>
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Draft · 14 lines · ₹18,42,000 before tax</p>
+  </div>
+</div>` },
+
+      { id: 'checks', name: 'Checkbox and radio items', code:
+`<!-- One View menu carrying both kinds of state, behaving differently on
+     purpose. The column toggles are role="menuitemcheckbox" and do not close
+     the menu: nobody opens View to show exactly one column, and a menu that
+     shuts after every tick is reopened three times to do one job. The density
+     options are role="menuitemradio" and do close, because one of a set is a
+     finished decision the moment it is made.
+
+     Leaving it open is only safe because focus stays on the item pressed.
+     aria-checked changes on the focused element, which is announced; change it
+     on an element nobody is on and the tick is silent. Nothing writes
+     aria-checked as a literal — bound, or it goes stale the first time the
+     item is used and the menu announces the opposite of what it shows.
+
+     Every row starts with a fixed size-4 marker slot, empty or not. Add the
+     tick only when checked and the label column shifts 24px as the state
+     changes. State is a check and a 6px disc rather than a tinted row, because
+     a tinted row cannot be told from the row the arrows are on.
+
+     The visible group headings are aria-hidden — a bare <p> is not a permitted
+     child of role="menu", and role="group" already carries the name. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       cols: { hsn: true, contract: false, tax: true },
+       density: 'comfortable',
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Bill of materials commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save revision
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="sheet" class="size-4 text-zinc-600"></i>Export to Excel
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="view"
+              :aria-expanded="open === 'view'" :tabindex="at === 'view' ? 0 : -1"
+              @click="open === 'view' ? close() : show('view')"
+              @mouseenter="if (open !== null) to('view')"
+              @keydown.arrow-down.prevent="show('view')" @keydown.arrow-up.prevent="show('view', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'view' && 'bg-zinc-100 text-zinc-900'">View</button>
+
+      <div x-show="open === 'view'" x-cloak data-panel="view" role="menu" aria-label="View"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+        <div role="group" aria-label="Columns" class="py-1">
+          <p aria-hidden="true" class="px-3 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Columns</p>
+
+          <button type="button" role="menuitemcheckbox" tabindex="-1" :aria-checked="cols.hsn" @click="cols.hsn = !cols.hsn"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+              <span x-show="cols.hsn" x-cloak class="flex"><i data-lucide="check" class="size-4"></i></span>
+            </span>HSN code
+          </button>
+          <button type="button" role="menuitemcheckbox" tabindex="-1" :aria-checked="cols.contract" @click="cols.contract = !cols.contract"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+              <span x-show="cols.contract" x-cloak class="flex"><i data-lucide="check" class="size-4"></i></span>
+            </span>Rate contract
+          </button>
+          <button type="button" role="menuitemcheckbox" tabindex="-1" :aria-checked="cols.tax" @click="cols.tax = !cols.tax"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center text-zinc-700">
+              <span x-show="cols.tax" x-cloak class="flex"><i data-lucide="check" class="size-4"></i></span>
+            </span>Tax breakup
+          </button>
+        </div>
+
+        <div role="group" aria-label="Density" class="border-t border-zinc-100 py-1">
+          <p aria-hidden="true" class="px-3 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Density</p>
+
+          <button type="button" role="menuitemradio" tabindex="-1" :aria-checked="density === 'comfortable'" @click="density = 'comfortable'; close()"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center">
+              <span x-show="density === 'comfortable'" x-cloak class="size-1.5 rounded-full bg-zinc-700"></span>
+            </span>Comfortable
+          </button>
+          <button type="button" role="menuitemradio" tabindex="-1" :aria-checked="density === 'compact'" @click="density = 'compact'; close()"
+                  class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="flex size-4 shrink-0 items-center justify-center">
+              <span x-show="density === 'compact'" x-cloak class="size-1.5 rounded-full bg-zinc-700"></span>
+            </span>Compact
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="help"
+              :aria-expanded="open === 'help'" :tabindex="at === 'help' ? 0 : -1"
+              @click="open === 'help' ? close() : show('help')"
+              @mouseenter="if (open !== null) to('help')"
+              @keydown.arrow-down.prevent="show('help')" @keydown.arrow-up.prevent="show('help', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'help' && 'bg-zinc-100 text-zinc-900'">Help</button>
+
+      <div x-show="open === 'help'" x-cloak data-panel="help" role="menu" aria-label="Help"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="keyboard" class="size-4 text-zinc-600"></i>Keyboard shortcuts
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="group relative mt-1 flex justify-center">
-    <a href="#" aria-label="Goods receipt" class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100">
-      <i data-lucide="package-check" class="size-4 text-zinc-600"></i>
-    </a>
-    <span class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block">Goods receipt — 27</span>
+  <div class="px-4 py-3 text-[13px]/5 tabular-nums text-zinc-600">
+    BOM-HDPE-08 · 22 components ·
+    <span x-text="density === 'compact' ? 'compact' : 'comfortable'"></span> rows ·
+    <span x-text="[cols.hsn && 'HSN', cols.contract && 'rate contract', cols.tax && 'tax'].filter(Boolean).join(', ') || 'no optional columns'"></span>
+  </div>
+</div>` },
+
+      { id: 'submenu', name: 'With a submenu', code:
+`<!-- One level of submenu, never two. Two levels means holding a diagonal
+     across two live panels, and the fix for that is a dialog with a search box,
+     not a third flyout.
+
+     items() had to grow a filter. querySelectorAll is deep, so the parent
+     panel's item list picked up the rows inside the flyout as well and Down
+     from Save fell straight into last Tuesday's order. Excluding anything
+     inside [data-sub] puts the walk back on the parent's own rows.
+
+     The submenu keys carry .stop as well as .prevent. Every handler here lives
+     on an ancestor of the flyout — the panel binds Left and Right to walk the
+     bar, the root binds Escape — so without .stop, Left closes the submenu and
+     also jumps to the previous menu, and Escape closes two levels in one press.
+
+     move() clears sub, or arrowing past the submenu trigger leaves a flyout on
+     screen belonging to a row nobody is on. There is no safe triangle and no
+     hover delay, so the flyout is anchored hard against the parent's edge and
+     every sibling row closes it on mouseenter. Below md it drops under its
+     trigger instead of flying sideways: left-full at 390px puts a 256px panel
+     off the right of the screen and the page scrolls to find it. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, sub: null, at: 'file', typed: '', clock: null,
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')].filter(e => !e.closest('[data-sub]')) : [];
+       },
+       subItems() {
+         const p = this.$refs.bar.querySelector('[data-sub=' + this.sub + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id; this.sub = null;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id; this.sub = null;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null; this.sub = null;
+         if (back) this.to(id);
+       },
+       openSub(id) {
+         this.sub = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.subItems()[0]?.focus()));
+       },
+       closeSub() {
+         const id = this.sub; this.sub = null;
+         this.$refs.bar.querySelector('[data-subtrigger=' + id + ']')?.focus();
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { this.sub = null; const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { this.sub = null; const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       subMove(n) { const i = this.subItems(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()" @mouseenter="sub = null"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="file-plus" class="size-4 text-zinc-600"></i>New purchase order
+        </button>
+
+        <div class="relative">
+          <button type="button" role="menuitem" tabindex="-1" aria-haspopup="menu" data-subtrigger="recent"
+                  :aria-expanded="sub === 'recent'"
+                  @click="openSub('recent')" @mouseenter="sub = 'recent'"
+                  @keydown.arrow-right.prevent.stop="openSub('recent')"
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"
+                  :class="sub === 'recent' && 'bg-zinc-100'">
+            <i data-lucide="clock" class="size-4 text-zinc-600"></i>Open recent
+            <span class="ml-auto flex text-zinc-600"><i data-lucide="chevron-right" class="size-3.5"></i></span>
+          </button>
+
+          <div x-show="sub === 'recent'" x-cloak data-sub="recent" role="menu" aria-label="Open recent"
+               @keydown.arrow-down.prevent.stop="subMove(1)" @keydown.arrow-up.prevent.stop="subMove(-1)"
+               @keydown.arrow-left.prevent.stop="closeSub()"
+               @keydown.escape.stop="closeSub()"
+               @keydown.tab="close()"
+               class="absolute top-0 left-full z-40 ml-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg max-md:top-full max-md:left-0 max-md:mt-1 max-md:ml-0">
+            <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                    class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[13px]/5 tabular-nums hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span>PO-24-1187 — Gujarat Polymers</span><span class="shrink-0 text-[12px]/4 text-zinc-500">16 Aug</span>
+            </button>
+            <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                    class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[13px]/5 tabular-nums hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span>PO-24-1179 — Sharma Steel</span><span class="shrink-0 text-[12px]/4 text-zinc-500">11 Aug</span>
+            </button>
+            <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                    class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[13px]/5 tabular-nums hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span>PO-24-1166 — Deccan Fasteners</span><span class="shrink-0 text-[12px]/4 text-zinc-500">4 Aug</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()" @mouseenter="sub = null"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save draft
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()" @mouseenter="sub = null"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="edit"
+              :aria-expanded="open === 'edit'" :tabindex="at === 'edit' ? 0 : -1"
+              @click="open === 'edit' ? close() : show('edit')"
+              @mouseenter="if (open !== null) to('edit')"
+              @keydown.arrow-down.prevent="show('edit')" @keydown.arrow-up.prevent="show('edit', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+
+      <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="rows-3" class="size-4 text-zinc-600"></i>Insert line
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="search" class="size-4 text-zinc-600"></i>Find item code
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="group relative mt-1 flex justify-center">
-    <a href="#" aria-label="Invoices" class="relative flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100">
-      <i data-lucide="receipt" class="size-4 text-zinc-600"></i>
-      <span class="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-red-600"></span>
-    </a>
-    <span class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block">Invoices — 9 on hold</span>
+  <div class="px-4 py-3">
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">PO-24-1187 · 14 lines · ₹18,42,000 before tax</p>
+  </div>
+</div>` },
+
+      { id: 'states', name: 'Disabled and destructive items', code:
+`<!-- Disabled items keep their place in the keyboard walk. They carry
+     aria-disabled="true" and keep tabindex="-1", never the disabled attribute:
+     a disabled button cannot be focused and drops out of the querySelectorAll
+     the arrows read the order from, so the third Down lands on Insert line in
+     a document that has been edited and on Duplicate line in one that has not.
+     A menubar is learned by position, and a list whose length depends on the
+     state of the record is a list nobody can learn.
+
+     Because they stay reachable, they get to explain themselves. The hint
+     column on a disabled row carries the reason instead of a shortcut —
+     "Nothing to undo", "GRN posted 12 Aug" — and that text is not aria-hidden,
+     because unlike a glyph it is the answer to the question the greyed row
+     raises. A dead grey row with nothing beside it sends people to the desk.
+
+     opacity-60 drains icon, label and reason in one go rather than three colour
+     classes kept in step by hand, and the hover tint is dropped so the pointer
+     does not promise a click that does nothing. Focus still shows.
+
+     Void order is last, below its own rule, in red-600, named by its verb
+     rather than by its colour, and not adjacent to Print. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save draft
+          <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Ctrl S</span>
+        </button>
+
+        <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="send" class="size-4 text-zinc-600"></i>Submit for approval
+          <span class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">2 lines have no rate</span>
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+          <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Ctrl P</span>
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="ban" class="size-4"></i>Void order
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="edit"
+              :aria-expanded="open === 'edit'" :tabindex="at === 'edit' ? 0 : -1"
+              @click="open === 'edit' ? close() : show('edit')"
+              @mouseenter="if (open !== null) to('edit')"
+              @keydown.arrow-down.prevent="show('edit')" @keydown.arrow-up.prevent="show('edit', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+
+      <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="undo-2" class="size-4 text-zinc-600"></i>Undo
+          <span class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Nothing to undo</span>
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="rows-3" class="size-4 text-zinc-600"></i>Insert line
+          <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Ctrl Enter</span>
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="trash-2" class="size-4 text-zinc-600"></i>Delete line 6
+          <span class="ml-auto shrink-0 pl-6 text-[12px]/4 tabular-nums text-zinc-500">GRN posted 12 Aug</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="help"
+              :aria-expanded="open === 'help'" :tabindex="at === 'help' ? 0 : -1"
+              @click="open === 'help' ? close() : show('help')"
+              @mouseenter="if (open !== null) to('help')"
+              @keydown.arrow-down.prevent="show('help')" @keydown.arrow-up.prevent="show('help', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'help' && 'bg-zinc-100 text-zinc-900'">Help</button>
+
+      <div x-show="open === 'help'" x-cloak data-panel="help" role="menu" aria-label="Help"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="scale" class="size-4 text-zinc-600"></i>Approval policy
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="my-2 border-t border-zinc-100"></div>
+  <div class="px-4 py-3">
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">PO-24-1187 · Gujarat Polymers Ltd · 2 of 14 lines have no rate</p>
+  </div>
+</div>` },
 
-  <div class="group relative flex justify-center">
-    <a href="#" aria-label="Vendors" class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100">
-      <i data-lucide="building-2" class="size-4 text-zinc-600"></i>
-    </a>
-    <span class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block">Vendors — 187</span>
+      { id: 'dense', name: 'Dense, embedded in an editor', code:
+`<!-- The bar an editor gets when it is a panel inside a bigger screen rather
+     than the screen itself — a BOM grid sitting in the right half of a
+     list-and-detail, where a 40px strip of chrome above a 300px grid is the
+     wrong proportion.
+
+     Only the bar shrinks. The triggers go to 12px on py-1, which lands them at
+     exactly 24px — the WCAG 2.2 target minimum and not a pixel under it, which
+     is why the padding is py-1 and not py-0.5. The panels stay at their normal
+     size, because the reason for the dense bar is the strip, not the menu: a
+     28px row in a flyout is harder to hit than a 24px trigger in a fixed strip
+     the pointer already knows the position of, and nothing is gained by
+     shrinking a panel that only exists while it is being read.
+
+     The panels are still w-56 and still hang below a 32px bar, so they overlap
+     the grid underneath. That is what z-40 is for, and it is also why the card
+     around the editor cannot be overflow-hidden — clip it and the menu opens
+     as a sliver the height of the bar.
+
+     Below md this is the first thing to collapse, not the last: a dense bar is
+     already at the target-size floor, so there is nothing left to give. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       menus: [
+         { id: 'file', label: 'File', items: [
+           { label: 'Save revision', icon: 'save', hint: 'Ctrl S', keys: 'Control+S' },
+           { label: 'Export to Excel', icon: 'sheet' }
+         ] },
+         { id: 'edit', label: 'Edit', items: [
+           { label: 'Add component', icon: 'plus', hint: 'Ctrl Enter', keys: 'Control+Enter' },
+           { label: 'Replace item', icon: 'repeat' },
+           { label: 'Recalculate cost', icon: 'calculator', hint: 'F9', keys: 'F9' }
+         ] },
+         { id: 'view', label: 'View', items: [
+           { label: 'Expand all levels', icon: 'chevrons-down-up' },
+           { label: 'Scrap and yield', icon: 'percent' }
+         ] }
+       ],
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Bill of materials commands"
+       class="relative flex h-8 items-center gap-0.5 border-b border-zinc-100 px-1">
+    <template x-for="m in menus" :key="m.id">
+      <div class="relative max-md:static">
+        <button type="button" role="menuitem" aria-haspopup="menu" :data-menu="m.id"
+                :aria-expanded="open === m.id" :tabindex="at === m.id ? 0 : -1"
+                @click="open === m.id ? close() : show(m.id)"
+                @mouseenter="if (open !== null) to(m.id)"
+                @keydown.arrow-down.prevent="show(m.id)" @keydown.arrow-up.prevent="show(m.id, true)"
+                @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+                @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+                class="rounded px-2 py-1 text-[12px]/4 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+
+        <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
+             @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+             @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+             @keydown.tab="close()"
+             class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+          <template x-for="it in m.items" :key="it.label">
+            <button type="button" role="menuitem" tabindex="-1" :aria-keyshortcuts="it.keys" @click="close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+              <span x-text="it.label"></span>
+              <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 tabular-nums text-zinc-500" x-text="it.hint"></span>
+            </button>
+          </template>
+        </div>
+      </div>
+    </template>
   </div>
 
-  <div class="group relative mt-1 flex justify-center">
-    <a href="#" aria-label="Analytics" class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100">
-      <i data-lucide="chart-no-axes-column" class="size-4 text-zinc-600"></i>
-    </a>
-    <span class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block">Analytics</span>
-  </div>
-</nav>` },
-      { id: 'nested', name: 'With nested children', code:
-`<nav aria-label="Main" class="w-60 shrink-0 rounded-xl border border-zinc-200 bg-white p-2"
-     x-data="{ open: 'orders' }">
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="layout-dashboard" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Overview</span>
-  </a>
+  <table class="w-full text-[12px]/4">
+    <thead class="bg-zinc-100 text-left text-zinc-600">
+      <tr><th class="px-3 py-1.5 font-medium">Component</th><th class="px-3 py-1.5 text-right font-medium">Qty</th><th class="px-3 py-1.5 text-right font-medium">Cost</th></tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-100">
+      <tr><td class="px-3 py-1.5">HDPE granules — grade 5200B</td><td class="px-3 py-1.5 text-right tabular-nums">840 kg</td><td class="px-3 py-1.5 text-right tabular-nums">₹92,400</td></tr>
+      <tr><td class="px-3 py-1.5">Masterbatch — natural</td><td class="px-3 py-1.5 text-right tabular-nums">18 kg</td><td class="px-3 py-1.5 text-right tabular-nums">₹7,020</td></tr>
+      <tr><td class="px-3 py-1.5">Carton 400×300×250</td><td class="px-3 py-1.5 text-right tabular-nums">120 nos</td><td class="px-3 py-1.5 text-right tabular-nums">₹4,560</td></tr>
+    </tbody>
+  </table>
+</div>` },
 
-  <button @click="open = open === 'orders' ? '' : 'orders'" :aria-expanded="open === 'orders'"
-          class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="file-text" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Purchase orders</span>
-    <span class="text-[11px]/4 tabular-nums text-zinc-600">148</span>
-    <span class="flex transition-transform" :class="open === 'orders' && 'rotate-180'">
-      <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+      { id: 'collapsed', name: 'Collapsed to one button', code:
+`<!-- Below md the bar is gone and one Menu button stands in its place. A
+     wrapped menubar is not a menubar: the second row reads as a separate
+     control, and Left and Right stop matching what the eye sees. Scrolling it
+     sideways is worse — the claim of the pattern is that the commands are all
+     visible at once.
+
+     The collapsed form drops role="menubar" with the bar. What is left is one
+     button and one role="menu", the menu names carried by role="group" labels
+     inside it. A menubar with one item in it is a lie: a screen reader
+     announces a bar of menus, there is only ever one, and Left and Right do
+     nothing when the user tries them. The roles change with the shape.
+
+     Both forms come out of the same menus array, which is the only way they
+     stay in step — a command added to File on the desktop bar and forgotten on
+     the phone is invisible to exactly the people who cannot find it elsewhere.
+     The cost is real: every command exists twice in the DOM, once hidden. Fine
+     for four menus of five items, not for forty commands, where the phone
+     answer is a page.
+
+     The breakpoint is md, not sm: what overflows is the count, not the width. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', sheet: false, typed: '', clock: null,
+       menus: [
+         { id: 'file', label: 'File', items: [
+           { label: 'New purchase order', icon: 'file-plus' },
+           { label: 'Save draft', icon: 'save' },
+           { label: 'Submit for approval', icon: 'send' }
+         ] },
+         { id: 'edit', label: 'Edit', items: [
+           { label: 'Insert line', icon: 'rows-3' },
+           { label: 'Duplicate line', icon: 'copy' }
+         ] },
+         { id: 'view', label: 'View', items: [
+           { label: 'Tax breakup', icon: 'percent' },
+           { label: 'Revision history', icon: 'history' }
+         ] }
+       ],
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       },
+       sItems() { return [...this.$refs.sheet.querySelectorAll('[role^=menuitem]')] },
+       sShow(last = false) {
+         this.sheet = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.sItems(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       sClose(back = true) {
+         if (!this.sheet) return;
+         this.sheet = false;
+         if (back) this.$refs.sTrigger.focus();
+       },
+       sMove(n) { const i = this.sItems(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       sEdge(last) { const i = this.sItems(); (last ? i[i.length - 1] : i[0])?.focus() }
+     }"
+     @click.outside="close(false); sClose(false)"
+     @keydown="type($event)"
+     @keydown.escape="
+       if (open !== null) { $event.stopPropagation(); close() }
+       else if (sheet) { $event.stopPropagation(); sClose() }">
+
+  <div class="flex items-center border-b border-zinc-100 px-1 py-1">
+
+    <div x-ref="bar" role="menubar" aria-label="Purchase order commands" class="relative hidden items-center gap-0.5 md:flex">
+      <template x-for="m in menus" :key="m.id">
+        <div class="relative max-md:static">
+          <button type="button" role="menuitem" aria-haspopup="menu" :data-menu="m.id"
+                  :aria-expanded="open === m.id" :tabindex="at === m.id ? 0 : -1"
+                  @click="open === m.id ? close() : show(m.id)"
+                  @mouseenter="if (open !== null) to(m.id)"
+                  @keydown.arrow-down.prevent="show(m.id)" @keydown.arrow-up.prevent="show(m.id, true)"
+                  @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+                  @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+                  class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+
+          <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
+               @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+               @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+               @keydown.tab="close()"
+               class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+            <template x-for="it in m.items" :key="it.label">
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+                <span x-text="it.label"></span>
+              </button>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="relative md:hidden">
+      <button type="button" x-ref="sTrigger" aria-haspopup="menu" :aria-expanded="sheet"
+              @click="sheet ? sClose(false) : sShow()"
+              @keydown.arrow-down.prevent="sShow()" @keydown.arrow-up.prevent="sShow(true)"
+              class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sheet && 'bg-zinc-100 text-zinc-900'">
+        <i data-lucide="menu" class="size-4"></i>Menu
+      </button>
+
+      <div x-show="sheet" x-cloak x-ref="sheet" role="menu" aria-label="Purchase order commands"
+           @keydown.arrow-down.prevent="sMove(1)" @keydown.arrow-up.prevent="sMove(-1)"
+           @keydown.home.prevent="sEdge(false)" @keydown.end.prevent="sEdge(true)"
+           @keydown.tab="sClose()"
+           class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <template x-for="m in menus" :key="m.id">
+          <div role="group" :aria-label="m.label" class="border-t border-zinc-100 py-1 first:border-t-0">
+            <p aria-hidden="true" class="px-3 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase" x-text="m.label"></p>
+            <template x-for="it in m.items" :key="it.label">
+              <button type="button" role="menuitem" tabindex="-1" @click="sClose()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+                <span x-text="it.label"></span>
+              </button>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Draft · 14 lines · ₹18,42,000 before tax</p>
+  </div>
+</div>` },
+
+      { id: 'trailing', name: 'With a trailing status', code:
+`<!-- The save indicator and the Submit button are in the same strip and outside
+     role="menubar". This is the mistake worth taking seriously: a menubar's
+     children are menus, and a child that is not a menuitem is either dropped
+     from the announced item count or reported as one of the menus, so the bar
+     announces four menus and the fourth is a button that opens nothing. Left
+     and Right would walk onto it too, which is the same bug from the keyboard.
+
+     So the strip is a plain flex row holding two things: the role="menubar"
+     element, and everything else. ml-auto sits on the trailing block rather
+     than on the bar, so the menus stay put when the status text changes length.
+
+     Saved is a status, not a control, and lives in a role="status" so the
+     announcement arrives when the autosave lands rather than when somebody
+     happens to focus it. The emerald dot is the only colour in the strip.
+
+     At 390px the words drop out and the dot stays, because the dot plus the
+     Submit button is the smallest honest version of "saved, and here is what to
+     do next". Hiding the button instead would leave the primary action of the
+     screen reachable only from the File menu. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       menus: [
+         { id: 'file', label: 'File', items: [
+           { label: 'Save draft', icon: 'save' },
+           { label: 'Print', icon: 'printer' },
+           { label: 'Export as PDF', icon: 'file-text' }
+         ] },
+         { id: 'edit', label: 'Edit', items: [
+           { label: 'Insert line', icon: 'rows-3' },
+           { label: 'Duplicate line', icon: 'copy' },
+           { label: 'Find item code', icon: 'search' }
+         ] },
+         { id: 'view', label: 'View', items: [
+           { label: 'Tax breakup', icon: 'percent' },
+           { label: 'Revision history', icon: 'history' }
+         ] }
+       ],
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div class="flex items-center gap-2 border-b border-zinc-100 px-1 py-1">
+
+    <div x-ref="bar" role="menubar" aria-label="Purchase order commands" class="relative flex items-center gap-0.5">
+      <template x-for="m in menus" :key="m.id">
+        <div class="relative max-md:static">
+          <button type="button" role="menuitem" aria-haspopup="menu" :data-menu="m.id"
+                  :aria-expanded="open === m.id" :tabindex="at === m.id ? 0 : -1"
+                  @click="open === m.id ? close() : show(m.id)"
+                  @mouseenter="if (open !== null) to(m.id)"
+                  @keydown.arrow-down.prevent="show(m.id)" @keydown.arrow-up.prevent="show(m.id, true)"
+                  @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+                  @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+                  class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="open === m.id && 'bg-zinc-100 text-zinc-900'" x-text="m.label"></button>
+
+          <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
+               @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+               @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+               @keydown.tab="close()"
+               class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+            <template x-for="it in m.items" :key="it.label">
+              <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+                <span x-text="it.label"></span>
+              </button>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="ml-auto flex items-center gap-2">
+      <p role="status" class="flex items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-600">
+        <span class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>
+        <span class="hidden sm:inline">Saved 11:04</span>
+        <span class="sr-only sm:hidden">Saved 11:04</span>
+      </p>
+      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Submit
+      </button>
+    </div>
+  </div>
+
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Draft · 14 lines · ₹18,42,000 before tax · Ritu Deshpande</p>
+  </div>
+</div>` },
+
+      { id: 'htmx', name: 'A command that posts', code:
+`<!-- htmx does the writing, because Alpine does not fetch. What is different
+     about a command fired from a menu all comes from one fact: the control that
+     started the request is gone before the response arrives.
+
+     hx-target points at the document region, never at anything inside the
+     panel. The click closes the menu, so by the time the reply lands the panel
+     is display:none — a swap into it succeeds, changes nothing anyone can see,
+     and is thrown away when the menu re-renders. Same for hx-indicator: a
+     spinner in a closed menu is one nobody watches, so the busy state is
+     painted on the strip under the bar instead.
+
+     The answer has to stay on screen and it has to be announced. role="status"
+     does both: the user pressed an item, the menu vanished, and without a live
+     region the only evidence is a number changing three lines further down.
+
+     hx-sync="this:drop", not :replace: two toggles of a switch are one intent
+     and the later wins, but two presses of Recalculate are one already in flight.
+
+     The @click does not preventDefault — htmx listens for the same click — and
+     hx-headers sits on the root, since there is no form to read a token from. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null, busy: false, msg: '', ok: true,
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }"
+     @htmx:before-request.camel="busy = true; msg = ''"
+     @htmx:after-request.camel="
+       busy = false; ok = $event.detail.successful;
+       msg = ok ? 'Tax recalculated from the rate contract' : 'Could not recalculate — the order is unchanged'">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-100 text-zinc-900'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save draft
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="edit"
+              :aria-expanded="open === 'edit'" :tabindex="at === 'edit' ? 0 : -1"
+              @click="open === 'edit' ? close() : show('edit')"
+              @mouseenter="if (open !== null) to('edit')"
+              @keydown.arrow-down.prevent="show('edit')" @keydown.arrow-up.prevent="show('edit', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'edit' && 'bg-zinc-100 text-zinc-900'">Edit</button>
+
+      <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                hx-post="/orders/PO-24-1187/recalculate-tax/"
+                hx-target="#mb-po-total" hx-swap="innerHTML" hx-sync="this:drop"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="calculator" class="size-4 text-zinc-600"></i>Recalculate tax
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="search" class="size-4 text-zinc-600"></i>Find item code
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p role="status" class="flex min-h-9 items-center gap-1.5 border-b border-zinc-100 px-4 text-[12px]/4">
+    <span x-show="busy" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Recalculating tax
     </span>
-  </button>
-  <div x-show="open === 'orders'" class="ml-[26px] border-l border-zinc-100 pl-2">
-    <a href="#" aria-current="page" class="flex items-center gap-2 rounded-lg bg-zinc-100 px-2 py-1.5 text-[13px]/5 font-medium">
-      <span class="flex-1">Awaiting GRN</span>
-      <span class="text-[11px]/4 tabular-nums text-zinc-600">27</span>
-    </a>
-    <a href="#" class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px]/5 hover:bg-zinc-100">
-      <span class="flex-1">Overdue over 7 days</span>
-      <span class="text-[11px]/4 tabular-nums text-zinc-600">18</span>
-    </a>
-    <a href="#" class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px]/5 hover:bg-zinc-100">
-      <span class="flex-1">My approvals</span>
-      <span class="text-[11px]/4 tabular-nums text-zinc-600">6</span>
-    </a>
-    <a href="#" class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px]/5 hover:bg-zinc-100">
-      <span class="flex-1">Closed</span>
-    </a>
-  </div>
-
-  <button @click="open = open === 'vendors' ? '' : 'vendors'" :aria-expanded="open === 'vendors'"
-          class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="building-2" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Vendors</span>
-    <span class="text-[11px]/4 tabular-nums text-zinc-600">187</span>
-    <span class="flex transition-transform" :class="open === 'vendors' && 'rotate-180'">
-      <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+    <span x-show="!busy && msg" x-cloak class="flex items-center gap-1.5"
+          :class="ok ? 'text-zinc-600' : 'font-medium text-red-600'">
+      <span class="flex shrink-0" :class="ok && 'text-emerald-600'"><i :data-lucide="ok ? 'check' : 'alert-circle'" class="size-3.5"></i></span>
+      <span x-text="msg"></span>
     </span>
-  </button>
-  <div x-show="open === 'vendors'" x-cloak class="ml-[26px] border-l border-zinc-100 pl-2">
-    <a href="#" class="block rounded-lg px-2 py-1.5 text-[13px]/5 hover:bg-zinc-100">Approved</a>
-    <a href="#" class="block rounded-lg px-2 py-1.5 text-[13px]/5 hover:bg-zinc-100">Pending KYC</a>
-    <a href="#" class="block rounded-lg px-2 py-1.5 text-[13px]/5 hover:bg-zinc-100">Rate contracts</a>
+    <span x-show="!busy && !msg" class="tabular-nums text-zinc-500">Last recalculated 16 Aug 2026, 11:04</span>
+  </p>
+
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p id="mb-po-total" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">14 lines · ₹18,42,000 before tax · IGST 18% ₹3,31,560</p>
+  </div>
+</div>` }
+    ]
+  },
+
+  {
+    id: 'navigation-menu', name: 'Navigation menu', category: 'navigation',
+    description: 'A horizontal bar of links to places, some of which open a panel of more links. Every item is an anchor, so the browser\'s own navigation gestures keep working, and aria-current says which one you are on.',
+    when: 'The top-level route map of an application that has more sections than a sidebar can hold at once — Procurement, Inventory, Reports — where a section is worth showing as a panel of its pages rather than a single link. If the items are commands that act on the document in front of you, that is a menubar. If there is one trigger and one list of actions behind it, that is a dropdown. The test is whether an item has a URL: a set of URLs is navigation and belongs here, and anything without one does not.',
+    notes: [
+      'Every item that goes somewhere is an <a href>. This is the whole component and it is the thing that gets built wrong: a navigation menu assembled out of role="menu" and <button>s looks identical on screen and throws away middle-click, Ctrl-click, Open in new tab, Copy link address, the status bar preview, and the browser\'s own history — every affordance a link gets for free and none of which you can put back. It also tells a screen reader that arrow keys drive the thing and that Tab will step over it in one press, and then neither is true. If it has a URL it is an anchor, and no amount of ARIA makes a button into one.',
+      'The panel is a plain container holding a <ul> of links. It is not role="menu" and its links are not role="menuitem". Those roles are a promise that the contents are commands, that the arrows move between them and that the whole panel is one tab stop; a panel of links is none of those, and applying them makes NVDA and VoiceOver stop announcing "link" for things that are links, which is the one word the user needed.',
+      'The trigger is a <button>, because it does not navigate — it reveals. aria-expanded belongs on a control that opens something and is a lie on a link, where a reader told "collapsed" presses Enter and leaves the page. The section that the trigger appears to name still needs a route, so the first link inside the panel is the section overview — All of Procurement — and the trigger loses nothing by not being a link itself.',
+      'Two delays, and they are different lengths for different reasons. Opening waits about 140ms so a pointer travelling across the bar toward something else does not flash three panels on the way. Closing waits about 280ms so the pointer can leave the trigger, cross the gap and land in the panel without the panel disappearing underneath it — it is off both elements for a frame or two in between. Drop the open delay and the bar strobes; drop the close delay and the panel can be seen but never reached.',
+      'Once a panel is open, crossing to a sibling trigger swaps instantly and skips the open delay. The delay exists to filter out a pointer that is passing through, and a pointer already inside an open menu is not passing through — it is reading the bar. Keep the delay in that state and moving between two sections feels like the bar is arguing with you.',
+      'The gap between the bar and the panel is padding on the positioned wrapper, never a margin on the panel. A margin is dead space belonging to nothing, so the pointer leaves the component halfway across it and the close timer starts. And the panel drops flush under the bar, full width, so the shortest route from a trigger to it is straight down — indent the panel or offset it sideways and the route becomes a diagonal, the diagonal passes over the next trigger, and that trigger takes the pointer. The cheap fix is the geometry; the expensive one is a safe-triangle hit test, and this system does not want the second. Keep the panel a DOM descendant of the nav while you are at it — mouseleave accounts for an element and its descendants in the tree rather than its box, so a panel inside the nav never fires the nav\'s mouseleave no matter where it is painted, and a panel portalled to the body to escape a clipping ancestor fires it the instant the pointer arrives.',
+      'Tab reaches every trigger. This is the line between this and a menubar: a menubar is one widget and takes one tab stop with a roving tabindex inside it, and a navigation bar is a list of destinations that a keyboard user has to be able to walk. Give this a roving tabindex and Tab jumps the entire route map in one press, which is the opposite of what a route map is for.',
+      'Focus leaving the whole component closes the panel, and the only way to detect that is @focusout on the root with a containment check on relatedTarget, because blur does not bubble and focusout does. relatedTarget is the element about to receive focus, so !$el.contains($event.relatedTarget) is the question "did focus land outside me". It is null when focus leaves the document entirely — the address bar, another window — and contains(null) is false, so that case closes too, which is correct. Bind blur instead and nothing fires; skip the check and the panel closes while the user is tabbing through its own links.',
+      'Guard the hover handlers with matchMedia(\'(hover: hover) and (pointer: fine)\'). A tap on a touch screen fires a synthetic mouseenter and then a click, so an unguarded bar opens the panel on the mouseenter and closes it again on the click, and the section is unreachable by tapping it. The click path has to be the whole story on touch.',
+      'aria-current="page" marks the exact page and nothing else; the trigger of the section you are inside takes aria-current="true", which means the current item of a set. They are not interchangeable and a trigger with page on it claims to be a page it has no URL for. aria-selected has no business here at all — that word belongs to a tab, which switches a panel in this document rather than moving you somewhere.',
+      'Nav items are not underlined, which is the documented exception to the interactive-text rule and the same exception breadcrumbs take. A row of underlined links reads as a fence rather than a bar; the tint on the current item and the hover carry it instead. Inside a panel the links stay unadorned for the same reason — twelve underlined lines in three columns is a grid of rules.',
+      'At 390px this is not a hover bar and must not try to be one. There is no hover to open with, four section names do not fit on one line, and a floating panel over a phone screen needs a dismiss affordance a bar does not have. Ship the disclosure list instead, sm:hidden against hidden sm:block, and accept that they are two pieces of markup rather than one that flexes.'
+    ],
+    anatomy: [
+      ['Bar', 'The <nav aria-label> holding the open state, the two timers, and the mouseleave, focusout, escape and click-outside handlers. It is the common parent of every trigger and every panel, which is the only place that can tell "left the trigger" from "left the component".'],
+      ['Link item', 'An <a href> straight to a page, with aria-current="page" when it is that page. No panel, no chevron, no state of its own.'],
+      ['Panel trigger', 'A <button> carrying aria-expanded and aria-controls. It looks exactly like a link item apart from the chevron, and the chevron is the only signal that anything is behind it.'],
+      ['Bridge', 'pt-2 on the positioned wrapper. The strip the pointer crosses on its way down, and it belongs to the component so crossing it is not leaving.'],
+      ['Panel', 'A white rounded-xl bordered surface below the bar, z-40, holding a <ul> of links. Not a role="menu", not focus-trapped, and not scrollable — if it needs to scroll it needs to be a page.'],
+      ['Group heading', 'A real <h3> above each column, 11px uppercase zinc-600. It is a heading and not a styled div, because jumping by heading is how a screen reader reads a panel of thirty links.'],
+      ['Link description', 'A 12px zinc-600 line under the link label, inside the anchor so the whole block is the target. Six words at most: it joins the accessible name and is read out every time.'],
+      ['Featured rail', 'An optional zinc-100 block at the head of the panel holding one promoted destination — a recently opened record. It is first in the DOM only when it is genuinely the most likely next click, because DOM order is keyboard order.']
+    ],
+    behaviour: [
+      'Hover opens after about 140ms and closes about 280ms after the pointer has left the trigger and the panel together. Coming back inside during the close delay cancels it, so a pointer that overshoots the panel edge and returns finds it still there.',
+      'With a panel already open, moving to another trigger swaps immediately. Only the first panel of a pass costs the open delay.',
+      'Clicking a trigger opens the panel and moves focus onto its first link. That is what makes Enter and Space work with nothing bound to them, because a native button turns both into a click, and it costs a mouse user nothing since focus-visible does not paint for a pointer.',
+      'Down on a trigger opens the panel and lands on the first link. Inside the panel there are no arrow keys at all — Tab walks the links, because they are links. Arrow navigation inside would be the one thing that makes it feel like a menu, and it is deliberately absent.',
+      'Escape closes the open panel and returns focus to the trigger it belongs to, and it stops propagating so it does not also close the dialog the bar happens to be inside.',
+      'Focus leaving the component closes the panel; clicking outside closes it without moving focus, because the user has already put focus somewhere by clicking.',
+      'One panel at a time falls out of holding a single id on the root rather than a boolean per item. There is nothing to keep in sync and no way to reach a state with two panels open.',
+      'A panel that is fetched is fetched on open, not on mouseenter, and once — the hover delay exists precisely so that dragging a pointer across the bar does not fire three requests. A failed fetch leaves the flag unset so the next open retries.',
+      'At 390px the bar is replaced, not reflowed: a stack of disclosure sections, several of which can be open at once, because collapsing one section as another opens moves every link under the thumb.'
+    ],
+    a11y: [
+      'Destinations are <a href> and nothing else. Middle-click, Ctrl-click, Open in new tab and the browser\'s status-bar preview all come from the element being an anchor, and none of them can be reimplemented on a button.',
+      'The panel is a plain container of links, not role="menu". Those roles change what a screen reader announces and what it promises about the keyboard, and both promises are false here.',
+      'The trigger is a button with aria-expanded bound to the open state and aria-controls pointing at the panel; the panel points back with aria-labelledby, so it is announced with the name of the section it belongs to rather than as an unnamed group.',
+      'Every trigger is in the tab order. A roving tabindex is correct for a menubar and wrong here: it would collapse the whole route map into one tab stop.',
+      'aria-current="page" on the exact page and aria-current="true" on the trigger of the section you are inside. The tint is the visual echo of the attribute, never the state itself.',
+      'Escape closes and hands focus back to the trigger, so the keyboard does not end up on a hidden element or dumped on the body.',
+      'Column headings are real <h3> elements so a panel of thirty links can be read by heading instead of link by link.',
+      'Focus is an outline with an offset, never a ring, and nothing here writes outline-none. Inside a panel the links are far enough from the edge for a positive offset to sit clear of the border.'
+    ],
+    related: ['topbar', 'menubar', 'sidebar'],
+    variants: [
+      { id: 'links', name: 'Link bar', code:
+`<!-- The simplest form, and still the component: four destinations, no panels
+     and no JavaScript at all. Reach for this first and add a panel only when a
+     section has pages worth listing.
+
+     aria-current="page" is the state. The zinc-100 tint is what you see, but it
+     is the attribute that is announced, and writing only the tint gives a
+     sighted user a marker and everybody else nothing.
+
+     The items are not underlined. That is the exception breadcrumbs take too:
+     interactive text is zinc-900 plus an underline everywhere else in this
+     system, and four underlined labels in a row read as a fence rather than a
+     bar. The hover tint carries it. -->
+<nav aria-label="Main" class="rounded-xl border border-zinc-200 bg-white p-1">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <a href="/dashboard/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+    </li>
+    <li>
+      <a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a>
+    </li>
+    <li>
+      <a href="/inventory/grn/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a>
+    </li>
+    <li>
+      <a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a>
+    </li>
+  </ul>
+</nav>` },
+
+      { id: 'panel', name: 'One panel of links', code:
+`<!-- The whole machine, on the smallest thing that needs it. Read this one and
+     the rest of the variants are the same root with different panel contents.
+
+     Two delays and they are not the same length. 140ms before opening filters
+     out a pointer crossing the bar on its way to the scrollbar; 280ms before
+     closing is the grace period in which the pointer leaves the trigger, is
+     over nothing for a frame or two, and lands in the panel. The nav's own
+     mouseenter clears the pending close, so overshooting the panel edge and
+     coming back finds it still open.
+
+     The gap is pt-2 on the positioned wrapper, never mt-2 on the panel: a
+     margin belongs to nothing, so the pointer is outside the component halfway
+     across it. And because the panel is a DOM child of the nav, mouseleave on
+     the nav does not fire when the pointer moves into it — mouseleave counts
+     descendants in the tree, not boxes.
+
+     The trigger is a button, not a link, because it reveals rather than
+     navigates and aria-expanded on a link is a lie. The page it looks like it
+     should point at is the first link inside the panel instead.
+
+     Click opens the panel and moves focus to the first link, which is why
+     nothing is bound to Enter or Space: a native button turns both into a
+     click. Focus is moved on the animation frame after $nextTick, because
+     x-show has not written display yet inside the tick and focus() on a hidden
+     element is a silent no-op — the same trap the dropdown documents.
+
+     fine is the touch guard. A tap fires a synthetic mouseenter and then a
+     click, so without it the panel opens on the first and closes on the second
+     and the section cannot be reached by tapping it. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <a href="/dashboard/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+    </li>
+
+    <li class="relative">
+      <button type="button" x-ref="vendors" id="nmp-t-vendors"
+              aria-controls="nmp-p-vendors" :aria-expanded="open === 'vendors'"
+              @mouseenter="hover('vendors')"
+              @click="open === 'vendors' ? shut($refs.vendors) : jump('vendors')"
+              @keydown.arrow-down.prevent="jump('vendors')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'vendors' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Vendors
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'vendors' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="vendorsPanel" x-show="open === 'vendors'" x-cloak
+           id="nmp-p-vendors" aria-labelledby="nmp-t-vendors"
+           class="absolute top-full left-0 z-40 pt-2">
+        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <li>
+            <a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All vendors</a>
+          </li>
+          <li>
+            <a href="/vendors/approved/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approved suppliers</a>
+          </li>
+          <li>
+            <a href="/vendors/contracts/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rate contracts</a>
+          </li>
+          <li>
+            <a href="/vendors/onboarding/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Onboarding queue</a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+    <li>
+      <a href="/reports/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+</nav>` },
+
+      { id: 'columns', name: 'Wide panel, grouped columns', code:
+`<!-- Twelve destinations under one trigger, in three columns with a real <h3>
+     over each. The headings are the reason this is readable to a screen reader
+     at all: thirty links read one at a time is a wall, and heading navigation
+     turns it back into three lists. A styled div would look identical and do
+     none of that.
+
+     The panel is anchored to the nav, not to the trigger, and takes w-full so
+     the shortest route from the trigger down into it is a straight line. Anchor
+     a wide panel to its own trigger and it either runs off the right edge or
+     has to be shifted back, and the shift is what turns the pointer's route
+     into a diagonal that the next trigger steals.
+
+     The description sits inside the anchor so the whole two-line block is the
+     target — outside it, the sentence is dead space that looks clickable and
+     is not. The cost is that it joins the accessible name, which is why every
+     one of them is six words or fewer and says what the page is rather than
+     selling it.
+
+     There is no x-transition on the panel. A fade looks considered on a single
+     panel and wrong the moment two of them swap, because both are mounted for
+     the length of the transition and you get a crossfade of two menus. The
+     open delay is what makes it feel deliberate. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <button type="button" x-ref="modules" id="nmc-t-modules"
+              aria-controls="nmc-p-modules" :aria-expanded="open === 'modules'"
+              @mouseenter="hover('modules')"
+              @click="open === 'modules' ? shut($refs.modules) : jump('modules')"
+              @keydown.arrow-down.prevent="jump('modules')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'modules' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Modules
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'modules' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+    </li>
+
+    <li>
+      <a href="/approvals/" @mouseenter="if (open) shut()"
+         class="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Approvals
+        <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/admin/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Admin</a>
+    </li>
+  </ul>
+
+  <div x-ref="modulesPanel" x-show="open === 'modules'" x-cloak
+       id="nmc-p-modules" aria-labelledby="nmc-t-modules"
+       class="absolute top-full left-0 z-40 w-full pt-2">
+    <div class="rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
+      <div class="grid gap-x-4 gap-y-4 sm:grid-cols-3">
+        <div>
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Procurement</h3>
+          <ul>
+            <li>
+              <a href="/procurement/orders/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Purchase orders</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Raised against a rate contract</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/requisitions/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Requisitions</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Indents waiting to become orders</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/contracts/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Rate contracts</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Agreed prices and their validity</span>
+              </a>
+            </li>
+            <li>
+              <a href="/vendors/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Vendors</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Suppliers and their contacts</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Inventory</h3>
+          <ul>
+            <li>
+              <a href="/inventory/grn/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Goods receipt</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">GRNs against open orders</span>
+              </a>
+            </li>
+            <li>
+              <a href="/inventory/stock/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Stock on hand</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Item ledger by store and bin</span>
+              </a>
+            </li>
+            <li>
+              <a href="/inventory/transfers/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Transfers</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Vasai to Silvassa movement</span>
+              </a>
+            </li>
+            <li>
+              <a href="/inventory/counts/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Stock counts</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Cycle counts and adjustments</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Reports</h3>
+          <ul>
+            <li>
+              <a href="/reports/consumption/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Consumption</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Issue by project and cost centre</span>
+              </a>
+            </li>
+            <li>
+              <a href="/reports/ageing/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Invoice ageing</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Outstanding past agreed terms</span>
+              </a>
+            </li>
+            <li>
+              <a href="/reports/price-trend/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Price trend</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Landed rate by item and month</span>
+              </a>
+            </li>
+            <li>
+              <a href="/reports/builder/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Saved reports</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Your own and the shared set</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>` },
+
+      { id: 'featured', name: 'Featured rail', code:
+`<!-- A promoted destination beside the list — here the record the buyer had
+     open before lunch, which in a procurement console is the most likely next
+     click by a wide margin.
+
+     The rail is first in the DOM, and that is a decision rather than a layout:
+     DOM order is keyboard order, so Down from the trigger lands on the record
+     rather than on All of Procurement. That is right only because the record
+     really is the likeliest destination. Put anything promotional there and it
+     becomes an advertisement standing between a keyboard user and the menu, in
+     which case it goes last in the DOM and the grid puts it back on the left
+     with sm:order-first — visual order is free to move, tab order is not.
+
+     The rail is bg-zinc-100, a surface, and the pill inside it is bg-zinc-200
+     with a zinc-300 ring, one step deeper. Give the pill the surface fill and
+     it measures identical against the rail and disappears.
+
+     The rail is a single anchor wrapping four lines, so the whole block is the
+     target. Splitting the amount out into a sibling would leave the largest
+     thing on the card unclickable, which is exactly the part people aim at. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <button type="button" x-ref="proc" id="nmf-t-proc"
+              aria-controls="nmf-p-proc" :aria-expanded="open === 'proc'"
+              @mouseenter="hover('proc')"
+              @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
+              @keydown.arrow-down.prevent="jump('proc')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'proc' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Procurement
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+    </li>
+    <li>
+      <a href="/inventory/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Inventory</a>
+    </li>
+    <li>
+      <a href="/reports/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+
+  <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
+       id="nmf-p-proc" aria-labelledby="nmf-t-proc"
+       class="absolute top-full left-0 z-40 w-full pt-2">
+    <div class="rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
+      <div class="grid gap-3 sm:grid-cols-3">
+        <a href="/procurement/orders/1187/"
+           class="block rounded-lg bg-zinc-100 p-3 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Back to where you were</span>
+          <span class="mt-2 block text-[14px]/5 font-semibold tabular-nums text-zinc-900">PO-24-1187</span>
+          <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Gujarat Polymers Ltd</span>
+          <span class="mt-2 flex items-center justify-between gap-2">
+            <span class="text-[13px]/5 font-medium tabular-nums text-zinc-900">₹18,42,000</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Awaiting GRN
+            </span>
+          </span>
+          <span class="mt-2 block text-[12px]/4 tabular-nums text-zinc-500">Opened 16 Aug 2026, 11:04</span>
+        </a>
+
+        <div class="sm:col-span-2">
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Procurement</h3>
+          <ul class="grid sm:grid-cols-2">
+            <li>
+              <a href="/procurement/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">All of Procurement</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">The section overview</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/orders/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Purchase orders</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-600">31 open, 4 overdue</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/requisitions/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Requisitions</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Indents from the sites</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/contracts/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Rate contracts</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Agreed prices and validity</span>
+              </a>
+            </li>
+            <li>
+              <a href="/vendors/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Vendors</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Suppliers and contacts</span>
+              </a>
+            </li>
+            <li>
+              <a href="/procurement/invoices/" class="block rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Invoices</span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Three-way match queue</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>` },
+
+      { id: 'icons', name: 'Icons per link', code:
+`<!-- An icon per row, in a tinted well. The well is a shape, so it takes
+     bg-zinc-200 with a zinc-300 ring; bg-zinc-100 would be the surface colour
+     and would measure identical against the white panel with nothing to hold
+     its edge.
+
+     Every well is the same size and every icon sits in one, including the rows
+     where the icon is weak, because the labels only form a readable column if
+     their left edge never moves. The moment one row has no well the whole list
+     reads as two lists.
+
+     The icons carry no label of their own. Each one repeats what the text
+     beside it already says, and a screen reader announcing "package, Stock on
+     hand" for six rows in a row is noise. If an icon needs explaining it is
+     not naming a destination, and the answer is to drop it rather than to
+     search Lucide for something vaguer.
+
+     No Alpine binding goes on the <i data-lucide>. createIcons() replaces that
+     element with an <svg> and takes the binding with it; the rotating chevron
+     on the trigger is bound on the span around it for the same reason. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <a href="/dashboard/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+    </li>
+
+    <li class="relative">
+      <button type="button" x-ref="inv" id="nmi-t-inv"
+              aria-controls="nmi-p-inv" :aria-expanded="open === 'inv'"
+              @mouseenter="hover('inv')"
+              @click="open === 'inv' ? shut($refs.inv) : jump('inv')"
+              @keydown.arrow-down.prevent="jump('inv')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'inv' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Inventory
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'inv' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="invPanel" x-show="open === 'inv'" x-cloak
+           id="nmi-p-inv" aria-labelledby="nmi-t-inv"
+           class="absolute top-full left-0 z-40 pt-2">
+        <ul class="w-72 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <li>
+            <a href="/inventory/stock/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="package" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Stock on hand</span>
+                <span class="block text-[12px]/4 text-zinc-600">By store and bin</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="/inventory/grn/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="truck" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Goods receipt</span>
+                <span class="block text-[12px]/4 text-zinc-600">Post a GRN against an order</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="/inventory/transfers/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="arrow-left-right" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Transfers</span>
+                <span class="block text-[12px]/4 text-zinc-600">Vasai to Silvassa</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="/inventory/counts/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="clipboard-list" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Stock counts</span>
+                <span class="block text-[12px]/4 text-zinc-600">Cycle counts and adjustments</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="/inventory/ledger/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="file-text" class="size-4 text-zinc-700"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[13px]/5 font-medium text-zinc-900">Item ledger</span>
+                <span class="block text-[12px]/4 text-zinc-600">Every movement, by item</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+    <li>
+      <a href="/reports/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+</nav>` },
+
+      { id: 'mixed', name: 'Links and triggers together', code:
+`<!-- Two plain links and two triggers in one bar, which is the ordinary case
+     and the one that exercises the hover logic properly. Move the pointer from
+     Procurement to Inventory: the second panel replaces the first with no
+     delay at all, because hover() skips the timer when something is already
+     open. The delay exists to ignore a pointer crossing the bar, and a pointer
+     already inside an open menu is not crossing it.
+
+     A plain link carries @mouseenter="if (open) shut()". Without it, sliding
+     from an open panel's trigger onto Dashboard leaves the panel hanging over
+     the page until the 280ms close timer catches up, and until then the bar
+     shows you inside a section you have just left.
+
+     The two kinds of item are deliberately identical apart from the chevron.
+     Styling a trigger differently — heavier, or in a different colour — makes
+     the bar look like two rows of things stacked on one line, and the user has
+     to learn which is which. The chevron is the entire distinction and it is
+     enough, because it is the same chevron a dropdown uses.
+
+     Only one panel can be open, and that is a property of the state shape
+     rather than of any code: open holds an id or null. A boolean per item
+     needs a rule to keep them exclusive, and the rule is what eventually gets
+     forgotten in one of the branches. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <a href="/dashboard/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+    </li>
+
+    <li class="relative">
+      <button type="button" x-ref="proc" id="nmm-t-proc"
+              aria-controls="nmm-p-proc" :aria-expanded="open === 'proc'"
+              @mouseenter="hover('proc')"
+              @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
+              @keydown.arrow-down.prevent="jump('proc')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'proc' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Procurement
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
+           id="nmm-p-proc" aria-labelledby="nmm-t-proc"
+           class="absolute top-full left-0 z-40 pt-2">
+        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
+          <li><a href="/procurement/orders/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+          <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
+          <li><a href="/procurement/contracts/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rate contracts</a></li>
+          <li><a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a></li>
+        </ul>
+      </div>
+    </li>
+
+    <li class="relative">
+      <button type="button" x-ref="inv" id="nmm-t-inv"
+              aria-controls="nmm-p-inv" :aria-expanded="open === 'inv'"
+              @mouseenter="hover('inv')"
+              @click="open === 'inv' ? shut($refs.inv) : jump('inv')"
+              @keydown.arrow-down.prevent="jump('inv')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'inv' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Inventory
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'inv' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="invPanel" x-show="open === 'inv'" x-cloak
+           id="nmm-p-inv" aria-labelledby="nmm-t-inv"
+           class="absolute top-full left-0 z-40 pt-2">
+        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <li><a href="/inventory/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Inventory</a></li>
+          <li><a href="/inventory/stock/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stock on hand</a></li>
+          <li><a href="/inventory/grn/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a></li>
+          <li><a href="/inventory/transfers/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Transfers</a></li>
+        </ul>
+      </div>
+    </li>
+
+    <li>
+      <a href="/reports/" aria-current="page" @mouseenter="if (open) shut()"
+         class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+</nav>` },
+
+      { id: 'current', name: 'Inside the section', code:
+`<!-- The bar as it looks from a page inside Procurement, which is where every
+     user spends their day and which almost every implementation gets wrong.
+
+     Two different values of aria-current are doing two different jobs here.
+     The trigger takes aria-current="true" — the current item of a set — because
+     it is the section you are in but it is not a page and has no URL to be
+     current for. Writing "page" on it claims a destination that does not
+     exist, and a reader following that claim finds a button. Inside the panel,
+     the link to the page actually on screen takes aria-current="page". Both
+     are marked, neither borrows the other's word, and aria-selected appears
+     nowhere: that word belongs to a tab, which swaps a panel in this document
+     rather than moving you.
+
+     The trigger keeps its zinc-100 tint whether the panel is open or not, so
+     "where I am" and "what is open" are the same colour. They are only ever
+     confusable for a moment, since the chevron rotates and the panel is on
+     screen, and the alternative — a second marker for the current section — is
+     a colour this system does not have.
+
+     The current link inside the panel is tinted the same way rather than
+     hidden or disabled. A menu that drops the page you are on changes length
+     depending on where you stand, and a list people navigate by position
+     cannot move under them. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <a href="/dashboard/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+    </li>
+
+    <li class="relative">
+      <button type="button" x-ref="proc" id="nmcur-t-proc" aria-current="true"
+              aria-controls="nmcur-p-proc" :aria-expanded="open === 'proc'"
+              @mouseenter="hover('proc')"
+              @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
+              @keydown.arrow-down.prevent="jump('proc')"
+              class="flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Procurement
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
+           id="nmcur-p-proc" aria-labelledby="nmcur-t-proc"
+           class="absolute top-full left-0 z-40 pt-2">
+        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
+          <li>
+            <a href="/procurement/orders/" aria-current="page"
+               class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a>
+          </li>
+          <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
+          <li><a href="/procurement/contracts/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rate contracts</a></li>
+          <li><a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a></li>
+        </ul>
+      </div>
+    </li>
+
+    <li>
+      <a href="/inventory/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Inventory</a>
+    </li>
+    <li>
+      <a href="/reports/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+</nav>` },
+
+      { id: 'phone', name: 'On a phone', code:
+`<!-- At 390px this stops being a hover bar and becomes a disclosure list, and
+     that is a different piece of markup rather than the same one reflowed. In
+     an app this carries sm:hidden and the bar carries hidden sm:block; here it
+     stands alone so it can be read on its own.
+
+     There is no hover to open with, no room for four section names on one
+     line, and no pointer that can travel a bridge. So every open is a tap, and
+     all the hover-intent machinery is gone rather than left in place doing
+     nothing — code that only runs on a device the component is not on is code
+     nobody will ever check.
+
+     Sections push the page down instead of floating over it. A floating panel
+     on a phone covers the content and then needs its own dismiss affordance,
+     a backdrop and a scroll lock, at which point it is a sheet and should be
+     built as one.
+
+     Several sections can be open at once. Closing one as another opens shifts
+     every link below it by the height of the section that just collapsed, and
+     on a touch screen the finger is already on its way down to a target that
+     has moved. That is worth a longer list.
+
+     x-cloak sits on the whole list and on each section body: without it the
+     entire route map is on screen for the frame before Alpine boots, which on
+     a phone is most of a screenful.
+
+     The menu and close icons are two elements with x-show on the spans around
+     them, not one <i> with the name bound. createIcons() replaces the <i> with
+     an <svg> and any binding on it goes with the element; a name that never
+     changes survives being read once, and one that toggles does not. -->
+<div class="rounded-xl border border-zinc-200 bg-white"
+     x-data="{ nav: false, open: { proc: true, inv: false, rep: false } }">
+  <div class="flex h-12 items-center justify-between gap-3 px-3">
+    <span class="text-[13px]/5 font-medium">Konspec Operations</span>
+    <button type="button" @click="nav = !nav" :aria-expanded="nav" aria-controls="nmph-list"
+            class="flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+            :aria-label="nav ? 'Close navigation' : 'Open navigation'">
+      <span x-show="!nav" class="flex"><i data-lucide="menu" class="size-4 text-zinc-600"></i></span>
+      <span x-show="nav" x-cloak class="flex"><i data-lucide="x" class="size-4 text-zinc-600"></i></span>
+    </button>
   </div>
 
-  <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]/5 hover:bg-zinc-100">
-    <i data-lucide="boxes" class="size-4 text-zinc-600"></i>
-    <span class="flex-1">Materials</span>
-  </a>
+  <nav id="nmph-list" aria-label="Main" x-show="nav" x-cloak class="border-t border-zinc-200 p-2">
+    <ul class="space-y-0.5">
+      <li>
+        <a href="/dashboard/" class="block rounded-lg px-3 py-2.5 text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+      </li>
+
+      <li>
+        <button type="button" @click="open.proc = !open.proc" :aria-expanded="open.proc" aria-controls="nmph-proc"
+                class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Procurement
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.proc && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+          </span>
+        </button>
+        <ul id="nmph-proc" x-show="open.proc" class="mt-0.5 ml-3 space-y-0.5 border-l border-zinc-200 pl-3">
+          <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
+          <li><a href="/procurement/orders/" aria-current="page" class="block rounded-lg bg-zinc-100 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+          <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
+          <li><a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <button type="button" @click="open.inv = !open.inv" :aria-expanded="open.inv" aria-controls="nmph-inv"
+                class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Inventory
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.inv && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+          </span>
+        </button>
+        <ul id="nmph-inv" x-show="open.inv" x-cloak class="mt-0.5 ml-3 space-y-0.5 border-l border-zinc-200 pl-3">
+          <li><a href="/inventory/stock/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stock on hand</a></li>
+          <li><a href="/inventory/grn/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a></li>
+          <li><a href="/inventory/transfers/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Transfers</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <button type="button" @click="open.rep = !open.rep" :aria-expanded="open.rep" aria-controls="nmph-rep"
+                class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Reports
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.rep && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+          </span>
+        </button>
+        <ul id="nmph-rep" x-show="open.rep" x-cloak class="mt-0.5 ml-3 space-y-0.5 border-l border-zinc-200 pl-3">
+          <li><a href="/reports/consumption/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Consumption</a></li>
+          <li><a href="/reports/ageing/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Invoice ageing</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>` },
+
+      { id: 'htmx', name: 'Fetched on first open', code:
+`<!-- The section links are rendered with the page, because they are the same
+     for every user in a role and fetching them buys nothing. What is fetched
+     is the half that is personal — the records this buyer last had open — and
+     that is the only part of a navigation panel that ever justifies a request.
+     Fetch the whole panel and you have made the route map depend on the
+     network.
+
+     The request goes out when the panel opens, not on mouseenter. This is the
+     second job the 140ms hover delay does: without it, dragging the pointer
+     across a bar of four sections fires four requests and the user reads
+     whichever one lands last.
+
+     Fetching once is an Alpine flag rather than htmx's own once modifier, and
+     the difference only shows on a failure. once is spent the moment the
+     request is fired, so a 500 leaves the trigger disarmed and the panel holds
+     its skeleton for the rest of the session. loaded is set from
+     htmx:after-request and only when it succeeded, so the next open retries.
+     hx-sync="this:drop" throws away a second request while one is in flight,
+     which is what a pointer leaving and re-entering the trigger produces.
+
+     x-effect re-runs when open or loaded changes, which is exactly the trigger
+     condition, and dispatching a plain CustomEvent on the button is how Alpine
+     hands over to htmx — htmx listens for any event name you give hx-trigger.
+
+     hx-indicator points at the body so .htmx-request fades it for the length
+     of the request with no custom CSS.
+
+     There is no CSRF token on this and there should not be: opening a menu is
+     a read, so it is a GET, and a navigation panel that needs a token is a
+     navigation panel that is writing something. -->
+<nav aria-label="Main" class="relative rounded-xl border border-zinc-200 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       loaded: false,
+       failed: false,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     x-effect="if (open === 'proc' && !loaded) $refs.proc.dispatchEvent(new CustomEvent('nav-open'))"
+     @htmx:after-request.camel="
+       if ($event.detail.successful) { loaded = true; failed = false } else { failed = true }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <button type="button" x-ref="proc" id="nmh-t-proc"
+              aria-controls="nmh-p-proc" :aria-expanded="open === 'proc'"
+              hx-get="/nav/procurement/recent/" hx-target="#nmh-recent"
+              hx-swap="innerHTML" hx-trigger="nav-open" hx-sync="this:drop"
+              hx-indicator="#nmh-recent"
+              @mouseenter="hover('proc')"
+              @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
+              @keydown.arrow-down.prevent="jump('proc')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'proc' ? 'bg-zinc-100 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+        Procurement
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+    </li>
+    <li>
+      <a href="/inventory/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Inventory</a>
+    </li>
+    <li>
+      <a href="/reports/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+
+  <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
+       id="nmh-p-proc" aria-labelledby="nmh-t-proc"
+       class="absolute top-full left-0 z-40 w-full pt-2">
+    <div class="rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Procurement</h3>
+          <ul>
+            <li><a href="/procurement/" class="block rounded-lg px-2 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
+            <li><a href="/procurement/orders/" class="block rounded-lg px-2 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+            <li><a href="/procurement/requisitions/" class="block rounded-lg px-2 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
+            <li><a href="/vendors/" class="block rounded-lg px-2 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="px-2 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Recently opened</h3>
+
+          <div id="nmh-recent" class="transition-opacity [&.htmx-request]:opacity-40">
+            <div class="space-y-2 p-2" aria-hidden="true">
+              <div class="h-4 w-2/3 rounded bg-zinc-200"></div>
+              <div class="h-3 w-1/2 rounded bg-zinc-200"></div>
+              <div class="h-4 w-3/5 rounded bg-zinc-200"></div>
+              <div class="h-3 w-2/5 rounded bg-zinc-200"></div>
+            </div>
+          </div>
+
+          <p x-show="failed" x-cloak role="status" class="flex flex-wrap items-center gap-x-2 gap-y-1 px-2 pt-1 text-[12px]/4 font-medium text-red-600">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Could not load your recent records
+            </span>
+            <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+                    @click="$refs.proc.dispatchEvent(new CustomEvent('nav-open'))">Try again</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </nav>` }
+    ]
+  },
+
+  {
+    id: 'sidebar', name: 'Sidebar', category: 'navigation',
+    description: 'The primary navigation panel of the console: a header, grouped menus with counts and submenus, and a footer for the signed-in user. It has three forms — a 256px panel, a 68px icon rail, and an off-canvas sheet over the page.',
+    when: 'Any signed-in screen with more than about five destinations, which in practice means every screen in the console. Below that, put the destinations in the topbar and skip the panel entirely — a sidebar holding four links spends 256px of a laptop to say what a row of tabs says in 40. This entry is the panel; the page skeleton that holds it beside the topbar and the scrolling main column is app-shell.',
+    notes: [
+      'sidebar is the panel and app-shell is the skeleton, and the split is worth holding. The panel owns its header, its groups, its menu items, its submenus, its footer, and the three forms it takes. The shell owns the fixed-height flex frame, the topbar beside it, the single scrolling main column, the backdrop behind the off-canvas form, and the breakpoint where the rail stops being available. Rebuild the frame inside the panel and you get two elements both claiming the full height, at which point the main column scrolls the sidebar along with it and the footer walks off the bottom of the screen. The two have to agree on exactly three numbers — the expanded width, the rail width, and the breakpoint — and nothing else.',
+      'Three states, not two sizes. Expanded is 256px, the rail is 68px, and off-canvas is a 288px sheet over a dimmed page. They do not all exist at the same width: the rail is an lg-and-up state, because a 68px rail on a 390px phone spends a sixth of the screen on a column of icons that has no room for a flyout beside it. Below lg the sidebar is either closed or a modal sheet, which is why the collapse toggle is hidden below lg and the topbar hamburger is not. Ship the rail on a phone and the first bug report is that the menu covers the order it was supposed to open.',
+      'The rail is not the same menu narrower. Every label loses its box, and a label with nowhere to go has to become two things at once: a tooltip for the sighted user and an aria-label for everyone else. Doing only the first is the commonest defect in this component — a column of eleven unnamed icons that screen-reads as eleven links called nothing, and that a new joiner navigates by trial and error for a fortnight. Write the aria-label first and the tooltip second, and mark the tooltip aria-hidden so the name is not read twice.',
+      'The rail is 68px, not the 48 or 56 other systems use, and the number comes from what has to fit in it: a 40px hit target leaves 14px of clear space either side, and a count pill overhanging the icon box needs somewhere to sit before it touches the border. At 56px the pill clips against the edge and the icons start reading as a strip rather than a column. This is the width app-shell already uses and the width on the reference screen; changing it here and not there produces a sidebar that jumps by 12px the moment it is dropped into the real shell.',
+      'Persist the collapsed state, and understand that reading it in Alpine alone guarantees a flash. x-init runs after the first paint, so the browser draws the 256px panel, Alpine reads localStorage, and the panel snaps to 68px on every single navigation — and if the aside carries transition-all, the snap is a 200ms animation the user watches on every page load. There are three honest fixes. A cookie the server reads and stamps as a class in the template is the right one for Django: correct on the first byte, no script involved, and Alpine can read the same cookie so there is one source of truth. A blocking inline script in the head that puts a class on the html element is the fix when there is no server to ask. localStorage read in x-init is the third and it always flashes. Note that @alpinejs/persist is not on the page — llms.txt loads collapse and focus and nothing else — so $persist, which is what everyone reaches for first, is not available here at all. Whichever you pick, gate the transition classes behind a ready flag set in $nextTick, or the correction animates.',
+      'The active item is aria-current="page" and bg-zinc-100 together, never one without the other, and exactly one element in the document carries it. bg-zinc-100 is a tinted surface rather than a tinted shape, so it takes no ring. It also has to survive the collapse: in the rail the tint moves onto the 40px icon box, and an active state that only exists in the expanded form means the rail cannot answer the one question navigation exists to answer. The panel is bg-white precisely so the tint has a step to move into — tint the panel itself zinc-100, as several systems do, and the current row measures 1.00 against its own container, which is not low contrast but the identical colour. Hover paints that same tint, so weight is all that is left to separate "you are here" from "the pointer is here": idle rows are font-normal text-zinc-600 and the current row alone is font-medium text-zinc-900. llms.txt files nav items under font-medium and the reference screen does not, and the screen is right — set all twenty rows to 500 and the current one has nothing left to say with.',
+      'A section that expands to reveal its pages must open itself when a descendant is the current page, and that seed comes from the server, not from a click. An x-data that starts with an empty open map closes the section the moment the user follows a link inside it, because the click is a full page load and the new document has no memory of what was open — the nav folds up under them on every navigation within the section they are working in. Render the seed: open the section whose child is current, keep any section the user opened by hand in the same persisted store, and never close a sibling when one opens. Sections are not an accordion; a single-open rule adds a click to every journey across the nav. The ancestor itself does not take aria-current="page" — there is one current page per document and it is the leaf, so the parent row gets a visual mark instead, which earns its place only when the section can be closed and is the only signal at all in the rail, where the child list is not on screen.',
+      'The rail flyout opens on hover and on focus, and the gap between the rail and the panel is the entire problem. Write the gap as padding on the positioned wrapper — left-full with pl-1 — never as a margin, or the pointer crosses four pixels of dead ground, mouseleave fires, and the flyout closes underneath a cursor that was travelling towards it. mouseleave must also refuse to close while focus is inside the flyout, or tabbing into it and then moving the mouse a pixel throws the keyboard user out of the panel they are in. Escape closes it and returns focus to the rail item, which is the only way back for somebody who is not using a mouse. A scrolling rail clips its own flyouts, because overflow-y:auto forces overflow-x to auto and there is no way to have one axis visible — if the rail has more destinations than fit, the flyout has to be positioned from the trigger rectangle rather than anchored inside the scroller.',
+      'The nav is a list of links in the normal Tab order, and it should stay one. Giving it role="menu" and role="menuitem" makes the whole nav a single tab stop with roving arrow-key focus, which sounds like an improvement and is not: it strips the link role, so the announcement no longer says link and the affordances that hang off that go with it; it puts screen readers into application mode, where the reading keys the user already knows stop working; and it promises the behaviour of an action menu — one that closes when you pick something — which a navigation list does not have. Yes, it is longer to tab through. That is what the skip link at the top of the shell is for, and a skip link costs one tab stop rather than every keyboard convention the user has.',
+      'The header and footer are shrink-0 and the nav body is min-h-0 flex-1 overflow-y-auto, and min-h-0 is the load-bearing half. A flex item defaults to min-height:auto, so without it the nav refuses to shrink below its content, the column grows past the frame, and the footer is pushed off the bottom edge with no scrollbar anywhere, because nothing ever overflowed. The edges under the header and over the footer are drawn only when there is content behind them: a rule that is always there says the workspace switcher is a separate block from the nav, which is a different claim from the one you meant. Draw both edges from the start as border-transparent and change only the colour, because adding a border on scroll moves every row below it down a pixel and the nav twitches under the cursor. overscroll-contain on the body, or scrolling the nav to its end scrolls the page behind it.',
+      'A count in the rail is the case that breaks naive implementations. 148 does not fit in a 40px box, and shrinking it until it does produces four pixels of type nobody reads. The rail carries a two-digit pill capped at 99+, or a plain dot when the number does not matter and only the fact of a queue does, and the quantity moves into the accessible name: aria-label="Goods receipt, 12 awaiting". In the expanded form the count is inside the anchor, so it joins the accessible name for free — which is exactly why it must not be lifted out and absolutely positioned beside the link, where it becomes an unattached number that reads as "148" with nothing to attach it to.',
+      'The off-canvas form is modal and has to behave like one: x-trap.noscroll so Tab stays inside it and the list behind stops scrolling, Escape to close, focus back to the topbar button that opened it, and closed on route change — a nav still sitting open over the page it just navigated to is the phone bug everybody ships once. Do not make it full width. Leaving a hundred pixels of dimmed page beside it is the only thing that says you are still on the orders list, and a full-bleed nav is indistinguishable from having navigated to a menu page, which is a place the back button then has to get you out of.'
+    ],
+    anatomy: [
+      ['Header', 'The workspace or plant the user is looking at, as a mark plus a name, and usually a switcher. Fixed — it does not scroll with the nav. In the rail only the 32px mark survives and the switcher becomes a flyout.'],
+      ['Group', 'An 11px uppercase label over a set of items, as a real heading id with the list pointed at it by aria-labelledby. Worth having once the nav passes about six entries; below that it is a label on a set of one.'],
+      ['Menu item', 'An anchor at min-h-9 holding an 18px icon, a truncating label, and an optional count. Idle is zinc-600 at 400; current is bg-zinc-100, zinc-900 and 500, with aria-current="page".'],
+      ['Badge', 'The count on the right of an item. A plain figure when it is only the size of the list, a tinted pill with its ring when it is a queue the user owns, and a 6px dot when the colour is the point. Capped at 99+ and always tabular-nums.'],
+      ['Submenu', 'The child list under a section, animated by x-collapse, indented past the icon column and held by a left rule so the descendants read as belonging to the row above them.'],
+      ['Rail label', 'What the hidden label becomes at 68px. For a leaf, a sibling span shown on hover and focus-within, aria-hidden because the anchor already carries the same words as an aria-label, and never bound on the i element — Lucide replaces that with an svg and the binding dies with it. For a section, the same slot is a flyout panel at left-full whose gap is padding rather than margin, flipped to bottom-anchored near the foot of the viewport, closing on Escape with focus returned to the rail item.'],
+      ['Footer', 'The signed-in user, their role and their plant, as the trigger for the account menu. Fixed. The menu opens upward because there is no room below it, and sideways in the rail because a 224px menu hanging off a 40px avatar looks unattached.'],
+      ['Collapse control', 'A full-width strip at the very bottom whose icon sits in a fixed 68px box on the left, so the aim point is at the same coordinates in both states. lg and up only.']
+    ],
+    behaviour: [
+      'Three forms, and which one is available depends on width. At lg and up the panel toggles between 256px and a 68px rail. Below lg there is no rail: the sidebar is closed or it is a modal sheet over the page, opened from the topbar and closed by Escape, by the backdrop, or by following a link.',
+      'The collapsed state persists, and it is stamped on the first paint rather than corrected after it. A cookie the server reads is the version with no flash; localStorage read in x-init draws the wrong width for a frame on every navigation.',
+      'Exactly one item is current, carrying both bg-zinc-100 and aria-current="page", and it stays current through a collapse — in the rail the tint moves onto the icon box.',
+      'A section containing the current page is open when the page loads, and it stays open when the user moves between its children. Opening one section does not close another.',
+      'The rail shows a label on hover and on focus. Where an item has children, that becomes a flyout panel, reached by travelling the pointer across a padded bridge, flipped upward near the bottom of the screen, and dismissed with Escape back to the rail item.',
+      'The nav body scrolls; the header and footer do not. The edges above and below it appear only when there is something scrolled behind them.',
+      'Counts are the size of a queue, not decoration. In the panel they sit inside the anchor; in the rail they collapse to two digits, a 99+ cap, or a dot, with the number moved into the accessible name.',
+      'Nothing navigates on hover. Hover reveals a name or a submenu and never changes the page — a nav that loads on hover makes crossing the sidebar to reach the main column a series of accidental page loads.',
+      'A permission-filtered nav that is fetched rather than rendered shows a skeleton of the right height in the body only, so the header and footer never move when the real list lands.'
+    ],
+    a11y: [
+      'The panel is a nav landmark with an accessible name, so it can be reached and skipped as a landmark rather than tabbed through. If the topbar also holds a nav, the two names have to differ — Main and Breadcrumb — or a landmark list shows two entries called Navigation.',
+      'Group labels are real elements with ids, and each list points at its label with aria-labelledby. The lists carry role="list", because preflight sets list-style:none and Safari drops list semantics from a list with no marker, which takes the item count with it.',
+      'aria-current="page" marks the leaf and only the leaf. An ancestor of the current page gets a visual mark and no aria-current — there is one current page per document, and a second one makes both meaningless.',
+      'Every rail item keeps an accessible name with its label hidden, and the count goes into that name rather than floating beside it: aria-label="Goods receipt, 12 awaiting" rather than an unattached 12. The visible tooltip is aria-hidden, or the name is announced twice.',
+      'The items are links in the ordinary Tab order. role="menu" turns the nav into one tab stop with roving focus, strips the link role, and puts the reader into application mode where its own navigation keys stop working. Length is solved by a skip link, not by rewriting the widget.',
+      'The collapse control is a real button with aria-expanded bound to the state and aria-controls naming the panel, and it is hidden below lg where the state it toggles does not exist.',
+      'A section trigger is a button with aria-expanded and aria-controls, and the panel carries that id. Ids rendered in a loop take the section key, or the second trigger points at the first panel and both rows open the same list.',
+      'The off-canvas form is role="dialog" aria-modal="true" with x-trap.noscroll: focus enters it, stays in it, and returns to the topbar button on close. Focus indicators inside the scrolling body take -outline-offset-2, because a 2px outer offset on a row flush against the scroller is clipped by it.'
+    ],
+    related: ['app-shell', 'topbar', 'navigation-menu'],
+    variants: [
+      { id: 'default', name: 'Expanded panel', code:
+`<!-- The panel is three rows in a flex column and only the middle one scrolls.
+     min-h-0 on the nav is the load-bearing half: a flex item defaults to
+     min-height:auto, so without it the nav refuses to shrink below its content,
+     the column grows past 560px, and the footer is pushed off the bottom edge —
+     with no scrollbar anywhere, because nothing ever overflowed.
+
+     Both edges exist from the first frame as border-transparent and only the
+     colour changes. Adding a border on scroll moves every row below it down one
+     pixel and the nav twitches under the cursor.
+
+     The panel is bg-white so the active row has a step to move into. Tint the
+     panel zinc-100 and bg-zinc-100 on the current item measures 1.00 against its
+     own container: not low contrast, the same colour. Hover paints that tint
+     too, so weight is what separates "you are here" from "the pointer is here".
+
+     The counts sit inside the anchor, which is why they need no aria work — the
+     name is already "Purchase orders, 148". Lift one out into a span positioned
+     beside the link and it becomes a number with nothing attached to it. -->
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{ scrolled: false, more: true }">
+
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-transparent px-4 transition-colors"
+       :class="scrolled && 'border-zinc-200'">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="min-w-0 flex-1">
+      <span class="block truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+      <span class="block truncate text-[11px]/4 text-zinc-500">Vasai plant</span>
+    </span>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2"
+       @scroll="scrolled = $el.scrollTop > 0; more = $el.scrollHeight - $el.scrollTop - $el.clientHeight > 1">
+
+    <p id="sb1-g1" class="px-2.5 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Procurement</p>
+    <ul role="list" aria-labelledby="sb1-g1" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Overview</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Purchase orders</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">148</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="clipboard-list" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Requisitions</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">62</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="truck" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Goods receipt</span>
+          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="receipt" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Invoices</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">9</span>
+        </a>
+      </li>
+    </ul>
+
+    <p id="sb1-g2" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Master data</p>
+    <ul role="list" aria-labelledby="sb1-g2" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Vendors</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="package" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Materials</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">2,418</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="scale" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Rate contracts</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">24</span>
+        </a>
+      </li>
+    </ul>
+
+    <p id="sb1-g3" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Saved views</p>
+    <ul role="list" aria-labelledby="sb1-g3" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Overdue over 7 days</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">18</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">27</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-zinc-400" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">My approvals</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">4</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="shrink-0 border-t border-transparent p-2 transition-colors" :class="more && 'border-zinc-200'">
+    <button type="button" class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
+        <span class="block truncate text-[11px]/4 text-zinc-500">Level 2 approver</span>
+      </span>
+      <i data-lucide="chevrons-up-down" class="size-4 shrink-0 text-zinc-500"></i>
+    </button>
+  </div>
+</div>` },
+
+      { id: 'counts', name: 'Group labels and counts', code:
+`<!-- Three kinds of number and the difference between them is what they are
+     asking for. A plain figure is the size of the list — 187 vendors is context,
+     not a task. A tinted pill is a queue this user owns and is expected to
+     empty; it is a shape, so it takes bg-zinc-200 with its ring rather than the
+     zinc-100 surface, which would measure identical to the active row behind it.
+     A dot is a state with no useful count, and it is the only place colour is
+     allowed to appear in this panel.
+
+     Put a pill on every row and the column reads as a traffic light by the
+     eighth item and stops meaning anything. One pill in twelve rows is read.
+
+     99+ is a real cap, not a nicety. Invoices on hold runs to four digits at
+     month end, and a four-digit pill pushes the label into a truncation that
+     makes half the nav read as "Purchase or…".
+
+     The group action stays visible instead of appearing on hover. A control that
+     needs a pointer to exist does not exist on a phone at all, and the opacity-0
+     version is worse than useless: it stays in the Tab order, so a keyboard user
+     lands on a button that paints nothing. -->
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+    <div class="flex items-center gap-1 pt-1 pb-1">
+      <p id="sb2-g1" class="min-w-0 flex-1 truncate px-2.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">My queues</p>
+      <button type="button" aria-label="New purchase order"
+              class="flex size-6 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-3.5"></i>
+      </button>
+    </div>
+    <ul role="list" aria-labelledby="sb2-g1" class="space-y-0.5">
+      <li>
+        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="truck" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
+          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="stamp" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Pending my approval</span>
+          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="receipt" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Invoices on hold</span>
+          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">99+</span>
+        </a>
+      </li>
+    </ul>
+
+    <p id="sb2-g2" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Registers</p>
+    <ul role="list" aria-labelledby="sb2-g2" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Purchase orders</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">1,438</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Vendors</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="book-open" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Item ledger</span>
+        </a>
+      </li>
+    </ul>
+
+    <p id="sb2-g3" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Saved views</p>
+    <ul role="list" aria-labelledby="sb2-g3" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Overdue over 7 days</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">18</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Rate contracts expiring</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">6</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="ml-[3px] size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+          <span class="min-w-0 flex-1 truncate">Closed this month</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">212</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Counts as at 16 Aug 2026, 11:04</p>
+  </div>
+</div>` },
+
+      { id: 'nested', name: 'Nested children', code:
+`<!-- The open map is seeded, not empty. In Django it is rendered — open: { orders:
+     {% if section == 'orders' %}true{% else %}false{% endif %}, ... } — because
+     the click that moves between the children of a section is a full page load,
+     and a map that starts empty folds the section up underneath the user on
+     every one of those navigations. That is the bug this variant exists for.
+
+     Opening one section does not close another. A nav is not an accordion: the
+     single-open rule saves two rows of height and costs a click on every journey
+     across the tree.
+
+     The parent of the current page gets a dot, not aria-current. There is one
+     current page per document and it is the leaf.
+
+     x-collapse animates the wrapper, so the wrapper carries nothing but x-show
+     and the id: border-box means height:0 cannot go below padding and borders,
+     so a panel carrying them bottoms out and then vanishes in one frame. The ul
+     inside takes py-1 rather than a margin — a margin on the first child
+     collapses through the wrapper and the measured height comes up short by
+     exactly that margin, clipping the last row until the next toggle. -->
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{ open: { orders: true, vendors: false, quality: false } }">
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate">Overview</span>
+    </a>
+
+    <div>
+      <button type="button" @click="open.orders = !open.orders" :aria-expanded="open.orders" aria-controls="sb3-orders"
+              class="flex min-h-9 w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate">Purchase orders</span>
+        <span x-show="!open.orders" x-cloak class="size-1.5 shrink-0 rounded-full bg-zinc-700" aria-hidden="true"></span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.orders && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+        </span>
+      </button>
+      <div id="sb3-orders" x-show="open.orders" x-collapse.duration.200ms>
+        <ul role="list" class="ml-[26px] space-y-0.5 border-l border-zinc-100 py-1 pl-2">
+          <li>
+            <a href="#" class="flex min-h-8 items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1 truncate">All orders</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">1,438</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" aria-current="page" class="flex min-h-8 items-center gap-2 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">12</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex min-h-8 items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1 truncate">Overdue over 7 days</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">18</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex min-h-8 items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1 truncate">Closed</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <button type="button" @click="open.vendors = !open.vendors" :aria-expanded="open.vendors" aria-controls="sb3-vendors"
+              class="flex min-h-9 w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate">Vendors</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.vendors && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+        </span>
+      </button>
+      <div id="sb3-vendors" x-show="open.vendors" x-cloak x-collapse.duration.200ms>
+        <ul role="list" class="ml-[26px] space-y-0.5 border-l border-zinc-100 py-1 pl-2">
+          <li><a href="#" class="flex min-h-8 items-center rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Approved vendors</a></li>
+          <li><a href="#" class="flex min-h-8 items-center rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Pending KYC</a></li>
+          <li><a href="#" class="flex min-h-8 items-center rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Rate contracts</a></li>
+          <li><a href="#" class="flex min-h-8 items-center rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Vendor performance</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <button type="button" @click="open.quality = !open.quality" :aria-expanded="open.quality" aria-controls="sb3-quality"
+              class="flex min-h-9 w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="flask-conical" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate">Quality</span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.quality && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+        </span>
+      </button>
+      <div id="sb3-quality" x-show="open.quality" x-cloak x-collapse.duration.200ms>
+        <ul role="list" class="ml-[26px] space-y-0.5 border-l border-zinc-100 py-1 pl-2">
+          <li><a href="#" class="flex min-h-8 items-center rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Inward inspection</a></li>
+          <li><a href="#" class="flex min-h-8 items-center rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Lab results</a></li>
+          <li><a href="#" class="flex min-h-8 items-center rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Rejections</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="package" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate">Materials</span>
+    </a>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 text-zinc-500">Sections stay open across a navigation.</p>
+  </div>
+</div>` },
+
+      { id: 'rail', name: 'Icon rail', code:
+`<!-- Two labels for one item and both are compulsory. aria-label on the anchor is
+     the real name; the dark bubble is a sibling span marked aria-hidden, or the
+     item is announced twice. Ship only the bubble and the rail is eleven links
+     called nothing to anyone not looking at it.
+
+     The bubble cannot live on the i element: createIcons() replaces that node
+     with an svg and takes every binding written against it along too. And
+     group-hover alone is not enough — group-focus-within is what makes the rail
+     usable from the keyboard, and it is the half everybody forgets because they
+     test with a mouse.
+
+     Counts do not survive at 40px. Two digits fit as a pill overhanging the
+     corner and three do not, and the pill needs ring-2 ring-white to hold an
+     edge against the icon under it. Anything wider becomes a dot and the
+     quantity moves into the aria-label — which is why one reads "Invoices, 148
+     on hold" while the dot beside it says nothing.
+
+     This nav deliberately does not scroll: overflow-y:auto forces overflow-x to
+     auto, so a scrolling rail clips its own tooltips at the right edge. More
+     destinations than fit needs the flyout variant. -->
+<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+  <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
+    <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-1 py-2">
+    <div class="group relative flex justify-center">
+      <a href="#" aria-label="Overview"
+         class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="layout-dashboard" class="size-[18px]"></i>
+      </a>
+      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Overview</span>
+    </div>
+
+    <div class="group relative flex justify-center">
+      <a href="#" aria-current="page" aria-label="Purchase orders, 148 open"
+         class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-100 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="file-text" class="size-[18px]"></i>
+        <span aria-hidden="true" class="absolute -top-1 -right-1 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
+      </a>
+      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Purchase orders — 148 open</span>
+    </div>
+
+    <div class="group relative flex justify-center">
+      <a href="#" aria-label="Goods receipt, 12 awaiting GRN"
+         class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="truck" class="size-[18px]"></i>
+        <span aria-hidden="true" class="absolute -top-1 -right-1 rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">12</span>
+      </a>
+      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Goods receipt — 12 awaiting</span>
+    </div>
+
+    <div class="group relative flex justify-center">
+      <a href="#" aria-label="Invoices, 148 on hold"
+         class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="receipt" class="size-[18px]"></i>
+        <span aria-hidden="true" class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-red-600 ring-2 ring-white"></span>
+      </a>
+      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Invoices — 148 on hold</span>
+    </div>
+
+    <div class="mx-4 border-t border-zinc-100"></div>
+
+    <div class="group relative flex justify-center">
+      <a href="#" aria-label="Vendors, 187"
+         class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="building-2" class="size-[18px]"></i>
+      </a>
+      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Vendors — 187</span>
+    </div>
+
+    <div class="group relative flex justify-center">
+      <a href="#" aria-label="Materials"
+         class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="package" class="size-[18px]"></i>
+      </a>
+      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Materials</span>
+    </div>
+
+    <div class="group relative flex justify-center">
+      <a href="#" aria-label="Rate contracts, 6 expiring"
+         class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="scale" class="size-[18px]"></i>
+        <span aria-hidden="true" class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-amber-500 ring-2 ring-white"></span>
+      </a>
+      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Rate contracts — 6 expiring</span>
+    </div>
+
+    <div class="group relative flex justify-center">
+      <a href="#" aria-label="Analytics"
+         class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chart-no-axes-column" class="size-[18px]"></i>
+      </a>
+      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Analytics</span>
+    </div>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200 py-2">
+    <div class="group relative flex justify-center">
+      <button type="button" aria-label="Account — Akshay Prabhu, Level 2 approver"
+              class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
+      </button>
+      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Akshay Prabhu</span>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'flyout', name: 'Rail flyout submenu', code:
+`<!-- The gap between the rail and the panel is the whole problem. It is pl-1 on
+     the positioned wrapper, never ml-1 on the card: with a margin those four
+     pixels are outside the hover region, the pointer crosses dead ground,
+     mouseleave fires, and the panel closes underneath a cursor that was
+     travelling straight at it. As padding the bridge is part of the thing being
+     hovered. mouseleave also refuses to close while focus is inside, or tabbing
+     into the flyout and nudging the mouse throws the keyboard user out of it.
+
+     Focus is what puts the flyout in the tab order at all. While it is hidden
+     its links are display:none and unreachable, so focusin opening it is the
+     only way a keyboard reaches the children of a rail item. Escape closes and
+     returns focus to the rail item, because a user left with focus on nothing
+     has to tab from the top of the document again; with the pointer still over
+     it, it reopens on the next mouse move, which is correct.
+
+     The flip is measured. On open the trigger rectangle is read and the panel
+     anchors bottom-0 instead of top-0 when 260px would not fit below it — the
+     account menu at the foot of the rail is permanently in that case. And the
+     nav does not scroll, because overflow-y:auto would force overflow-x with it
+     and clip every panel at the rail edge. -->
+<div class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+  <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
+    <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white" aria-hidden="true">K</span>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 py-2">
+    <ul role="list" class="space-y-1">
+      <li class="relative flex justify-center">
+        <a href="#" aria-label="Overview"
+           class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="layout-dashboard" class="size-[18px]"></i>
+        </a>
+      </li>
+
+      <li class="relative flex justify-center" x-data="{ open: false, flip: false }"
+          @mouseenter="open = true; flip = $refs.trig.getBoundingClientRect().top + 264 > window.innerHeight"
+          @mouseleave="if (!$el.contains(document.activeElement)) open = false"
+          @focusin="open = true; flip = $refs.trig.getBoundingClientRect().top + 264 > window.innerHeight"
+          @focusout="if (!$el.contains($event.relatedTarget)) open = false"
+          @keydown.escape="if (open) { open = false; $refs.trig.focus() }">
+        <a href="#" x-ref="trig" aria-current="page" aria-label="Purchase orders, 1,438 — section open"
+           class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-100 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-[18px]"></i>
+          <span aria-hidden="true" class="absolute -top-1 -right-1 rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">12</span>
+        </a>
+
+        <div x-show="open" x-cloak class="absolute left-full z-50 w-60 pl-1" :class="flip ? 'bottom-0' : 'top-0'">
+          <div class="rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+            <a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="file-text" class="size-4 shrink-0 text-zinc-600"></i>Purchase orders
+            </a>
+            <div class="my-1 border-t border-zinc-100"></div>
+            <ul role="list">
+              <li><a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><span class="min-w-0 flex-1 truncate">All orders</span><span class="shrink-0 text-[11px]/4 tabular-nums">1,438</span></a></li>
+              <li><a href="#" class="flex items-center gap-2 rounded-lg bg-zinc-100 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15" aria-current="page"><span class="min-w-0 flex-1 truncate">Awaiting GRN</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">12</span></a></li>
+              <li><a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><span class="min-w-0 flex-1 truncate">Overdue over 7 days</span><span class="shrink-0 text-[11px]/4 tabular-nums">18</span></a></li>
+              <li><a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><span class="min-w-0 flex-1 truncate">Closed</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li class="relative flex justify-center" x-data="{ open: false, flip: false }"
+          @mouseenter="open = true; flip = $refs.trig.getBoundingClientRect().top + 200 > window.innerHeight"
+          @mouseleave="if (!$el.contains(document.activeElement)) open = false"
+          @focusin="open = true; flip = $refs.trig.getBoundingClientRect().top + 200 > window.innerHeight"
+          @focusout="if (!$el.contains($event.relatedTarget)) open = false"
+          @keydown.escape="if (open) { open = false; $refs.trig.focus() }">
+        <a href="#" x-ref="trig" aria-label="Vendors, 187"
+           class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="building-2" class="size-[18px]"></i>
+        </a>
+        <div x-show="open" x-cloak class="absolute left-full z-50 w-60 pl-1" :class="flip ? 'bottom-0' : 'top-0'">
+          <div class="rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+            <a href="#" class="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="building-2" class="size-4 shrink-0 text-zinc-600"></i>Vendors
+            </a>
+            <div class="my-1 border-t border-zinc-100"></div>
+            <ul role="list">
+              <li><a href="#" class="flex rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Approved vendors</a></li>
+              <li><a href="#" class="flex rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Pending KYC</a></li>
+              <li><a href="#" class="flex rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Rate contracts</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li class="relative flex justify-center">
+        <a href="#" aria-label="Materials"
+           class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="package" class="size-[18px]"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- permanently in the flipped case: nothing fits below the last row -->
+  <div class="shrink-0 border-t border-zinc-200 py-2">
+    <div class="relative flex justify-center" x-data="{ open: false }"
+         @mouseenter="open = true"
+         @mouseleave="if (!$el.contains(document.activeElement)) open = false"
+         @focusin="open = true"
+         @focusout="if (!$el.contains($event.relatedTarget)) open = false"
+         @keydown.escape="if (open) { open = false; $refs.trig.focus() }">
+      <button type="button" x-ref="trig" :aria-expanded="open" aria-label="Account — Akshay Prabhu, Level 2 approver"
+              class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
+      </button>
+      <div x-show="open" x-cloak class="absolute bottom-0 left-full z-50 w-60 pl-1">
+        <div class="rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+          <div class="px-2.5 py-2">
+            <p class="truncate text-[13px]/5 font-medium">Akshay Prabhu</p>
+            <p class="truncate text-[12px]/4 text-zinc-500">Level 2 approver · Vasai plant</p>
+          </div>
+          <div class="my-1 border-t border-zinc-100"></div>
+          <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="user" class="size-4 shrink-0"></i>My profile</a>
+          <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="arrow-left-right" class="size-4 shrink-0"></i>Switch plant</a>
+          <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'collapse', name: 'Collapse and persist', code:
+`<!-- Persisting in JavaScript alone guarantees a flash. x-init runs after the
+     first paint, so the browser draws 256px, Alpine reads localStorage, and the
+     panel snaps to 68px on every navigation. In Django the honest fix is a
+     cookie: the view reads kon-sidebar and the template stamps w-64 or w-[68px]
+     into the class attribute, so the first byte is right and Alpine reads the
+     same cookie rather than a second source of truth. The trade is that the
+     width is now server state — one more thing to get wrong in a cached
+     response, and Vary: Cookie on every page that uses it. With no server it is
+     a blocking head script setting a class on the html element. This variant
+     shows the localStorage form because that is what pastes here, and it flashes.
+
+     ready is the other half: without it the correction from the wrong width to
+     the right one is animated, so the flash becomes a 200ms slide watched on
+     every page load. @alpinejs/persist would do all of this in one directive and
+     is not on the page, so $persist is not an option here.
+
+     Labels hide with a plain hidden so the rail can be seen at 390px; inside
+     app-shell it is lg:hidden, because below lg there is no rail state at all.
+     The control keeps its icon in a fixed 68px box so its centre does not move
+     between the two widths — centre it in the strip and the second click misses. -->
+<div class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{ expanded: true, ready: false }"
+     x-init="expanded = localStorage.getItem('kon-sidebar') !== '0';
+             $nextTick(() => ready = true);
+             $watch('expanded', v => localStorage.setItem('kon-sidebar', v ? '1' : '0'))"
+     @keydown.window="if ($event.key === '[' && !/^(input|textarea|select)$/i.test($event.target.tagName)) expanded = !expanded"
+     :class="[ expanded ? 'w-64' : 'w-[68px]', ready && 'transition-all duration-200 motion-reduce:transition-none' ]">
+
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200" :class="expanded ? 'px-4' : 'justify-center'">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold" :class="!expanded && 'hidden'">Konspec Operations</span>
+  </div>
+
+  <nav id="sb6-nav" aria-label="Main" class="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain py-2" :class="expanded ? 'px-3' : 'px-3.5'">
+    <div class="group relative">
+      <a href="#" aria-current="page" aria-label="Purchase orders, 148 open"
+         class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Purchase orders</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600" :class="!expanded && 'hidden'">148</span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Purchase orders — 148</span>
+    </div>
+
+    <div class="group relative">
+      <a href="#" aria-label="Goods receipt, 12 awaiting GRN"
+         class="relative flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="truck" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Goods receipt</span>
+        <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" :class="!expanded && 'hidden'">12</span>
+        <span x-show="!expanded" x-cloak aria-hidden="true" class="absolute top-1 right-1 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Goods receipt — 12 awaiting</span>
+    </div>
+
+    <div class="group relative">
+      <a href="#" aria-label="Vendors, 187"
+         class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Vendors</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600" :class="!expanded && 'hidden'">187</span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Vendors — 187</span>
+    </div>
+
+    <div class="group relative">
+      <a href="#" aria-label="Materials"
+         class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="package" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Materials</span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Materials</span>
+    </div>
+
+    <div class="group relative">
+      <a href="#" aria-label="Analytics"
+         class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+        <i data-lucide="chart-no-axes-column" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Analytics</span>
+      </a>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Analytics</span>
+    </div>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200">
+    <button type="button" @click="expanded = !expanded" :aria-expanded="expanded" aria-controls="sb6-nav"
+            :aria-label="expanded ? 'Collapse sidebar' : 'Expand sidebar'"
+            class="flex h-11 w-full items-center text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex h-11 w-[68px] shrink-0 items-center justify-center">
+        <span class="flex transition-transform motion-reduce:transition-none" :class="!expanded && 'rotate-180'">
+          <i data-lucide="chevrons-left" class="size-4"></i>
+        </span>
+      </span>
+      <span class="flex-1 text-left" :class="!expanded && 'hidden'">Collapse</span>
+      <kbd class="mr-3 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-600" :class="!expanded && 'hidden'">[</kbd>
+    </button>
+  </div>
+</div>` },
+
+      { id: 'mobile', name: 'Off-canvas sheet', code:
+`<!-- Below lg the sidebar is modal, so it behaves like a dialog and not like a
+     narrower panel: x-trap.noscroll holds Tab inside it and stops the register
+     behind from scrolling under the thumb, Escape closes it, and focus goes back
+     to the button in the topbar that opened it.
+
+     Closing on route change is the part that gets shipped broken. A nav still
+     sitting open over the page it just navigated to looks like the tap did
+     nothing, so the panel closes on any anchor click inside it and on the htmx
+     swap that follows. Both, because one covers a full page load in a browser
+     that keeps the DOM alive and the other covers a partial swap.
+
+     288px, not full width. The hundred pixels of dimmed page beside it are the
+     only thing saying you are still on the orders list; a full-bleed nav is
+     indistinguishable from having navigated to a menu page, and the back button
+     then has to get you out of somewhere you never went.
+
+     The overlay is absolute inside this preview box. In app-shell it is fixed
+     inset-0 — the shell is the thing that owns the viewport, and a fixed overlay
+     rendered here would escape the docs frame and cover the page around it. -->
+<div class="relative h-[560px] overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 text-[14px]/5 text-zinc-900"
+     x-data="{ nav: false }" @htmx:after-swap.camel.window="nav = false">
+
+  <header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3">
+    <button type="button" @click="nav = true" :aria-expanded="nav" aria-controls="sb7-panel" aria-label="Open navigation"
+            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="menu" class="size-5"></i>
+    </button>
+    <p class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">Purchase orders</p>
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold ring-1 ring-inset ring-zinc-300">AP</span>
+  </header>
+
+  <div class="space-y-3 p-4">
+    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · promised 22 Aug 2026</p>
+    </div>
+    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+      <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1191 · Sharma Extrusions</p>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹4,26,500 · promised 28 Aug 2026</p>
+    </div>
+  </div>
+
+  <div x-show="nav" x-cloak x-trap.noscroll="nav" @keydown.escape.window="nav = false" @click.self="nav = false"
+       class="absolute inset-0 z-50 flex bg-zinc-900/40">
+    <div id="sb7-panel" role="dialog" aria-modal="true" aria-label="Main navigation"
+         x-show="nav"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="-translate-x-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="-translate-x-full"
+         @click="if ($event.target.closest('a[href]')) nav = false"
+         class="flex h-full w-72 flex-col border-r border-zinc-200 bg-white shadow-lg">
+
+      <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+        <button type="button" @click="nav = false" aria-label="Close navigation"
+                class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+        <p id="sb7-g1" class="px-2.5 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Procurement</p>
+        <ul role="list" aria-labelledby="sb7-g1" class="space-y-0.5">
+          <li>
+            <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Overview</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" aria-current="page" class="flex min-h-11 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[14px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="file-text" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Purchase orders</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">148</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="truck" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Goods receipt</span>
+              <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="receipt" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Invoices</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">9</span>
+            </a>
+          </li>
+        </ul>
+
+        <p id="sb7-g2" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Master data</p>
+        <ul role="list" aria-labelledby="sb7-g2" class="space-y-0.5">
+          <li>
+            <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="building-2" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Vendors</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="package" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Materials</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-[14px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="scale" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Rate contracts</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="shrink-0 border-t border-zinc-200 p-2">
+        <a href="#" class="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold ring-1 ring-inset ring-zinc-300">AP</span>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
+            <span class="block truncate text-[11px]/4 text-zinc-500">Level 2 approver</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'blocks', name: 'Header switcher and user menu', code:
+`<!-- The two menus open in opposite directions and neither choice is cosmetic.
+     The switcher hangs below its trigger because there are 480 pixels of nav
+     under it. The account menu opens upward from bottom-full because there is
+     nothing under it but the bottom of the screen, and a menu anchored downward
+     there is a menu whose last three items are off the page.
+
+     Both are anchored inside the panel, so the panel cannot be overflow-hidden.
+     Add it to tidy the rounded corners and both menus are cut off at the edge of
+     the sidebar.
+
+     One open key, not two booleans. Two independent flags let both menus sit
+     open at once, stacked over each other, and the click that should have closed
+     the first one opens the second.
+
+     Neither survives the rail as-is: a 240px menu hanging off a 40px avatar
+     looks unattached, so at 68px both become right-side flyouts anchored to the
+     icon. The switcher marks the selected plant with a check rather than a tint,
+     because a tinted row in a menu is the hover state and a permanently tinted
+     one reads as permanently hovered. -->
+<div class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{ menu: '' }" @keydown.escape.window="menu = ''">
+
+  <div class="shrink-0 border-b border-zinc-200 p-2">
+    <div class="relative">
+      <button type="button" @click="menu = menu === 'plant' ? '' : 'plant'"
+              :aria-expanded="menu === 'plant'" aria-haspopup="true" aria-controls="sb8-plant"
+              class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0 flex-1">
+          <span class="block truncate text-[13px]/5 font-medium">Konspec Operations</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Vasai plant · FY 2026–27</span>
+        </span>
+        <i data-lucide="chevrons-up-down" class="size-4 shrink-0 text-zinc-500"></i>
+      </button>
+
+      <div id="sb8-plant" x-show="menu === 'plant'" x-cloak @click.outside="menu = ''"
+           class="absolute top-full right-0 left-0 z-50 mt-1 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+        <p class="px-2.5 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Plants</p>
+        <button type="button" @click="menu = ''" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="min-w-0 flex-1 truncate font-medium">Vasai plant</span>
+          <i data-lucide="check" class="size-4 shrink-0 text-zinc-600"></i>
+        </button>
+        <button type="button" @click="menu = ''" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="min-w-0 flex-1 truncate">Waluj MIDC plant</span>
+        </button>
+        <button type="button" @click="menu = ''" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="min-w-0 flex-1 truncate">Silvassa unit</span>
+        </button>
+        <div class="my-1 border-t border-zinc-100"></div>
+        <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="settings" class="size-4 shrink-0"></i>Plant settings
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+    <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-100 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Overview</span>
+    </a>
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="file-text" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Purchase orders</span>
+      <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">148</span>
+    </a>
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="truck" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Goods receipt</span>
+      <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
+    </a>
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="building-2" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Vendors</span>
+      <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+    </a>
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="package" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Materials</span>
+    </a>
+  </nav>
+
+  <div class="relative shrink-0 border-t border-zinc-200 p-2">
+    <button type="button" @click="menu = menu === 'user' ? '' : 'user'"
+            :aria-expanded="menu === 'user'" aria-haspopup="true" aria-controls="sb8-user"
+            class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
+        <span class="block truncate text-[11px]/4 text-zinc-500">Level 2 approver</span>
+      </span>
+      <i data-lucide="chevrons-up-down" class="size-4 shrink-0 text-zinc-500"></i>
+    </button>
+
+    <div id="sb8-user" x-show="menu === 'user'" x-cloak @click.outside="menu = ''"
+         class="absolute right-2 bottom-full left-2 z-50 mb-1 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+      <div class="px-2.5 py-2">
+        <p class="truncate text-[13px]/5 font-medium">Akshay Prabhu</p>
+        <p class="truncate text-[12px]/4 text-zinc-500">akshay.prabhu@konspec.com</p>
+      </div>
+      <div class="my-1 border-t border-zinc-100"></div>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="user" class="size-4 shrink-0"></i>My profile</a>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="sliders-horizontal" class="size-4 shrink-0"></i>Preferences</a>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="stamp" class="size-4 shrink-0"></i>Approval limits</a>
+      <div class="my-1 border-t border-zinc-100"></div>
+      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'skeleton', name: 'Loading a permission-filtered nav', code:
+`<!-- A nav filtered by permission cannot be guessed and then corrected. Render an
+     optimistic list and a buyer sees Approvals for half a second before it is
+     taken away, which reads as a permissions bug and generates a ticket. So the
+     body loads and the frame does not.
+
+     Only the body is skeleton. The workspace and the signed-in user are already
+     known to the page that rendered this, so they are drawn for real, and
+     keeping them out of the loading state is also what stops the header and
+     footer moving when the list lands.
+
+     The block count is a guess, so it is pinned to a guess that cannot hurt: the
+     skeleton is exactly as tall as the shortest nav any role gets. Guess high and
+     the panel shrinks on arrival; guess low and it grows, but growth inside a
+     scrolling body moves nothing outside it.
+
+     aria-busy on the container and aria-hidden on the blocks, plus one sr-only
+     role="status" line. Without the live region the arrival is silent — the
+     blocks are decorative and the links appear with nothing announcing them.
+     Nothing in here is focusable, so a Tab during the wait skips straight past
+     to the footer rather than landing on a grey rectangle. -->
+<div class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white text-[14px]/5 text-zinc-900">
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Konspec Operations</span>
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-y-auto px-3 py-2" aria-busy="true"
+       hx-get="/nav/" hx-trigger="load" hx-swap="outerHTML">
+    <p class="sr-only" role="status">Loading navigation</p>
+
+    <div class="animate-pulse space-y-0.5 motion-reduce:animate-none" aria-hidden="true">
+      <div class="px-2.5 pt-1 pb-2"><div class="h-2 w-20 rounded bg-zinc-200"></div></div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-32 rounded bg-zinc-200"></div>
+        <div class="ml-auto h-2.5 w-6 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+        <div class="ml-auto h-2.5 w-5 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-28 rounded bg-zinc-200"></div>
+      </div>
+
+      <div class="px-2.5 pt-5 pb-2"><div class="h-2 w-16 rounded bg-zinc-200"></div></div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+        <div class="ml-auto h-2.5 w-6 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">
+        <div class="size-[18px] shrink-0 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-28 rounded bg-zinc-200"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shrink-0 border-t border-zinc-200 p-2">
+    <div class="flex items-center gap-2.5 px-2 py-2">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
+      <span class="min-w-0 flex-1">
+        <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
+        <span class="block truncate text-[11px]/4 text-zinc-500">Level 2 approver</span>
+      </span>
+    </div>
+  </div>
+</div>` }
     ]
   },
 
@@ -1077,7 +4529,7 @@ register(
       'The unread dot is backed by text in the button\'s accessible name — "Notifications, unread" — since a dot announces nothing.',
       'The account menu follows the dropdown pattern: aria-haspopup, arrow keys and Escape.'
     ],
-    related: ['app-shell', 'sidebar-nav', 'dropdown'],
+    related: ['app-shell', 'sidebar', 'dropdown'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
@@ -1960,7 +5412,7 @@ register(
       'Focus is trapped in the panel and cannot reach the page behind. The trap opens on the query input because it carries autofocus, rather than on the Esc button, which is the first tabbable node.',
       'Escape closes and returns focus to whatever opened the palette, captured by x-trap at the moment it activated.',
     ],
-    related: ['combobox', 'sidebar-nav', 'dropdown'],
+    related: ['combobox', 'sidebar', 'dropdown'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<!-- A palette has a text box, so it is a combobox and not a menu: real focus
