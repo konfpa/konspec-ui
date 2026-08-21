@@ -1,0 +1,53 @@
+<!-- The options are bands of one number, so two things carry meaning that a
+     list of names does not have: the order and the boundary.
+
+     The order is low to high and never anything else. Sort these by how often
+     they are picked, or alphabetically because the template had a sort on it,
+     and the third option is no longer between the second and the fourth — which
+     is how somebody who has used the screen twice picks by position and grants
+     a limit an order of magnitude out.
+
+     Every boundary belongs to exactly one band, and the labels say which. "Up
+     to ₹1,00,000" beside "₹1,00,000 to ₹5,00,000" claims the same rupee twice,
+     and the two people reading it route the same order two different ways. The
+     wording here is the rule the server applies: the lower edge is in the band,
+     the upper edge is not.
+
+     The value is a band code, not the numbers. Finance revises the slabs, and a
+     stored 100000 cannot afterwards be told from the band it used to be the top
+     of; a stored limit_b still means the second band whatever it now spans.
+
+     Who signs sits inside the label. It is part of the option rather than help
+     about it — the range means nothing on its own — and the test is whether
+     removing it leaves an answer somebody could give. Anything that fails that
+     test is a description and goes outside the label. -->
+<fieldset data-kui="radio/bands" class="max-w-lg">
+  <legend class="mb-2 text-[13px]/5 font-medium">Approval limit for the Buyer role</legend>
+
+  <div class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+    <label class="flex items-center gap-3 px-3 py-2.5 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <input type="radio" name="approval_limit" value="limit_a" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 tabular-nums">Up to ₹1,00,000</span>
+      <span class="text-right text-zinc-600">Buyer releases</span>
+    </label>
+    <label class="flex items-center gap-3 px-3 py-2.5 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <input type="radio" name="approval_limit" value="limit_b" checked class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 tabular-nums">₹1,00,000 to ₹5,00,000</span>
+      <span class="text-right text-zinc-600">Plant head</span>
+    </label>
+    <label class="flex items-center gap-3 px-3 py-2.5 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <input type="radio" name="approval_limit" value="limit_c" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 tabular-nums">₹5,00,000 to ₹25,00,000</span>
+      <span class="text-right text-zinc-600">Plant head and finance</span>
+    </label>
+    <!-- the top band is open-ended and says so; a range that stops at a number
+         leaves every order above it belonging to no band at all -->
+    <label class="flex items-center gap-3 px-3 py-2.5 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <input type="radio" name="approval_limit" value="limit_d" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 tabular-nums">Above ₹25,00,000</span>
+      <span class="text-right text-zinc-600">Director</span>
+    </label>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">A band starts where the one above it ends: an order of exactly ₹5,00,000 goes to the plant head and finance.</p>
+</fieldset>

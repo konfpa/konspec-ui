@@ -1,7 +1,12 @@
 <!-- No Alpine. :has() paints each tile from its own radio, so the tint is the
      answer rather than a second copy of it, and has-[:focus-visible] puts the
-     focus indication somewhere it can be seen — a 3px halo drawn round a 16px
-     circle lands on top of the circle.
+     focus indication somewhere it can be seen — a 3px outline drawn round a
+     16px circle lands on top of the circle.
+
+     The indication is an outline and not a ring. ring-* compiles to a
+     box-shadow, forced-colours mode drops every box-shadow, and the tile has
+     already given up the UA outline by moving the indication off the radio — so
+     a ring here leaves the users who most need a focus mark with none at all.
 
      The radio stays visible inside the tile. Hidden with sr-only, the only mark
      of what was chosen is the tint, and forced-colours mode does not paint it.
@@ -13,7 +18,7 @@
   <legend class="mb-2 text-[13px]/5 font-medium">Inspection before dispatch</legend>
 
   <div class="grid gap-2 sm:grid-cols-3">
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="inspection" value="vendor" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">At vendor works</span>
@@ -21,7 +26,7 @@
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="inspection" value="gate" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">At the plant gate</span>
@@ -29,7 +34,7 @@
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="inspection" value="third_party" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">Third-party agency</span>

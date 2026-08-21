@@ -1,0 +1,69 @@
+<!-- Three of these on an amendment screen, and on a real order thirty. The
+     comfortable field is the wrong one at that count: four rows and a 14px body
+     per line turns a six-line order into a page that has to be scrolled before
+     it can be read. Two rows, 13px and half the padding, and the whole order
+     fits in one view.
+
+     The label is sr-only and names the item, not the field. Thirty visible
+     "Note" labels down a column would be thirty controls with the same
+     accessible name and no way to tell them apart in a list of form fields —
+     the item code is the only thing that separates them, so the item code is
+     the name.
+
+     resize-none, because the drag handle is the wrong affordance in a grid of
+     equal rows: one box dragged taller reflows every row under it and the
+     column stops lining up. The box that is meant to grow is autogrow.
+
+     Two columns above sm and one below, which is why the item is a block of its
+     own rather than a table cell — at 390px it stacks and the item stays
+     directly above the note that belongs to it. -->
+<div data-kui="textarea/dense" class="max-w-2xl rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Amend PO-24-1187</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Gujarat Polymers Ltd · 3 lines · ₹2,47,600</p>
+  </div>
+
+  <div class="divide-y divide-zinc-100">
+    <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">HDPE-BLM-45</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">1,200 kg · ₹1,04,400</p>
+      </div>
+      <div>
+        <label for="td-1" class="sr-only">Amendment note for HDPE-BLM-45</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <textarea id="td-1" name="note-1" rows="2" placeholder="Why this line changed"
+                    class="block w-full resize-none bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">Rate revised to ₹87.00 per kg after the August discount lapsed.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">LDPE-FLM-12</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">400 kg · ₹38,800</p>
+      </div>
+      <div>
+        <label for="td-2" class="sr-only">Amendment note for LDPE-FLM-12</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <textarea id="td-2" name="note-2" rows="2" placeholder="Why this line changed"
+                    class="block w-full resize-none bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">Quantity cut to 400 kg — the vendor cannot hold the balance past 04 Sep 2026.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">PP-RCP-08</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">900 kg · ₹1,04,400</p>
+      </div>
+      <div>
+        <label for="td-3" class="sr-only">Amendment note for PP-RCP-08</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <textarea id="td-3" name="note-3" rows="2" placeholder="Why this line changed"
+                    class="block w-full resize-none bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

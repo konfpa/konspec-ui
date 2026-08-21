@@ -1,0 +1,56 @@
+<!-- The explanation of what an HSN code is runs to a paragraph, and a
+     paragraph under every field is a form nobody reads. It goes behind a
+     trigger on the label row, and the trigger is a sibling of the label rather
+     than a child of it: inside, the press would bubble to the label, the label
+     would forward it to the input, and one click would open the panel and
+     throw focus into the box at the same time — while "What is an HSN code?"
+     joined the field's accessible name.
+
+     The trigger is named for the topic, not for the glyph. "Help" and "?" are
+     the two names that suggest themselves and neither says which field it
+     belongs to, which matters because a screen reader listing the buttons on a
+     twelve-field form gets twelve of them.
+
+     aria-expanded is bound rather than written, so it cannot be a stale string
+     — Alpine keeps aria-expanded on the element when it resolves to false,
+     unlike every other aria-* attribute. aria-controls names a panel that is in
+     the document from first paint and hidden with x-show; x-if would leave
+     aria-controls pointing at an id that does not exist until it is opened.
+
+     What is behind the disclosure is not the field's description. Something a
+     user has to open is something they will not have when they need it, so the
+     rule they must obey — eight digits — stays in the line under the control
+     and aria-describedby keeps pointing at that line. The panel is background,
+     and it is reached on purpose. -->
+<div data-kui="label/help" class="max-w-xl rounded-xl border border-zinc-300 bg-white p-4" x-data="{ open: false }">
+  <div class="mb-1.5 flex items-center gap-1">
+    <label for="lb-hsn" class="text-[13px]/5 font-medium">HSN code</label>
+    <button type="button" aria-label="What is an HSN code?" aria-controls="lb-hsn-more"
+            :aria-expanded="open" @click="open = !open"
+            class="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="circle-help" class="size-3.5"></i>
+    </button>
+  </div>
+
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <input id="lb-hsn" name="hsn" value="3901 20 00" inputmode="numeric" maxlength="10"
+           aria-describedby="lb-hsn-help"
+           class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums outline-none">
+  </div>
+
+  <p id="lb-hsn-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Eight digits. It sets the GST rate on every line raised against this item.
+  </p>
+
+  <div id="lb-hsn-more" x-show="open" x-cloak class="mt-2 rounded-lg bg-zinc-50 p-3 text-[12px]/4 text-zinc-600">
+    <p class="tabular-nums">
+      HSN is the customs classification the GST rate hangs off. The first two digits are the
+      chapter, the next two the heading and the last four the tariff item, so 3901 20 00 is
+      polyethylene of specific gravity 0.94 or more.
+    </p>
+    <p class="mt-2">
+      A wrong code is not a display fault. It changes the tax on every invoice raised against
+      the item, and correcting it afterwards means a credit note for each one.
+    </p>
+  </div>
+</div>

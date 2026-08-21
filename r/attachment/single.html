@@ -1,19 +1,27 @@
-<!-- One file, inside a form, where a whole panel would be out of proportion. -->
+<!-- One file, inside a form, where a whole panel would be out of proportion.
+
+     The field name is a <p> with an id and the input takes aria-labelledby, not
+     a second <label for>. Two labels bound to one input concatenate: with the
+     field name above and the Replace button beside it, the input's accessible
+     name comes out as "Signed GRN * Replace", and the asterisk is read aloud
+     too. aria-labelledby wins over both, so the name is the field and Replace
+     stays a working click target that contributes nothing to it. -->
 <div data-kui="attachment/single">
-  <label for="grn-scan" class="mb-1.5 block text-[13px]/5 font-medium">
-    Signed GRN <span class="text-red-600">*</span>
-  </label>
+  <p id="grn-scan-label" class="mb-1.5 text-[13px]/5 font-medium">
+    Signed GRN <span aria-hidden="true" class="text-red-600">*</span>
+  </p>
   <div class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
     <div class="min-w-0 flex-1">
       <p class="truncate text-[13px]/5 font-medium">signed-grn-1142.pdf</p>
-      <p class="text-[12px]/4 text-zinc-500">4.2 MB · attached just now</p>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">4.2 MB · attached just now</p>
     </div>
-    <input type="file" id="grn-scan" name="grn_scan" class="peer sr-only">
+    <input type="file" id="grn-scan" name="grn_scan" required
+           aria-labelledby="grn-scan-label" aria-describedby="grn-scan-hint" class="peer sr-only">
     <label for="grn-scan"
            class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
       Replace
     </label>
   </div>
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">PDF or JPG, up to 10 MB.</p>
+  <p id="grn-scan-hint" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">PDF or JPG, up to 10 MB.</p>
 </div>

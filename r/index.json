@@ -1377,6 +1377,14 @@
           "name": "With a hint and an action"
         },
         {
+          "id": "unit",
+          "name": "A unit in the name, a note outside it"
+        },
+        {
+          "id": "help",
+          "name": "Help behind a disclosure"
+        },
+        {
           "id": "hidden",
           "name": "Hidden and absent labels"
         },
@@ -1385,12 +1393,28 @@
           "name": "Disabled and read-only"
         },
         {
+          "id": "invalid",
+          "name": "The server said no"
+        },
+        {
           "id": "horizontal",
           "name": "Dense horizontal form"
         },
         {
+          "id": "row",
+          "name": "Names in a repeated row"
+        },
+        {
           "id": "caption",
           "name": "What is not a label"
+        },
+        {
+          "id": "htmx",
+          "name": "Swapped as one block"
+        },
+        {
+          "id": "django",
+          "name": "Django form field"
         }
       ],
       "detail": "r/label.json"
@@ -1415,6 +1439,10 @@
           "name": "Error replaces the help text"
         },
         {
+          "id": "warning",
+          "name": "Questionable, not wrong"
+        },
+        {
           "id": "required",
           "name": "Required and optional"
         },
@@ -1431,6 +1459,10 @@
           "name": "Around a radio group"
         },
         {
+          "id": "dependent",
+          "name": "Locked by the answer above it"
+        },
+        {
           "id": "action",
           "name": "Trailing action and a unit"
         },
@@ -1439,8 +1471,20 @@
           "name": "Two columns, one field spanning"
         },
         {
+          "id": "inline",
+          "name": "Dense, in a line-items row"
+        },
+        {
           "id": "readonly",
           "name": "Read-only and derived"
+        },
+        {
+          "id": "server",
+          "name": "Checked by the server, not the browser"
+        },
+        {
+          "id": "django",
+          "name": "Django form field"
         }
       ],
       "detail": "r/field.json"
@@ -1452,7 +1496,7 @@
       "description": "Single-line text entry. The border lives on the wrapper, not on the control, so an icon, a unit or a clear button sits inside the focus outline instead of beside it.",
       "related": [
         "field",
-        "textarea",
+        "input-group",
         "combobox"
       ],
       "variants": [
@@ -1485,12 +1529,32 @@
           "name": "Format-constrained fields"
         },
         {
+          "id": "widths",
+          "name": "Fields sized to the value they hold"
+        },
+        {
           "id": "password",
           "name": "Password with show and hide"
         },
         {
           "id": "disabled",
           "name": "Disabled and read-only"
+        },
+        {
+          "id": "inline",
+          "name": "Edited in place in a table cell"
+        },
+        {
+          "id": "stale",
+          "name": "The value moved while the form was open"
+        },
+        {
+          "id": "htmx",
+          "name": "Checked by the server as it is typed"
+        },
+        {
+          "id": "django",
+          "name": "Django form field"
         }
       ],
       "detail": "r/input.json"
@@ -1499,7 +1563,7 @@
       "id": "input-group",
       "name": "Input group",
       "category": "forms",
-      "description": "One text field and the things that qualify it — a unit, a currency, a scope select, an action — inside a single bordered enclosure that draws one focus outline for all of them.",
+      "description": "One text field — or a from and a to — and the things that qualify it: a unit, a currency, a scope select, an action, an answer the server fills in, all inside a single bordered enclosure that draws one focus outline for all of them.",
       "related": [
         "input",
         "button-group",
@@ -1523,6 +1587,14 @@
           "name": "A select fused to the field"
         },
         {
+          "id": "range",
+          "name": "A from and a to under one border"
+        },
+        {
+          "id": "stepper",
+          "name": "Stepped, and typed into"
+        },
+        {
           "id": "action",
           "name": "A trailing action button"
         },
@@ -1539,8 +1611,24 @@
           "name": "Error on the enclosure"
         },
         {
+          "id": "locked",
+          "name": "Locked as one object"
+        },
+        {
           "id": "dense",
           "name": "In a table filter row"
+        },
+        {
+          "id": "responsive",
+          "name": "What the group does at 390px"
+        },
+        {
+          "id": "htmx",
+          "name": "The addon the server fills in"
+        },
+        {
+          "id": "django",
+          "name": "Django form field"
         }
       ],
       "detail": "r/input-group.json"
@@ -1565,6 +1653,14 @@
           "name": "Groups and a placeholder"
         },
         {
+          "id": "long",
+          "name": "Thirty-six options, still native"
+        },
+        {
+          "id": "stale",
+          "name": "A value the list no longer offers"
+        },
+        {
           "id": "states",
           "name": "Disabled, read-only, invalid"
         },
@@ -1577,6 +1673,10 @@
           "name": "Dense, in a filter bar"
         },
         {
+          "id": "cell",
+          "name": "In a line-items table"
+        },
+        {
           "id": "rich",
           "name": "Listbox with two-line rows"
         },
@@ -1585,8 +1685,16 @@
           "name": "Listbox with a status dot"
         },
         {
+          "id": "loading",
+          "name": "A listbox whose rows arrive late"
+        },
+        {
           "id": "cascade",
           "name": "Options loaded by htmx"
+        },
+        {
+          "id": "autosave",
+          "name": "Saved the moment it changes"
         },
         {
           "id": "django",
@@ -1615,6 +1723,10 @@
           "name": "Sizes"
         },
         {
+          "id": "dense",
+          "name": "Dense, one per line item"
+        },
+        {
           "id": "counter",
           "name": "With a counter"
         },
@@ -1627,12 +1739,28 @@
           "name": "With a footer"
         },
         {
+          "id": "actions",
+          "name": "Cancel and post under the box"
+        },
+        {
+          "id": "template",
+          "name": "Starting from a canned reason"
+        },
+        {
           "id": "error",
           "name": "With error"
         },
         {
           "id": "disabled",
           "name": "Disabled and read-only"
+        },
+        {
+          "id": "copy",
+          "name": "A locked body you copy out of"
+        },
+        {
+          "id": "htmx",
+          "name": "Saving to the server"
         },
         {
           "id": "django",
@@ -1665,6 +1793,10 @@
           "name": "Select all and mixed"
         },
         {
+          "id": "nested",
+          "name": "Parents and children"
+        },
+        {
           "id": "cards",
           "name": "Option tiles"
         },
@@ -1673,12 +1805,32 @@
           "name": "Filter list"
         },
         {
+          "id": "dense",
+          "name": "Many flags at once"
+        },
+        {
           "id": "table",
           "name": "Row selection"
         },
         {
+          "id": "matrix",
+          "name": "Roles across permissions"
+        },
+        {
           "id": "states",
           "name": "Disabled, locked and invalid"
+        },
+        {
+          "id": "locked",
+          "name": "Frozen because the record is posted"
+        },
+        {
+          "id": "acknowledge",
+          "name": "What the button is waiting for"
+        },
+        {
+          "id": "htmx",
+          "name": "Ticked and saved"
         },
         {
           "id": "django",
@@ -1695,7 +1847,8 @@
       "related": [
         "checkbox",
         "toggle",
-        "field"
+        "field",
+        "questionnaire"
       ],
       "variants": [
         {
@@ -1719,12 +1872,32 @@
           "name": "When none is an answer"
         },
         {
+          "id": "bands",
+          "name": "Options that are ranges"
+        },
+        {
+          "id": "conditional",
+          "name": "One option opens a field"
+        },
+        {
           "id": "table",
           "name": "Picking one record"
         },
         {
+          "id": "rows",
+          "name": "A group on every line"
+        },
+        {
           "id": "states",
           "name": "Default, locked and invalid"
+        },
+        {
+          "id": "phone",
+          "name": "Answered at 390px"
+        },
+        {
+          "id": "htmx",
+          "name": "Saved as it is chosen"
         },
         {
           "id": "django",
@@ -1741,7 +1914,8 @@
       "related": [
         "checkbox",
         "radio",
-        "field"
+        "field",
+        "alert-dialog"
       ],
       "variants": [
         {
@@ -1769,8 +1943,28 @@
           "name": "On, off, locked, saving, failed"
         },
         {
+          "id": "table",
+          "name": "One switch per row in a register"
+        },
+        {
+          "id": "dependent",
+          "name": "Revealing what it governs"
+        },
+        {
+          "id": "readonly",
+          "name": "Locked to you, and locked for good"
+        },
+        {
+          "id": "confirm",
+          "name": "Asking before it moves"
+        },
+        {
           "id": "htmx",
           "name": "Saved on change"
+        },
+        {
+          "id": "refused",
+          "name": "The server said no"
         },
         {
           "id": "django",
@@ -1823,6 +2017,26 @@
           "name": "Disabled, locked, invalid"
         },
         {
+          "id": "selected-first",
+          "name": "What is already selected, at the top"
+        },
+        {
+          "id": "dense",
+          "name": "One per line in a line-items grid"
+        },
+        {
+          "id": "filter",
+          "name": "In a filter bar, behind a button"
+        },
+        {
+          "id": "phone",
+          "name": "The panel takes the screen at 390px"
+        },
+        {
+          "id": "htmx",
+          "name": "Committing straight to the record"
+        },
+        {
           "id": "django",
           "name": "Django form field"
         }
@@ -1853,8 +2067,20 @@
           "name": "Uploading"
         },
         {
+          "id": "failed",
+          "name": "Broke halfway, with a retry"
+        },
+        {
           "id": "rejected",
           "name": "Rejected file"
+        },
+        {
+          "id": "required",
+          "name": "Missing, and blocking the post"
+        },
+        {
+          "id": "versions",
+          "name": "Replaced, with the old one kept"
         },
         {
           "id": "readonly",
@@ -1865,8 +2091,16 @@
           "name": "Single file field"
         },
         {
+          "id": "compact",
+          "name": "Inline on a record card"
+        },
+        {
           "id": "images",
           "name": "Image grid"
+        },
+        {
+          "id": "htmx",
+          "name": "Posted to a real endpoint"
         },
         {
           "id": "django",
@@ -1911,8 +2145,32 @@
           "name": "Range with presets"
         },
         {
+          "id": "marked",
+          "name": "Days that carry a mark"
+        },
+        {
+          "id": "slot",
+          "name": "A date and a delivery slot"
+        },
+        {
+          "id": "period",
+          "name": "Months and quarters, not days"
+        },
+        {
+          "id": "locked",
+          "name": "The date on a posted record"
+        },
+        {
+          "id": "phone",
+          "name": "The grid under a thumb"
+        },
+        {
           "id": "native",
           "name": "The native input"
+        },
+        {
+          "id": "htmx",
+          "name": "The month comes from the server"
         },
         {
           "id": "django",
@@ -1929,6 +2187,7 @@
       "related": [
         "radio",
         "field",
+        "attachment",
         "form-page"
       ],
       "variants": [
@@ -1949,6 +2208,14 @@
           "name": "Follow-up on a fail"
         },
         {
+          "id": "not-applicable",
+          "name": "Not applicable, and why"
+        },
+        {
+          "id": "evidence",
+          "name": "The answer that needs a photograph"
+        },
+        {
           "id": "scale",
           "name": "Rating on a scale"
         },
@@ -1961,12 +2228,24 @@
           "name": "The whole sheet"
         },
         {
+          "id": "remaining",
+          "name": "How far through, and what is left"
+        },
+        {
           "id": "invalid",
           "name": "Submitted with gaps"
         },
         {
+          "id": "autosave",
+          "name": "Each answer written as it is given"
+        },
+        {
           "id": "signed",
           "name": "Signed off"
+        },
+        {
+          "id": "django",
+          "name": "Django formset"
         }
       ],
       "detail": "r/questionnaire.json"

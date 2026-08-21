@@ -1,0 +1,88 @@
+<!-- A remark that belongs to the record rather than to a form: nothing else on
+     the screen is being submitted, so this box saves itself.
+
+     It saves on a button and not on a keystroke debounce. An autosave on a
+     textarea writes a half-finished sentence into the approval trail every time
+     the writer stops to think, and the one write that fails does it silently
+     while the typing carries on over the top of it.
+
+     hx-swap="none" is the important attribute. The response arrives while the
+     caret is still in the box, so a swap that touched the textarea would throw
+     away the caret, the scroll position, the undo stack and every character
+     typed since the request left. The server only has to say whether it worked;
+     the box already shows what was typed.
+
+     hx-sync="this:replace" abandons a save still in flight, so two presses a
+     second apart cannot land out of order and leave the record holding the
+     older text. That is also why the button is not disabled while the request
+     runs: a button that goes grey mid-save says you cannot do this, when the
+     truth is that you already have.
+
+     Alpine owns the state machine rather than hx-indicator, because the status
+     line needs four states and htmx offers one class. htmx:after-request fires
+     on failure, timeout and abort as well as success, which is the property
+     that matters — it is the three endings a hand-written busy flag is still
+     spinning through.
+
+     A failure changes nothing in the box. Unlike a toggle, the value here is
+     the writer's own sentences, and reverting them is the one unrecoverable
+     thing this component could do.
+
+     Under Django the CSRF token goes on the form as a hidden input, or on the
+     request as hx-headers — see the django variant. -->
+<form data-kui="textarea/htmx" class="max-w-xl"
+      hx-post="/orders/PO-24-1187/remark/" hx-swap="none" hx-sync="this:replace"
+      x-data="{
+        text: '', saved: '', state: 'idle',
+        get dirty() { return this.text.trim() !== this.saved; },
+        get line() {
+          if (this.state === 'saving') return 'saving';
+          if (this.state === 'failed') return 'failed';
+          if (this.dirty) return 'dirty';
+          return this.state === 'saved' ? 'done' : 'idle';
+        }
+      }"
+      @htmx:before-request.camel="state = 'saving'"
+      @htmx:after-request.camel="
+        if ($event.detail.successful) { saved = text.trim(); state = 'saved' }
+        else { state = 'failed' }">
+  <label for="ta-hx" class="mb-1.5 block text-[13px]/5 font-medium">Approval remark</label>
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <textarea id="ta-hx" name="remark" rows="4" x-model="text"
+              aria-describedby="ta-hx-state"
+              placeholder="Why this order is being approved above the rate contract"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
+  </div>
+
+  <div class="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+    <p id="ta-hx-state" role="status" class="min-w-0 text-[12px]/4">
+      <span x-show="line === 'idle'" class="tabular-nums text-zinc-500">Not saved yet. The remark goes on the approval record for PO-24-1187.</span>
+
+      <span x-show="line === 'dirty'" x-cloak class="text-zinc-500">Unsaved changes</span>
+
+      <span x-show="line === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+      </span>
+
+      <span x-show="line === 'done'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved to the approval record
+      </span>
+
+      <span x-show="line === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — what you wrote is still here
+        </span>
+        <button type="button" @click="$refs.save.click()"
+                class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Try again</button>
+      </span>
+    </p>
+
+    <button type="submit" x-ref="save" :disabled="!dirty"
+            class="inline-flex h-8 shrink-0 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
+      <span class="grid">
+        <span class="col-start-1 row-start-1" :class="state === 'saving' && 'invisible'">Save remark</span>
+        <span class="col-start-1 row-start-1" :class="state !== 'saving' && 'invisible'">Saving…</span>
+      </span>
+    </button>
+  </div>
+</form>

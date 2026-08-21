@@ -1,0 +1,88 @@
+<!-- Three boxes in a column and nothing on screen names any of them. The
+     header says Receiving now, the row says which item it is, and neither is a
+     label: a header cell cannot take a for, and the item description is a
+     sibling two levels up. Left alone, all three are announced as "edit,
+     8.500" and the only thing separating them is a position nobody is told.
+
+     Each control gets a real label with sr-only, naming the column and the
+     line. That is the version that survives the layout: the header row is
+     aria-hidden and not rendered at all below sm, so anything that leaned on it
+     — aria-labelledby pointing at the header cell, a th with scope="col" — has
+     nothing to point at on a phone.
+
+     The ids carry the line's primary key, not the loop index. An index-based id
+     renumbers every row the moment a line is inserted at the top, and every
+     label follows the number rather than the line: the name says one item and
+     the box belongs to another. The field names carry the same key, so the POST
+     pairs up without depending on order.
+
+     One DOM copy at both widths, and that is not a preference. The usual
+     responsive answer is a table for desktop and cards for the phone with one
+     of them display:none, which puts every id in the document twice — and for
+     binds to the first, so the hidden copy's label drives the visible copy's
+     box. A grid that reflows has one of everything.
+
+     The MT beside each box is aria-hidden and named in the label instead. As
+     visible text next to the input it is either a second label on the same id,
+     which lengthens every name, or it is nothing at all to a screen reader. -->
+<div data-kui="label/row" class="max-w-3xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium tabular-nums">Receive against PO-24-1187 — Gujarat Polymers Ltd</h3>
+  </div>
+
+  <div aria-hidden="true" class="hidden border-b border-zinc-200 bg-zinc-50 px-4 py-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase sm:grid sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:gap-4">
+    <span>Item</span>
+    <span class="text-right">Ordered</span>
+    <span class="text-right">Receiving now</span>
+  </div>
+
+  <ul class="divide-y divide-zinc-100">
+    <li class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:items-center sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">ITM-1042 · HDPE granules — natural</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Batch 24-0912 · 27.500 MT still pending</p>
+      </div>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600 sm:text-right"><span class="sm:sr-only">Ordered </span>40.000 MT</p>
+      <div>
+        <label for="lb-ln-4021-qty" class="sr-only">Receiving now, in MT, of ITM-1042 HDPE granules — natural</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white pr-3 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="lb-ln-4021-qty" name="line-4021-received" value="8.500" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-3 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+          <span aria-hidden="true" class="shrink-0 text-[13px]/5 text-zinc-500">MT</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:items-center sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">ITM-1078 · LDPE granules — 22FA002</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Batch 24-0918 · 5.000 MT still pending</p>
+      </div>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600 sm:text-right"><span class="sm:sr-only">Ordered </span>15.000 MT</p>
+      <div>
+        <label for="lb-ln-4022-qty" class="sr-only">Receiving now, in MT, of ITM-1078 LDPE granules — 22FA002</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white pr-3 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="lb-ln-4022-qty" name="line-4022-received" value="5.000" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-3 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+          <span aria-hidden="true" class="shrink-0 text-[13px]/5 text-zinc-500">MT</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:items-center sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">ITM-3310 · M12 hex bolt — 8.8 zinc</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Batch 24-0921 · 4,000 nos still pending</p>
+      </div>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600 sm:text-right"><span class="sm:sr-only">Ordered </span>12,000 nos</p>
+      <div>
+        <label for="lb-ln-4023-qty" class="sr-only">Receiving now, in numbers, of ITM-3310 M12 hex bolt — 8.8 zinc</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white pr-3 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="lb-ln-4023-qty" name="line-4023-received" value="4,000" inputmode="numeric"
+                 class="w-full min-w-0 bg-transparent px-3 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+          <span aria-hidden="true" class="shrink-0 text-[13px]/5 text-zinc-500">nos</span>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>

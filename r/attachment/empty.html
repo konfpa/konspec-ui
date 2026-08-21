@@ -1,19 +1,21 @@
-<!-- Say what to attach and why. "No files" is a fact, not an instruction. -->
+<!-- Say what to attach and why. "No files" is a fact, not an instruction, and
+     the sentence that stops the support call is the one naming the rule the
+     record is about to fail — not the one naming the state it is in. -->
 <div data-kui="attachment/empty" x-data="{ depth: 0 }">
-  <label class="mb-1.5 block text-[13px]/5 font-medium">Attachments</label>
+  <p class="mb-1.5 text-[13px]/5 font-medium">Attachments</p>
   <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
        class="rounded-lg border border-dashed px-4 py-8 text-center transition"
        :class="depth > 0 ? 'border-zinc-700 bg-zinc-50' : 'border-zinc-200 bg-zinc-100'">
     <i data-lucide="paperclip" class="mx-auto size-6 text-zinc-500"></i>
     <p class="mt-3 text-[14px]/5 font-semibold">No documents on this order yet</p>
-    <p class="mx-auto mt-1 max-w-[42ch] text-[12px]/4 text-zinc-600">
+    <p class="mx-auto mt-1 max-w-[42ch] text-[12px]/4 tabular-nums text-zinc-600">
       Approvals above ₹10,00,000 need the vendor quotation attached before the plant head can sign off.
     </p>
-    <input type="file" id="empty-files" name="attachments" multiple class="peer sr-only">
+    <input type="file" id="empty-files" name="attachments" multiple aria-describedby="empty-files-limit" class="peer sr-only">
     <label for="empty-files"
            class="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/30">
       <i data-lucide="upload" class="size-4"></i>Attach a document
     </label>
-    <p class="mt-3 text-[12px]/4 text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</p>
+    <p id="empty-files-limit" class="mt-3 text-[12px]/4 tabular-nums text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</p>
   </div>
 </div>

@@ -19,10 +19,11 @@
   <label for="ta-grow" class="mb-1.5 block text-[13px]/5 font-medium">Inspection remarks</label>
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <textarea id="ta-grow" name="remarks" x-ref="ta" rows="2" @input="grow()"
+              aria-describedby="ta-grow-help"
               placeholder="Type — the box follows"
-              class="block max-h-54 w-full resize-none overflow-y-auto bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">Material received against GRN-24-0912.
+              class="block max-h-54 w-full resize-none overflow-y-auto bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none placeholder:text-zinc-500">Material received against GRN-24-0912.
 Two bundles show mill scale on the outer face.
 Held pending the test certificate.</textarea>
   </div>
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Stops growing at 10 rows and scrolls after that.</p>
+  <p id="ta-grow-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Stops growing at 10 rows and scrolls after that.</p>
 </div>

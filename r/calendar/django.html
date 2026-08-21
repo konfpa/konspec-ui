@@ -1,10 +1,24 @@
-<!-- Two named inputs, one clean(). The values that post are ISO strings, which
+<!-- Two named fields, one clean(). The values that post are ISO strings, which
      is the one format DateField parses without touching DATE_INPUT_FORMATS.
 
      # forms.py
      class PeriodForm(forms.Form):
-         start = forms.DateField(input_formats=['%Y-%m-%d'])
-         end   = forms.DateField(input_formats=['%Y-%m-%d'])
+         # format='%Y-%m-%d' is not optional. Without it an unbound form renders
+         # its initial through the locale — "20 August 2026" — and a
+         # type="date" input silently discards anything that is not ISO, so the
+         # field paints empty and nobody can say why.
+         start = forms.DateField(
+             input_formats=['%Y-%m-%d'],
+             widget=forms.DateInput(format='%Y-%m-%d', attrs={
+                 'type': 'date', 'x-ref': 's',
+                 'class': 'h-9 w-full bg-transparent px-3 text-[14px]/5 '
+                          'tabular-nums outline-none'}))
+         end = forms.DateField(
+             input_formats=['%Y-%m-%d'],
+             widget=forms.DateInput(format='%Y-%m-%d', attrs={
+                 'type': 'date', 'x-ref': 'e', ':min': 'start',
+                 'class': 'h-9 w-full bg-transparent px-3 text-[14px]/5 '
+                          'tabular-nums outline-none'}))
 
          def clean(self):
              c = super().clean()
@@ -14,28 +28,44 @@
 
      The clean() check is not optional even though the widget prevents it — a
      POST does not have to come from this page. :min on the end input is a
-     convenience for the user, never a guarantee to the view. -->
+     convenience for the user, never a guarantee to the view, and the error it
+     is meant to prevent still has to be rendered: raising in clean() and never
+     printing non_field_errors is a form that refuses and does not say so.
+
+     Alpine reads the two inputs; it does not own them. x-model would write its
+     own value back into the field on init, which is the same silent wipe the
+     widget format above prevents. sync() runs on x-init and on every input
+     event, and the summary is derived from what the inputs actually hold.
+
+     method="get", so the period is in the URL and the report is a link somebody
+     can send. That is also why there is no csrf_token here — a GET is not a
+     write. -->
 <form data-kui="calendar/django" method="get" class="max-w-md"
       x-data="{
-        start: '2026-04-01', end: '2026-08-20',
+        start: '', end: '',
+        sync() { this.start = this.$refs.s.value; this.end = this.$refs.e.value; },
         parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
         fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
         span() { return (this.start && this.end) ? Math.round((this.parse(this.end) - this.parse(this.start)) / 86400000) + 1 : 0; }
-      }">
+      }" x-init="$nextTick(() => sync())" @input="sync()">
   <fieldset>
     <legend class="mb-1.5 text-[13px]/5 font-medium">Reporting period</legend>
 
+    {% if form.non_field_errors %}
+      <p id="period-err" role="alert" class="mb-2 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.non_field_errors.0 }}
+      </p>
+    {% endif %}
+
     <div class="flex items-center gap-2">
-      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-        <label for="id_start" class="sr-only">Start date</label>
-        <input type="date" id="id_start" name="start" x-model="start"
-               class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
+      <div class="flex-1 rounded-lg bg-white {% if form.start.errors or form.non_field_errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+        <label for="{{ form.start.id_for_label }}" class="sr-only">{{ form.start.label }}</label>
+        {{ form.start }}
       </div>
       <span class="text-[13px]/5 text-zinc-500" aria-hidden="true">to</span>
-      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-        <label for="id_end" class="sr-only">End date</label>
-        <input type="date" id="id_end" name="end" x-model="end" :min="start"
-               class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
+      <div class="flex-1 rounded-lg bg-white {% if form.end.errors or form.non_field_errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+        <label for="{{ form.end.id_for_label }}" class="sr-only">{{ form.end.label }}</label>
+        {{ form.end }}
       </div>
     </div>
 
@@ -43,5 +73,5 @@
        x-text="span() ? fmt(start) + ' to ' + fmt(end) + ' · ' + span() + ' days' : 'Both dates are required.'"></p>
   </fieldset>
 
-  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Run report</button>
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Run report</button>
 </form>

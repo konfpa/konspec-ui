@@ -13,14 +13,14 @@
            and aria-controls naming an id that does not exist is worse than
            leaving it off -->
       <input id="cb-off" type="text" disabled value="Gujarat Polymers Ltd"
-             role="combobox" aria-expanded="false"
+             role="combobox" aria-expanded="false" aria-describedby="cb-off-help"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 text-zinc-400">
       <span class="mr-3 flex size-4 shrink-0 items-center justify-center">
         <i data-lucide="chevron-down" class="size-4 text-zinc-400"></i>
       </span>
     </div>
     <input type="hidden" name="vendor_disabled" value="gujarat-polymers" disabled>
-    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
+    <p id="cb-off-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
   </div>
 
   <!-- A locked value is rendered, not made read-only. There is no read-only
@@ -73,13 +73,18 @@
            this.ai = this.next(this.ai, step);
            this.scroll();
          },
+         edge(end) {
+           if (!this.list.length) return;
+           this.ai = end ? this.next(this.list.length, -1) : this.next(-1, 1);
+           this.scroll();
+         },
          pick(o) { if (o.blocked) return; this.sel = o.id; this.close(); this.$refs.q.focus(); },
          commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
        }"
        @click.outside="close()"
        @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
 
-    <label for="cb-bad" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+    <label for="cb-bad" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span aria-hidden="true" class="text-red-600">*</span></label>
 
     <div class="flex items-center rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
@@ -91,6 +96,8 @@
              @input="typed = true; open = true; ai = 0"
              @keydown.arrow-down.prevent="move(1)"
              @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+             @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
              @keydown.enter="if (open) { $event.preventDefault(); commit() }"
              @keydown.tab="close()"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none">

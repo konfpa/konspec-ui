@@ -20,16 +20,16 @@
        get n() { return Number(this.rate.replace(/[^0-9.]/g, '')); },
        get bad() { return this.touched && (!this.rate.trim() || this.n < this.floor); }
      }">
-  <label for="in-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per MT <span class="text-red-600">*</span></label>
+  <label for="in-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per MT <span aria-hidden="true" class="text-red-600">*</span></label>
 
   <div class="flex items-center rounded-lg bg-white border"
        :class="bad ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
                    : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
-    <span class="pl-3 text-[14px]/5" :class="bad ? 'text-red-600' : 'text-zinc-600'">₹</span>
+    <span id="in-rate-unit" class="shrink-0 pl-3 text-[14px]/5" :class="bad ? 'text-red-600' : 'text-zinc-600'">₹</span>
     <input id="in-rate" name="rate" x-model="rate" @blur="touched = true"
            inputmode="decimal" autocomplete="off"
            :aria-invalid="bad ? 'true' : null"
-           aria-describedby="in-rate-msg"
+           aria-describedby="in-rate-unit in-rate-msg"
            class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
   </div>
 

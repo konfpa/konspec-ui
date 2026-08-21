@@ -1,0 +1,73 @@
+<!-- N/A already has a value of its own. What it does not have is a reason, and
+     an N/A with no reason is the one answer on a sheet that cannot be audited:
+     six months later "not applicable" reads the same whether the parameter
+     genuinely does not apply to this material or the meter was flat that
+     morning.
+
+     The reason is a closed list rather than a note, because counting is the
+     point. A parameter that reads N/A on forty of the last fifty GRNs is a
+     parameter nobody is inspecting any more, and that only shows up if the
+     reasons are codes. Other is on the list because a closed list that does not
+     fit gets the nearest wrong code picked instead.
+
+     Both conditional fields carry the whole condition, not their own half. The
+     nested box is disabled when the reason is not Other and when the answer is
+     not N/A: bind it to why !== 'other' alone and it stays enabled and posting
+     the moment the answer goes back to Pass, so the question posts a pass
+     alongside a written reason for not having inspected it. That is the
+     follow-up trap one level deeper, and it is where it is usually missed. -->
+<div data-kui="questionnaire/not-applicable" class="max-w-xl" x-data="{ ans: 'na', why: 'not_bought' }">
+  <fieldset>
+    <legend>
+      <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">Incoming inspection · question 12 of 18</span>
+      <span class="mt-1.5 block text-[14px]/5 font-medium">Third-party inspection report from the agency named on the purchase order</span>
+    </legend>
+
+    <p id="qn-crit" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">PO-24-1188 names Geo-Chem, Vapi. Clause 7 of the rate contract.</p>
+
+    <div class="mt-3 grid max-w-sm grid-cols-3 gap-2">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="qc_third_party" value="pass" x-model="ans" aria-describedby="qn-crit" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="qc_third_party" value="fail" x-model="ans" aria-describedby="qn-crit" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="qc_third_party" value="na" x-model="ans" aria-describedby="qn-crit" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div x-show="ans === 'na'" x-cloak class="mt-4 border-l-2 border-zinc-200 pl-4">
+    <label for="qn-why" class="block text-[13px]/5 font-medium">
+      Why it does not apply <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+
+    <div class="relative mt-1.5 max-w-sm rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <select id="qn-why" name="qc_third_party_na" required x-model="why" :disabled="ans !== 'na'"
+              aria-describedby="qn-why-help"
+              class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+        <option value="not_bought">Not bought on this purchase order</option>
+        <option value="waived">Waived in writing by the plant head</option>
+        <option value="material">Does not apply to this material</option>
+        <option value="other">Something else — one line below</option>
+      </select>
+      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </div>
+    <p id="qn-why-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Counted across every sheet this quarter, which is how a parameter that quietly stopped being inspected gets found.</p>
+
+    <div x-show="why === 'other'" x-cloak class="mt-3">
+      <label for="qn-other" class="block text-[13px]/5 font-medium">
+        In one line <span aria-hidden="true" class="text-red-600">*</span>
+      </label>
+      <div class="mt-1.5 max-w-sm rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="qn-other" name="qc_third_party_na_other" type="text" maxlength="120" required
+               :disabled="ans !== 'na' || why !== 'other'"
+               placeholder="Agency could not reach Silvassa before unloading closed"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+      </div>
+    </div>
+  </div>
+</div>

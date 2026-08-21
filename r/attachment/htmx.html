@@ -1,0 +1,113 @@
+<!-- The upload with a server behind it, which is the only place an honest
+     progress number can come from.
+
+     hx-encoding="multipart/form-data" is the whole integration and the one line
+     everybody leaves out. Without it htmx posts urlencoded, the browser drops
+     the file on the way out, and the view returns 200 over an empty
+     request.FILES — a failure that reads as a success from both ends and shows
+     up weeks later as a record with no paperwork on it.
+
+     htmx fires htmx:xhr:progress carrying loaded and total off the
+     XMLHttpRequest, so Alpine paints bytes rather than a timer. lengthComputable
+     is checked before dividing because it is false for a chunked request, and
+     the division then paints NaN% across the bar.
+
+     Picking a file uploads it. hx-trigger="change from:#hx-attach" puts the
+     request on the input rather than on a submit button, because a separate
+     Upload button after choosing is a second click a third of users never make
+     and the row then looks attached while nothing has been posted.
+
+     A dropped file goes through the input too: the handler assigns the
+     DataTransfer FileList to it and dispatches change, which is what htmx is
+     already listening for. Wiring @drop straight to fetch gives the control two
+     upload paths and they drift apart within a release.
+
+     hx-swap="beforeend" appends the row the server rendered to the list already
+     on the page. innerHTML on the same target wipes every attachment the record
+     loaded with, and the server would have to re-send all of them to hide it.
+
+     hx-disabled-elt stops a second pick landing mid-flight. It is an attribute
+     rather than an Alpine flag because htmx re-enables on failure, timeout and
+     abort as well as on success, which are the three endings a hand-written
+     flag is always still stuck in.
+
+     The failed state clears the input, so the retry is Choose it again rather
+     than Retry: there is no file left in the picker to re-send.
+
+     Remove carries no hx-delete of its own. A stored file is destructive to
+     remove, so the request belongs on alert-dialog's confirm button, with
+     hx-target="closest li" and hx-swap="outerHTML" aimed back at this row.
+     hx-confirm is window.confirm — a browser dialog with the page title on it,
+     no styling and no place to say what else the deletion takes with it.
+
+     Under Django the CSRF token goes on the form as hx-headers — that is in the
+     django variant. -->
+<div data-kui="attachment/htmx" class="max-w-xl"
+     x-data="{ depth: 0, state: 'idle', name: '', pct: 0 }"
+     @htmx:before-request.camel="state = 'uploading'; pct = 0; name = $refs.picker.files.length ? $refs.picker.files[0].name : 'The file'"
+     @htmx:xhr:progress.camel="if ($event.detail.lengthComputable) pct = Math.round($event.detail.loaded / $event.detail.total * 100)"
+     @htmx:after-request.camel="state = $event.detail.successful ? 'idle' : 'failed'; $refs.picker.value = ''">
+
+  <form hx-post="/grn/1142/attachments/" hx-encoding="multipart/form-data"
+        hx-trigger="change from:#hx-attach"
+        hx-target="#hx-attach-list" hx-swap="beforeend"
+        hx-disabled-elt="#hx-attach">
+    <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent
+         @drop.prevent="depth = 0; $refs.picker.files = $event.dataTransfer.files; $refs.picker.dispatchEvent(new Event('change'))"
+         class="rounded-lg border border-dashed px-4 py-5 transition"
+         :class="depth > 0 ? 'border-zinc-700 bg-zinc-50' : 'border-zinc-200 bg-zinc-100'">
+      <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
+        <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
+        <span class="text-[13px]/5 text-zinc-600">Drag a document here or</span>
+        <input type="file" id="hx-attach" name="document" x-ref="picker"
+               aria-describedby="hx-attach-limit" class="peer sr-only">
+        <label for="hx-attach"
+               class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+          Browse files
+        </label>
+        <span id="hx-attach-limit" class="text-[12px]/4 tabular-nums text-zinc-500">PDF or JPG · up to 10 MB</span>
+      </div>
+    </div>
+  </form>
+
+  <!-- in the document from first paint, so the live region exists before it has
+       anything to say -->
+  <div role="status">
+    <div x-show="state === 'uploading'" x-cloak class="mt-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+      <div class="flex items-center gap-3">
+        <p class="min-w-0 flex-1 truncate text-[13px]/5 font-medium" x-text="name"></p>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="pct + '%'"></span>
+      </div>
+      <div role="progressbar" aria-valuemin="0" aria-valuemax="100" :aria-valuenow="pct" :aria-label="'Uploading ' + name"
+           class="mt-2 h-1 overflow-hidden rounded-full bg-zinc-200">
+        <div class="h-full rounded-full bg-zinc-700 transition-[width] duration-150" :style="'width: ' + pct + '%'"></div>
+      </div>
+    </div>
+
+    <p x-show="state === 'failed'" x-cloak
+       class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px]/4 font-medium text-red-600">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>
+        <span x-text="name + ' did not upload. Nothing was saved.'"></span>
+      </span>
+      <button type="button" @click="$refs.picker.click()"
+              class="rounded-sm font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Choose it again
+      </button>
+    </p>
+  </div>
+
+  <ul id="hx-attach-list" aria-label="Attached documents" class="mt-2 space-y-2">
+    <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[13px]/5 font-medium">challan-gp-77412.pdf</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">310 KB · Ritu Deshpande · 04 Sep 2026</p>
+      </div>
+      <button type="button" aria-label="Remove challan-gp-77412.pdf"
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="x" class="size-4"></i>
+      </button>
+    </li>
+  </ul>
+</div>

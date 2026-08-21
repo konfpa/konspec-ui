@@ -63,12 +63,12 @@
      }">
   <div class="flex items-center justify-between pb-2">
     <button type="button" @click="shift(-1)" aria-label="Previous month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
     <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
     <button type="button" @click="shift(1)" aria-label="Next month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
@@ -97,7 +97,7 @@
                         :aria-current="c.iso === today ? 'date' : null"
                         :tabindex="c.iso === focus ? 0 : -1"
                         :data-focus="c.iso === focus ? '1' : null"
-                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                         :class="cls(c.iso)" x-text="c.day"></button>
               </template>
               <template x-if="!c"><span class="block size-9"></span></template>

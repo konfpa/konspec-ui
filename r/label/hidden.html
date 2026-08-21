@@ -3,11 +3,15 @@
      The search box has a real label with sr-only. The card is already headed
      Purchase orders and the icon says search, so a visible name would repeat
      what is on screen twice — but the element is still there, still bound with
-     for, and clicking the icon still focuses the field. The placeholder is an
-     example of the format, not the name. Some readers do fall back to it when
-     nothing else is there, which is exactly why placeholder-as-label looks like
-     it works: it survives the screen-reader check and then vanishes the moment
-     anything is typed, at a contrast nobody chose.
+     for, and that is what the accessibility tree reads. There is one cost worth
+     naming: with no visible text there is nothing to click, so the cheapest
+     test in this entry — click the words, watch focus land — is not available
+     here and the binding has to be read out of the accessibility tree instead.
+     The placeholder is an example of the format, not the name. Some readers do
+     fall back to it when nothing else is there, which is exactly why
+     placeholder-as-label looks like it works: it survives the screen-reader
+     check and then vanishes the moment anything is typed, at a contrast nobody
+     chose.
 
      The select takes aria-label instead. There is no text to hide, its options
      already read as Status, and an sr-only label here would be a second name

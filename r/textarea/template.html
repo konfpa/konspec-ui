@@ -1,0 +1,62 @@
+<!-- A rejection reason has to be specific enough to answer a query three
+     months later, and nobody writes that at half past five. The canned lines
+     are a starting point the writer then edits, and that is why they are
+     buttons that insert text rather than a select that sets the value: what
+     gets posted is the box, and the whole point of the box is that it no longer
+     says what the button said.
+
+     The insert goes through the Alpine state, never through t.value. Writing
+     the element directly leaves x-model holding the string it had before, so
+     the next keystroke writes that stale string back over the line that was
+     just inserted — and the field looks like it lost a paragraph on its own.
+
+     It appends on a new line rather than replacing. A button that silently
+     discards a paragraph somebody typed is a button they press exactly once.
+
+     Focus moves into the box with the caret at the end. The caret is set in
+     $nextTick because before Alpine has written the new value, setSelectionRange
+     is measuring the length of the old one and the caret lands mid-sentence.
+
+     Text arriving in a textarea by script is announced by nothing, so the
+     sr-only live region names the line that was added. -->
+<div data-kui="textarea/template" class="max-w-xl"
+     x-data="{
+       text: '',
+       said: '',
+       reasons: [
+         { key: 'Moisture', line: 'Moisture measured at 0.21% against a limit of 0.15% on the incoming lot.' },
+         { key: 'Melt flow', line: 'Melt flow index 1.6 g/10 min, outside the agreed band of 0.8 to 1.2.' },
+         { key: 'Damage in transit', line: 'Four bags torn on arrival, so contamination of the lot cannot be ruled out.' },
+         { key: 'No test certificate', line: 'Mill test certificate for heat 2026-B-114 did not arrive with the consignment.' }
+       ],
+       use(r) {
+         this.text = this.text.trim() ? this.text.trim() + '\n' + r.line : r.line;
+         this.said = r.key + ' added — edit it before sending';
+         const t = this.$refs.body;
+         t.focus();
+         this.$nextTick(() => t.setSelectionRange(t.value.length, t.value.length));
+       }
+     }">
+  <label for="ta-tpl" class="mb-1.5 block text-[13px]/5 font-medium">Reason for rejecting lot 24-0912 <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div role="group" aria-labelledby="ta-tpl-lead" class="mb-1.5 flex flex-wrap items-center gap-1.5">
+    <span id="ta-tpl-lead" class="text-[12px]/4 text-zinc-500">Start from</span>
+    <template x-for="r in reasons" :key="r.key">
+      <button type="button" @click="use(r)" x-text="r.key"
+              class="inline-flex h-7 items-center rounded-lg border border-zinc-200 bg-white px-2.5 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></button>
+    </template>
+  </div>
+
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <textarea id="ta-tpl" name="reason" rows="5" x-ref="body" x-model="text" required
+              aria-describedby="ta-tpl-help"
+              placeholder="What was wrong with the lot, measured against what"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none placeholder:text-zinc-500"></textarea>
+  </div>
+
+  <p id="ta-tpl-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Goes on the QC record and on the debit note. Edit the line until it says what was actually measured.
+  </p>
+
+  <span class="sr-only" aria-live="polite" x-text="said"></span>
+</div>

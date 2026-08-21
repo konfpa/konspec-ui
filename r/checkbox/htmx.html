@@ -1,0 +1,121 @@
+<!-- A checklist against one document, where each tick is written the moment it
+     is made. These are boxes rather than switches on purpose: a switch says a
+     setting is on, a tick says somebody did the thing, and what a supervisor
+     reads here is the work done on one document and what is still open.
+
+     The state lives on each row, never on the list. One flag on the ul and two
+     boxes ticked a second apart share a status line, so the second answer
+     overwrites the first and the row that failed reads as saved.
+
+     There is no hx-disabled-elt. Disabling the box while its own request is in
+     flight takes focus off the element the user is standing on and drops it to
+     the body, which loses a keyboard user their place in a list they were
+     working down. hx-sync="this:replace" is what stops two writes landing out
+     of order, and hx-swap="none" is because the row already looks the way it
+     should — the answer only has to say whether it stuck.
+
+     An unticked box posts nothing at all, so there is one endpoint per check
+     and the URL carries which one it is. A body holding only this field says
+     off by being empty; the same absence inside a form of twelve fields cannot
+     be told from a field that was never rendered.
+
+     want is captured before the request so Try again re-sends what the user
+     asked for, rather than the value the failure reverted to. The status line
+     is role="status" because the revert is script writing checked, and a
+     programmatic change announces nothing — without it the only sign the tick
+     did not stick is a pixel moving back. The CSRF token is in the django
+     variant. -->
+<ul data-kui="checkbox/htmx" class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+  <li class="px-4 py-2.5"
+      x-data="{ state: 'idle', want: false }"
+      @htmx:before-request.camel="want = $refs.box.checked; state = 'saving'"
+      @htmx:after-request.camel="
+        if ($event.detail.successful) { state = 'saved' }
+        else { $refs.box.checked = !want; state = 'failed' }">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" x-ref="box" name="done" value="1" checked
+             hx-post="/grn/GRN-24-0918/checks/weighbridge/"
+             hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="tabular-nums">Weighbridge slip attached — 2,945 kg net</span>
+    </label>
+    <p role="status" class="mt-1 pl-[26px] text-[12px]/4">
+      <span x-show="state === 'idle'" class="tabular-nums text-zinc-500">Recorded 05 Sep 2026, 09:12 by Anil Kulkarni</span>
+      <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+      </span>
+      <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+      </span>
+      <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the check is unchanged
+        </span>
+        <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                @click="$refs.box.checked = want; $refs.box.dispatchEvent(new Event('change'))">Try again</button>
+      </span>
+    </p>
+  </li>
+
+  <li class="px-4 py-2.5"
+      x-data="{ state: 'idle', want: false }"
+      @htmx:before-request.camel="want = $refs.box.checked; state = 'saving'"
+      @htmx:after-request.camel="
+        if ($event.detail.successful) { state = 'saved' }
+        else { $refs.box.checked = !want; state = 'failed' }">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" x-ref="box" name="done" value="1"
+             hx-post="/grn/GRN-24-0918/checks/coa/"
+             hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Certificate of analysis checked against the batch</span>
+    </label>
+    <p role="status" class="mt-1 pl-[26px] text-[12px]/4">
+      <span x-show="state === 'idle'" class="text-zinc-500">Not recorded</span>
+      <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+      </span>
+      <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+      </span>
+      <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the check is unchanged
+        </span>
+        <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                @click="$refs.box.checked = want; $refs.box.dispatchEvent(new Event('change'))">Try again</button>
+      </span>
+    </p>
+  </li>
+
+  <li class="px-4 py-2.5"
+      x-data="{ state: 'idle', want: false }"
+      @htmx:before-request.camel="want = $refs.box.checked; state = 'saving'"
+      @htmx:after-request.camel="
+        if ($event.detail.successful) { state = 'saved' }
+        else { $refs.box.checked = !want; state = 'failed' }">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" x-ref="box" name="done" value="1"
+             hx-post="/grn/GRN-24-0918/checks/damage/"
+             hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Damage or shortage noted on the challan</span>
+    </label>
+    <p role="status" class="mt-1 pl-[26px] text-[12px]/4">
+      <span x-show="state === 'idle'" class="text-zinc-500">Not recorded</span>
+      <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+      </span>
+      <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+      </span>
+      <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the check is unchanged
+        </span>
+        <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                @click="$refs.box.checked = want; $refs.box.dispatchEvent(new Event('change'))">Try again</button>
+      </span>
+    </p>
+  </li>
+</ul>

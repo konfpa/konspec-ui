@@ -1,0 +1,61 @@
+<!-- The exception to the rule, and the rule is worth restating: a switch does
+     not ask. Anything worth stopping for is a button with a verb on it. What
+     buys this one its question is that it lives among ordinary settings on a
+     vendor page — moving it out to a button breaks a list people read by
+     position — and that the same gesture cannot take it back, because
+     unblocking does not restore the orders nobody could raise.
+
+     The switch does not move while the question is open. It is driven by state
+     — :checked="on" with @click.prevent — rather than by its own checked
+     property, so a cancelled question leaves a switch that never moved instead
+     of one that moved and then moved back. A switch that moves first has
+     already told the user the thing happened.
+
+     Only one direction asks. Blocking is the hard way round; unblocking goes
+     straight through. Ask on both and you have written a button that has been
+     drawn as a switch.
+
+     Focus moves to Cancel when the question opens, never to the destructive
+     answer, and Escape or either button puts it back on the switch. Left where
+     it was, focus sits on a control that did not move while a question nobody
+     was told about waits underneath it.
+
+     The write goes on the confirming press, not on the switch: put hx-post on
+     the Block vendor button and never on the input, which is why nothing here
+     posts. If the question needs more than one sentence, or the page behind it
+     has to be held while it is asked, this is alert-dialog instead. -->
+<div data-kui="toggle/confirm" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
+     x-data="{ on: false, asking: false }"
+     @keydown.escape="if (asking) { asking = false; $refs.sw.focus() }">
+
+  <label class="flex items-start justify-between gap-4 py-1">
+    <span class="text-[14px]/5">Block new orders to Gujarat Polymers Ltd</span>
+    <input type="checkbox" role="switch" x-ref="sw" :checked="on"
+           @click.prevent="if (on) { on = false } else { asking = true; $nextTick(() => $refs.cancel.focus()) }"
+           aria-describedby="sw-block-help" class="peer sr-only">
+    <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+      <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+    </span>
+  </label>
+
+  <p id="sw-block-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">
+    Buyers can still receive against the 3 orders already open, worth ₹42,90,000.
+  </p>
+
+  <p role="status" class="mt-1 pr-13 text-[12px]/4">
+    <span x-show="!on" class="tabular-nums text-zinc-500">Not blocked. Last order raised 14 Aug 2026.</span>
+    <span x-show="on" x-cloak class="flex items-center gap-1.5 font-medium text-zinc-900">
+      <i data-lucide="alert-circle" class="size-3.5 shrink-0 text-red-600"></i>Blocked — no new order can be raised
+    </span>
+  </p>
+
+  <div x-show="asking" x-cloak class="mt-2.5 rounded-lg bg-zinc-50 p-3">
+    <p class="text-[13px]/5">Block Gujarat Polymers Ltd? Nobody can raise an order against them until this is switched back, and the 6 lines in draft will not submit.</p>
+    <div class="mt-2.5 flex flex-wrap gap-2">
+      <button type="button" @click="on = true; asking = false; $refs.sw.focus()"
+              class="inline-flex h-8 items-center rounded-lg border border-transparent bg-red-600 px-3 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Block vendor</button>
+      <button type="button" x-ref="cancel" @click="asking = false; $refs.sw.focus()"
+              class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+    </div>
+  </div>
+</div>

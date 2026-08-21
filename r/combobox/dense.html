@@ -1,0 +1,165 @@
+<!-- Eleven of these on one screen, one per order line. Dense is less padding
+     and not a smaller target: py-1.5 against 13px/5 text is a 34px control, the
+     height the dense controls in a register toolbar take, and the option rows
+     inside the popup stay at 36px because a row nobody can hit is not denser,
+     it is broken.
+
+     The card holds no overflow-hidden and the lines are a grid rather than a
+     table in a scroller. Either one clips the popup at the edge of the cell,
+     and a clipped popup has nothing to scroll it back into view. The popup is
+     pinned to both edges of the item cell, which is the widest column in the
+     grid for exactly this reason; drop a combobox into a 120px column and the
+     panel has to take a width of its own above sm and cap it at the viewport.
+
+     z-20 on the panel is what puts it over the lines below, whose cells are
+     positioned too and would otherwise paint on top of it in document order.
+
+     Every id is built from the line number, never from the loop index. Deleting
+     line 2 renumbers every index after it, and a label whose for points at the
+     old index now names the row below the one it sits on.
+
+     Each line is a fieldset with an sr-only legend, so eleven controls called
+     Item are announced as "line 4, Item". No padding on the fieldset — a legend
+     is laid out in the block-start border area — so the grid goes on a div
+     inside it. Below md the column headings are gone, so each cell shows its own
+     label; the headings are aria-hidden because they are a ruler for a grid
+     that is not a table. -->
+<div data-kui="combobox/dense" class="max-w-3xl"
+     x-data="{
+       items: [
+         { id: 'ms-plt', label: 'MS plate 10 mm, IS 2062 E250', code: 'ITM-4471', rate: '₹62.40 / kg' },
+         { id: 'ms-ang', label: 'MS angle 50 × 50 × 6 mm', code: 'ITM-4488', rate: '₹58.90 / kg' },
+         { id: 'ht-bolt', label: 'HT bolt M16 × 60, grade 8.8', code: 'ITM-5102', rate: '₹18.50 / no' },
+         { id: 'hex-nut', label: 'Hex nut M16, grade 8', code: 'ITM-5117', rate: '₹4.20 / no' },
+         { id: 'ldpe', label: 'LDPE granules, film grade', code: 'ITM-6203', rate: '₹96.75 / kg' },
+         { id: 'carton', label: 'Carton 600 × 400 × 300, 5-ply', code: 'ITM-8110', rate: '₹34.10 / no' }
+       ],
+       lines: [
+         { n: 1, item: 'ms-plt', qty: '4,200' },
+         { n: 2, item: 'ht-bolt', qty: '600' },
+         { n: 3, item: '', qty: '' }
+       ],
+       find(id) { return this.items.find(x => x.id === id) || null; },
+       label(id) { const o = this.find(id); return o ? o.label : ''; },
+       rate(id) { const o = this.find(id); return o ? o.rate : '—'; }
+     }">
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div aria-hidden="true"
+         class="hidden border-b border-zinc-200 bg-zinc-50 px-3 py-2 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase md:grid md:grid-cols-[minmax(0,1fr)_6rem_9rem] md:gap-3">
+      <span>Item</span>
+      <span class="text-right">Quantity</span>
+      <span class="text-right">Contract rate</span>
+    </div>
+
+    <template x-for="l in lines" :key="l.n">
+      <fieldset class="border-b border-zinc-100 last:border-b-0">
+        <legend class="sr-only" x-text="'Line ' + l.n"></legend>
+
+        <div class="grid gap-2 px-3 py-2 md:grid-cols-[minmax(0,1fr)_6rem_9rem] md:items-center md:gap-3">
+
+          <div class="relative min-w-0"
+               x-data="{
+                 open: false, typed: false, q: '', ai: 0,
+                 name(id) { const o = items.find(x => x.id === id); return o ? o.label : ''; },
+                 get list() {
+                   if (!this.typed) return items;
+                   const s = this.q.trim().toLowerCase();
+                   return items.filter(o => (o.label + ' ' + o.code).toLowerCase().includes(s));
+                 },
+                 rowId(o) { return 'cb-line-' + l.n + '-' + o.id; },
+                 get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+                 scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+                 show() {
+                   if (this.open) return;
+                   this.open = true; this.typed = false;
+                   this.ai = Math.max(0, this.list.findIndex(o => o.id === l.item));
+                   this.scroll();
+                 },
+                 close() { this.open = false; this.typed = false; this.q = this.name(l.item); },
+                 move(n) {
+                   if (!this.open) { this.show(); return; }
+                   if (!this.list.length) return;
+                   this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+                   this.scroll();
+                 },
+                 edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+                 pick(o) { l.item = o.id; this.close(); this.$refs.q.focus(); },
+                 commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+               }"
+               x-init="q = name(l.item)"
+               @click.outside="close()"
+               @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+            <label :for="'cb-line-' + l.n"
+                   class="mb-1 block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase md:sr-only">Item</label>
+
+            <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input :id="'cb-line-' + l.n" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+                     aria-autocomplete="list" :aria-controls="'cb-line-' + l.n + '-list'"
+                     :aria-expanded="open" :aria-activedescendant="activeId"
+                     placeholder="Item or code"
+                     @click="show()"
+                     @input="typed = true; open = true; ai = 0"
+                     @keydown.arrow-down.prevent="move(1)"
+                     @keydown.arrow-up.prevent="move(-1)"
+                     @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+                     @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+                     @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+                     @keydown.tab="close()"
+                     class="w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+              <span class="mr-2 flex size-4 shrink-0 items-center justify-center transition-transform motion-reduce:transition-none"
+                    :class="open && 'rotate-180'">
+                <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+              </span>
+            </div>
+
+            <input type="hidden" :name="'lines-' + (l.n - 1) + '-item'" :value="l.item">
+
+            <p role="status" class="sr-only"
+               x-text="open ? (list.length === 1 ? '1 item matches' : list.length + ' items match') : ''"></p>
+
+            <div x-show="open" x-cloak
+                 class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+              <div :id="'cb-line-' + l.n + '-list'" role="listbox" :aria-label="'Item master, line ' + l.n"
+                   class="max-h-56 overflow-y-auto py-1">
+                <template x-for="(o, i) in list" :key="o.id">
+                  <div :id="rowId(o)" role="option" :aria-selected="o.id === l.item"
+                       @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+                       :class="i === ai ? 'bg-zinc-100' : ''"
+                       class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+                    <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+                    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.code"></span>
+                  </div>
+                </template>
+              </div>
+              <div x-show="!list.length" x-cloak class="px-3 py-4 text-center">
+                <p class="text-[13px]/5 font-medium">No item matches “<span x-text="q"></span>”</p>
+                <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Codes run from ITM-4000 upwards.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="min-w-0">
+            <label :for="'cb-qty-' + l.n"
+                   class="mb-1 block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase md:sr-only">Quantity</label>
+            <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input :id="'cb-qty-' + l.n" x-model="l.qty" inputmode="decimal" placeholder="0"
+                     :name="'lines-' + (l.n - 1) + '-qty'"
+                     class="w-full min-w-0 bg-transparent px-2.5 py-1.5 text-right text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <p class="flex items-baseline justify-between gap-2 md:justify-end">
+            <span aria-hidden="true" class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase md:hidden">Contract rate</span>
+            <span class="text-[13px]/5 tabular-nums text-zinc-600">
+              <span class="sr-only">Contract rate </span><span x-text="rate(l.item)"></span>
+            </span>
+          </p>
+        </div>
+      </fieldset>
+    </template>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">The rate is read off the live rate contract when the item is committed. Line 3 posts a blank item, which the formset drops as an unchanged extra form.</p>
+</div>

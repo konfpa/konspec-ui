@@ -19,6 +19,22 @@
      clears the rows in script — otherwise last search's answer sits there under
      a query that did not produce it.
 
+     A request that failed is the same problem with a worse cause: the rows on
+     screen are the answer to an older query, and leaving them under an error
+     that says the search did not answer invites somebody to pick one. They go,
+     and Retry sends the query that failed rather than asking the user to type a
+     character they did not want to type. The trigger list carries a second
+     event for it — the [this.value.length > 1] filter belongs to input alone,
+     so the floor is re-checked in the handler before the event is dispatched.
+
+     The failure is announced as well as drawn. A red line inside a popup is
+     nothing at all to a screen reader if the live region only ever reports
+     counts.
+
+     Retry is a control inside the popup, so this field closes on focus leaving
+     it rather than on Tab — the same reason select-all does. Close on Tab and
+     the only way out of a failed search is the mouse.
+
      The search box is named q, never vendor. The value is the hidden input, and
      a Django form ignores a POST key it has no field for. -->
 <div data-kui="combobox/remote" class="relative max-w-md"
@@ -40,6 +56,7 @@
          this.ai = Math.min(r.length - 1, Math.max(0, this.ai + n));
          this.paint();
        },
+       edge(end) { const r = this.rows(); if (!r.length) return; this.ai = end ? r.length - 1 : 0; this.paint(); },
        take(el) {
          if (!el) return;
          this.sel = el.dataset.value; this.label = el.dataset.label; this.term = this.label;
@@ -53,12 +70,19 @@
          this.term = v; this.open = true; this.failed = false;
          if (v.trim().length < 2) { this.searched = false; this.empty = false; this.$refs.list.innerHTML = ''; }
        },
+       retry() {
+         if (this.$refs.q.value.trim().length < 2) { this.$refs.q.focus(); return; }
+         this.$refs.q.dispatchEvent(new Event('retry'));
+       },
        close() { this.open = false; this.aid = null; this.term = this.label; this.$refs.q.value = this.label; }
      }"
      @click.outside="close()"
+     @focusout="if (open && !$el.contains($event.relatedTarget)) close()"
      @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }"
      @htmx:before-request.camel="loading = true; failed = false; open = true"
-     @htmx:after-request.camel="loading = false; if (!$event.detail.successful) failed = true"
+     @htmx:after-request.camel="
+       loading = false;
+       if (!$event.detail.successful) { failed = true; searched = false; empty = false; $refs.list.innerHTML = '' }"
      @htmx:after-swap.camel="searched = true; ai = 0; $nextTick(() => { empty = rows().length === 0; paint() })">
 
   <label for="cb-remote" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
@@ -70,14 +94,15 @@
            :aria-expanded="open" :aria-activedescendant="aid"
            placeholder="Type two characters to search"
            hx-get="/vendors/search/"
-           hx-trigger="input[this.value.length > 1] changed delay:300ms"
+           hx-trigger="input[this.value.length > 1] changed delay:300ms, retry"
            hx-target="#cb-remote-list" hx-swap="innerHTML" hx-sync="this:replace"
            @click="open = true"
            @input="changed($event.target.value)"
            @keydown.arrow-down.prevent="move(1)"
            @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
            @keydown.enter="if (open) { $event.preventDefault(); commit() }"
-           @keydown.tab="close()"
            class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
     <span class="mr-3 flex size-4 shrink-0 items-center justify-center" x-show="loading" x-cloak>
       <i data-lucide="loader-circle" class="size-4 animate-spin text-zinc-600"></i>
@@ -87,7 +112,9 @@
   <input type="hidden" name="vendor" :value="sel">
 
   <p role="status" class="sr-only"
-     x-text="loading ? 'Searching vendors' : (searched ? (empty ? 'No vendor matches' : 'Vendors listed') : '')"></p>
+     x-text="loading ? 'Searching vendors'
+             : (failed ? 'The vendor search did not answer'
+             : (searched ? (empty ? 'No vendor matches' : 'Vendors listed') : ''))"></p>
 
   <div x-show="open" x-cloak
        class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
@@ -119,7 +146,11 @@
       <p class="flex items-center justify-center gap-1.5 text-[13px]/5 font-medium text-red-600">
         <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>The vendor search did not answer
       </p>
-      <p class="mt-1 text-[12px]/4 text-zinc-500">Type another character to try again.</p>
+      <p class="mt-1 text-[12px]/4 text-zinc-500">Nothing was lost. The last search is still in the box.</p>
+      <button type="button" @mousedown.prevent @click="retry()"
+              class="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="rotate-ccw" class="size-3.5 text-zinc-600"></i>Search again
+      </button>
     </div>
   </div>
 </div>

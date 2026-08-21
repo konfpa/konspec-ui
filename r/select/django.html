@@ -33,6 +33,20 @@
 
          def __init__(self, *args, **kwargs):
              super().__init__(*args, **kwargs)
+             # A record can hold a value the live choices no longer contain — a
+             # blocked vendor, an expired contract. ChoiceField cannot render
+             # what is not in choices, so the field comes up on the first option
+             # and an untouched save moves the order to a vendor nobody chose.
+             # Put the current value back so it can be drawn, and refuse it in
+             # clean_vendor: the widget draws, the validator says no.
+             self.withdrawn = None
+             current = self.initial.get('vendor')
+             if current and current not in {v for v, _ in VENDOR_CHOICES}:
+                 self.withdrawn = current
+                 self.fields['vendor'].choices = [
+                     ('No longer available', [(current, Vendor.label_for(current))]),
+                     ('Approved vendors', VENDOR_CHOICES)]
+
              # aria-invalid and aria-describedby cannot be decided in the
              # template — the widget attrs are fixed before it renders — and
              # this is the only place that knows both the errors and the ids.
@@ -41,6 +55,16 @@
                  attrs['aria-describedby'] = bf.auto_id + ('-err' if bf.errors else '-help')
                  if bf.errors:
                      attrs['aria-invalid'] = 'true'
+
+         def clean_vendor(self):
+             # The option was added so the draft could show its own value, not
+             # so it could be saved again. Rendering it and validating it are
+             # two different questions and only this one reaches the database.
+             value = self.cleaned_data['vendor']
+             if value == self.withdrawn:
+                 raise forms.ValidationError(
+                     'This vendor is blocked. Choose another before releasing the order.')
+             return value
 
      widgets.py
          class PlaceholderSelect(forms.Select):
@@ -62,20 +86,41 @@
              # the fragment only: options, and nothing around them
              return render(request, 'orders/_contract_options.html', {'rows': rows})
 
+         @require_POST
+         def order_buyer(request, number):
+             # The autosave variant's endpoint. One field, one URL, and a 204
+             # so nothing is swapped — the browser painted the new option the
+             # moment it was chosen, and anything 4xx or 5xx is what puts it
+             # back. ChoiceField is doing the same job here as in the form: it
+             # is the only thing between a POST anybody can forge and the row.
+             order = get_object_or_404(PurchaseOrder, number=number)
+             form = BuyerForm(request.POST)
+             if not form.is_valid():
+                 return HttpResponseBadRequest()
+             order.buyer_id = form.cleaned_data['buyer']
+             order.save(update_fields=['buyer_id'])
+             return HttpResponse(status=204)
+
      urls.py
          path('rate-contracts/options/', views.contract_options,
               name='contract-options'),
+         path('orders/<str:number>/buyer/', views.order_buyer, name='order-buyer'),
 
      The widget renders the <select> and only the <select>. The wrapper, the
      chevron and the focus outline are template markup, so {{ form.vendor }} on
      its own is never the whole field — which is the one thing that catches
-     everybody who has used a crispy-forms style renderer before. -->
+     everybody who has used a crispy-forms style renderer before.
+
+     A select that posts on its own, outside a form, has no CSRF token to find,
+     so the card round it carries one:
+
+         <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'> … </div> -->
 <form data-kui="select/django" method="post" class="max-w-md space-y-5">
   {% csrf_token %}
 
   <div>
     <label for="{{ form.vendor.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
-      {{ form.vendor.label }} <span class="text-red-600">*</span>
+      {{ form.vendor.label }} <span aria-hidden="true" class="text-red-600">*</span>
     </label>
 
     <div class="relative rounded-lg bg-white {% if form.vendor.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
@@ -103,7 +148,7 @@
     <p id="{{ form.plant.auto_id }}-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
   </div>
 
-  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Raise order
   </button>
 </form>

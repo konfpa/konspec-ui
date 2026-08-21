@@ -1,0 +1,85 @@
+<!-- htmx asks; Alpine never fetches. Alpine's whole job here is copying the
+     answer onto the control, because the swap lands in the paragraph and
+     aria-invalid has to be on the input.
+
+     The state is read out of the fragment rather than kept a second time in
+     x-data. The server sends a marker on the message it renders, init() reads
+     it at first paint and every swap reads it again, so the border and the
+     words under it cannot disagree — which they will the moment two copies of
+     the same fact exist. $el.querySelector rather than $refs, because $refs is
+     not populated yet while init() runs.
+
+     The trigger filter binds to the event name, not to the end of the spec:
+     input[this.value.length > 3] changed delay:400ms. Written the other way
+     round it is parsed as part of the modifier and the four-character floor
+     never applies. delay is a debounce and not a throttle, hx-sync this:replace
+     drops a request still in flight so a slow early reply cannot land last, and
+     blur is in the trigger list so a value pasted and left inside the debounce
+     window is still checked. Below the floor nothing fires, so deleting back to
+     three characters clears the message in script or the last answer sits there
+     under a value that did not produce it.
+
+     The field is never disabled while the request is in flight. Disabling the
+     control that has focus moves focus to the body and drops every keystroke
+     typed during the round trip, which is exactly what a 400ms debounce
+     guarantees will happen. The spinner goes in the trailing slot instead.
+
+     None of this is validation. It says the number was free 400ms ago, and two
+     people can be told that inside the same second — the constraint is on the
+     table and the submit checks again. What it buys is that the second person
+     finds out now rather than after filling in the rest of the receipt.
+
+     Django needs the CSRF token on the request; that is in the django variant. -->
+<div data-kui="input/htmx" class="max-w-xl"
+     x-data="{
+       state: 'idle',
+       taken: false,
+       msg() { return this.$el.querySelector('#in-hx-msg'); },
+       read() { this.taken = !!this.msg().querySelector('[data-state=taken]'); },
+       clear() { this.msg().innerHTML = ''; this.taken = false; this.state = 'idle'; },
+       init() { this.read(); }
+     }"
+     @htmx:before-request.camel="state = 'checking'"
+     @htmx:after-request.camel="state = $event.detail.successful ? 'idle' : 'failed'"
+     @htmx:after-swap.camel="read()">
+
+  <label for="in-hx-inv" class="mb-1.5 block text-[13px]/5 font-medium">Vendor invoice number <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div class="flex items-center rounded-lg border bg-white"
+       :class="taken ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
+                     : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
+    <input id="in-hx-inv" name="invoice_no" value="GPL/26-27/0418"
+           autocomplete="off" spellcheck="false"
+           :aria-invalid="taken ? 'true' : null"
+           aria-describedby="in-hx-msg in-hx-net"
+           hx-post="/grn/invoice-no/check/"
+           hx-trigger="input[this.value.length > 3] changed delay:400ms, blur"
+           hx-include="[name='vendor']"
+           hx-target="#in-hx-msg" hx-swap="innerHTML" hx-sync="this:replace"
+           @input="if ($el.value.trim().length < 4) clear()"
+           class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 outline-none">
+
+    <span class="mr-3 flex size-4 shrink-0 items-center justify-center" x-show="state === 'checking'" x-cloak>
+      <i data-lucide="loader-circle" aria-hidden="true" class="size-4 animate-spin text-zinc-600"></i>
+    </span>
+  </div>
+
+  <input type="hidden" name="vendor" value="gujarat-polymers">
+
+  <!-- htmx swaps into this paragraph and never over it. Replace the region
+       itself and the message arrives inside an element that was never a live
+       region, so nothing is announced. -->
+  <p id="in-hx-msg" role="status" class="mt-1.5 text-[12px]/4 tabular-nums"
+     :class="taken ? 'font-medium text-red-600' : 'text-zinc-500'">
+    <span data-state="taken" class="flex items-start gap-1.5">
+      <i data-lucide="alert-circle" aria-hidden="true" class="mt-0.5 size-3.5 shrink-0"></i>
+      <span>Gujarat Polymers Ltd already invoiced GPL/26-27/0418 on GRN-24-0912, 14 Aug 2026.</span>
+    </span>
+  </p>
+
+  <!-- the transport, not the answer, and a region of its own because htmx owns
+       the paragraph above and would swap anything put in it away -->
+  <p id="in-hx-net" role="status" x-show="state === 'failed'" x-cloak class="mt-1.5 text-[12px]/4 text-zinc-500">
+    The duplicate check could not be reached. The receipt can still be posted; the server checks again on submit.
+  </p>
+</div>

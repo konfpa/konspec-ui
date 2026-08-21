@@ -1,0 +1,62 @@
+<!-- One rule decides all three of these. A qualifier goes in the name when it
+     changes the value, and stays out of it when it explains how to enter one.
+
+     Received quantity keeps its (MT) because the same item is bought in tonnes
+     on the rate contract and issued in kilograms at the plant, so 8.500 and
+     8,500 are both plausible answers and the name is the only thing on the
+     screen that says which is wanted. Take the unit out of the label and the
+     field is ambiguous to everybody, not only to a screen reader.
+
+     Rate does the opposite. Its unit is fixed and it is printed inside the box
+     at the point of typing, so it is a description: the span carries an id and
+     aria-describedby names it before the help line, because the order the ids
+     are written in is the order they are read in. Making it a second
+     <label for> on the same id would work — two labels are concatenated in
+     document order — but then the field is called "Rate per MT" everywhere,
+     including in a voice command, and the unit is not what distinguishes this
+     field from the others on the form.
+
+     Vendor invoice number carries nothing in its label. "Exactly as printed"
+     is advice about typing, it is the same advice on every one of these
+     fields, and in the label it is read back in full on every focus. The ₹ is
+     aria-hidden for the same reason the asterisk is: it is a glyph the reader
+     would pronounce, and the amount is already described as a rate. -->
+<div data-kui="label/unit" class="max-w-xl space-y-5">
+  <div>
+    <label for="lb-u-qty" class="mb-1.5 block text-[13px]/5 font-medium">Received quantity (MT)</label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="lb-u-qty" name="received_qty" value="8.500" inputmode="decimal"
+             aria-describedby="lb-u-qty-help"
+             class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="lb-u-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+      Net weight off the weighbridge slip, to three decimals.
+    </p>
+  </div>
+
+  <div>
+    <label for="lb-u-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white pl-3 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <span aria-hidden="true" class="shrink-0 text-[14px]/5 text-zinc-500">₹</span>
+      <input id="lb-u-rate" name="rate" value="1,04,400" inputmode="numeric"
+             aria-describedby="lb-u-rate-unit lb-u-rate-help"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      <span id="lb-u-rate-unit" class="shrink-0 pr-3 text-[14px]/5 text-zinc-600">per MT</span>
+    </div>
+    <p id="lb-u-rate-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+      Rate contract RC-2026-014 quotes ₹1,04,400. Anything above it needs the plant head.
+    </p>
+  </div>
+
+  <div>
+    <label for="lb-u-inv" class="mb-1.5 block text-[13px]/5 font-medium">Vendor invoice number</label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="lb-u-inv" name="vendor_invoice" value="INV/26-27/0418"
+             aria-describedby="lb-u-inv-help"
+             class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="lb-u-inv-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+      Exactly as printed, series prefix and all. The three-way match is done on this string.
+    </p>
+  </div>
+</div>

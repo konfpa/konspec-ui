@@ -1,0 +1,52 @@
+<!-- The other place the buttons can go, and the choice is not cosmetic. The
+     footer variant puts them inside the ring because there the field is the
+     whole feature: one box, one verb, and the wrapper border is the edge of the
+     thing being acted on. Here the box is one field of a form — there is a
+     checkbox under it that decides who gets emailed — so the buttons belong to
+     the form and sit outside the ring. Draw a Post button inside the ring of
+     one field in a multi-field form and it says it posts that field; the first
+     person who writes the comment, leaves the checkbox alone and presses it
+     finds out that it did not.
+
+     For the same reason there is no Ctrl-Enter shortcut here. A keyboard post
+     from inside the box would jump the checkbox that sits between the box and
+     the button, which is exactly the field the shortcut cannot see.
+
+     Cancel is never disabled. The primary goes off while the box is empty
+     because there is nothing to send, but the way out of a form must not depend
+     on what is in it. Cancel empties the box here; in a panel it closes the
+     panel, and it is the same button in the same place either way. Where
+     leaving throws away a paragraph somebody typed, the two-press arm from
+     button/confirm goes on this button — it belongs to the button and not to
+     the field, which is why it is not written out again here.
+
+     Below sm the row reverses into a column and both buttons go full width,
+     primary on top. Two 36px buttons side by side at 390px are two thumb-wide
+     targets with a gap between them that is also thumb-wide. -->
+<form data-kui="textarea/actions" method="post" class="max-w-xl" x-data="{ text: '' }">
+  <label for="ta-act" class="mb-1.5 block text-[13px]/5 font-medium">Internal comment</label>
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <textarea id="ta-act" name="body" rows="4" x-ref="body" x-model="text"
+              aria-describedby="ta-act-help"
+              placeholder="What the buyer needs to know before this goes back to the vendor"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
+  </div>
+  <p id="ta-act-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Internal to Konspec. The vendor never sees this.</p>
+
+  <label class="mt-3 flex items-start gap-2.5 py-1 text-[14px]/5">
+    <input type="checkbox" name="notify" value="buyer" checked
+           class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+    <span>Email Ritu Deshpande when it is posted</span>
+  </label>
+
+  <div class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    <button type="button" @click="text = ''; $refs.body.focus()"
+            class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Cancel
+    </button>
+    <button type="submit" :disabled="!text.trim()"
+            class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
+      Post comment
+    </button>
+  </div>
+</form>

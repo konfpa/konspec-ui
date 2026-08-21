@@ -1,0 +1,127 @@
+<!-- The control sets the row height, not the other way round. A 34px select in
+     a table whose read-only rows are 28px makes the rows taller, and that is
+     the honest outcome: trim the select to fit the row instead and the chevron
+     has nowhere left to draw, the option text clips, and the target drops under
+     what WCAG 2.2 asks for. An editable grid is a grid of controls.
+
+     Every select carries an aria-label rather than a <label for>, and the label
+     names the row as well as the column. A <th scope="col"> establishes the
+     column for anything reading the table as a table and contributes nothing to
+     the accessible name of a control that has been tabbed to, so a column of
+     these otherwise announces as four unnamed comboboxes reading out numbers.
+
+     aria-label is also the only thing that works here, because the same four
+     lines are drawn twice — a table above md and cards below it — and one
+     for/id pair cannot serve two copies of one control. Two ids for one field
+     is how a label ends up pointing at the copy that is display:none.
+
+     The GST options are written out rather than looped. x-model writes the
+     model into the control while its own directives initialise, which is before
+     an x-for inside it has produced anything to select, so a looped list comes
+     up with nothing chosen — an empty box on a line that has a rate, and the
+     next click is somebody setting a value that was already there.
+
+     The rows take no hover fill. Nothing happens when the row is clicked — the
+     controls in it are what respond — and a band that lights up under a cursor
+     that can do nothing with it is a promise the row does not keep.
+
+     The total is the confirmation that the change landed, so the live region is
+     on the page from first paint with the figure already in it. The two visible
+     totals are ordinary text: only one of them is displayed at any width, and a
+     live region inside a display:none block announces nothing anyway. -->
+<div data-kui="select/cell" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       lines: [
+         { id: 'L1', code: 'ITM-1042', name: 'HDPE granules — natural', qty: '1,200 kg', base: 1044000, rate: '18' },
+         { id: 'L2', code: 'ITM-1091', name: 'Masterbatch — white 60%', qty: '250 kg', base: 61250, rate: '18' },
+         { id: 'L3', code: 'ITM-3310', name: 'M12 hex bolt — 8.8 zinc', qty: '4,000 nos', base: 96000, rate: '18' },
+         { id: 'L4', code: 'ITM-5140', name: 'Stretch film — 23 micron', qty: '300 kg', base: 52500, rate: '12' }
+       ],
+       amount(l) { return l.base + Math.round(l.base * Number(l.rate) / 100); },
+       get total() { return this.lines.reduce((s, l) => s + this.amount(l), 0); },
+       fmt(n) { return '₹' + n.toLocaleString('en-IN'); }
+     }">
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-1.5 font-medium">Item</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Quantity</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Taxable</th>
+        <th scope="col" class="w-28 px-3 py-1.5 font-medium">GST</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Line total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="l in lines" :key="l.id">
+        <tr class="border-b border-zinc-100">
+          <td class="px-3 py-1.5">
+            <span class="block" x-text="l.name"></span>
+            <span class="block text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code"></span>
+          </td>
+          <td class="px-3 py-1.5 text-right tabular-nums" x-text="l.qty"></td>
+          <td class="px-3 py-1.5 text-right tabular-nums" x-text="fmt(l.base)"></td>
+          <td class="px-3 py-1.5">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="l.rate" :aria-label="'GST rate for ' + l.name"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-7 pl-2 text-[13px]/5 tabular-nums outline-none">
+                <option value="0">0%</option>
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18">18%</option>
+                <option value="28">28%</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </td>
+          <td class="px-3 py-1.5 text-right font-medium tabular-nums" x-text="fmt(amount(l))"></td>
+        </tr>
+      </template>
+    </tbody>
+    <tfoot>
+      <tr class="bg-zinc-50">
+        <td colspan="4" class="px-3 py-2 text-right text-[12px]/4 font-medium text-zinc-600">Order value including GST</td>
+        <td class="px-3 py-2 text-right font-medium tabular-nums" x-text="fmt(total)"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- the same four lines at 390px. The select keeps its 34px and takes a width
+       of its own here, because a full-width control in a card reads as the
+       field the card is about rather than as one column of it. -->
+  <div class="divide-y divide-zinc-100 md:hidden">
+    <template x-for="l in lines" :key="l.id">
+      <div class="px-3 py-3">
+        <p class="text-[13px]/5 font-medium" x-text="l.name"></p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <span x-text="l.code"></span> · <span x-text="l.qty"></span> · <span x-text="fmt(l.base)"></span>
+        </p>
+        <div class="mt-2 flex items-center gap-3">
+          <div class="relative w-24 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select x-model="l.rate" :aria-label="'GST rate for ' + l.name"
+                    class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-7 pl-2 text-[13px]/5 tabular-nums outline-none">
+              <option value="0">0%</option>
+              <option value="5">5%</option>
+              <option value="12">12%</option>
+              <option value="18">18%</option>
+              <option value="28">28%</option>
+            </select>
+            <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-zinc-600">
+              <i data-lucide="chevron-down" class="size-3.5"></i>
+            </span>
+          </div>
+          <span class="ml-auto text-[13px]/5 font-medium tabular-nums" x-text="fmt(amount(l))"></span>
+        </div>
+      </div>
+    </template>
+
+    <div class="flex items-center justify-between gap-3 bg-zinc-50 px-3 py-2">
+      <span class="text-[12px]/4 font-medium text-zinc-600">Order value including GST</span>
+      <span class="text-[13px]/5 font-medium tabular-nums" x-text="fmt(total)"></span>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="'Order value including GST ' + fmt(total)"></p>
+</div>

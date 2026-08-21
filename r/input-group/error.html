@@ -18,10 +18,10 @@
      The red text is the message under the box, and it says the number it is
      comparing against — "invalid" tells nobody what to type instead. -->
 <div data-kui="input-group/error" class="max-w-xl">
-  <label for="ig8-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity <span class="text-red-600">*</span></label>
+  <label for="ig8-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity <span aria-hidden="true" class="text-red-600">*</span></label>
 
   <div class="flex items-stretch rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
-    <input id="ig8-qty" name="qty" inputmode="decimal" value="4,200.000"
+    <input id="ig8-qty" name="qty" inputmode="decimal" value="4,200.000" required
            aria-invalid="true" aria-describedby="ig8-qty-err"
            class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
     <label for="ig8-uom" class="sr-only">Unit of measure</label>

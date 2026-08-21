@@ -1,33 +1,51 @@
 <!-- Drop-in replacement for {{ form.attachment }} when the field is a FileField.
      Django's ClearableFileInput renders exactly three things: the current file
      link, a clear checkbox named <field>-clear, and the new file input. Keep all
-     three names or the POST does not clear the file.
+     three names or the POST does not clear the file. Its ids are Django's own:
+     id_attachment for the input, attachment-clear_id for the checkbox.
 
-     {% if form.attachment.value %} … {% endif %} guards the first two. -->
-<div data-kui="attachment/django">
+     {% if form.attachment.value %} … {% endif %} guards the first two.
+
+     enctype="multipart/form-data" is on the <form> here rather than in a note
+     under it. It used to be a red line rendered on the page, which is a message
+     to the developer sitting in the space the user reads for messages about
+     their own record — and it stayed there after the form was fixed. Without
+     the attribute request.FILES arrives empty and the view sees a valid form
+     with no file in it.
+
+     Errors come from form.attachment.errors, not from a hand-written check.
+     FileField already enforces required, and a max size validator on the field
+     reports through the same list. -->
+<form data-kui="attachment/django" method="post" enctype="multipart/form-data" class="max-w-xl">
+  {% csrf_token %}
+
   <label for="id_attachment" class="mb-1.5 block text-[13px]/5 font-medium">Attachment</label>
 
   <div class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
-    <a href="/media/po/quotation-sharma-aug.pdf" class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-900 underline underline-offset-2">quotation-sharma-aug.pdf</a>
+    <a href="/media/po/quotation-sharma-aug.pdf" class="min-w-0 flex-1 truncate rounded-sm text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">quotation-sharma-aug.pdf</a>
     <label class="flex shrink-0 items-center gap-2 text-[12px]/4 text-zinc-600">
       <input type="checkbox" name="attachment-clear" id="attachment-clear_id"
-             class="size-4 rounded border-zinc-200 text-zinc-700">
+             class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       Clear
     </label>
   </div>
 
   <div class="mt-2">
-    <input type="file" name="attachment" id="id_attachment" class="peer sr-only">
+    <input type="file" name="attachment" id="id_attachment" aria-describedby="id_attachment_helptext" class="peer sr-only">
     <label for="id_attachment"
            class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
       <i data-lucide="upload" class="size-4"></i>Choose a replacement
     </label>
   </div>
 
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Uploading a new file replaces the current one.</p>
-  <p class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
-    <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>
-    Remember enctype="multipart/form-data" on the &lt;form&gt;, or request.FILES arrives empty.
+  <p id="id_attachment_helptext" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    PDF or JPG, up to 10 MB. Uploading a new file replaces the current one.
   </p>
-</div>
+
+  {% if form.attachment.errors %}
+    <p class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>{{ form.attachment.errors.0 }}
+    </p>
+  {% endif %}
+</form>

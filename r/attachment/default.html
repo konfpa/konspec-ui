@@ -1,5 +1,14 @@
+<!-- The panel heading is a <p>, not a <label>. A <label> with no for and no
+     control inside it is bound to nothing: clicking it does nothing and it is
+     announced as the label of whatever the browser guesses. The one real label
+     here belongs to the file input and reads "Browse files", which is also the
+     visible words on it.
+
+     The limit line has an id and the input points at it with aria-describedby,
+     so the constraint is read out when focus lands on the picker rather than
+     only being visible to somebody looking at the middle of the zone. -->
 <div data-kui="attachment/default" x-data="{ depth: 0 }">
-  <label class="mb-1.5 block text-[13px]/5 font-medium">Attachments</label>
+  <p id="po-files-label" class="mb-1.5 text-[13px]/5 font-medium">Attachments</p>
 
   <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
        class="rounded-lg border border-dashed px-4 py-5 transition"
@@ -7,28 +16,28 @@
     <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
       <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
       <span class="text-[13px]/5 text-zinc-600">Drag files here or</span>
-      <input type="file" id="po-files" name="attachments" multiple class="peer sr-only">
+      <input type="file" id="po-files" name="attachments" multiple aria-describedby="po-files-limit" class="peer sr-only">
       <label for="po-files"
              class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
         Browse files
       </label>
-      <span class="text-[12px]/4 text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</span>
+      <span id="po-files-limit" class="text-[12px]/4 tabular-nums text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</span>
     </div>
   </div>
 
-  <ul class="mt-2 space-y-2">
+  <ul aria-labelledby="po-files-label" class="mt-2 space-y-2">
     <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
       <div class="min-w-0 flex-1">
         <p class="truncate text-[13px]/5 font-medium">quotation-sharma-extrusions-aug.pdf</p>
-        <p class="text-[12px]/4 text-zinc-500">248 KB · Ritu Deshpande · 19 Aug 2024</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">248 KB · Ritu Deshpande · 19 Aug 2026</p>
       </div>
       <a href="#" aria-label="Download quotation-sharma-extrusions-aug.pdf"
-         class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+         class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="download" class="size-4"></i>
       </a>
       <button type="button" aria-label="Remove quotation-sharma-extrusions-aug.pdf"
-              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="x" class="size-4"></i>
       </button>
     </li>
@@ -36,14 +45,14 @@
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="sheet" class="size-4 text-zinc-600"></i></span>
       <div class="min-w-0 flex-1">
         <p class="truncate text-[13px]/5 font-medium">rate-comparison-q3.xlsx</p>
-        <p class="text-[12px]/4 text-zinc-500">54 KB · Anil Kulkarni · 14 Aug 2024</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">54 KB · Anil Kulkarni · 14 Aug 2026</p>
       </div>
       <a href="#" aria-label="Download rate-comparison-q3.xlsx"
-         class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+         class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="download" class="size-4"></i>
       </a>
       <button type="button" aria-label="Remove rate-comparison-q3.xlsx"
-              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="x" class="size-4"></i>
       </button>
     </li>

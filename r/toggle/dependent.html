@@ -1,0 +1,70 @@
+<!-- The block under the switch is not a second setting, it is the qualifier
+     for the first one: "3 days before" means nothing while reminders are off,
+     so it is revealed rather than disabled in place. The group variant does the
+     opposite, and the test between them is whether the dependants are settings
+     in their own right — those stay on screen and go disabled, because a list
+     that changes length is a list nobody can scan by position.
+
+     Everything inside the block writes on change, the same contract the switch
+     itself has. Put one field in here that only lands on a Save and the card
+     needs a Save button, and the switch above it has quietly become a checkbox.
+
+     The switch takes no aria-expanded. It already announces on and off, and a
+     second expanded state on the same control is two states where there is one.
+     The block follows it in the DOM, so it is the next thing read.
+
+     x-collapse animates the wrapper, so the wrapper carries nothing but x-show,
+     x-collapse and the divider: box-sizing is border-box, and height:0 cannot go
+     below a padding of its own, so the panel would bottom out at the padding and
+     then vanish in a single frame. The padding lives on the inner div. There is
+     no x-cloak because the block is open at first paint — cloak something that
+     is already visible and it flashes empty until Alpine boots. -->
+<div data-kui="toggle/dependent" class="max-w-xl rounded-xl border border-zinc-300 bg-white" x-data="{ remind: true }">
+  <div class="px-4 py-2.5">
+    <label class="flex items-start justify-between gap-4 py-1">
+      <span class="text-[14px]/5">Remind the buyer before payment falls due</span>
+      <input type="checkbox" role="switch" x-model="remind" checked name="on" value="1"
+             hx-post="/vendors/gujarat-polymers/settings/payment-reminder/"
+             hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+             aria-describedby="sw-remind-help" class="peer sr-only">
+      <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+        <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+      </span>
+    </label>
+    <p id="sw-remind-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">
+      Every open invoice on the account. 4 invoices, ₹12,45,000 outstanding.
+    </p>
+  </div>
+
+  <div x-show="remind" x-collapse class="border-t border-zinc-100">
+    <div class="space-y-3.5 px-4 py-3.5">
+      <div>
+        <label for="sw-remind-when" class="mb-1.5 block text-[13px]/5 font-medium">How long before the due date</label>
+        <div class="relative max-w-xs rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="sw-remind-when" name="days"
+                  hx-post="/vendors/gujarat-polymers/settings/payment-reminder-days/"
+                  hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 tabular-nums outline-none">
+            <option value="3" selected>3 days before</option>
+            <option value="7">7 days before</option>
+            <option value="14">14 days before</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-4"></i>
+          </span>
+        </div>
+      </div>
+
+      <label class="flex items-center justify-between gap-4 py-1">
+        <span class="text-[13px]/5">Copy the accounts team on every reminder</span>
+        <input type="checkbox" role="switch" name="on" value="1"
+               hx-post="/vendors/gujarat-polymers/settings/payment-reminder-copy/"
+               hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+               class="peer sr-only">
+        <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+          <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+        </span>
+      </label>
+    </div>
+  </div>
+</div>

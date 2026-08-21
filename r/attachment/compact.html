@@ -1,0 +1,48 @@
+<!-- Attachments where they are not the point of the screen — a card in a
+     register, a cell in a table row. At this width the only facts worth drawing
+     are that the paperwork exists and that one click reaches it, so the row is
+     chips: no size, no uploader, no date, and no drop zone.
+
+     The drop zone is what has to go first. A drop target inside a list row
+     competes with whatever selects the row, it is a few pixels tall, and a file
+     dropped just outside it lands on the page and navigates away from the
+     register the user spent a minute filtering. Uploading lives on the record's
+     own screen; this is a pointer to it.
+
+     Each chip caps its own width so a 60-character vendor filename cannot push
+     the overflow count off the card, and "+2 more" is a real link to the
+     record — a count that does nothing is the most-clicked dead element in any
+     internal application.
+
+     No per-chip remove. Deleting a document is a decision that wants the record
+     open in front of you, not a stray click while scanning twenty rows. -->
+<div data-kui="attachment/compact" class="max-w-xl rounded-xl border border-zinc-300 bg-white p-4">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold tabular-nums">GRN-1142 · Gujarat Polymers Ltd</h3>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">04 Sep 2026 · ₹12,45,000</span>
+  </div>
+
+  <ul aria-label="Attachments on GRN-1142" class="mt-3 flex flex-wrap items-center gap-1.5">
+    <li>
+      <a href="#" class="flex max-w-[15rem] items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[12px]/4 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="file-text" class="size-3.5 shrink-0 text-zinc-500"></i>
+        <span class="truncate">challan-gp-77412.pdf</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex max-w-[15rem] items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[12px]/4 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="file-text" class="size-3.5 shrink-0 text-zinc-500"></i>
+        <span class="truncate">test-certificate-heat-8841.pdf</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex max-w-[15rem] items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[12px]/4 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="image" class="size-3.5 shrink-0 text-zinc-500"></i>
+        <span class="truncate">weighbridge-slip-8841.jpg</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex items-center rounded-lg px-2 py-1 text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">+2 more</a>
+    </li>
+  </ul>
+</div>

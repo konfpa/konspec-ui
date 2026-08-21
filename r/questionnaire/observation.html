@@ -11,6 +11,13 @@
      rejected is a separate question with a separate answer, and this sheet does
      not decide it.
 
+     Out of spec is never only a border. An amber edge is a colour with no text
+     under it: forced-colours mode repaints it, and a screen reader is told
+     nothing at all. Every field that can go out of range carries the warning
+     line as well, hidden until it applies, and the field points at it with
+     aria-describedby only while it is on screen — a describedby aimed at a
+     display:none paragraph reads out a warning that is not being shown.
+
      type="number" gives a numeric keypad on a phone and silently drops anything
      that is not a number, which is why the empty string is tested on its own —
      a blank field is unanswered, not zero.
@@ -31,12 +38,16 @@
       <div class="flex w-32 items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
            :class="out(thickness, 2.35, 2.55) ? 'border-amber-700' : 'border-zinc-200 focus-within:border-zinc-700'">
         <input id="qo-thk" name="obs_thickness" type="number" step="0.01" inputmode="decimal"
-               x-model="thickness" aria-describedby="qo-spec-thk"
+               x-model="thickness"
+               :aria-describedby="out(thickness, 2.35, 2.55) ? 'qo-spec-thk qo-warn-thk' : 'qo-spec-thk'"
                class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
         <span class="pr-3 text-[13px]/5 text-zinc-600">mm</span>
       </div>
       <span id="qo-spec-thk" class="text-[12px]/4 tabular-nums text-zinc-500">Spec 2.35 – 2.55 mm</span>
     </div>
+    <p id="qo-warn-thk" x-show="out(thickness, 2.35, 2.55)" x-cloak class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-amber-700">
+      <i data-lucide="alert-triangle" class="mt-px size-3.5 shrink-0"></i>Outside 2.35 – 2.55 mm. Recorded as measured.
+    </p>
   </div>
 
   <div>
@@ -45,12 +56,13 @@
       <div class="flex w-32 items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
            :class="out(mfi, 0.28, 0.42) ? 'border-amber-700' : 'border-zinc-200 focus-within:border-zinc-700'">
         <input id="qo-mfi" name="obs_mfi" type="number" step="0.01" inputmode="decimal"
-               x-model="mfi" aria-describedby="qo-spec-mfi"
+               x-model="mfi"
+               :aria-describedby="out(mfi, 0.28, 0.42) ? 'qo-spec-mfi qo-warn-mfi' : 'qo-spec-mfi'"
                class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
       </div>
       <span id="qo-spec-mfi" class="text-[12px]/4 tabular-nums text-zinc-500">Spec 0.28 – 0.42 g/10 min</span>
     </div>
-    <p x-show="out(mfi, 0.28, 0.42)" x-cloak class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-amber-700">
+    <p id="qo-warn-mfi" x-show="out(mfi, 0.28, 0.42)" x-cloak class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-amber-700">
       <i data-lucide="alert-triangle" class="mt-px size-3.5 shrink-0"></i>Above the upper limit. Recorded as measured — accepting it is a separate answer.
     </p>
   </div>

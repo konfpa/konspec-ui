@@ -21,7 +21,7 @@
   <div>
     <label for="ig4-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity</label>
     <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <input id="ig4-qty" name="qty" inputmode="decimal" value="42.500"
+      <input id="ig4-qty" name="qty" inputmode="decimal" value="42.500" aria-describedby="ig4-qty-help"
              class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
       <label for="ig4-uom" class="sr-only">Unit of measure</label>
       <select id="ig4-uom" name="uom"
@@ -32,7 +32,7 @@
         <option>L</option>
       </select>
     </div>
-    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ordered 42.500 MT on rate contract RC-26-041.</p>
+    <p id="ig4-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ordered 42.500 MT on rate contract RC-26-041.</p>
   </div>
 
   <div>
@@ -45,9 +45,9 @@
         <option>+971</option>
         <option>+65</option>
       </select>
-      <input id="ig4-phone" name="phone" type="tel" inputmode="tel" value="98250 41163"
+      <input id="ig4-phone" name="phone" type="tel" inputmode="tel" value="98250 41163" aria-describedby="ig4-phone-help"
              class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>
-    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Ritu Deshpande, Gujarat Polymers Ltd. Used for despatch confirmations.</p>
+    <p id="ig4-phone-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Ritu Deshpande, Gujarat Polymers Ltd. Used for despatch confirmations.</p>
   </div>
 </div>

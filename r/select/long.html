@@ -1,0 +1,94 @@
+<!-- Option count is not what decides this. The rule of thumb — a combobox
+     above about fifteen — is about lists nobody has memorised, where the only
+     route to the answer is reading every row. A closed list everybody already
+     knows their own answer in behaves nothing like that: typing ma on the
+     focused control lands on Maharashtra without reading a single row, and the
+     person picking has known which one they wanted since before the page
+     loaded. Thirty-six states and union territories is comfortable here. Two
+     hundred vendor names, where nobody can spell the one they want, is not.
+
+     The frequently-used group is three of the options below repeated, and
+     repeating an option is only safe if the label is repeated character for
+     character. Two options may share a value — the DOM allows it — but .value
+     and x-model both select the first match, so the shortcut copy is the one
+     that ends up selected, and two spellings of one state make the field look
+     like it changed its own answer. Server-side, selected goes on exactly one
+     of the two: rendered on both, the later one wins and the shortcut group
+     stops shortcutting anything.
+
+     Repeating options also moves what the typeahead finds. The buffer walks the
+     list in document order, so ma reaches the shortcut copy of Maharashtra
+     before Madhya Pradesh — which is the answer wanted here, and is still a
+     change to a keyboard that used to be alphabetical. A shortcut group that is
+     not genuinely the frequent answer costs more than it saves.
+
+     There is no placeholder, because this field has a real default: the plant's
+     own state. A default that is right nine times in ten beats the guarantee
+     that somebody touched the field — but only where being wrong is visible on
+     the same screen, and it is, because the tax lines under it change the
+     moment this does.
+
+     The code lives inside the option text — Maharashtra — 27 — because an
+     option cannot be given a column, tabular-nums or any other styling. If the
+     codes have to line up, the control is a listbox and not a select. -->
+<div data-kui="select/long" class="max-w-sm">
+  <label for="sel-pos" class="mb-1.5 block text-[13px]/5 font-medium">Place of supply <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <select id="sel-pos" name="place_of_supply" required aria-describedby="sel-pos-help"
+            class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+      <optgroup label="Frequently used">
+        <option value="27" selected>Maharashtra — 27</option>
+        <option value="24">Gujarat — 24</option>
+        <option value="33">Tamil Nadu — 33</option>
+      </optgroup>
+
+      <optgroup label="All states and union territories">
+        <option value="35">Andaman and Nicobar Islands — 35</option>
+        <option value="37">Andhra Pradesh — 37</option>
+        <option value="12">Arunachal Pradesh — 12</option>
+        <option value="18">Assam — 18</option>
+        <option value="10">Bihar — 10</option>
+        <option value="04">Chandigarh — 04</option>
+        <option value="22">Chhattisgarh — 22</option>
+        <option value="26">Dadra and Nagar Haveli and Daman and Diu — 26</option>
+        <option value="07">Delhi — 07</option>
+        <option value="30">Goa — 30</option>
+        <option value="24">Gujarat — 24</option>
+        <option value="06">Haryana — 06</option>
+        <option value="02">Himachal Pradesh — 02</option>
+        <option value="01">Jammu and Kashmir — 01</option>
+        <option value="20">Jharkhand — 20</option>
+        <option value="29">Karnataka — 29</option>
+        <option value="32">Kerala — 32</option>
+        <option value="38">Ladakh — 38</option>
+        <option value="31">Lakshadweep — 31</option>
+        <option value="23">Madhya Pradesh — 23</option>
+        <option value="27">Maharashtra — 27</option>
+        <option value="14">Manipur — 14</option>
+        <option value="17">Meghalaya — 17</option>
+        <option value="15">Mizoram — 15</option>
+        <option value="13">Nagaland — 13</option>
+        <option value="21">Odisha — 21</option>
+        <option value="34">Puducherry — 34</option>
+        <option value="03">Punjab — 03</option>
+        <option value="08">Rajasthan — 08</option>
+        <option value="11">Sikkim — 11</option>
+        <option value="33">Tamil Nadu — 33</option>
+        <option value="36">Telangana — 36</option>
+        <option value="16">Tripura — 16</option>
+        <option value="09">Uttar Pradesh — 09</option>
+        <option value="05">Uttarakhand — 05</option>
+        <option value="19">West Bengal — 19</option>
+      </optgroup>
+    </select>
+
+    <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+      <i data-lucide="chevron-down" class="size-4"></i>
+    </span>
+  </div>
+
+  <p id="sel-pos-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    36 states and union territories. The GST state code decides whether this invoice carries IGST or CGST plus SGST, so it is the code that posts and the name that is read.
+  </p>
+</div>

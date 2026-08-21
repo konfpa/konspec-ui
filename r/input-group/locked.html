@@ -1,0 +1,61 @@
+<!-- The lock is painted on the enclosure. Grey the input alone and the ₹, the
+     unit and the button stay white inside a box that has gone dead in the
+     middle, which reads as a field that is half broken rather than a value that
+     is settled.
+
+     Read-only and disabled are not two shades of the same state, and a group
+     makes the difference worse than a plain field does. readonly submits;
+     disabled does not. A native <select> has no readonly, so the unit beside a
+     read-only quantity has to be disabled — at which point the POST carries
+     42.500 with no UOM at all, and a quantity without its unit is not a
+     quantity. The hidden input beside the dead select is what puts it back.
+
+     Then each addon is decided on what it does, not on what the field is
+     doing. The Copy button in the button variant reads the value and stays
+     live inside a read-only enclosure; Apply here changes the value, so it
+     dies with the field. A live Apply on a dead field is a button that posts
+     an empty value.
+
+     Both dividers step to zinc-300. border-zinc-200 against a zinc-200
+     enclosure is the same colour twice, so the join disappears and the addon
+     reads as a word floating inside the box.
+
+     Only the read-only group takes a focus outline, because only read-only is
+     focusable and a keyboard user landing somewhere with no indicator has no
+     idea where they are. Neither group takes focus-within:border-zinc-700 — a
+     locked border that lights up says the field is about to accept something.
+     The text splits the two states: zinc-400 where the value no longer matters,
+     the ordinary zinc-900 where it still has to be read off the screen. -->
+<div data-kui="input-group/locked" class="max-w-xl space-y-5">
+  <div>
+    <label for="ig11-qty" class="mb-1.5 block text-[13px]/5 font-medium">Received quantity</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-200 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="ig11-qty" name="qty" readonly value="42.500" aria-describedby="ig11-qty-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+
+      <label for="ig11-uom" class="sr-only">Unit of measure</label>
+      <select id="ig11-uom" disabled
+              class="shrink-0 rounded-r-[7px] border-l border-zinc-300 bg-transparent py-2 pr-2 pl-3 text-[14px]/5 text-zinc-400">
+        <option>MT</option>
+      </select>
+      <input type="hidden" name="uom" value="MT">
+    </div>
+    <p id="ig11-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Posted on GRN-24-0912. The quantity moves by a correction note, not from here.</p>
+  </div>
+
+  <div>
+    <label for="ig11-rate" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Contract rate (₹/kg)</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-200">
+      <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-400">₹</span>
+      <input id="ig11-rate" disabled value="86.40" aria-describedby="ig11-rate-help"
+             class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums text-zinc-400">
+      <span aria-hidden="true" class="flex items-center pr-2 text-[14px]/5 text-zinc-400">/kg</span>
+
+      <button type="button" disabled
+              class="inline-flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-300 px-3 text-[13px]/5 font-medium text-zinc-400">
+        Apply
+      </button>
+    </div>
+    <p id="ig11-rate-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Held by rate contract RC-26-041 to 31 Mar 2027. Nothing in this group is submitted.</p>
+  </div>
+</div>

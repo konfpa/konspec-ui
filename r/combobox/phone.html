@@ -1,0 +1,131 @@
+<!-- A panel anchored under the field is unusable on a phone the moment the
+     field is focused, because focusing it raises the keyboard and the keyboard
+     takes the bottom half of the screen — which is where the panel just opened.
+     The rows that are left are two, and scrolling them means scrolling a 120px
+     window with a thumb that covers it.
+
+     So below sm the component stops being a field with a panel and becomes the
+     screen: the root goes fixed inset-0, the search box sits at the top where
+     the keyboard cannot reach it, and the list takes everything left over and
+     scrolls. Above sm it is the anchored panel from the default variant,
+     unchanged, which is why both shapes are one x-data and one input rather
+     than a phone copy with its own ids — a second input carrying the same id
+     rebinds the label to whichever of the two rendered last.
+
+     The field leaves the flow while it is open and the page behind it moves up
+     by its own height. That is invisible under a full-bleed layer and it is
+     back the moment the list closes, which is the trade for not having to
+     measure and pin anything.
+
+     No scrim and no focus trap: this is the field taking the screen, not a
+     dialog over it. A scrim is a promise that the page underneath has stopped,
+     and a combobox never stops it. Rows are 44px below sm and 36px above,
+     because a thumb and a mouse do not need the same target.
+
+     There is no Escape key on a phone and no visible trigger left to press
+     again, so the way out is in the layer: Close, at the top, beside the label
+     that says what is being searched. -->
+<div data-kui="combobox/phone" class="w-full sm:max-w-sm"
+     :class="open ? 'fixed inset-0 z-40 flex flex-col bg-white p-4 sm:relative sm:inset-auto sm:z-auto sm:block sm:bg-transparent sm:p-0' : 'relative'"
+     x-data="{
+       open: false, typed: false, q: '', sel: '', ai: 0,
+       options: [
+         { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'VEN-0142' },
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'VEN-0187' },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'VEN-0203' },
+         { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', meta: 'VEN-0219' },
+         { id: 'silvassa-packaging', label: 'Silvassa Packaging and Allied Products', meta: 'VEN-0231' },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'VEN-0244' },
+         { id: 'baroda-fasteners', label: 'Baroda Fasteners', meta: 'VEN-0258' },
+         { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', meta: 'VEN-0266' }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       get chosen() { return this.options.find(o => o.id === this.sel) || null; },
+       rowId(o) { return 'cb-ph-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(o => o.id === this.sel));
+         this.scroll();
+       },
+       close() { this.open = false; this.typed = false; this.q = this.chosen ? this.chosen.label : ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <div class="flex items-baseline justify-between gap-3">
+    <label for="cb-ph" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+    <button type="button" x-show="open" x-cloak @click="close()"
+            class="mb-1.5 shrink-0 rounded-lg px-2 py-1 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:hidden">Close</button>
+  </div>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-ph" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-ph-list"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Search 248 approved vendors"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2.5 text-[14px]/5 outline-none placeholder:text-zinc-500 sm:py-2">
+  </div>
+
+  <input type="hidden" name="vendor" :value="sel">
+
+  <!-- visible on the phone layer, where there is room for it and nothing else
+       on screen says how much of the list is left. It is not the field's
+       aria-describedby: it is display:none for half the widths and all of the
+       closed state, and a description nobody can reach is worse than none —
+       the count reaches a screen reader through the live region below. -->
+  <p x-show="open" x-cloak
+     class="mt-2 text-[12px]/4 tabular-nums text-zinc-500 sm:hidden"
+     x-text="list.length + ' of 248 vendors'"></p>
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="mt-2 min-h-0 flex-1 overflow-y-auto rounded-xl border border-zinc-200 bg-white sm:absolute sm:top-full sm:right-0 sm:left-0 sm:z-20 sm:mt-1 sm:flex-none sm:overflow-hidden sm:shadow-lg">
+
+    <div id="cb-ph-list" role="listbox" aria-label="Approved vendors" class="py-1 sm:max-h-64 sm:overflow-y-auto">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="o.id === sel"
+             @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-center gap-2.5 px-3 py-2.5 text-[14px]/5 sm:py-2 sm:text-[13px]/5">
+          <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.meta"></span>
+          <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+            <i data-lucide="check" class="size-4 text-zinc-600"></i>
+          </span>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Check the spelling, or search by vendor code — VEN-0142.</p>
+    </div>
+  </div>
+</div>

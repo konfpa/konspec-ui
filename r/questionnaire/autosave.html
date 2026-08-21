@@ -1,0 +1,161 @@
+<!-- One endpoint per question, named for the parameter. A single draft endpoint
+     taking the whole sheet on every change re-posts seventeen answers to record
+     one, and the body cannot be read afterwards: an unanswered group posts no
+     key at all, so nothing in it separates "not answered yet" from "not sent".
+     A body carrying qa_marking and nothing else says exactly what happened.
+
+     hx-sync is per question, and that is not a detail. Put it on the form and
+     the answer to question 5 is dropped because question 4 was still in flight,
+     which is what somebody working down a sheet at speed causes constantly. Per
+     question it only replaces a second change to the same question, which is
+     the race that actually exists.
+
+     hx-swap="none" because the tile is painted from its own radio and is
+     already right before the request leaves. Returning the question's markup
+     and swapping it in would replace the control the user still has focus on.
+
+     want is captured before the request, so Try again re-sends what was asked
+     for rather than what the failure reverted to, and the revert re-checks the
+     last confirmed answer — the screen never shows an answer the server does
+     not hold. Each status line is role="status" because that revert is a script
+     setting .checked, and a programmatic change is announced by nothing.
+
+     The header says Draft and the button still says sign: a draft with every
+     answer in it is not an inspection until somebody attests to it. Signing
+     posts the whole form, so the attestation is checked against what is on
+     screen rather than against whatever the drafts accumulated. htmx needs the
+     CSRF token on each of these requests; that is in the django variant. -->
+<form data-kui="questionnaire/autosave" method="post" action="/qc/GRN-24-0912/sign/"
+      class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+  <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-zinc-200 px-5 py-4">
+    <div class="min-w-0">
+      <h2 class="text-[16px]/6 font-semibold">Incoming inspection — GRN-24-0912</h2>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Answers are written as they are given · last write 11:06</p>
+    </div>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">
+      <span class="size-1.5 shrink-0 rounded-full bg-zinc-400"></span>Draft
+    </span>
+  </div>
+
+  <div class="divide-y divide-zinc-100 px-5">
+    <fieldset class="py-4"
+              hx-post="/qc/GRN-24-0912/answers/marking/"
+              hx-trigger="change" hx-include="this" hx-swap="none" hx-sync="this:replace"
+              x-data="{ state: 'idle', saved: 'pass', want: '' }"
+              @htmx:before-request.camel="want = $refs.group.querySelector(':checked')?.value ?? ''; state = 'saving'"
+              @htmx:after-request.camel="
+                if ($event.detail.successful) { saved = want; state = 'saved' }
+                else { $refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === saved); state = 'failed' }">
+      <legend class="text-[13px]/5 font-medium">Bag markings — grade, lot and net weight legible on every bag</legend>
+      <div x-ref="group" class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_marking" value="pass" checked class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_marking" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_marking" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+      <p role="status" class="mt-2 text-[12px]/4">
+        <span x-show="state === 'idle'" x-cloak class="tabular-nums text-zinc-500">Saved 11:04</span>
+        <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+          <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+        </span>
+        <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+          <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+        </span>
+        <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+          <span class="flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the answer shown is the last one that was
+          </span>
+          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  @click="$refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === want); $refs.group.querySelector(':checked').dispatchEvent(new Event('change', { bubbles: true }))">Try again</button>
+        </span>
+      </p>
+    </fieldset>
+
+    <fieldset class="py-4"
+              hx-post="/qc/GRN-24-0912/answers/cert/"
+              hx-trigger="change" hx-include="this" hx-swap="none" hx-sync="this:replace"
+              x-data="{ state: 'failed', saved: 'pass', want: 'fail' }"
+              @htmx:before-request.camel="want = $refs.group.querySelector(':checked')?.value ?? ''; state = 'saving'"
+              @htmx:after-request.camel="
+                if ($event.detail.successful) { saved = want; state = 'saved' }
+                else { $refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === saved); state = 'failed' }">
+      <legend class="text-[13px]/5 font-medium">Test certificate lot number matches the bags</legend>
+      <div x-ref="group" class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_cert" value="pass" checked class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_cert" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_cert" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+      <p role="status" class="mt-2 text-[12px]/4">
+        <span x-show="state === 'idle'" x-cloak class="tabular-nums text-zinc-500">Saved 11:05</span>
+        <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+          <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+        </span>
+        <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+          <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+        </span>
+        <span x-show="state === 'failed'" class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+          <span class="flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the answer shown is the last one that was
+          </span>
+          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  @click="$refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === want); $refs.group.querySelector(':checked').dispatchEvent(new Event('change', { bubbles: true }))">Try again</button>
+        </span>
+      </p>
+    </fieldset>
+
+    <fieldset class="py-4"
+              hx-post="/qc/GRN-24-0912/answers/moisture/"
+              hx-trigger="change" hx-include="this" hx-swap="none" hx-sync="this:replace"
+              x-data="{ state: 'idle', saved: '', want: '' }"
+              @htmx:before-request.camel="want = $refs.group.querySelector(':checked')?.value ?? ''; state = 'saving'"
+              @htmx:after-request.camel="
+                if ($event.detail.successful) { saved = want; state = 'saved' }
+                else { $refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === saved); state = 'failed' }">
+      <legend class="text-[13px]/5 font-medium tabular-nums">Moisture on the hand-held meter at or below 0.05%</legend>
+      <div x-ref="group" class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_moisture" value="pass" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_moisture" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_moisture" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+      <p role="status" class="mt-2 text-[12px]/4">
+        <span x-show="state === 'idle'" class="text-zinc-500">Not answered yet</span>
+        <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+          <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+        </span>
+        <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+          <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+        </span>
+        <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+          <span class="flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — this question is still unanswered on the server
+          </span>
+          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  @click="$refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === want); $refs.group.querySelector(':checked').dispatchEvent(new Event('change', { bubbles: true }))">Try again</button>
+        </span>
+      </p>
+    </fieldset>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-zinc-200 px-5 py-3.5">
+    <p class="text-[12px]/4 text-zinc-500">A draft with every answer in it is still not an inspection.</p>
+    <button type="submit" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Review and sign</button>
+  </div>
+</form>

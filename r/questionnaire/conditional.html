@@ -26,7 +26,7 @@
   <fieldset>
     <legend>
       <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">
-        Safety audit · question 7 of <span x-text="ppe === 'fail' ? 5 : 4"></span>
+        Safety audit · question 7 of <span x-text="ppe === 'fail' ? 5 : 4">5</span>
       </span>
       <span class="mt-1.5 block text-[14px]/5 font-medium">Every person on the unloading bay was wearing helmet, safety shoes and hi-vis</span>
     </legend>
@@ -46,7 +46,7 @@
 
   <div x-show="ppe === 'fail'" x-cloak class="mt-4 border-l-2 border-zinc-200 pl-4">
     <label for="qf-note" class="block text-[13px]/5 font-medium">
-      Who was missing what, and what was done <span class="text-red-600">*</span>
+      Who was missing what, and what was done <span aria-hidden="true" class="text-red-600">*</span>
     </label>
     <div class="mt-1.5 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <textarea id="qf-note" name="qc_ppe_note" rows="3" required :disabled="ppe !== 'fail'"

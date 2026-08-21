@@ -4,6 +4,12 @@
      nothing at all. Left without required it is a red mark with no behaviour
      under it: the form submits empty and the mark was decoration.
 
+     required on a select only fires when the selected option has an empty
+     value, which is why the list leads with a disabled, hidden placeholder.
+     Leave the first real vendor selected and the attribute is decoration
+     again — the browser considers the field answered before anybody has read
+     the question, and the first vendor in the list becomes the house default.
+
      The convention is explained once, above the fields, not beside each of
      them. A form that repeats "required" twelve times has spent twelve lines
      saying what one line says.
@@ -25,6 +31,7 @@
       </label>
       <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
         <select id="lb-req-vendor" name="vendor" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          <option value="" disabled selected hidden>Choose a vendor</option>
           <option>Gujarat Polymers Ltd</option>
           <option>Sharma Extrusions Pvt Ltd</option>
         </select>

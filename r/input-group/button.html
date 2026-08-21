@@ -13,12 +13,17 @@
      input entry uses — a read-only value on white with a live border is pixel
      for pixel an editable field. The copy button inside it stays live, because
      copying does not change the value; a unit select in the same enclosure
-     would go disabled with the field.
+     would go disabled with the field. Its divider steps to zinc-300 for the
+     same reason the fill did: border-zinc-200 against a zinc-200 enclosure is
+     the same colour twice, and the join disappears.
 
      Copy swaps its icon, which is announced by nothing, so the confirmation is
      a live region and the button's own name changes with it. The two icons are
      spans carrying x-show rather than one :data-lucide binding, because
-     createIcons() replaces the <i> and anything bound on it goes too.
+     createIcons() replaces the <i> and anything bound on it goes too. The
+     static aria-label under the bound one is not redundant: an icon-only button
+     whose only name is :aria-label has no name at all until Alpine boots, and
+     none ever if the script fails.
 
      Clear destroys itself: the click empties the field, the button disappears
      with the text, and focus lands on <body> unless the same handler puts it
@@ -34,16 +39,17 @@
                             this.done = true;
                             clearTimeout(this.t);
                             this.t = setTimeout(() => this.done = false, 2000) } }">
-      <input id="ig3-grn" x-ref="grn" readonly value="GRN-24-0912"
+      <input id="ig3-grn" x-ref="grn" name="grn_no" readonly value="GRN-24-0912" aria-describedby="ig3-grn-help"
              class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
-      <button type="button" @click="copy()" :aria-label="done ? 'GRN number copied' : 'Copy GRN number'"
-              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 hover:bg-zinc-300 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+      <button type="button" @click="copy()" aria-label="Copy GRN number"
+              :aria-label="done ? 'GRN number copied' : 'Copy GRN number'"
+              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-300 px-3 hover:bg-zinc-300 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
         <span x-show="!done"><i data-lucide="copy" class="size-4 text-zinc-600"></i></span>
         <span x-show="done" x-cloak><i data-lucide="check" class="size-4 text-emerald-600"></i></span>
       </button>
       <span class="sr-only" aria-live="polite" x-text="done ? 'GRN number copied' : ''"></span>
     </div>
-    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Posted 16 Aug 2026 against PO-24-1187. Numbering is set by the plant.</p>
+    <p id="ig3-grn-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Posted 16 Aug 2026 against PO-24-1187. Numbering is set by the plant.</p>
   </div>
 
   <div x-data="{ q: 'HDPE-BLM' }">

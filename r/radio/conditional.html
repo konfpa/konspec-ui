@@ -1,0 +1,61 @@
+<!-- The follow-up sits under the option that opens it, not at the foot of the
+     group. A field between two options does not disturb the keyboard: the
+     arrows walk the radios in their own order and step over everything else, so
+     all that changes is where Tab goes after the answer — which is the point,
+     because the next thing the user owes is right there.
+
+     x-show alone is the bug this variant exists for. display:none does not take
+     an input out of the form: type the rework cost, change the answer to Return
+     to vendor, and the POST carries a cost for a rework that is not happening.
+     :disabled bound to the inverse of the show condition drops it from the
+     submission and from constraint validation together — which is what lets the
+     required attribute beside it stay static, and what stops a hidden required
+     field making the form unsubmittable with nothing on screen to explain it.
+
+     Nothing here takes focus when it appears, and nothing animates. The arrow
+     keys answer as they move, so a keyboard user on the way to Scrap opens and
+     closes this panel in passing; moving focus into it would strand them
+     mid-group, and a transition would flash.
+
+     Rework is checked here so the follow-up is on screen in the registry. A
+     real disposal screen starts unanswered — x-data="{ action: '' }" and no
+     checked attribute — because writing off material is not a choice to make
+     for somebody who never read the question. Whichever way it starts, the
+     static checked and the Alpine value have to agree: x-model applies its
+     value only once Alpine has booted, so on its own it leaves the first paint
+     showing an unanswered group with the panel already open. -->
+<fieldset data-kui="radio/conditional" class="max-w-xl" x-data="{ action: 'rework' }">
+  <legend class="mb-2 text-[13px]/5 font-medium tabular-nums">What happens to the 180 kg rejected on GRN-24-0912</legend>
+
+  <div class="space-y-2">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="rejection_action" value="return" x-model="action" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Return to Gujarat Polymers Ltd against a debit note</span>
+    </label>
+
+    <div>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="rejection_action" value="rework" checked x-model="action" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Rework in house and bill the vendor</span>
+      </label>
+
+      <div x-show="action === 'rework'" x-cloak class="mt-2 ml-[26px] border-l-2 border-zinc-200 pl-4">
+        <label for="rc-cost" class="block text-[13px]/5 font-medium">Rework cost to bill <span aria-hidden="true" class="text-red-600">*</span></label>
+        <div class="mt-1.5 flex max-w-[14rem] items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+          <input id="rc-cost" name="rework_cost" value="18,400" inputmode="decimal" required
+                 :disabled="action !== 'rework'" aria-describedby="rc-cost-help"
+                 class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+        </div>
+        <p id="rc-cost-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Goes on the debit note as its own line, so it is recovered separately from the material.</p>
+      </div>
+    </div>
+
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="rejection_action" value="scrap" x-model="action" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Scrap at our end and write the value off</span>
+    </label>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500">The lot stays in the quarantine bay until this is answered and the store keeper acts on it.</p>
+</fieldset>

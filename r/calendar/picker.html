@@ -2,6 +2,12 @@
      — 14 Aug 2026 — while a hidden input carries the ISO string that posts, so
      the display format and the wire format never have to agree.
 
+     aria-labelledby names the trigger with the label and the value span
+     together. Pointing it at the label alone is the version that ships first
+     and it replaces the whole accessible name with "Due date": the button then
+     announces what it is for and never what it holds, which is the one fact the
+     user opened it to check.
+
      x-trap keeps Tab inside the panel and returns focus to the trigger on
      close. Choosing a day closes it, because a single date is finished the
      moment it is picked. -->
@@ -60,9 +66,9 @@
   <input type="hidden" name="due_date" :value="sel">
 
   <button type="button" x-ref="trigger" @click="open = !open"
-          aria-labelledby="due-label" :aria-expanded="open" aria-haspopup="dialog"
-          class="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 hover:bg-zinc-200">
-    <span class="tabular-nums" :class="sel ? 'text-zinc-900' : 'text-zinc-500'" x-text="sel ? fmt(sel) : 'Select a date'"></span>
+          aria-labelledby="due-label due-value" :aria-expanded="open" aria-haspopup="dialog"
+          class="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <span id="due-value" class="tabular-nums" :class="sel ? 'text-zinc-900' : 'text-zinc-500'" x-text="sel ? fmt(sel) : 'Select a date'"></span>
     <i data-lucide="calendar" class="size-4 shrink-0 text-zinc-600"></i>
   </button>
 
@@ -70,12 +76,12 @@
        class="absolute left-0 z-40 mt-1 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
     <div class="flex items-center justify-between pb-2">
       <button type="button" @click="shift(-1)" aria-label="Previous month"
-              class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+              class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
       <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
       <button type="button" @click="shift(1)" aria-label="Next month"
-              class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+              class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>
     </div>
@@ -104,7 +110,7 @@
                           :aria-current="c.iso === today ? 'date' : null"
                           :tabindex="c.iso === focus ? 0 : -1"
                           :data-focus="c.iso === focus ? '1' : null"
-                          class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                          class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                           :class="cls(c.iso)" x-text="c.day"></button>
                 </template>
                 <template x-if="!c"><span class="block size-9"></span></template>
@@ -115,9 +121,9 @@
       </tbody>
     </table>
     <div class="mt-2 flex items-center justify-between border-t border-zinc-200 pt-2">
-      <button type="button" @click="sel = null" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Clear</button>
+      <button type="button" @click="sel = null" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
       <button type="button" @click="vy = new Date().getFullYear(); vm = new Date().getMonth(); pick(today)"
-              class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Today</button>
+              class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Today</button>
     </div>
   </div>
 </div>

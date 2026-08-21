@@ -1,0 +1,107 @@
+<!-- Whether this invoice number has already been booked against this vendor is
+     not a fact the browser holds. maxlength and a pattern cannot answer it, so
+     the field asks, and everything here follows from the answer arriving late.
+
+     htmx does the asking, because Alpine does not fetch. hx-trigger="change"
+     and nothing else: a check that costs a request does not run per keystroke,
+     which would be a request per character, a queue of replies that can land
+     out of order, and a verdict on half a number. hx-sync="this:replace" drops
+     whatever is still in flight, so the last answer on screen is the answer to
+     the last question asked.
+
+     The swap target is inside the message paragraph, not the paragraph. The id
+     in aria-describedby has to survive the swap, and hx-swap="outerHTML" on the
+     described element replaces it with whatever the server sent — one id typo
+     there and the description is silently gone. So the paragraph keeps the id
+     and a span inside it takes the innerHTML.
+
+     The verdict rides in the same response as the words, on a data attribute
+     the swapped fragment carries, so the border, the announcement and the
+     sentence cannot disagree. It is read after the swap; a failed request never
+     swaps, which is why the offline branch is set from after-request instead.
+
+     The icon lives in the control, not in the message. createIcons runs once at
+     load and never sees markup that arrives in a swap, so an <i data-lucide>
+     in the server's fragment is a blank space. What the server sends is words.
+
+     role="status" is on the message, and this is the one variant in the entry
+     that gets a live region. A description is read when focus arrives, and by
+     the time this answer comes back focus is two fields down the form — without
+     it, the only sign is a colour nobody is looking at.
+
+     None of this is the check. The POST runs it again, because the number can
+     be booked by somebody else between the field going green and Save being
+     pressed. In Django hx-include="closest form" carries the CSRF token along
+     with the vendor, since the token is a hidden input inside the form. -->
+<form data-kui="field/server" method="post" action="/purchase/invoices/" class="max-w-sm space-y-5"
+      x-data="{ state: 'idle' }"
+      @htmx:before-request.camel="state = 'checking'"
+      @htmx:after-swap.camel="state = $refs.verdict.firstElementChild?.dataset.verdict || 'ok'"
+      @htmx:after-request.camel="if (!$event.detail.successful) state = 'offline'">
+
+  <div>
+    <label for="fs-vendor" class="mb-1.5 block text-[13px]/5 font-medium">
+      Vendor <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <select id="fs-vendor" name="vendor" required aria-describedby="fs-vendor-msg"
+              class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+        <option value="">Choose a vendor</option>
+        <option value="v-0412" selected>Gujarat Polymers Ltd</option>
+        <option value="v-0288">Sharma Steel &amp; Alloys</option>
+      </select>
+    </div>
+    <p id="fs-vendor-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+      The number below is checked against this vendor's books.
+    </p>
+  </div>
+
+  <div>
+    <label for="fs-inv" class="mb-1.5 block text-[13px]/5 font-medium">
+      Vendor invoice number <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+
+    <div class="flex items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+         :class="state === 'bad' ? 'border-red-600 focus-within:outline-red-600/15'
+                                 : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+      <input id="fs-inv" name="invoice_no" value="GPL/26-27/0418" required maxlength="32"
+             hx-post="/purchase/invoices/check-number/" hx-trigger="change"
+             hx-include="closest form" hx-target="#fs-inv-verdict" hx-swap="innerHTML"
+             hx-sync="this:replace"
+             aria-describedby="fs-inv-msg"
+             :aria-invalid="state === 'bad' ? 'true' : 'false'"
+             :aria-busy="state === 'checking' ? 'true' : 'false'"
+             class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+
+      <span class="flex size-9 shrink-0 items-center justify-center">
+        <span x-show="state === 'checking'" x-cloak class="text-zinc-500"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+        <span x-show="state === 'ok'" x-cloak class="text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        <span x-show="state === 'bad'" x-cloak class="text-red-600"><i data-lucide="alert-circle" class="size-4"></i></span>
+        <span x-show="state === 'offline'" x-cloak class="text-amber-700"><i data-lucide="alert-triangle" class="size-4"></i></span>
+      </span>
+    </div>
+
+    <p id="fs-inv-msg" role="status" class="mt-1.5 min-h-4 text-[12px]/4">
+      <span id="fs-inv-verdict" x-ref="verdict" x-show="state !== 'offline'">
+        <span data-verdict="idle" class="block tabular-nums text-zinc-500">Unique per vendor per financial year. Checked when you leave the field.</span>
+      </span>
+      <span x-show="state === 'offline'" x-cloak class="block text-amber-700">Could not reach the books. The number is checked again when the invoice is saved.</span>
+    </p>
+  </div>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Book invoice
+  </button>
+</form>
+
+<!-- purchase/_invoice_number_msg.html — the whole response. Words and a
+     verdict, no icon, and nothing around them: it is swapped into the span
+     that sits inside the message paragraph.
+
+     <span data-verdict="bad" class="block font-medium tabular-nums text-red-600">
+       Already booked on 04 Sep 2026 against GRN-24-0912.
+     </span>
+
+     <span data-verdict="ok" class="block tabular-nums text-zinc-500">
+       Not booked against Gujarat Polymers Ltd this year.
+     </span> -->

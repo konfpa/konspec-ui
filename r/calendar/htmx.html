@@ -1,0 +1,84 @@
+<!-- Once the days carry marks, the month is a request. The delivery schedule,
+     the holiday table and who is on shift are rows in a database, and shipping
+     a year of them to the browser to draw thirty cells is moving the wrong half
+     of the work.
+
+     The two chevrons sit outside the swap target on purpose. Swapping the
+     element the user just pressed destroys it mid-gesture and the caret lands
+     back on <body>, so paging with the keyboard walks the whole page again
+     every month. Everything that changes is inside #hxcal-view; everything that
+     is pressed is outside it.
+
+     The cursor is a hidden input rather than a month baked into each button's
+     URL, so the server decides what "next" means — it is the only side that
+     knows the schedule starts in April and ends where the data does. It is
+     swapped out of band, along with the month label.
+
+     The label is out of band because a live region has to be on the page before
+     its content changes. Swapped in with the grid it is a brand new element and
+     announces nothing, which is the failure that reads as "the calendar works
+     for me" for as long as nobody tests it with a screen reader.
+
+     The response body is the grid, and two elements addressed by id:
+
+       <span id="hxcal-month" hx-swap-oob="innerHTML">October 2026</span>
+       <input type="hidden" id="hxcal-cursor" name="m" value="2026-10" hx-swap-oob="true">
+
+     The skeleton is six rows of seven squares — the shape of the answer, so the
+     panel does not resize under the pointer when the month lands. -->
+<div data-kui="calendar/htmx" class="inline-block max-w-full rounded-xl border border-zinc-300 bg-white p-3"
+     x-data="{ busy: false, failed: false }"
+     @htmx:before-request.camel="busy = true; failed = false"
+     @htmx:after-request.camel="busy = false"
+     @htmx:response-error.camel="failed = true"
+     @htmx:send-error.camel="failed = true">
+
+  <input type="hidden" id="hxcal-cursor" name="m" value="2026-09">
+
+  <div class="flex items-center justify-between gap-2 pb-2">
+    <button type="button" aria-label="Previous month"
+            hx-get="/planning/deliveries/calendar/" hx-vals='{"step": "-1"}'
+            hx-include="#hxcal-cursor" hx-target="#hxcal-view" hx-swap="innerHTML"
+            hx-disabled-elt="this"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+
+    <span class="flex items-center gap-2">
+      <span id="hxcal-month" class="text-[13px]/5 font-medium tabular-nums" aria-live="polite">September 2026</span>
+      <span x-show="busy" x-cloak role="status" class="flex items-center gap-1 text-[12px]/4 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin motion-reduce:animate-none"></i>Loading
+      </span>
+    </span>
+
+    <button type="button" aria-label="Next month"
+            hx-get="/planning/deliveries/calendar/" hx-vals='{"step": "1"}'
+            hx-include="#hxcal-cursor" hx-target="#hxcal-view" hx-swap="innerHTML"
+            hx-disabled-elt="this"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+
+  <div id="hxcal-view" :aria-busy="busy"
+       hx-get="/planning/deliveries/calendar/" hx-trigger="load" hx-swap="innerHTML"
+       hx-include="#hxcal-cursor">
+    <div aria-hidden="true" class="grid w-[15.75rem] grid-cols-7 gap-0 animate-pulse motion-reduce:animate-none">
+      <template x-for="i in 42" :key="i">
+        <span class="flex size-9 items-center justify-center">
+          <span class="block size-8 rounded-lg bg-zinc-200"></span>
+        </span>
+      </template>
+    </div>
+  </div>
+
+  <p x-show="failed" x-cloak class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-zinc-200 pt-2 text-[12px]/4 font-medium text-red-600">
+    <span class="flex items-center gap-1.5">
+      <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>The month did not load
+    </span>
+    <button type="button"
+            hx-get="/planning/deliveries/calendar/" hx-include="#hxcal-cursor"
+            hx-target="#hxcal-view" hx-swap="innerHTML"
+            class="rounded font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Try again</button>
+  </p>
+</div>

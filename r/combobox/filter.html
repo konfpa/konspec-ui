@@ -1,0 +1,161 @@
+<!-- A filter bar has no room for a text box per filter, and a text box is the
+     wrong shape anyway: at rest a filter has to say what it is filtering on,
+     and a search box showing "Gujarat Polymers Ltd" reads as something somebody
+     typed and can clear with Backspace. So the trigger is a 34px button that
+     says the filter and how many values are on, and the search box lives inside
+     the panel where it is only a search box.
+
+     That is a different keyboard model from the field-shaped combobox, and the
+     difference is the whole reason this variant exists. The button owns
+     aria-expanded and aria-controls; the input inside owns the listbox and is
+     aria-expanded="true" for as long as it exists. Focus moves into the panel
+     on open and Escape puts it back on the trigger, because a panel that closes
+     leaving focus on nothing drops the keyboard at the top of the document.
+
+     The panel holds real controls, so it cannot close on Tab: Tab is how you
+     reach Clear. It closes when focus leaves the component, which is what
+     relatedTarget on focusout answers and what blur cannot.
+
+     No aria-haspopup on the trigger. The panel is neither a menu nor a dialog,
+     and either value is a promise about the keyboard that this panel does not
+     keep — aria-expanded with aria-controls says what is true and nothing more.
+
+     Clear lives in the panel and clears this filter. A filter bar carrying
+     several controls puts a Clear all beside them as well, which is a different
+     control with a different scope; two buttons doing the same thing to the
+     same filter is what makes people distrust both.
+
+     It applies on change and has no Apply button, for the same reason a
+     settings switch has no Save — put one there and half the users press it and
+     half do not, and the two halves get different lists out of the same
+     gesture. The count on the trigger is the only thing left saying the filter
+     is on once the panel is shut, so it is not decoration.
+
+     w-72 with max-w-[calc(100vw-2rem)]: the trigger is 90px and the panel
+     cannot be, but a fixed width hangs off the right edge of a 390px screen. -->
+<div data-kui="combobox/filter"
+     x-data="{
+       open: false, typed: false, q: '', ai: 0,
+       sel: ['gujarat-polymers', 'nashik-steel'],
+       options: [
+         { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', orders: 12 },
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', orders: 8 },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', orders: 6 },
+         { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', orders: 5 },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', orders: 4 },
+         { id: 'baroda-fasteners', label: 'Baroda Fasteners', orders: 4 },
+         { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', orders: 3 }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => o.label.toLowerCase().includes(s));
+       },
+       has(id) { return this.sel.includes(id); },
+       get matched() { return this.sel.length ? this.options.filter(o => this.has(o.id)).reduce((n, o) => n + o.orders, 0) : 42; },
+       rowId(o) { return 'cb-flt-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         this.open = true; this.typed = false; this.q = ''; this.ai = 0;
+         this.$nextTick(() => { this.$refs.q.focus(); this.scroll(); });
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false; this.typed = false; this.q = '';
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(n) {
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       toggle(o) { this.sel = this.has(o.id) ? this.sel.filter(v => v !== o.id) : [...this.sel, o.id]; this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.toggle(o); }
+     }"
+     @click.outside="close(false)"
+     @focusout="if (open && !$el.contains($event.relatedTarget)) close(false)">
+
+  <div class="rounded-xl border border-zinc-200 bg-white px-3 py-3">
+    <div class="flex flex-wrap items-center gap-2">
+
+      <div class="relative">
+        <button type="button" x-ref="trigger" @click="open ? close() : show()"
+                @keydown.arrow-down.prevent="open || show()"
+                :aria-expanded="open" aria-controls="cb-flt-panel"
+                :aria-label="sel.length ? 'Vendor, ' + sel.length + ' selected' : 'Vendor, no filter applied'"
+                class="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-1.5 pr-2 pl-2.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Vendor
+          <span x-show="sel.length" x-cloak aria-hidden="true"
+                class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300"
+                x-text="sel.length"></span>
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+          </span>
+        </button>
+
+        <div id="cb-flt-panel" x-show="open" x-cloak
+             @keydown.escape="$event.stopPropagation(); close()"
+             class="absolute top-full left-0 z-30 mt-1 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+          <div class="flex items-center border-b border-zinc-200 px-2.5 py-1.5">
+            <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+            <label for="cb-flt-q" class="sr-only">Search vendors</label>
+            <input id="cb-flt-q" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+                   aria-autocomplete="list" aria-controls="cb-flt-list" aria-expanded="true"
+                   :aria-activedescendant="activeId"
+                   placeholder="Search vendors"
+                   @input="typed = true; ai = 0"
+                   @keydown.arrow-down.prevent="move(1)"
+                   @keydown.arrow-up.prevent="move(-1)"
+                   @keydown.home="$event.preventDefault(); edge(false)"
+                   @keydown.end="$event.preventDefault(); edge(true)"
+                   @keydown.enter.prevent="commit()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-[13px]/5 outline-none placeholder:text-zinc-500">
+          </div>
+
+          <div id="cb-flt-list" role="listbox" aria-multiselectable="true" aria-label="Vendors"
+               class="max-h-56 overflow-y-auto py-1">
+            <template x-for="(o, i) in list" :key="o.id">
+              <div :id="rowId(o)" role="option" :aria-selected="has(o.id)"
+                   :aria-label="o.label + ', ' + o.orders + ' open orders'"
+                   @mousedown.prevent @click="toggle(o)" @mousemove="ai = i"
+                   :class="i === ai ? 'bg-zinc-100' : ''"
+                   class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+                <span class="flex size-4 shrink-0 items-center justify-center rounded"
+                      :class="has(o.id) ? 'bg-zinc-700 text-white' : 'bg-white ring-1 ring-inset ring-zinc-300'">
+                  <span class="flex" x-show="has(o.id)" x-cloak><i data-lucide="check" class="size-3"></i></span>
+                </span>
+                <span class="min-w-0 flex-1 truncate" aria-hidden="true" x-text="o.label"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" aria-hidden="true" x-text="o.orders"></span>
+              </div>
+            </template>
+          </div>
+
+          <div x-show="!list.length" x-cloak class="px-4 py-5 text-center">
+            <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+          </div>
+
+          <div class="flex items-center justify-between gap-2 border-t border-zinc-200 px-2 py-1.5">
+            <button type="button" @mousedown.prevent @click="sel = []; $refs.q.focus()" :disabled="!sel.length"
+                    class="rounded-lg px-1.5 py-1 text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2 hover:bg-zinc-200 disabled:text-zinc-400 disabled:no-underline disabled:hover:bg-transparent focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span x-text="sel.length ? 'Clear ' + sel.length : 'Clear'"></span>
+            </button>
+            <button type="button" @click="close()"
+                    class="rounded-lg px-2 py-1 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Done</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- the applied filter posts with the register's own query string -->
+      <template x-for="id in sel" :key="'post-' + id">
+        <input type="hidden" name="vendor" :value="id">
+      </template>
+
+    </div>
+
+    <p role="status" class="mt-2.5 border-t border-zinc-100 pt-2.5 text-[12px]/4 tabular-nums text-zinc-600"
+       x-text="sel.length ? matched + ' of 42 purchase orders' : '42 purchase orders'"></p>
+  </div>
+</div>

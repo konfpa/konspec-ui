@@ -20,8 +20,13 @@
 
      Ticks drawn inside template x-for do not exist when createIcons() first
      runs, so the page needs the guarded re-hydration loop or they come up
-     empty. The x-show goes on the wrapping span, never on the <i>. -->
-<div data-kui="select/status" class="relative max-w-sm"
+     empty. The x-show goes on the wrapping span, never on the <i>.
+
+     The popup is positioned against a wrapper round the trigger, not against
+     the component root: top-full on the root measures from the bottom of the
+     line under the field, and the list then opens with a gap where nothing
+     is. -->
+<div data-kui="select/status" class="max-w-sm"
      x-data="{
        open: false, sel: 'accepted', buf: '', timer: null,
        options: [
@@ -69,49 +74,51 @@
 
   <span id="lb-qc-label" class="mb-1.5 block text-[13px]/5 font-medium tabular-nums">QC disposition — GRN-24-0912, line 3</span>
 
-  <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
-          aria-labelledby="lb-qc-label lb-qc-value"
-          @click="open ? close(false) : show()"
-          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
-          class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
-    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full" :class="chosen ? chosen.dot : 'bg-zinc-400'"></span>
-    <span id="lb-qc-value" class="min-w-0 flex-1 truncate text-[14px]/5" x-text="chosen ? chosen.label : 'Not dispositioned'"></span>
-    <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
-      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
-    </span>
-  </button>
+  <div class="relative">
+    <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
+            aria-labelledby="lb-qc-label lb-qc-value" aria-describedby="lb-qc-help"
+            @click="open ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+            class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full" :class="chosen ? chosen.dot : 'bg-zinc-400'"></span>
+      <span id="lb-qc-value" class="min-w-0 flex-1 truncate text-[14px]/5" x-text="chosen ? chosen.label : 'Not dispositioned'"></span>
+      <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+      <div x-ref="list" role="listbox" aria-labelledby="lb-qc-label"
+           class="max-h-72 overflow-y-auto py-1"
+           @click="take($event.target.closest('[role=option]'))"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)"
+           @keydown.end.prevent="edge(true)"
+           @keydown.enter.prevent="commit()"
+           @keydown.space.prevent="buf ? type(' ') : commit()"
+           @keydown.tab="close(false)"
+           @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }">
+
+        <template x-for="o in options" :key="o.id">
+          <div role="option" tabindex="-1" :data-value="o.id" :data-label="o.label"
+               :aria-selected="o.id === sel" :aria-label="o.label + ' — ' + o.note"
+               class="flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full" :class="o.dot"></span>
+            <span class="min-w-0 flex-1 truncate text-[13px]/5" aria-hidden="true" x-text="o.label"></span>
+            <span class="shrink-0 text-[12px]/4 text-zinc-500" aria-hidden="true" x-text="o.note"></span>
+            <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+              <i data-lucide="check" class="size-4 text-zinc-600"></i>
+            </span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
 
   <input type="hidden" name="disposition" :value="sel">
 
-  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">450 kg of HDPE granules — natural, received 16 Aug 2026 against PO-24-1187.</p>
-
-  <div x-show="open" x-cloak
-       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
-
-    <div x-ref="list" role="listbox" aria-labelledby="lb-qc-label"
-         class="max-h-72 overflow-y-auto py-1"
-         @click="take($event.target.closest('[role=option]'))"
-         @keydown.arrow-down.prevent="move(1)"
-         @keydown.arrow-up.prevent="move(-1)"
-         @keydown.home.prevent="edge(false)"
-         @keydown.end.prevent="edge(true)"
-         @keydown.enter.prevent="commit()"
-         @keydown.space.prevent="buf ? type(' ') : commit()"
-         @keydown.tab="close(false)"
-         @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }">
-
-      <template x-for="o in options" :key="o.id">
-        <div role="option" tabindex="-1" :data-value="o.id" :data-label="o.label"
-             :aria-selected="o.id === sel" :aria-label="o.label + ' — ' + o.note"
-             class="flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
-          <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full" :class="o.dot"></span>
-          <span class="min-w-0 flex-1 truncate text-[13px]/5" aria-hidden="true" x-text="o.label"></span>
-          <span class="shrink-0 text-[12px]/4 text-zinc-500" aria-hidden="true" x-text="o.note"></span>
-          <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
-            <i data-lucide="check" class="size-4 text-zinc-600"></i>
-          </span>
-        </div>
-      </template>
-    </div>
-  </div>
+  <p id="lb-qc-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">450 kg of HDPE granules — natural, received 16 Aug 2026 against PO-24-1187.</p>
 </div>

@@ -1,0 +1,79 @@
+<!-- The GRN is posted, so its date is a fact and not a field. Nothing here
+     opens.
+
+     It is not a disabled picker. A disabled trigger is a control that still
+     looks like a way in, and readonly on <input type="date"> is honoured
+     unevenly enough that the picker button opens anyway in more than one
+     browser. There is nothing to type into and nothing to choose from, so the
+     value is text on the locked surface with a hidden input carrying the ISO
+     string for whatever else the form posts.
+
+     The month is drawn because "12 Aug 2026" does not say it was a Wednesday
+     three days before the month end. It is aria-hidden and made of spans, not
+     of thirty-one disabled buttons: read-only is not disabled, and a grid
+     nobody can act on announcing "unavailable" thirty-one times is worse than a
+     grid that says nothing while the date, the month and the reason are all
+     written out above it in text.
+
+     No previous or next either. There is nothing to look for in another month.
+
+     The reason line names the record to reverse. "This field is locked" is the
+     version that generates the support call. -->
+<div data-kui="calendar/locked" class="max-w-xs"
+     x-data="{
+       sel: '2026-08-12',
+       vy: 2026, vm: 7,
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       title() { return new Date(this.vy, this.vm, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       weeks() {
+         const y = this.vy, m = this.vm;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) cells.push({ iso: this.iso(y, m, d), day: d });
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       }
+     }">
+  <p class="mb-1.5 text-[13px]/5 font-medium text-zinc-600">GRN date</p>
+  <input type="hidden" name="grn_date" value="2026-08-12">
+
+  <div class="flex h-9 items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-zinc-200 px-3">
+    <span class="text-[14px]/5 tabular-nums text-zinc-900">12 Aug 2026</span>
+    <i data-lucide="lock" class="size-4 shrink-0 text-zinc-600"></i>
+  </div>
+
+  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Posted to stock on 12 Aug 2026 by Ritu Deshpande. Reverse GRN-26-0455 to change it.
+  </p>
+
+  <div aria-hidden="true" class="mt-3 inline-block rounded-xl border border-zinc-300 bg-white p-3">
+    <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600" x-text="title()"></p>
+    <table class="border-collapse">
+      <thead>
+        <tr>
+          <template x-for="h in head" :key="h">
+            <th scope="col" class="size-9 text-[11px]/4 font-medium text-zinc-400" x-text="h"></th>
+          </template>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="(week, wi) in weeks()" :key="wi">
+          <tr>
+            <template x-for="(c, ci) in week" :key="ci">
+              <td class="p-0">
+                <span class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                      :class="c && c.iso === sel ? 'bg-zinc-700 font-medium text-white' : 'text-zinc-500'"
+                      x-text="c ? c.day : ''"></span>
+              </td>
+            </template>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+</div>

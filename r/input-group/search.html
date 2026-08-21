@@ -30,7 +30,7 @@
     </select>
 
     <label for="ig6-q" class="sr-only">Search orders, GRNs and vendors</label>
-    <input id="ig6-q" name="q" type="search" placeholder="PO-24-1187, HDPE, Gujarat Polymers"
+    <input id="ig6-q" name="q" type="search" placeholder="PO-24-1187, HDPE, Gujarat Polymers" aria-describedby="ig6-q-help"
            class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
 
     <button type="submit" aria-label="Search orders, GRNs and vendors"
@@ -38,5 +38,5 @@
       <i data-lucide="search" class="size-4 text-zinc-600"></i>
     </button>
   </div>
-  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Scoping is what keeps 1,438 open orders out of a vendor lookup.</p>
+  <p id="ig6-q-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Scoping is what keeps 1,438 open orders out of a vendor lookup.</p>
 </form>

@@ -1,0 +1,104 @@
+<!-- One enclosure, two form fields. Django renders the control and nothing
+     around it, so the join lives in the widget attrs: border-l and
+     rounded-r-[7px] are part of the select's class string, not of the wrapper,
+     and the wrapper is template markup on both sides of them.
+
+     forms.py
+         class ReceiptLineForm(forms.Form):
+             qty = forms.DecimalField(
+                 max_digits=12, decimal_places=3, label='Received quantity',
+                 help_text='Ordered 42.500 MT on RC-26-041. Over-receipt is capped at 2%.',
+                 widget=forms.NumberInput(attrs={
+                     'class': 'min-w-0 flex-1 bg-transparent px-3 py-2 text-right '
+                              'text-[14px]/5 tabular-nums outline-none'}))
+
+             uom = forms.ChoiceField(
+                 choices=UOM_CHOICES, label='Unit of measure',
+                 widget=forms.Select(attrs={
+                     'class': 'shrink-0 rounded-r-[7px] border-l border-zinc-200 '
+                              'bg-transparent py-2 pr-2 pl-3 text-[14px]/5 '
+                              'focus-visible:outline-2 focus-visible:-outline-offset-2 '
+                              'focus-visible:outline-zinc-700'}))
+
+             # The serial is the only thing the browser sends. The series is
+             # context, never a field and never a hidden input: a hidden input
+             # is markup anybody can edit, so a server that reads one back is
+             # trusting the page it just rendered.
+             serial = forms.CharField(
+                 max_length=6, label='Invoice number',
+                 widget=forms.TextInput(attrs={
+                     'inputmode': 'numeric',
+                     'class': 'min-w-0 flex-1 bg-transparent px-3 py-2 '
+                              'text-[14px]/5 tabular-nums outline-none'}))
+
+             def __init__(self, *args, line=None, **kwargs):
+                 super().__init__(*args, **kwargs)
+                 self.line = line
+                 # One message under one enclosure, so both controls point at
+                 # the same id. Two paragraphs under one border and nobody can
+                 # tell which of them the red edge is about.
+                 for name in ('qty', 'uom'):
+                     bf, attrs = self[name], self.fields[name].widget.attrs
+                     attrs['aria-describedby'] = 'rcpt-qty-msg'
+                     if bf.errors:
+                         attrs['aria-invalid'] = 'true'
+                 self.fields['serial'].widget.attrs['aria-describedby'] = (
+                     'rcpt-series ' + self['serial'].auto_id + '-help')
+
+             def clean(self):
+                 cleaned = super().clean()
+                 qty, uom = cleaned.get('qty'), cleaned.get('uom')
+                 if qty and uom and to_mt(qty, uom) > self.line.remaining * Decimal('1.02'):
+                     # add_error names the control that is wrong. A bare raise
+                     # here lands the message in non_field_errors, which renders
+                     # above the group with nothing inside it marked invalid.
+                     self.add_error('qty', 'Over PO-24-1187 by 4,157.500 MT.')
+                 return cleaned
+
+     views.py
+         # The series is composed here, on the way in, from the record and the
+         # financial year. The form never sees it and the browser never sends it.
+         line.invoice_no = f'{series_for(request.user.plant)}{form.cleaned_data["serial"]}'
+
+     The wrapper reddens when either field is in error, because the wrapper is
+     the field. aria-invalid stays on the one control clean() blamed, so a wrong
+     number and a right unit is one mistake and gets reported once. -->
+<form data-kui="input-group/django" method="post" class="max-w-xl space-y-5">
+  {% csrf_token %}
+
+  <div>
+    <label for="{{ form.qty.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.qty.label }} <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+
+    <div class="flex items-stretch rounded-lg bg-white {% if form.qty.errors or form.uom.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.qty }}
+      <label for="{{ form.uom.id_for_label }}" class="sr-only">{{ form.uom.label }}</label>
+      {{ form.uom }}
+    </div>
+
+    {% if form.qty.errors or form.uom.errors %}
+      <p id="rcpt-qty-msg" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
+        <span class="tabular-nums">{% firstof form.qty.errors.0 form.uom.errors.0 %}</span>
+      </p>
+    {% else %}
+      <p id="rcpt-qty-msg" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">{{ form.qty.help_text }}</p>
+    {% endif %}
+  </div>
+
+  {# The series is rendered from context and posts nothing. What the field #}
+  {# sends is the serial, and the two are joined in the view.              #}
+  <div>
+    <label for="{{ form.serial.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">{{ form.serial.label }}</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <span id="rcpt-series" class="flex shrink-0 items-center rounded-l-[7px] border-r border-zinc-200 bg-zinc-100 px-3 text-[14px]/5 tabular-nums text-zinc-600">{{ series }}</span>
+      {{ form.serial }}
+    </div>
+    <p id="{{ form.serial.auto_id }}-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">The series is fixed for 2026-27. Type the serial only.</p>
+  </div>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Post receipt
+  </button>
+</form>

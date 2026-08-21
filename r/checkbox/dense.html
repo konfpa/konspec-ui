@@ -1,0 +1,89 @@
+<!-- Fourteen flags on an item master, and the only question density raises is
+     the order they are read in.
+
+     columns-2, not grid-cols-2. Multi-column fills the first column to the
+     bottom before it starts the second, so the order the eye takes down the
+     page and the order Tab takes are the same list. A two-column grid lays the
+     same DOM out across the rows instead, and from the second item on, the
+     keyboard and the eye are somewhere different — which nobody notices until
+     they tab past the flag they were reading.
+
+     break-inside-avoid on every label, because a column boundary is allowed to
+     fall inside one: the box ends up at the foot of the left column and its
+     text at the head of the right.
+
+     Density comes out of the gaps and never out of the target. py-1 on a 20px
+     line is a 28px row, which still clears the 24px WCAG 2.2 asks for; take the
+     padding off to fit two more flags on screen and the target is the 16px box
+     on its own. One column below sm, where two of them leave 170px each and
+     every second label wraps.
+
+     No help text under any of them. Fourteen explanations is a page nobody
+     reads — the flags that need one are worth a sentence in the group line at
+     the foot, and the rest are worth naming properly instead. -->
+<fieldset data-kui="checkbox/dense" class="max-w-2xl">
+  <legend class="mb-2 text-[13px]/5 font-medium tabular-nums">Flags on HDPE granules — M60075</legend>
+
+  <div class="sm:columns-2 sm:gap-x-10">
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="batch_tracked" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Batch tracked</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="inspect_on_receipt" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Inspect on receipt</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="coa_required" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Certificate of analysis required</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="serial" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Serial numbered</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="partial_receipt" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Partial receipt allowed</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="over_receipt" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Over-receipt allowed</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="negative_stock" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Negative stock allowed</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="auto_reorder" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Reorder automatically</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="cycle_count" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>In the cycle count</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="msds" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>MSDS travels with the despatch</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="subcontract" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Issued to subcontractors</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="weigh_on_despatch" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Weigh on despatch</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="blocked_purchase" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Blocked for new purchase orders</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="blocked_sale" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Blocked for sale</span>
+    </label>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">
+    Flags apply everywhere the item is used, including on the 6 open orders against it.
+  </p>
+</fieldset>

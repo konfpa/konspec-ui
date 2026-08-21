@@ -1,0 +1,169 @@
+<!-- The delivery month. Every day here is still selectable, but the reason to
+     look at it is what is already booked on it: a purchase order due, a QC
+     audit, the plant shut for Ganesh Chaturthi.
+
+     The mark is a dot under the number, never a fill behind it. A tinted day
+     collides with the two fills the grid already owns — the zinc-200 chip that
+     means today and the solid zinc-700 that means selected — and a month of
+     coloured squares reads as a heat map of nothing by the second week.
+
+     The dot row is drawn at h-1.5 on every day, marked or not. Sized to its
+     contents it collapses on the empty days, and the numbers in a week stop
+     sitting on one line.
+
+     On the selected day the dots go white. red-600 on zinc-700 is unreadable,
+     and the colour is not where the meaning lives anyway: the count and every
+     label are in the button's accessible name, and the day's records are listed
+     under the grid the moment it is picked.
+
+     Three dots is the cap. A day with five things on it says so in its name and
+     in the list; five dots in a 36px square is a smudge.
+
+     The marks are keyed off today so the demo always has something in view. In
+     an application they arrive as a dict of ISO string to records — see the
+     htmx variant for where they come from. -->
+<div data-kui="calendar/marked" class="inline-block max-w-full rounded-xl border border-zinc-300 bg-white p-3"
+     x-data="{
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       sel: null,
+       vy: new Date().getFullYear(),
+       vm: new Date().getMonth(),
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       marks: (() => {
+         const t = new Date();
+         const k = (n) => { const d = new Date(t.getFullYear(), t.getMonth(), t.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+         const m = {};
+         m[k(-9)] = [{ tone: 'bg-emerald-600', text: 'GRN-26-0431 received — 18 MT HDPE' }];
+         m[k(-3)] = [{ tone: 'bg-red-600', text: 'PO-24-1187 overdue — Gujarat Polymers Ltd' },
+                     { tone: 'bg-zinc-500', text: 'Vendor audit — Nashik' }];
+         m[k(0)]  = [{ tone: 'bg-amber-500', text: 'PO-24-1203 due — 4 MT masterbatch' }];
+         m[k(2)]  = [{ tone: 'bg-zinc-500', text: 'Plant closed — Ganesh Chaturthi' }];
+         m[k(5)]  = [{ tone: 'bg-amber-500', text: 'PO-24-1211 due — 20 MT PP granules' },
+                     { tone: 'bg-emerald-600', text: 'Invoice INV-3391 cleared — ₹12,45,000' },
+                     { tone: 'bg-zinc-500', text: 'Stock count — Store 2' },
+                     { tone: 'bg-zinc-500', text: 'Shift roster published' }];
+         return m;
+       })(),
+       on(s) { return this.marks[s] || []; },
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
+       title(o) { return new Date(this.vy, this.vm + o, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       long(s) { return this.parse(s).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); },
+       fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
+       name(s) {
+         const n = this.on(s);
+         if (!n.length) return this.long(s);
+         return this.long(s) + ' — ' + n.length + (n.length === 1 ? ' entry: ' : ' entries: ') + n.map(x => x.text).join('; ');
+       },
+       weeks(o) {
+         const y = this.vy, m = this.vm + o;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) {
+           const dt = new Date(y, m, d);
+           cells.push({ iso: this.iso(dt.getFullYear(), dt.getMonth(), d), day: d, dow: dt.getDay() });
+         }
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       },
+       shift(n) { const v = new Date(this.vy, this.vm + n, 1); this.vy = v.getFullYear(); this.vm = v.getMonth(); this.clamp(); },
+       clamp() {
+         if (!this.focus) return;
+         const f = this.parse(this.focus);
+         if (f.getFullYear() === this.vy && f.getMonth() === this.vm) return;
+         const last = new Date(this.vy, this.vm + 1, 0).getDate();
+         this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
+       },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
+       cls(s) {
+         if (s === this.sel) return 'bg-zinc-700 font-medium text-white hover:bg-zinc-800';
+         if (s === this.today) return 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300';
+         return 'text-zinc-900 hover:bg-zinc-200';
+       }
+     }">
+  <div class="flex items-center justify-between pb-2">
+    <button type="button" @click="shift(-1)" aria-label="Previous month"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+    <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
+    <button type="button" @click="shift(1)" aria-label="Next month"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+  <table x-ref="grid" class="border-collapse"
+         @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+         @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+         @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+         @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
+    <caption class="sr-only" x-text="'Delivery calendar, ' + title(0)"></caption>
+    <thead>
+      <tr>
+        <template x-for="h in head" :key="h">
+          <th scope="col" class="size-9 text-[11px]/4 font-medium text-zinc-500" x-text="h"></th>
+        </template>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="(week, wi) in weeks(0)" :key="wi">
+        <tr>
+          <template x-for="(c, ci) in week" :key="ci">
+            <td class="p-0">
+              <template x-if="c">
+                <button type="button" @click="sel = c.iso; focus = c.iso"
+                        :aria-label="name(c.iso)" :aria-pressed="c.iso === sel"
+                        :aria-current="c.iso === today ? 'date' : null"
+                        :tabindex="c.iso === focus ? 0 : -1"
+                        :data-focus="c.iso === focus ? '1' : null"
+                        class="inline-flex size-9 flex-col items-center justify-center gap-0.5 rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                        :class="cls(c.iso)">
+                  <span x-text="c.day"></span>
+                  <span aria-hidden="true" class="flex h-1.5 items-center gap-0.5">
+                    <template x-for="(mk, mi) in on(c.iso).slice(0, 3)" :key="mi">
+                      <span class="size-1.5 rounded-full" :class="c.iso === sel ? 'bg-white' : mk.tone"></span>
+                    </template>
+                  </span>
+                </button>
+              </template>
+              <template x-if="!c"><span class="block size-9"></span></template>
+            </td>
+          </template>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <ul class="mt-2 flex flex-wrap gap-x-3 gap-y-1 border-t border-zinc-200 pt-2 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-red-600"></span>Overdue</li>
+    <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>Due</li>
+    <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Received</li>
+    <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-zinc-500"></span>Other</li>
+  </ul>
+
+  <div class="mt-2 max-w-[17rem] border-t border-zinc-200 pt-2" aria-live="polite">
+    <p class="text-[13px]/5 font-medium tabular-nums" x-text="sel ? fmt(sel) : 'No day selected'"></p>
+    <ul class="mt-1 space-y-1">
+      <template x-for="(mk, mi) in (sel ? on(sel) : [])" :key="mi">
+        <li class="flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+          <span class="mt-1.5 size-1.5 shrink-0 rounded-full" :class="mk.tone"></span>
+          <span x-text="mk.text"></span>
+        </li>
+      </template>
+    </ul>
+    <p x-show="!sel || !on(sel).length" x-cloak class="mt-1 text-[12px]/4 text-zinc-500"
+       x-text="sel ? 'Nothing booked on this day.' : 'Pick a day to see what falls on it.'"></p>
+  </div>
+</div>

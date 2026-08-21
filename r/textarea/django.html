@@ -17,6 +17,24 @@
                  })
              }
 
+         def __init__(self, *args, **kwargs):
+             super().__init__(*args, **kwargs)
+             attrs = self.fields['body'].widget.attrs
+             attrs['aria-describedby'] = self['body'].auto_id + '_desc'
+             if self.is_bound and self['body'].errors:
+                 attrs['aria-invalid'] = 'true'
+
+     The description id is built from auto_id, so it is set on the widget rather
+     than written in the template, and aria-invalid comes from whether the field
+     has errors on this render — never from a hardcoded attribute. Both run
+     after super(), which is what makes is_bound and errors answerable at all.
+
+     Help and error share the one id because only one of them ever renders: the
+     error replaces the help text rather than stacking under it, so a single
+     constant id always points at whichever line is on the page. Give them
+     separate ids and the widget attr has to be rewritten per render to pick
+     between them, which is the __init__ this wrapper exists to avoid.
+
      A max_length on the model renders as maxlength on the widget, which
      truncates a paste in silence. Either drop it from the widget and let
      clean() reject the value with a message, or say the number in help_text
@@ -25,7 +43,7 @@
   {% csrf_token %}
   <div>
     <label for="{{ form.body.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
-      {{ form.body.label }}{% if form.body.field.required %} <span class="text-red-600">*</span>{% endif %}
+      {{ form.body.label }}{% if form.body.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
     </label>
 
     <div class="rounded-lg bg-white {% if form.body.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
@@ -33,13 +51,13 @@
     </div>
 
     {% if form.body.errors %}
-      <p class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
+      <p id="{{ form.body.auto_id }}_desc" class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
         <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>{{ form.body.errors.0 }}
       </p>
     {% elif form.body.help_text %}
-      <p class="mt-1.5 text-[12px]/4 text-zinc-500">{{ form.body.help_text }}</p>
+      <p id="{{ form.body.auto_id }}_desc" class="mt-1.5 text-[12px]/4 text-zinc-500">{{ form.body.help_text }}</p>
     {% endif %}
   </div>
 
-  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Post note</button>
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Post note</button>
 </form>

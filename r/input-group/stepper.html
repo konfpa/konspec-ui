@@ -1,0 +1,75 @@
+<!-- Which entry this is depends on one question: can the number be typed? If
+     the only two ways to change it are the two buttons, it is
+     button-group/stepper — the figure there is a display, the strip owns the
+     border and each button draws its own outline. The moment somebody can type
+     into it the figure is a field, the enclosure is this component, and the
+     focus outline moves to the wrapper. That move is the whole difference:
+     focus-within has to say the keyboard is in this group whether it is in the
+     box or on a button beside it, and neither button may draw a halo of its
+     own. They keep the inset indicator every control addon here keeps, which is
+     what says which of the three has the caret.
+
+     The clamp is on the field, not on the buttons. A click can only ever
+     produce a legal value — that is what :disabled at the limits buys — but a
+     typed one can be 9999, -4, 24.5 or nothing at all, and none of those ever
+     touch a button. min and max on the buttons are a convenience; set() is the
+     correctness. It runs on change rather than on input, because clamping every
+     keystroke rewrites a number somebody is still halfway through typing, and
+     it writes the clamped figure back to the element so a typed 0244 does not
+     sit on screen as 0244 while the state says 244.
+
+     The buttons are really disabled at the limits rather than painted to look
+     it. A live minus at zero is a button that does nothing and says nothing
+     about why.
+
+     type="number" is the obvious control here and the wrong one: it draws the
+     browser's own spin buttons hard against the right-hand edge of the field,
+     directly under the plus button, so the group ends with two ways to add one
+     and a hit area belonging to neither. inputmode="numeric" and the arrow keys
+     bound by hand leave the enclosure with only the controls it drew.
+
+     type="button" on both, and this variant is a form so the reason is on
+     screen: a button inside a form with no type is a submit button, so minus
+     posts the receipt.
+
+     The unit is in the label rather than in a suffix. Minus, field and plus is
+     already the two-addon ceiling, and a third addon at 390px takes the number
+     down to three characters.
+
+     What changed is a field's value and what is focused is a button, so
+     nothing announces it. In button-group the display cell can be the live
+     region; a control cannot, so here the message under the group carries the
+     figure and what it now means. -->
+<form data-kui="input-group/stepper" action="/grn/GRN-24-0912/lines/3/" method="post" class="max-w-xl"
+      x-data="{
+        qty: 240, min: 0, max: 244,
+        set(n) { const v = Math.round(Number(n));
+                 this.qty = Number.isFinite(v) ? Math.min(this.max, Math.max(this.min, v)) : this.min },
+        bump(d) { this.set(this.qty + d) }
+      }">
+  <label for="ig13-qty" class="mb-1.5 block text-[13px]/5 font-medium">Drums received (nos)</label>
+
+  <div class="flex max-w-48 items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <button type="button" @click="bump(-1)" :disabled="qty <= min" aria-label="Decrease drums received"
+            class="flex w-9 shrink-0 items-center justify-center rounded-l-[7px] border-r border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700 disabled:text-zinc-400 disabled:hover:bg-transparent">
+      <i data-lucide="minus" class="size-4"></i>
+    </button>
+
+    <input id="ig13-qty" name="qty" inputmode="numeric" value="240" :value="qty"
+           @change="set($el.value); $el.value = qty"
+           @keydown.arrow-up.prevent="bump(1)" @keydown.arrow-down.prevent="bump(-1)"
+           aria-describedby="ig13-qty-msg"
+           class="min-w-0 flex-1 bg-transparent px-2 py-2 text-center text-[14px]/5 tabular-nums outline-none">
+
+    <button type="button" @click="bump(1)" :disabled="qty >= max" aria-label="Increase drums received"
+            class="flex w-9 shrink-0 items-center justify-center rounded-r-[7px] border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700 disabled:text-zinc-400 disabled:hover:bg-transparent">
+      <i data-lucide="plus" class="size-4"></i>
+    </button>
+  </div>
+
+  <p id="ig13-qty-msg" role="status" class="mt-1.5 text-[12px]/4 tabular-nums"
+     :class="qty >= max ? 'font-medium text-amber-700' : 'text-zinc-500'"
+     x-text="qty >= max
+               ? qty + ' nos, the 2% over-receipt cap on PO-24-1187. More than this needs a deviation from QA.'
+               : qty + ' of 240 nos on challan GJ-8841. A short receipt closes the line at what arrived.'"></p>
+</form>

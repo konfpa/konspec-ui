@@ -1,0 +1,71 @@
+<!-- A form redisplayed after a failed POST, and the label is the one part of
+     it that has not changed. Not red, not carrying the complaint. Colouring the
+     name says the field is wrong in a way only a sighted user gets, and moving
+     the message into the label makes "Vendor GSTIN 14 of 15 characters" the
+     field's accessible name, read out on arrival and on every keystroke back
+     through it. The state goes on the control as aria-invalid and the words go
+     in the element aria-describedby already points at.
+
+     One element holds the message, and it holds the help line when the field is
+     valid — see field/error. Two elements with an id each means aria-describedby
+     has to be rewritten on every state change, and both ways of getting that
+     wrong are silent.
+
+     The summary's link href is the control's id, which is the same string the
+     label's for names. One typo there breaks the label click, the summary jump
+     and the description binding at once, and not one of the three reports
+     anything. It is also the reason a duplicated id is worse than a missing
+     one: the summary jumps to a field, the field is the wrong one, and it looks
+     like it worked.
+
+     The summary is focused, not announced. On a page the server has rendered
+     whole, nothing was inserted, so role="alert" fires for nobody — the request
+     handler puts focus on this block, which is why it takes tabindex="-1" and a
+     plain focus: outline rather than focus-visible:, since programmatic focus
+     does not match focus-visible. -->
+<form data-kui="label/invalid" class="max-w-xl" novalidate>
+  <div tabindex="-1" class="mb-5 flex items-start gap-2.5 rounded-xl border border-zinc-300 bg-white p-4 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 font-medium tabular-nums">The order was not saved. 1 field needs attention.</p>
+      <ul class="mt-1">
+        <li>
+          <a href="#lb-iv-gstin" class="text-[13px]/5 tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Vendor GSTIN — 14 of 15 characters
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="space-y-5">
+    <div>
+      <label for="lb-iv-gstin" class="mb-1.5 block text-[13px]/5 font-medium">
+        Vendor GSTIN <span aria-hidden="true" class="text-red-600">*</span>
+      </label>
+      <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+        <input id="lb-iv-gstin" name="gstin" value="24AACCG1234M1Z" maxlength="15" required
+               aria-invalid="true" aria-describedby="lb-iv-gstin-msg"
+               class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums uppercase outline-none">
+      </div>
+      <p id="lb-iv-gstin-msg" class="mt-1.5 flex min-h-4 items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+        <span class="tabular-nums">14 of 15 characters. Check it against the vendor's certificate.</span>
+      </p>
+    </div>
+
+    <div>
+      <label for="lb-iv-terms" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="lb-iv-terms" name="terms" aria-invalid="false" aria-describedby="lb-iv-terms-msg"
+                class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+          <option>45 days from invoice date</option>
+          <option>30 days from GRN</option>
+        </select>
+      </div>
+      <p id="lb-iv-terms-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+        Printed on the order. The same element carries the error when there is one.
+      </p>
+    </div>
+  </div>
+</form>

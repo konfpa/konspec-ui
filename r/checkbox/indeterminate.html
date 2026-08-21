@@ -18,11 +18,11 @@
 
   <div class="flex items-center justify-between gap-3 border-b border-zinc-200 pb-2">
     <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
-      <input type="checkbox" aria-label="Select all four lines"
+      <input type="checkbox"
              :checked="every" x-effect="$el.indeterminate = some"
              @change="toggleAll($event.target.checked)"
              class="size-4 shrink-0 accent-zinc-700">
-      <span>All lines</span>
+      <span class="tabular-nums">All 4 lines</span>
     </label>
     <!-- the count sits outside the label, or it becomes part of the box's name
          and is read back in full on every toggle -->

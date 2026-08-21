@@ -45,13 +45,13 @@
       <span x-show="scope === 'query'" x-cloak>All 4,312 matching orders selected</span>
     </span>
     <div class="flex flex-wrap items-center gap-2">
-      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">Export</button>
-      <button type="button" class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Cancel orders</button>
+      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export</button>
+      <button type="button" class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel orders</button>
     </div>
     <button type="button" x-show="every && scope === 'page'" x-cloak @click="scope = 'query'"
-            class="text-[13px]/5 tabular-nums text-zinc-900 underline underline-offset-2">Select all 4,312 matching orders</button>
-    <button type="button" @click="clear()" class="ml-auto shrink-0 text-[13px]/5 text-zinc-600 underline underline-offset-2">Clear</button>
+            class="text-[13px]/5 tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Select all 4,312 matching orders</button>
+    <button type="button" @click="clear()" class="ml-auto shrink-0 text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
   </div>
 
   <table class="hidden w-full text-[13px]/5 md:table">
@@ -153,7 +153,7 @@
        sideways scroll, and the select-all comes with them. -->
   <div class="border-b border-zinc-200 px-4 py-2.5 md:hidden">
     <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
-      <input type="checkbox" aria-label="Select all 5 orders on this page"
+      <input type="checkbox"
              :checked="every" x-effect="$el.indeterminate = some"
              @change="page($event.target.checked)"
              class="size-4 shrink-0 accent-zinc-700">

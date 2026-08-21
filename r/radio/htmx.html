@@ -1,0 +1,71 @@
+<!-- htmx does the writing, because Alpine does not fetch — and the reason this
+     is not the same snippet as a toggle saving itself is the arrow keys. They
+     answer as they move, so walking from Normal to Emergency fires change three
+     times. delay:400ms restarts the timer on each one and only the answer that
+     is still standing goes out; hx-sync="this:replace" drops a write still in
+     flight, so two answers a second apart cannot settle on the older reply.
+
+     The request comes off the wrapper, because change bubbles from whichever
+     option was touched and there is no one element to hang it on. A wrapper is
+     not an input and contributes no value of its own, so hx-include="this" is
+     what puts the chosen option in the body — the rule that a triggering
+     element sends its own value only covers an element that has one. Django
+     also wants the CSRF token on this request, which is an hx-headers decision
+     for the page rather than one this block should make.
+
+     A failed write reverts to settled, the last value the server acknowledged.
+     A radio has no opposite to flip back to, and by the time the failure
+     arrives the user may have moved twice more, so the value that was on screen
+     a moment ago is not the value the record holds. want keeps what they asked
+     for, so Try again re-sends that rather than re-sending the revert.
+
+     The revert is script setting checked, which fires no change event: nothing
+     re-posts, and nothing is announced either — hence role="status" on the line
+     underneath, which is the only thing that says the answer did not stick. -->
+<div data-kui="radio/htmx" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-3"
+     x-data="{ chosen: 'normal', settled: 'normal', want: 'normal', state: 'idle' }"
+     hx-post="/requisitions/PR-24-0442/priority/"
+     hx-trigger="change delay:400ms" hx-include="this" hx-swap="none" hx-sync="this:replace"
+     @change="state = 'saving'"
+     @htmx:after-request.camel="
+       if ($event.detail.successful) { settled = chosen; state = 'saved' }
+       else { want = chosen; chosen = settled; state = 'failed' }">
+
+  <fieldset>
+    <legend class="text-[13px]/5 font-medium">Priority</legend>
+    <div class="mt-2 space-y-2">
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="priority" value="normal" checked x-model="chosen" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Normal — planned into the weekly buying run</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="priority" value="urgent" x-model="chosen" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Urgent — the buyer picks it up the same day</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="priority" value="emergency" x-model="chosen" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Emergency — plant head is notified and the order can go out without three quotes</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <p role="status" class="mt-2 text-[12px]/4">
+    <span x-show="state === 'idle'" class="tabular-nums text-zinc-500">Last changed 04 Sep 2026, 09:12 by Ritu Deshpande</span>
+
+    <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+    </span>
+
+    <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+      <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved on the requisition
+    </span>
+
+    <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the requisition still holds the earlier priority
+      </span>
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+              @click="chosen = want; $nextTick(() => htmx.trigger($root, 'change'))">Try again</button>
+    </span>
+  </p>
+</div>

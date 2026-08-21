@@ -1,0 +1,51 @@
+<!-- This draft was raised in March against Nashik Steel Traders. The vendor was
+     blocked in June and is not in the choices any more — and a select cannot
+     show a value it has no option for. Render only the live vendors and the
+     control comes up on whichever option is first, somebody saves the draft
+     without touching this field, and the order is now against a vendor nobody
+     chose. Nothing on screen was wrong at any point, which is why this defect
+     survives review.
+
+     So the record's own value is rendered, as a real option, inside a group
+     whose label says what it is, and it stays selected. What it must not do is
+     pass: the server puts the current value into the choices so the field can
+     draw it, and refuses it in clean(), which is the only place that knows the
+     vendor is blocked.
+
+     Marking that option disabled is the obvious alternative and changes less
+     than it looks. An option the server rendered as selected still sets the
+     control's value, so the field posts the blocked id either way — all
+     disabled buys is that nobody can choose it back after moving off, at the
+     price of a draft that quietly loses its own value.
+
+     The warning is a line of text with an icon rather than a red field and an
+     aria-invalid. Nothing is invalid yet: the record is exactly as it was left,
+     and this only becomes an error when somebody tries to release it. -->
+<div data-kui="select/stale" class="max-w-sm">
+  <label for="sel-stale" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <select id="sel-stale" name="vendor" required aria-describedby="sel-stale-note"
+            class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+      <optgroup label="No longer available">
+        <option value="nashik-steel" selected>Nashik Steel Traders — blocked</option>
+      </optgroup>
+
+      <optgroup label="Approved vendors">
+        <option value="gujarat-polymers">Gujarat Polymers Ltd</option>
+        <option value="sharma-extrusions">Sharma Extrusions</option>
+        <option value="deccan-fasteners">Deccan Fasteners Pvt Ltd</option>
+        <option value="konkan-chemicals">Konkan Chemicals Pvt Ltd</option>
+      </optgroup>
+    </select>
+
+    <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+      <i data-lucide="chevron-down" class="size-4"></i>
+    </span>
+  </div>
+
+  <p id="sel-stale-note" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-amber-700">
+    <i data-lucide="alert-triangle" class="mt-0.5 size-3.5 shrink-0"></i>
+    Blocked on 30 Jun 2026 for a failed quality audit. PR-24-0918 cannot be converted to an order until another vendor is chosen.
+  </p>
+</div>

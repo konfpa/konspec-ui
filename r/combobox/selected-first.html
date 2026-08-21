@@ -1,0 +1,182 @@
+<!-- Six items ticked out of four hundred is a selection nobody can find again.
+     The records already committed are lifted into a group of their own at the
+     head of the list, so opening the popup starts with what is in the field
+     rather than with whatever the item master sorts first.
+
+     The split is taken when the popup opens and is not recomputed while it is
+     open. Recompute it on every tick and the row leaves from under the pointer
+     the moment it is ticked, the next one slides into the space, and ticking
+     four items becomes a game of chase — the same defect as a register that
+     re-sorts itself while somebody is clicking down a column.
+
+     Each record lands in exactly one of the two groups, so the option ids stay
+     unique and aria-activedescendant still names one node. Listing a ticked
+     record in both groups is the obvious alternative and it puts two rows
+     carrying the same id inside one listbox.
+
+     The arrow keys run over both groups as one flattened list, in the order the
+     rows are drawn. An index per group leaves the last row of the top group
+     with nowhere to go. -->
+<div data-kui="combobox/selected-first" class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: '', ai: 0,
+       sel: ['itm-4471', 'itm-6203', 'itm-6244'],
+       pinned: [],
+       options: [
+         { id: 'itm-4471', label: 'MS plate 10 mm, IS 2062 E250', code: 'ITM-4471', stock: '182.400 MT' },
+         { id: 'itm-4488', label: 'MS angle 50 × 50 × 6 mm', code: 'ITM-4488', stock: '46.900 MT' },
+         { id: 'itm-5102', label: 'HT bolt M16 × 60, grade 8.8', code: 'ITM-5102', stock: '12,400 nos' },
+         { id: 'itm-5117', label: 'Hex nut M16, grade 8', code: 'ITM-5117', stock: '18,900 nos' },
+         { id: 'itm-6203', label: 'LDPE granules, film grade', code: 'ITM-6203', stock: '64.250 MT' },
+         { id: 'itm-6210', label: 'HDPE granules, blow moulding', code: 'ITM-6210', stock: '31.800 MT' },
+         { id: 'itm-6244', label: 'Masterbatch, black 2%', code: 'ITM-6244', stock: '1,240 kg' },
+         { id: 'itm-7008', label: 'Hydraulic oil ISO VG 46', code: 'ITM-7008', stock: '820 ltr' },
+         { id: 'itm-7042', label: 'Cotton waste, white', code: 'ITM-7042', stock: '310 kg' },
+         { id: 'itm-8110', label: 'Carton 600 × 400 × 300, 5-ply', code: 'ITM-8110', stock: '4,150 nos' }
+       ],
+       match(rows) {
+         if (!this.typed) return rows;
+         const s = this.q.trim().toLowerCase();
+         return rows.filter(o => (o.label + ' ' + o.code).toLowerCase().includes(s));
+       },
+       get top() { return this.match(this.options.filter(o => this.pinned.includes(o.id))); },
+       get rest() { return this.match(this.options.filter(o => !this.pinned.includes(o.id))); },
+       get list() { return [...this.top, ...this.rest]; },
+       has(id) { return this.sel.includes(id); },
+       label(id) { const o = this.options.find(x => x.id === id); return o ? o.label : id; },
+       get chips() { return this.sel.length > 1 ? this.sel.slice(0, 1) : this.sel; },
+       get extra() { return this.sel.length - this.chips.length; },
+       rowId(o) { return 'cb-item-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.pinned = [...this.sel];
+         this.ai = 0; this.scroll();
+       },
+       close() { this.open = false; this.typed = false; this.q = ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       toggle(o) {
+         this.sel = this.has(o.id) ? this.sel.filter(v => v !== o.id) : [...this.sel, o.id];
+         this.$refs.q.focus();
+       },
+       drop(id) { this.sel = this.sel.filter(v => v !== id); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.toggle(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-item" class="mb-1.5 block text-[13px]/5 font-medium">Items counted in zone A</label>
+
+  <div @click="$refs.q.focus(); show()"
+       class="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+
+    <template x-for="id in chips" :key="id">
+      <span class="inline-flex max-w-full items-center gap-1 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 ring-1 ring-inset ring-zinc-300">
+        <span class="min-w-0 truncate" x-text="label(id)"></span>
+        <button type="button" :aria-label="'Remove ' + label(id)" @click.stop="drop(id)"
+                class="flex size-4 shrink-0 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900">
+          <i data-lucide="x" class="size-3"></i>
+        </button>
+      </span>
+    </template>
+
+    <button type="button" x-show="extra" x-cloak @click.stop="$refs.q.focus(); show()"
+            :aria-label="extra + ' more selected — open the list to see all ' + sel.length"
+            class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300">
+      <span x-text="'+' + extra + ' more'"></span>
+    </button>
+
+    <input id="cb-item" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-item-list" aria-describedby="cb-item-count"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           :placeholder="sel.length ? 'Search' : 'Search the item master'"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.backspace="if (!q && sel.length) { $event.preventDefault(); sel = sel.slice(0, -1) }"
+           @keydown.tab="close()"
+           class="min-w-16 flex-1 bg-transparent px-1 py-1 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <template x-for="id in sel" :key="'post-' + id">
+    <input type="hidden" name="item" :value="id">
+  </template>
+
+  <p id="cb-item-count" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500"
+     x-text="sel.length ? sel.length + ' of 412 items selected' : 'No item selected — the count sheet will print empty'"></p>
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 item matches' : list.length + ' items match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-item-list" role="listbox" aria-multiselectable="true" aria-label="Item master"
+         class="max-h-72 overflow-y-auto pb-1">
+
+      <!-- the heading is aria-hidden and the group carries the name: a bare
+           paragraph is not a permitted child of a listbox, and the sticky
+           heading needs a fill of its own or the rows scroll through the text -->
+      <div role="group" aria-label="Already selected" x-show="top.length" x-cloak>
+        <p aria-hidden="true"
+           class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Already selected</p>
+        <template x-for="o in top" :key="o.id">
+          <div :id="rowId(o)" role="option" :aria-selected="has(o.id)"
+               @mousedown.prevent @click="toggle(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+               :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+               class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="flex size-4 shrink-0 items-center justify-center rounded"
+                  :class="has(o.id) ? 'bg-zinc-700 text-white' : 'bg-white ring-1 ring-inset ring-zinc-300'">
+              <span class="flex" x-show="has(o.id)" x-cloak><i data-lucide="check" class="size-3"></i></span>
+            </span>
+            <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+            <span class="flex shrink-0 items-center gap-2 text-[12px]/4 tabular-nums text-zinc-500">
+              <span x-text="o.code"></span>
+              <!-- the quantity on hand is what a count sheet is checked against, and
+                   the first thing to go at 390px: three facts on a phone row is one
+                   too many and the code is what people search by -->
+              <span class="hidden sm:inline" x-text="o.stock"></span>
+            </span>
+          </div>
+        </template>
+      </div>
+
+      <div role="group" aria-label="All items" x-show="rest.length" x-cloak>
+        <p aria-hidden="true"
+           class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">All items</p>
+        <template x-for="o in rest" :key="o.id">
+          <div :id="rowId(o)" role="option" :aria-selected="has(o.id)"
+               @mousedown.prevent @click="toggle(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+               :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+               class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="flex size-4 shrink-0 items-center justify-center rounded"
+                  :class="has(o.id) ? 'bg-zinc-700 text-white' : 'bg-white ring-1 ring-inset ring-zinc-300'">
+              <span class="flex" x-show="has(o.id)" x-cloak><i data-lucide="check" class="size-3"></i></span>
+            </span>
+            <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+            <span class="flex shrink-0 items-center gap-2 text-[12px]/4 tabular-nums text-zinc-500">
+              <span x-text="o.code"></span>
+              <span class="hidden sm:inline" x-text="o.stock"></span>
+            </span>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No item matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Search by item code instead — ITM-4471.</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,78 @@
+<!-- Could not and would not are different answers, and the row has to say
+     which. The htmx variant reverts and offers Try again for everything that
+     was not a 2xx, which is right for a dropped connection and wrong for a
+     rule: pressing Try again against a 409 asks the same question and gets the
+     same answer, and the second refusal reads as a broken button.
+
+     So the handler splits on the status. 403 and 409 are the codes this
+     application's own views return with a plain sentence in the body — you may
+     not change this, and this cannot be changed while something else is true —
+     and that sentence is what the row prints. Everything else keeps the retry.
+
+     Only ever print the bodies your own views produce. A 500 body is a stack
+     trace or a whole HTML error page, and an empty one leaves the row saying
+     nothing at all, which is why there is a fallback string behind it. It goes
+     in with x-text and never x-html: a message you did not write is not markup
+     you may run.
+
+     The tone follows the meaning rather than the severity. A refusal is a rule
+     the record is over — the warning tone, amber-700 with alert-triangle — and
+     a write that never landed is danger, red-600 with alert-circle. Both are an
+     icon and a line of text; neither is a field of colour behind them.
+
+     views.py
+         if vendor.open_orders:
+             return HttpResponse(
+                 'Gujarat Polymers Ltd has 3 open orders. Close or cancel them '
+                 'before blocking the account.',
+                 status=409, content_type='text/plain')
+-->
+<div data-kui="toggle/refused" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
+     x-data="{ state: 'idle', want: false, reason: '' }"
+     @htmx:before-request.camel="want = $refs.sw.checked; state = 'saving'"
+     @htmx:after-request.camel="
+       if ($event.detail.successful) { state = 'saved' }
+       else if ([403, 409].includes($event.detail.xhr.status)) {
+         $refs.sw.checked = !want;
+         reason = $event.detail.xhr.responseText || 'The change was refused.';
+         state = 'refused';
+       }
+       else { $refs.sw.checked = !want; state = 'failed' }">
+
+  <label class="flex items-start justify-between gap-4 py-1">
+    <span class="text-[14px]/5">Block new orders to Gujarat Polymers Ltd</span>
+    <input type="checkbox" role="switch" x-ref="sw" name="on" value="1"
+           hx-post="/vendors/gujarat-polymers/settings/blocked/"
+           hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+           aria-describedby="sw-refused-help" class="peer sr-only">
+    <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+      <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+    </span>
+  </label>
+
+  <p id="sw-refused-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">
+    3 orders open, ₹42,90,000 committed.
+  </p>
+
+  <p role="status" class="mt-1 pr-13 text-[12px]/4">
+    <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+    </span>
+
+    <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+      <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+    </span>
+
+    <span x-show="state === 'refused'" x-cloak class="flex items-start gap-1.5 font-medium text-amber-700">
+      <i data-lucide="alert-triangle" class="size-3.5 shrink-0 translate-y-px"></i><span x-text="reason"></span>
+    </span>
+
+    <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged
+      </span>
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              @click="$refs.sw.checked = want; $refs.sw.dispatchEvent(new Event('change'))">Try again</button>
+    </span>
+  </p>
+</div>

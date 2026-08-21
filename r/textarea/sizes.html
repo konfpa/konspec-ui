@@ -1,26 +1,39 @@
 <!-- Three heights, and rows is what sets all three. A pixel height cuts the
-     last line in half: h-[100px] against a 20px leading is 4.2 lines. -->
+     last line in half: h-[100px] against a 20px leading is 4.2 lines.
+
+     Each label is the name of the field and nothing else, and the sentence
+     saying what the height is for sits under the box as help text tied on with
+     aria-describedby. A label that carries its own explanation becomes the
+     control's accessible name, so the field is announced as "Two rows — a
+     remark inside a table row or a dialog, edit text" and the name is longer
+     than the value it is naming. -->
 <div data-kui="textarea/sizes" class="max-w-xl space-y-5">
   <div>
-    <label for="ta-2" class="mb-1.5 block text-[13px]/5 font-medium">Two rows — a remark inside a table row or a dialog</label>
+    <label for="ta-2" class="mb-1.5 block text-[13px]/5 font-medium">Short remark</label>
     <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <textarea id="ta-2" rows="2" class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">Short shipped by 40 kg, balance promised Friday.</textarea>
+      <textarea id="ta-2" rows="2" aria-describedby="ta-2-help"
+                class="block w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">Short shipped by 40 kg, balance promised Friday.</textarea>
     </div>
+    <p id="ta-2-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Two rows — a remark inside a table row or a dialog.</p>
   </div>
 
   <div>
-    <label for="ta-4" class="mb-1.5 block text-[13px]/5 font-medium">Four rows — the default for a form field</label>
+    <label for="ta-4" class="mb-1.5 block text-[13px]/5 font-medium">Delivery address</label>
     <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <textarea id="ta-4" rows="4" class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">Konspec Industries
+      <textarea id="ta-4" rows="4" aria-describedby="ta-4-help"
+                class="block w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">Konspec Industries
 Plot 214, Silvassa Industrial Estate
 Dadra &amp; Nagar Haveli 396230</textarea>
     </div>
+    <p id="ta-4-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Four rows — the default for a form field.</p>
   </div>
 
   <div>
-    <label for="ta-10" class="mb-1.5 block text-[13px]/5 font-medium">Ten rows — the page is the field</label>
+    <label for="ta-10" class="mb-1.5 block text-[13px]/5 font-medium">Scope of work</label>
     <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <textarea id="ta-10" rows="10" class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none" placeholder="Scope of work"></textarea>
+      <textarea id="ta-10" rows="10" aria-describedby="ta-10-help" placeholder="What the contractor is being asked to do"
+                class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
     </div>
+    <p id="ta-10-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ten rows — the page is the field.</p>
   </div>
 </div>

@@ -12,11 +12,17 @@
 
      Read-only greys the surface and not the label. The value still matters and
      still has to be copied out, so it stays at full contrast — dim it and you
-     have said the order number does not count. And it is written outright, not
-     with has-[:read-only]: the CSS :read-only pseudo-class matches every
-     element that is not user-alterable, which includes the label and the
-     paragraph inside the wrapper, so the wrapper matches always. Match the
-     attribute — has-[[readonly]] — or write the classes, as here. -->
+     have said the order number does not count. Its wrapper is the only one of
+     the two that draws a focus outline, because read-only is still in the Tab
+     order: the input takes outline-none so the border and the outline stay one
+     shape, and a wrapper that forgot the focus-within rule leaves a keyboard
+     user in a field with nothing marking it.
+
+     And it is written outright, not with has-[:read-only]: the CSS :read-only
+     pseudo-class matches every element that is not user-alterable, which
+     includes the label and the paragraph inside the wrapper, so the wrapper
+     matches always. Match the attribute — has-[[readonly]] — or write the
+     classes, as here. -->
 <div data-kui="label/states" class="max-w-xl space-y-5">
   <div class="has-[:disabled]:text-zinc-500">
     <label for="lb-off" class="mb-1.5 block text-[13px]/5 font-medium">Rate contract</label>
@@ -24,12 +30,12 @@
       <input id="lb-off" value="RC-2026-014 — Gujarat Polymers Ltd" disabled
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums disabled:text-zinc-400">
     </div>
-    <p class="mt-1.5 text-[12px]/4">Changed on the contract, not on the order.</p>
+    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Changed on the contract, not on the order.</p>
   </div>
 
   <div>
     <label for="lb-ro" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <input id="lb-ro" value="PO-24-1187" readonly
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>

@@ -1,33 +1,41 @@
-<!-- Photographs are recognised by sight, not by filename. Show them. -->
+<!-- Photographs are recognised by sight, not by filename. Show them.
+
+     The remove button is visible by default and only hides behind hover from sm
+     up. Reveal-on-hover is a desktop affordance with no touch equivalent, and a
+     gate photographer working on a phone had no way to delete the blurred one
+     at all — the control existed and could not be reached. Keyboard users are
+     covered by focus-visible:opacity-100, which has to be paired with a real
+     focus outline or the button becomes visible at exactly the moment nothing
+     says where focus is. -->
 <div data-kui="attachment/images">
   <div class="flex items-end justify-between gap-3">
-    <label class="text-[13px]/5 font-medium">Delivery photographs</label>
+    <p class="text-[13px]/5 font-medium">Delivery photographs</p>
     <span class="text-[12px]/4 tabular-nums text-zinc-500">4 of 10</span>
   </div>
   <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
     <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
       <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
       <button type="button" aria-label="Remove gate-in-truck.jpg"
-              class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 opacity-0 transition hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100">
+              class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 transition hover:text-red-600 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 sm:opacity-0 sm:group-hover:opacity-100">
         <i data-lucide="x" class="size-3.5"></i>
       </button>
-      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pb-1 pt-4 text-[11px]/4 text-white">gate-in-truck.jpg</p>
+      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">gate-in-truck.jpg</p>
     </div>
     <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
       <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
       <button type="button" aria-label="Remove unloading-bay-3.jpg"
-              class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 opacity-0 transition hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100">
+              class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 transition hover:text-red-600 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 sm:opacity-0 sm:group-hover:opacity-100">
         <i data-lucide="x" class="size-3.5"></i>
       </button>
-      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pb-1 pt-4 text-[11px]/4 text-white">unloading-bay-3.jpg</p>
+      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">unloading-bay-3.jpg</p>
     </div>
     <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
       <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
       <button type="button" aria-label="Remove weighbridge-slip.jpg"
-              class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 opacity-0 transition hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100">
+              class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 transition hover:text-red-600 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 sm:opacity-0 sm:group-hover:opacity-100">
         <i data-lucide="x" class="size-3.5"></i>
       </button>
-      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pb-1 pt-4 text-[11px]/4 text-white">weighbridge-slip.jpg</p>
+      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">weighbridge-slip.jpg</p>
     </div>
     <div>
       <input type="file" id="photo-add" name="photos" accept="image/*" multiple class="peer sr-only">

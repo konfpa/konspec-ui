@@ -19,7 +19,7 @@
      nothing else: no count, no icon, no second line. Wanting any of those is
      the signal to move to the listbox variants below. -->
 <div data-kui="select/groups" class="max-w-sm">
-  <label for="sel-item" class="mb-1.5 block text-[13px]/5 font-medium">Item <span class="text-red-600">*</span></label>
+  <label for="sel-item" class="mb-1.5 block text-[13px]/5 font-medium">Item <span aria-hidden="true" class="text-red-600">*</span></label>
 
   <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <select id="sel-item" name="item" required aria-describedby="sel-item-help"
@@ -49,6 +49,6 @@
   </div>
 
   <p id="sel-item-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
-    Seven items across three groups. Above about fifteen this becomes a combobox, because the answer stops being findable by scrolling.
+    Seven items across three groups. It becomes a combobox at the point nobody can reach the answer by typing the first letters of it.
   </p>
 </div>

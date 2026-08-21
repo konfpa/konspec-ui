@@ -1,0 +1,158 @@
+<!-- The rows are not in the page because they are not the page's to know. Cost
+     centres belong to finance, they open and close through the day, and a form
+     rendered at nine o'clock would still be offering that list at four. So they
+     are fetched the first time the control is opened — late enough to be
+     current, and once, because a page lives for minutes and a request per
+     glance is a request too many.
+
+     Nine rows is well inside listbox territory. What makes this variant is that
+     they are not there when the control is drawn, so the panel has three states
+     to draw that the lists above it never needed: loading, the request failed,
+     and the server answered with nothing.
+
+     Alpine owns open, the keyboard and the value; htmx owns the rows. The
+     custom event is what joins them, because the list opens from a click and
+     from Arrow Down and both have to fetch — hx-trigger="click once" would
+     leave a keyboard user opening an empty box for ever.
+
+     The panel opens before the rows exist and focus stays on the trigger until
+     there is something to put it on. Move it into an empty panel and a keyboard
+     user is standing in a box whose only exit is Escape, pressing arrow keys
+     that do nothing.
+
+     Because the rows came from the server there is no array to index into. The
+     keyboard reads the option elements out of the DOM on every move, and the
+     committed label is read off the row rather than looked up — an Alpine copy
+     of the list goes stale the moment the first response lands.
+
+     once has already been spent by the time a request fails, so the retry is a
+     second element carrying its own hx-get at the same URL and the same target.
+
+     aria-busy on the listbox is what says the empty box is filling rather than
+     empty, and the sr-only status is what says it out loud: a spinner is
+     announced by nothing at all.
+
+     The response is rows and nothing else — one delegated click handler lives
+     on the listbox, so the fragment carries data and no behaviour:
+
+         <div role="option" tabindex="-1" data-value="{{ c.code }}"
+              data-label="{{ c.name }}" aria-label="{{ c.name }}, {{ c.code }}"
+              class="flex items-start gap-3 px-3 py-2 hover:bg-zinc-100
+                     focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2
+                     focus:outline-zinc-700"> … </div> -->
+<div data-kui="select/loading" class="max-w-md"
+     x-data="{
+       open: false, state: 'idle', count: 0, sel: '', label: '', buf: '', timer: null,
+       rows() { return [...this.$refs.list.querySelectorAll('[role=option]')]; },
+       land(last = false) {
+         const r = this.rows();
+         if (!r.length) return;
+         const at = r.findIndex(el => el.dataset.value === this.sel);
+         (at > -1 ? r[at] : (last ? r[r.length - 1] : r[0]))?.focus();
+       },
+       show(last = false) {
+         this.open = true;
+         this.$refs.trigger.dispatchEvent(new CustomEvent('kui-open'));
+         this.$nextTick(() => requestAnimationFrame(() => this.land(last)));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false; this.buf = '';
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const r = this.rows(), at = r.indexOf(document.activeElement);
+         r[Math.min(r.length - 1, Math.max(0, at + step))]?.focus();
+       },
+       edge(last) { const r = this.rows(); (last ? r[r.length - 1] : r[0])?.focus(); },
+       take(el) { if (!el) return; this.sel = el.dataset.value; this.label = el.dataset.label; this.close(); },
+       commit() { const a = document.activeElement; if (a) this.take(a.closest('[role=option]')); },
+       type(k) {
+         clearTimeout(this.timer);
+         this.timer = setTimeout(() => { this.buf = ''; }, 600);
+         this.buf += k.toLowerCase();
+         const r = this.rows(), at = r.indexOf(document.activeElement);
+         const from = this.buf.length > 1 ? Math.max(at, 0) : at + 1;
+         for (let i = 0; i < r.length; i++) {
+           const el = r[(from + i) % r.length];
+           if (el.dataset.label.toLowerCase().startsWith(this.buf)) { el.focus(); return; }
+         }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }"
+     @htmx:before-request.camel="state = 'loading'"
+     @htmx:after-swap.camel="count = rows().length; if (open) $nextTick(() => land())"
+     @htmx:after-request.camel="state = $event.detail.successful ? 'ready' : 'failed'">
+
+  <span id="lb-cc-label" class="mb-1.5 block text-[13px]/5 font-medium">Cost centre</span>
+
+  <div class="relative">
+    <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
+            aria-labelledby="lb-cc-label lb-cc-value" aria-describedby="lb-cc-help"
+            hx-get="/cost-centres/options/" hx-trigger="kui-open once"
+            hx-target="#lb-cc-list" hx-swap="innerHTML"
+            @click="open ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+            class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span id="lb-cc-value" class="min-w-0 flex-1 truncate text-[14px]/5" x-text="label || 'Choose a cost centre'"></span>
+      <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+      <!-- no whitespace inside, or empty:hidden never matches and the panel
+           keeps a 4px band of padding above every message below it -->
+      <div id="lb-cc-list" x-ref="list" role="listbox" aria-labelledby="lb-cc-label"
+           :aria-busy="state === 'loading'"
+           class="max-h-72 overflow-y-auto py-1 empty:hidden"
+           @click="take($event.target.closest('[role=option]'))"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)"
+           @keydown.end.prevent="edge(true)"
+           @keydown.enter.prevent="commit()"
+           @keydown.space.prevent="buf ? type(' ') : commit()"
+           @keydown.tab="close(false)"
+           @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }"></div>
+
+      <div x-show="state === 'loading'" x-cloak class="px-4 py-6 text-center">
+        <p class="flex items-center justify-center gap-2 text-[13px]/5 text-zinc-500">
+          <i data-lucide="loader-circle" class="size-4 shrink-0 animate-spin"></i>Loading cost centres
+        </p>
+      </div>
+
+      <div x-show="state === 'failed'" x-cloak class="px-4 py-6 text-center">
+        <p class="flex items-center justify-center gap-1.5 text-[13px]/5 font-medium text-red-600">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>The cost centre list did not load
+        </p>
+        <button type="button"
+                hx-get="/cost-centres/options/" hx-target="#lb-cc-list" hx-swap="innerHTML"
+                class="mt-2.5 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-ccw" class="size-4 text-zinc-600"></i>Try again
+        </button>
+      </div>
+
+      <div x-show="state === 'ready' && !count" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">No cost centre is open for Silvassa — Unit II</p>
+        <p class="mt-1 text-[12px]/4 text-zinc-500">Finance opens one against the plant before anything can be charged to it.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="hidden" name="cost_centre" :value="sel">
+
+  <p id="lb-cc-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Nine cost centres are open for Silvassa — Unit II. Two lines to a row, the code and what it pays for, which is why this is a listbox and not a select.
+  </p>
+
+  <p role="status" class="sr-only"
+     x-text="state === 'loading'
+               ? 'Loading cost centres'
+               : (state === 'failed'
+                   ? 'The cost centre list did not load'
+                   : (state === 'ready' ? count + ' cost centres' : ''))"></p>
+</div>

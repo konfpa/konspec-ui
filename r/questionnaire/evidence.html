@@ -1,0 +1,83 @@
+<!-- Evidence belongs to the answer, not to the sheet. One Attachments box at
+     the foot of an eighteen-question audit comes back with nine photographs and
+     no way to say which question any of them is about, and the one that matters
+     is the one nobody can place. The input is named for the parameter, so the
+     file arrives keyed to the question it proves.
+
+     The photographs are already uploaded and what the sheet posts is their ids.
+     A file input cannot be given a value, so a sheet that fails validation
+     drops every attachment while keeping every radio — the inspector re-answers
+     nothing and re-photographs everything. Upload on select, render what came
+     back, and carry the id in a hidden input that survives the round trip like
+     any other field.
+
+     The hidden inputs take the same :disabled binding as the file input. Hidden
+     is not exempt: a hidden input inside a display:none block still posts, so
+     an answer changed from Fail back to Pass would keep the evidence for a
+     failure that is no longer recorded.
+
+     required is deliberately absent. The requirement is real, but the file
+     input is empty once the upload has happened, so required on it blocks a
+     sheet that already has two photographs attached. The asterisk states it,
+     the server enforces it, and the failed submit answers with the summary.
+
+     Remove is always visible rather than appearing on hover. This is filled on
+     a phone at an unloading bay, where there is no hover at all. -->
+<div data-kui="questionnaire/evidence" class="max-w-xl" x-data="{ ans: 'fail' }">
+  <fieldset>
+    <legend>
+      <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">Safety audit · unloading bay 3</span>
+      <span class="mt-1.5 block text-[14px]/5 font-medium">Fire extinguisher at the bay is in date and the gauge needle sits in the green</span>
+    </legend>
+
+    <p id="qe-crit" class="mt-1.5 text-[12px]/4 text-zinc-500">Checked against the extinguisher register. A fail is photographed before it is written down.</p>
+
+    <div class="mt-3 grid max-w-sm grid-cols-3 gap-2">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="audit_extinguisher" value="pass" x-model="ans" aria-describedby="qe-crit" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="audit_extinguisher" value="fail" x-model="ans" aria-describedby="qe-crit" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="audit_extinguisher" value="na" x-model="ans" aria-describedby="qe-crit" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div x-show="ans === 'fail'" x-cloak class="mt-4 border-l-2 border-zinc-200 pl-4">
+    <p id="qe-label" class="text-[13px]/5 font-medium">
+      Photograph of the gauge and the service tag <span class="text-red-600">*</span>
+    </p>
+
+    <ul class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <li class="relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
+        <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
+        <input type="hidden" name="audit_extinguisher_evidence" value="EV-4471" :disabled="ans !== 'fail'">
+        <button type="button" aria-label="Remove gauge-needle-red.jpg"
+                class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 hover:text-red-600 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-3.5"></i>
+        </button>
+        <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">gauge-needle-red.jpg</p>
+      </li>
+      <li class="relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
+        <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
+        <input type="hidden" name="audit_extinguisher_evidence" value="EV-4472" :disabled="ans !== 'fail'">
+        <button type="button" aria-label="Remove service-tag-2025.jpg"
+                class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 hover:text-red-600 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-3.5"></i>
+        </button>
+        <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">service-tag-2025.jpg</p>
+      </li>
+    </ul>
+
+    <input type="file" id="qe-add" name="audit_extinguisher_photo" accept="image/*" capture="environment" multiple
+           :disabled="ans !== 'fail'" aria-describedby="qe-label qe-add-help" class="peer sr-only">
+    <label for="qe-add"
+           class="mt-2.5 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+      <i data-lucide="camera" class="size-4 text-zinc-600"></i>Take a photo
+    </label>
+
+    <p id="qe-add-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Uploaded as it is taken, up to 10 MB each. The sheet posts the reference, not the file.</p>
+  </div>
+</div>

@@ -1,0 +1,108 @@
+<!-- The inverse of the register above: there, one name across every row picks
+     one record; here every row is its own question and the name carries the
+     line id — qc_l1, qc_l2. Repeat one name down the column and the four lines
+     become one group four answers long, so answering the second clears the
+     first, the POST carries a single key, and the screen looks correct until
+     somebody notices the GRN posted with one line decided.
+
+     No fieldset and no legend, because a fieldset cannot wrap a table row. That
+     leaves each option with nothing to name it — a screen reader in forms mode
+     reads the control, not the header of the cell it sits in — so every radio
+     carries an aria-label with the line and the answer in it. Twelve radios all
+     called "Accept" say nothing about which line the cursor is on.
+
+     Every line is a separate group, so every line is its own Tab stop and the
+     arrows move within one line rather than down the column. That is the right
+     behaviour and it is also why the count in the footer earns its place: with
+     eighteen lines, which of them are still undecided is not something the eye
+     gets from a column of dots.
+
+     The columns that describe the material drop out below md and reappear under
+     the line name. The three answer columns never drop, and the rows are never
+     rendered twice for a phone: two copies share the name, and the checked
+     option in the display:none copy is the one that posts. -->
+<div data-kui="radio/rows" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{ lines: { l1: 'accept', l2: '', l3: 'hold', l4: '' } }">
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-2.5 font-medium">Line</th>
+        <th scope="col" class="hidden px-3 py-2.5 text-right font-medium md:table-cell">Received</th>
+        <th scope="col" class="w-12 px-2 py-2.5 text-center font-medium">Accept</th>
+        <th scope="col" class="w-12 px-2 py-2.5 text-center font-medium">Hold</th>
+        <th scope="col" class="w-12 px-2 py-2.5 text-center font-medium">Reject</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-medium">Polypropylene granules
+          <span class="mt-0.5 block font-normal tabular-nums text-zinc-600">HD-118 · lot 24-HD-118<span class="md:hidden"> · 4,500 kg</span></span>
+        </th>
+        <td class="hidden px-3 py-2.5 text-right tabular-nums md:table-cell">4,500 kg</td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l1" value="accept" checked x-model="lines.l1" aria-label="Polypropylene granules HD-118 — accept" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l1" value="hold" x-model="lines.l1" aria-label="Polypropylene granules HD-118 — hold" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l1" value="reject" x-model="lines.l1" aria-label="Polypropylene granules HD-118 — reject" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-medium">Masterbatch, black
+          <span class="mt-0.5 block font-normal tabular-nums text-zinc-600">MB-BLK-02 · lot 24-MB-441<span class="md:hidden"> · 200 kg</span></span>
+        </th>
+        <td class="hidden px-3 py-2.5 text-right tabular-nums md:table-cell">200 kg</td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l2" value="accept" x-model="lines.l2" aria-label="Masterbatch, black MB-BLK-02 — accept" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l2" value="hold" x-model="lines.l2" aria-label="Masterbatch, black MB-BLK-02 — hold" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l2" value="reject" x-model="lines.l2" aria-label="Masterbatch, black MB-BLK-02 — reject" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-medium">HDPE liner film
+          <span class="mt-0.5 block font-normal tabular-nums text-zinc-600">FL-HD-40 · lot 24-FL-207<span class="md:hidden"> · 18 MT</span></span>
+        </th>
+        <td class="hidden px-3 py-2.5 text-right tabular-nums md:table-cell">18 MT</td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l3" value="accept" x-model="lines.l3" aria-label="HDPE liner film FL-HD-40 — accept" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l3" value="hold" checked x-model="lines.l3" aria-label="HDPE liner film FL-HD-40 — hold" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l3" value="reject" x-model="lines.l3" aria-label="HDPE liner film FL-HD-40 — reject" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-3 py-2.5 text-left font-medium">Stretch wrap, 23 micron
+          <span class="mt-0.5 block font-normal tabular-nums text-zinc-600">SW-23 · lot 24-SW-090<span class="md:hidden"> · 400 nos</span></span>
+        </th>
+        <td class="hidden px-3 py-2.5 text-right tabular-nums md:table-cell">400 nos</td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l4" value="accept" x-model="lines.l4" aria-label="Stretch wrap, 23 micron SW-23 — accept" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l4" value="hold" x-model="lines.l4" aria-label="Stretch wrap, 23 micron SW-23 — hold" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l4" value="reject" x-model="lines.l4" aria-label="Stretch wrap, 23 micron SW-23 — reject" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- The count is derived from the same state the rows render from. A line
+       nobody answered posts no key at all, so this is also what the view has to
+       be told: read the answers back by iterating the lines on the GRN, never
+       the keys that arrived in the POST. -->
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
+    <span class="text-[13px]/5 tabular-nums"><span x-text="Object.values(lines).filter(Boolean).length"></span> of 4 lines decided</span>
+    <button type="button" class="shrink-0 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Post GRN</button>
+  </div>
+</div>

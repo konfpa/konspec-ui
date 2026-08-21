@@ -2,6 +2,11 @@
      clicks. The header doubles as two selects, so any month in a twelve-year
      window is one gesture.
 
+     The selects take focus: rather than focus-visible:, which is what every
+     native field in this system does — a select shows its outline on a pointer
+     open as well, and hiding it there is the one case where the two differ
+     visibly.
+
      The year list is built around the current year rather than hard-coded, so
      this markup does not quietly expire. -->
 <div data-kui="calendar/jump" class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
@@ -57,7 +62,7 @@
      }">
   <div class="flex items-center gap-1.5 pb-2">
     <button type="button" @click="shift(-1)" aria-label="Previous month"
-            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
 
@@ -78,13 +83,15 @@
     </select>
 
     <button type="button" @click="shift(1)" aria-label="Next month"
-            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
   <table x-ref="grid" class="border-collapse"
            @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
              @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+             @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+             @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
              @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
     <caption class="sr-only" x-text="'Calendar, ' + title(0)"></caption>
     <thead>
@@ -105,7 +112,7 @@
                         :aria-current="c.iso === today ? 'date' : null"
                         :tabindex="c.iso === focus ? 0 : -1"
                         :data-focus="c.iso === focus ? '1' : null"
-                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                         :class="cls(c.iso)" x-text="c.day"></button>
               </template>
               <template x-if="!c"><span class="block size-9"></span></template>

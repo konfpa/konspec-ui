@@ -5,7 +5,12 @@
 
      One locked row keeps its place and its position. Dropping it would change
      the shape of a list people scan by position, and repainting it to the off
-     fill would say the setting is off when it is on and out of their hands. -->
+     fill would say the setting is off when it is on and out of their hands.
+
+     That row takes plain disabled rather than aria-disabled, because its reason
+     is already printed under it. The readonly variant carries the other case,
+     where the sentence is the only thing that explains the lock and has to stay
+     reachable from the keyboard. -->
 <div data-kui="toggle/list" class="max-w-xl rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[13px]/5 font-medium">Notifications — Gujarat Polymers Ltd</h3>

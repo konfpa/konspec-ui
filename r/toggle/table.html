@@ -1,0 +1,128 @@
+<!-- A column of switches over a register, where the switch is the record's
+     state rather than a preference of the user's. The column header names
+     nothing: it is not associated with the input under it, so every switch
+     carries aria-label with the column and the record in it — twelve switches
+     called Active say nothing about which row the cursor is on. The label wraps
+     the input for the pointer and the target and holds no text of its own.
+
+     There is no status line per row and there is no room for one. The table
+     carries a single role="status" underneath it and the message names the
+     record it is about, so one handler on the table covers every row: htmx
+     events bubble, and $event.detail.elt is the switch that failed. Flipping
+     that element's checked back is the whole revert, because hx-sync has
+     already made sure nothing else was in flight against it.
+
+     Three columns, rendered once. A desktop table with a stacked phone list
+     under it would put two switches on one record, and after a write the hidden
+     one is wrong — so the vendor name wraps instead and the row keeps its
+     shape at 390px.
+
+     The small track is the one for a table: a 20px pill in a 13px row is taller
+     than everything beside it. -->
+<div data-kui="toggle/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{ msg: '' }"
+     @htmx:before-request.camel="msg = ''"
+     @htmx:after-request.camel="
+       if (!$event.detail.successful) {
+         $event.detail.elt.checked = !$event.detail.elt.checked;
+         msg = 'Not saved — ' + $event.detail.elt.dataset.vendor + ' is unchanged';
+       }">
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5">Vendor</th>
+        <th scope="col" class="px-3 py-2.5 text-right">Open</th>
+        <th scope="col" class="px-4 py-2.5 text-right">Active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2">
+          <span class="block">Gujarat Polymers Ltd</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-500">24AAACG1234F1Z5</span>
+        </td>
+        <td class="px-3 py-2 text-right tabular-nums text-zinc-600">18</td>
+        <td class="px-4 py-2 text-right">
+          <label class="inline-flex py-1">
+            <input type="checkbox" role="switch" checked
+                   aria-label="Active — Gujarat Polymers Ltd" data-vendor="Gujarat Polymers Ltd"
+                   hx-post="/vendors/gujarat-polymers/active/"
+                   hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                   class="peer sr-only">
+            <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+              <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+            </span>
+          </label>
+        </td>
+      </tr>
+
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2">
+          <span class="block">Sharma Extrusions</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-500">27AABCS5678K1Z2</span>
+        </td>
+        <td class="px-3 py-2 text-right tabular-nums text-zinc-600">6</td>
+        <td class="px-4 py-2 text-right">
+          <label class="inline-flex py-1">
+            <input type="checkbox" role="switch" checked
+                   aria-label="Active — Sharma Extrusions" data-vendor="Sharma Extrusions"
+                   hx-post="/vendors/sharma-extrusions/active/"
+                   hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                   class="peer sr-only">
+            <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+              <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+            </span>
+          </label>
+        </td>
+      </tr>
+
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2">
+          <span class="block">Nashik Steel Traders</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-500">27AACCN9012M1Z8</span>
+        </td>
+        <td class="px-3 py-2 text-right tabular-nums text-zinc-600">0</td>
+        <td class="px-4 py-2 text-right">
+          <label class="inline-flex py-1">
+            <input type="checkbox" role="switch"
+                   aria-label="Active — Nashik Steel Traders" data-vendor="Nashik Steel Traders"
+                   hx-post="/vendors/nashik-steel/active/"
+                   hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                   class="peer sr-only">
+            <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+              <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+            </span>
+          </label>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="px-4 py-2">
+          <span class="block">Deccan Fasteners Pvt Ltd</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-500">29AADCD3456P1Z1</span>
+        </td>
+        <td class="px-3 py-2 text-right tabular-nums text-zinc-600">3</td>
+        <td class="px-4 py-2 text-right">
+          <label class="inline-flex py-1">
+            <input type="checkbox" role="switch" checked
+                   aria-label="Active — Deccan Fasteners Pvt Ltd" data-vendor="Deccan Fasteners Pvt Ltd"
+                   hx-post="/vendors/deccan-fasteners/active/"
+                   hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                   class="peer sr-only">
+            <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+              <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+            </span>
+          </label>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p role="status" class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4">
+    <span x-show="!msg" class="text-zinc-500">An inactive vendor keeps its history and takes no new orders. Each switch applies as you set it.</span>
+    <span x-show="msg" x-cloak class="flex items-center gap-1.5 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i><span x-text="msg"></span>
+    </span>
+  </p>
+</div>

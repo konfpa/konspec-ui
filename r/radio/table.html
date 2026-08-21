@@ -9,7 +9,12 @@
      and the checked option in the display:none copy is the one that wins.
 
      No select-all and no bulk bar. The answer is a single record, so it is named
-     in the footer instead — the filled dot alone is not readable at a glance. -->
+     in the footer instead — the filled dot alone is not readable at a glance.
+
+     The chosen row carries a static checked as well as x-model. x-model only
+     applies its value once Alpine has booted, so without it the first paint of
+     the table shows nothing chosen and the footer names a record no dot agrees
+     with, for as long as the page takes to hydrate. -->
 <div data-kui="radio/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ po: 'PO-24-1191' }">
   <table class="w-full text-[13px]/5">
@@ -38,7 +43,7 @@
       </tr>
       <tr class="border-b border-zinc-100 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
         <td class="px-4 py-2.5">
-          <input type="radio" name="grn_against" value="PO-24-1191" x-model="po"
+          <input type="radio" name="grn_against" value="PO-24-1191" checked x-model="po"
                  aria-label="Raise the GRN against PO-24-1191"
                  class="size-4 accent-zinc-700">
         </td>
@@ -62,9 +67,11 @@
         <td class="px-4 py-2.5 text-right tabular-nums">4,500 kg</td>
         <td class="hidden px-4 py-2.5 text-right tabular-nums text-zinc-600 md:table-cell">02 Aug</td>
       </tr>
-      <!-- closed to receipt, and still in its place: dropping the row would
-           change the shape of a list people scan by position -->
-      <tr class="[&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <!-- Closed to receipt, and still in its place: dropping the row would
+           change the shape of a list people scan by position. It is the one row
+           with no hover — a row that lights up under the cursor and then refuses
+           the click reads as a broken table rather than as a closed order. -->
+      <tr>
         <td class="px-4 py-2.5">
           <input type="radio" name="grn_against" value="PO-24-1203" disabled
                  aria-label="PO-24-1203, fully received, cannot be picked"

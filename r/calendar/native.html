@@ -2,14 +2,19 @@
      any grid rendered in a page; it validates, it respects the device locale,
      and it posts an ISO string that Django parses with no format setting at all.
 
+     max and the help text say the same date. A control that allows what the
+     line under it forbids is the version that ships, and the user finds out
+     from the server.
+
      Use the grid instead when the choice depends on seeing the month — a
      delivery date next to the weekend, a range across a month end. Use this
      when the user already knows the date. -->
 <div data-kui="calendar/native" class="max-w-xs">
   <label for="grn-date" class="mb-1.5 block text-[13px]/5 font-medium">GRN date</label>
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-    <input type="date" id="grn-date" name="grn_date" value="2026-08-14" max="2026-12-31"
+    <input type="date" id="grn-date" name="grn_date" value="2026-08-14" max="2026-08-20"
+           aria-describedby="grn-date-msg"
            class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
   </div>
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Cannot be later than the invoice date.</p>
+  <p id="grn-date-msg" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Cannot be later than the invoice date, 20 Aug 2026.</p>
 </div>

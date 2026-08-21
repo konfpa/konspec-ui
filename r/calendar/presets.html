@@ -6,10 +6,18 @@
      a bug that only appears in Q1 and only to accounts.
 
      Picking a day in the grid clears the preset label, because the range is no
-     longer the thing the preset named. -->
+     longer the thing the preset named.
+
+     The preset column wraps below sm rather than scrolling sideways. A strip of
+     six chips in a horizontal scroller hides half of them behind a gesture
+     nothing on the page suggests, and on a phone that is the half people want.
+
+     Two live regions again: the panel header carries the range, the caption
+     over the left month carries the month. -->
 <div data-kui="calendar/presets" class="relative inline-block"
      x-data="{
        open: false,
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        vy: new Date().getFullYear(),
        vm: new Date().getMonth(),
        today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
@@ -42,8 +50,16 @@
          const last = new Date(this.vy, this.vm + 1, 0).getDate();
          this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
        },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
        start: null, end: null, hover: null,
        pick(s) {
+         this.focus = s;
          if (!this.start || (this.start && this.end)) { this.start = s; this.end = null; return; }
          if (s < this.start) { this.end = this.start; this.start = s; } else { this.end = s; }
          this.hover = null;
@@ -79,13 +95,15 @@
          if (name === 'This FY')      { a = new Date(m < 3 ? y - 1 : y, 3, 1); b = new Date(y, m, d); }
          this.start = this.iso(a.getFullYear(), a.getMonth(), a.getDate());
          this.end = this.iso(b.getFullYear(), b.getMonth(), b.getDate());
+         this.focus = this.end;
          this.preset = name;
-         this.vy = a.getFullYear(); this.vm = a.getMonth();
+         const v = new Date(b.getFullYear(), b.getMonth(), 1);
+         this.vy = v.getFullYear(); this.vm = v.getMonth();
        },
        tap(s) { this.preset = null; this.pick(s); }
      }" @click.outside="open = false" @keydown.escape.window="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="dialog"
-          class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200">
+          class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="calendar-range" class="size-4 text-zinc-600"></i>
     <span class="tabular-nums" x-text="preset || (start ? fmt(start) + ' – ' + fmt(end) : 'Select period')"></span>
     <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -93,11 +111,11 @@
 
   <div x-show="open" x-cloak x-trap="open" role="dialog" aria-label="Choose a reporting period"
        class="absolute left-0 z-40 mt-1 flex flex-col rounded-xl border border-zinc-200 bg-white shadow-lg sm:flex-row">
-    <div class="flex shrink-0 gap-1 overflow-x-auto border-b border-zinc-200 p-2 sm:w-44 sm:flex-col sm:gap-0.5 sm:overflow-visible sm:border-r sm:border-b-0">
+    <div class="flex shrink-0 flex-wrap gap-1 border-b border-zinc-200 p-2 sm:w-44 sm:flex-col sm:flex-nowrap sm:gap-0.5 sm:border-r sm:border-b-0">
       <template x-for="p in presets" :key="p">
         <button type="button" @click="apply(p)" :aria-pressed="preset === p"
-                class="inline-flex h-8 shrink-0 items-center rounded-lg px-3 text-left text-[13px]/5 whitespace-nowrap"
-                :class="preset === p ? 'bg-zinc-700 font-medium text-white' : 'text-zinc-900 hover:bg-zinc-200'">
+                class="inline-flex h-8 items-center rounded-lg px-3 text-left text-[13px]/5 whitespace-nowrap focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="preset === p ? 'bg-zinc-700 font-medium text-white hover:bg-zinc-800' : 'text-zinc-900 hover:bg-zinc-200'">
           <span x-text="p"></span>
         </button>
       </template>
@@ -106,19 +124,25 @@
     <div class="p-3">
       <div class="flex items-center justify-between pb-2">
         <button type="button" @click="shift(-1)" aria-label="Previous month"
-                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="chevron-left" class="size-4"></i>
         </button>
         <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="fmt(start) + ' – ' + fmt(end)"></span>
         <button type="button" @click="shift(1)" aria-label="Next month"
-                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="chevron-right" class="size-4"></i>
         </button>
       </div>
-      <div class="flex flex-col gap-5 lg:flex-row" @mouseleave="hover = null">
+      <div x-ref="grid" class="flex flex-col gap-5 lg:flex-row" @mouseleave="hover = null"
+           @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+           @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+           @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+           @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
         <template x-for="o in [0, 1]" :key="o">
           <div :class="o === 1 && 'hidden lg:block'">
-            <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600" x-text="title(o)"></p>
+            <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600"
+               :aria-live="o === 0 ? 'polite' : null" x-text="title(o)"></p>
             <table class="border-collapse">
               <caption class="sr-only" x-text="'Calendar, ' + title(o)"></caption>
               <thead>
@@ -137,7 +161,9 @@
                           <button type="button" @click="tap(c.iso)" @mouseenter="if (start && !end) hover = c.iso"
                                   :aria-label="long(c.iso)" :aria-pressed="isEnd(c.iso)"
                                   :aria-current="c.iso === today ? 'date' : null"
-                                  class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                                  :tabindex="c.iso === focus ? 0 : -1"
+                                  :data-focus="c.iso === focus ? '1' : null"
+                                  class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                                   :class="cls(c.iso)" x-text="c.day"></button>
                         </template>
                         <template x-if="!c"><span class="block size-9"></span></template>
@@ -154,9 +180,9 @@
         <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="span() ? span() + ' days' : 'No period set'"></span>
         <div class="flex items-center gap-2">
           <button type="button" @click="start = null; end = null; preset = null"
-                  class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">Clear</button>
+                  class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
           <button type="button" @click="open = false" :disabled="!start || !end"
-                  class="inline-flex h-8 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400">Apply</button>
+                  class="inline-flex h-8 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Apply</button>
         </div>
       </div>
     </div>

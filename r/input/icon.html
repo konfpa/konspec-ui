@@ -11,12 +11,18 @@
 
      A unit rendered as text is not submitted. What posts is the number alone,
      so the server has to know that this field is rupees and that one is
-     percent — the prefix tells the user, not the endpoint. -->
+     percent — the prefix tells the user, not the endpoint.
+
+     And it only tells a user who can see it, unless the span has an id and
+     that id is first in aria-describedby. A % sitting beside the box is not
+     part of the value, not part of the label and not read with either, so a
+     tolerance of 2 is announced as the number 2 and the field might as well be
+     counting anything. -->
 <div data-kui="input/icon" class="max-w-xl space-y-5">
   <div>
     <label for="in-search" class="mb-1.5 block text-[13px]/5 font-medium">Find a vendor</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
       <input id="in-search" placeholder="Name, GSTIN or vendor code"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
     </div>
@@ -25,9 +31,9 @@
   <div>
     <label for="in-tol" class="mb-1.5 block text-[13px]/5 font-medium">Receipt tolerance</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <input id="in-tol" name="tolerance" value="2" inputmode="decimal" aria-describedby="in-tol-help"
+      <input id="in-tol" name="tolerance" value="2" inputmode="decimal" aria-describedby="in-tol-unit in-tol-help"
              class="w-full min-w-0 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
-      <span class="pr-3 text-[14px]/5 text-zinc-600">%</span>
+      <span id="in-tol-unit" class="shrink-0 pr-3 text-[14px]/5 text-zinc-600">%</span>
     </div>
     <p id="in-tol-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Over-receipt allowed against the ordered quantity.</p>
   </div>
@@ -35,9 +41,11 @@
   <div>
     <label for="in-code" class="mb-1.5 block text-[13px]/5 font-medium">Item code</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <span class="pl-3 font-mono text-[13px]/5 text-zinc-500">KSP-</span>
+      <span id="in-code-prefix" class="shrink-0 pl-3 font-mono text-[13px]/5 text-zinc-500">KSP-</span>
       <input id="in-code" name="item_code" value="4471029" inputmode="numeric" spellcheck="false"
+             aria-describedby="in-code-prefix in-code-help"
              class="w-full min-w-0 bg-transparent py-2 pr-3 pl-1 font-mono text-[13px]/5 tabular-nums outline-none">
     </div>
+    <p id="in-code-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Every Konspec code begins KSP-, so only the seven digits after it are typed and only the seven digits post.</p>
   </div>
 </div>

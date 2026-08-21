@@ -4,9 +4,14 @@
      Read-only is still a field. readonly keeps it in the tab order, keeps the
      value selectable, and still posts it. disabled does none of those, so a
      disabled order number drops out of the POST and a server that reads absence
-     as a change clears it. The locked surface — bg-zinc-200, no focus outline —
-     is what says you cannot type here; the zinc-900 text is what says the value
-     still matters.
+     as a change clears it. The locked surface — bg-zinc-200 — is what says you
+     cannot type here; the zinc-900 text is what says the value still matters.
+
+     The read-only field keeps its focus outline, and that is not a decoration
+     left in by accident. It is in the tab order precisely so the number can be
+     selected and copied, so a keyboard user lands on it, and a focusable
+     control with nothing drawn round it is a control they cannot find. The
+     disabled field below takes no outline because focus can never reach it.
 
      A derived number is not a control at all. Drawing it as a disabled input
      promises an edit that will never be allowed; it is <output>, which is one
@@ -23,7 +28,7 @@
 
   <div>
     <label for="fr-no" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <input id="fr-no" name="number" readonly value="PO-24-1187" aria-describedby="fr-no-msg"
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>

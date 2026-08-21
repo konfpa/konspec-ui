@@ -6,12 +6,25 @@
      before its start swaps them rather than refusing: the user has said which
      two days they mean and the order is an implementation detail.
 
+     The roving tabindex spans both tables — one focus value, and the day that
+     matches it is the only tabbable cell in either month. Two months without it
+     is over sixty tab stops. move() always pulls the view so the focused day
+     lands in the left-hand table, because the right-hand one is hidden below
+     lg: focus() on a display:none button is a silent no-op and the grid reads
+     as having no keyboard at all.
+
      The band sits on the td and the endpoints on the button, so one continuous
      stripe runs behind the row while the two ends stay round. Today keeps only
      a ring here, not a fill — a zinc-200 chip inside a zinc-200 band is
-     invisible. -->
+     invisible.
+
+     Two live regions, and they never speak together: the month caption
+     announces paging, the footer announces the range. Wiring the range alone
+     and leaving the previous and next buttons silent is what the first version
+     did. -->
 <div data-kui="calendar/range" class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        vy: new Date().getFullYear(),
        vm: new Date().getMonth(),
        today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
@@ -44,8 +57,16 @@
          const last = new Date(this.vy, this.vm + 1, 0).getDate();
          this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
        },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
        start: null, end: null, hover: null,
        pick(s) {
+         this.focus = s;
          if (!this.start || (this.start && this.end)) { this.start = s; this.end = null; return; }
          if (s < this.start) { this.end = this.start; this.start = s; } else { this.end = s; }
          this.hover = null;
@@ -70,19 +91,25 @@
      }">
   <div class="flex items-center justify-between pb-2">
     <button type="button" @click="shift(-1)" aria-label="Previous month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
-    <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="fmt(start) + ' – ' + fmt(end)"></span>
+    <span class="text-[13px]/5 font-medium tabular-nums" x-text="fmt(start) + ' – ' + fmt(end)"></span>
     <button type="button" @click="shift(1)" aria-label="Next month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
-  <div class="flex flex-col gap-5 lg:flex-row" @mouseleave="hover = null">
+  <div x-ref="grid" class="flex flex-col gap-5 lg:flex-row" @mouseleave="hover = null"
+       @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+       @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+       @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+       @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+       @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
     <template x-for="o in [0, 1]" :key="o">
       <div :class="o === 1 && 'hidden lg:block'">
-        <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600" x-text="title(o)"></p>
+        <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600"
+           :aria-live="o === 0 ? 'polite' : null" x-text="title(o)"></p>
         <table class="border-collapse">
           <caption class="sr-only" x-text="'Calendar, ' + title(o)"></caption>
           <thead>
@@ -101,7 +128,9 @@
                       <button type="button" @click="pick(c.iso)" @mouseenter="if (start && !end) hover = c.iso"
                               :aria-label="long(c.iso)" :aria-pressed="isEnd(c.iso)"
                               :aria-current="c.iso === today ? 'date' : null"
-                              class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                              :tabindex="c.iso === focus ? 0 : -1"
+                              :data-focus="c.iso === focus ? '1' : null"
+                              class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                               :class="cls(c.iso)" x-text="c.day"></button>
                     </template>
                     <template x-if="!c"><span class="block size-9"></span></template>
@@ -115,8 +144,8 @@
     </template>
   </div>
   <div class="mt-3 flex items-center justify-between border-t border-zinc-200 pt-2">
-    <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="span() ? span() + ' days' : 'Pick a start and an end'"></span>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500" aria-live="polite" x-text="span() ? span() + ' days' : 'Pick a start and an end'"></span>
     <button type="button" @click="start = null; end = null; hover = null"
-            class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Clear</button>
+            class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
   </div>
 </div>

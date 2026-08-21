@@ -1,0 +1,143 @@
+<!-- The same picker at 390px. Three things change and they are the three that
+     always change.
+
+     The cells are 44px, not 36. A size-9 square is right under a pointer and
+     under the recommended touch target, and the fix is not tighter padding
+     around the same square — the table is table-fixed and w-full, so the seven
+     columns are fractions of whatever width the panel has and the cell grows
+     into its share.
+
+     The panel is in the flow, not absolutely positioned. A popover anchored to
+     a field near the right edge of a 390px screen hangs off it, and the usual
+     answer — a fixed overlay — is a drawer, which is its own component. Here it
+     pushes the page down, which on a phone is what the user expects anyway.
+
+     Done commits; the tap only drafts. A thumb lands on 13 instead of 14 often
+     enough that a panel closing on contact means opening it again to correct
+     the value, and Cancel puts the draft back to what was committed. That is
+     also why closing by tapping outside cancels rather than saves. -->
+<div data-kui="calendar/phone" class="w-full max-w-sm"
+     x-data="{
+       open: false,
+       sel: null, draft: null,
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       vy: new Date().getFullYear(),
+       vm: new Date().getMonth(),
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
+       title(o) { return new Date(this.vy, this.vm + o, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       long(s) { return this.parse(s).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); },
+       fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
+       weeks(o) {
+         const y = this.vy, m = this.vm + o;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) {
+           const dt = new Date(y, m, d);
+           cells.push({ iso: this.iso(dt.getFullYear(), dt.getMonth(), d), day: d, dow: dt.getDay() });
+         }
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       },
+       shift(n) { const v = new Date(this.vy, this.vm + n, 1); this.vy = v.getFullYear(); this.vm = v.getMonth(); this.clamp(); },
+       clamp() {
+         if (!this.focus) return;
+         const f = this.parse(this.focus);
+         if (f.getFullYear() === this.vy && f.getMonth() === this.vm) return;
+         const last = new Date(this.vy, this.vm + 1, 0).getDate();
+         this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
+       },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
+       show() {
+         this.draft = this.sel;
+         if (this.draft) { const f = this.parse(this.draft); this.vy = f.getFullYear(); this.vm = f.getMonth(); this.focus = this.draft; }
+         this.open = true;
+       },
+       done() { this.sel = this.draft; this.close(); },
+       close(back = true) { this.open = false; if (back) this.$nextTick(() => this.$refs.trigger.focus()); },
+       cls(s) {
+         if (s === this.draft) return 'bg-zinc-700 font-medium text-white hover:bg-zinc-800';
+         if (s === this.today) return 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300';
+         return 'text-zinc-900 hover:bg-zinc-200';
+       }
+     }" @click.outside="if (open) close(false)" @keydown.escape.window="if (open) close()">
+  <span id="ph-label" class="mb-1.5 block text-[13px]/5 font-medium">Expected delivery</span>
+  <input type="hidden" name="expected_on" :value="sel">
+
+  <button type="button" x-ref="trigger" @click="open ? close() : show()"
+          aria-labelledby="ph-label ph-value" :aria-expanded="open" aria-haspopup="dialog"
+          class="flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[14px]/5 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <span id="ph-value" class="tabular-nums" :class="sel ? 'text-zinc-900' : 'text-zinc-500'" x-text="sel ? fmt(sel) : 'Select a date'"></span>
+    <i data-lucide="calendar" class="size-4 shrink-0 text-zinc-600"></i>
+  </button>
+
+  <div x-show="open" x-cloak x-trap="open" role="dialog" aria-label="Choose the expected delivery date"
+       class="mt-1 w-full rounded-xl border border-zinc-300 bg-white p-2">
+    <div class="flex items-center justify-between pb-1">
+      <button type="button" @click="shift(-1)" aria-label="Previous month"
+              class="inline-flex size-11 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-5"></i>
+      </button>
+      <span class="text-[14px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
+      <button type="button" @click="shift(1)" aria-label="Next month"
+              class="inline-flex size-11 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-right" class="size-5"></i>
+      </button>
+    </div>
+
+    <table x-ref="grid" class="w-full table-fixed border-collapse"
+           @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+           @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+           @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+           @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
+      <caption class="sr-only" x-text="'Calendar, ' + title(0)"></caption>
+      <thead>
+        <tr>
+          <template x-for="h in head" :key="h">
+            <th scope="col" class="h-8 text-[11px]/4 font-medium text-zinc-500" x-text="h"></th>
+          </template>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="(week, wi) in weeks(0)" :key="wi">
+          <tr>
+            <template x-for="(c, ci) in week" :key="ci">
+              <td class="p-0 text-center">
+                <template x-if="c">
+                  <button type="button" @click="draft = c.iso; focus = c.iso"
+                          :aria-label="long(c.iso)" :aria-pressed="c.iso === draft"
+                          :aria-current="c.iso === today ? 'date' : null"
+                          :tabindex="c.iso === focus ? 0 : -1"
+                          :data-focus="c.iso === focus ? '1' : null"
+                          class="mx-auto flex size-11 items-center justify-center rounded-lg text-[14px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                          :class="cls(c.iso)" x-text="c.day"></button>
+                </template>
+                <template x-if="!c"><span class="mx-auto block size-11"></span></template>
+              </td>
+            </template>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+
+    <div class="mt-2 flex items-center gap-2 border-t border-zinc-200 pt-2">
+      <button type="button" @click="close()"
+              class="inline-flex h-11 flex-1 items-center justify-center rounded-lg border border-zinc-200 bg-white text-[14px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+      <button type="button" @click="done()" :disabled="!draft"
+              class="inline-flex h-11 flex-1 items-center justify-center rounded-lg border border-transparent bg-zinc-700 text-[14px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Done</button>
+    </div>
+  </div>
+</div>

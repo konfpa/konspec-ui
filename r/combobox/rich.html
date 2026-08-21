@@ -43,6 +43,7 @@
          this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
          this.scroll();
        },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
        pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
        commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
      }"
@@ -61,6 +62,8 @@
            @input="typed = true; open = true; ai = 0"
            @keydown.arrow-down.prevent="move(1)"
            @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
            @keydown.enter="if (open) { $event.preventDefault(); commit() }"
            @keydown.tab="close()"
            class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">

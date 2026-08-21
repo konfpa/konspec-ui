@@ -11,7 +11,7 @@
 
 [![CI](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml)
 [![components](https://img.shields.io/badge/components-55-18181b?style=flat-square)](#components)
-[![variants](https://img.shields.io/badge/variants-436-18181b?style=flat-square)](#components)
+[![variants](https://img.shields.io/badge/variants-505-18181b?style=flat-square)](#components)
 [![build step](https://img.shields.io/badge/build_step-none-18181b?style=flat-square)](#running-it-locally)
 [![licence](https://img.shields.io/badge/licence-MIT-18181b?style=flat-square)](LICENSE)
 
@@ -72,7 +72,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**55 components · 436 variants · 55 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
+**55 components · 505 variants · 55 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
 
 ### Actions
 
@@ -86,19 +86,19 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 
 | Component | id | Variants | Page |
 |---|---|--:|---|
-| Label | `label` | 9 | [open](https://konfpa.github.io/konspec-ui/components/label.html) |
-| Field | `field` | 9 | [open](https://konfpa.github.io/konspec-ui/components/field.html) |
-| Input | `input` | 9 | [open](https://konfpa.github.io/konspec-ui/components/input.html) |
-| Input group | `input-group` | 9 | [open](https://konfpa.github.io/konspec-ui/components/input-group.html) |
-| Select | `select` | 9 | [open](https://konfpa.github.io/konspec-ui/components/select.html) |
-| Textarea | `textarea` | 8 | [open](https://konfpa.github.io/konspec-ui/components/textarea.html) |
-| Checkbox | `checkbox` | 8 | [open](https://konfpa.github.io/konspec-ui/components/checkbox.html) |
-| Radio | `radio` | 8 | [open](https://konfpa.github.io/konspec-ui/components/radio.html) |
-| Toggle | `toggle` | 8 | [open](https://konfpa.github.io/konspec-ui/components/toggle.html) |
-| Combobox | `combobox` | 9 | [open](https://konfpa.github.io/konspec-ui/components/combobox.html) |
-| Attachment | `attachment` | 8 | [open](https://konfpa.github.io/konspec-ui/components/attachment.html) |
-| Calendar | `calendar` | 8 | [open](https://konfpa.github.io/konspec-ui/components/calendar.html) |
-| Questionnaire | `questionnaire` | 9 | [open](https://konfpa.github.io/konspec-ui/components/questionnaire.html) |
+| Label | `label` | 15 | [open](https://konfpa.github.io/konspec-ui/components/label.html) |
+| Field | `field` | 14 | [open](https://konfpa.github.io/konspec-ui/components/field.html) |
+| Input | `input` | 14 | [open](https://konfpa.github.io/konspec-ui/components/input.html) |
+| Input group | `input-group` | 15 | [open](https://konfpa.github.io/konspec-ui/components/input-group.html) |
+| Select | `select` | 14 | [open](https://konfpa.github.io/konspec-ui/components/select.html) |
+| Textarea | `textarea` | 13 | [open](https://konfpa.github.io/konspec-ui/components/textarea.html) |
+| Checkbox | `checkbox` | 14 | [open](https://konfpa.github.io/konspec-ui/components/checkbox.html) |
+| Radio | `radio` | 13 | [open](https://konfpa.github.io/konspec-ui/components/radio.html) |
+| Toggle | `toggle` | 13 | [open](https://konfpa.github.io/konspec-ui/components/toggle.html) |
+| Combobox | `combobox` | 14 | [open](https://konfpa.github.io/konspec-ui/components/combobox.html) |
+| Attachment | `attachment` | 13 | [open](https://konfpa.github.io/konspec-ui/components/attachment.html) |
+| Calendar | `calendar` | 14 | [open](https://konfpa.github.io/konspec-ui/components/calendar.html) |
+| Questionnaire | `questionnaire` | 14 | [open](https://konfpa.github.io/konspec-ui/components/questionnaire.html) |
 
 ### Data display
 

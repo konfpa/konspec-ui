@@ -1,7 +1,7 @@
 <div data-kui="textarea/error" class="max-w-xl">
-  <label for="ta-bad" class="mb-1.5 block text-[13px]/5 font-medium">Rejection reason <span class="text-red-600">*</span></label>
+  <label for="ta-bad" class="mb-1.5 block text-[13px]/5 font-medium">Rejection reason <span aria-hidden="true" class="text-red-600">*</span></label>
   <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
-    <textarea id="ta-bad" name="reason" rows="4" aria-invalid="true" aria-describedby="ta-bad-err"
+    <textarea id="ta-bad" name="reason" rows="4" required aria-invalid="true" aria-describedby="ta-bad-err"
               class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none"></textarea>
   </div>
   <!-- the error replaces the help text, it does not stack under it -->

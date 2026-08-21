@@ -15,6 +15,11 @@
              vendor = get_object_or_404(Vendor, slug=slug)
              if key not in EDITABLE_SETTINGS:          # never setattr a POST key
                  return HttpResponseBadRequest()
+             if key in vendor.locked_settings(request.user):
+                 # 403 with a sentence, not an empty one: the row prints this
+                 # body verbatim. See the refused variant.
+                 return HttpResponse('Only the plant head can change this.',
+                                     status=403, content_type='text/plain')
              form = SettingForm(request.POST)
              form.is_valid()
              setattr(vendor, key, form.cleaned_data['on'])
@@ -38,6 +43,12 @@
              'role': 'switch', 'class': 'peer sr-only',
              'hx-trigger': 'change', 'hx-swap': 'none', 'hx-sync': 'this:replace',
          })
+
+     A locked row renders disabled, and disabled is right here because the
+     reason is printed underneath it in the same loop. A lock that is only
+     explained on request needs aria-disabled instead — see the readonly
+     variant, because a disabled control cannot be focused and its
+     aria-describedby cannot be reached.
 
      hx-headers sits on the card so every switch inside it sends the CSRF token;
      htmx will not find one without a form to read it from. -->
@@ -77,7 +88,7 @@
           <span class="flex items-center gap-1.5">
             <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged
           </span>
-          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                   @click="$refs.sw.checked = want; $refs.sw.dispatchEvent(new Event('change'))">Try again</button>
         </span>
       </p>

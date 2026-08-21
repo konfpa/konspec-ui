@@ -1,0 +1,66 @@
+<!-- disabled on the fieldset, not on eight boxes. One attribute locks every
+     control inside it, and it cannot fall out of step with the list the way
+     eight copies of the same attribute do the first time somebody adds a check.
+
+     What that attribute also does is disable every listed element in there,
+     including <input type="hidden">. So the three values that still have to
+     reach the server sit above the fieldset rather than beside the boxes they
+     belong to — inside it they are as absent from the POST as the boxes are,
+     and a hidden input that silently stops posting is not a thing anyone finds
+     by reading the form.
+
+     The other exception is the first legend: controls in it stay live. That is
+     occasionally what you want, and it is a trap when it is not — an action
+     parked in the legend is the one thing on a frozen form that still works.
+     This legend holds text.
+
+     The checks keep their shape instead of being rendered as a list of ticks.
+     states is right that a value which can never change on this form is text,
+     but this one is frozen by the document being posted rather than by policy:
+     the same page is live for the next GRN, and a form that rearranges itself
+     by status is a different form every time somebody opens it.
+
+     The reason is on screen, at the top, before the grey. A page of disabled
+     controls with nothing saying why is the most-reported fault in every
+     internal application, and the report is always "the form does not work". -->
+<form data-kui="checkbox/locked" method="post" class="max-w-xl rounded-xl border border-zinc-300 bg-white">
+  <!-- posted values that still travel, deliberately outside the disabled fieldset -->
+  <input type="hidden" name="qc_cleared" value="1">
+  <input type="hidden" name="weighbridge" value="1">
+  <input type="hidden" name="damage" value="0">
+
+  <div class="flex items-start gap-2.5 border-b border-zinc-200 px-4 py-2.5">
+    <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+    <p class="text-[12px]/4 tabular-nums text-zinc-600">
+      Posted 04 Sep 2026, 16:20 by Anil Kulkarni. The checks are part of the posted document — a correction goes on a debit note against Gujarat Polymers Ltd, not here.
+    </p>
+  </div>
+
+  <fieldset disabled class="px-4 py-3">
+    <legend class="mb-2 text-[13px]/5 font-medium text-zinc-500 tabular-nums">Checks recorded on GRN-24-0912</legend>
+    <div class="space-y-2">
+      <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+        <input type="checkbox" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>QC cleared against the certificate of analysis</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+        <input type="checkbox" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="tabular-nums">Weighbridge slip attached — 2,945 kg net</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+        <input type="checkbox" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Damage or shortage noted on the challan</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- still live, and outside the fieldset because that is the only thing that
+       keeps it live -->
+  <div class="border-t border-zinc-200 px-4 py-3">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="email_vendor" value="1" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Email the posted GRN to Gujarat Polymers Ltd</span>
+    </label>
+    <button type="submit" class="mt-3 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Send a copy</button>
+  </div>
+</form>

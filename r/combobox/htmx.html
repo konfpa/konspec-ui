@@ -1,0 +1,150 @@
+<!-- Two different jobs share the word htmx in this entry. remote is htmx
+     fetching the options; this is htmx writing the value. A combobox on a
+     record header has no Save button next to it, so committing is the write.
+
+     Alpine does not fetch, so the commit dispatches an event and htmx listens
+     for it on the hidden input, which is the element that holds the value.
+     htmx sends the value of the element that made the request, so the POST is
+     buyer=<id> and nothing else — one endpoint per field is what makes the body
+     readable at the other end.
+
+     The dispatch waits for $nextTick. Alpine writes :value on the next
+     microtask, so an event fired in the same statement that set sel posts the
+     value that was there before the pick — the field on screen and the row in
+     the database then disagree, and nothing on either side looks wrong.
+
+     was is the value the server last confirmed and want is the one being sent.
+     A failed write puts was back into the box, the hidden input and the query
+     together: revert two of the three and the field reads one vendor over a
+     hidden value of another. Try again re-sends want rather than re-posting
+     what the failure reverted to.
+
+     The status line is role="status" because the revert is script writing a
+     value, and a programmatic change is announced by nothing at all. hx-sync
+     this:replace drops a write still in flight, so two commits inside a second
+     cannot settle on the older reply. Django needs the CSRF token on this
+     request; that is in the django variant. -->
+<div data-kui="combobox/htmx" class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: 'Ritu Deshpande', ai: 0,
+       sel: 'ritu-deshpande', was: 'ritu-deshpande', want: '', state: 'idle',
+       options: [
+         { id: 'ritu-deshpande', label: 'Ritu Deshpande', meta: 'Purchase' },
+         { id: 'anand-kulkarni', label: 'Anand Kulkarni', meta: 'Purchase' },
+         { id: 'faisal-shaikh', label: 'Faisal Shaikh', meta: 'Stores' },
+         { id: 'meera-nair', label: 'Meera Nair', meta: 'Projects' },
+         { id: 'suresh-patil', label: 'Suresh Patil', meta: 'Maintenance' }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       label(id) { const o = this.options.find(x => x.id === id); return o ? o.label : ''; },
+       rowId(o) { return 'cb-buyer-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(o => o.id === this.sel));
+         this.scroll();
+       },
+       close() { this.open = false; this.typed = false; this.q = this.label(this.sel); },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       send() {
+         this.want = this.sel;
+         this.$nextTick(() => this.$refs.post.dispatchEvent(new Event('commit')));
+       },
+       pick(o) {
+         if (o.id === this.sel) { this.close(); this.$refs.q.focus(); return; }
+         this.sel = o.id; this.close(); this.$refs.q.focus(); this.send();
+       },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); },
+       revert() { this.sel = this.was; this.q = this.label(this.was); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }"
+     @htmx:before-request.camel="state = 'saving'"
+     @htmx:after-request.camel="
+       if ($event.detail.successful) { was = want; state = 'saved' }
+       else { revert(); state = 'failed' }">
+
+  <label for="cb-buyer" class="mb-1.5 block text-[13px]/5 font-medium">Buyer on PO-24-1187</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <i data-lucide="user-round" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-buyer" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-buyer-list" aria-describedby="cb-buyer-state"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Search buyers"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+    <span class="mr-3 flex size-4 shrink-0 items-center justify-center" x-show="state === 'saving'" x-cloak>
+      <i data-lucide="loader-circle" class="size-4 animate-spin text-zinc-600"></i>
+    </span>
+  </div>
+
+  <!-- the value and the request live on the same element: htmx sends the value
+       of the element that fired, so the body is this field and nothing else -->
+  <input type="hidden" x-ref="post" name="buyer" :value="sel"
+         hx-post="/orders/PO-24-1187/buyer/" hx-trigger="commit"
+         hx-swap="none" hx-sync="this:replace">
+
+  <p id="cb-buyer-state" role="status" class="mt-1.5 text-[12px]/4">
+    <span x-show="state === 'idle'" class="tabular-nums text-zinc-500">Assigned 16 Aug 2026, 11:04 by Anand Kulkarni</span>
+
+    <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+    </span>
+
+    <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+      <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+    </span>
+
+    <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the buyer is unchanged
+      </span>
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+              @click="sel = want; q = label(want); send()">Try again</button>
+    </span>
+  </p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-buyer-list" role="listbox" aria-label="Buyers" class="max-h-64 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="o.id === sel"
+             @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+          <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+          <span class="shrink-0 text-[12px]/4 text-zinc-500" x-text="o.meta"></span>
+          <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+            <i data-lucide="check" class="size-4 text-zinc-600"></i>
+          </span>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No buyer matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 text-zinc-500">Only people in a purchasing role can hold an order.</p>
+    </div>
+  </div>
+</div>

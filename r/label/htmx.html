@@ -1,0 +1,57 @@
+<!-- The server checks the GSTIN against the GST portal, and what comes back is
+     the label, the control and the message as one element. Targeting the input
+     on its own is tighter and is the version that breaks: the label is left
+     outside the swap pointing at a string the response has to reproduce
+     exactly, and the day that field is rendered from a second form instance, a
+     formset row that renumbered or a widget that gained a prefix, the id is
+     different. Nothing errors and nothing logs. The label simply stops
+     focusing the box and the description stops being read.
+
+     The response repeats two ids verbatim, the block's and the input's:
+
+       <div id="lb-hx-gstin-field">
+         <label for="lb-hx-gstin" class="mb-1.5 block text-[13px]/5 font-medium">...</label>
+         <div class="rounded-lg border border-red-600 bg-white ...">
+           <input id="lb-hx-gstin" aria-invalid="true"
+                  aria-describedby="lb-hx-gstin-msg" ...>
+         </div>
+         <p id="lb-hx-gstin-msg" class="mt-1.5 min-h-4 text-[12px]/4 font-medium text-red-600">
+           No vendor registered under 24AACCG1234M1ZP.
+         </p>
+       </div>
+
+     The input's id has to survive because htmx puts focus back after a swap by
+     finding the element carrying the id that had it. Rename the input in the
+     response and a user who was still typing loses the caret to the top of the
+     document, mid-form.
+
+     No live region here. The trigger is change, which is blur, so the user has
+     already left the field — and aria-describedby is announced when focus
+     arrives, so the message is in place before they come back to it, with
+     aria-invalid saying so on the way in. A submit that still fails gets the
+     summary in label/invalid, which is the backstop for anyone who never
+     returns.
+
+     aria-invalid is written as "false" rather than left off, so the valid state
+     is a value the server sets rather than an attribute it forgets to clear.
+     hx-sync="this:replace" drops a check still in flight, so a fast retype
+     cannot settle on the older reply. -->
+<div data-kui="label/htmx" class="max-w-xl">
+  <div id="lb-hx-gstin-field">
+    <label for="lb-hx-gstin" class="mb-1.5 block text-[13px]/5 font-medium">
+      Vendor GSTIN <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="lb-hx-gstin" name="gstin" value="24AACCG1234M1ZP" maxlength="15" required
+             aria-invalid="false" aria-describedby="lb-hx-gstin-msg"
+             hx-post="/vendors/gstin/check/" hx-trigger="change"
+             hx-target="#lb-hx-gstin-field" hx-swap="outerHTML" hx-sync="this:replace"
+             class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums uppercase outline-none">
+    </div>
+
+    <p id="lb-hx-gstin-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+      15 characters. Checked against the GST portal when you leave the field.
+    </p>
+  </div>
+</div>

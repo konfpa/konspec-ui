@@ -1,0 +1,61 @@
+<!-- Two text fields sharing one enclosure, and both of them delegate their
+     outline to the wrapper. That is not an exception to the one-child rule but
+     the rule read properly: what may delegate is text entry, not the first
+     child. A caret is visible, and it says which half of the range has the
+     keyboard, so an inset outline on each field would put three indicators on
+     one 38px box. A select or a button shows nothing of the sort, which is why
+     those keep an indicator of their own.
+
+     The glyph between them is passive — aria-hidden, no divider, no width of
+     its own beyond its padding. A rule there would say the two halves are
+     separate controls, which is the opposite of what a range is.
+
+     Both fields carry min-w-0 flex-1. Two inputs in one enclosure is two
+     intrinsic twenty-character minimums, so this is the group that drags the
+     page sideways first, and flex-1 is also what makes them split the width
+     evenly rather than letting the longer value win.
+
+     role="group" names the pair, because the visible heading is a <span> and a
+     span names nothing on its own. The field labels still say the whole thing —
+     "Delivery window from", not "From" — so the pair reads correctly when
+     somebody tabs straight into the second box and never hears the group name.
+     The repetition on entry is the cheaper mistake.
+
+     The date pickers are the browser's, drawn at the right-hand edge of each
+     field, so the from picker lands against the dash. Nothing may be added
+     between the two fields; there is no room and it is already occupied. -->
+<div data-kui="input-group/range" class="max-w-xl space-y-5">
+  <div role="group" aria-labelledby="ig10-window">
+    <span id="ig10-window" class="mb-1.5 block text-[13px]/5 font-medium">Delivery window</span>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <label for="ig10-from" class="sr-only">Delivery window from</label>
+      <input id="ig10-from" name="window_from" type="date" value="2026-09-04" aria-describedby="ig10-window-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+
+      <span aria-hidden="true" class="flex items-center px-1 text-[14px]/5 text-zinc-500">–</span>
+
+      <label for="ig10-to" class="sr-only">Delivery window to</label>
+      <input id="ig10-to" name="window_to" type="date" value="2026-09-18" aria-describedby="ig10-window-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="ig10-window-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">14 days. Gujarat Polymers Ltd quotes 10 working days from PO-24-1187.</p>
+  </div>
+
+  <div role="group" aria-labelledby="ig10-value">
+    <span id="ig10-value" class="mb-1.5 block text-[13px]/5 font-medium">Order value between (₹)</span>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+
+      <label for="ig10-min" class="sr-only">Lowest order value</label>
+      <input id="ig10-min" name="value_min" inputmode="numeric" value="50,000" aria-describedby="ig10-value-help"
+             class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+
+      <span aria-hidden="true" class="flex items-center px-1 text-[14px]/5 text-zinc-500">–</span>
+
+      <label for="ig10-max" class="sr-only">Highest order value</label>
+      <input id="ig10-max" name="value_max" inputmode="numeric" value="12,45,000" aria-describedby="ig10-value-help"
+             class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="ig10-value-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">One ₹ qualifies both boxes. Leave the second empty for no ceiling.</p>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<!-- Two retreats, in the order they are worth taking.
+
+     The first is the cheap one: shed the word, keep the object. The button
+     holds its icon and drops its label below sm, which buys about sixty pixels
+     without moving a single edge. A control that loses its visible label at one
+     width has to carry an accessible name at every width, and the visible words
+     have to be inside that name — somebody speaking to the page says what they
+     can see, so "Add line to PO-24-1187" answers to "click Add line" and "Add
+     item" does not.
+
+     The second is the real one. A group never wraps: flex-wrap on the enclosure
+     is the version that looks like it works, and what it produces is one border
+     round two rows with the left rounding stranded on the piece that is now on
+     top, the right rounding on the piece below it, and a divider that stops in
+     the middle of nothing. Below sm the row becomes a column instead, and the
+     corners and the divider turn with it — rounded-r-[7px] becomes
+     rounded-b-[7px], border-l becomes border-t. One enclosure, one border, one
+     focus outline, at both widths.
+
+     Turning the axis moves the height. In a row the addon takes its height from
+     the field by stretching and declares none of its own; items-stretch in a
+     column stretches width, so the addon has nothing left to take a height from
+     and needs py-2 below sm and sm:py-0 above it. This is the one place the
+     never-a-height-on-an-addon rule has a second half.
+
+     Past this there is nothing left to give up. A group that still does not fit
+     is trying to be a form. -->
+<div data-kui="input-group/responsive" class="max-w-xl space-y-5">
+  <form action="/orders/PO-24-1187/lines/" method="post">
+    <label for="ig12-code" class="mb-1.5 block text-[13px]/5 font-medium">Add an item to PO-24-1187</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="ig12-code" name="item_code" placeholder="Item code" aria-describedby="ig12-code-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+      <button type="submit" aria-label="Add line to PO-24-1187"
+              class="inline-flex shrink-0 items-center gap-2 rounded-r-[7px] bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="plus" class="size-4"></i><span class="hidden sm:inline">Add line</span>
+      </button>
+    </div>
+    <p id="ig12-code-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">3 lines so far. Rates come from RC-26-041 and cannot be typed here.</p>
+  </form>
+
+  <div>
+    <label for="ig12-gstin" class="mb-1.5 block text-[13px]/5 font-medium">Vendor GSTIN</label>
+    <div class="flex flex-col items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 sm:flex-row">
+      <input id="ig12-gstin" name="gstin" value="24AABCG1122F1Z8" maxlength="15" aria-describedby="ig12-gstin-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums uppercase outline-none">
+      <button type="button"
+              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-b-[7px] border-t border-zinc-200 px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700 sm:rounded-b-none sm:rounded-r-[7px] sm:border-t-0 sm:border-l sm:py-0">
+        <i data-lucide="shield-check" class="size-4 text-zinc-600"></i>Verify with GSTN
+      </button>
+    </div>
+    <p id="ig12-gstin-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">15 characters. 24 is Gujarat, and the 12th is the entity code.</p>
+  </div>
+</div>

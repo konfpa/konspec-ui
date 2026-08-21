@@ -1,0 +1,119 @@
+<!-- The border being on the wrapper is what keeps the widget declaration in
+     forms.py. The error state is a class on the div around the field, so
+     nothing has to reach into widget.attrs in __init__ to append a red border
+     to a class string that was already written once.
+
+     # forms.py
+     class GrnForm(forms.Form):
+         invoice_no = forms.CharField(
+             label='Vendor invoice number', max_length=16,
+             help_text='As printed on the vendor invoice.',
+             widget=forms.TextInput(attrs={
+                 'class': 'w-full min-w-0 bg-transparent px-3 py-2 font-mono '
+                          'text-[13px]/5 outline-none placeholder:text-zinc-500',
+                 'autocomplete': 'off', 'spellcheck': 'false',
+                 'aria-describedby': 'id_invoice_no-msg',
+             }))
+
+         # DecimalField's default widget is NumberInput, which renders
+         # type="number" — the control this entry rejects by name. Override the
+         # widget and keep the field: the validation, the decimal_places and the
+         # rounding are the field's, and the keyboard is the widget's.
+         rate = forms.DecimalField(
+             label='Rate per MT', max_digits=12, decimal_places=2,
+             widget=forms.TextInput(attrs={
+                 'class': 'w-full min-w-0 bg-transparent px-2 py-2 text-right '
+                          'text-[14px]/5 tabular-nums outline-none',
+                 'inputmode': 'decimal',
+                 'aria-describedby': 'id_rate-unit id_rate-msg',
+             }))
+
+         # disabled on the field, not readonly on the widget. It renders the
+         # disabled attribute and makes Django ignore whatever the POST says
+         # about it, falling back to initial — which is the only version of
+         # locking that survives a client that simply deleted the attribute.
+         # The value still reaches cleaned_data, so this is Django's read-only
+         # rather than the entry's: readonly is a request to the browser,
+         # disabled=True is a statement the form makes to itself. The control
+         # renders disabled, so it is painted disabled, and the number is
+         # printed as text in the page header where it can still be copied.
+         number = forms.CharField(
+             label='Order number', disabled=True,
+             widget=forms.TextInput(attrs={
+                 'class': 'w-full min-w-0 bg-transparent px-3 py-2 font-mono '
+                          'text-[13px]/5 tabular-nums text-zinc-400',
+                 'aria-describedby': 'id_number-msg',
+             }))
+
+         def add_error(self, field, error):
+             # aria-invalid belongs on the control, and the control is rendered
+             # from attrs that were fixed before anyone knew the value was bad.
+             # Every field error routes through add_error, including one raised
+             # in clean_invoice_no, so this is the one place it can be set.
+             super().add_error(field, error)
+             if field:
+                 self.fields[field].widget.attrs['aria-invalid'] = 'true'
+
+         def clean_rate(self):
+             # Decimal('52,400') raises. Whatever the field shows, what reaches
+             # the field has to be digits — either strip them here or post the
+             # raw value from the hidden input the amount variant carries.
+             return self.cleaned_data['rate']
+
+     aria-describedby is written into attrs and has to match the id rendered
+     under the box. Django 5 adds one of its own when it renders help text for
+     you through as_div; this template renders the widget by itself, so the id
+     in attrs is the id that has to exist.
+
+     max_length renders maxlength, which truncates a paste in silence. Sixteen
+     characters is a real GST limit rather than a guess, so it is said in the
+     help text before anybody reaches it. -->
+<form data-kui="input/django" method="post" class="max-w-xl space-y-5">
+  {% csrf_token %}
+
+  <div>
+    <label for="{{ form.invoice_no.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.invoice_no.label }}{% if form.invoice_no.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+
+    <div class="flex items-center rounded-lg bg-white {% if form.invoice_no.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.invoice_no }}
+    </div>
+
+    <p id="{{ form.invoice_no.auto_id }}-msg" class="mt-1.5 text-[12px]/4 {% if form.invoice_no.errors %}font-medium text-red-600{% else %}text-zinc-500{% endif %}">
+      {% if form.invoice_no.errors %}
+        <span class="flex items-start gap-1.5"><i data-lucide="alert-circle" aria-hidden="true" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.invoice_no.errors.0 }}</span>
+      {% else %}{{ form.invoice_no.help_text }}{% endif %}
+    </p>
+  </div>
+
+  <div>
+    <label for="{{ form.rate.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.rate.label }}{% if form.rate.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+
+    <div class="flex items-center rounded-lg bg-white {% if form.rate.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      <span id="{{ form.rate.auto_id }}-unit" class="shrink-0 pl-3 text-[14px]/5 text-zinc-600">₹</span>
+      {{ form.rate }}
+    </div>
+
+    <p id="{{ form.rate.auto_id }}-msg" class="mt-1.5 text-[12px]/4 tabular-nums {% if form.rate.errors %}font-medium text-red-600{% else %}text-zinc-500{% endif %}">
+      {% if form.rate.errors %}
+        <span class="flex items-start gap-1.5"><i data-lucide="alert-circle" aria-hidden="true" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.rate.errors.0 }}</span>
+      {% else %}Rupees per MT, excluding GST.{% endif %}
+    </p>
+  </div>
+
+  <!-- disabled=True on the field: rendered locked, and what the POST says about
+       it is ignored in favour of initial. readonly would have submitted
+       whatever arrived. -->
+  <div>
+    <label for="{{ form.number.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">{{ form.number.label }}</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
+      {{ form.number }}
+    </div>
+    <p id="{{ form.number.auto_id }}-msg" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Allotted when the draft was created. The value the view cleans comes from initial, not from this box.</p>
+  </div>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Post the receipt</button>
+</form>

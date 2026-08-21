@@ -1,0 +1,78 @@
+<!-- The upload that started and stopped. It is not the rejected state and the
+     two must not share a row shape: a rejected file is the wrong file and
+     sending it again changes nothing, a failed file is the right file and
+     sending it again is the whole answer. So this one has Retry and that one
+     does not, and the reason line says which of the two happened.
+
+     The bar goes when the transfer does. A progress bar left frozen at the
+     percentage it died on is the most misread state in any upload control — it
+     reads as slow rather than as stopped, and the user sits waiting for a
+     request that ended two minutes ago. The reason takes the bar's place.
+
+     Nothing announces the failure on its own. The progressbar does not fail, it
+     stops being updated, and silence is not an error message, so the summary
+     line is role="status" and each row's reason is tied to its own Retry with
+     aria-describedby.
+
+     The bytes already sent are gone. The word is Retry, not Resume: Resume
+     promises a range request that a plain multipart POST cannot honour, and a
+     4 MB file on a plant Wi-Fi connection will make that promise a lie often.
+
+     Retry all sits in the header rather than being the only control, because a
+     user who can see three failures usually wants two of them back and not the
+     third — the one that failed because somebody attached the wrong thing. -->
+<div data-kui="attachment/failed" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+    <p role="status" class="flex items-center gap-2 text-[13px]/5 font-medium tabular-nums">
+      <i data-lucide="alert-circle" class="size-4 shrink-0 text-red-600"></i>
+      1 of 3 files did not upload
+    </p>
+    <button type="button"
+            class="inline-flex h-8 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="rotate-ccw" class="size-4"></i>Retry all
+    </button>
+  </div>
+
+  <ul class="divide-y divide-zinc-100">
+    <li class="flex flex-wrap items-start gap-x-3 gap-y-2 px-4 py-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-500"></i></span>
+      <div class="min-w-[12rem] flex-1">
+        <p class="truncate text-[13px]/5 font-medium">test-certificate-heat-8841.pdf</p>
+        <p id="fail-tc" class="mt-0.5 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-red-600">
+          <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+          Connection dropped at 2.6 MB of 4.2 MB. Nothing was saved.
+        </p>
+      </div>
+      <button type="button" aria-describedby="fail-tc"
+              class="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="rotate-ccw" class="size-3.5"></i>Retry
+      </button>
+      <button type="button" aria-label="Remove test-certificate-heat-8841.pdf"
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="x" class="size-4"></i>
+      </button>
+    </li>
+
+    <li class="flex items-center gap-3 px-4 py-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[13px]/5 font-medium">challan-gp-77412.pdf</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">310 KB · Ritu Deshpande · 04 Sep 2026</p>
+      </div>
+      <span class="flex shrink-0 items-center text-emerald-600">
+        <i data-lucide="check-circle-2" class="size-4"></i><span class="sr-only">Uploaded</span>
+      </span>
+    </li>
+
+    <li class="flex items-center gap-3 px-4 py-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="image" class="size-4 text-zinc-600"></i></span>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[13px]/5 font-medium">weighbridge-slip-8841.jpg</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">1.1 MB · Ritu Deshpande · 04 Sep 2026</p>
+      </div>
+      <span class="flex shrink-0 items-center text-emerald-600">
+        <i data-lucide="check-circle-2" class="size-4"></i><span class="sr-only">Uploaded</span>
+      </span>
+    </li>
+  </ul>
+</div>

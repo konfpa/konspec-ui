@@ -1,0 +1,66 @@
+<!-- The vendor sent a corrected invoice and the first one does not go away.
+     Replacing a document on a record money has moved against is not an edit, it
+     is a new version — the superseded file is what an audit reads when it asks
+     why the amount changed — so the control that replaces it has to keep it.
+
+     Current version is the row; the earlier ones are behind a disclosure,
+     collapsed. On an invoice with four revisions the history is longer than
+     everything else on the panel and it is read about once a year, so it starts
+     shut and x-cloak keeps it from painting before Alpine boots.
+
+     Earlier versions download and do nothing else. No remove, because a trail
+     with a delete button on it is not a trail, and no promote, because rolling
+     back is a new upload with its own timestamp and its own name against it.
+
+     The reason for each replacement sits with the version rather than in a
+     separate audit tab. "Freight line corrected" is the only thing that makes
+     three near-identical PDFs tell apart, and a version list without it is a
+     list of dates.
+
+     The chevron rotates on a wrapping span. Bound on the <i>, createIcons()
+     replaces the node and the binding goes with it. -->
+<div data-kui="attachment/versions" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white" x-data="{ open: false }">
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+    <div class="min-w-[12rem] flex-1">
+      <p class="truncate text-[13px]/5 font-medium">invoice-gujarat-polymers-4471.pdf</p>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">Version 3 · 412 KB · ₹12,45,000 · Anil Kulkarni · 04 Sep 2026</p>
+    </div>
+    <input type="file" id="ver-invoice" name="invoice" class="peer sr-only">
+    <label for="ver-invoice"
+           class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+      Replace
+    </label>
+  </div>
+
+  <div class="border-t border-zinc-200">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="ver-history"
+            class="flex w-full items-center gap-2 px-4 py-2 text-left text-[12px]/4 font-medium text-zinc-600 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex transition-transform" :class="open && 'rotate-180'"><i data-lucide="chevron-down" class="size-4"></i></span>
+      <span class="tabular-nums">2 earlier versions</span>
+    </button>
+
+    <ul id="ver-history" x-show="open" x-cloak class="divide-y divide-zinc-100 border-t border-zinc-100">
+      <li class="flex items-center gap-3 py-2 pr-4 pl-15">
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-[12px]/4 tabular-nums text-zinc-600">Version 2 · 408 KB · ₹12,45,000 · 29 Aug 2026</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">Superseded — freight line corrected</p>
+        </div>
+        <a href="#" aria-label="Download version 2 of invoice-gujarat-polymers-4471.pdf"
+           class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="download" class="size-4"></i>
+        </a>
+      </li>
+      <li class="flex items-center gap-3 py-2 pr-4 pl-15">
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-[12px]/4 tabular-nums text-zinc-600">Version 1 · 401 KB · ₹11,98,000 · 22 Aug 2026</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">Superseded — GSTIN on the header was wrong</p>
+        </div>
+        <a href="#" aria-label="Download version 1 of invoice-gujarat-polymers-4471.pdf"
+           class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="download" class="size-4"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -39,7 +39,7 @@
       <span class="text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026 · Ritu Deshpande</span>
     </div>
 
-    <textarea id="ig7-note" name="body" rows="4" x-model="text"
+    <textarea id="ig7-note" name="body" rows="4" x-model="text" aria-describedby="ig7-note-help"
               @keydown.ctrl.enter="if (text.trim()) $refs.post.click()"
               @keydown.meta.enter="if (text.trim()) $refs.post.click()"
               placeholder="What was short, by how much, and what the vendor has promised"
@@ -57,12 +57,12 @@
           <kbd class="rounded border border-zinc-200 bg-zinc-100 px-1 py-0.5 font-mono text-[10px]/3 text-zinc-600">Enter</kbd>
         </span>
         <button type="button" x-ref="post" :disabled="!text.trim()"
-                class="inline-flex h-8 shrink-0 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:bg-zinc-200 disabled:text-zinc-400">
+                class="inline-flex h-8 shrink-0 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
           Post remark
         </button>
       </span>
     </div>
   </div>
 
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Goes on the receipt, visible to the buyer and to stores. It cannot be edited afterwards.</p>
+  <p id="ig7-note-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Goes on the receipt, visible to the buyer and to stores. It cannot be edited afterwards.</p>
 </div>

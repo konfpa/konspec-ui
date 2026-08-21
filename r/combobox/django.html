@@ -84,6 +84,7 @@
            this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
            this.scroll();
          },
+         edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
          pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
          commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
        }"
@@ -92,7 +93,7 @@
        @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
 
     <label for="{{ form.vendor.id_for_label }}-q" class="mb-1.5 block text-[13px]/5 font-medium">
-      {{ form.vendor.label }} <span class="text-red-600">*</span>
+      {{ form.vendor.label }} <span aria-hidden="true" class="text-red-600">*</span>
     </label>
 
     <div class="flex items-center rounded-lg bg-white {% if form.vendor.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
@@ -109,6 +110,8 @@
              @input="typed = true; open = true; ai = 0"
              @keydown.arrow-down.prevent="move(1)"
              @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+             @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
              @keydown.enter="if (open) { $event.preventDefault(); commit() }"
              @keydown.tab="close()"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">

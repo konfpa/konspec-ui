@@ -1,0 +1,45 @@
+<!-- The value is unusual and the order can still be raised. Everything in this
+     variant is about keeping those two facts from being read as one.
+
+     The border stays zinc-200 and aria-invalid stays "false". An amber border
+     is one glance away from a red one, and once a field can look wrong and save
+     anyway, red stops meaning stop. The caution is the message line and nothing
+     else: alert-triangle in amber-700, in the normal weight where the error is
+     font-medium, so the two are told apart at arm's length as well as up close.
+
+     aria-invalid is written once here, which the rest of the entry forbids.
+     This is the exception it is worth stating: the field has no invalid state
+     to go stale into, so "false" is not a snapshot of anything, and leaving the
+     attribute off entirely would say the same thing less plainly.
+
+     It does not wait for blur either. A caution is not a verdict on what was
+     typed — it is arithmetic the form was already doing, the same class of
+     thing as the line total beside it — so it stays true as the number changes
+     rather than arriving after the user has moved on.
+
+     The last sentence is the one that matters and it says what happens, not
+     what is wrong. Somebody who wants 12,000 kg is going to order 12,000 kg;
+     what they need to know is that 4,000 of them bill at a different rate. -->
+<div data-kui="field/warning" class="max-w-sm"
+     x-data="{ qty: 12000, balance: 8000, get over() { return this.qty > this.balance } }">
+  <label for="fw-qty" class="mb-1.5 block text-[13px]/5 font-medium">
+    Order quantity <span aria-hidden="true" class="text-red-600">*</span>
+  </label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <input id="fw-qty" name="qty" required inputmode="numeric" value="12000"
+           x-model.number="qty" aria-invalid="false"
+           aria-describedby="fw-qty-unit fw-qty-msg"
+           class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+    <span id="fw-qty-unit" class="pr-3 text-[14px]/5 text-zinc-600">kg</span>
+  </div>
+
+  <p id="fw-qty-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+    <span x-show="!over" x-cloak class="block tabular-nums text-zinc-500">Contract RC-26-0043 has 8,000 kg left at ₹114.20 per kg.</span>
+    <span x-show="over" x-cloak class="flex items-start gap-1.5 text-amber-700">
+      <i data-lucide="alert-triangle" class="mt-px size-3.5 shrink-0"></i>
+      <span class="tabular-nums"
+            x-text="(qty - balance).toLocaleString('en-IN') + ' kg is past the contract balance and bills at the spot rate. The order can still be raised.'"></span>
+    </span>
+  </p>
+</div>

@@ -10,7 +10,14 @@
      ticked in it, and no route back to the other three.
 
      The line under the buttons only appears while a query is typed, so the
-     asymmetry is on screen rather than in the documentation. -->
+     asymmetry is on screen rather than in the documentation.
+
+     A popup carrying its own controls cannot close on Tab. Every other variant
+     here closes on it, because Tab out of the input is Tab out of the field —
+     but here Tab is the only route to Select all, and closing on it left a bulk
+     control that worked with a mouse and did not exist for a keyboard. The list
+     closes when focus leaves the component instead, which relatedTarget on
+     focusout answers and blur cannot. -->
 <div data-kui="combobox/select-all" class="relative max-w-md"
      x-data="{
        open: false, typed: false, q: '', ai: 0,
@@ -50,6 +57,7 @@
          this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
          this.scroll();
        },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
        toggle(o) {
          this.sel = this.has(o.id) ? this.sel.filter(v => v !== o.id) : [...this.sel, o.id];
          this.$refs.q.focus();
@@ -59,6 +67,7 @@
        commit() { const o = this.list[this.ai]; if (o) this.toggle(o); }
      }"
      @click.outside="close()"
+     @focusout="if (open && !$el.contains($event.relatedTarget)) close()"
      @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
 
   <label for="cb-cc" class="mb-1.5 block text-[13px]/5 font-medium">Cost centres this expense is split across</label>
@@ -91,7 +100,7 @@
 
     <button type="button" x-show="extra" x-cloak @click.stop="$refs.q.focus(); show()"
             :aria-label="extra + ' more selected — open the list to see all ' + sel.length"
-            class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300">
       <span x-text="'+' + extra + ' more'"></span>
     </button>
 
@@ -102,9 +111,10 @@
            @input="typed = true; open = true; ai = 0"
            @keydown.arrow-down.prevent="move(1)"
            @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
            @keydown.enter="if (open) { $event.preventDefault(); commit() }"
            @keydown.backspace="if (!q && sel.length) { $event.preventDefault(); sel = sel.slice(0, -1) }"
-           @keydown.tab="close()"
            class="min-w-16 flex-1 bg-transparent px-1 py-1 text-[14px]/5 outline-none placeholder:text-zinc-500">
   </div>
 
@@ -121,13 +131,17 @@
   <div x-show="open" x-cloak
        class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
 
+    <!-- these are the only tab stops inside the popup, which is why the field
+         does not close on Tab. Both take a focus outline of their own: the
+         field's focus-within ring is behind them and says nothing about which
+         of the two the keyboard is on. -->
     <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2">
       <button type="button" @mousedown.prevent @click="takeShown()" :disabled="allShown"
-              class="text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline">
+              class="rounded text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:text-zinc-400 disabled:no-underline">
         <span x-text="filtering ? 'Select all ' + list.length + ' matching' : 'Select all ' + options.length"></span>
       </button>
       <button type="button" @mousedown.prevent @click="clearAll()" :disabled="!sel.length"
-              class="text-[12px]/4 tabular-nums text-zinc-600 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline">
+              class="rounded text-[12px]/4 tabular-nums text-zinc-600 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:text-zinc-400 disabled:no-underline">
         <span x-text="'Clear all ' + sel.length"></span>
       </button>
     </div>

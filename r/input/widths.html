@@ -1,0 +1,70 @@
+<!-- The width of a box is a statement about the value before anything is typed
+     into it. A six-digit PIN code in a full-width field says something longer
+     was expected, and the person filling it stops to work out what they have
+     missed; a fifteen-character GSTIN in a 96px field says the opposite and
+     gets read two characters at a time through a moving window. The short
+     fields are sized off their longest legal value, and the open ones — a legal
+     name, an address line — are not sized at all, because there is no length to
+     size them to.
+
+     The widths are w-* off the scale rather than ch. A ch is the width of a
+     zero in the element's own font, so it holds for the mono GSTIN and drifts
+     for everything set in Inter.
+
+     They are sm: widths. At 390px every field runs full width: a row of short
+     boxes that wraps in the middle of itself puts the PIN code under the GSTIN
+     with nothing left to say which label owns which box.
+
+     maxlength is the same number as the width and comes from the same place. It
+     truncates a paste in silence, which is only tolerable where there is
+     exactly one legal length — a sixteenth character in a GSTIN is a typo and
+     not a longer GSTIN — and is wrong on anything free-form.
+
+     autocomplete is off on all of it. These values describe a vendor and not
+     the person typing, so autofill offering the buyer's own mobile number fills
+     a vendor record with the buyer's details, and nobody catches it until the
+     delivery SMS goes to the purchase officer. -->
+<div data-kui="input/widths" class="max-w-2xl space-y-5">
+  <div>
+    <label for="in-w-name" class="mb-1.5 block text-[13px]/5 font-medium">Vendor legal name <span aria-hidden="true" class="text-red-600">*</span></label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="in-w-name" name="legal_name" value="Gujarat Polymers Ltd" autocomplete="off"
+             aria-describedby="in-w-name-help"
+             class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+    </div>
+    <p id="in-w-name-help" class="mt-1.5 text-[12px]/4 text-zinc-500">As printed on the GST certificate, including Pvt Ltd or Ltd.</p>
+  </div>
+
+  <div class="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-start">
+    <div class="sm:w-44">
+      <label for="in-w-gstin" class="mb-1.5 block text-[13px]/5 font-medium">GSTIN</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="in-w-gstin" name="gstin" value="24AABCG1234H1Z5" maxlength="15"
+               autocomplete="off" spellcheck="false" aria-describedby="in-w-gstin-help"
+               class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 tabular-nums outline-none">
+      </div>
+      <p id="in-w-gstin-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Fifteen characters. It opens with 24 for Gujarat.</p>
+    </div>
+
+    <div class="sm:w-28">
+      <label for="in-w-pin" class="mb-1.5 block text-[13px]/5 font-medium">PIN code</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="in-w-pin" name="pincode" value="396230" inputmode="numeric" maxlength="6"
+               autocomplete="off" aria-describedby="in-w-pin-help"
+               class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+      </div>
+      <p id="in-w-pin-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Six digits.</p>
+    </div>
+
+    <div class="sm:w-40">
+      <label for="in-w-mob" class="mb-1.5 block text-[13px]/5 font-medium">Mobile</label>
+      <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <span id="in-w-mob-cc" class="shrink-0 pl-3 text-[14px]/5 tabular-nums text-zinc-600">+91</span>
+        <input id="in-w-mob" name="mobile" type="tel" inputmode="numeric" maxlength="10"
+               value="9825012345" autocomplete="off" aria-describedby="in-w-mob-cc in-w-mob-help"
+               class="w-full min-w-0 bg-transparent py-2 pr-3 pl-1.5 text-[14px]/5 tabular-nums outline-none">
+      </div>
+      <p id="in-w-mob-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ten digits. The +91 is not posted.</p>
+    </div>
+  </div>
+</div>

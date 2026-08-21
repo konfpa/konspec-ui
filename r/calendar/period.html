@@ -1,0 +1,97 @@
+<!-- Closing the books is a month and reporting is a quarter, so the cells are
+     months and quarters. A day grid for a period means hitting the 1st and the
+     30th exactly, and off-by-one there is a GST return that does not tie out.
+
+     April first, because the year in an Indian ledger runs April to March. The
+     calendar year is on every cell for the same reason: Jan, Feb and Mar of
+     FY 2026-27 fall in 2027, and a bare "Mar" is the cell people pick out of
+     the wrong year.
+
+     Each cell is a range, not a point, which is why what posts is two ISO
+     strings and not one. last() takes day 0 of the following month so February
+     and a leap year are the calendar's problem rather than this markup's.
+
+     The grid is a radiogroup with a roving tabindex, like every other set of
+     one-of-many in this system. Twelve tab stops for twelve months is the same
+     defect as thirty-one for thirty-one days, only smaller.
+
+     Switching the unit clears the selection. Q2 and August are not the same
+     period and carrying an index across pretends they are. -->
+<div data-kui="calendar/period" class="inline-block max-w-full rounded-xl border border-zinc-300 bg-white p-3"
+     x-data="{
+       fy: (() => { const t = new Date(); return t.getMonth() < 3 ? t.getFullYear() - 1 : t.getFullYear(); })(),
+       unit: 'month',
+       sel: null,
+       names: ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       cell(i) { return { y: this.fy + (i < 9 ? 0 : 1), m: (i + 3) % 12 }; },
+       first(i) { const c = this.cell(i); return this.iso(c.y, c.m, 1); },
+       last(i) { const c = this.cell(i); const d = new Date(c.y, c.m + 1, 0); return this.iso(d.getFullYear(), d.getMonth(), d.getDate()); },
+       count() { return this.unit === 'month' ? 12 : 4; },
+       lo(i) { return this.unit === 'month' ? i : i * 3; },
+       hi(i) { return this.unit === 'month' ? i : i * 3 + 2; },
+       start() { return this.sel === null ? '' : this.first(this.lo(this.sel)); },
+       end() { return this.sel === null ? '' : this.last(this.hi(this.sel)); },
+       label(i) {
+         if (this.unit === 'month') return this.names[i] + ' ' + this.cell(i).y;
+         return 'Q' + (i + 1) + ' · ' + this.names[i * 3] + ' – ' + this.names[i * 3 + 2] + ' ' + this.cell(i * 3).y;
+       },
+       fyLabel() { return 'FY ' + this.fy + '–' + String(this.fy + 1).slice(2); },
+       current(i) { return this.today >= this.first(this.lo(i)) && this.today <= this.last(this.hi(i)); },
+       fmt(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); },
+       step(n) {
+         const c = this.count();
+         this.sel = this.sel === null ? (n > 0 ? 0 : c - 1) : (this.sel + n + c) % c;
+         this.$nextTick(() => { const b = this.$refs.tiles.querySelector('[aria-checked=true]'); if (b) b.focus(); });
+       },
+       setUnit(u) { if (u !== this.unit) { this.unit = u; this.sel = null; } }
+     }">
+  <div class="flex items-center justify-between gap-3 pb-2">
+    <button type="button" @click="fy--" aria-label="Previous financial year"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+    <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="fyLabel()"></span>
+    <button type="button" @click="fy++" aria-label="Next financial year"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+
+  <div role="radiogroup" aria-label="Period unit" x-ref="unitgrp"
+       @keydown.arrow-right.prevent="setUnit(unit === 'month' ? 'quarter' : 'month'); $nextTick(() => $refs.unitgrp.querySelector('[aria-checked=true]').focus())"
+       @keydown.arrow-left.prevent="setUnit(unit === 'month' ? 'quarter' : 'month'); $nextTick(() => $refs.unitgrp.querySelector('[aria-checked=true]').focus())"
+       class="mb-3 flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+    <template x-for="u in ['month', 'quarter']" :key="u">
+      <button type="button" role="radio" :aria-checked="unit === u" :tabindex="unit === u ? 0 : -1"
+              @click="setUnit(u)"
+              class="inline-flex h-8 flex-1 items-center justify-center rounded-md px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="unit === u ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+        <span x-text="u === 'month' ? 'Months' : 'Quarters'"></span>
+      </button>
+    </template>
+  </div>
+
+  <input type="hidden" name="period_start" :value="start()">
+  <input type="hidden" name="period_end" :value="end()">
+
+  <div x-ref="tiles" role="radiogroup" :aria-label="(unit === 'month' ? 'Month' : 'Quarter') + ' in ' + fyLabel()"
+       @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+       @keydown.arrow-down.prevent="step(unit === 'month' ? 3 : 1)"
+       @keydown.arrow-up.prevent="step(unit === 'month' ? -3 : -1)"
+       class="grid w-64 gap-1" :class="unit === 'month' ? 'grid-cols-3' : 'grid-cols-1'">
+    <template x-for="i in count()" :key="i">
+      <button type="button" role="radio" @click="sel = i - 1"
+              :aria-checked="sel === i - 1" :tabindex="(sel === null ? i === 1 : sel === i - 1) ? 0 : -1"
+              :aria-current="current(i - 1) ? 'true' : null"
+              class="inline-flex h-9 w-full items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i - 1 ? 'bg-zinc-700 font-medium text-white hover:bg-zinc-800'
+                      : (current(i - 1) ? 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300' : 'text-zinc-900 hover:bg-zinc-100')"
+              x-text="label(i - 1)"></button>
+    </template>
+  </div>
+
+  <p class="mt-3 border-t border-zinc-200 pt-2 text-[12px]/4 tabular-nums text-zinc-500"
+     x-text="sel === null ? 'No period set' : fmt(start()) + ' – ' + fmt(end())"></p>
+</div>

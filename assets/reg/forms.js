@@ -7,14 +7,16 @@ register(
       'There are exactly two bindings and they are not interchangeable. for and id names a control that sits outside the label element, which is every text input, select and textarea, because the box is not inside the sentence that names it. Wrapping is for a checkbox, a radio or a switch, where the control and its text are one row and the point of the label is that the whole row is the target. Choosing by taste rather than by shape is how a checkbox ends up with a 16px hit area and a text field ends up inside a label it does not need.',
       'for accepts only a labelable element — button, input, meter, output, progress, select, textarea. Point it at a div, a span, a fieldset or a contenteditable and nothing happens: no error, no warning, no console message, and the markup validates. There is one symptom and it is worth knowing, because it is the cheapest test in this entry: click the label text. If focus does not land in the control, or the box does not toggle, the binding is broken — a mistyped for, a duplicated id, a control that ended up outside the label it was meant to be inside. Every one of those is findable at the mouse in a second rather than in a screen reader an hour later.',
       'ids are per document, not per component, and for binds to the first element carrying the id. A row loop that renders id="qty" on every line makes every label in the table focus line one. Django is a quieter version of the same problem: auto_id gives id_vendor to the field in both forms on a page, so the second form\'s label drives the first form\'s input. Prefix the ids with something that varies — the record id, the form prefix — and never with a bare index.',
+      'A control the server replaces has to come back carrying the id it left with. Swap the input on its own and the label stays behind pointing at a string the response may or may not have reproduced: a form rendered from a second instance, a formset row that renumbered, a widget that gained a prefix, and the id is different. Nothing errors and nothing logs — the label stops focusing the box, the description stops being read, and the field looks exactly as it did. Swap the label, the control and the message as one block, and make the id a fixed string the server repeats rather than one it derives.',
       'A label is a name, not a description. Everything inside the label element is concatenated into the accessible name, so a two-line explanation is read back in full every time focus lands on the control, and again on every keystroke of an arrow key through a radio group. Help text lives outside the label and is attached with aria-describedby, which is announced once and after the name.',
+      'A qualifier belongs in the name when it changes the value, and outside it when it explains how to enter one. "Received quantity (MT)" earns its parenthesis: 8.5 and 8,500 are the same field answered in two units, and the name is the only thing on the screen that says which one is wanted. "Exactly as printed, series prefix and all" does not earn it — that is advice, it is read back on every focus if it is in the label, and it is a description everywhere else.',
       'Nothing interactive goes inside a label. A link, a button or a second control inside it is clicked, the click bubbles to the label, and the label forwards it to its own control — so the link both navigates and toggles the checkbox, or the button both fires and steals focus into the field. A trailing action on the label row is a sibling of the label inside a flex row, never a child of it.',
       'The accessible name has a precedence order and label is not at the top of it: aria-labelledby beats aria-label beats the label element beats placeholder beats title. Writing aria-label on a control that already has a visible label replaces the visible words with a string nobody can see, and if the two disagree, voice control fails — a user saying the words on screen addresses a control that is not called that. Use one, and when there is visible text, that is the one.',
       'The red asterisk is decoration unless the required attribute is on the control. It also has no business in the accessible name, so it carries aria-hidden="true" and required does the announcing — otherwise the field is called "Vendor star" and every screen reader pronounces the glyph differently. Explain the convention once at the top of the form, and mark whichever set is smaller: on a form where eleven of twelve fields are required, marking the one optional field is the honest version.',
       'A group of controls cannot take a label. A radio group or a set of related checkboxes is a fieldset whose first child is a legend, and the legend has to be the first child or it is not the group\'s name — a stray div above it demotes it to ordinary text and the group is announced with no question attached. There is no for on a legend and none is needed; the fieldset is the scope.',
       'peer- reaches forward to siblings, has- reaches down from an ancestor, and which one is available is decided by the order of the markup, not by preference. In the label-above-control layout the label comes first, so peer-disabled on it never matches anything and quietly does nothing; the wrapper around both takes has-[:disabled] instead. In the checkbox and toggle shapes the painted part follows the input, which is exactly why those use peer-disabled and peer-checked.',
       'has-[:read-only] is a trap. The CSS :read-only pseudo-class matches every element that is not user-alterable, which is every div, span and paragraph on the page, so a wrapper containing any of them matches always and the read-only styling is permanently on. Match the attribute instead, has-[[readonly]], or write the classes outright when readonly is a server-rendered fact rather than a state that changes.',
-      'Disabled greys the label; read-only does not. A disabled control has a value nobody may change and often nobody needs to read, so the whole row drains to zinc-500. A read-only control has a value that still matters and still has to be copied out of, so only the surface goes to bg-zinc-100 and the label stays at full weight. Dim both and you have told the user the order number does not matter.',
+      'Disabled greys the label; read-only does not. A disabled control has a value nobody may change and often nobody needs to read, so the whole row drains to zinc-500. A read-only control has a value that still matters and still has to be copied out of, so only the surface goes to bg-zinc-200 and the label stays at full weight. Dim both and you have told the user the order number does not matter.',
       'A form label is text-[13px]/5 font-medium in the default text colour. The 11px uppercase tracking-wider label is a column header and a record caption, not a form control name — put it on an eight-field form and the form reads as eight section headings with a box under each.'
     ],
     anatomy: [
@@ -24,6 +26,7 @@ register(
       ['Trailing slot', 'A hint, a count or an action on the same baseline as the label, as a sibling in a flex row. Outside the label element, always — a description would join the name and an action would be swallowed by it.'],
       ['Legend', 'What a fieldset uses instead of a label. First child of the fieldset, or it is not the group\'s name.'],
       ['Hidden label', 'A real label with sr-only when the control has a visible name in its surroundings, or aria-label when there is no text at all. Never a placeholder.'],
+      ['Row name', 'The sr-only label a control in a repeated row carries, naming the column and the record it belongs to. The ids it binds to carry the record key, never the loop index.'],
       ['Description', 'The 12px zinc-500 line under the control, outside the label, attached with aria-describedby so it is announced after the name rather than as part of it.']
     ],
     behaviour: [
@@ -32,6 +35,8 @@ register(
       'Wrapping the control in a div for layout inside the label breaks the pointer without breaking anything else. The rule matches label:has(> input[type="checkbox"]), so the input has to stay the label\'s direct child; put the flex on the label itself.',
       'A disabled control turns the whole row to cursor: not-allowed through label:has(> input:disabled), so the row says no before it is clicked rather than after.',
       'The label never reports state. It names the setting, not its position — "Auto-approve orders under ₹50,000", not "Enabled" — because a name that changes with the value is announced as a contradiction the moment the two disagree.',
+      'An invalid control does not change its label either. Turning the name red says the field is wrong in a way that is only visible, and moving the message into the label makes the whole complaint part of the name, read out on every focus and on every arrow-key pass through a group. The mark goes on the control as aria-invalid and the message goes in the element aria-describedby already points at.',
+      'A column header is not a label. It has no for, a th cannot be given one, and in the stacked-card layout a table falls back to on a phone it is not rendered at all. A control in a repeated row carries its own label hidden with sr-only, naming the column and the record — otherwise every box in the column is announced identically and the only thing separating them is a position nobody is told.',
       'A label wraps rather than truncates. Truncating the name of a field hides the part that distinguishes it from the field above, and the middle of a long label is usually where that lives.',
       'At 390px a horizontal form goes back to labels above their controls. A two-column layout at phone width leaves a name in a 90px gutter wrapping to four lines beside a box that is barely wider.',
       'Two labels pointing at one id are both read, in document order, as one name. That is occasionally useful for a unit after a field, and much more often it is a copy-paste that has left a field called "Quantity Quantity".'
@@ -41,6 +46,8 @@ register(
       'The name comes from a visible label wherever there is visible text, so that what a voice-control user says matches what they see. aria-label is for the case where there is genuinely no text: an icon-only button, a bare filter in a toolbar. It names the action, not the icon.',
       'sr-only on a real label is honest when the surroundings already name the control — a search box in a toolbar headed "Purchase orders" — and dishonest when it is hiding a name a sighted user also needs. The placeholder is never the substitute: some screen readers do fall back to it, which is why the pattern looks like it works, and then it disappears the moment anything is typed, sits at a contrast nobody chose, and is gone by the time the field is being checked over.',
       'Help text is attached with aria-describedby and stays out of the label element. Inside it, the whole sentence becomes part of the name and is repeated on every focus and every arrow-key pass.',
+      'An error summary links to the control by its id, which is the same string the label\'s for names. One typo there breaks the label click, the summary jump and the message binding at once, and not one of the three reports anything. On a page the server has redisplayed, the summary is focused rather than announced: nothing was inserted, so a live region fires for nobody.',
+      'A help disclosure on the label row names the topic, not the glyph — "What is an HSN code?", never "Help" and never "?". aria-expanded is bound to the open state, and aria-controls names a panel that is in the document from first paint and hidden with x-show, because a panel x-if inserts leaves aria-controls pointing at nothing until it opens. What is behind the disclosure is not the field\'s description: a description somebody has to open is one they will not have when they need it, so the short rule stays in the line under the control and aria-describedby keeps pointing at that.',
       'A fieldset with a legend is the only way to name a group. Browsers already announce an option\'s position — "45 days from invoice date, radio button, 2 of 3" — and without the legend, 2 of 3 of what is a guess.',
       'The required attribute is what announces a field as required. The asterisk is aria-hidden and exists for the eye; on its own it is a red star with no meaning attached to it.',
       'Disabled uses the disabled attribute, which takes the control out of the Tab order and out of the POST. There is no read-only checkbox — readonly does nothing on one — so a locked flag is rendered as text, with a hidden input beside it if the value still has to travel.',
@@ -81,6 +88,12 @@ register(
      nothing at all. Left without required it is a red mark with no behaviour
      under it: the form submits empty and the mark was decoration.
 
+     required on a select only fires when the selected option has an empty
+     value, which is why the list leads with a disabled, hidden placeholder.
+     Leave the first real vendor selected and the attribute is decoration
+     again — the browser considers the field answered before anybody has read
+     the question, and the first vendor in the list becomes the house default.
+
      The convention is explained once, above the fields, not beside each of
      them. A form that repeats "required" twelve times has spent twelve lines
      saying what one line says.
@@ -102,6 +115,7 @@ register(
       </label>
       <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
         <select id="lb-req-vendor" name="vendor" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          <option value="" disabled selected hidden>Choose a vendor</option>
           <option>Gujarat Polymers Ltd</option>
           <option>Sharma Extrusions Pvt Ltd</option>
         </select>
@@ -218,7 +232,7 @@ register(
     <label for="lb-gstin" class="text-[13px]/5 font-medium">Vendor GSTIN</label>
     <div class="flex items-baseline gap-3">
       <span id="lb-gstin-hint" class="text-[12px]/4 tabular-nums text-zinc-500">15 characters</span>
-      <button type="button" class="text-[12px]/4 text-zinc-900 underline underline-offset-2">Copy from master</button>
+      <button type="button" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Copy from master</button>
     </div>
   </div>
 
@@ -229,17 +243,143 @@ register(
   </div>
 </div>` },
 
+      { id: 'unit', name: 'A unit in the name, a note outside it', tagNew: true, code:
+`<!-- One rule decides all three of these. A qualifier goes in the name when it
+     changes the value, and stays out of it when it explains how to enter one.
+
+     Received quantity keeps its (MT) because the same item is bought in tonnes
+     on the rate contract and issued in kilograms at the plant, so 8.500 and
+     8,500 are both plausible answers and the name is the only thing on the
+     screen that says which is wanted. Take the unit out of the label and the
+     field is ambiguous to everybody, not only to a screen reader.
+
+     Rate does the opposite. Its unit is fixed and it is printed inside the box
+     at the point of typing, so it is a description: the span carries an id and
+     aria-describedby names it before the help line, because the order the ids
+     are written in is the order they are read in. Making it a second
+     <label for> on the same id would work — two labels are concatenated in
+     document order — but then the field is called "Rate per MT" everywhere,
+     including in a voice command, and the unit is not what distinguishes this
+     field from the others on the form.
+
+     Vendor invoice number carries nothing in its label. "Exactly as printed"
+     is advice about typing, it is the same advice on every one of these
+     fields, and in the label it is read back in full on every focus. The ₹ is
+     aria-hidden for the same reason the asterisk is: it is a glyph the reader
+     would pronounce, and the amount is already described as a rate. -->
+<div data-kui="label/unit" class="max-w-xl space-y-5">
+  <div>
+    <label for="lb-u-qty" class="mb-1.5 block text-[13px]/5 font-medium">Received quantity (MT)</label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="lb-u-qty" name="received_qty" value="8.500" inputmode="decimal"
+             aria-describedby="lb-u-qty-help"
+             class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="lb-u-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+      Net weight off the weighbridge slip, to three decimals.
+    </p>
+  </div>
+
+  <div>
+    <label for="lb-u-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate</label>
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white pl-3 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <span aria-hidden="true" class="shrink-0 text-[14px]/5 text-zinc-500">₹</span>
+      <input id="lb-u-rate" name="rate" value="1,04,400" inputmode="numeric"
+             aria-describedby="lb-u-rate-unit lb-u-rate-help"
+             class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+      <span id="lb-u-rate-unit" class="shrink-0 pr-3 text-[14px]/5 text-zinc-600">per MT</span>
+    </div>
+    <p id="lb-u-rate-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+      Rate contract RC-2026-014 quotes ₹1,04,400. Anything above it needs the plant head.
+    </p>
+  </div>
+
+  <div>
+    <label for="lb-u-inv" class="mb-1.5 block text-[13px]/5 font-medium">Vendor invoice number</label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="lb-u-inv" name="vendor_invoice" value="INV/26-27/0418"
+             aria-describedby="lb-u-inv-help"
+             class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="lb-u-inv-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+      Exactly as printed, series prefix and all. The three-way match is done on this string.
+    </p>
+  </div>
+</div>` },
+
+      { id: 'help', name: 'Help behind a disclosure', tagNew: true, code:
+`<!-- The explanation of what an HSN code is runs to a paragraph, and a
+     paragraph under every field is a form nobody reads. It goes behind a
+     trigger on the label row, and the trigger is a sibling of the label rather
+     than a child of it: inside, the press would bubble to the label, the label
+     would forward it to the input, and one click would open the panel and
+     throw focus into the box at the same time — while "What is an HSN code?"
+     joined the field's accessible name.
+
+     The trigger is named for the topic, not for the glyph. "Help" and "?" are
+     the two names that suggest themselves and neither says which field it
+     belongs to, which matters because a screen reader listing the buttons on a
+     twelve-field form gets twelve of them.
+
+     aria-expanded is bound rather than written, so it cannot be a stale string
+     — Alpine keeps aria-expanded on the element when it resolves to false,
+     unlike every other aria-* attribute. aria-controls names a panel that is in
+     the document from first paint and hidden with x-show; x-if would leave
+     aria-controls pointing at an id that does not exist until it is opened.
+
+     What is behind the disclosure is not the field's description. Something a
+     user has to open is something they will not have when they need it, so the
+     rule they must obey — eight digits — stays in the line under the control
+     and aria-describedby keeps pointing at that line. The panel is background,
+     and it is reached on purpose. -->
+<div data-kui="label/help" class="max-w-xl rounded-xl border border-zinc-300 bg-white p-4" x-data="{ open: false }">
+  <div class="mb-1.5 flex items-center gap-1">
+    <label for="lb-hsn" class="text-[13px]/5 font-medium">HSN code</label>
+    <button type="button" aria-label="What is an HSN code?" aria-controls="lb-hsn-more"
+            :aria-expanded="open" @click="open = !open"
+            class="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="circle-help" class="size-3.5"></i>
+    </button>
+  </div>
+
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <input id="lb-hsn" name="hsn" value="3901 20 00" inputmode="numeric" maxlength="10"
+           aria-describedby="lb-hsn-help"
+           class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums outline-none">
+  </div>
+
+  <p id="lb-hsn-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Eight digits. It sets the GST rate on every line raised against this item.
+  </p>
+
+  <div id="lb-hsn-more" x-show="open" x-cloak class="mt-2 rounded-lg bg-zinc-50 p-3 text-[12px]/4 text-zinc-600">
+    <p class="tabular-nums">
+      HSN is the customs classification the GST rate hangs off. The first two digits are the
+      chapter, the next two the heading and the last four the tariff item, so 3901 20 00 is
+      polyethylene of specific gravity 0.94 or more.
+    </p>
+    <p class="mt-2">
+      A wrong code is not a display fault. It changes the tax on every invoice raised against
+      the item, and correcting it afterwards means a credit note for each one.
+    </p>
+  </div>
+</div>` },
+
       { id: 'hidden', name: 'Hidden and absent labels', code:
 `<!-- Three controls in one strip and three different answers.
 
      The search box has a real label with sr-only. The card is already headed
      Purchase orders and the icon says search, so a visible name would repeat
      what is on screen twice — but the element is still there, still bound with
-     for, and clicking the icon still focuses the field. The placeholder is an
-     example of the format, not the name. Some readers do fall back to it when
-     nothing else is there, which is exactly why placeholder-as-label looks like
-     it works: it survives the screen-reader check and then vanishes the moment
-     anything is typed, at a contrast nobody chose.
+     for, and that is what the accessibility tree reads. There is one cost worth
+     naming: with no visible text there is nothing to click, so the cheapest
+     test in this entry — click the words, watch focus land — is not available
+     here and the binding has to be read out of the accessibility tree instead.
+     The placeholder is an example of the format, not the name. Some readers do
+     fall back to it when nothing else is there, which is exactly why
+     placeholder-as-label looks like it works: it survives the screen-reader
+     check and then vanishes the moment anything is typed, at a contrast nobody
+     chose.
 
      The select takes aria-label instead. There is no text to hide, its options
      already read as Status, and an sr-only label here would be a second name
@@ -287,11 +427,17 @@ register(
 
      Read-only greys the surface and not the label. The value still matters and
      still has to be copied out, so it stays at full contrast — dim it and you
-     have said the order number does not count. And it is written outright, not
-     with has-[:read-only]: the CSS :read-only pseudo-class matches every
-     element that is not user-alterable, which includes the label and the
-     paragraph inside the wrapper, so the wrapper matches always. Match the
-     attribute — has-[[readonly]] — or write the classes, as here. -->
+     have said the order number does not count. Its wrapper is the only one of
+     the two that draws a focus outline, because read-only is still in the Tab
+     order: the input takes outline-none so the border and the outline stay one
+     shape, and a wrapper that forgot the focus-within rule leaves a keyboard
+     user in a field with nothing marking it.
+
+     And it is written outright, not with has-[:read-only]: the CSS :read-only
+     pseudo-class matches every element that is not user-alterable, which
+     includes the label and the paragraph inside the wrapper, so the wrapper
+     matches always. Match the attribute — has-[[readonly]] — or write the
+     classes, as here. -->
 <div data-kui="label/states" class="max-w-xl space-y-5">
   <div class="has-[:disabled]:text-zinc-500">
     <label for="lb-off" class="mb-1.5 block text-[13px]/5 font-medium">Rate contract</label>
@@ -299,12 +445,12 @@ register(
       <input id="lb-off" value="RC-2026-014 — Gujarat Polymers Ltd" disabled
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums disabled:text-zinc-400">
     </div>
-    <p class="mt-1.5 text-[12px]/4">Changed on the contract, not on the order.</p>
+    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Changed on the contract, not on the order.</p>
   </div>
 
   <div>
     <label for="lb-ro" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <input id="lb-ro" value="PO-24-1187" readonly
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>
@@ -324,6 +470,79 @@ register(
     </span>
   </label>
 </div>` },
+
+      { id: 'invalid', name: 'The server said no', tagNew: true, code:
+`<!-- A form redisplayed after a failed POST, and the label is the one part of
+     it that has not changed. Not red, not carrying the complaint. Colouring the
+     name says the field is wrong in a way only a sighted user gets, and moving
+     the message into the label makes "Vendor GSTIN 14 of 15 characters" the
+     field's accessible name, read out on arrival and on every keystroke back
+     through it. The state goes on the control as aria-invalid and the words go
+     in the element aria-describedby already points at.
+
+     One element holds the message, and it holds the help line when the field is
+     valid — see field/error. Two elements with an id each means aria-describedby
+     has to be rewritten on every state change, and both ways of getting that
+     wrong are silent.
+
+     The summary's link href is the control's id, which is the same string the
+     label's for names. One typo there breaks the label click, the summary jump
+     and the description binding at once, and not one of the three reports
+     anything. It is also the reason a duplicated id is worse than a missing
+     one: the summary jumps to a field, the field is the wrong one, and it looks
+     like it worked.
+
+     The summary is focused, not announced. On a page the server has rendered
+     whole, nothing was inserted, so role="alert" fires for nobody — the request
+     handler puts focus on this block, which is why it takes tabindex="-1" and a
+     plain focus: outline rather than focus-visible:, since programmatic focus
+     does not match focus-visible. -->
+<form data-kui="label/invalid" class="max-w-xl" novalidate>
+  <div tabindex="-1" class="mb-5 flex items-start gap-2.5 rounded-xl border border-zinc-300 bg-white p-4 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 font-medium tabular-nums">The order was not saved. 1 field needs attention.</p>
+      <ul class="mt-1">
+        <li>
+          <a href="#lb-iv-gstin" class="text-[13px]/5 tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Vendor GSTIN — 14 of 15 characters
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="space-y-5">
+    <div>
+      <label for="lb-iv-gstin" class="mb-1.5 block text-[13px]/5 font-medium">
+        Vendor GSTIN <span aria-hidden="true" class="text-red-600">*</span>
+      </label>
+      <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+        <input id="lb-iv-gstin" name="gstin" value="24AACCG1234M1Z" maxlength="15" required
+               aria-invalid="true" aria-describedby="lb-iv-gstin-msg"
+               class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums uppercase outline-none">
+      </div>
+      <p id="lb-iv-gstin-msg" class="mt-1.5 flex min-h-4 items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+        <span class="tabular-nums">14 of 15 characters. Check it against the vendor's certificate.</span>
+      </p>
+    </div>
+
+    <div>
+      <label for="lb-iv-terms" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="lb-iv-terms" name="terms" aria-invalid="false" aria-describedby="lb-iv-terms-msg"
+                class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+          <option>45 days from invoice date</option>
+          <option>30 days from GRN</option>
+        </select>
+      </div>
+      <p id="lb-iv-terms-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+        Printed on the order. The same element carries the error when there is one.
+      </p>
+    </div>
+  </div>
+</form>` },
 
       { id: 'horizontal', name: 'Dense horizontal form', code:
 `<!-- Labels in a left gutter, and the binding is still for and id — the grid
@@ -379,6 +598,96 @@ register(
   </div>
 </div>` },
 
+      { id: 'row', name: 'Names in a repeated row', tagNew: true, code:
+`<!-- Three boxes in a column and nothing on screen names any of them. The
+     header says Receiving now, the row says which item it is, and neither is a
+     label: a header cell cannot take a for, and the item description is a
+     sibling two levels up. Left alone, all three are announced as "edit,
+     8.500" and the only thing separating them is a position nobody is told.
+
+     Each control gets a real label with sr-only, naming the column and the
+     line. That is the version that survives the layout: the header row is
+     aria-hidden and not rendered at all below sm, so anything that leaned on it
+     — aria-labelledby pointing at the header cell, a th with scope="col" — has
+     nothing to point at on a phone.
+
+     The ids carry the line's primary key, not the loop index. An index-based id
+     renumbers every row the moment a line is inserted at the top, and every
+     label follows the number rather than the line: the name says one item and
+     the box belongs to another. The field names carry the same key, so the POST
+     pairs up without depending on order.
+
+     One DOM copy at both widths, and that is not a preference. The usual
+     responsive answer is a table for desktop and cards for the phone with one
+     of them display:none, which puts every id in the document twice — and for
+     binds to the first, so the hidden copy's label drives the visible copy's
+     box. A grid that reflows has one of everything.
+
+     The MT beside each box is aria-hidden and named in the label instead. As
+     visible text next to the input it is either a second label on the same id,
+     which lengthens every name, or it is nothing at all to a screen reader. -->
+<div data-kui="label/row" class="max-w-3xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium tabular-nums">Receive against PO-24-1187 — Gujarat Polymers Ltd</h3>
+  </div>
+
+  <div aria-hidden="true" class="hidden border-b border-zinc-200 bg-zinc-50 px-4 py-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase sm:grid sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:gap-4">
+    <span>Item</span>
+    <span class="text-right">Ordered</span>
+    <span class="text-right">Receiving now</span>
+  </div>
+
+  <ul class="divide-y divide-zinc-100">
+    <li class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:items-center sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">ITM-1042 · HDPE granules — natural</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Batch 24-0912 · 27.500 MT still pending</p>
+      </div>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600 sm:text-right"><span class="sm:sr-only">Ordered </span>40.000 MT</p>
+      <div>
+        <label for="lb-ln-4021-qty" class="sr-only">Receiving now, in MT, of ITM-1042 HDPE granules — natural</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white pr-3 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="lb-ln-4021-qty" name="line-4021-received" value="8.500" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-3 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+          <span aria-hidden="true" class="shrink-0 text-[13px]/5 text-zinc-500">MT</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:items-center sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">ITM-1078 · LDPE granules — 22FA002</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Batch 24-0918 · 5.000 MT still pending</p>
+      </div>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600 sm:text-right"><span class="sm:sr-only">Ordered </span>15.000 MT</p>
+      <div>
+        <label for="lb-ln-4022-qty" class="sr-only">Receiving now, in MT, of ITM-1078 LDPE granules — 22FA002</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white pr-3 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="lb-ln-4022-qty" name="line-4022-received" value="5.000" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-3 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+          <span aria-hidden="true" class="shrink-0 text-[13px]/5 text-zinc-500">MT</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:items-center sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">ITM-3310 · M12 hex bolt — 8.8 zinc</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Batch 24-0921 · 4,000 nos still pending</p>
+      </div>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600 sm:text-right"><span class="sm:sr-only">Ordered </span>12,000 nos</p>
+      <div>
+        <label for="lb-ln-4023-qty" class="sr-only">Receiving now, in numbers, of ITM-3310 M12 hex bolt — 8.8 zinc</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white pr-3 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="lb-ln-4023-qty" name="line-4023-received" value="4,000" inputmode="numeric"
+                 class="w-full min-w-0 bg-transparent px-3 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+          <span aria-hidden="true" class="shrink-0 text-[13px]/5 text-zinc-500">nos</span>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>` },
+
       { id: 'caption', name: 'What is not a label', code:
 `<!-- These captions name values, not controls, so none of them is a label
      element. A label with no control is bound to nothing: the click behaviour
@@ -418,11 +727,211 @@ register(
     <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Status</dt>
     <dd class="mt-0.5">
       <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
-        <span class="size-1.5 rounded-full bg-amber-500"></span>Approved
+        <span aria-hidden="true" class="size-1.5 rounded-full bg-amber-500"></span>Approved
       </span>
     </dd>
   </div>
-</dl>` }
+</dl>` },
+
+      { id: 'htmx', name: 'Swapped as one block', tagNew: true, code:
+`<!-- The server checks the GSTIN against the GST portal, and what comes back is
+     the label, the control and the message as one element. Targeting the input
+     on its own is tighter and is the version that breaks: the label is left
+     outside the swap pointing at a string the response has to reproduce
+     exactly, and the day that field is rendered from a second form instance, a
+     formset row that renumbered or a widget that gained a prefix, the id is
+     different. Nothing errors and nothing logs. The label simply stops
+     focusing the box and the description stops being read.
+
+     The response repeats two ids verbatim, the block's and the input's:
+
+       <div id="lb-hx-gstin-field">
+         <label for="lb-hx-gstin" class="mb-1.5 block text-[13px]/5 font-medium">...</label>
+         <div class="rounded-lg border border-red-600 bg-white ...">
+           <input id="lb-hx-gstin" aria-invalid="true"
+                  aria-describedby="lb-hx-gstin-msg" ...>
+         </div>
+         <p id="lb-hx-gstin-msg" class="mt-1.5 min-h-4 text-[12px]/4 font-medium text-red-600">
+           No vendor registered under 24AACCG1234M1ZP.
+         </p>
+       </div>
+
+     The input's id has to survive because htmx puts focus back after a swap by
+     finding the element carrying the id that had it. Rename the input in the
+     response and a user who was still typing loses the caret to the top of the
+     document, mid-form.
+
+     No live region here. The trigger is change, which is blur, so the user has
+     already left the field — and aria-describedby is announced when focus
+     arrives, so the message is in place before they come back to it, with
+     aria-invalid saying so on the way in. A submit that still fails gets the
+     summary in label/invalid, which is the backstop for anyone who never
+     returns.
+
+     aria-invalid is written as "false" rather than left off, so the valid state
+     is a value the server sets rather than an attribute it forgets to clear.
+     hx-sync="this:replace" drops a check still in flight, so a fast retype
+     cannot settle on the older reply. -->
+<div data-kui="label/htmx" class="max-w-xl">
+  <div id="lb-hx-gstin-field">
+    <label for="lb-hx-gstin" class="mb-1.5 block text-[13px]/5 font-medium">
+      Vendor GSTIN <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="lb-hx-gstin" name="gstin" value="24AACCG1234M1ZP" maxlength="15" required
+             aria-invalid="false" aria-describedby="lb-hx-gstin-msg"
+             hx-post="/vendors/gstin/check/" hx-trigger="change"
+             hx-target="#lb-hx-gstin-field" hx-swap="outerHTML" hx-sync="this:replace"
+             class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums uppercase outline-none">
+    </div>
+
+    <p id="lb-hx-gstin-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+      15 characters. Checked against the GST portal when you leave the field.
+    </p>
+  </div>
+</div>` },
+
+      { id: 'django', name: 'Django form field', tagNew: true, code:
+`<!-- forms.py
+     class GrnForm(forms.Form):
+         QC = [('pass', 'Passed — release to stores'),
+               ('deviation', 'Passed on deviation'),
+               ('reject', 'Rejected — raise a debit note')]
+
+         # A ModelForm takes the label from verbose_name with capfirst applied,
+         # which is right for "vendor" and wrong for every acronym in a
+         # procurement schema. Write those out.
+         gstin = forms.CharField(
+             label='Vendor GSTIN', max_length=15,
+             help_text='15 characters, as printed on the certificate.',
+             widget=forms.TextInput(attrs={
+                 'class': 'w-full bg-transparent px-3 py-2 font-mono '
+                          'text-[14px]/5 tabular-nums uppercase outline-none'}))
+
+         # RadioSelect and CheckboxSelectMultiple return '' from id_for_label,
+         # on purpose: a label pointing at the group would toggle its first
+         # option. <label for=""> is valid markup, binds to nothing and reports
+         # nothing, so the question is a <legend>. See label/legend.
+         qc = forms.ChoiceField(
+             choices=QC, label='Lab result',
+             help_text='Locks the lot against issue until a result is recorded.',
+             widget=forms.RadioSelect(attrs={
+                 'class': 'mt-0.5 size-4 shrink-0 accent-zinc-700'}))
+
+         # Every MultiWidget renders two inputs with suffixed ids and no label
+         # of its own for either half. id_for_label on the field is empty here
+         # too; each subwidget carries its own.
+         received_at = forms.SplitDateTimeField(
+             label='Received at',
+             widget=forms.SplitDateTimeWidget(attrs={
+                 'class': 'w-full min-w-0 bg-transparent px-3 py-2 '
+                          'text-[14px]/5 tabular-nums outline-none'}))
+
+         def __init__(self, *args, **kwargs):
+             # label_suffix is a colon Django appends inside the <label>, so
+             # label_tag renders "Vendor GSTIN:" and the colon lands in the
+             # accessible name. Kill it on the form rather than with a filter.
+             kwargs.setdefault('label_suffix', '')
+             super().__init__(*args, **kwargs)
+             # aria-describedby cannot be decided in the template — widget
+             # attrs are fixed before it renders, and this is the only place
+             # that knows both the errors and the ids.
+             for name in self.fields:
+                 bf, widget = self[name], self.fields[name].widget
+                 # attrs on a group widget are inherited by every subwidget, so
+                 # this would put the group's help line on all three radios and
+                 # it would be read back on every arrow-key pass through them.
+                 # Groups take aria-describedby on the <fieldset> instead.
+                 if isinstance(widget, (forms.RadioSelect,
+                                        forms.CheckboxSelectMultiple,
+                                        forms.MultiWidget)):
+                     continue
+                 widget.attrs['aria-describedby'] = bf.auto_id + ('-err' if bf.errors else '-help')
+                 if bf.errors:
+                     widget.attrs['aria-invalid'] = 'true'
+
+     views.py
+         def receive(request):
+             # Two forms on one page share auto_id: id_gstin is generated for
+             # both, for binds to the first, and the second form's label drives
+             # the first form's input. A prefix is the whole fix — the ids
+             # become id_ship-gstin and id_bill-gstin, and nothing else changes.
+             return render(request, 'grn/receive.html', {
+                 'form': GrnForm(prefix='ship'),
+                 'bill_form': GrnForm(prefix='bill')})
+
+     Write the <label> out rather than printing {{ form.gstin.label_tag }}.
+     label_tag takes its attrs as a Python argument, which a template has no way
+     to pass, so the tag it renders carries no classes and there is nowhere to
+     put them. id_for_label and label are the two halves it is built from, and
+     id_for_label is the one to bind to: it is the same string as auto_id for a
+     TextInput and it is not for a RadioSelect or a MultiWidget, which is
+     exactly where a hand-built for goes wrong.
+
+     In a formset the ids already vary — form.prefix gives lines-0-gstin — but a
+     hand-written id="qty" inside the row loop does not, and that is the
+     duplicate this entry keeps warning about. See label/row. -->
+<form data-kui="label/django" method="post" class="max-w-xl space-y-5">
+  {% csrf_token %}
+
+  <div>
+    <label for="{{ form.gstin.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.gstin.label }}{% if form.gstin.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+
+    <div class="rounded-lg bg-white {% if form.gstin.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.gstin }}
+    </div>
+
+    {% if form.gstin.errors %}
+      <p id="{{ form.gstin.auto_id }}-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.gstin.errors.0 }}
+      </p>
+    {% else %}
+      <p id="{{ form.gstin.auto_id }}-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">{{ form.gstin.help_text }}</p>
+    {% endif %}
+  </div>
+
+  {# id_for_label is empty on a RadioSelect, so the question is a legend and  #}
+  {# each option's own label wraps the tag Django hands back. The group's     #}
+  {# help line is described from the fieldset, which is announced once as the #}
+  {# group is entered rather than on every option in it.                      #}
+  <fieldset aria-describedby="{{ form.qc.auto_id }}-help">
+    <legend class="mb-2 text-[13px]/5 font-medium">{{ form.qc.label }}</legend>
+    <div class="space-y-2">
+      {% for choice in form.qc %}
+        <label class="flex items-start gap-2.5 py-1 text-[14px]/5">
+          {{ choice.tag }}<span>{{ choice.choice_label }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    <p id="{{ form.qc.auto_id }}-help" class="mt-2 text-[12px]/4 text-zinc-500">{{ form.qc.help_text }}</p>
+  </fieldset>
+
+  {# a MultiWidget: the legend names the pair, and each half is labelled by #}
+  {# its own subwidget id. Printing {{ form.received_at }} emits both boxes  #}
+  {# with nothing naming either.                                            #}
+  <fieldset>
+    <legend class="mb-2 text-[13px]/5 font-medium">{{ form.received_at.label }}</legend>
+    <div class="flex flex-wrap gap-3">
+      {% for part in form.received_at.subwidgets %}
+        <div class="min-w-0 flex-1">
+          <label for="{{ part.id_for_label }}" class="mb-1.5 block text-[12px]/4 text-zinc-500">
+            {% if forloop.first %}Date{% else %}Time{% endif %}
+          </label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            {{ part }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Post GRN
+  </button>
+</form>` }
     ]
   },
 
@@ -442,6 +951,12 @@ register(
       'aria-invalid on a fieldset does nothing. The implicit role is group, which is not a widget, so a cross-field error goes in a paragraph under the group, is pointed at by aria-describedby on the fieldset, and the invalid flag is set on each input inside it. An error that belongs to one field belongs under that field; only an error about the combination — a GSTIN that does not contain its own PAN — belongs to the group.',
       'Read-only is not disabled. readonly keeps the control in the tab order, keeps its value selectable, and still posts it; disabled does none of the three, so a disabled field quietly drops out of the POST and a server that reads absence as a change wipes the value. A number the form computes rather than collects is not a control at all — it is an <output>, which is labelable so <label for> still works, and which is a live region, so a total that recomputes on every keystroke is announced on every keystroke unless you turn that off.',
       'In Django the mapping is direct but the details bite. {{ field.errors }} renders a <ul class="errorlist">, so the message paragraph takes {{ field.errors.0 }}; {{ field.help_text }} goes in the same paragraph in the else branch. The aria-describedby id depends on auto_id, so it is set on the widget in the form\'s __init__ rather than written in the template, and aria-invalid comes from whether field.errors is truthy at render time — never from a hardcoded attribute.',
+      'A caution is not an error and must not be dressed as one. The border stays zinc-200, aria-invalid stays "false", the submit stays enabled, and the whole of it is one line of amber-700 text with an alert-triangle in the message slot. An amber border is one glance away from a red one, and a field that looks wrong and saves anyway is what teaches somebody that red is negotiable. The error is font-medium and the caution is not, so the two are told apart at arm\'s length as well as up close. This is also the one place a static aria-invalid="false" is right — the field is never invalid, so there is nothing to bind it to.',
+      'aria-describedby on a disabled control is dead text. A disabled control never takes focus, and a description is read when focus arrives, so the sentence explaining why the field is locked is heard by nobody. Anything the user has to know in order to unlock it belongs on the control that governs it — the radio group, the checkbox, the select whose answer does the locking — and the locked field\'s own message is left as something read by eye.',
+      'Lock a dependent field, never hide it. It keeps its place, so the form does not reflow every time the answer above it changes, and the person filling it in can see that the question exists and what turns it on. Lock it with disabled rather than with display:none: a required control that is hidden but not disabled makes the browser refuse the submit on a control it cannot scroll into view, and the only trace is "An invalid form control is not focusable" in a console nobody has open. disabled exempts a control from constraint validation and drops it from the POST, which is exactly what "not applicable" should send.',
+      'Digit grouping belongs to a value being read, not to a value being typed. An <output> reads ₹2,36,800.00 and an input holds 2000 — put the commas in the input and they are three characters the user deletes before they can edit the number, a cursor that jumps as the grouping re-flows, and a parse on the server that has to strip them before it can trust the figure.',
+      'The reserved message line is not only about layout — it is what lets aria-describedby be written once and never touched. A dense line-items row cannot afford 22px of nothing per cell, so its message renders only when it exists, and the moment it does the description has to be bound with it. That is the real price of the dense arrangement, and it is worth paying in a table and not worth paying in a form.',
+      'A check that costs a request runs on blur and on nothing else. Live revalidation is for constraints the browser can settle on its own; running a lookup on every keystroke is a request per character, a queue of replies that can land out of order, and a verdict on a half-typed value. It is also advisory — the same check runs again inside the POST, because the number can be booked by somebody else between the moment the field went green and the moment Save was pressed.',
       'A trailing action beside the label is a <button type="button">, and it lives outside the <label>. A bare <button> in a form defaults to type="submit", so "Same as plant address" submits the half-filled order the first time somebody presses Enter in a field. Inside the label, the click is forwarded to the control and the button becomes part of the field\'s accessible name.'
     ],
     anatomy: [
@@ -452,7 +967,9 @@ register(
       ['Required marker', 'A red asterisk with aria-hidden="true", backed by the required attribute. Flips to an Optional word in the label on a form where most fields are required.'],
       ['Legend', 'The name of a group of controls, on a fieldset. It names the question; the labels inside name the answers, and it does not replace them.'],
       ['Trailing action', 'A type="button" on the label row, right-aligned — Same as plant address, Clear, Look up. Outside the label, so it neither submits nor joins the field\'s name.'],
-      ['Locked surface', 'bg-zinc-200 with no focus outline, for a value that cannot be typed into. Read-only keeps zinc-900 text because the value still matters; disabled drops to zinc-400.']
+      ['Locked surface', 'bg-zinc-200, for a value that cannot be typed into. Read-only keeps zinc-900 text and its focus outline, because the value still matters and the field is still in the tab order; disabled drops to zinc-400 and takes no outline, because focus can never land on it.'],
+      ['Status slot', 'A 36px square inside the control wrapper, right of the value, holding one icon at a time — a spinner while a server check is in flight, a tick when it came back clean, alert-circle when it did not. It sits in the control rather than in the message because the message is what the server rewrites, and an icon that arrives in a swap is never hydrated.'],
+      ['Header row', 'In a line-items row the column names stand in for the labels. It is aria-hidden, because every control below it still carries its own label; that label is sr-only while the header is on screen and comes back when the row stacks at 390px.']
     ],
     behaviour: [
       'The error replaces the help text in the same paragraph, so aria-describedby never has to change and the block never grows. The help text has done its job by the time the error exists — it described a format that has now been broken, and repeating it under the error is two sentences about the same mistake.',
@@ -463,6 +980,10 @@ register(
       'In a two-column grid the tab order is DOM order. Anything long — an address, a description, a line table — spans both columns rather than being crushed into one, and at 390px everything is one column and has to still read top to bottom without a connecting word between two halves of a pair.',
       'A group error sits under the group and a field error sits under its field. Putting a cross-field error under whichever of the two the user touched last makes the same mistake report itself in two different places on two different visits.',
       'Read-only renders on the locked surface and still submits; disabled renders drained and does not. A value the form derives is rendered as text with its label, never as a disabled input — a greyed box says "you may not edit this yet", and a computed total is not something anybody was ever going to edit.',
+      'A caution does not wait for blur. It is not a verdict on what was typed, it is a fact about the value that the form already knows — this quantity is past the contract balance, this date falls in the shutdown week — so it behaves like the running total beside it and stays true as the number changes. Waiting for blur to say something that is not an accusation only delays it.',
+      'A field locked by another field\'s answer stays in place, on the locked surface, and posts nothing while it is locked. Unlocking it is the answer above changing, and nothing else — never a second click, never an Edit button. The message under it says which answer unlocks it, and the field that owns that answer says what unlocking costs.',
+      'A server check runs when the field is left. In flight, the status slot spins and the message keeps the last thing it said; on the way back, the server rewrites the message and the verdict travels in the same response, so the border, the announcement and the words cannot disagree. If the request fails, the field says the check did not happen — it does not say the value is fine, and it does not block the save either, because the POST will check it again.',
+      'Read-only takes focus and shows it. It is in the tab order so the value can be selected and copied, which is the entire reason to render it as a control instead of as text, and a control that can be reached with the keyboard and draws nothing when it is reached cannot be found with the keyboard.',
       'In Django the same block round-trips: the error paragraph is {{ field.errors.0 }}, the help paragraph is {{ field.help_text }}, and a failed POST comes back with every entered value still in place.'
     ],
     a11y: [
@@ -473,6 +994,11 @@ register(
       'A set of controls is a fieldset with a legend, described with aria-describedby on the fieldset so the help is read once on entry rather than once per arrow key. aria-invalid on the fieldset is ignored — role group is not a widget — so it goes on the inputs.',
       'The error is real text under the field. Never a title attribute, never a tooltip, never colour alone: a red border with no words is invisible in forced-colours mode and meaningless to anybody who cannot see red.',
       'An <output> is a live region by default, so a derived total announces itself every time it changes. That is right for a value recomputed on a discrete action and wrong for one recomputed per keystroke, where aria-live="off" leaves it as plain text with a label.',
+      'role="status" goes on the message paragraph in exactly one case: when the answer can arrive after focus has left the field. A server check is that case — the description is read when focus arrives, and by the time the verdict comes back focus is two fields further down, so without the live region the only sign is a colour the user may not be looking at. Every other message in this block is written before focus can return to it and needs nothing.',
+      'That is not a licence to make every field live. The rule is one announcement per thing the user did: one blur, one check, one sentence. A form that validates five fields on submit is the error summary\'s job, and five per-field live regions there overlap into noise.',
+      'Read-only keeps a visible focus outline; disabled takes none. The split is whether focus can land there at all. A read-only control is in the tab order so its value can be copied, so it has to draw where it is; a disabled control is unreachable, and an outline on it would be a promise of an interaction that is not available.',
+      'A disabled control\'s aria-describedby is never announced, because the announcement is triggered by focus and focus cannot get there. Put the reason a field is locked on the control that unlocks it. The locked field keeps its own message for the person reading the form with their eyes.',
+      'A field in a line-items row still needs a real label. The column header is not one — it is aria-hidden decoration for the eye — so each control carries its own <label for>, sr-only while the header is on screen and visible again when the row stacks at 390px. aria-label on the input would work for the column and say nothing about the row; the row is named by the item in the first cell, in DOM order before the controls.',
       'The error summary at the top of a failed form is a separate component and takes focus on submit. This block does not shout — a per-field live region turns a five-error form into five overlapping announcements.'
     ],
     related: ['label', 'input', 'form-page'],
@@ -551,6 +1077,53 @@ register(
   </p>
 </div>` },
 
+      { id: 'warning', name: 'Questionable, not wrong', tagNew: true, code:
+`<!-- The value is unusual and the order can still be raised. Everything in this
+     variant is about keeping those two facts from being read as one.
+
+     The border stays zinc-200 and aria-invalid stays "false". An amber border
+     is one glance away from a red one, and once a field can look wrong and save
+     anyway, red stops meaning stop. The caution is the message line and nothing
+     else: alert-triangle in amber-700, in the normal weight where the error is
+     font-medium, so the two are told apart at arm's length as well as up close.
+
+     aria-invalid is written once here, which the rest of the entry forbids.
+     This is the exception it is worth stating: the field has no invalid state
+     to go stale into, so "false" is not a snapshot of anything, and leaving the
+     attribute off entirely would say the same thing less plainly.
+
+     It does not wait for blur either. A caution is not a verdict on what was
+     typed — it is arithmetic the form was already doing, the same class of
+     thing as the line total beside it — so it stays true as the number changes
+     rather than arriving after the user has moved on.
+
+     The last sentence is the one that matters and it says what happens, not
+     what is wrong. Somebody who wants 12,000 kg is going to order 12,000 kg;
+     what they need to know is that 4,000 of them bill at a different rate. -->
+<div data-kui="field/warning" class="max-w-sm"
+     x-data="{ qty: 12000, balance: 8000, get over() { return this.qty > this.balance } }">
+  <label for="fw-qty" class="mb-1.5 block text-[13px]/5 font-medium">
+    Order quantity <span aria-hidden="true" class="text-red-600">*</span>
+  </label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <input id="fw-qty" name="qty" required inputmode="numeric" value="12000"
+           x-model.number="qty" aria-invalid="false"
+           aria-describedby="fw-qty-unit fw-qty-msg"
+           class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+    <span id="fw-qty-unit" class="pr-3 text-[14px]/5 text-zinc-600">kg</span>
+  </div>
+
+  <p id="fw-qty-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+    <span x-show="!over" x-cloak class="block tabular-nums text-zinc-500">Contract RC-26-0043 has 8,000 kg left at ₹114.20 per kg.</span>
+    <span x-show="over" x-cloak class="flex items-start gap-1.5 text-amber-700">
+      <i data-lucide="alert-triangle" class="mt-px size-3.5 shrink-0"></i>
+      <span class="tabular-nums"
+            x-text="(qty - balance).toLocaleString('en-IN') + ' kg is past the contract balance and bills at the spot rate. The order can still be raised.'"></span>
+    </span>
+  </p>
+</div>` },
+
       { id: 'required', name: 'Required and optional', code:
 `<!-- Which one you mark depends on the ratio, and it is a decision about the
      form rather than about the field. Two required out of nine: mark them.
@@ -569,7 +1142,7 @@ register(
 <div data-kui="field/required" class="max-w-sm space-y-6">
   <div>
     <p class="mb-3 text-[12px]/4 text-zinc-600">
-      Two of the nine fields on this form are required. <span aria-hidden="true" class="text-red-600">*</span> marks them.
+      Two of the nine fields on this form are required, and a red asterisk <span aria-hidden="true" class="text-red-600">*</span> marks each one.
     </p>
 
     <div class="space-y-4">
@@ -736,8 +1309,15 @@ register(
 
      The legend names the question. Every input inside still needs its own
      label; a legend does not stand in for one, and two fields under one legend
-     with no labels are announced as "Tax registration, edit" twice. -->
-<fieldset data-kui="field/group" class="max-w-md" aria-describedby="fg-msg">
+     with no labels are announced as "Tax registration, edit" twice.
+
+     Both flags come off one getter. Two inputs, one fact, one place it is
+     decided — and it is decided live rather than written into the markup,
+     because the mismatch stops being true the moment either half is corrected
+     and an aria-invalid that was typed by hand does not. -->
+<fieldset data-kui="field/group" class="max-w-md" aria-describedby="fg-msg"
+          x-data="{ pan: 'AAACG4171B', gstin: '24AAACG9902B1ZP',
+                    get bad() { return this.gstin.slice(2, 12).toUpperCase() !== this.pan.toUpperCase() } }">
   <legend class="mb-2 text-[13px]/5 font-medium">
     Tax registration <span aria-hidden="true" class="text-red-600">*</span>
   </legend>
@@ -745,23 +1325,33 @@ register(
   <div class="grid gap-3 sm:grid-cols-2">
     <div>
       <label for="fg-pan" class="mb-1.5 block text-[12px]/4 text-zinc-600">PAN</label>
-      <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
-        <input id="fg-pan" name="pan" value="AAACG4171B" required aria-invalid="true"
+      <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+           :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                       : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+        <input id="fg-pan" name="pan" required x-model="pan"
+               :aria-invalid="bad ? 'true' : 'false'"
                class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums uppercase outline-none">
       </div>
     </div>
     <div>
       <label for="fg-gstin" class="mb-1.5 block text-[12px]/4 text-zinc-600">GSTIN</label>
-      <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
-        <input id="fg-gstin" name="gstin" value="24AAACG9902B1ZP" required aria-invalid="true"
+      <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+           :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                       : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+        <input id="fg-gstin" name="gstin" required maxlength="15" x-model="gstin"
+               :aria-invalid="bad ? 'true' : 'false'"
                class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums uppercase outline-none">
       </div>
     </div>
   </div>
 
-  <p id="fg-msg" class="mt-2 flex items-start gap-1.5 min-h-4 text-[12px]/4 font-medium text-red-600">
-    <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
-    <span class="tabular-nums">Characters 3 to 12 of the GSTIN are the PAN. This pair reads AAACG9902B against AAACG4171B.</span>
+  <p id="fg-msg" class="mt-2 min-h-4 text-[12px]/4">
+    <span x-show="!bad" x-cloak class="block tabular-nums text-zinc-500">Characters 3 to 12 of the GSTIN are the PAN.</span>
+    <span x-show="bad" x-cloak class="flex items-start gap-1.5 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+      <span class="tabular-nums"
+            x-text="'Characters 3 to 12 of the GSTIN are the PAN. This pair reads ' + gstin.slice(2, 12).toUpperCase() + ' against ' + pan.toUpperCase() + '.'"></span>
+    </span>
   </p>
 </fieldset>` },
 
@@ -816,6 +1406,102 @@ register(
   </p>
 </fieldset>` },
 
+      { id: 'dependent', name: 'Locked by the answer above it', tagNew: true, code:
+`<!-- Two fields that only exist if the question above them was answered one
+     particular way, and the whole variant is about what "only exists" is
+     allowed to mean.
+
+     They lock, they do not disappear. A form that grows and shrinks under the
+     pointer is one nobody can learn the shape of, and a field that is not on
+     the page cannot tell anyone it is there or what turns it on. Locked, it
+     keeps its place and its message, and the message names the answer that
+     unlocks it.
+
+     The lock is disabled and never display:none. A required control hidden
+     rather than disabled is still a required control: the browser refuses the
+     submit on something it cannot scroll into view, says "An invalid form
+     control is not focusable" to a console nobody has open, and the user gets a
+     Save button that does nothing with no message anywhere on the page.
+     disabled is exempt from constraint validation and drops out of the POST,
+     which is the right thing to send for not applicable.
+
+     What unlocks them is said on the radio group, not on the locked fields.
+     A disabled control never takes focus, and a description is only read when
+     focus arrives, so aria-describedby on a locked field is text nobody hears.
+     The consequence — an agency, a window, a fee — belongs on the control the
+     user can still reach.
+
+     The message under each locked field is still worth writing. It is read by
+     eye, by the person looking at a greyed box wondering whether it is broken. -->
+<div data-kui="field/dependent" class="max-w-md space-y-5" x-data="{ mode: 'gate' }">
+
+  <fieldset aria-describedby="fp-mode-msg">
+    <legend class="mb-2 text-[13px]/5 font-medium">
+      Inspection <span aria-hidden="true" class="text-red-600">*</span>
+    </legend>
+    <div class="space-y-2">
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="inspection" value="none" required x-model="mode"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Not required</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="inspection" value="gate" checked required x-model="mode"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>At the plant gate, by stores</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="inspection" value="third_party" required x-model="mode"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Third-party agency</span>
+      </label>
+    </div>
+    <p id="fp-mode-msg" class="mt-2 min-h-4 text-[12px]/4 text-zinc-500">
+      A third-party inspection needs an agency and a window, and their fee is added to the order.
+    </p>
+  </fieldset>
+
+  <div>
+    <label for="fp-agency" class="mb-1.5 block text-[13px]/5 font-medium"
+           :class="mode === 'third_party' ? '' : 'text-zinc-500'">Agency</label>
+    <div class="rounded-lg border border-zinc-200"
+         :class="mode === 'third_party'
+                   ? 'bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'
+                   : 'bg-zinc-200'">
+      <select id="fp-agency" name="agency" aria-describedby="fp-agency-msg"
+              :disabled="mode !== 'third_party'" :required="mode === 'third_party'"
+              class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none disabled:text-zinc-400">
+        <option value="">Choose an agency</option>
+        <option value="sgs">SGS India — Vapi</option>
+        <option value="tuv">TUV Rheinland — Silvassa</option>
+        <option value="bv">Bureau Veritas — Daman</option>
+      </select>
+    </div>
+    <p id="fp-agency-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+      <span x-show="mode === 'third_party'" x-cloak class="block">Their report is attached to the GRN before it can be posted.</span>
+      <span x-show="mode !== 'third_party'" x-cloak class="block">Locked, and posts nothing, until Inspection is a third-party agency.</span>
+    </p>
+  </div>
+
+  <div>
+    <label for="fp-window" class="mb-1.5 block text-[13px]/5 font-medium"
+           :class="mode === 'third_party' ? '' : 'text-zinc-500'">Inspection window</label>
+    <div class="flex items-center rounded-lg border border-zinc-200"
+         :class="mode === 'third_party'
+                   ? 'bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'
+                   : 'bg-zinc-200'">
+      <input id="fp-window" name="window_days" value="3" inputmode="numeric"
+             aria-describedby="fp-window-unit"
+             :disabled="mode !== 'third_party'"
+             class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none disabled:text-zinc-400">
+      <span id="fp-window-unit" class="pr-3 text-[14px]/5"
+            :class="mode === 'third_party' ? 'text-zinc-600' : 'text-zinc-400'">working days</span>
+    </div>
+    <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+  </div>
+
+</div>` },
+
       { id: 'action', name: 'Trailing action and a unit', code:
 `<!-- Two affordances that both want to live in the field and belong in
      different places.
@@ -856,7 +1542,7 @@ register(
   <div>
     <label for="fa-qty" class="mb-1.5 block text-[13px]/5 font-medium">Order quantity</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <input id="fa-qty" name="qty" value="2,000" inputmode="numeric"
+      <input id="fa-qty" name="qty" value="2000" inputmode="numeric"
              aria-describedby="fa-qty-unit fa-qty-msg"
              class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
       <span id="fa-qty-unit" class="pr-3 text-[14px]/5 text-zinc-600">kg</span>
@@ -973,6 +1659,131 @@ register(
   </div>
 </div>` },
 
+      { id: 'inline', name: 'Dense, in a line-items row', tagNew: true, code:
+`<!-- The comfortable field costs about 90px of height. Eight order lines of it
+     is a screen and a half of scrolling to type sixteen numbers, so in a
+     line-items row the label moves to the column header, the control drops to
+     32px, and the reserved message line goes.
+
+     Losing the reserved line is the part that costs something, and it is not
+     the layout. A message that is only rendered when it exists is a message
+     aria-describedby has to be bound to — so the third row binds it, and the id
+     is dropped from the attribute rather than left pointing at a paragraph that
+     is display:none, which resolves to nothing and takes the whole description
+     with it. Reserve the line in a form; pay this price only in a table.
+
+     The header is aria-hidden and every control still carries a real <label
+     for>, sr-only from sm up. At 390px there is no header to borrow from, so
+     the labels come back and each row stacks into a small form of its own. An
+     aria-label on the input would have named the column and said nothing about
+     which line it belongs to; the item name in the first cell does that, and it
+     is read first because it comes first.
+
+     The inputs hold 2000 and the value reads ₹2,28,400. Digit grouping belongs
+     to a number being read — in a box somebody types into, the commas are
+     characters they have to delete and a parse the server has to undo.
+
+     The value is an <output>, not a disabled input — nobody was ever going to
+     edit it, and a greyed box says the opposite. It carries aria-live="off"
+     because an output is a live region by default and this one recomputes on
+     every keystroke in the two boxes beside it, which is a total announced
+     character by character while somebody is still typing the quantity. -->
+<div data-kui="field/inline" class="max-w-3xl">
+
+  <div aria-hidden="true" class="hidden px-3 pb-1.5 sm:grid sm:grid-cols-[minmax(0,1fr)_6rem_7rem_7rem] sm:gap-3">
+    <span class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Item</span>
+    <span class="text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Qty (kg)</span>
+    <span class="text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Rate</span>
+    <span class="text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Value</span>
+  </div>
+
+  <div class="divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+
+    <div class="grid gap-3 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_6rem_7rem_7rem] sm:items-start sm:gap-3">
+      <p class="text-[13px]/5 sm:pt-1.5">HDPE granules — natural, M60075</p>
+      <div>
+        <label for="fl-qty-1" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Quantity in kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="fl-qty-1" name="qty_1" value="2000" inputmode="numeric"
+                 class="w-full min-w-0 bg-transparent px-2.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-rate-1" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Rate per kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <span class="pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+          <input id="fl-rate-1" name="rate_1" value="114.20" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-value-1" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Line value</label>
+        <output id="fl-value-1" for="fl-qty-1 fl-rate-1" aria-live="off"
+                class="flex h-8 items-center justify-end text-[13px]/5 font-medium tabular-nums">₹2,28,400</output>
+      </div>
+    </div>
+
+    <div class="grid gap-3 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_6rem_7rem_7rem] sm:items-start sm:gap-3">
+      <p class="text-[13px]/5 sm:pt-1.5">LDPE granules — grade 24FS040</p>
+      <div>
+        <label for="fl-qty-2" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Quantity in kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="fl-qty-2" name="qty_2" value="500" inputmode="numeric"
+                 class="w-full min-w-0 bg-transparent px-2.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-rate-2" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Rate per kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <span class="pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+          <input id="fl-rate-2" name="rate_2" value="121.75" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-value-2" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Line value</label>
+        <output id="fl-value-2" for="fl-qty-2 fl-rate-2" aria-live="off"
+                class="flex h-8 items-center justify-end text-[13px]/5 font-medium tabular-nums">₹60,875</output>
+      </div>
+    </div>
+
+    <div class="grid gap-3 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_6rem_7rem_7rem] sm:items-start sm:gap-3"
+         x-data="{ qty: 2010, bag: 25, get bad() { return this.qty % this.bag !== 0 } }">
+      <p class="text-[13px]/5 sm:pt-1.5">HDPE granules — black, M60075B</p>
+      <div>
+        <label for="fl-qty-3" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Quantity in kg</label>
+        <div class="flex h-8 items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+             :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                         : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+          <input id="fl-qty-3" name="qty_3" inputmode="numeric" x-model.number="qty"
+                 :aria-invalid="bad ? 'true' : 'false'"
+                 :aria-describedby="bad ? 'fl-qty-3-msg' : null"
+                 class="w-full min-w-0 bg-transparent px-2.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+        <p id="fl-qty-3-msg" x-show="bad" x-cloak class="mt-1 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+          <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+          <span class="tabular-nums">Sold in 25 kg bags.</span>
+        </p>
+      </div>
+      <div>
+        <label for="fl-rate-3" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Rate per kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <span class="pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+          <input id="fl-rate-3" name="rate_3" value="109.60" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-value-3" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Line value</label>
+        <output id="fl-value-3" for="fl-qty-3 fl-rate-3" aria-live="off"
+                class="flex h-8 items-center justify-end text-[13px]/5 font-medium tabular-nums"
+                x-text="'₹' + (qty * 109.6).toLocaleString('en-IN', { maximumFractionDigits: 0 })">₹2,20,296</output>
+      </div>
+    </div>
+
+  </div>
+</div>` },
+
       { id: 'readonly', name: 'Read-only and derived', code:
 `<!-- Three things that all look like "a field you cannot type in" and are not
      the same thing.
@@ -980,9 +1791,14 @@ register(
      Read-only is still a field. readonly keeps it in the tab order, keeps the
      value selectable, and still posts it. disabled does none of those, so a
      disabled order number drops out of the POST and a server that reads absence
-     as a change clears it. The locked surface — bg-zinc-200, no focus outline —
-     is what says you cannot type here; the zinc-900 text is what says the value
-     still matters.
+     as a change clears it. The locked surface — bg-zinc-200 — is what says you
+     cannot type here; the zinc-900 text is what says the value still matters.
+
+     The read-only field keeps its focus outline, and that is not a decoration
+     left in by accident. It is in the tab order precisely so the number can be
+     selected and copied, so a keyboard user lands on it, and a focusable
+     control with nothing drawn round it is a control they cannot find. The
+     disabled field below takes no outline because focus can never reach it.
 
      A derived number is not a control at all. Drawing it as a disabled input
      promises an edit that will never be allowed; it is <output>, which is one
@@ -999,7 +1815,7 @@ register(
 
   <div>
     <label for="fr-no" class="mb-1.5 block text-[13px]/5 font-medium">Order number</label>
-    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <input id="fr-no" name="number" readonly value="PO-24-1187" aria-describedby="fr-no-msg"
              class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>
@@ -1050,7 +1866,221 @@ register(
     </p>
   </div>
 
-</div>` }
+</div>` },
+
+      { id: 'server', name: 'Checked by the server, not the browser', tagNew: true, code:
+`<!-- Whether this invoice number has already been booked against this vendor is
+     not a fact the browser holds. maxlength and a pattern cannot answer it, so
+     the field asks, and everything here follows from the answer arriving late.
+
+     htmx does the asking, because Alpine does not fetch. hx-trigger="change"
+     and nothing else: a check that costs a request does not run per keystroke,
+     which would be a request per character, a queue of replies that can land
+     out of order, and a verdict on half a number. hx-sync="this:replace" drops
+     whatever is still in flight, so the last answer on screen is the answer to
+     the last question asked.
+
+     The swap target is inside the message paragraph, not the paragraph. The id
+     in aria-describedby has to survive the swap, and hx-swap="outerHTML" on the
+     described element replaces it with whatever the server sent — one id typo
+     there and the description is silently gone. So the paragraph keeps the id
+     and a span inside it takes the innerHTML.
+
+     The verdict rides in the same response as the words, on a data attribute
+     the swapped fragment carries, so the border, the announcement and the
+     sentence cannot disagree. It is read after the swap; a failed request never
+     swaps, which is why the offline branch is set from after-request instead.
+
+     The icon lives in the control, not in the message. createIcons runs once at
+     load and never sees markup that arrives in a swap, so an <i data-lucide>
+     in the server's fragment is a blank space. What the server sends is words.
+
+     role="status" is on the message, and this is the one variant in the entry
+     that gets a live region. A description is read when focus arrives, and by
+     the time this answer comes back focus is two fields down the form — without
+     it, the only sign is a colour nobody is looking at.
+
+     None of this is the check. The POST runs it again, because the number can
+     be booked by somebody else between the field going green and Save being
+     pressed. In Django hx-include="closest form" carries the CSRF token along
+     with the vendor, since the token is a hidden input inside the form. -->
+<form data-kui="field/server" method="post" action="/purchase/invoices/" class="max-w-sm space-y-5"
+      x-data="{ state: 'idle' }"
+      @htmx:before-request.camel="state = 'checking'"
+      @htmx:after-swap.camel="state = $refs.verdict.firstElementChild?.dataset.verdict || 'ok'"
+      @htmx:after-request.camel="if (!$event.detail.successful) state = 'offline'">
+
+  <div>
+    <label for="fs-vendor" class="mb-1.5 block text-[13px]/5 font-medium">
+      Vendor <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <select id="fs-vendor" name="vendor" required aria-describedby="fs-vendor-msg"
+              class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+        <option value="">Choose a vendor</option>
+        <option value="v-0412" selected>Gujarat Polymers Ltd</option>
+        <option value="v-0288">Sharma Steel &amp; Alloys</option>
+      </select>
+    </div>
+    <p id="fs-vendor-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+      The number below is checked against this vendor's books.
+    </p>
+  </div>
+
+  <div>
+    <label for="fs-inv" class="mb-1.5 block text-[13px]/5 font-medium">
+      Vendor invoice number <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+
+    <div class="flex items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+         :class="state === 'bad' ? 'border-red-600 focus-within:outline-red-600/15'
+                                 : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+      <input id="fs-inv" name="invoice_no" value="GPL/26-27/0418" required maxlength="32"
+             hx-post="/purchase/invoices/check-number/" hx-trigger="change"
+             hx-include="closest form" hx-target="#fs-inv-verdict" hx-swap="innerHTML"
+             hx-sync="this:replace"
+             aria-describedby="fs-inv-msg"
+             :aria-invalid="state === 'bad' ? 'true' : 'false'"
+             :aria-busy="state === 'checking' ? 'true' : 'false'"
+             class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+
+      <span class="flex size-9 shrink-0 items-center justify-center">
+        <span x-show="state === 'checking'" x-cloak class="text-zinc-500"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+        <span x-show="state === 'ok'" x-cloak class="text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        <span x-show="state === 'bad'" x-cloak class="text-red-600"><i data-lucide="alert-circle" class="size-4"></i></span>
+        <span x-show="state === 'offline'" x-cloak class="text-amber-700"><i data-lucide="alert-triangle" class="size-4"></i></span>
+      </span>
+    </div>
+
+    <p id="fs-inv-msg" role="status" class="mt-1.5 min-h-4 text-[12px]/4">
+      <span id="fs-inv-verdict" x-ref="verdict" x-show="state !== 'offline'">
+        <span data-verdict="idle" class="block tabular-nums text-zinc-500">Unique per vendor per financial year. Checked when you leave the field.</span>
+      </span>
+      <span x-show="state === 'offline'" x-cloak class="block text-amber-700">Could not reach the books. The number is checked again when the invoice is saved.</span>
+    </p>
+  </div>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Book invoice
+  </button>
+</form>
+
+<!-- purchase/_invoice_number_msg.html — the whole response. Words and a
+     verdict, no icon, and nothing around them: it is swapped into the span
+     that sits inside the message paragraph.
+
+     <span data-verdict="bad" class="block font-medium tabular-nums text-red-600">
+       Already booked on 04 Sep 2026 against GRN-24-0912.
+     </span>
+
+     <span data-verdict="ok" class="block tabular-nums text-zinc-500">
+       Not booked against Gujarat Polymers Ltd this year.
+     </span> -->` },
+
+      { id: 'django', name: 'Django form field', tagNew: true, code:
+`<!-- forms.py
+     class InvoiceForm(forms.Form):
+         CTRL = ('w-full bg-transparent px-3 py-2 text-[14px]/5 '
+                 'tabular-nums outline-none')
+
+         number = forms.CharField(
+             label='Vendor invoice number', max_length=32,
+             help_text='As printed on the vendor copy. Unique per vendor per financial year.',
+             widget=forms.TextInput(attrs={'class': CTRL}))
+
+         amount = forms.DecimalField(
+             label='Invoice value', max_digits=12, decimal_places=2,
+             help_text='Excluding GST. The tax lines are read off the vendor GSTIN.',
+             widget=forms.NumberInput(attrs={
+                 'class': CTRL + ' text-right', 'inputmode': 'decimal'}))
+
+         def __init__(self, *args, **kwargs):
+             super().__init__(*args, **kwargs)
+             for name in self.fields:
+                 bf, attrs = self[name], self.fields[name].widget.attrs
+                 # One id, and it does not depend on the state. The paragraph is
+                 # always rendered — that is what min-h-4 buys — so there is no
+                 # -err id to switch to and no branch here to get wrong.
+                 attrs['aria-describedby'] = bf.auto_id + '-msg'
+                 # Decided at render time from the errors that exist at render
+                 # time. Typed into the template by hand it is right once, and
+                 # then the field is announced as invalid for the rest of the
+                 # session no matter what the user does about it.
+                 attrs['aria-invalid'] = 'true' if bf.errors else 'false'
+
+         def clean(self):
+             cleaned = super().clean()
+             # A mismatch between the two belongs to neither of them. add_error
+             # with None puts it in non_field_errors, which the error summary at
+             # the top of the page renders and takes focus on. Attached to
+             # whichever field the user touched last, the same mistake reports
+             # itself somewhere different on the next visit.
+             return cleaned
+
+     The widget renders the control and only the control. The wrapper that owns
+     the border and the focus outline, the label and the message paragraph are
+     template markup, so form.number on its own is never the whole field — the
+     one thing that catches everybody arriving from a form renderer.
+
+     Write the label rather than field.label_tag. label_tag builds its own
+     element, appends label_suffix, and leaves nowhere to hang the asterisk or
+     the classes. Take the asterisk from field.field.required so it cannot drift
+     from the constraint the server actually enforces.
+
+     field.errors is a <ul class="errorlist">, which is why the paragraph takes
+     field.errors.0. min-h-4 stays on it in both branches: a failed POST
+     re-renders the whole page, and without the reserved line every field that
+     errored shifts the ones under it before the user has read anything.
+
+     The block below is nine lines and every field on the form needs all nine.
+     Put it in an include and pass the bound field to it — the wiring is only
+     ever right if it is written once. -->
+<form data-kui="field/django" method="post" class="max-w-sm space-y-5">
+  {% csrf_token %}
+
+  <div>
+    <label for="{{ form.number.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.number.label }}{% if form.number.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+    <div class="rounded-lg bg-white focus-within:outline-3 focus-within:outline-offset-2 {% if form.number.errors %}border border-red-600 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.number }}
+    </div>
+    <p id="{{ form.number.auto_id }}-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+      {% if form.number.errors %}
+        <span class="flex items-start gap-1.5 font-medium text-red-600">
+          <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+          <span class="tabular-nums">{{ form.number.errors.0 }}</span>
+        </span>
+      {% else %}
+        <span class="block tabular-nums text-zinc-500">{{ form.number.help_text }}</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <div>
+    <label for="{{ form.amount.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.amount.label }}{% if form.amount.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+    <div class="flex items-center rounded-lg bg-white focus-within:outline-3 focus-within:outline-offset-2 {% if form.amount.errors %}border border-red-600 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15{% endif %}">
+      <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+      {{ form.amount }}
+    </div>
+    <p id="{{ form.amount.auto_id }}-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+      {% if form.amount.errors %}
+        <span class="flex items-start gap-1.5 font-medium text-red-600">
+          <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+          <span class="tabular-nums">{{ form.amount.errors.0 }}</span>
+        </span>
+      {% else %}
+        <span class="block tabular-nums text-zinc-500">{{ form.amount.help_text }}</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Book invoice
+  </button>
+</form>` }
     ]
   },
 
@@ -1065,19 +2095,24 @@ register(
       'Height comes from padding against the line box, never from an h- class. py-2 on a 20px leading is a 36px control and py-1.5 is 32px, and both are a whole number of line boxes. Set h-9 on the input instead and the text is centred by the flex row rather than by its own padding, so the moment the wrapper gains a taller child — a 28px button, a two-line prefix — the baseline moves and the caret sits off-centre against the icon beside it.',
       'type="number" is the wrong control for a rupee amount and for every other number this system takes. The scroll wheel edits a focused number input in Chrome and Safari, so a rate changes silently when somebody scrolls the page past it. Grouping separators are not valid, so 18,42,000 makes the field invalid and .value comes back as an empty string — the digits are on screen and unreadable to script. The decimal separator is the browser\'s locale, so the same keystroke means 1.5 and 15 in two different browsers. And the spinner is two 12px targets nobody has ever deliberately pressed. Write type="text" with inputmode="decimal" and parse on the server.',
       'Indian grouping is not thousands grouping. A naive three-digit regex turns 1842000 into 1,842,000, which is wrong on an order printed in Silvassa; the lakh and crore grouping is 18,42,000 and Intl.NumberFormat with the en-IN locale is what produces it. Group for display only — post the raw digits from a hidden input, because the server should never have to guess which separators a string came dressed in.',
-      'Disabled and read-only are different states and must not look the same, and the difference that matters is not visual: a disabled control is not submitted with the form. Lock a field by disabling it and its value vanishes from the POST, so the server sees a blank where the locked value used to be and writes the blank. readonly submits, stays in the Tab order and stays copyable. Disable a field only when there is genuinely nothing to send.',
+      'Disabled and read-only are different states and must not look the same, and the difference that matters is not visual: a disabled control is not submitted with the form. Lock a field by disabling it and its value vanishes from the POST, so the server sees a blank where the locked value used to be and writes the blank. readonly submits, stays in the Tab order and stays copyable. Disable a field only when there is genuinely nothing to send. A server-side form framework offers a third thing worth knowing about: Django\'s disabled=True on the field renders the disabled attribute and makes the form ignore whatever the POST said about it, cleaning the value out of initial instead. That is the one disabled worth having, because the value still reaches the view — from the form definition rather than from the request, which is the only version of locking a client cannot argue with.',
       'They do share one surface, though: bg-zinc-200 with no resting focus ring, because neither can be typed into. Only the text separates them — zinc-900 for read-only, whose value still matters and still has to be read off the screen and copied, zinc-400 for disabled, whose value does not. Read-only keeps a focus outline on its wrapper, because read-only is still focusable and a keyboard user has to see where they have landed. A read-only field left white, bordered and focus-ringed is pixel for pixel an editable one, and the only way to find out otherwise is to click into it and get nothing back.',
       'An invalid wrapper has to state its red border in the focused form as well as the resting one. focus-within:border-zinc-700 and has-[:user-invalid]:border-red-600 have the same specificity, so which one wins is decided by the order Tailwind happens to emit them in — and if the grey one wins, focusing a wrong field repaints it as a normal field while the error text is still under it. Write has-[:user-invalid]:focus-within:border-red-600 as well and the question stops being a question.',
       'Prefer :user-invalid to :invalid for anything the browser can check itself. :invalid matches from first paint, so a required field is red before it has been touched and the form opens covered in errors nobody has made yet. :user-invalid waits until the field has been interacted with and left, which is the same rule Field states in prose. It needs a real pattern or type or required to fire — CSS cannot invalidate a field the HTML says is fine.',
       'A trailing button inside the wrapper must hand focus back to the input when it removes itself. A clear button that disappears the instant it is pressed takes the focus with it, and focus resets to the document body, which puts a keyboard user back at the top of the page with no way to know it happened. Clear the value, then focus the field.',
-      'Placeholder text is an example of the format and never a label. It leaves the moment typing starts, it is zinc-500 against white so it fails contrast as a permanent label anyway, and a form of unlabelled fields is unreadable the second time someone opens it with half the values already filled in.'
+      'Placeholder text is an example of the format and never a label. It leaves the moment typing starts, it is zinc-500 against white so it fails contrast as a permanent label anyway, and a form of unlabelled fields is unreadable the second time someone opens it with half the values already filled in.',
+      'A field is as wide as the value it holds, and its width is read as a promise before anything has been typed into it. A six-digit PIN code in a full-width box says something longer was expected, so the person filling it stops to check what they have missed; a fifteen-character GSTIN in a 96px box says the opposite and gets read two characters at a time. Size the box off the longest legal value, and let anything open-ended — a name, a title, an address line — run full width because there is no length to size to. Below sm they all go full width anyway: a row of short boxes that wraps mid-row is harder to read than a column of them.',
+      'A field inside a table cell draws no border at rest. Thirty rows of bordered boxes is a spreadsheet rendered inside a register, and the border repeats what the column heading has already said; hover is what declares the cell editable and the focus outline is what says the keyboard is in it. The row then takes no hover tint of its own — a row tint under a cell tint is two surfaces changing at once, and neither of them says where the click will land.',
+      'A check the server runs while the field is being typed into is advisory, and the markup has to treat it as advisory. It says the invoice number was free four hundred milliseconds ago, which is not the same as free: two people can be told the same number is available inside the same second. The constraint that holds is on the table and the submit revalidates. What the check buys is that the second person finds out before typing the rest of the form, not that the first one wins.',
+      'A value that changed on the server after the form was opened is not an invalid value, and painting the field red for it accuses the user of a mistake they did not make. The border stays grey, the notice under the box carries the amber mark, and both ways out are a deliberate click — a field that quietly refills itself while somebody is looking at it is the worst way this can go, because the one thing nobody does is re-read a field they have already filled in. What makes the save safe is not the notice but the version the form was rendered against, posted in a hidden input beside the field. A server that writes without comparing it has chosen last-write-wins by not choosing anything.'
     ],
     anatomy: [
       ['Wrapper', 'The bordered box, and the owner of everything visible: the border, the fill, the radius and the focus outline. Everything the field needs sits inside it, which is the reason the border is here and not on the control.'],
       ['Control', 'A transparent, borderless <input> with outline-none, w-full and min-w-0. It carries the name, the type, the inputmode and the value, and no visual styling other than the text.'],
       ['Leading icon', 'size-4 zinc-600 at ml-3, shrink-0. Decorative and always a duplicate of the label — a magnifier next to a field called Search says nothing the label has not already said, and is there to make the box findable in a toolbar.'],
       ['Prefix or suffix', 'A fixed unit inside the ring — ₹, %, kg, per MT. It is not part of the value that posts, so the server has to know the unit independently; it is on screen so the number is not read bare.'],
-      ['Trailing button', 'A size-7 button flush inside the right edge: clear a search, show a password, open a picker. It is inside the outline, it is type="button", and it returns focus to the input when it acts.'],
+      ['Trailing button', 'A size-7 button flush inside the right edge: clear a search, show a password, open a picker. It is inside the outline, it is type="button", and it returns focus to the input when it acts. Its own focus style is an inset outline-2 at a negative offset — the wrapper\'s halo says the keyboard is in this field, the inset outline says it is on the button rather than in the text.'],
+      ['Trailing status', 'The same slot holding a spinner or a tick while something about the value is being checked. It is a status and not a control: no border, no hover, no tab stop, and x-cloak because it is not there at first paint.'],
       ['Focus outline', 'focus-within on the wrapper — border zinc-700 plus a 3px zinc-700/15 halo at offset 2. An outline rather than a ring, because forced-colours mode drops every box-shadow.'],
       ['Help or error', '12px under the box, pointed at by aria-describedby. The error replaces the help text rather than stacking under it, so the block keeps its height and the form does not jump on submit.']
     ],
@@ -1089,18 +2124,22 @@ register(
       'A clear button exists only while there is something to clear, and pressing it puts focus back in the field so typing can continue. Escape clears the field too, and stops propagating, or clearing a search inside a sheet also closes the sheet.',
       'Disabled leaves the Tab order and is not submitted. Read-only stays in the Tab order, stays selectable, and is submitted — which is why locking a value is readonly and never disabled.',
       'A password field toggles its own type and nothing else. The button keeps focus so the change of state is announced, and a live region says the password is now visible, because the caret moving back into the field would swallow the announcement.',
-      'At 390px the wrapper keeps its shape: the input shrinks, the icon and the unit stay at their natural width, and the row never scrolls sideways. This only holds because the control carries min-w-0.'
+      'At 390px the wrapper keeps its shape: the input shrinks, the icon and the unit stay at their natural width, and the row never scrolls sideways. This only holds because the control carries min-w-0.',
+      'A field being checked against the server stays enabled while the request is in flight. Disabling the control that has focus moves focus to the document body and drops every keystroke typed during the round trip, which is the one thing a debounced check is guaranteed to do at least once. The spinner goes in the trailing slot and the answer goes in the described text.',
+      'A cell in a register commits when it is left and reverts on Escape, and Escape restores the value the cell held when focus arrived rather than emptying it. Committing on every keystroke posts a rate of 5 on the way to 52,900.'
     ],
     a11y: [
       'Every input has a real <label> bound with for/id. A placeholder is not a label and neither is a heading above the field; both leave the control with no accessible name the moment there is a value in it.',
-      'aria-describedby points at the help text, and at the error text when there is one. A unit shown as a prefix belongs in that description too — "18,42,000" announced without the rupee is a number with no idea what it counts.',
+      'aria-describedby points at the help text, and at the error text when there is one. A unit shown as a prefix belongs in that description too — "18,42,000" announced without the rupee is a number with no idea what it counts. That means giving the ₹, the % or the MT an id of its own and naming it first in the list; a span sitting beside the control is read by nobody, however obvious it looks on screen.',
+      'A field in a table cell is named by its row and its column together — "Quantity in MT, HDPE-BLM-45" — never by the column alone. A column heading is associated with nothing, so twelve fields called Quantity are twelve fields with one name between them and no way to tell which of them has focus.',
+      'A message the server swaps in is announced only if the region it lands in was already on the page. Swap the paragraph itself and what arrives is a new element that no live region ever contained; swap its contents and the same paragraph speaks. aria-invalid stays on the control, which the swap cannot reach, so the state comes back on the fragment and is copied across.',
       'A server-rendered error sets aria-invalid="true" on the control and the message is real text under the box, tied by id. A red border is not a state and a title attribute is not a message; neither reaches a screen reader and neither survives forced-colours mode.',
       'Disabled uses the disabled attribute, which removes the control from the Tab order and from the form data. Read-only uses readonly, which keeps it reachable so the value can be read and copied — and keeps a visible focus outline for exactly that reason.',
       'The trailing button is type="button", has an aria-label that names what it does to this field rather than "Clear", and is reachable by keyboard. A div with a click handler on it is not any of those things.',
       'type and inputmode are set for the value, not for the validation. type="email" and inputmode="decimal" change the keyboard a phone offers, which is most of the accessibility gain either of them ever delivers, and inputmode is the safe half — it changes the keyboard without changing how the value is parsed.',
       'The focus outline reads against white and against zinc-100, sits outside the border at offset 2 so it is never confused with the border itself, and is an outline rather than a ring so forced-colours mode cannot drop it.'
     ],
-    related: ['field', 'textarea', 'combobox'],
+    related: ['field', 'input-group', 'combobox'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<!-- The border, the fill and the focus outline are on the wrapper. The input
@@ -1117,7 +2156,7 @@ register(
      a min-content width of about twenty characters and pushes anything beside
      it out through the border. -->
 <div data-kui="input/default" class="max-w-xl">
-  <label for="in-title" class="mb-1.5 block text-[13px]/5 font-medium">Order title <span class="text-red-600">*</span></label>
+  <label for="in-title" class="mb-1.5 block text-[13px]/5 font-medium">Order title <span aria-hidden="true" class="text-red-600">*</span></label>
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <input id="in-title" name="title" value="MS angles and plates — August lot"
            aria-describedby="in-title-help"
@@ -1151,15 +2190,15 @@ register(
 
   <div>
     <p class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">32px — the filter row over a register</p>
-    <div class="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2.5">
+    <div class="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-300 bg-white px-3 py-2.5">
       <div class="flex min-w-0 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-        <i data-lucide="search" class="ml-2.5 size-4 shrink-0 text-zinc-600"></i>
+        <i data-lucide="search" aria-hidden="true" class="ml-2.5 size-4 shrink-0 text-zinc-600"></i>
         <label for="in-h32" class="sr-only">Filter purchase orders</label>
         <input id="in-h32" placeholder="Filter 1,438 orders"
                class="w-full min-w-0 bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
       </div>
-      <button type="button" class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[13px]/5 font-medium hover:bg-zinc-100">
-        <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Filters
+      <button type="button" class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="sliders-horizontal" aria-hidden="true" class="size-4 text-zinc-600"></i>Filters
       </button>
     </div>
   </div>
@@ -1179,12 +2218,18 @@ register(
 
      A unit rendered as text is not submitted. What posts is the number alone,
      so the server has to know that this field is rupees and that one is
-     percent — the prefix tells the user, not the endpoint. -->
+     percent — the prefix tells the user, not the endpoint.
+
+     And it only tells a user who can see it, unless the span has an id and
+     that id is first in aria-describedby. A % sitting beside the box is not
+     part of the value, not part of the label and not read with either, so a
+     tolerance of 2 is announced as the number 2 and the field might as well be
+     counting anything. -->
 <div data-kui="input/icon" class="max-w-xl space-y-5">
   <div>
     <label for="in-search" class="mb-1.5 block text-[13px]/5 font-medium">Find a vendor</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
       <input id="in-search" placeholder="Name, GSTIN or vendor code"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
     </div>
@@ -1193,9 +2238,9 @@ register(
   <div>
     <label for="in-tol" class="mb-1.5 block text-[13px]/5 font-medium">Receipt tolerance</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <input id="in-tol" name="tolerance" value="2" inputmode="decimal" aria-describedby="in-tol-help"
+      <input id="in-tol" name="tolerance" value="2" inputmode="decimal" aria-describedby="in-tol-unit in-tol-help"
              class="w-full min-w-0 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
-      <span class="pr-3 text-[14px]/5 text-zinc-600">%</span>
+      <span id="in-tol-unit" class="shrink-0 pr-3 text-[14px]/5 text-zinc-600">%</span>
     </div>
     <p id="in-tol-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Over-receipt allowed against the ordered quantity.</p>
   </div>
@@ -1203,10 +2248,12 @@ register(
   <div>
     <label for="in-code" class="mb-1.5 block text-[13px]/5 font-medium">Item code</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <span class="pl-3 font-mono text-[13px]/5 text-zinc-500">KSP-</span>
+      <span id="in-code-prefix" class="shrink-0 pl-3 font-mono text-[13px]/5 text-zinc-500">KSP-</span>
       <input id="in-code" name="item_code" value="4471029" inputmode="numeric" spellcheck="false"
+             aria-describedby="in-code-prefix in-code-help"
              class="w-full min-w-0 bg-transparent py-2 pr-3 pl-1 font-mono text-[13px]/5 tabular-nums outline-none">
     </div>
+    <p id="in-code-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Every Konspec code begins KSP-, so only the seven digits after it are typed and only the seven digits post.</p>
   </div>
 </div>` },
 
@@ -1241,11 +2288,11 @@ register(
        get raw() { return this.amount.replace(/[^0-9.]/g, ''); }
      }">
   <div>
-    <label for="in-amt" class="mb-1.5 block text-[13px]/5 font-medium">Order value <span class="text-red-600">*</span></label>
+    <label for="in-amt" class="mb-1.5 block text-[13px]/5 font-medium">Order value <span aria-hidden="true" class="text-red-600">*</span></label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+      <span id="in-amt-unit" class="shrink-0 pl-3 text-[14px]/5 text-zinc-600">₹</span>
       <input id="in-amt" x-model="amount" @focus="strip()" @blur="group()"
-             inputmode="decimal" autocomplete="off" aria-describedby="in-amt-help"
+             inputmode="decimal" autocomplete="off" aria-describedby="in-amt-unit in-amt-help"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
     </div>
     <!-- the digits, with nothing dressed onto them -->
@@ -1258,9 +2305,9 @@ register(
   <div>
     <label for="in-qty" class="mb-1.5 block text-[13px]/5 font-medium">Quantity ordered</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <input id="in-qty" name="qty" value="12.500" inputmode="decimal" aria-describedby="in-qty-help"
+      <input id="in-qty" name="qty" value="12.500" inputmode="decimal" aria-describedby="in-qty-unit in-qty-help"
              class="w-full min-w-0 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
-      <span class="pr-3 shrink-0 text-[14px]/5 text-zinc-600">MT</span>
+      <span id="in-qty-unit" class="shrink-0 pr-3 text-[14px]/5 text-zinc-600">MT</span>
     </div>
     <p id="in-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Three decimal places. 12.500 MT against a contracted 15.000 MT.</p>
   </div>
@@ -1281,12 +2328,20 @@ register(
 
      Escape clears the field and stops propagating. A search box inside a sheet
      or a dialog shares Escape with the panel around it, and without the stop
-     the first press both clears the query and closes the panel. -->
+     the first press both clears the query and closes the panel.
+
+     The button takes a focus style of its own even though the wrapper is
+     already lit by focus-within. The halo says the keyboard is somewhere in
+     this field; it cannot say whether the next Enter searches or clears. It is
+     an inset outline-2 at a negative offset rather than the standard halo,
+     because a 3px ring at offset 2 on a control 4px from the border would be
+     drawn on top of the border and outside it. -->
+
 <div data-kui="input/search" class="max-w-xl" x-data="{ q: 'gujarat polymers' }">
   <label for="in-q" class="mb-1.5 block text-[13px]/5 font-medium">Search purchase orders</label>
 
   <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
     <input id="in-q" x-ref="q" x-model="q" type="search" enterkeyhint="search"
            autocomplete="off" spellcheck="false" aria-describedby="in-q-help"
            @keydown.escape="if (q) { $event.stopPropagation(); q = '' }"
@@ -1295,8 +2350,8 @@ register(
 
     <button type="button" x-show="q" x-cloak
             @click="q = ''; $refs.q.focus()" aria-label="Clear the order search"
-            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
-      <i data-lucide="x" class="size-4"></i>
+            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+      <i data-lucide="x" aria-hidden="true" class="size-4"></i>
     </button>
   </div>
 
@@ -1305,7 +2360,7 @@ register(
     <span x-show="q" x-cloak>7 of 1,438 orders match. Escape clears the box.</span>
   </p>
 
-  <div class="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white" x-show="q" x-cloak>
+  <div class="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white" x-show="q" x-cloak>
     <p class="px-4 py-2.5 text-[13px]/5 tabular-nums">PO-24-1187 · Gujarat Polymers Ltd · ₹18,42,000</p>
     <p class="px-4 py-2.5 text-[13px]/5 tabular-nums">PO-24-1163 · Gujarat Polymers Ltd · ₹4,10,500</p>
   </div>
@@ -1334,16 +2389,16 @@ register(
        get n() { return Number(this.rate.replace(/[^0-9.]/g, '')); },
        get bad() { return this.touched && (!this.rate.trim() || this.n < this.floor); }
      }">
-  <label for="in-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per MT <span class="text-red-600">*</span></label>
+  <label for="in-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per MT <span aria-hidden="true" class="text-red-600">*</span></label>
 
   <div class="flex items-center rounded-lg bg-white border"
        :class="bad ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
                    : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
-    <span class="pl-3 text-[14px]/5" :class="bad ? 'text-red-600' : 'text-zinc-600'">₹</span>
+    <span id="in-rate-unit" class="shrink-0 pl-3 text-[14px]/5" :class="bad ? 'text-red-600' : 'text-zinc-600'">₹</span>
     <input id="in-rate" name="rate" x-model="rate" @blur="touched = true"
            inputmode="decimal" autocomplete="off"
            :aria-invalid="bad ? 'true' : null"
-           aria-describedby="in-rate-msg"
+           aria-describedby="in-rate-unit in-rate-msg"
            class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
   </div>
 
@@ -1382,7 +2437,7 @@ register(
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 has-[:user-invalid]:border-red-600 has-[:user-invalid]:focus-within:border-red-600 has-[:user-invalid]:focus-within:outline-red-600/15">
       <input id="in-ref" name="grn_ref" x-model="ref" @blur="ref = ref.toUpperCase().trim()"
              pattern="GRN-[0-9]{2}-[0-9]{4}"
-             title="Three letters, two digits, four digits — GRN-24-0912"
+             title="GRN, then the year, then four digits — GRN-24-0912"
              autocomplete="off" spellcheck="false" aria-describedby="in-ref-help"
              placeholder="GRN-24-0912"
              class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 uppercase tabular-nums outline-none placeholder:normal-case placeholder:text-zinc-500">
@@ -1398,6 +2453,78 @@ register(
              class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>
     <p id="in-date-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">The date on the vendor invoice, not the date it was received. Cannot be in the future.</p>
+  </div>
+</div>` },
+
+      { id: 'widths', name: 'Fields sized to the value they hold', tagNew: true, code:
+`<!-- The width of a box is a statement about the value before anything is typed
+     into it. A six-digit PIN code in a full-width field says something longer
+     was expected, and the person filling it stops to work out what they have
+     missed; a fifteen-character GSTIN in a 96px field says the opposite and
+     gets read two characters at a time through a moving window. The short
+     fields are sized off their longest legal value, and the open ones — a legal
+     name, an address line — are not sized at all, because there is no length to
+     size them to.
+
+     The widths are w-* off the scale rather than ch. A ch is the width of a
+     zero in the element's own font, so it holds for the mono GSTIN and drifts
+     for everything set in Inter.
+
+     They are sm: widths. At 390px every field runs full width: a row of short
+     boxes that wraps in the middle of itself puts the PIN code under the GSTIN
+     with nothing left to say which label owns which box.
+
+     maxlength is the same number as the width and comes from the same place. It
+     truncates a paste in silence, which is only tolerable where there is
+     exactly one legal length — a sixteenth character in a GSTIN is a typo and
+     not a longer GSTIN — and is wrong on anything free-form.
+
+     autocomplete is off on all of it. These values describe a vendor and not
+     the person typing, so autofill offering the buyer's own mobile number fills
+     a vendor record with the buyer's details, and nobody catches it until the
+     delivery SMS goes to the purchase officer. -->
+<div data-kui="input/widths" class="max-w-2xl space-y-5">
+  <div>
+    <label for="in-w-name" class="mb-1.5 block text-[13px]/5 font-medium">Vendor legal name <span aria-hidden="true" class="text-red-600">*</span></label>
+    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="in-w-name" name="legal_name" value="Gujarat Polymers Ltd" autocomplete="off"
+             aria-describedby="in-w-name-help"
+             class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+    </div>
+    <p id="in-w-name-help" class="mt-1.5 text-[12px]/4 text-zinc-500">As printed on the GST certificate, including Pvt Ltd or Ltd.</p>
+  </div>
+
+  <div class="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-start">
+    <div class="sm:w-44">
+      <label for="in-w-gstin" class="mb-1.5 block text-[13px]/5 font-medium">GSTIN</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="in-w-gstin" name="gstin" value="24AABCG1234H1Z5" maxlength="15"
+               autocomplete="off" spellcheck="false" aria-describedby="in-w-gstin-help"
+               class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 tabular-nums outline-none">
+      </div>
+      <p id="in-w-gstin-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Fifteen characters. It opens with 24 for Gujarat.</p>
+    </div>
+
+    <div class="sm:w-28">
+      <label for="in-w-pin" class="mb-1.5 block text-[13px]/5 font-medium">PIN code</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="in-w-pin" name="pincode" value="396230" inputmode="numeric" maxlength="6"
+               autocomplete="off" aria-describedby="in-w-pin-help"
+               class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+      </div>
+      <p id="in-w-pin-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Six digits.</p>
+    </div>
+
+    <div class="sm:w-40">
+      <label for="in-w-mob" class="mb-1.5 block text-[13px]/5 font-medium">Mobile</label>
+      <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <span id="in-w-mob-cc" class="shrink-0 pl-3 text-[14px]/5 tabular-nums text-zinc-600">+91</span>
+        <input id="in-w-mob" name="mobile" type="tel" inputmode="numeric" maxlength="10"
+               value="9825012345" autocomplete="off" aria-describedby="in-w-mob-cc in-w-mob-help"
+               class="w-full min-w-0 bg-transparent py-2 pr-3 pl-1.5 text-[14px]/5 tabular-nums outline-none">
+      </div>
+      <p id="in-w-mob-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ten digits. The +91 is not posted.</p>
+    </div>
   </div>
 </div>` },
 
@@ -1438,7 +2565,7 @@ register(
 
     <button type="button" @click="show = !show"
             :aria-label="show ? 'Hide password' : 'Show password'"
-            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
       <span x-show="!show" class="flex"><i data-lucide="eye" class="size-4"></i></span>
       <span x-show="show" x-cloak class="flex"><i data-lucide="eye-off" class="size-4"></i></span>
     </button>
@@ -1456,8 +2583,9 @@ register(
      submits, stays in the Tab order and stays selectable. Lock with readonly;
      disable only when there is genuinely nothing to send.
 
-     They do share a surface, and deliberately: bg-zinc-100 with no resting
-     ring reads as a field that is closed. What separates them is the text —
+     They do share a surface, and deliberately: bg-zinc-200 with no resting
+     focus ring reads as a field that is closed, and it is the same locked fill
+     the read-only groups in input-group take. What separates them is the text —
      zinc-400 for disabled, whose value does not matter, zinc-900 for
      read-only, whose value still has to be read off the screen and copied.
 
@@ -1484,17 +2612,405 @@ register(
     </div>
     <p id="in-ro-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Allotted on 16 Aug 2026 and submitted with the form. Select it to copy.</p>
   </div>
-</div>` }
+</div>` },
+
+      { id: 'inline', name: 'Edited in place in a table cell', tagNew: true, code:
+`<!-- The cells are fields all the time and they draw no border at rest.
+     Thirty rows of bordered boxes is a spreadsheet rendered inside a register,
+     and the border says nothing the column heading has not: hover is what
+     declares the cell editable, focus is what says the keyboard is in it.
+
+     The row itself takes no hover tint. A row tint under a cell tint is two
+     surfaces changing at once and neither of them says where the click lands —
+     and the row is not a link here, so there is nothing for a row hover to
+     promise. In a register whose rows do open, the fields go back to being
+     text and the edit moves to a form.
+
+     The cells keep 8px of padding because the halo is 3px at offset 2 and needs
+     five of them. A field flush against the clipped edge of the card loses the
+     outline on the side that touches it, and a register is exactly where a
+     control is most likely to be flush. table-fixed with a width on each number
+     column is what keeps the item cell truncating instead of the table growing
+     until the page scrolls sideways.
+
+     Escape puts back the value the cell held when focus arrived rather than
+     emptying it, and stops propagating so a register inside a sheet does not
+     lose the sheet with it. The commit is on the way out: in a real screen this
+     input carries hx-post with hx-trigger="change", which fires once, on blur,
+     and only if the value moved. Committing on input posts a rate of 5 on the
+     way to 52,900.
+
+     Every field is named by its row and its column together. Three fields
+     called Quantity are three fields with one name between them. -->
+<div data-kui="input/inline" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full table-fixed">
+    <thead class="bg-zinc-50">
+      <tr class="border-b border-zinc-200">
+        <th scope="col" class="px-3 py-2 text-left text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Item</th>
+        <th scope="col" class="w-20 px-2 py-2 text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Qty MT</th>
+        <th scope="col" class="w-24 px-2 py-2 text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Rate ₹</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-100">
+      <tr>
+        <td class="px-3 py-1.5">
+          <p class="truncate text-[13px]/5 font-medium">HDPE-BLM-45</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">Blow moulding grade</p>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Quantity in MT, HDPE-BLM-45" value="12.500" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Rate per MT in rupees, HDPE-BLM-45" value="51,800" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-3 py-1.5">
+          <p class="truncate text-[13px]/5 font-medium">LLDPE-FLM-18</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">Film grade</p>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Quantity in MT, LLDPE-FLM-18" value="4.000" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Rate per MT in rupees, LLDPE-FLM-18" value="54,200" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-3 py-1.5">
+          <p class="truncate text-[13px]/5 font-medium">MB-WHT-207</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">White masterbatch</p>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Quantity in MT, MB-WHT-207" value="0.250" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Rate per MT in rupees, MB-WHT-207" value="1,64,000" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-3 py-2">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Three lines against PO-24-1187. A cell saves when it is left; Escape puts it back.</p>
+    <button type="button" class="inline-flex h-8 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Post the GRN</button>
+  </div>
+</div>` },
+
+      { id: 'stale', name: 'The value moved while the form was open', tagNew: true, code:
+`<!-- Somebody else amended the rate two minutes after this form was opened. The
+     field is not invalid — the number in it is a perfectly good number, typed
+     by somebody who was told it was current — so nothing here turns red. Red
+     says you made a mistake, and this is not one.
+
+     The border stays grey and the notice under the box carries the amber mark,
+     which is the same rule the alerts follow: colour in the icon, never behind
+     the text.
+
+     Nothing refills the field on the user's behalf. A value that changes while
+     somebody is looking at it is the worst way this can go, because the one
+     thing nobody does is re-read a field they have already filled in. Both ways
+     out are a click, and both name the figure they commit to rather than saying
+     mine and theirs.
+
+     What actually makes the save safe is the hidden version, not the notice.
+     The form posts the version it was rendered against, and a server that
+     writes without comparing it has picked last-write-wins by not picking
+     anything. Both buttons write the current version back, because the version
+     records what the user has seen rather than which number won.
+
+     The notice is role="status" and the paragraph is on the page from the
+     start, so a version that lands from a poll is announced. A region that
+     arrives with its own message announces nothing, because it was not a live
+     region when the message was put in it. -->
+<div data-kui="input/stale" class="max-w-xl"
+     x-data="{
+       mine: '52,900', theirs: '53,400',
+       version: 7, latest: 9,
+       get stale() { return this.latest > this.version; },
+       take() { this.mine = this.theirs; this.version = this.latest; },
+       keep() { this.version = this.latest; }
+     }">
+  <label for="in-stale-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per MT <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <span id="in-stale-unit" class="shrink-0 pl-3 text-[14px]/5 text-zinc-600">₹</span>
+    <input id="in-stale-rate" name="rate" x-model="mine" inputmode="decimal" autocomplete="off"
+           aria-describedby="in-stale-unit in-stale-msg"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+  </div>
+
+  <!-- what the form was rendered against, and what the server compares -->
+  <input type="hidden" name="rate_version" :value="version">
+
+  <p id="in-stale-msg" role="status" class="mt-1.5 text-[12px]/4 tabular-nums">
+    <span x-show="!stale" x-cloak class="text-zinc-500">
+      Editing the current version of PO-24-1187. Contracted floor is ₹52,400 per MT.
+    </span>
+
+    <span x-show="stale" class="flex flex-wrap items-start gap-x-3 gap-y-1">
+      <span class="flex items-start gap-1.5 text-zinc-600">
+        <i data-lucide="alert-triangle" aria-hidden="true" class="mt-0.5 size-3.5 shrink-0 text-amber-700"></i>
+        <span>Ritu Deshpande set this to ₹53,400 at 11:04, after this form was opened.</span>
+      </span>
+      <span class="flex shrink-0 items-center gap-3">
+        <button type="button" @click="take()"
+                class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Use ₹53,400</button>
+        <button type="button" @click="keep()"
+                class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Keep ₹52,900</button>
+      </span>
+    </span>
+  </p>
+</div>` },
+
+      { id: 'htmx', name: 'Checked by the server as it is typed', tagNew: true, code:
+`<!-- htmx asks; Alpine never fetches. Alpine's whole job here is copying the
+     answer onto the control, because the swap lands in the paragraph and
+     aria-invalid has to be on the input.
+
+     The state is read out of the fragment rather than kept a second time in
+     x-data. The server sends a marker on the message it renders, init() reads
+     it at first paint and every swap reads it again, so the border and the
+     words under it cannot disagree — which they will the moment two copies of
+     the same fact exist. $el.querySelector rather than $refs, because $refs is
+     not populated yet while init() runs.
+
+     The trigger filter binds to the event name, not to the end of the spec:
+     input[this.value.length > 3] changed delay:400ms. Written the other way
+     round it is parsed as part of the modifier and the four-character floor
+     never applies. delay is a debounce and not a throttle, hx-sync this:replace
+     drops a request still in flight so a slow early reply cannot land last, and
+     blur is in the trigger list so a value pasted and left inside the debounce
+     window is still checked. Below the floor nothing fires, so deleting back to
+     three characters clears the message in script or the last answer sits there
+     under a value that did not produce it.
+
+     The field is never disabled while the request is in flight. Disabling the
+     control that has focus moves focus to the body and drops every keystroke
+     typed during the round trip, which is exactly what a 400ms debounce
+     guarantees will happen. The spinner goes in the trailing slot instead.
+
+     None of this is validation. It says the number was free 400ms ago, and two
+     people can be told that inside the same second — the constraint is on the
+     table and the submit checks again. What it buys is that the second person
+     finds out now rather than after filling in the rest of the receipt.
+
+     Django needs the CSRF token on the request; that is in the django variant. -->
+<div data-kui="input/htmx" class="max-w-xl"
+     x-data="{
+       state: 'idle',
+       taken: false,
+       msg() { return this.$el.querySelector('#in-hx-msg'); },
+       read() { this.taken = !!this.msg().querySelector('[data-state=taken]'); },
+       clear() { this.msg().innerHTML = ''; this.taken = false; this.state = 'idle'; },
+       init() { this.read(); }
+     }"
+     @htmx:before-request.camel="state = 'checking'"
+     @htmx:after-request.camel="state = $event.detail.successful ? 'idle' : 'failed'"
+     @htmx:after-swap.camel="read()">
+
+  <label for="in-hx-inv" class="mb-1.5 block text-[13px]/5 font-medium">Vendor invoice number <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div class="flex items-center rounded-lg border bg-white"
+       :class="taken ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
+                     : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
+    <input id="in-hx-inv" name="invoice_no" value="GPL/26-27/0418"
+           autocomplete="off" spellcheck="false"
+           :aria-invalid="taken ? 'true' : null"
+           aria-describedby="in-hx-msg in-hx-net"
+           hx-post="/grn/invoice-no/check/"
+           hx-trigger="input[this.value.length > 3] changed delay:400ms, blur"
+           hx-include="[name='vendor']"
+           hx-target="#in-hx-msg" hx-swap="innerHTML" hx-sync="this:replace"
+           @input="if ($el.value.trim().length < 4) clear()"
+           class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 outline-none">
+
+    <span class="mr-3 flex size-4 shrink-0 items-center justify-center" x-show="state === 'checking'" x-cloak>
+      <i data-lucide="loader-circle" aria-hidden="true" class="size-4 animate-spin text-zinc-600"></i>
+    </span>
+  </div>
+
+  <input type="hidden" name="vendor" value="gujarat-polymers">
+
+  <!-- htmx swaps into this paragraph and never over it. Replace the region
+       itself and the message arrives inside an element that was never a live
+       region, so nothing is announced. -->
+  <p id="in-hx-msg" role="status" class="mt-1.5 text-[12px]/4 tabular-nums"
+     :class="taken ? 'font-medium text-red-600' : 'text-zinc-500'">
+    <span data-state="taken" class="flex items-start gap-1.5">
+      <i data-lucide="alert-circle" aria-hidden="true" class="mt-0.5 size-3.5 shrink-0"></i>
+      <span>Gujarat Polymers Ltd already invoiced GPL/26-27/0418 on GRN-24-0912, 14 Aug 2026.</span>
+    </span>
+  </p>
+
+  <!-- the transport, not the answer, and a region of its own because htmx owns
+       the paragraph above and would swap anything put in it away -->
+  <p id="in-hx-net" role="status" x-show="state === 'failed'" x-cloak class="mt-1.5 text-[12px]/4 text-zinc-500">
+    The duplicate check could not be reached. The receipt can still be posted; the server checks again on submit.
+  </p>
+</div>` },
+
+      { id: 'django', name: 'Django form field', tagNew: true, code:
+`<!-- The border being on the wrapper is what keeps the widget declaration in
+     forms.py. The error state is a class on the div around the field, so
+     nothing has to reach into widget.attrs in __init__ to append a red border
+     to a class string that was already written once.
+
+     # forms.py
+     class GrnForm(forms.Form):
+         invoice_no = forms.CharField(
+             label='Vendor invoice number', max_length=16,
+             help_text='As printed on the vendor invoice.',
+             widget=forms.TextInput(attrs={
+                 'class': 'w-full min-w-0 bg-transparent px-3 py-2 font-mono '
+                          'text-[13px]/5 outline-none placeholder:text-zinc-500',
+                 'autocomplete': 'off', 'spellcheck': 'false',
+                 'aria-describedby': 'id_invoice_no-msg',
+             }))
+
+         # DecimalField's default widget is NumberInput, which renders
+         # type="number" — the control this entry rejects by name. Override the
+         # widget and keep the field: the validation, the decimal_places and the
+         # rounding are the field's, and the keyboard is the widget's.
+         rate = forms.DecimalField(
+             label='Rate per MT', max_digits=12, decimal_places=2,
+             widget=forms.TextInput(attrs={
+                 'class': 'w-full min-w-0 bg-transparent px-2 py-2 text-right '
+                          'text-[14px]/5 tabular-nums outline-none',
+                 'inputmode': 'decimal',
+                 'aria-describedby': 'id_rate-unit id_rate-msg',
+             }))
+
+         # disabled on the field, not readonly on the widget. It renders the
+         # disabled attribute and makes Django ignore whatever the POST says
+         # about it, falling back to initial — which is the only version of
+         # locking that survives a client that simply deleted the attribute.
+         # The value still reaches cleaned_data, so this is Django's read-only
+         # rather than the entry's: readonly is a request to the browser,
+         # disabled=True is a statement the form makes to itself. The control
+         # renders disabled, so it is painted disabled, and the number is
+         # printed as text in the page header where it can still be copied.
+         number = forms.CharField(
+             label='Order number', disabled=True,
+             widget=forms.TextInput(attrs={
+                 'class': 'w-full min-w-0 bg-transparent px-3 py-2 font-mono '
+                          'text-[13px]/5 tabular-nums text-zinc-400',
+                 'aria-describedby': 'id_number-msg',
+             }))
+
+         def add_error(self, field, error):
+             # aria-invalid belongs on the control, and the control is rendered
+             # from attrs that were fixed before anyone knew the value was bad.
+             # Every field error routes through add_error, including one raised
+             # in clean_invoice_no, so this is the one place it can be set.
+             super().add_error(field, error)
+             if field:
+                 self.fields[field].widget.attrs['aria-invalid'] = 'true'
+
+         def clean_rate(self):
+             # Decimal('52,400') raises. Whatever the field shows, what reaches
+             # the field has to be digits — either strip them here or post the
+             # raw value from the hidden input the amount variant carries.
+             return self.cleaned_data['rate']
+
+     aria-describedby is written into attrs and has to match the id rendered
+     under the box. Django 5 adds one of its own when it renders help text for
+     you through as_div; this template renders the widget by itself, so the id
+     in attrs is the id that has to exist.
+
+     max_length renders maxlength, which truncates a paste in silence. Sixteen
+     characters is a real GST limit rather than a guess, so it is said in the
+     help text before anybody reaches it. -->
+<form data-kui="input/django" method="post" class="max-w-xl space-y-5">
+  {% csrf_token %}
+
+  <div>
+    <label for="{{ form.invoice_no.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.invoice_no.label }}{% if form.invoice_no.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+
+    <div class="flex items-center rounded-lg bg-white {% if form.invoice_no.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.invoice_no }}
+    </div>
+
+    <p id="{{ form.invoice_no.auto_id }}-msg" class="mt-1.5 text-[12px]/4 {% if form.invoice_no.errors %}font-medium text-red-600{% else %}text-zinc-500{% endif %}">
+      {% if form.invoice_no.errors %}
+        <span class="flex items-start gap-1.5"><i data-lucide="alert-circle" aria-hidden="true" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.invoice_no.errors.0 }}</span>
+      {% else %}{{ form.invoice_no.help_text }}{% endif %}
+    </p>
+  </div>
+
+  <div>
+    <label for="{{ form.rate.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.rate.label }}{% if form.rate.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+
+    <div class="flex items-center rounded-lg bg-white {% if form.rate.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      <span id="{{ form.rate.auto_id }}-unit" class="shrink-0 pl-3 text-[14px]/5 text-zinc-600">₹</span>
+      {{ form.rate }}
+    </div>
+
+    <p id="{{ form.rate.auto_id }}-msg" class="mt-1.5 text-[12px]/4 tabular-nums {% if form.rate.errors %}font-medium text-red-600{% else %}text-zinc-500{% endif %}">
+      {% if form.rate.errors %}
+        <span class="flex items-start gap-1.5"><i data-lucide="alert-circle" aria-hidden="true" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.rate.errors.0 }}</span>
+      {% else %}Rupees per MT, excluding GST.{% endif %}
+    </p>
+  </div>
+
+  <!-- disabled=True on the field: rendered locked, and what the POST says about
+       it is ignored in favour of initial. readonly would have submitted
+       whatever arrived. -->
+  <div>
+    <label for="{{ form.number.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">{{ form.number.label }}</label>
+    <div class="rounded-lg border border-zinc-200 bg-zinc-200">
+      {{ form.number }}
+    </div>
+    <p id="{{ form.number.auto_id }}-msg" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Allotted when the draft was created. The value the view cleans comes from initial, not from this box.</p>
+  </div>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Post the receipt</button>
+</form>` }
     ]
   },
 
   {
     id: 'input-group', name: 'Input group', category: 'forms',
-    description: 'One text field and the things that qualify it — a unit, a currency, a scope select, an action — inside a single bordered enclosure that draws one focus outline for all of them.',
-    when: 'When a value is only complete with something attached to it: a quantity that needs a unit, a number that needs a currency, a search that needs a scope, a code that needs an Add line beside it. If you can delete the text field and the rest still makes sense, it was never a group — it is a button group with a box parked next to it.',
+    description: 'One text field — or a from and a to — and the things that qualify it: a unit, a currency, a scope select, an action, an answer the server fills in, all inside a single bordered enclosure that draws one focus outline for all of them.',
+    when: 'When a value is only complete with something attached to it: a quantity that needs a unit, a number that needs a currency, a search that needs a scope, a code that needs an Add line beside it, a window that is only a window once it has both ends. If you can delete the text field and the rest still makes sense, it was never a group — it is a button group with a box parked next to it.',
     notes: [
       'The border and the focus outline live on the wrapper and nothing inside draws its own. focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 on the enclosure, outline-none on the field. Put the outline on the input instead and it is drawn inside the border the input shares with everything else, so the ₹ and the unit select sit outside the indicator and the group stops looking like one field and starts looking like a box with two things stuck to it. This is the one place outline-none is allowed, and it is allowed because something else is drawing the outline for that control.',
-      'Exactly one child may delegate its outline to the wrapper, and it is the text field. Every other focusable child — a copy button, a fused select, a submit — keeps an indicator of its own, drawn inset with focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700. Give an addon the ordinary outward halo and the right-hand end of the group shows two rounded boxes two pixels apart, one round the button and one round the enclosure it is flush against. Give it nothing and the enclosure lights up identically whether the caret is in the field or on the button beside it, which is the same as having no indicator at all. The wrapper halo says the keyboard is in this group; the inset outline says which part.',
+      'Exactly one kind of child may delegate its outline to the wrapper, and it is the text field. Every other focusable child — a copy button, a fused select, a submit — keeps an indicator of its own, drawn inset with focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700. Give an addon the ordinary outward halo and the right-hand end of the group shows two rounded boxes two pixels apart, one round the button and one round the enclosure it is flush against. Give it nothing and the enclosure lights up identically whether the caret is in the field or on the button beside it, which is the same as having no indicator at all. The wrapper halo says the keyboard is in this group; the inset outline says which part.',
+      'What may delegate its outline is text entry, not the first child. A from and a to under one border both delegate and both are right to: a caret is visible and says which half of the range has the keyboard, so an inset outline on each would put three indicators on one 38px box. A select, a button or a checkbox shows nothing of the sort, which is why the rule bites there and not here. Read it as one indicator per thing that cannot otherwise be located, rather than as a count of children.',
       'items-stretch on the wrapper, and never a height on an addon. The height of the whole group is set once, by the field\'s own padding, and every addon takes it by stretching. Write h-8 on a button inside a 38px enclosure and you get a 3px strip of white above and below it, a border-l that stops short of both edges, and a hover fill floating in the middle of the row. The price of items-stretch is that every text addon has to carry flex items-center of its own, or its glyph sits against the top edge of a box it is supposed to be centred in.',
       'min-w-0 on the field, always. An <input> carries an intrinsic minimum width of roughly twenty characters and a flex item will not shrink below its intrinsic minimum, so a group with a select on one end and a button on the other does not get narrow at 390px — it gets wider than the screen and drags the page sideways with it. min-w-0 flex-1 is the entire fix and it is invisible until somebody opens the page on a phone.',
       'A passive addon takes no divider and an interactive one always does. ₹, .00, % and a leading icon are part of the value being read, so a rule between them and the number would say they are a separate control. A button or a select is a separate control, so it takes a border-l or border-r in border-zinc-200 — the same weight as the enclosure\'s own edge, because a lighter internal rule inside a 38px box reads as a smudge rather than a join. This is the rule the attached strip in button-group follows, and for the same reason.',
@@ -1503,15 +3019,19 @@ register(
       'A fixed prefix is not in the value. The input posts what was typed and nothing else, so KIL/26-27/ has to be prepended on the server or carried in a hidden input beside the field. Leave it out and the record is saved with a bare serial where an invoice number should be, while the person entering it watched a full invoice number on screen the whole time and has no reason to check.',
       'A trailing unit is decoration or it is content, and the difference is whether the label already says it. The suffix span is a sibling of the input, not part of its accessible name, so it is silent by default — somebody typing 40 into a field called Quantity never learns it is MT. Either the label carries the unit, "Quantity (MT)", and the visible span takes aria-hidden so a label-wrapped group does not read it twice, or the span keeps an id and aria-describedby points at it. What is not allowed is the unit existing only as pixels.',
       'The red edge in an error state belongs to the wrapper. border-red-600 on the input draws the rule round the number alone and leaves the currency and the unit outside it in zinc, so the error looks like it belongs to a part of the group rather than to the value. The border stays red-600 while the group has focus — leaving focus-within:border-zinc-700 in place beside it erases the error the instant somebody clicks in to fix it, which is the one moment they are looking at it — and only the halo changes colour, to red-600/15. aria-invalid goes on the control that is actually wrong, which may be the select and not the number; mark both and one mistake is reported twice.',
+      'A control that brings its own furniture cannot sit in an enclosure that has already drawn some. type="number" is the obvious field for a stepper and the wrong one, because it renders the browser\'s spin buttons hard against its right-hand edge, directly under the plus button — two ways to add one, and a hit area belonging to neither. type="date" collides the same way, which is why the icon variant puts its calendar on the left. inputmode plus the arrow keys bound by hand leaves the enclosure holding only the controls it drew. The reflex to check alongside it is type="button": inside a form a button with no type submits, so a minus button posts the receipt.',
       'Two addons and a field is the ceiling, because the group is the one component that adds width in three places at once. A scoped select, a box, a submit and a clear is four things and it does not fit 390px: the button label goes first, then the button becomes an icon, then the group gives up and puts its controls on a line of their own under the field. Nothing in this component scrolls sideways, and a native select is as wide as its longest option, so the options are codes — MT, +91, All — and never spelled-out words.',
-      'Disabled and read-only apply to the enclosure, not to the field inside it. Grey the wrapper to bg-zinc-200, drop the focus-within border change, and then decide each addon separately: one that reads the value stays live, because copying a locked GRN number is exactly what a locked GRN number is for, and one that changes the value goes disabled with the field. A live Apply button on a dead field is a button that posts an empty value.'
+      'Disabled and read-only apply to the enclosure, not to the field inside it. Grey the wrapper to bg-zinc-200, drop the focus-within border change, and then decide each addon separately: one that reads the value stays live, because copying a locked GRN number is exactly what a locked GRN number is for, and one that changes the value goes disabled with the field. A live Apply button on a dead field is a button that posts an empty value. Every divider inside a locked enclosure steps to border-zinc-300 in the same pass — zinc-200 against a zinc-200 fill is the same colour twice and the join disappears.',
+      'A disabled control posts nothing, and inside a group that loses half a value rather than a whole field. A native select has no readonly, so the unit beside a read-only quantity has to be disabled, and the POST then carries 42.500 with no UOM — which the server either rejects or, worse, defaults. Carry the addon\'s value in a hidden input beside the dead control. Under Django this is the one case that needs no hidden input at all, because disabled=True makes the field clean from initial and ignore the browser entirely.',
+      'The enclosure is never an htmx target. It contains the input somebody is typing in, and a swap replaces that input with a fresh one: the caret, the selection and every keystroke not yet sent go with it, while the request the user triggered looks from the outside like it worked. Target one addon. If the answer carries a state as well as a string — found, unknown, stale — swap that addon whole with outerHTML, since innerHTML cannot reach an attribute of the element it fills, and wrap it in the live region rather than making it the live region: a region that is itself replaced announces nothing.'
     ],
     anatomy: [
       ['Enclosure', 'The bordered flex row. It owns the border, the focus outline and the height, and it is the only thing in the component that is not a control.'],
       ['Field', 'The text input or textarea, borderless and transparent with outline-none, min-w-0 flex-1 so it takes every pixel the addons do not.'],
+      ['Field pair', 'Two text fields sharing one enclosure — a from and a to. Both delegate their outline, both carry a label that stands on its own, both take min-w-0 flex-1 so neither wins the width, and the glyph between them is passive.'],
       ['Passive addon', 'A currency, a unit, a fixed prefix or a decorative icon. aria-hidden or referenced by aria-describedby, flex items-center, and no divider between it and the field.'],
       ['Control addon', 'A button or a select inside the enclosure. Takes a divider, an accessible name of its own, and an inset focus outline, because focus-within cannot say which of two controls the keyboard is on.'],
-      ['Divider', 'border-l or border-r in border-zinc-200 between the field and a control addon. One rule, the same weight as the enclosure, and none at all against a filled button where the colour change is the join.'],
+      ['Divider', 'border-l or border-r in border-zinc-200 between the field and a control addon, or border-t when the group has turned into a column. One rule, the same weight as the enclosure; border-zinc-300 inside a locked enclosure, where zinc-200 would be the fill again; and none at all against a filled button, where the colour change is the join.'],
       ['Block addon', 'A header or footer bar inside the enclosure, above or below a textarea, separated by a full-width border-zinc-200 rule. This is what the wrapper border buys that a bordered control cannot.'],
       ['Message', 'Help text or an error under the group, pointed at with aria-describedby. The error replaces the help text rather than stacking under it.']
     ],
@@ -1519,18 +3039,22 @@ register(
       'The field fills everything the addons leave, so there is almost nowhere in the enclosure to click and miss. The slivers of padding beside a passive addon genuinely do nothing, and that is the price of not wrapping the whole group in a <label> — do that and the suffix text joins the field\'s accessible name and "40" comes back as "Quantity kilograms kg".',
       'Tab order is DOM order. A leading scope select is reached before the box and a trailing submit after it, which is why the scope select is written first rather than placed first — order-first would look right and tab backwards.',
       'Enter in the field does whatever the trailing button does. Inside a form the button is type="submit" and this is already true; standalone the field needs the key bound, because typing a code and pressing Enter is the gesture people use and reaching for a button beside the box is not.',
+      'Where an addon changes the value in the field, the clamp belongs to the field. A click can only ever produce a legal figure, which is what disabling a stepper button at its limit buys; a typed one can be 9999, -4, 24.5 or empty, and none of those go anywhere near a button. Clamp on change rather than on input, or the field rewrites a number somebody is still halfway through typing, and write the clamped figure back to the element as well as to the state, or a typed 0244 stays on screen as 0244 while the record says 244.',
       'A clear button that only exists while there is text destroys itself on the click that fires it. Put focus back in the field in the same handler or it falls to <body> and the next Tab restarts from the top of the page.',
       'A copy button that swaps its icon has told nobody anything. The confirmation is a live region, the button\'s own accessible name changes with the icon, and both revert on a timer so the next copy is not silent.',
-      'A group never wraps. It is one object, so below sm it either drops an addon or becomes a field with its controls on a line under it, and it never becomes two rows of a broken enclosure with the wrong corners rounded on four of the pieces.',
+      'A group never wraps. It is one object, so below sm it either sheds a button label or turns its row into a column inside the same border, and the corners and the divider turn with it: rounded-r-[7px] becomes rounded-b-[7px] and border-l becomes border-t. flex-wrap is the version that looks like it works — one border round two rows, the left rounding stranded on the piece that is now on top and the right rounding on the piece below it.',
+      'Turning that axis moves the height. In a row an addon takes its height from the field by stretching and declares none of its own; items-stretch in a column stretches width instead, so the addon has nothing left to take a height from and needs padding of its own below sm and none above it. This is the second half of the never-a-height-on-an-addon rule, and the only place it applies.',
       'A textarea inside an enclosure takes resize-none and gets its height from rows. Its resize grabber renders in its own bottom-right corner, which is now in the middle of the box above the footer bar — a drag handle floating over nothing.',
       'Two focusable children mean two indicators at once, nested rather than side by side: the enclosure keeps its halo because the keyboard is inside the group, and the inset outline picks out the control. Anyone who finds that noisy is reading it as two boxes, which is what the inset offset exists to prevent.'
     ],
     a11y: [
       'The field has a real label bound with for/id, visible or sr-only, and so does every other control in the enclosure. A prefix is not a label, a placeholder is not a label and disappears on the first keystroke, and an icon is not a label — a magnifying glass says the field is a search, not what is being searched.',
+      'A control that drops its visible label at one width keeps an accessible name at every width, and the words that were on screen stay inside that name. An Add line button whose aria-label reads "Add item to order" cannot be reached by anybody speaking to the page, because what they say is what they can see. The same applies to a name that only exists as an Alpine binding: an icon-only button with nothing but :aria-label has no name until Alpine boots, and none at all if the script never arrives.',
       'Decorative icons take aria-hidden. An icon-only button takes an aria-label naming the verb and the object — "Copy GRN number", "Search purchase orders, GRNs and vendors" — because a page with three search boxes otherwise hands a screen-reader user three buttons called Search and no way to tell them apart.',
       'A unit or currency in a suffix is announced by nothing on its own. Either the label carries it and the visible span is aria-hidden, or the span has an id and aria-describedby on the field points at it. A value read back without its unit is a different value.',
       'Only the field writes outline-none, and only because the wrapper draws its outline. Every other focusable child keeps an indicator, inset so it does not stack a second box on the enclosure\'s own. The wrapper indicator is an outline rather than a ring, so it survives forced-colours mode where box-shadows are dropped; the border and the internal dividers survive it too, because they are borders.',
       'aria-invalid goes on the control that is wrong and on nothing else. The message is real text under the group, referenced by aria-describedby, not a colour and not a title attribute, and no addon inside the group turns red with it — a red ₹ reads as a negative amount and a red MT reads as the wrong unit.',
+      'A value changed by an addon rather than by typing is announced by nothing: what is focused is the button and what moved is the figure beside it. Where that figure is a display, as in the button-group stepper, the display is the live region. Where it is a field it cannot be one, so the message under the group carries the new figure and what it now means — and that message is the only thing standing between somebody who cannot see the box and a quantity they never agreed to.',
       'Confirmations that arrive without a page change go through role="status" or aria-live: Copied, Applied, added as line 4. A swapped icon and a changed fill are announced by nothing, and the person who cannot see them is the one who most needs to know the click landed.',
       'Read-only keeps the field in the tab order so its value can be selected and copied; disabled takes it out. The locked surface, bg-zinc-200 with no live border, is what says so on screen — a read-only value left white and bordered is pixel for pixel an editable field until somebody clicks into it and nothing happens.',
       'A group wrapped in role="group" with an aria-label is announced once on entry and does not name anything inside it. That is an addition to the individual labels, never a replacement for them.'
@@ -1562,11 +3086,11 @@ register(
     <label for="ig1-value" class="mb-1.5 block text-[13px]/5 font-medium">Order value (₹)</label>
     <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
-      <input id="ig1-value" name="value" inputmode="decimal" value="18,42,000"
+      <input id="ig1-value" name="value" inputmode="decimal" value="18,42,000" aria-describedby="ig1-value-help"
              class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
       <span aria-hidden="true" class="flex items-center pr-3 text-[14px]/5 text-zinc-500">.00</span>
     </div>
-    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Excluding GST. PO-24-1187, Gujarat Polymers Ltd.</p>
+    <p id="ig1-value-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Excluding GST. PO-24-1187, Gujarat Polymers Ltd.</p>
   </div>
 
   <div>
@@ -1612,10 +3136,10 @@ register(
     <label for="ig2-date" class="mb-1.5 block text-[13px]/5 font-medium">Promised delivery date</label>
     <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <i data-lucide="calendar" aria-hidden="true" class="ml-3 size-4 shrink-0 self-center text-zinc-500"></i>
-      <input id="ig2-date" name="promised" type="date" value="2026-08-16"
+      <input id="ig2-date" name="promised" type="date" value="2026-08-16" aria-describedby="ig2-date-help"
              class="min-w-0 flex-1 bg-transparent px-2 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>
-    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ordered 02 Aug 2026. Moving this date re-runs the ageing on the register.</p>
+    <p id="ig2-date-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ordered 02 Aug 2026. Moving this date re-runs the ageing on the register.</p>
   </div>
 </div>` },
 
@@ -1635,12 +3159,17 @@ register(
      input entry uses — a read-only value on white with a live border is pixel
      for pixel an editable field. The copy button inside it stays live, because
      copying does not change the value; a unit select in the same enclosure
-     would go disabled with the field.
+     would go disabled with the field. Its divider steps to zinc-300 for the
+     same reason the fill did: border-zinc-200 against a zinc-200 enclosure is
+     the same colour twice, and the join disappears.
 
      Copy swaps its icon, which is announced by nothing, so the confirmation is
      a live region and the button's own name changes with it. The two icons are
      spans carrying x-show rather than one :data-lucide binding, because
-     createIcons() replaces the <i> and anything bound on it goes too.
+     createIcons() replaces the <i> and anything bound on it goes too. The
+     static aria-label under the bound one is not redundant: an icon-only button
+     whose only name is :aria-label has no name at all until Alpine boots, and
+     none ever if the script fails.
 
      Clear destroys itself: the click empties the field, the button disappears
      with the text, and focus lands on <body> unless the same handler puts it
@@ -1656,16 +3185,17 @@ register(
                             this.done = true;
                             clearTimeout(this.t);
                             this.t = setTimeout(() => this.done = false, 2000) } }">
-      <input id="ig3-grn" x-ref="grn" readonly value="GRN-24-0912"
+      <input id="ig3-grn" x-ref="grn" name="grn_no" readonly value="GRN-24-0912" aria-describedby="ig3-grn-help"
              class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
-      <button type="button" @click="copy()" :aria-label="done ? 'GRN number copied' : 'Copy GRN number'"
-              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-200 px-3 hover:bg-zinc-300 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+      <button type="button" @click="copy()" aria-label="Copy GRN number"
+              :aria-label="done ? 'GRN number copied' : 'Copy GRN number'"
+              class="flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-300 px-3 hover:bg-zinc-300 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
         <span x-show="!done"><i data-lucide="copy" class="size-4 text-zinc-600"></i></span>
         <span x-show="done" x-cloak><i data-lucide="check" class="size-4 text-emerald-600"></i></span>
       </button>
       <span class="sr-only" aria-live="polite" x-text="done ? 'GRN number copied' : ''"></span>
     </div>
-    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Posted 16 Aug 2026 against PO-24-1187. Numbering is set by the plant.</p>
+    <p id="ig3-grn-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Posted 16 Aug 2026 against PO-24-1187. Numbering is set by the plant.</p>
   </div>
 
   <div x-data="{ q: 'HDPE-BLM' }">
@@ -1707,7 +3237,7 @@ register(
   <div>
     <label for="ig4-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity</label>
     <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <input id="ig4-qty" name="qty" inputmode="decimal" value="42.500"
+      <input id="ig4-qty" name="qty" inputmode="decimal" value="42.500" aria-describedby="ig4-qty-help"
              class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
       <label for="ig4-uom" class="sr-only">Unit of measure</label>
       <select id="ig4-uom" name="uom"
@@ -1718,7 +3248,7 @@ register(
         <option>L</option>
       </select>
     </div>
-    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ordered 42.500 MT on rate contract RC-26-041.</p>
+    <p id="ig4-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ordered 42.500 MT on rate contract RC-26-041.</p>
   </div>
 
   <div>
@@ -1731,12 +3261,152 @@ register(
         <option>+971</option>
         <option>+65</option>
       </select>
-      <input id="ig4-phone" name="phone" type="tel" inputmode="tel" value="98250 41163"
+      <input id="ig4-phone" name="phone" type="tel" inputmode="tel" value="98250 41163" aria-describedby="ig4-phone-help"
              class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
     </div>
-    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Ritu Deshpande, Gujarat Polymers Ltd. Used for despatch confirmations.</p>
+    <p id="ig4-phone-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Ritu Deshpande, Gujarat Polymers Ltd. Used for despatch confirmations.</p>
   </div>
 </div>` },
+
+      { id: 'range', name: 'A from and a to under one border', tagNew: true, code:
+`<!-- Two text fields sharing one enclosure, and both of them delegate their
+     outline to the wrapper. That is not an exception to the one-child rule but
+     the rule read properly: what may delegate is text entry, not the first
+     child. A caret is visible, and it says which half of the range has the
+     keyboard, so an inset outline on each field would put three indicators on
+     one 38px box. A select or a button shows nothing of the sort, which is why
+     those keep an indicator of their own.
+
+     The glyph between them is passive — aria-hidden, no divider, no width of
+     its own beyond its padding. A rule there would say the two halves are
+     separate controls, which is the opposite of what a range is.
+
+     Both fields carry min-w-0 flex-1. Two inputs in one enclosure is two
+     intrinsic twenty-character minimums, so this is the group that drags the
+     page sideways first, and flex-1 is also what makes them split the width
+     evenly rather than letting the longer value win.
+
+     role="group" names the pair, because the visible heading is a <span> and a
+     span names nothing on its own. The field labels still say the whole thing —
+     "Delivery window from", not "From" — so the pair reads correctly when
+     somebody tabs straight into the second box and never hears the group name.
+     The repetition on entry is the cheaper mistake.
+
+     The date pickers are the browser's, drawn at the right-hand edge of each
+     field, so the from picker lands against the dash. Nothing may be added
+     between the two fields; there is no room and it is already occupied. -->
+<div data-kui="input-group/range" class="max-w-xl space-y-5">
+  <div role="group" aria-labelledby="ig10-window">
+    <span id="ig10-window" class="mb-1.5 block text-[13px]/5 font-medium">Delivery window</span>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <label for="ig10-from" class="sr-only">Delivery window from</label>
+      <input id="ig10-from" name="window_from" type="date" value="2026-09-04" aria-describedby="ig10-window-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+
+      <span aria-hidden="true" class="flex items-center px-1 text-[14px]/5 text-zinc-500">–</span>
+
+      <label for="ig10-to" class="sr-only">Delivery window to</label>
+      <input id="ig10-to" name="window_to" type="date" value="2026-09-18" aria-describedby="ig10-window-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="ig10-window-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">14 days. Gujarat Polymers Ltd quotes 10 working days from PO-24-1187.</p>
+  </div>
+
+  <div role="group" aria-labelledby="ig10-value">
+    <span id="ig10-value" class="mb-1.5 block text-[13px]/5 font-medium">Order value between (₹)</span>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+
+      <label for="ig10-min" class="sr-only">Lowest order value</label>
+      <input id="ig10-min" name="value_min" inputmode="numeric" value="50,000" aria-describedby="ig10-value-help"
+             class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+
+      <span aria-hidden="true" class="flex items-center px-1 text-[14px]/5 text-zinc-500">–</span>
+
+      <label for="ig10-max" class="sr-only">Highest order value</label>
+      <input id="ig10-max" name="value_max" inputmode="numeric" value="12,45,000" aria-describedby="ig10-value-help"
+             class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+    </div>
+    <p id="ig10-value-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">One ₹ qualifies both boxes. Leave the second empty for no ceiling.</p>
+  </div>
+</div>` },
+
+      { id: 'stepper', name: 'Stepped, and typed into', tagNew: true, code:
+`<!-- Which entry this is depends on one question: can the number be typed? If
+     the only two ways to change it are the two buttons, it is
+     button-group/stepper — the figure there is a display, the strip owns the
+     border and each button draws its own outline. The moment somebody can type
+     into it the figure is a field, the enclosure is this component, and the
+     focus outline moves to the wrapper. That move is the whole difference:
+     focus-within has to say the keyboard is in this group whether it is in the
+     box or on a button beside it, and neither button may draw a halo of its
+     own. They keep the inset indicator every control addon here keeps, which is
+     what says which of the three has the caret.
+
+     The clamp is on the field, not on the buttons. A click can only ever
+     produce a legal value — that is what :disabled at the limits buys — but a
+     typed one can be 9999, -4, 24.5 or nothing at all, and none of those ever
+     touch a button. min and max on the buttons are a convenience; set() is the
+     correctness. It runs on change rather than on input, because clamping every
+     keystroke rewrites a number somebody is still halfway through typing, and
+     it writes the clamped figure back to the element so a typed 0244 does not
+     sit on screen as 0244 while the state says 244.
+
+     The buttons are really disabled at the limits rather than painted to look
+     it. A live minus at zero is a button that does nothing and says nothing
+     about why.
+
+     type="number" is the obvious control here and the wrong one: it draws the
+     browser's own spin buttons hard against the right-hand edge of the field,
+     directly under the plus button, so the group ends with two ways to add one
+     and a hit area belonging to neither. inputmode="numeric" and the arrow keys
+     bound by hand leave the enclosure with only the controls it drew.
+
+     type="button" on both, and this variant is a form so the reason is on
+     screen: a button inside a form with no type is a submit button, so minus
+     posts the receipt.
+
+     The unit is in the label rather than in a suffix. Minus, field and plus is
+     already the two-addon ceiling, and a third addon at 390px takes the number
+     down to three characters.
+
+     What changed is a field's value and what is focused is a button, so
+     nothing announces it. In button-group the display cell can be the live
+     region; a control cannot, so here the message under the group carries the
+     figure and what it now means. -->
+<form data-kui="input-group/stepper" action="/grn/GRN-24-0912/lines/3/" method="post" class="max-w-xl"
+      x-data="{
+        qty: 240, min: 0, max: 244,
+        set(n) { const v = Math.round(Number(n));
+                 this.qty = Number.isFinite(v) ? Math.min(this.max, Math.max(this.min, v)) : this.min },
+        bump(d) { this.set(this.qty + d) }
+      }">
+  <label for="ig13-qty" class="mb-1.5 block text-[13px]/5 font-medium">Drums received (nos)</label>
+
+  <div class="flex max-w-48 items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <button type="button" @click="bump(-1)" :disabled="qty <= min" aria-label="Decrease drums received"
+            class="flex w-9 shrink-0 items-center justify-center rounded-l-[7px] border-r border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700 disabled:text-zinc-400 disabled:hover:bg-transparent">
+      <i data-lucide="minus" class="size-4"></i>
+    </button>
+
+    <input id="ig13-qty" name="qty" inputmode="numeric" value="240" :value="qty"
+           @change="set($el.value); $el.value = qty"
+           @keydown.arrow-up.prevent="bump(1)" @keydown.arrow-down.prevent="bump(-1)"
+           aria-describedby="ig13-qty-msg"
+           class="min-w-0 flex-1 bg-transparent px-2 py-2 text-center text-[14px]/5 tabular-nums outline-none">
+
+    <button type="button" @click="bump(1)" :disabled="qty >= max" aria-label="Increase drums received"
+            class="flex w-9 shrink-0 items-center justify-center rounded-r-[7px] border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700 disabled:text-zinc-400 disabled:hover:bg-transparent">
+      <i data-lucide="plus" class="size-4"></i>
+    </button>
+  </div>
+
+  <p id="ig13-qty-msg" role="status" class="mt-1.5 text-[12px]/4 tabular-nums"
+     :class="qty >= max ? 'font-medium text-amber-700' : 'text-zinc-500'"
+     x-text="qty >= max
+               ? qty + ' nos, the 2% over-receipt cap on PO-24-1187. More than this needs a deviation from QA.'
+               : qty + ' of 240 nos on challan GJ-8841. A short receipt closes the line at what arrived.'"></p>
+</form>` },
 
       { id: 'action', name: 'A trailing action button', code:
 `<!-- Add line is the group's action, so it is filled, and a filled child takes
@@ -1771,7 +3441,7 @@ register(
       <input id="ig5-code" name="item_code" x-model="code" placeholder="Item code, e.g. HDPE-BLM-5502"
              class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
       <button type="submit" :disabled="!code.trim()"
-              class="inline-flex shrink-0 items-center gap-2 rounded-r-[7px] bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:bg-zinc-200 disabled:text-zinc-400">
+              class="inline-flex shrink-0 items-center gap-2 rounded-r-[7px] bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
         <i data-lucide="plus" class="size-4"></i>Add line
       </button>
     </div>
@@ -1833,7 +3503,7 @@ register(
     </select>
 
     <label for="ig6-q" class="sr-only">Search orders, GRNs and vendors</label>
-    <input id="ig6-q" name="q" type="search" placeholder="PO-24-1187, HDPE, Gujarat Polymers"
+    <input id="ig6-q" name="q" type="search" placeholder="PO-24-1187, HDPE, Gujarat Polymers" aria-describedby="ig6-q-help"
            class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
 
     <button type="submit" aria-label="Search orders, GRNs and vendors"
@@ -1841,7 +3511,7 @@ register(
       <i data-lucide="search" class="size-4 text-zinc-600"></i>
     </button>
   </div>
-  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Scoping is what keeps 1,438 open orders out of a vendor lookup.</p>
+  <p id="ig6-q-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Scoping is what keeps 1,438 open orders out of a vendor lookup.</p>
 </form>` },
 
       { id: 'textarea', name: 'Textarea with a footer', code:
@@ -1886,7 +3556,7 @@ register(
       <span class="text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026 · Ritu Deshpande</span>
     </div>
 
-    <textarea id="ig7-note" name="body" rows="4" x-model="text"
+    <textarea id="ig7-note" name="body" rows="4" x-model="text" aria-describedby="ig7-note-help"
               @keydown.ctrl.enter="if (text.trim()) $refs.post.click()"
               @keydown.meta.enter="if (text.trim()) $refs.post.click()"
               placeholder="What was short, by how much, and what the vendor has promised"
@@ -1904,14 +3574,14 @@ register(
           <kbd class="rounded border border-zinc-200 bg-zinc-100 px-1 py-0.5 font-mono text-[10px]/3 text-zinc-600">Enter</kbd>
         </span>
         <button type="button" x-ref="post" :disabled="!text.trim()"
-                class="inline-flex h-8 shrink-0 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:bg-zinc-200 disabled:text-zinc-400">
+                class="inline-flex h-8 shrink-0 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
           Post remark
         </button>
       </span>
     </div>
   </div>
 
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Goes on the receipt, visible to the buyer and to stores. It cannot be edited afterwards.</p>
+  <p id="ig7-note-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Goes on the receipt, visible to the buyer and to stores. It cannot be edited afterwards.</p>
 </div>` },
 
       { id: 'error', name: 'Error on the enclosure', code:
@@ -1935,10 +3605,10 @@ register(
      The red text is the message under the box, and it says the number it is
      comparing against — "invalid" tells nobody what to type instead. -->
 <div data-kui="input-group/error" class="max-w-xl">
-  <label for="ig8-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity <span class="text-red-600">*</span></label>
+  <label for="ig8-qty" class="mb-1.5 block text-[13px]/5 font-medium">Receipt quantity <span aria-hidden="true" class="text-red-600">*</span></label>
 
   <div class="flex items-stretch rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
-    <input id="ig8-qty" name="qty" inputmode="decimal" value="4,200.000"
+    <input id="ig8-qty" name="qty" inputmode="decimal" value="4,200.000" required
            aria-invalid="true" aria-describedby="ig8-qty-err"
            class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
     <label for="ig8-uom" class="sr-only">Unit of measure</label>
@@ -1953,6 +3623,69 @@ register(
     <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
     <span class="tabular-nums">Over PO-24-1187 by 4,157.500 MT. The order is for 42.500 MT and over-receipt is capped at 2%.</span>
   </p>
+</div>` },
+
+      { id: 'locked', name: 'Locked as one object', tagNew: true, code:
+`<!-- The lock is painted on the enclosure. Grey the input alone and the ₹, the
+     unit and the button stay white inside a box that has gone dead in the
+     middle, which reads as a field that is half broken rather than a value that
+     is settled.
+
+     Read-only and disabled are not two shades of the same state, and a group
+     makes the difference worse than a plain field does. readonly submits;
+     disabled does not. A native <select> has no readonly, so the unit beside a
+     read-only quantity has to be disabled — at which point the POST carries
+     42.500 with no UOM at all, and a quantity without its unit is not a
+     quantity. The hidden input beside the dead select is what puts it back.
+
+     Then each addon is decided on what it does, not on what the field is
+     doing. The Copy button in the button variant reads the value and stays
+     live inside a read-only enclosure; Apply here changes the value, so it
+     dies with the field. A live Apply on a dead field is a button that posts
+     an empty value.
+
+     Both dividers step to zinc-300. border-zinc-200 against a zinc-200
+     enclosure is the same colour twice, so the join disappears and the addon
+     reads as a word floating inside the box.
+
+     Only the read-only group takes a focus outline, because only read-only is
+     focusable and a keyboard user landing somewhere with no indicator has no
+     idea where they are. Neither group takes focus-within:border-zinc-700 — a
+     locked border that lights up says the field is about to accept something.
+     The text splits the two states: zinc-400 where the value no longer matters,
+     the ordinary zinc-900 where it still has to be read off the screen. -->
+<div data-kui="input-group/locked" class="max-w-xl space-y-5">
+  <div>
+    <label for="ig11-qty" class="mb-1.5 block text-[13px]/5 font-medium">Received quantity</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-200 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="ig11-qty" name="qty" readonly value="42.500" aria-describedby="ig11-qty-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+
+      <label for="ig11-uom" class="sr-only">Unit of measure</label>
+      <select id="ig11-uom" disabled
+              class="shrink-0 rounded-r-[7px] border-l border-zinc-300 bg-transparent py-2 pr-2 pl-3 text-[14px]/5 text-zinc-400">
+        <option>MT</option>
+      </select>
+      <input type="hidden" name="uom" value="MT">
+    </div>
+    <p id="ig11-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Posted on GRN-24-0912. The quantity moves by a correction note, not from here.</p>
+  </div>
+
+  <div>
+    <label for="ig11-rate" class="mb-1.5 block text-[13px]/5 font-medium text-zinc-500">Contract rate (₹/kg)</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-zinc-200">
+      <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-400">₹</span>
+      <input id="ig11-rate" disabled value="86.40" aria-describedby="ig11-rate-help"
+             class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums text-zinc-400">
+      <span aria-hidden="true" class="flex items-center pr-2 text-[14px]/5 text-zinc-400">/kg</span>
+
+      <button type="button" disabled
+              class="inline-flex shrink-0 items-center rounded-r-[7px] border-l border-zinc-300 px-3 text-[13px]/5 font-medium text-zinc-400">
+        Apply
+      </button>
+    </div>
+    <p id="ig11-rate-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Held by rate contract RC-26-041 to 31 Mar 2027. Nothing in this group is submitted.</p>
+  </div>
 </div>` },
 
       { id: 'dense', name: 'In a table filter row', code:
@@ -2002,16 +3735,263 @@ register(
   </div>
 </div>
 
-<p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">1,438 ledger entries. Filters apply as they are typed.</p>` }
+<p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">1,438 ledger entries. Filters apply as they are typed.</p>` },
+
+      { id: 'responsive', name: 'What the group does at 390px', tagNew: true, code:
+`<!-- Two retreats, in the order they are worth taking.
+
+     The first is the cheap one: shed the word, keep the object. The button
+     holds its icon and drops its label below sm, which buys about sixty pixels
+     without moving a single edge. A control that loses its visible label at one
+     width has to carry an accessible name at every width, and the visible words
+     have to be inside that name — somebody speaking to the page says what they
+     can see, so "Add line to PO-24-1187" answers to "click Add line" and "Add
+     item" does not.
+
+     The second is the real one. A group never wraps: flex-wrap on the enclosure
+     is the version that looks like it works, and what it produces is one border
+     round two rows with the left rounding stranded on the piece that is now on
+     top, the right rounding on the piece below it, and a divider that stops in
+     the middle of nothing. Below sm the row becomes a column instead, and the
+     corners and the divider turn with it — rounded-r-[7px] becomes
+     rounded-b-[7px], border-l becomes border-t. One enclosure, one border, one
+     focus outline, at both widths.
+
+     Turning the axis moves the height. In a row the addon takes its height from
+     the field by stretching and declares none of its own; items-stretch in a
+     column stretches width, so the addon has nothing left to take a height from
+     and needs py-2 below sm and sm:py-0 above it. This is the one place the
+     never-a-height-on-an-addon rule has a second half.
+
+     Past this there is nothing left to give up. A group that still does not fit
+     is trying to be a form. -->
+<div data-kui="input-group/responsive" class="max-w-xl space-y-5">
+  <form action="/orders/PO-24-1187/lines/" method="post">
+    <label for="ig12-code" class="mb-1.5 block text-[13px]/5 font-medium">Add an item to PO-24-1187</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <input id="ig12-code" name="item_code" placeholder="Item code" aria-describedby="ig12-code-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+      <button type="submit" aria-label="Add line to PO-24-1187"
+              class="inline-flex shrink-0 items-center gap-2 rounded-r-[7px] bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="plus" class="size-4"></i><span class="hidden sm:inline">Add line</span>
+      </button>
+    </div>
+    <p id="ig12-code-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">3 lines so far. Rates come from RC-26-041 and cannot be typed here.</p>
+  </form>
+
+  <div>
+    <label for="ig12-gstin" class="mb-1.5 block text-[13px]/5 font-medium">Vendor GSTIN</label>
+    <div class="flex flex-col items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15 sm:flex-row">
+      <input id="ig12-gstin" name="gstin" value="24AABCG1122F1Z8" maxlength="15" aria-describedby="ig12-gstin-help"
+             class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums uppercase outline-none">
+      <button type="button"
+              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-b-[7px] border-t border-zinc-200 px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700 sm:rounded-b-none sm:rounded-r-[7px] sm:border-t-0 sm:border-l sm:py-0">
+        <i data-lucide="shield-check" class="size-4 text-zinc-600"></i>Verify with GSTN
+      </button>
+    </div>
+    <p id="ig12-gstin-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">15 characters. 24 is Gujarat, and the 12th is the entity code.</p>
+  </div>
+</div>` },
+
+      { id: 'htmx', name: 'The addon the server fills in', tagNew: true, code:
+`<!-- The enclosure is never the target. It contains the input somebody is
+     typing in, and a swap replaces that input with a fresh one — the caret, the
+     selection and every keystroke not yet sent go with it, while the request
+     the user triggered looks from the outside like it worked. The target is one
+     addon and nothing else.
+
+     outerHTML rather than innerHTML, because the answer carries a state as well
+     as a string: found, or no such code. That state lives on the addon's own
+     data-ok, and innerHTML cannot reach an attribute of the element it fills.
+     The price is one class list living in a template as well as here, and it is
+     cheaper than the alternatives — a second out-of-band swap, or targeting the
+     wrapper and destroying the field.
+
+     The live region wraps the target and is never the target. A region that is
+     itself replaced announces nothing, because the announcement is made by the
+     region that was already on the page when the text under it changed.
+
+     The field triggers its own lookup and so contributes its own value; no
+     hx-include is needed for that. hx-sync="this:replace" abandons a lookup
+     still in flight, so a fast typist cannot end up with the unit of a code
+     that is no longer in the box, and the delay keeps a held key to one
+     request.
+
+     Nothing inside the enclosure turns red. The addon reports what the server
+     found in the ordinary zinc, and the red is the wrapper's border and the
+     message under it — a red unit inside the box reads as the wrong unit, the
+     way a red ₹ reads as a negative amount. aria-invalid goes on the field,
+     which is the control that is wrong.
+
+     border stays in the static class list and only its colour is bound, which
+     is the idiom the input entry uses for the same reason: two border-colour
+     utilities in one class list are settled by the stylesheet rather than by
+     the order they were written in, and an enclosure whose entire border
+     arrives with Alpine has no border at all at first paint.
+
+     views.py
+         def item_lookup(request):
+             item = Item.objects.live().filter(
+                 code__iexact=request.GET.get("item_code", "").strip()).first()
+             return render(request, "orders/_item_info.html", {"item": item})
+
+     orders/_item_info.html, which is the whole response:
+         {% if item %}
+           <span id="igh-info" data-ok="1" class="text-[13px]/5 tabular-nums
+                 text-zinc-500">{{ item.uom }} · {{ item.free_stock }} in stock</span>
+         {% else %}
+           <span id="igh-info" data-ok="0" class="text-[13px]/5 tabular-nums
+                 text-zinc-500">No such code</span>
+         {% endif %} -->
+<div data-kui="input-group/htmx" class="max-w-xl"
+     x-data="{ loading: false, bad: false }"
+     @htmx:before-request.camel="loading = true"
+     @htmx:after-request.camel="loading = false"
+     @htmx:after-swap.camel="bad = $el.querySelector('#igh-info').dataset.ok === '0'">
+  <label for="igh-code" class="mb-1.5 block text-[13px]/5 font-medium">Item code</label>
+
+  <div class="flex items-stretch rounded-lg border bg-white"
+       :class="bad ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
+                   : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
+    <input id="igh-code" name="item_code" value="HDPE-BLM-5502"
+           aria-describedby="igh-info" :aria-invalid="bad ? 'true' : null"
+           hx-get="/items/lookup/" hx-trigger="change, keyup changed delay:400ms"
+           hx-target="#igh-info" hx-swap="outerHTML" hx-sync="this:replace"
+           class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+
+    <span role="status" class="flex shrink-0 items-center pr-3 pl-1">
+      <span x-show="loading" x-cloak aria-hidden="true" class="flex items-center">
+        <i data-lucide="loader-circle" class="size-4 animate-spin text-zinc-500"></i>
+      </span>
+      <span x-show="!loading" class="flex items-center">
+        <span id="igh-info" data-ok="1" class="text-[13px]/5 tabular-nums text-zinc-500">MT · 18.400 in stock</span>
+      </span>
+    </span>
+  </div>
+
+  <p class="mt-1.5 text-[12px]/4 tabular-nums"
+     :class="bad ? 'font-medium text-red-600' : 'text-zinc-500'"
+     x-text="bad
+               ? 'No live item with this code. Stores opens one against the rate contract before it can be ordered.'
+               : 'Unit and free stock come from the item master as the code is typed.'"></p>
+</div>` },
+
+      { id: 'django', name: 'Django form field', tagNew: true, code:
+`<!-- One enclosure, two form fields. Django renders the control and nothing
+     around it, so the join lives in the widget attrs: border-l and
+     rounded-r-[7px] are part of the select's class string, not of the wrapper,
+     and the wrapper is template markup on both sides of them.
+
+     forms.py
+         class ReceiptLineForm(forms.Form):
+             qty = forms.DecimalField(
+                 max_digits=12, decimal_places=3, label='Received quantity',
+                 help_text='Ordered 42.500 MT on RC-26-041. Over-receipt is capped at 2%.',
+                 widget=forms.NumberInput(attrs={
+                     'class': 'min-w-0 flex-1 bg-transparent px-3 py-2 text-right '
+                              'text-[14px]/5 tabular-nums outline-none'}))
+
+             uom = forms.ChoiceField(
+                 choices=UOM_CHOICES, label='Unit of measure',
+                 widget=forms.Select(attrs={
+                     'class': 'shrink-0 rounded-r-[7px] border-l border-zinc-200 '
+                              'bg-transparent py-2 pr-2 pl-3 text-[14px]/5 '
+                              'focus-visible:outline-2 focus-visible:-outline-offset-2 '
+                              'focus-visible:outline-zinc-700'}))
+
+             # The serial is the only thing the browser sends. The series is
+             # context, never a field and never a hidden input: a hidden input
+             # is markup anybody can edit, so a server that reads one back is
+             # trusting the page it just rendered.
+             serial = forms.CharField(
+                 max_length=6, label='Invoice number',
+                 widget=forms.TextInput(attrs={
+                     'inputmode': 'numeric',
+                     'class': 'min-w-0 flex-1 bg-transparent px-3 py-2 '
+                              'text-[14px]/5 tabular-nums outline-none'}))
+
+             def __init__(self, *args, line=None, **kwargs):
+                 super().__init__(*args, **kwargs)
+                 self.line = line
+                 # One message under one enclosure, so both controls point at
+                 # the same id. Two paragraphs under one border and nobody can
+                 # tell which of them the red edge is about.
+                 for name in ('qty', 'uom'):
+                     bf, attrs = self[name], self.fields[name].widget.attrs
+                     attrs['aria-describedby'] = 'rcpt-qty-msg'
+                     if bf.errors:
+                         attrs['aria-invalid'] = 'true'
+                 self.fields['serial'].widget.attrs['aria-describedby'] = (
+                     'rcpt-series ' + self['serial'].auto_id + '-help')
+
+             def clean(self):
+                 cleaned = super().clean()
+                 qty, uom = cleaned.get('qty'), cleaned.get('uom')
+                 if qty and uom and to_mt(qty, uom) > self.line.remaining * Decimal('1.02'):
+                     # add_error names the control that is wrong. A bare raise
+                     # here lands the message in non_field_errors, which renders
+                     # above the group with nothing inside it marked invalid.
+                     self.add_error('qty', 'Over PO-24-1187 by 4,157.500 MT.')
+                 return cleaned
+
+     views.py
+         # The series is composed here, on the way in, from the record and the
+         # financial year. The form never sees it and the browser never sends it.
+         line.invoice_no = f'{series_for(request.user.plant)}{form.cleaned_data["serial"]}'
+
+     The wrapper reddens when either field is in error, because the wrapper is
+     the field. aria-invalid stays on the one control clean() blamed, so a wrong
+     number and a right unit is one mistake and gets reported once. -->
+<form data-kui="input-group/django" method="post" class="max-w-xl space-y-5">
+  {% csrf_token %}
+
+  <div>
+    <label for="{{ form.qty.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.qty.label }} <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+
+    <div class="flex items-stretch rounded-lg bg-white {% if form.qty.errors or form.uom.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.qty }}
+      <label for="{{ form.uom.id_for_label }}" class="sr-only">{{ form.uom.label }}</label>
+      {{ form.uom }}
+    </div>
+
+    {% if form.qty.errors or form.uom.errors %}
+      <p id="rcpt-qty-msg" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
+        <span class="tabular-nums">{% firstof form.qty.errors.0 form.uom.errors.0 %}</span>
+      </p>
+    {% else %}
+      <p id="rcpt-qty-msg" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">{{ form.qty.help_text }}</p>
+    {% endif %}
+  </div>
+
+  {# The series is rendered from context and posts nothing. What the field #}
+  {# sends is the serial, and the two are joined in the view.              #}
+  <div>
+    <label for="{{ form.serial.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">{{ form.serial.label }}</label>
+    <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <span id="rcpt-series" class="flex shrink-0 items-center rounded-l-[7px] border-r border-zinc-200 bg-zinc-100 px-3 text-[14px]/5 tabular-nums text-zinc-600">{{ series }}</span>
+      {{ form.serial }}
+    </div>
+    <p id="{{ form.serial.auto_id }}-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">The series is fixed for 2026-27. Type the serial only.</p>
+  </div>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Post receipt
+  </button>
+</form>` }
     ]
   },
 
   {
     id: 'select', name: 'Select', category: 'forms',
     description: 'One answer out of a short fixed list. A real <select>, styled through its wrapper the way an input is, and an Alpine listbox only for the rows an <option> cannot hold.',
-    when: 'A field whose answer is one of a dozen known values — a status, a unit, a plant, a GST rate, a state, a payment term. The native element is the default and stays the default to about fifteen options: it submits, it binds to a Django ChoiceField, it gets the platform picker on a phone and typeahead on a desktop, and none of that is code you own. Move to the Alpine listbox in this entry only when the row has to carry something an <option> cannot hold — a second line, a status dot. The moment somebody has to type to find the value it is not a select at all, it is a combobox, and that entry is next door.',
+    when: 'A field whose answer is one of a dozen known values — a status, a unit, a plant, a GST rate, a state, a payment term. The native element is the default, and it stays the default for as long as somebody can find their answer by typing the first two letters of it — thirty-six states as easily as six payment terms: it submits, it binds to a Django ChoiceField, it gets the platform picker on a phone and typeahead on a desktop, and none of that is code you own. Move to the Alpine listbox in this entry only when the row has to carry something an <option> cannot hold — a second line, a status dot. The moment somebody has to type to find the value it is not a select at all, it is a combobox, and that entry is next door.',
     notes: [
       'The native <select> is the default, and the bar for replacing it is high. One element gives you form participation, a Django ChoiceField binding, the platform\'s own picker on a phone, desktop typeahead, the keyboard, forced-colours mode and a popup that is allowed to escape the viewport — none of which is yours to maintain. A hand-built listbox for eight states throws all of it away and buys sixty lines of keyboard handling that has to be right the first time. The three controls divide cleanly: a native select for a short list of strings, the Alpine listbox for a short list whose rows need more than a string, a combobox the moment the list is long enough that somebody has to type. Choosing by which one looks nicer is how a phone ends up with a 240px scrolling div where the OS wheel should have been.',
+      'What forces a combobox is findability, not a count. Fifteen options is a useful rule of thumb for a list nobody has memorised — vendor names, item codes, cost centres — where the only route to the answer is reading every row. A closed list whose members everybody already knows their own answer in behaves nothing like that: thirty-six states with the native typeahead is a two-keystroke field, and the same thirty-six rows in a hand-built listbox is a scrolling div with the typeahead written by hand. Count the rows second. Ask first whether somebody can type the first two letters of the answer without being told what the answers are.',
+      'A select cannot show a value it has no option for. Render only the currently valid choices and a record holding a withdrawn one — a blocked vendor, a discontinued item, an expired rate contract — comes up on whichever option happens to be first, and saving the form writes that as though somebody chose it. Nothing on screen was ever wrong. So the record\'s own value goes into the choices whatever its state, in a group whose label says what it is, and the server refuses it in clean() rather than in the widget. Marking that option disabled changes less than it looks: an option the server rendered as selected still sets the control\'s value, so the field posts the withdrawn id either way — all it buys is that nobody can choose it back.',
       'appearance-none is the whole styling trade and it comes with a chevron you now own. Leave appearance alone and the browser draws its own arrow, so a chevron of yours sits beside it and the control has two. Take appearance-none and the select has no arrow at all, so one is drawn on top of it — absolutely positioned inside the wrapper, with pr-9 on the select so a long vendor name never runs underneath. A select standing alone in a toolbar can legitimately keep the platform arrow and skip all of this; a select in a form takes appearance-none so it is the same object as the inputs above it.',
       'The drawn chevron must be pointer-events-none, on a wrapping span. It sits over the right end of the control, which is exactly where people click to open a select, so without it the click lands on the span and the list never opens — and the defect reads as "the dropdown only opens sometimes", because clicking the text still works. It goes on the span rather than on the <i data-lucide> for the same reason everything else does: createIcons() replaces the <i> with an <svg>, and a class on a span is one you never have to think about again.',
       'The border and the focus outline live on the wrapper, through focus-within, exactly as they do for an input. The select itself is transparent with outline-none, which is the one carve-out rule 8 allows — a field whose wrapper draws the outline for it. Put the border on the select instead and there is nothing for the chevron to be positioned against, invalid and disabled have to restyle three elements rather than one, and a form of mixed controls stops lining up because the select is measuring its own box and the input beside it is measuring a different one.',
@@ -2022,6 +4002,8 @@ register(
       'readonly does nothing on a select. It parses, it looks right in the markup and it leaves a fully working control that anybody can change. The only lock is disabled, and a disabled control does not submit — so a read-only value that still has to reach the server needs a hidden input beside it, or, in Django, disabled=True on the form field, which makes the field ignore request.POST and clean from initial instead. That leaves the text colour to separate the two states the way it does on an input: zinc-900 for a value that still matters and still has to be read off the screen, zinc-400 for one that does not. The read-only box also drops the chevron, because an arrow promises a list that will not open.',
       'Never <select multiple>. Adding a second value needs ctrl-click or cmd-click, which nothing on screen says, and one ordinary click on a row wipes every other choice the user had made. Its height is fixed by the size attribute, so it either scrolls at six rows or takes over the form, and the selection cannot be read without scrolling the box — the answer to "which plants did I pick" is not on screen. Under about ten options the replacement is a checkbox group, where every choice and every state is visible at once and no modifier key is involved; above that it is a combobox multi with chips in the field. If one is inherited, Django needs MultipleChoiceField, whose widget reads the POST with getlist; a plain ChoiceField takes the last value and drops the rest without erroring.',
       'Nothing on the page can know whether a native select is open. There is no open event and no state to bind to, so a chevron that rotates on :focus is lying — the control stays focused after the list has closed, and the arrow then points up at nothing. Leave the drawn chevron still. Rotation belongs to the Alpine listbox, which owns the open flag and can tell the truth about it.',
+      'In an editable grid the control sets the row height, not the other way round. A 34px select in a table whose read-only rows are 28px makes the rows taller, and that is the right way round: trim the select to fit the row instead and the chevron has nowhere left to draw, the option text starts clipping, and the target goes under what WCAG 2.2 asks for. 34px is the floor and the second and last size this component has — the filter bar and the table cell share it.',
+      'A select that writes on change never disables itself while the request is in flight. Disabling the element that has focus drops focus to <body>, so the next Tab restarts at the top of the page, and it happens to somebody halfway down a form who did nothing but change one field. hx-sync="this:replace" is what stops two changes inside a second settling in the order the network chose, and what a failed write puts back is the value the server last accepted rather than the value that happened to be in the control.',
       'The Alpine listbox moves real focus onto the option, one tabindex="-1" at a time, and draws the indicator with a plain :focus outline. That is the dropdown menu\'s model rather than the combobox\'s, and the difference is where focus has to live: a combobox keeps focus in its text box so typing keeps working, which forces it to point at a row with aria-activedescendant and to mint a stable id for every option — the two things the combobox entry documents most carefully. A select has no text box, so the option itself can be the focused thing, .focus() scrolls it into view inside the scrolling panel for nothing, and the outline is a real focus outline that no code has to remember to paint. It also has to reimplement typeahead, or it is strictly worse than the element it replaced: typing "gu" on a focused native select jumps to Gujarat Polymers, and on a hand-built listbox it does nothing at all — a loss that never shows up in review because everyone testing it is using a mouse.'
     ],
     anatomy: [
@@ -2031,6 +4013,8 @@ register(
       ['Placeholder option', 'value="" disabled selected hidden, before the first optgroup. It is the thing required tests, not a label — the label is a real <label for>.'],
       ['Option group', 'An <optgroup label="…">. One level, never selectable, text only. A group that needs a count or an icon is the signal to leave the native element.'],
       ['Help text or error', 'A 12px line under the box, pointed at with aria-describedby. The error replaces the help text rather than stacking under it, so the block keeps its height.'],
+      ['Withdrawn option', 'The record\'s current value when the live choices no longer contain it, kept selected inside an optgroup that names the state. Selectable, still posted, and refused on the server rather than in the widget.'],
+      ['Cell select', 'The same control at 34px inside a table cell: w-full so it fills the column, an aria-label carrying the row and the column, and no visible label of its own. It is what sets the height of the row it sits in.'],
       ['Trigger', 'The Alpine listbox only: a button carrying the current value and the chevron, aria-haspopup="listbox", aria-expanded bound to the open flag, and named by aria-labelledby because a <label for> does not name a button. The hidden input beside it is what posts.'],
       ['Option row', 'The Alpine listbox only: role="option" with tabindex="-1", aria-selected on the committed value alone, data-value and data-label for the keyboard to read, and everything past the first line aria-hidden under an explicit aria-label.']
     ],
@@ -2042,6 +4026,9 @@ register(
       'Typeahead in the Alpine listbox mirrors the native one: a buffer that clears after 600ms, the same letter twice cycling through the options that start with it, and a search that wraps round the end of the list even though the arrow keys clamp — a search that clamped would find nothing for "r" while the focus sat at the bottom.',
       'Committing closes the popup, writes the label into the trigger and puts focus back on it. A single-select popup that stays open after a choice reads as a click that was missed.',
       'The child of a cascade is cleared before it is refilled and stays disabled until its parent has a value. A child still holding the previous parent\'s options posts a rate contract belonging to a different vendor, and nothing catches it until the server does.',
+      'A request that fails swaps nothing, so a cascade whose options did not arrive is left showing the last parent\'s answer under the new parent\'s name. Failure locks the child again, says so where the count would have been, and offers a retry — which is a second element with its own hx-get, because the field that triggered the first request is not the thing being clicked the second time.',
+      'A listbox whose rows come from the server fetches them the first time it is opened and not again — late enough that the list is current, once because a page lives for minutes and a request per glance is a request too many. The panel opens before the rows exist and focus stays on the trigger until there is something to put it on, because a keyboard user moved into an empty panel is in a box whose only exit is Escape.',
+      'A select that saves on change has no Save button and no undo of its own. It says saving, then saved with the time; a write that fails puts the control back to the last value the server accepted and offers the change again, because the field is now telling the truth about the record and lying about what the user asked for.',
       'Disabled and read-only both refuse the pointer and neither submits on its own. Only the text colour tells them apart, and the read-only one carries a hidden input so its value still reaches the server.',
       'At 390px every select is full width with the chevron inside it, and a filter row becomes a two-column grid rather than a strip that scrolls sideways.'
     ],
@@ -2053,6 +4040,9 @@ register(
       'The popup is role="listbox" with an accessible name, every row is role="option", and aria-selected marks the committed value only. Focus is real focus, roving with tabindex="-1", because there is no text box that focus has to stay in.',
       'A two-line row takes an explicit aria-label and everything decorative inside it is aria-hidden, or the row is read as one run: the vendor name, then a GSTIN spelled out character by character, then a date.',
       'The status dot is aria-hidden and the status word is in the label. Colour is not a name, and in forced-colours mode the dot is the first thing to go.',
+      'A select in a table cell takes an aria-label naming the row and the column. A <th scope="col"> establishes the column for anything reading the table as a table and contributes nothing to the accessible name of a control that has been tabbed to, so a grid of them announces as a column of unnamed comboboxes reading out numbers. It is also the only thing that works when the same rows are drawn twice — a table above md and cards below it — since one for/id pair cannot serve two copies of one field, and the second id is the one the label is not pointing at.',
+      'Help text under an Alpine listbox needs aria-describedby on the trigger. The name of that button comes from aria-labelledby, which replaces everything else, so a paragraph sitting under it is on screen and nowhere in the accessible name.',
+      'A listbox that is still fetching carries aria-busy on the element with role="listbox", and a role="status" says which of loading, failed and empty the panel is in. A spinner is announced by nothing, and an empty box that is filling is indistinguishable from an empty box that is finished.',
       'The result count on a filter bar is a role="status" that was in the document before the number changed. A live region rendered inside an x-show block with its text already in it announces nothing on the one change that mattered.'
     ],
     related: ['combobox', 'field', 'dropdown'],
@@ -2079,7 +4069,7 @@ register(
      input, so this and the fields above it are the same object at the same
      height. outline-none on the select is the carve-out rule 8 allows. -->
 <div data-kui="select/default" class="max-w-sm">
-  <label for="sel-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+  <label for="sel-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span aria-hidden="true" class="text-red-600">*</span></label>
 
   <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <!-- the value is the option carrying selected. There is no value attribute
@@ -2127,7 +4117,7 @@ register(
      nothing else: no count, no icon, no second line. Wanting any of those is
      the signal to move to the listbox variants below. -->
 <div data-kui="select/groups" class="max-w-sm">
-  <label for="sel-item" class="mb-1.5 block text-[13px]/5 font-medium">Item <span class="text-red-600">*</span></label>
+  <label for="sel-item" class="mb-1.5 block text-[13px]/5 font-medium">Item <span aria-hidden="true" class="text-red-600">*</span></label>
 
   <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <select id="sel-item" name="item" required aria-describedby="sel-item-help"
@@ -2157,7 +4147,156 @@ register(
   </div>
 
   <p id="sel-item-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
-    Seven items across three groups. Above about fifteen this becomes a combobox, because the answer stops being findable by scrolling.
+    Seven items across three groups. It becomes a combobox at the point nobody can reach the answer by typing the first letters of it.
+  </p>
+</div>` },
+
+      { id: 'long', name: 'Thirty-six options, still native', tagNew: true, code:
+`<!-- Option count is not what decides this. The rule of thumb — a combobox
+     above about fifteen — is about lists nobody has memorised, where the only
+     route to the answer is reading every row. A closed list everybody already
+     knows their own answer in behaves nothing like that: typing ma on the
+     focused control lands on Maharashtra without reading a single row, and the
+     person picking has known which one they wanted since before the page
+     loaded. Thirty-six states and union territories is comfortable here. Two
+     hundred vendor names, where nobody can spell the one they want, is not.
+
+     The frequently-used group is three of the options below repeated, and
+     repeating an option is only safe if the label is repeated character for
+     character. Two options may share a value — the DOM allows it — but .value
+     and x-model both select the first match, so the shortcut copy is the one
+     that ends up selected, and two spellings of one state make the field look
+     like it changed its own answer. Server-side, selected goes on exactly one
+     of the two: rendered on both, the later one wins and the shortcut group
+     stops shortcutting anything.
+
+     Repeating options also moves what the typeahead finds. The buffer walks the
+     list in document order, so ma reaches the shortcut copy of Maharashtra
+     before Madhya Pradesh — which is the answer wanted here, and is still a
+     change to a keyboard that used to be alphabetical. A shortcut group that is
+     not genuinely the frequent answer costs more than it saves.
+
+     There is no placeholder, because this field has a real default: the plant\'s
+     own state. A default that is right nine times in ten beats the guarantee
+     that somebody touched the field — but only where being wrong is visible on
+     the same screen, and it is, because the tax lines under it change the
+     moment this does.
+
+     The code lives inside the option text — Maharashtra — 27 — because an
+     option cannot be given a column, tabular-nums or any other styling. If the
+     codes have to line up, the control is a listbox and not a select. -->
+<div data-kui="select/long" class="max-w-sm">
+  <label for="sel-pos" class="mb-1.5 block text-[13px]/5 font-medium">Place of supply <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <select id="sel-pos" name="place_of_supply" required aria-describedby="sel-pos-help"
+            class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+      <optgroup label="Frequently used">
+        <option value="27" selected>Maharashtra — 27</option>
+        <option value="24">Gujarat — 24</option>
+        <option value="33">Tamil Nadu — 33</option>
+      </optgroup>
+
+      <optgroup label="All states and union territories">
+        <option value="35">Andaman and Nicobar Islands — 35</option>
+        <option value="37">Andhra Pradesh — 37</option>
+        <option value="12">Arunachal Pradesh — 12</option>
+        <option value="18">Assam — 18</option>
+        <option value="10">Bihar — 10</option>
+        <option value="04">Chandigarh — 04</option>
+        <option value="22">Chhattisgarh — 22</option>
+        <option value="26">Dadra and Nagar Haveli and Daman and Diu — 26</option>
+        <option value="07">Delhi — 07</option>
+        <option value="30">Goa — 30</option>
+        <option value="24">Gujarat — 24</option>
+        <option value="06">Haryana — 06</option>
+        <option value="02">Himachal Pradesh — 02</option>
+        <option value="01">Jammu and Kashmir — 01</option>
+        <option value="20">Jharkhand — 20</option>
+        <option value="29">Karnataka — 29</option>
+        <option value="32">Kerala — 32</option>
+        <option value="38">Ladakh — 38</option>
+        <option value="31">Lakshadweep — 31</option>
+        <option value="23">Madhya Pradesh — 23</option>
+        <option value="27">Maharashtra — 27</option>
+        <option value="14">Manipur — 14</option>
+        <option value="17">Meghalaya — 17</option>
+        <option value="15">Mizoram — 15</option>
+        <option value="13">Nagaland — 13</option>
+        <option value="21">Odisha — 21</option>
+        <option value="34">Puducherry — 34</option>
+        <option value="03">Punjab — 03</option>
+        <option value="08">Rajasthan — 08</option>
+        <option value="11">Sikkim — 11</option>
+        <option value="33">Tamil Nadu — 33</option>
+        <option value="36">Telangana — 36</option>
+        <option value="16">Tripura — 16</option>
+        <option value="09">Uttar Pradesh — 09</option>
+        <option value="05">Uttarakhand — 05</option>
+        <option value="19">West Bengal — 19</option>
+      </optgroup>
+    </select>
+
+    <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+      <i data-lucide="chevron-down" class="size-4"></i>
+    </span>
+  </div>
+
+  <p id="sel-pos-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    36 states and union territories. The GST state code decides whether this invoice carries IGST or CGST plus SGST, so it is the code that posts and the name that is read.
+  </p>
+</div>` },
+
+      { id: 'stale', name: 'A value the list no longer offers', tagNew: true, code:
+`<!-- This draft was raised in March against Nashik Steel Traders. The vendor was
+     blocked in June and is not in the choices any more — and a select cannot
+     show a value it has no option for. Render only the live vendors and the
+     control comes up on whichever option is first, somebody saves the draft
+     without touching this field, and the order is now against a vendor nobody
+     chose. Nothing on screen was wrong at any point, which is why this defect
+     survives review.
+
+     So the record\'s own value is rendered, as a real option, inside a group
+     whose label says what it is, and it stays selected. What it must not do is
+     pass: the server puts the current value into the choices so the field can
+     draw it, and refuses it in clean(), which is the only place that knows the
+     vendor is blocked.
+
+     Marking that option disabled is the obvious alternative and changes less
+     than it looks. An option the server rendered as selected still sets the
+     control\'s value, so the field posts the blocked id either way — all
+     disabled buys is that nobody can choose it back after moving off, at the
+     price of a draft that quietly loses its own value.
+
+     The warning is a line of text with an icon rather than a red field and an
+     aria-invalid. Nothing is invalid yet: the record is exactly as it was left,
+     and this only becomes an error when somebody tries to release it. -->
+<div data-kui="select/stale" class="max-w-sm">
+  <label for="sel-stale" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <select id="sel-stale" name="vendor" required aria-describedby="sel-stale-note"
+            class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+      <optgroup label="No longer available">
+        <option value="nashik-steel" selected>Nashik Steel Traders — blocked</option>
+      </optgroup>
+
+      <optgroup label="Approved vendors">
+        <option value="gujarat-polymers">Gujarat Polymers Ltd</option>
+        <option value="sharma-extrusions">Sharma Extrusions</option>
+        <option value="deccan-fasteners">Deccan Fasteners Pvt Ltd</option>
+        <option value="konkan-chemicals">Konkan Chemicals Pvt Ltd</option>
+      </optgroup>
+    </select>
+
+    <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+      <i data-lucide="chevron-down" class="size-4"></i>
+    </span>
+  </div>
+
+  <p id="sel-stale-note" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-amber-700">
+    <i data-lucide="alert-triangle" class="mt-0.5 size-3.5 shrink-0"></i>
+    Blocked on 30 Jun 2026 for a failed quality audit. PR-24-0918 cannot be converted to an order until another vendor is chosen.
   </p>
 </div>` },
 
@@ -2208,11 +4347,11 @@ register(
     </div>
     <!-- the disabled control posts nothing, so the value travels here -->
     <input type="hidden" name="plant" value="silvassa-2">
-    <p id="sel-ro-help" class="mt-1.5 tabular-nums text-[12px]/4 text-zinc-500">Fixed when GRN-24-0912 was posted against this order.</p>
+    <p id="sel-ro-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Fixed when GRN-24-0912 was posted against this order.</p>
   </div>
 
   <div>
-    <label for="sel-bad" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms <span class="text-red-600">*</span></label>
+    <label for="sel-bad" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms <span aria-hidden="true" class="text-red-600">*</span></label>
     <div class="relative rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
       <select id="sel-bad" name="terms" required aria-invalid="true" aria-describedby="sel-bad-err"
               class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
@@ -2260,7 +4399,7 @@ register(
   <div>
     <label for="sel-multi" class="mb-1.5 block text-[13px]/5 font-medium">Plants — the control to avoid</label>
     <select id="sel-multi" name="plant_native" multiple size="5" aria-describedby="sel-multi-help"
-            class="block w-full min-w-0 rounded-lg border border-zinc-200 bg-white px-1 py-1 text-[14px]/5 focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+            class="block w-full min-w-0 rounded-lg border border-zinc-200 bg-white px-1 py-1 text-[14px]/5 focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <option value="silvassa-1" selected>Silvassa — Unit I</option>
       <option value="silvassa-2">Silvassa — Unit II</option>
       <option value="vadodara">Vadodara</option>
@@ -2413,7 +4552,7 @@ register(
                    ? orders.length + ' purchase orders'
                    : rows.length + ' of ' + orders.length + ' purchase orders'"></p>
       <button type="button" x-show="applied" x-cloak @click="clear()"
-              class="text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2">
+              class="rounded-sm text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Clear <span x-text="applied"></span> filters
       </button>
     </div>
@@ -2443,6 +4582,135 @@ register(
   </div>
 </div>` },
 
+      { id: 'cell', name: 'In a line-items table', tagNew: true, code:
+`<!-- The control sets the row height, not the other way round. A 34px select in
+     a table whose read-only rows are 28px makes the rows taller, and that is
+     the honest outcome: trim the select to fit the row instead and the chevron
+     has nowhere left to draw, the option text clips, and the target drops under
+     what WCAG 2.2 asks for. An editable grid is a grid of controls.
+
+     Every select carries an aria-label rather than a <label for>, and the label
+     names the row as well as the column. A <th scope="col"> establishes the
+     column for anything reading the table as a table and contributes nothing to
+     the accessible name of a control that has been tabbed to, so a column of
+     these otherwise announces as four unnamed comboboxes reading out numbers.
+
+     aria-label is also the only thing that works here, because the same four
+     lines are drawn twice — a table above md and cards below it — and one
+     for/id pair cannot serve two copies of one control. Two ids for one field
+     is how a label ends up pointing at the copy that is display:none.
+
+     The GST options are written out rather than looped. x-model writes the
+     model into the control while its own directives initialise, which is before
+     an x-for inside it has produced anything to select, so a looped list comes
+     up with nothing chosen — an empty box on a line that has a rate, and the
+     next click is somebody setting a value that was already there.
+
+     The rows take no hover fill. Nothing happens when the row is clicked — the
+     controls in it are what respond — and a band that lights up under a cursor
+     that can do nothing with it is a promise the row does not keep.
+
+     The total is the confirmation that the change landed, so the live region is
+     on the page from first paint with the figure already in it. The two visible
+     totals are ordinary text: only one of them is displayed at any width, and a
+     live region inside a display:none block announces nothing anyway. -->
+<div data-kui="select/cell" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       lines: [
+         { id: 'L1', code: 'ITM-1042', name: 'HDPE granules — natural', qty: '1,200 kg', base: 1044000, rate: '18' },
+         { id: 'L2', code: 'ITM-1091', name: 'Masterbatch — white 60%', qty: '250 kg', base: 61250, rate: '18' },
+         { id: 'L3', code: 'ITM-3310', name: 'M12 hex bolt — 8.8 zinc', qty: '4,000 nos', base: 96000, rate: '18' },
+         { id: 'L4', code: 'ITM-5140', name: 'Stretch film — 23 micron', qty: '300 kg', base: 52500, rate: '12' }
+       ],
+       amount(l) { return l.base + Math.round(l.base * Number(l.rate) / 100); },
+       get total() { return this.lines.reduce((s, l) => s + this.amount(l), 0); },
+       fmt(n) { return '₹' + n.toLocaleString('en-IN'); }
+     }">
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-1.5 font-medium">Item</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Quantity</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Taxable</th>
+        <th scope="col" class="w-28 px-3 py-1.5 font-medium">GST</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Line total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="l in lines" :key="l.id">
+        <tr class="border-b border-zinc-100">
+          <td class="px-3 py-1.5">
+            <span class="block" x-text="l.name"></span>
+            <span class="block text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code"></span>
+          </td>
+          <td class="px-3 py-1.5 text-right tabular-nums" x-text="l.qty"></td>
+          <td class="px-3 py-1.5 text-right tabular-nums" x-text="fmt(l.base)"></td>
+          <td class="px-3 py-1.5">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="l.rate" :aria-label="'GST rate for ' + l.name"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-7 pl-2 text-[13px]/5 tabular-nums outline-none">
+                <option value="0">0%</option>
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18">18%</option>
+                <option value="28">28%</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </td>
+          <td class="px-3 py-1.5 text-right font-medium tabular-nums" x-text="fmt(amount(l))"></td>
+        </tr>
+      </template>
+    </tbody>
+    <tfoot>
+      <tr class="bg-zinc-50">
+        <td colspan="4" class="px-3 py-2 text-right text-[12px]/4 font-medium text-zinc-600">Order value including GST</td>
+        <td class="px-3 py-2 text-right font-medium tabular-nums" x-text="fmt(total)"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- the same four lines at 390px. The select keeps its 34px and takes a width
+       of its own here, because a full-width control in a card reads as the
+       field the card is about rather than as one column of it. -->
+  <div class="divide-y divide-zinc-100 md:hidden">
+    <template x-for="l in lines" :key="l.id">
+      <div class="px-3 py-3">
+        <p class="text-[13px]/5 font-medium" x-text="l.name"></p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <span x-text="l.code"></span> · <span x-text="l.qty"></span> · <span x-text="fmt(l.base)"></span>
+        </p>
+        <div class="mt-2 flex items-center gap-3">
+          <div class="relative w-24 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select x-model="l.rate" :aria-label="'GST rate for ' + l.name"
+                    class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-7 pl-2 text-[13px]/5 tabular-nums outline-none">
+              <option value="0">0%</option>
+              <option value="5">5%</option>
+              <option value="12">12%</option>
+              <option value="18">18%</option>
+              <option value="28">28%</option>
+            </select>
+            <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-zinc-600">
+              <i data-lucide="chevron-down" class="size-3.5"></i>
+            </span>
+          </div>
+          <span class="ml-auto text-[13px]/5 font-medium tabular-nums" x-text="fmt(amount(l))"></span>
+        </div>
+      </div>
+    </template>
+
+    <div class="flex items-center justify-between gap-3 bg-zinc-50 px-3 py-2">
+      <span class="text-[12px]/4 font-medium text-zinc-600">Order value including GST</span>
+      <span class="text-[13px]/5 font-medium tabular-nums" x-text="fmt(total)"></span>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="'Order value including GST ' + fmt(total)"></p>
+</div>` },
+
       { id: 'rich', name: 'Listbox with two-line rows', code:
 `<!-- The case the native element cannot reach. An <option> holds text and
      nothing else — HTML inside one is stripped to its characters — and a second
@@ -2464,10 +4732,17 @@ register(
      wraps although the arrows clamp — clamped, r finds nothing from the bottom.
 
      A <label for> does not name a <button>, so the label is a span and the
-     trigger takes aria-labelledby with two ids. The trigger shows one line: the
-     second belongs to the list, and in the closed control it makes every field
-     in the form a different height. -->
-<div data-kui="select/rich" class="relative max-w-md"
+     trigger takes aria-labelledby with two ids. That replaces the accessible
+     name outright, so the help text under the control needs aria-describedby
+     or it is on screen and nowhere in the announcement. The trigger shows one
+     line: the second belongs to the list, and in the closed control it makes
+     every field in the form a different height.
+
+     The popup is positioned against a wrapper round the trigger alone, never
+     against the component root. top-full on the root measures from the bottom
+     of the help text, so the list opens a line and a half below the control it
+     belongs to and the two read as unrelated objects. -->
+<div data-kui="select/rich" class="max-w-md"
      x-data="{
        open: false, sel: 'sharma-extrusions', buf: '', timer: null,
        options: [
@@ -2518,63 +4793,65 @@ register(
 
   <span id="lb-vendor-label" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</span>
 
-  <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
-          aria-labelledby="lb-vendor-label lb-vendor-value"
-          @click="open ? close(false) : show()"
-          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
-          class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
-    <span class="flex min-w-0 flex-1 items-baseline gap-2">
-      <span id="lb-vendor-value" class="min-w-0 truncate text-[14px]/5" x-text="chosen ? chosen.label : 'Choose a vendor'"></span>
-      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="chosen ? chosen.code : ''"></span>
-    </span>
-    <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
-      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
-    </span>
-  </button>
+  <div class="relative">
+    <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
+            aria-labelledby="lb-vendor-label lb-vendor-value" aria-describedby="lb-vendor-help"
+            @click="open ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+            class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex min-w-0 flex-1 items-baseline gap-2">
+        <span id="lb-vendor-value" class="min-w-0 truncate text-[14px]/5" x-text="chosen ? chosen.label : 'Choose a vendor'"></span>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="chosen ? chosen.code : ''"></span>
+      </span>
+      <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+      <div x-ref="list" role="listbox" aria-labelledby="lb-vendor-label"
+           class="max-h-72 overflow-y-auto py-1"
+           @click="take($event.target.closest('[role=option]'))"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)"
+           @keydown.end.prevent="edge(true)"
+           @keydown.enter.prevent="commit()"
+           @keydown.space.prevent="buf ? type(' ') : commit()"
+           @keydown.tab="close(false)"
+           @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }">
+
+        <template x-for="o in options" :key="o.id">
+          <!-- the whole row gets one aria-label. Left alone it is read as a
+               single run: the name, then a GSTIN spelled out character by
+               character. The label is the name and the code; the rest is
+               aria-hidden and stays on screen for the people reading it. -->
+          <div role="option" tabindex="-1" :data-value="o.id" :data-label="o.label"
+               :aria-selected="o.id === sel" :aria-label="o.label + ', ' + o.code"
+               class="flex items-start gap-3 px-3 py-2 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="min-w-0 flex-1" aria-hidden="true">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="min-w-0 truncate text-[13px]/5 font-medium" x-text="o.label"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.code"></span>
+              </span>
+              <span class="mt-0.5 block truncate font-mono text-[12px]/4 text-zinc-500" x-text="o.gstin"></span>
+            </span>
+            <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+              <i data-lucide="check" class="size-4 text-zinc-600"></i>
+            </span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
 
   <!-- what actually posts. The field is still a ChoiceField on the server; only
        the widget changed, and only the server can say whether the id is real. -->
   <input type="hidden" name="vendor" :value="sel">
 
-  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Seven approved vendors. The GSTIN is on the row because two of them are called Sharma.</p>
-
-  <div x-show="open" x-cloak
-       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
-
-    <div x-ref="list" role="listbox" aria-labelledby="lb-vendor-label"
-         class="max-h-72 overflow-y-auto py-1"
-         @click="take($event.target.closest('[role=option]'))"
-         @keydown.arrow-down.prevent="move(1)"
-         @keydown.arrow-up.prevent="move(-1)"
-         @keydown.home.prevent="edge(false)"
-         @keydown.end.prevent="edge(true)"
-         @keydown.enter.prevent="commit()"
-         @keydown.space.prevent="buf ? type(' ') : commit()"
-         @keydown.tab="close(false)"
-         @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }">
-
-      <template x-for="o in options" :key="o.id">
-        <!-- the whole row gets one aria-label. Left alone it is read as a single
-             run: the name, then a GSTIN spelled out character by character. The
-             label is the name and the code; the rest is aria-hidden and stays on
-             screen for the people reading it. -->
-        <div role="option" tabindex="-1" :data-value="o.id" :data-label="o.label"
-             :aria-selected="o.id === sel" :aria-label="o.label + ', ' + o.code"
-             class="flex items-start gap-3 px-3 py-2 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
-          <span class="min-w-0 flex-1" aria-hidden="true">
-            <span class="flex items-baseline justify-between gap-3">
-              <span class="min-w-0 truncate text-[13px]/5 font-medium" x-text="o.label"></span>
-              <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.code"></span>
-            </span>
-            <span class="mt-0.5 block truncate font-mono text-[12px]/4 text-zinc-500" x-text="o.gstin"></span>
-          </span>
-          <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
-            <i data-lucide="check" class="size-4 text-zinc-600"></i>
-          </span>
-        </div>
-      </template>
-    </div>
-  </div>
+  <p id="lb-vendor-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Seven approved vendors. The GSTIN is on the row because two of them are called Sharma.</p>
 </div>` },
 
       { id: 'status', name: 'Listbox with a status dot', code:
@@ -2600,8 +4877,13 @@ register(
 
      Ticks drawn inside template x-for do not exist when createIcons() first
      runs, so the page needs the guarded re-hydration loop or they come up
-     empty. The x-show goes on the wrapping span, never on the <i>. -->
-<div data-kui="select/status" class="relative max-w-sm"
+     empty. The x-show goes on the wrapping span, never on the <i>.
+
+     The popup is positioned against a wrapper round the trigger, not against
+     the component root: top-full on the root measures from the bottom of the
+     line under the field, and the list then opens with a gap where nothing
+     is. -->
+<div data-kui="select/status" class="max-w-sm"
      x-data="{
        open: false, sel: 'accepted', buf: '', timer: null,
        options: [
@@ -2649,51 +4931,213 @@ register(
 
   <span id="lb-qc-label" class="mb-1.5 block text-[13px]/5 font-medium tabular-nums">QC disposition — GRN-24-0912, line 3</span>
 
-  <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
-          aria-labelledby="lb-qc-label lb-qc-value"
-          @click="open ? close(false) : show()"
-          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
-          class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
-    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full" :class="chosen ? chosen.dot : 'bg-zinc-400'"></span>
-    <span id="lb-qc-value" class="min-w-0 flex-1 truncate text-[14px]/5" x-text="chosen ? chosen.label : 'Not dispositioned'"></span>
-    <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
-      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
-    </span>
-  </button>
+  <div class="relative">
+    <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
+            aria-labelledby="lb-qc-label lb-qc-value" aria-describedby="lb-qc-help"
+            @click="open ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+            class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full" :class="chosen ? chosen.dot : 'bg-zinc-400'"></span>
+      <span id="lb-qc-value" class="min-w-0 flex-1 truncate text-[14px]/5" x-text="chosen ? chosen.label : 'Not dispositioned'"></span>
+      <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+      <div x-ref="list" role="listbox" aria-labelledby="lb-qc-label"
+           class="max-h-72 overflow-y-auto py-1"
+           @click="take($event.target.closest('[role=option]'))"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)"
+           @keydown.end.prevent="edge(true)"
+           @keydown.enter.prevent="commit()"
+           @keydown.space.prevent="buf ? type(' ') : commit()"
+           @keydown.tab="close(false)"
+           @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }">
+
+        <template x-for="o in options" :key="o.id">
+          <div role="option" tabindex="-1" :data-value="o.id" :data-label="o.label"
+               :aria-selected="o.id === sel" :aria-label="o.label + ' — ' + o.note"
+               class="flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full" :class="o.dot"></span>
+            <span class="min-w-0 flex-1 truncate text-[13px]/5" aria-hidden="true" x-text="o.label"></span>
+            <span class="shrink-0 text-[12px]/4 text-zinc-500" aria-hidden="true" x-text="o.note"></span>
+            <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+              <i data-lucide="check" class="size-4 text-zinc-600"></i>
+            </span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
 
   <input type="hidden" name="disposition" :value="sel">
 
-  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">450 kg of HDPE granules — natural, received 16 Aug 2026 against PO-24-1187.</p>
+  <p id="lb-qc-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">450 kg of HDPE granules — natural, received 16 Aug 2026 against PO-24-1187.</p>
+</div>` },
 
-  <div x-show="open" x-cloak
-       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+      { id: 'loading', name: 'A listbox whose rows arrive late', tagNew: true, code:
+`<!-- The rows are not in the page because they are not the page\'s to know. Cost
+     centres belong to finance, they open and close through the day, and a form
+     rendered at nine o\'clock would still be offering that list at four. So they
+     are fetched the first time the control is opened — late enough to be
+     current, and once, because a page lives for minutes and a request per
+     glance is a request too many.
 
-    <div x-ref="list" role="listbox" aria-labelledby="lb-qc-label"
-         class="max-h-72 overflow-y-auto py-1"
-         @click="take($event.target.closest('[role=option]'))"
-         @keydown.arrow-down.prevent="move(1)"
-         @keydown.arrow-up.prevent="move(-1)"
-         @keydown.home.prevent="edge(false)"
-         @keydown.end.prevent="edge(true)"
-         @keydown.enter.prevent="commit()"
-         @keydown.space.prevent="buf ? type(' ') : commit()"
-         @keydown.tab="close(false)"
-         @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }">
+     Nine rows is well inside listbox territory. What makes this variant is that
+     they are not there when the control is drawn, so the panel has three states
+     to draw that the lists above it never needed: loading, the request failed,
+     and the server answered with nothing.
 
-      <template x-for="o in options" :key="o.id">
-        <div role="option" tabindex="-1" :data-value="o.id" :data-label="o.label"
-             :aria-selected="o.id === sel" :aria-label="o.label + ' — ' + o.note"
-             class="flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
-          <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full" :class="o.dot"></span>
-          <span class="min-w-0 flex-1 truncate text-[13px]/5" aria-hidden="true" x-text="o.label"></span>
-          <span class="shrink-0 text-[12px]/4 text-zinc-500" aria-hidden="true" x-text="o.note"></span>
-          <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
-            <i data-lucide="check" class="size-4 text-zinc-600"></i>
-          </span>
-        </div>
-      </template>
+     Alpine owns open, the keyboard and the value; htmx owns the rows. The
+     custom event is what joins them, because the list opens from a click and
+     from Arrow Down and both have to fetch — hx-trigger="click once" would
+     leave a keyboard user opening an empty box for ever.
+
+     The panel opens before the rows exist and focus stays on the trigger until
+     there is something to put it on. Move it into an empty panel and a keyboard
+     user is standing in a box whose only exit is Escape, pressing arrow keys
+     that do nothing.
+
+     Because the rows came from the server there is no array to index into. The
+     keyboard reads the option elements out of the DOM on every move, and the
+     committed label is read off the row rather than looked up — an Alpine copy
+     of the list goes stale the moment the first response lands.
+
+     once has already been spent by the time a request fails, so the retry is a
+     second element carrying its own hx-get at the same URL and the same target.
+
+     aria-busy on the listbox is what says the empty box is filling rather than
+     empty, and the sr-only status is what says it out loud: a spinner is
+     announced by nothing at all.
+
+     The response is rows and nothing else — one delegated click handler lives
+     on the listbox, so the fragment carries data and no behaviour:
+
+         <div role="option" tabindex="-1" data-value="{{ c.code }}"
+              data-label="{{ c.name }}" aria-label="{{ c.name }}, {{ c.code }}"
+              class="flex items-start gap-3 px-3 py-2 hover:bg-zinc-100
+                     focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2
+                     focus:outline-zinc-700"> … </div> -->
+<div data-kui="select/loading" class="max-w-md"
+     x-data="{
+       open: false, state: 'idle', count: 0, sel: '', label: '', buf: '', timer: null,
+       rows() { return [...this.$refs.list.querySelectorAll('[role=option]')]; },
+       land(last = false) {
+         const r = this.rows();
+         if (!r.length) return;
+         const at = r.findIndex(el => el.dataset.value === this.sel);
+         (at > -1 ? r[at] : (last ? r[r.length - 1] : r[0]))?.focus();
+       },
+       show(last = false) {
+         this.open = true;
+         this.$refs.trigger.dispatchEvent(new CustomEvent('kui-open'));
+         this.$nextTick(() => requestAnimationFrame(() => this.land(last)));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false; this.buf = '';
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(step) {
+         const r = this.rows(), at = r.indexOf(document.activeElement);
+         r[Math.min(r.length - 1, Math.max(0, at + step))]?.focus();
+       },
+       edge(last) { const r = this.rows(); (last ? r[r.length - 1] : r[0])?.focus(); },
+       take(el) { if (!el) return; this.sel = el.dataset.value; this.label = el.dataset.label; this.close(); },
+       commit() { const a = document.activeElement; if (a) this.take(a.closest('[role=option]')); },
+       type(k) {
+         clearTimeout(this.timer);
+         this.timer = setTimeout(() => { this.buf = ''; }, 600);
+         this.buf += k.toLowerCase();
+         const r = this.rows(), at = r.indexOf(document.activeElement);
+         const from = this.buf.length > 1 ? Math.max(at, 0) : at + 1;
+         for (let i = 0; i < r.length; i++) {
+           const el = r[(from + i) % r.length];
+           if (el.dataset.label.toLowerCase().startsWith(this.buf)) { el.focus(); return; }
+         }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }"
+     @htmx:before-request.camel="state = 'loading'"
+     @htmx:after-swap.camel="count = rows().length; if (open) $nextTick(() => land())"
+     @htmx:after-request.camel="state = $event.detail.successful ? 'ready' : 'failed'">
+
+  <span id="lb-cc-label" class="mb-1.5 block text-[13px]/5 font-medium">Cost centre</span>
+
+  <div class="relative">
+    <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
+            aria-labelledby="lb-cc-label lb-cc-value" aria-describedby="lb-cc-help"
+            hx-get="/cost-centres/options/" hx-trigger="kui-open once"
+            hx-target="#lb-cc-list" hx-swap="innerHTML"
+            @click="open ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+            class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span id="lb-cc-value" class="min-w-0 flex-1 truncate text-[14px]/5" x-text="label || 'Choose a cost centre'"></span>
+      <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+      <!-- no whitespace inside, or empty:hidden never matches and the panel
+           keeps a 4px band of padding above every message below it -->
+      <div id="lb-cc-list" x-ref="list" role="listbox" aria-labelledby="lb-cc-label"
+           :aria-busy="state === 'loading'"
+           class="max-h-72 overflow-y-auto py-1 empty:hidden"
+           @click="take($event.target.closest('[role=option]'))"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)"
+           @keydown.end.prevent="edge(true)"
+           @keydown.enter.prevent="commit()"
+           @keydown.space.prevent="buf ? type(' ') : commit()"
+           @keydown.tab="close(false)"
+           @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }"></div>
+
+      <div x-show="state === 'loading'" x-cloak class="px-4 py-6 text-center">
+        <p class="flex items-center justify-center gap-2 text-[13px]/5 text-zinc-500">
+          <i data-lucide="loader-circle" class="size-4 shrink-0 animate-spin"></i>Loading cost centres
+        </p>
+      </div>
+
+      <div x-show="state === 'failed'" x-cloak class="px-4 py-6 text-center">
+        <p class="flex items-center justify-center gap-1.5 text-[13px]/5 font-medium text-red-600">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>The cost centre list did not load
+        </p>
+        <button type="button"
+                hx-get="/cost-centres/options/" hx-target="#lb-cc-list" hx-swap="innerHTML"
+                class="mt-2.5 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-ccw" class="size-4 text-zinc-600"></i>Try again
+        </button>
+      </div>
+
+      <div x-show="state === 'ready' && !count" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">No cost centre is open for Silvassa — Unit II</p>
+        <p class="mt-1 text-[12px]/4 text-zinc-500">Finance opens one against the plant before anything can be charged to it.</p>
+      </div>
     </div>
   </div>
+
+  <input type="hidden" name="cost_centre" :value="sel">
+
+  <p id="lb-cc-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Nine cost centres are open for Silvassa — Unit II. Two lines to a row, the code and what it pays for, which is why this is a listbox and not a select.
+  </p>
+
+  <p role="status" class="sr-only"
+     x-text="state === 'loading'
+               ? 'Loading cost centres'
+               : (state === 'failed'
+                   ? 'The cost centre list did not load'
+                   : (state === 'ready' ? count + ' cost centres' : ''))"></p>
 </div>` },
 
       { id: 'cascade', name: 'Options loaded by htmx', code:
@@ -2720,15 +5164,23 @@ register(
      An empty answer is a real answer: a vendor with no live contract sends one
      disabled option saying so, and the child stays required so nothing can be
      submitted past it. An empty fragment leaves a select with no options at
-     all, which is a 20px sliver nobody can explain. -->
+     all, which is a 20px sliver nobody can explain.
+
+     A request that fails swaps nothing, which is worse than an empty list: the
+     child is left holding the previous vendor\'s contracts under the new
+     vendor\'s name, and it looks exactly like an answer. failed locks it again
+     and says so where the count would have been. The retry is a button with an
+     hx-get of its own, and it is the one place hx-include is needed — a button
+     is not the field, so nothing carries the vendor for it the way the select
+     carries its own value. -->
 <div data-kui="select/cascade" class="max-w-md space-y-4"
-     x-data="{ vendor: '', loading: false, count: 0 }"
-     @htmx:before-request.camel="loading = true"
-     @htmx:after-request.camel="loading = false"
+     x-data="{ vendor: '', loading: false, failed: false, count: 0 }"
+     @htmx:before-request.camel="loading = true; failed = false"
+     @htmx:after-request.camel="loading = false; if (!$event.detail.successful) { failed = true; count = 0 }"
      @htmx:after-swap.camel="count = $refs.contract.querySelectorAll('option[data-live]').length">
 
   <div>
-    <label for="cs-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+    <label for="cs-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span aria-hidden="true" class="text-red-600">*</span></label>
     <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <select id="cs-vendor" name="vendor" required x-model="vendor"
               hx-get="/rate-contracts/options/" hx-trigger="change"
@@ -2747,11 +5199,11 @@ register(
   </div>
 
   <div>
-    <label for="cs-contract" class="mb-1.5 block text-[13px]/5 font-medium">Rate contract <span class="text-red-600">*</span></label>
+    <label for="cs-contract" class="mb-1.5 block text-[13px]/5 font-medium">Rate contract <span aria-hidden="true" class="text-red-600">*</span></label>
     <div class="relative rounded-lg border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
-         :class="!vendor || loading ? 'bg-zinc-100' : 'bg-white'">
+         :class="!vendor || loading || failed ? 'bg-zinc-200' : 'bg-white'">
       <select id="cs-contract" x-ref="contract" name="rate_contract" required
-              :disabled="!vendor || loading" aria-describedby="cs-contract-status"
+              :disabled="!vendor || loading || failed" aria-describedby="cs-contract-status"
               class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none disabled:text-zinc-400">
         <option value="" disabled selected hidden>Choose a vendor first</option>
       </select>
@@ -2766,16 +5218,111 @@ register(
       </span>
     </div>
 
-    <!-- in the document from first paint, outside anything x-show hides -->
-    <p id="cs-contract-status" role="status" class="mt-1.5 text-[12px]/4 tabular-nums"
-       :class="vendor && !loading && !count ? 'font-medium text-amber-700' : 'text-zinc-500'"
-       x-text="loading
-                 ? 'Loading rate contracts'
-                 : (!vendor
-                     ? 'Pick a vendor and its live rate contracts load here.'
-                     : (count
-                         ? count + ' live rate contracts for this vendor.'
-                         : 'No live rate contract for this vendor. Raise one before ordering.'))"></p>
+    <div class="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+      <!-- in the document from first paint, outside anything x-show hides -->
+      <p id="cs-contract-status" role="status" class="min-w-0 text-[12px]/4 tabular-nums"
+         :class="failed ? 'font-medium text-red-600' : (vendor && !loading && !count ? 'font-medium text-amber-700' : 'text-zinc-500')"
+         x-text="failed
+                   ? 'The rate contracts did not load.'
+                   : (loading
+                       ? 'Loading rate contracts'
+                       : (!vendor
+                           ? 'Pick a vendor and its live rate contracts load here.'
+                           : (count
+                               ? count + ' live rate contracts for this vendor.'
+                               : 'No live rate contract for this vendor. Raise one before ordering.')))"></p>
+
+      <button type="button" x-show="failed" x-cloak
+              hx-get="/rate-contracts/options/" hx-include="#cs-vendor"
+              hx-target="#cs-contract" hx-swap="innerHTML"
+              class="shrink-0 rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Try again
+      </button>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'autosave', name: 'Saved the moment it changes', tagNew: true, code:
+`<!-- htmx does the writing; Alpine does not fetch. There is no Save button and
+     no form, for the same reason the settings switch has neither: put one there
+     and half the users press it and half do not, and the two groups leave the
+     record in different states after the same gesture.
+
+     prev is what makes the revert honest. It is the value the server last
+     accepted rather than whatever is in the control, so a failed write puts the
+     field back to what the record actually says instead of to the choice that
+     failed two attempts ago. want is captured before the request so Try again
+     re-sends what the user asked for.
+
+     Nothing disables the select while the request is in flight. Disabling the
+     element that has focus drops focus to <body> and the next Tab restarts at
+     the top of the page, which happens to somebody who did nothing but change
+     one field. hx-sync="this:replace" does the work disabling was reaching for:
+     it drops a write still in flight, so two changes inside a second cannot
+     settle on the older reply.
+
+     hx-swap="none" because the field already looks the way it should — the
+     browser painted the new option the moment it was chosen. The response only
+     has to say whether it worked.
+
+     The status line is a role="status" on the page from first paint. The revert
+     is script writing .value, and a programmatic change is announced by nothing
+     at all: without the live region the only sign the write failed is a word in
+     a box changing back while nobody is looking at it.
+
+     There is no form here for htmx to read a CSRF token out of, so in Django
+     the card carries hx-headers with the token in it and the view is a small
+     @require_POST endpoint that answers 204. Both are in the django variant. -->
+<div data-kui="select/autosave" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-3.5"
+     x-data="{ state: 'idle', prev: 'ritu', want: '' }"
+     @htmx:before-request.camel="want = $refs.sel.value; state = 'saving'"
+     @htmx:after-request.camel="
+       if ($event.detail.successful) { prev = want; state = 'saved' }
+       else { $refs.sel.value = prev; state = 'failed' }">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+    <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187</p>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Gujarat Polymers Ltd · ₹18,42,000 · due 04 Sep 2026</p>
+  </div>
+
+  <div class="mt-3">
+    <label for="as-buyer" class="mb-1.5 block text-[13px]/5 font-medium">Buyer</label>
+
+    <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <select id="as-buyer" x-ref="sel" name="buyer" aria-describedby="as-buyer-status"
+              hx-post="/orders/PO-24-1187/buyer/" hx-trigger="change"
+              hx-swap="none" hx-sync="this:replace"
+              class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+        <option value="ritu" selected>Ritu Deshpande</option>
+        <option value="anand">Anand Kulkarni</option>
+        <option value="farida">Farida Shaikh</option>
+        <option value="vivek">Vivek Rane</option>
+      </select>
+      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </div>
+
+    <p id="as-buyer-status" role="status" class="mt-1.5 text-[12px]/4">
+      <span x-show="state === 'idle'" class="tabular-nums text-zinc-500">Assigned 16 Aug 2026, 11:04 by Ritu Deshpande</span>
+
+      <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+      </span>
+
+      <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+      </span>
+
+      <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the buyer is unchanged
+        </span>
+        <button type="button"
+                @click="$refs.sel.value = want; $refs.sel.dispatchEvent(new Event('change'))"
+                class="rounded-sm font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Try again</button>
+      </span>
+    </p>
   </div>
 </div>` },
 
@@ -2815,6 +5362,20 @@ register(
 
          def __init__(self, *args, **kwargs):
              super().__init__(*args, **kwargs)
+             # A record can hold a value the live choices no longer contain — a
+             # blocked vendor, an expired contract. ChoiceField cannot render
+             # what is not in choices, so the field comes up on the first option
+             # and an untouched save moves the order to a vendor nobody chose.
+             # Put the current value back so it can be drawn, and refuse it in
+             # clean_vendor: the widget draws, the validator says no.
+             self.withdrawn = None
+             current = self.initial.get('vendor')
+             if current and current not in {v for v, _ in VENDOR_CHOICES}:
+                 self.withdrawn = current
+                 self.fields['vendor'].choices = [
+                     ('No longer available', [(current, Vendor.label_for(current))]),
+                     ('Approved vendors', VENDOR_CHOICES)]
+
              # aria-invalid and aria-describedby cannot be decided in the
              # template — the widget attrs are fixed before it renders — and
              # this is the only place that knows both the errors and the ids.
@@ -2823,6 +5384,16 @@ register(
                  attrs['aria-describedby'] = bf.auto_id + ('-err' if bf.errors else '-help')
                  if bf.errors:
                      attrs['aria-invalid'] = 'true'
+
+         def clean_vendor(self):
+             # The option was added so the draft could show its own value, not
+             # so it could be saved again. Rendering it and validating it are
+             # two different questions and only this one reaches the database.
+             value = self.cleaned_data['vendor']
+             if value == self.withdrawn:
+                 raise forms.ValidationError(
+                     'This vendor is blocked. Choose another before releasing the order.')
+             return value
 
      widgets.py
          class PlaceholderSelect(forms.Select):
@@ -2844,20 +5415,41 @@ register(
              # the fragment only: options, and nothing around them
              return render(request, 'orders/_contract_options.html', {'rows': rows})
 
+         @require_POST
+         def order_buyer(request, number):
+             # The autosave variant\'s endpoint. One field, one URL, and a 204
+             # so nothing is swapped — the browser painted the new option the
+             # moment it was chosen, and anything 4xx or 5xx is what puts it
+             # back. ChoiceField is doing the same job here as in the form: it
+             # is the only thing between a POST anybody can forge and the row.
+             order = get_object_or_404(PurchaseOrder, number=number)
+             form = BuyerForm(request.POST)
+             if not form.is_valid():
+                 return HttpResponseBadRequest()
+             order.buyer_id = form.cleaned_data['buyer']
+             order.save(update_fields=['buyer_id'])
+             return HttpResponse(status=204)
+
      urls.py
          path('rate-contracts/options/', views.contract_options,
               name='contract-options'),
+         path('orders/<str:number>/buyer/', views.order_buyer, name='order-buyer'),
 
      The widget renders the <select> and only the <select>. The wrapper, the
      chevron and the focus outline are template markup, so {{ form.vendor }} on
      its own is never the whole field — which is the one thing that catches
-     everybody who has used a crispy-forms style renderer before. -->
+     everybody who has used a crispy-forms style renderer before.
+
+     A select that posts on its own, outside a form, has no CSRF token to find,
+     so the card round it carries one:
+
+         <div hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'> … </div> -->
 <form data-kui="select/django" method="post" class="max-w-md space-y-5">
   {% csrf_token %}
 
   <div>
     <label for="{{ form.vendor.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
-      {{ form.vendor.label }} <span class="text-red-600">*</span>
+      {{ form.vendor.label }} <span aria-hidden="true" class="text-red-600">*</span>
     </label>
 
     <div class="relative rounded-lg bg-white {% if form.vendor.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
@@ -2885,7 +5477,7 @@ register(
     <p id="{{ form.plant.auto_id }}-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
   </div>
 
-  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Raise order
   </button>
 </form>
@@ -2912,20 +5504,27 @@ register(
     notes: [
       'Give the control block. A textarea is inline-block by default, so it sits on a text baseline and leaves a 5px strip of wrapper below it that looks like a rendering bug.',
       'Set the height with rows, never with an h- class. h-[100px] against a 20px leading is 4.2 lines, and the fifth line is sliced in half along its x-height.',
-      'Preflight already sets resize: vertical, so resize-y is redundant and resize-x is a layout bug waiting to happen. The only resize class worth writing is resize-none, on a box whose height is owned by script.',
+      'Preflight already sets resize: vertical, so resize-y is redundant and resize-x is a layout bug waiting to happen. The only resize class worth writing is resize-none, on a box whose height is owned by script or whose row has to keep lining up with the rows around it.',
       'Never leave a read-only box white, bordered and ringed. It is then pixel for pixel an editable field, and the only way to find out otherwise is to click into it and get nothing back. Read-only takes bg-zinc-200, the same locked surface disabled uses, and drops the resting ring. It keeps a focus outline: read-only is still in the tab order precisely so the value can be copied, and a keyboard user has to see where they have landed.',
+      'A read-only body that exists to be copied out of gets a copy button, not select-on-focus. Selecting on focus fights the mouse: the click that starts a drag through half a paragraph also fires focus, which selects the lot and throws the drag away. It is no better for the keyboard, which is left holding a selection it still has to copy.',
       'Enter inserts a newline. Never bind Enter to submit — the one key someone needs to write a second line must not post the form.',
       'maxlength truncates a paste in silence. Use it only when the limit is the column width, and say the number in the help text before it is reached; otherwise count past the limit and block the submit, so the user can see what has to go.',
       'Set the height back to auto before reading scrollHeight, or an auto-growing box grows and never shrinks — scrollHeight cannot report less than the height already set.',
       'Re-measure an auto-growing box on resize. Its height was computed at whatever width it had when it was first painted, and that is the wrong height at 390px.',
+      'Canned text goes in through the state the control is bound to, never by writing element.value. x-model keeps the string it had, so the counter, the disabled submit and everything else reading that state stays one insert behind — and the next keystroke writes the stale value back over the line that was just inserted.',
+      'A remark saved to the server on its own is saved by a button. A keystroke debounce writes half a sentence into an audit trail every time the writer stops to think, and the one save that fails does it silently while the typing carries on over the top of it.',
+      'Never swap the textarea itself. A save comes back while the caret is still in the box, and replacing the element throws away the caret, the scroll position, the undo stack and everything typed since the request left. Swap the status line under it, or nothing at all.',
+      'Nothing about the box breaks at 390px — it is full width at every size. Its furniture does. A keyboard hint goes below sm because a phone has no Ctrl key, an action row reverses into full-width buttons, and a two-column line-item row stacks so the note stays under the item it belongs to.',
       'The counter is tabular-nums. Proportional digits change width as they count and the label beside them shifts on every keystroke.'
     ],
     anatomy: [
       ['Wrapper', 'The bordered box, and what owns the focus ring. Same as the input, which is why a footer row can sit inside the ring.'],
       ['Control', 'A borderless, transparent, block-level textarea with outline-none. Its height comes from rows.'],
-      ['Label row', 'The label on the left, the counter on the right, on one line above the box, so the counter costs no vertical space.'],
+      ['Label row', 'The label on the left, the counter or a copy button on the right, on one line above the box, so neither costs any vertical space.'],
       ['Counter', '11px mono tabular-nums, counting down. zinc-500, amber-700 inside the last 20, red-600 once it is over.'],
       ['Footer', 'An optional row inside the ring: a hint on the left, the submit on the right. This is what the wrapper border buys.'],
+      ['Action row', 'Cancel and the primary under the box and outside the ring, for a box that is one field of a form rather than the whole feature. Reversed into full-width buttons below sm.'],
+      ['Canned lines', 'A row of buttons above the box that insert a starting sentence. Buttons rather than a select, because what is posted is the box after it has been edited.'],
       ['Help or error', '12px under the box. The error replaces the help text rather than stacking under it, exactly as in Field.']
     ],
     behaviour: [
@@ -2933,13 +5532,18 @@ register(
       'Enter inserts a newline and never submits. Where a submit shortcut is genuinely wanted, it is Ctrl or Cmd plus Enter, and it is written in the hint rather than left to be discovered.',
       'The counter counts down, not up: what is left is the number the writer is deciding against. It turns amber inside the last 20 characters and red once it is over, and the submit disables while it is over.',
       'An auto-growing box grows with its content up to a ceiling, then stops and scrolls. Without the ceiling a long paste pushes the submit button off the screen.',
-      'Resize is vertical only, so a textarea can never be dragged wider than the form it sits in. An auto-growing box drops the handle entirely, because script and the drag would fight over the same height.',
+      'Resize is vertical only, so a textarea can never be dragged wider than the form it sits in. An auto-growing box drops the handle entirely, because script and the drag would fight over the same height, and so does a box in a grid of equal rows, where one box dragged taller reflows every row under it.',
+      'Where the buttons go says who they belong to. Inside the ring they belong to the field, and the field is the whole feature — one box, one verb. Under the box they belong to the form, and there is something else in it. A post button drawn inside the ring of one field in a multi-field form claims to post that field alone, and the first person who fills the box, skips the checkbox under it and presses the button finds out otherwise.',
+      'The primary goes off while the box is empty, because there is nothing to send. Cancel never does: the way out of a form must not depend on what is in it.',
+      'A canned line is a starting point and not the value. It is inserted on a new line under whatever is already there, never over it, and focus moves into the box with the caret at the end of it, because editing what has just arrived is the next thing that happens.',
       'Read-only and disabled share one locked surface, bg-zinc-200 with no resting ring, because both are boxes you cannot type into. Only read-only takes a focus outline, because only read-only is focusable. The text is what separates them: zinc-900 for read-only, whose value still matters and still has to be copyable, zinc-400 for disabled, whose value does not. A read-only field left white, bordered and ringed says nothing at all until someone clicks into it and nothing happens.'
     ],
     a11y: [
       'A real label bound with for/id. A placeholder is not a label, and in a box this size it disappears the moment anyone starts typing.',
+      'A column of identical fields takes its name from the row, not from the field. Six controls all called Note are six controls nobody can tell apart in a list of form fields, and the item code is the only thing that separates them — so the item code is what the sr-only label says.',
       'aria-describedby points at the help text, at the error when there is one, and at the counter, so the limit is announced with the field and not left as a number floating beside it.',
       'The visible counter is aria-hidden and mirrored in a polite live region that stays empty until the last 20 characters, then updates on a debounce. Announcing a count on every keystroke makes the field unusable with a screen reader.',
+      'Text that arrives in the box by script — a canned line, a template, a paste made on the user\'s behalf — is announced by nothing at all. Say what was inserted in a polite live region, or a screen reader user is left with a box that silently grew.',
       'Over the limit sets aria-invalid on the control, and the reason is real text under the box, not a colour and not a title attribute.',
       'Never a contenteditable div. A real textarea brings keyboard support, IME composition, spellcheck, undo and form submission with it, and none of that is worth reimplementing.',
       'The focus ring sits on the wrapper via focus-within, so it stays visible against both white and zinc-100 and never leaves the footer row outside it.'
@@ -2960,28 +5564,112 @@ register(
 
       { id: 'sizes', name: 'Sizes', code:
 `<!-- Three heights, and rows is what sets all three. A pixel height cuts the
-     last line in half: h-[100px] against a 20px leading is 4.2 lines. -->
+     last line in half: h-[100px] against a 20px leading is 4.2 lines.
+
+     Each label is the name of the field and nothing else, and the sentence
+     saying what the height is for sits under the box as help text tied on with
+     aria-describedby. A label that carries its own explanation becomes the
+     control's accessible name, so the field is announced as "Two rows — a
+     remark inside a table row or a dialog, edit text" and the name is longer
+     than the value it is naming. -->
 <div data-kui="textarea/sizes" class="max-w-xl space-y-5">
   <div>
-    <label for="ta-2" class="mb-1.5 block text-[13px]/5 font-medium">Two rows — a remark inside a table row or a dialog</label>
+    <label for="ta-2" class="mb-1.5 block text-[13px]/5 font-medium">Short remark</label>
     <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <textarea id="ta-2" rows="2" class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">Short shipped by 40 kg, balance promised Friday.</textarea>
+      <textarea id="ta-2" rows="2" aria-describedby="ta-2-help"
+                class="block w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">Short shipped by 40 kg, balance promised Friday.</textarea>
     </div>
+    <p id="ta-2-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Two rows — a remark inside a table row or a dialog.</p>
   </div>
 
   <div>
-    <label for="ta-4" class="mb-1.5 block text-[13px]/5 font-medium">Four rows — the default for a form field</label>
+    <label for="ta-4" class="mb-1.5 block text-[13px]/5 font-medium">Delivery address</label>
     <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <textarea id="ta-4" rows="4" class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">Konspec Industries
+      <textarea id="ta-4" rows="4" aria-describedby="ta-4-help"
+                class="block w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">Konspec Industries
 Plot 214, Silvassa Industrial Estate
 Dadra &amp; Nagar Haveli 396230</textarea>
     </div>
+    <p id="ta-4-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Four rows — the default for a form field.</p>
   </div>
 
   <div>
-    <label for="ta-10" class="mb-1.5 block text-[13px]/5 font-medium">Ten rows — the page is the field</label>
+    <label for="ta-10" class="mb-1.5 block text-[13px]/5 font-medium">Scope of work</label>
     <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <textarea id="ta-10" rows="10" class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none" placeholder="Scope of work"></textarea>
+      <textarea id="ta-10" rows="10" aria-describedby="ta-10-help" placeholder="What the contractor is being asked to do"
+                class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
+    </div>
+    <p id="ta-10-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Ten rows — the page is the field.</p>
+  </div>
+</div>` },
+
+      { id: 'dense', name: 'Dense, one per line item', tagNew: true, code:
+`<!-- Three of these on an amendment screen, and on a real order thirty. The
+     comfortable field is the wrong one at that count: four rows and a 14px body
+     per line turns a six-line order into a page that has to be scrolled before
+     it can be read. Two rows, 13px and half the padding, and the whole order
+     fits in one view.
+
+     The label is sr-only and names the item, not the field. Thirty visible
+     "Note" labels down a column would be thirty controls with the same
+     accessible name and no way to tell them apart in a list of form fields —
+     the item code is the only thing that separates them, so the item code is
+     the name.
+
+     resize-none, because the drag handle is the wrong affordance in a grid of
+     equal rows: one box dragged taller reflows every row under it and the
+     column stops lining up. The box that is meant to grow is autogrow.
+
+     Two columns above sm and one below, which is why the item is a block of its
+     own rather than a table cell — at 390px it stacks and the item stays
+     directly above the note that belongs to it. -->
+<div data-kui="textarea/dense" class="max-w-2xl rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Amend PO-24-1187</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Gujarat Polymers Ltd · 3 lines · ₹2,47,600</p>
+  </div>
+
+  <div class="divide-y divide-zinc-100">
+    <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">HDPE-BLM-45</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">1,200 kg · ₹1,04,400</p>
+      </div>
+      <div>
+        <label for="td-1" class="sr-only">Amendment note for HDPE-BLM-45</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <textarea id="td-1" name="note-1" rows="2" placeholder="Why this line changed"
+                    class="block w-full resize-none bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">Rate revised to ₹87.00 per kg after the August discount lapsed.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">LDPE-FLM-12</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">400 kg · ₹38,800</p>
+      </div>
+      <div>
+        <label for="td-2" class="sr-only">Amendment note for LDPE-FLM-12</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <textarea id="td-2" name="note-2" rows="2" placeholder="Why this line changed"
+                    class="block w-full resize-none bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">Quantity cut to 400 kg — the vendor cannot hold the balance past 04 Sep 2026.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-2 px-4 py-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:gap-4">
+      <div class="min-w-0">
+        <p class="truncate text-[13px]/5 font-medium tabular-nums">PP-RCP-08</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">900 kg · ₹1,04,400</p>
+      </div>
+      <div>
+        <label for="td-3" class="sr-only">Amendment note for PP-RCP-08</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <textarea id="td-3" name="note-3" rows="2" placeholder="Why this line changed"
+                    class="block w-full resize-none bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500"></textarea>
+        </div>
+      </div>
     </div>
   </div>
 </div>` },
@@ -3003,7 +5691,7 @@ Dadra &amp; Nagar Haveli 396230</textarea>
      }"
      x-effect="say(left <= 20 ? msg : '')">
   <div class="mb-1.5 flex items-baseline justify-between gap-3">
-    <label for="ta-reason" class="text-[13px]/5 font-medium">Reason for revision <span class="text-red-600">*</span></label>
+    <label for="ta-reason" class="text-[13px]/5 font-medium">Reason for revision <span aria-hidden="true" class="text-red-600">*</span></label>
     <span id="ta-reason-count" aria-hidden="true"
           class="shrink-0 font-mono text-[11px]/4 tabular-nums" :class="tone" x-text="msg"></span>
   </div>
@@ -3011,14 +5699,14 @@ Dadra &amp; Nagar Haveli 396230</textarea>
   <div class="rounded-lg bg-white border"
        :class="over ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
                     : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
-    <textarea id="ta-reason" name="reason" rows="4" x-model="text"
+    <textarea id="ta-reason" name="reason" rows="4" x-model="text" required
               :aria-invalid="over ? 'true' : null"
               aria-describedby="ta-reason-help ta-reason-count"
               class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none"></textarea>
   </div>
 
   <p id="ta-reason-help" class="mt-1.5 text-[12px]/4" :class="over ? 'font-medium text-red-600' : 'text-zinc-500'">
-    <span x-show="!over">Goes on the amendment record, visible to the vendor. 180 characters.</span>
+    <span x-show="!over" class="tabular-nums">Goes on the amendment record, visible to the vendor. 180 characters.</span>
     <span x-show="over" x-cloak class="flex items-center gap-1.5">
       <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Too long to fit on the amendment record.
     </span>
@@ -3051,22 +5739,28 @@ Dadra &amp; Nagar Haveli 396230</textarea>
   <label for="ta-grow" class="mb-1.5 block text-[13px]/5 font-medium">Inspection remarks</label>
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <textarea id="ta-grow" name="remarks" x-ref="ta" rows="2" @input="grow()"
+              aria-describedby="ta-grow-help"
               placeholder="Type — the box follows"
-              class="block max-h-54 w-full resize-none overflow-y-auto bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">Material received against GRN-24-0912.
+              class="block max-h-54 w-full resize-none overflow-y-auto bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none placeholder:text-zinc-500">Material received against GRN-24-0912.
 Two bundles show mill scale on the outer face.
 Held pending the test certificate.</textarea>
   </div>
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Stops growing at 10 rows and scrolls after that.</p>
+  <p id="ta-grow-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Stops growing at 10 rows and scrolls after that.</p>
 </div>` },
 
       { id: 'toolbar', name: 'With a footer', code:
 `<!-- The footer sits inside the ring, which is the whole reason the border is on
      the wrapper and not on the control. Ctrl or Cmd plus Enter posts; a bare
-     Enter writes a newline, because that is what the key is for. -->
-<div data-kui="textarea/toolbar" class="max-w-xl" x-data="{ text: '' }">
+     Enter writes a newline, because that is what the key is for.
+
+     The root is the form. A type="submit" button in a div submits nothing at
+     all — no error, no console message — and Ctrl-Enter, which works by
+     clicking that button, goes quiet with it. -->
+<form data-kui="textarea/toolbar" method="post" class="max-w-xl" x-data="{ text: '' }">
   <div class="rounded-xl border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <label for="ta-note" class="sr-only">Add a note to this order</label>
     <textarea id="ta-note" name="body" rows="3" x-model="text"
+              aria-describedby="ta-note-hint"
               @keydown.ctrl.enter="if (text.trim()) $refs.post.click()"
               @keydown.meta.enter="if (text.trim()) $refs.post.click()"
               placeholder="Add a note for whoever picks this up next"
@@ -3074,7 +5768,7 @@ Held pending the test certificate.</textarea>
 
     <div class="flex items-center justify-between gap-3 px-3.5 pb-3 pt-1.5">
       <span class="min-w-0 text-[12px]/4 text-zinc-500">
-        Visible to everyone on this order
+        <span id="ta-note-hint">Visible to everyone on this order</span>
         <!-- a phone has no Ctrl key, so the hint goes rather than truncates -->
         <span class="hidden sm:inline">
           <kbd class="ml-1 rounded border border-zinc-200 bg-zinc-100 px-1 py-0.5 font-mono text-[10px]/3 text-zinc-600">Ctrl</kbd>
@@ -3082,18 +5776,136 @@ Held pending the test certificate.</textarea>
         </span>
       </span>
       <button type="submit" x-ref="post" :disabled="!text.trim()"
-              class="inline-flex h-8 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400">
+              class="inline-flex h-8 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
         Post note
       </button>
     </div>
   </div>
+</form>` },
+
+      { id: 'actions', name: 'Cancel and post under the box', tagNew: true, code:
+`<!-- The other place the buttons can go, and the choice is not cosmetic. The
+     footer variant puts them inside the ring because there the field is the
+     whole feature: one box, one verb, and the wrapper border is the edge of the
+     thing being acted on. Here the box is one field of a form — there is a
+     checkbox under it that decides who gets emailed — so the buttons belong to
+     the form and sit outside the ring. Draw a Post button inside the ring of
+     one field in a multi-field form and it says it posts that field; the first
+     person who writes the comment, leaves the checkbox alone and presses it
+     finds out that it did not.
+
+     For the same reason there is no Ctrl-Enter shortcut here. A keyboard post
+     from inside the box would jump the checkbox that sits between the box and
+     the button, which is exactly the field the shortcut cannot see.
+
+     Cancel is never disabled. The primary goes off while the box is empty
+     because there is nothing to send, but the way out of a form must not depend
+     on what is in it. Cancel empties the box here; in a panel it closes the
+     panel, and it is the same button in the same place either way. Where
+     leaving throws away a paragraph somebody typed, the two-press arm from
+     button/confirm goes on this button — it belongs to the button and not to
+     the field, which is why it is not written out again here.
+
+     Below sm the row reverses into a column and both buttons go full width,
+     primary on top. Two 36px buttons side by side at 390px are two thumb-wide
+     targets with a gap between them that is also thumb-wide. -->
+<form data-kui="textarea/actions" method="post" class="max-w-xl" x-data="{ text: '' }">
+  <label for="ta-act" class="mb-1.5 block text-[13px]/5 font-medium">Internal comment</label>
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <textarea id="ta-act" name="body" rows="4" x-ref="body" x-model="text"
+              aria-describedby="ta-act-help"
+              placeholder="What the buyer needs to know before this goes back to the vendor"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
+  </div>
+  <p id="ta-act-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Internal to Konspec. The vendor never sees this.</p>
+
+  <label class="mt-3 flex items-start gap-2.5 py-1 text-[14px]/5">
+    <input type="checkbox" name="notify" value="buyer" checked
+           class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+    <span>Email Ritu Deshpande when it is posted</span>
+  </label>
+
+  <div class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    <button type="button" @click="text = ''; $refs.body.focus()"
+            class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Cancel
+    </button>
+    <button type="submit" :disabled="!text.trim()"
+            class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
+      Post comment
+    </button>
+  </div>
+</form>` },
+
+      { id: 'template', name: 'Starting from a canned reason', tagNew: true, code:
+`<!-- A rejection reason has to be specific enough to answer a query three
+     months later, and nobody writes that at half past five. The canned lines
+     are a starting point the writer then edits, and that is why they are
+     buttons that insert text rather than a select that sets the value: what
+     gets posted is the box, and the whole point of the box is that it no longer
+     says what the button said.
+
+     The insert goes through the Alpine state, never through t.value. Writing
+     the element directly leaves x-model holding the string it had before, so
+     the next keystroke writes that stale string back over the line that was
+     just inserted — and the field looks like it lost a paragraph on its own.
+
+     It appends on a new line rather than replacing. A button that silently
+     discards a paragraph somebody typed is a button they press exactly once.
+
+     Focus moves into the box with the caret at the end. The caret is set in
+     $nextTick because before Alpine has written the new value, setSelectionRange
+     is measuring the length of the old one and the caret lands mid-sentence.
+
+     Text arriving in a textarea by script is announced by nothing, so the
+     sr-only live region names the line that was added. -->
+<div data-kui="textarea/template" class="max-w-xl"
+     x-data="{
+       text: '',
+       said: '',
+       reasons: [
+         { key: 'Moisture', line: 'Moisture measured at 0.21% against a limit of 0.15% on the incoming lot.' },
+         { key: 'Melt flow', line: 'Melt flow index 1.6 g/10 min, outside the agreed band of 0.8 to 1.2.' },
+         { key: 'Damage in transit', line: 'Four bags torn on arrival, so contamination of the lot cannot be ruled out.' },
+         { key: 'No test certificate', line: 'Mill test certificate for heat 2026-B-114 did not arrive with the consignment.' }
+       ],
+       use(r) {
+         this.text = this.text.trim() ? this.text.trim() + '\\n' + r.line : r.line;
+         this.said = r.key + ' added — edit it before sending';
+         const t = this.$refs.body;
+         t.focus();
+         this.$nextTick(() => t.setSelectionRange(t.value.length, t.value.length));
+       }
+     }">
+  <label for="ta-tpl" class="mb-1.5 block text-[13px]/5 font-medium">Reason for rejecting lot 24-0912 <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div role="group" aria-labelledby="ta-tpl-lead" class="mb-1.5 flex flex-wrap items-center gap-1.5">
+    <span id="ta-tpl-lead" class="text-[12px]/4 text-zinc-500">Start from</span>
+    <template x-for="r in reasons" :key="r.key">
+      <button type="button" @click="use(r)" x-text="r.key"
+              class="inline-flex h-7 items-center rounded-lg border border-zinc-200 bg-white px-2.5 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></button>
+    </template>
+  </div>
+
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <textarea id="ta-tpl" name="reason" rows="5" x-ref="body" x-model="text" required
+              aria-describedby="ta-tpl-help"
+              placeholder="What was wrong with the lot, measured against what"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none placeholder:text-zinc-500"></textarea>
+  </div>
+
+  <p id="ta-tpl-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Goes on the QC record and on the debit note. Edit the line until it says what was actually measured.
+  </p>
+
+  <span class="sr-only" aria-live="polite" x-text="said"></span>
 </div>` },
 
       { id: 'error', name: 'With error', code:
 `<div data-kui="textarea/error" class="max-w-xl">
-  <label for="ta-bad" class="mb-1.5 block text-[13px]/5 font-medium">Rejection reason <span class="text-red-600">*</span></label>
+  <label for="ta-bad" class="mb-1.5 block text-[13px]/5 font-medium">Rejection reason <span aria-hidden="true" class="text-red-600">*</span></label>
   <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
-    <textarea id="ta-bad" name="reason" rows="4" aria-invalid="true" aria-describedby="ta-bad-err"
+    <textarea id="ta-bad" name="reason" rows="4" required aria-invalid="true" aria-describedby="ta-bad-err"
               class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none"></textarea>
   </div>
   <!-- the error replaces the help text, it does not stack under it -->
@@ -3122,11 +5934,167 @@ Held pending the test certificate.</textarea>
     <label for="ta-ro" class="mb-1.5 block text-[13px]/5 font-medium">Vendor reply</label>
     <div class="rounded-lg border border-zinc-200 bg-zinc-200">
       <textarea id="ta-ro" rows="3" readonly
-                class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Balance 40 kg dispatched on 18 August by Gati, LR 4471029.
+                class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Balance 40 kg dispatched on 18 August by Gati, LR 4471029.
 Test certificate follows by email.</textarea>
     </div>
   </div>
 </div>` },
+
+      { id: 'copy', name: 'A locked body you copy out of', tagNew: true, code:
+`<!-- The vendor's reply, pasted into the record by whoever read the email, and
+     read here by three people who will each need a line of it somewhere else —
+     a debit note, a reply, the transporter's complaint. So it is read-only
+     rather than disabled: disabled drops the box out of the tab order and, in
+     more than one browser, out of reach of a selection as well, which means the
+     one thing this box exists for cannot be done at all.
+
+     The copy button rather than select-on-focus. Selecting the whole value when
+     the box takes focus fights the mouse — the click that starts a drag through
+     one paragraph also fires focus, which selects the lot and throws the drag
+     away — and it does nothing for a keyboard user, who is still holding a
+     selection they have to copy by hand.
+
+     Both words of the button live in one grid cell, so the label row does not
+     jump three pixels when Copy becomes Copied. Neither carries aria-hidden:
+     invisible is visibility:hidden, which takes the hidden string out of the
+     accessibility tree too, so the button is always named by whichever of the
+     two is showing.
+
+     The two icons are spans with x-show rather than one bound <i>.
+     createIcons() replaces that node with an <svg> and anything bound on it
+     goes with it.
+
+     No resize-none. The reply is longer than six rows and the handle is the
+     cheapest way to see the rest of it without scrolling a box inside a page
+     that also scrolls. -->
+<div data-kui="textarea/copy" class="max-w-xl"
+     x-data="{ done: false, t: null,
+               copy() { navigator.clipboard?.writeText(this.$refs.body.value);
+                        this.done = true;
+                        clearTimeout(this.t);
+                        this.t = setTimeout(() => this.done = false, 2000) } }">
+  <div class="mb-1.5 flex items-center justify-between gap-3">
+    <label for="ta-copy" class="text-[13px]/5 font-medium tabular-nums">Vendor reply · 18 Aug 2026</label>
+    <button type="button" @click="copy()"
+            class="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span x-show="!done"><i data-lucide="copy" class="size-3.5"></i></span>
+      <span x-show="done" x-cloak><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+      <span class="grid">
+        <span class="col-start-1 row-start-1" :class="done && 'invisible'">Copy</span>
+        <span class="col-start-1 row-start-1" :class="!done && 'invisible'">Copied</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="rounded-lg border border-zinc-200 bg-zinc-200">
+    <textarea id="ta-copy" x-ref="body" rows="6" readonly aria-describedby="ta-copy-help"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Balance 40 kg of HDPE-BLM-45 was dispatched on 18 Aug 2026 by Gati,
+LR 4471029, against your PO-24-1187.
+
+Mill test certificate for heat 2026-B-114 follows by email today.
+Rate holds at ₹87.00 per kg until 30 Sep 2026, per our quotation of
+02 Aug 2026.
+
+Mahesh Patel
+Gujarat Polymers Ltd</textarea>
+  </div>
+
+  <p id="ta-copy-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Recorded by Ritu Deshpande on 18 Aug 2026. It cannot be edited here — corrections go on a new remark.
+  </p>
+
+  <span class="sr-only" aria-live="polite" x-text="done ? 'Vendor reply copied' : ''"></span>
+</div>` },
+
+      { id: 'htmx', name: 'Saving to the server', tagNew: true, code:
+`<!-- A remark that belongs to the record rather than to a form: nothing else on
+     the screen is being submitted, so this box saves itself.
+
+     It saves on a button and not on a keystroke debounce. An autosave on a
+     textarea writes a half-finished sentence into the approval trail every time
+     the writer stops to think, and the one write that fails does it silently
+     while the typing carries on over the top of it.
+
+     hx-swap="none" is the important attribute. The response arrives while the
+     caret is still in the box, so a swap that touched the textarea would throw
+     away the caret, the scroll position, the undo stack and every character
+     typed since the request left. The server only has to say whether it worked;
+     the box already shows what was typed.
+
+     hx-sync="this:replace" abandons a save still in flight, so two presses a
+     second apart cannot land out of order and leave the record holding the
+     older text. That is also why the button is not disabled while the request
+     runs: a button that goes grey mid-save says you cannot do this, when the
+     truth is that you already have.
+
+     Alpine owns the state machine rather than hx-indicator, because the status
+     line needs four states and htmx offers one class. htmx:after-request fires
+     on failure, timeout and abort as well as success, which is the property
+     that matters — it is the three endings a hand-written busy flag is still
+     spinning through.
+
+     A failure changes nothing in the box. Unlike a toggle, the value here is
+     the writer's own sentences, and reverting them is the one unrecoverable
+     thing this component could do.
+
+     Under Django the CSRF token goes on the form as a hidden input, or on the
+     request as hx-headers — see the django variant. -->
+<form data-kui="textarea/htmx" class="max-w-xl"
+      hx-post="/orders/PO-24-1187/remark/" hx-swap="none" hx-sync="this:replace"
+      x-data="{
+        text: '', saved: '', state: 'idle',
+        get dirty() { return this.text.trim() !== this.saved; },
+        get line() {
+          if (this.state === 'saving') return 'saving';
+          if (this.state === 'failed') return 'failed';
+          if (this.dirty) return 'dirty';
+          return this.state === 'saved' ? 'done' : 'idle';
+        }
+      }"
+      @htmx:before-request.camel="state = 'saving'"
+      @htmx:after-request.camel="
+        if ($event.detail.successful) { saved = text.trim(); state = 'saved' }
+        else { state = 'failed' }">
+  <label for="ta-hx" class="mb-1.5 block text-[13px]/5 font-medium">Approval remark</label>
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <textarea id="ta-hx" name="remark" rows="4" x-model="text"
+              aria-describedby="ta-hx-state"
+              placeholder="Why this order is being approved above the rate contract"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
+  </div>
+
+  <div class="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+    <p id="ta-hx-state" role="status" class="min-w-0 text-[12px]/4">
+      <span x-show="line === 'idle'" class="tabular-nums text-zinc-500">Not saved yet. The remark goes on the approval record for PO-24-1187.</span>
+
+      <span x-show="line === 'dirty'" x-cloak class="text-zinc-500">Unsaved changes</span>
+
+      <span x-show="line === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+      </span>
+
+      <span x-show="line === 'done'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved to the approval record
+      </span>
+
+      <span x-show="line === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — what you wrote is still here
+        </span>
+        <button type="button" @click="$refs.save.click()"
+                class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Try again</button>
+      </span>
+    </p>
+
+    <button type="submit" x-ref="save" :disabled="!dirty"
+            class="inline-flex h-8 shrink-0 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
+      <span class="grid">
+        <span class="col-start-1 row-start-1" :class="state === 'saving' && 'invisible'">Save remark</span>
+        <span class="col-start-1 row-start-1" :class="state !== 'saving' && 'invisible'">Saving…</span>
+      </span>
+    </button>
+  </div>
+</form>` },
 
       { id: 'django', name: 'Django form field', code:
 `<!-- The border being on the wrapper is what keeps the error state in the
@@ -3148,6 +6116,24 @@ Test certificate follows by email.</textarea>
                  })
              }
 
+         def __init__(self, *args, **kwargs):
+             super().__init__(*args, **kwargs)
+             attrs = self.fields['body'].widget.attrs
+             attrs['aria-describedby'] = self['body'].auto_id + '_desc'
+             if self.is_bound and self['body'].errors:
+                 attrs['aria-invalid'] = 'true'
+
+     The description id is built from auto_id, so it is set on the widget rather
+     than written in the template, and aria-invalid comes from whether the field
+     has errors on this render — never from a hardcoded attribute. Both run
+     after super(), which is what makes is_bound and errors answerable at all.
+
+     Help and error share the one id because only one of them ever renders: the
+     error replaces the help text rather than stacking under it, so a single
+     constant id always points at whichever line is on the page. Give them
+     separate ids and the widget attr has to be rewritten per render to pick
+     between them, which is the __init__ this wrapper exists to avoid.
+
      A max_length on the model renders as maxlength on the widget, which
      truncates a paste in silence. Either drop it from the widget and let
      clean() reject the value with a message, or say the number in help_text
@@ -3156,7 +6142,7 @@ Test certificate follows by email.</textarea>
   {% csrf_token %}
   <div>
     <label for="{{ form.body.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
-      {{ form.body.label }}{% if form.body.field.required %} <span class="text-red-600">*</span>{% endif %}
+      {{ form.body.label }}{% if form.body.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
     </label>
 
     <div class="rounded-lg bg-white {% if form.body.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
@@ -3164,15 +6150,15 @@ Test certificate follows by email.</textarea>
     </div>
 
     {% if form.body.errors %}
-      <p class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
+      <p id="{{ form.body.auto_id }}_desc" class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
         <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>{{ form.body.errors.0 }}
       </p>
     {% elif form.body.help_text %}
-      <p class="mt-1.5 text-[12px]/4 text-zinc-500">{{ form.body.help_text }}</p>
+      <p id="{{ form.body.auto_id }}_desc" class="mt-1.5 text-[12px]/4 text-zinc-500">{{ form.body.help_text }}</p>
     {% endif %}
   </div>
 
-  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Post note</button>
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Post note</button>
 </form>` }
     ]
   },
@@ -3194,7 +6180,12 @@ Test certificate follows by email.</textarea>
       'Never write outline-none on a box. The focus-within halo that text fields use is a wrapper trick; a 3px ring around a 16px square lands on top of the square and reads as a smudge. Keep the UA ring, and where a whole tile has to show focus put it on the tile with has-[:focus-visible].',
       'A select-all means this page, not the query behind it. Say the number out loud — "5 of 5 on this page" — and make selecting the other 4,312 a separate, deliberate click. A bulk approve that quietly took every match is not recoverable by pressing Undo.',
       'Paint the selected row with has-[:checked] rather than a second copy of the state, so the tint cannot disagree with the box. Guard the hover tint with [&:not(:has(:checked))] while you are there: hover and selected are one class each at equal specificity, so without the guard which one wins on a hovered selected row is decided by the order Tailwind emits the variants in.',
-      'Never render the same rows twice with the same name — the desktop table and the stacked cards below md are both in the DOM, one of them display:none, and a display:none checkbox still posts. Either the boxes carry no name and the selection is Alpine state, as it is here, or one list is rendered and restyled.'
+      'Never render the same rows twice with the same name — the desktop table and the stacked cards below md are both in the DOM, one of them display:none, and a display:none checkbox still posts. Either the boxes carry no name and the selection is Alpine state, as it is here, or one list is rendered and restyled.',
+      'A parent box over a subtree is the select-all rule one level down: no name, no value, and the leaves are what post. It also fixes what a ticked parent means — the children that exist now, not a standing subscription to the group, so an item added under it in October does not quietly join a report somebody set up in August. If the intent is everything under here for ever, that is a value of its own with a name on it.',
+      'disabled on a fieldset locks every control inside it with one attribute, which is what keeps it from falling out of step with a list somebody adds a line to. It also disables every listed element in there, <input type="hidden"> included, so a value that must still reach the server sits outside the fieldset — inside it, it stops posting and nothing on the form says so. The exception is the first legend, whose controls stay live; an action parked there is the one thing on a frozen form that still works.',
+      'A long list of flags goes in columns-2, never grid-cols-2. Multi-column fills the first column to the bottom before starting the second, so the order the eye takes down the page and the order Tab takes are the same list; a grid lays the same DOM across the rows, and from the second item on the two disagree. Each label takes break-inside-avoid, or a column boundary is allowed to fall between a box and its text.',
+      'A box in a grid cell has no name of its own. Row and column headers are announced when a screen reader walks a table and not when it tabs through the controls in one, which is how anybody filling in a permission matrix moves, so every cell carries an aria-label naming both axes. Three or four role columns is the ceiling: each one costs the width of its heading and the row label pays, so a fifth role is a second matrix rather than a sideways scroll.',
+      'A box that writes on change is a record of work done, not a setting — a setting that takes effect the moment it is touched is a toggle. Give every row its own request state: one flag on the list means two boxes ticked a second apart share a status line, and the second answer overwrites the first. Do not disable the box while its own request is in flight either; disabling the focused element drops focus to the body and loses a keyboard user their place in the list. hx-sync="this:replace" is what keeps two writes in order.'
     ],
     anatomy: [
       ['Box', 'A real input type="checkbox", size-4 accent-zinc-700 shrink-0. No wrapper, no appearance-none, no substitute.'],
@@ -3203,7 +6194,10 @@ Test certificate follows by email.</textarea>
       ['Group', 'A fieldset with a legend, one name repeated across the options, and one help line under the whole group rather than one under every row.'],
       ['Select-all', 'A box with no name and no value of its own. It reads all, some or none off the count, and writes indeterminate back through script.'],
       ['Selected row', 'bg-zinc-200 through has-[:checked], so the tint is the box\'s own state and not a second copy of it.'],
-      ['Bulk bar', 'The strip above the rows once something is selected: how many, what will happen to them, and the way back out.']
+      ['Bulk bar', 'The strip above the rows once something is selected: how many, what will happen to them, and the way back out.'],
+      ['Parent box', 'A box over a subtree with its children indented to pl-[26px] below it. Same rules as the select-all — no name, no value, indeterminate written by script.'],
+      ['Matrix cell', 'A box in a table cell, named by an aria-label carrying its row and its column, because the cell gives it neither.'],
+      ['Row status', 'The 12px line under a box that writes on change: when it was recorded, or that it is saving, saved, or not saved and why. role="status", one per row.']
     ],
     behaviour: [
       'Clicking anywhere on the label toggles the box, so the target is the whole row and not the 16px square. Text merely sitting beside the box leaves a target that misses on a phone.',
@@ -3212,7 +6206,9 @@ Test certificate follows by email.</textarea>
       'The selection is an array of record ids on the component root, so the count, the row tint and the bulk bar cannot drift apart, and re-sorting the rows does not lose it.',
       'The bulk bar appears only once something is selected, names the number it will act on, and is x-cloaked so it is not on screen for the first frame.',
       'A group posts its name once for every ticked box and not at all when none are ticked. The difference between "none of them" and "the field was never on this form" comes from the form definition on the server, never from the request.',
-      'A disabled option keeps its place in the list rather than disappearing, so a policy locking one does not change the shape of a set people have learned to scan.'
+      'A disabled option keeps its place in the list rather than disappearing, so a policy locking one does not change the shape of a set people have learned to scan.',
+      'A box that gates a submit disables the button in the markup and binds it as well. The binding on its own leaves the button live from first paint until Alpine boots, which is long enough for somebody who runs the screen forty times a day to press it.',
+      'A tick that writes on change paints first and reconciles after: the box has already moved when the request leaves, and a failure puts it back and says so beside the box it belongs to. The outcome stays on the row rather than going into a toast, because it is a fact about the record and the row is where anyone will look for it.'
     ],
     a11y: [
       'Every box has a name of its own. In a register that is aria-label naming the record — "Select PO-24-1187" — because twelve boxes all called "Select" say nothing about which row the cursor is on.',
@@ -3221,7 +6217,9 @@ Test certificate follows by email.</textarea>
       'No box carries outline-none. The UA focus ring is the only indicator that survives forced-colours mode, and on a 16px control there is no room to draw a better one.',
       'Disabled uses the disabled attribute, which drops the box out of the Tab order and out of the POST. There is no read-only checkbox — readonly does nothing on one — so a value that must not change is rendered as text, and one that must still be submitted gets a hidden input beside it.',
       'The selected count is plain text and not a live region. The box announces its own state on every toggle already; a live count makes that two announcements per keystroke and a stream of them on a shift-click.',
-      'An error is real text under the group, referenced with aria-describedby, and a required single box carries both required and aria-invalid. A red asterisk on its own is decoration.'
+      'An error is real text under the group, referenced with aria-describedby, and a required single box carries both required and aria-invalid. A red asterisk on its own is decoration.',
+      'The visible words beside a box are part of its accessible name, so an aria-label that does not contain them breaks voice control, which matches on what is on screen. A select-all with the words "All 5 lines" next to it is named by them; aria-label belongs to the box that has no visible text at all — the one in a table header, and the one in a matrix cell.',
+      'The reason a submit is off is text under the button, never a tooltip on it. A disabled control fires no pointer events and takes no focus, so the tooltip never opens, a title reaches nobody and an aria-describedby on it is never read.'
     ],
     related: ['radio', 'toggle', 'table'],
     variants: [
@@ -3294,11 +6292,11 @@ Test certificate follows by email.</textarea>
 
   <div class="flex items-center justify-between gap-3 border-b border-zinc-200 pb-2">
     <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
-      <input type="checkbox" aria-label="Select all four lines"
+      <input type="checkbox"
              :checked="every" x-effect="$el.indeterminate = some"
              @change="toggleAll($event.target.checked)"
              class="size-4 shrink-0 accent-zinc-700">
-      <span>All lines</span>
+      <span class="tabular-nums">All 4 lines</span>
     </label>
     <!-- the count sits outside the label, or it becomes part of the box's name
          and is read back in full on every toggle -->
@@ -3329,11 +6327,123 @@ Test certificate follows by email.</textarea>
   </div>
 </fieldset>` },
 
+      { id: 'nested', name: 'Parents and children', tagNew: true, code:
+`<!-- A parent over a subtree is the select-all again, one level down: no name,
+     no value, nothing of its own in the POST. The leaves are the answer and the
+     parent is a shortcut for ticking them.
+
+     Which fixes what a ticked parent means — these children, now. It is not a
+     standing rule about the category, so an item group added under Raw material
+     in October does not quietly join a report somebody set up in August. Where
+     the intent really is everything under here, for ever, that is a value of its
+     own with a name, not a parent box read back off its children.
+
+     One level of nesting. The children indent to pl-[26px], the offset help
+     text already uses, so the subtree lines up with its parent's text rather
+     than with its box. A second level costs another 26px of a 390px screen and
+     the labels start wrapping every other word.
+
+     x-effect sits on each parent box rather than on the fieldset: $refs is not
+     populated when the root initialises, and indeterminate has to be written by
+     script on every render because there is no attribute for it. -->
+<fieldset data-kui="checkbox/nested" class="max-w-xl"
+          x-data="{
+            tree: {
+              raw: ['hdpe', 'ldpe', 'mb'],
+              packing: ['liners', 'cartons'],
+              spares: ['screws', 'heaters']
+            },
+            sel: ['hdpe', 'ldpe', 'liners'],
+            every(g) { return this.tree[g].every(v => this.sel.includes(v)); },
+            some(g) { return this.tree[g].some(v => this.sel.includes(v)) && !this.every(g); },
+            toggle(g, on) {
+              const rest = this.sel.filter(v => !this.tree[g].includes(v));
+              this.sel = on ? [...rest, ...this.tree[g]] : rest;
+            }
+          }">
+  <legend class="mb-2 text-[13px]/5 font-medium">Item groups in the reorder report</legend>
+
+  <div class="space-y-3">
+    <div>
+      <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
+        <input type="checkbox" :checked="every('raw')" x-effect="$el.indeterminate = some('raw')"
+               @change="toggle('raw', $event.target.checked)"
+               class="size-4 shrink-0 accent-zinc-700">
+        <span>Raw material</span>
+      </label>
+      <div class="mt-2 space-y-2 pl-[26px]">
+        <label class="flex items-center gap-2.5 text-[13px]/5">
+          <input type="checkbox" name="group" value="hdpe" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 truncate">HDPE granules</span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">142 items</span>
+        </label>
+        <label class="flex items-center gap-2.5 text-[13px]/5">
+          <input type="checkbox" name="group" value="ldpe" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 truncate">LDPE granules</span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">88 items</span>
+        </label>
+        <label class="flex items-center gap-2.5 text-[13px]/5">
+          <input type="checkbox" name="group" value="mb" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 truncate">Masterbatch and additives</span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">37 items</span>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
+        <input type="checkbox" :checked="every('packing')" x-effect="$el.indeterminate = some('packing')"
+               @change="toggle('packing', $event.target.checked)"
+               class="size-4 shrink-0 accent-zinc-700">
+        <span>Packing</span>
+      </label>
+      <div class="mt-2 space-y-2 pl-[26px]">
+        <label class="flex items-center gap-2.5 text-[13px]/5">
+          <input type="checkbox" name="group" value="liners" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 truncate">PE liners</span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">12 items</span>
+        </label>
+        <label class="flex items-center gap-2.5 text-[13px]/5">
+          <input type="checkbox" name="group" value="cartons" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 truncate">Corrugated cartons</span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">24 items</span>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
+        <input type="checkbox" :checked="every('spares')" x-effect="$el.indeterminate = some('spares')"
+               @change="toggle('spares', $event.target.checked)"
+               class="size-4 shrink-0 accent-zinc-700">
+        <span>Machine spares</span>
+      </label>
+      <div class="mt-2 space-y-2 pl-[26px]">
+        <label class="flex items-center gap-2.5 text-[13px]/5">
+          <input type="checkbox" name="group" value="screws" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 truncate">Screws and barrels</span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">9 items</span>
+        </label>
+        <label class="flex items-center gap-2.5 text-[13px]/5">
+          <input type="checkbox" name="group" value="heaters" x-model="sel" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 truncate">Heater bands</span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">31 items</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-[12px]/4 tabular-nums text-zinc-500"
+     x-text="sel.length + ' of 7 groups — the report runs over the items in them on the day it runs'"></p>
+</fieldset>` },
+
       { id: 'cards', name: 'Option tiles', code:
 `<!-- No Alpine at all. :has() paints the tile from the box's own state, so the
      tint can never disagree with what is ticked, and has-[:focus-visible] puts
-     the focus indication where it can actually be seen — a 3px halo drawn round
-     a 16px square lands on top of the square.
+     the outline where there is room to draw it — 3px round a 16px square lands
+     on top of the square. It is an outline and not a ring for the reason every
+     focus style in this system is: forced-colours mode drops box-shadow, so a
+     ring is the one indicator guaranteed to vanish for the people who need it.
 
      The hover tint carries the [&:not(:has(:checked))] guard: hover and selected
      are one class each at equal specificity, and without it which one paints a
@@ -3342,7 +6452,7 @@ Test certificate follows by email.</textarea>
   <legend class="mb-2 text-[13px]/5 font-medium">Send with the vendor email</legend>
 
   <div class="grid gap-2 sm:grid-cols-3">
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="checkbox" name="enclose" value="po" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">Purchase order</span>
@@ -3350,7 +6460,7 @@ Test certificate follows by email.</textarea>
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="checkbox" name="enclose" value="drawings" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">Drawing set</span>
@@ -3358,7 +6468,7 @@ Test certificate follows by email.</textarea>
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="checkbox" name="enclose" value="contract" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">Rate contract extract</span>
@@ -3378,7 +6488,7 @@ Test certificate follows by email.</textarea>
   <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
     <h3 class="text-[13px]/5 font-medium">Vendor</h3>
     <button type="button" x-show="sel.length" x-cloak @click="sel = []"
-            class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600 underline underline-offset-2">
+            class="shrink-0 text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       Clear <span x-text="sel.length"></span>
     </button>
   </div>
@@ -3424,6 +6534,97 @@ Test certificate follows by email.</textarea>
        x-text="sel.length ? sel.length + ' of 6 vendors' : 'No vendor filter · all 1,438 orders'"></p>
   </div>
 </div>` },
+
+      { id: 'dense', name: 'Many flags at once', tagNew: true, code:
+`<!-- Fourteen flags on an item master, and the only question density raises is
+     the order they are read in.
+
+     columns-2, not grid-cols-2. Multi-column fills the first column to the
+     bottom before it starts the second, so the order the eye takes down the
+     page and the order Tab takes are the same list. A two-column grid lays the
+     same DOM out across the rows instead, and from the second item on, the
+     keyboard and the eye are somewhere different — which nobody notices until
+     they tab past the flag they were reading.
+
+     break-inside-avoid on every label, because a column boundary is allowed to
+     fall inside one: the box ends up at the foot of the left column and its
+     text at the head of the right.
+
+     Density comes out of the gaps and never out of the target. py-1 on a 20px
+     line is a 28px row, which still clears the 24px WCAG 2.2 asks for; take the
+     padding off to fit two more flags on screen and the target is the 16px box
+     on its own. One column below sm, where two of them leave 170px each and
+     every second label wraps.
+
+     No help text under any of them. Fourteen explanations is a page nobody
+     reads — the flags that need one are worth a sentence in the group line at
+     the foot, and the rest are worth naming properly instead. -->
+<fieldset data-kui="checkbox/dense" class="max-w-2xl">
+  <legend class="mb-2 text-[13px]/5 font-medium tabular-nums">Flags on HDPE granules — M60075</legend>
+
+  <div class="sm:columns-2 sm:gap-x-10">
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="batch_tracked" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Batch tracked</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="inspect_on_receipt" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Inspect on receipt</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="coa_required" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Certificate of analysis required</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="serial" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Serial numbered</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="partial_receipt" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Partial receipt allowed</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="over_receipt" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Over-receipt allowed</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="negative_stock" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Negative stock allowed</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="auto_reorder" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Reorder automatically</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="cycle_count" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>In the cycle count</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="msds" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>MSDS travels with the despatch</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="subcontract" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Issued to subcontractors</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="weigh_on_despatch" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Weigh on despatch</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="blocked_purchase" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Blocked for new purchase orders</span>
+    </label>
+    <label class="flex break-inside-avoid items-start gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" name="flag" value="blocked_sale" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Blocked for sale</span>
+    </label>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">
+    Flags apply everywhere the item is used, including on the 6 open orders against it.
+  </p>
+</fieldset>` },
 
       { id: 'table', name: 'Row selection', code:
 `<!-- Selection is an array of PO numbers on the root, and the row tint is
@@ -3473,13 +6674,13 @@ Test certificate follows by email.</textarea>
       <span x-show="scope === 'query'" x-cloak>All 4,312 matching orders selected</span>
     </span>
     <div class="flex flex-wrap items-center gap-2">
-      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">Export</button>
-      <button type="button" class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Cancel orders</button>
+      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export</button>
+      <button type="button" class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel orders</button>
     </div>
     <button type="button" x-show="every && scope === 'page'" x-cloak @click="scope = 'query'"
-            class="text-[13px]/5 tabular-nums text-zinc-900 underline underline-offset-2">Select all 4,312 matching orders</button>
-    <button type="button" @click="clear()" class="ml-auto shrink-0 text-[13px]/5 text-zinc-600 underline underline-offset-2">Clear</button>
+            class="text-[13px]/5 tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Select all 4,312 matching orders</button>
+    <button type="button" @click="clear()" class="ml-auto shrink-0 text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
   </div>
 
   <table class="hidden w-full text-[13px]/5 md:table">
@@ -3581,7 +6782,7 @@ Test certificate follows by email.</textarea>
        sideways scroll, and the select-all comes with them. -->
   <div class="border-b border-zinc-200 px-4 py-2.5 md:hidden">
     <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
-      <input type="checkbox" aria-label="Select all 5 orders on this page"
+      <input type="checkbox"
              :checked="every" x-effect="$el.indeterminate = some"
              @change="page($event.target.checked)"
              class="size-4 shrink-0 accent-zinc-700">
@@ -3687,6 +6888,121 @@ Test certificate follows by email.</textarea>
   </ul>
 </div>` },
 
+      { id: 'matrix', name: 'Roles across permissions', tagNew: true, code:
+`<!-- A box in a grid cell has no name of its own. Row and column headers are
+     announced when a screen reader walks a table, and not when it tabs through
+     the controls inside one — which is how anybody using this screen will move
+     — so every box carries an aria-label saying both axes: "Approve over
+     ₹5,00,000 — Approver". Without it eighteen boxes announce as "checkbox".
+
+     Three columns is the ceiling. Every role column costs the width of its
+     heading, and the permission column is the one that pays: past three or four
+     the row label wraps to four lines on a phone. A fourth role is a second
+     matrix on the page, not a sideways scroll.
+
+     There is no row tint here, and no has-[:checked] on the tr. A matrix row is
+     not a selected row — it holds three separate answers, and painting the row
+     from one of them says the whole row is on. The hover band is the only thing
+     that tracks the eye across, which is what a grid this wide is for.
+
+     Viewing comes with every role and is not editable here, so those three
+     boxes are ticked and disabled. Disabled posts nothing, and nothing needs to
+     be posted: the server does not read view off this form. A value that has to
+     travel while it cannot be changed needs a hidden input — see states. -->
+<div data-kui="checkbox/matrix" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full text-[13px]/5">
+    <caption class="border-b border-zinc-200 px-3 py-2.5 text-left text-[13px]/5 font-medium sm:px-4">
+      What each role may do with purchase orders
+    </caption>
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-2.5 text-left font-medium sm:px-4">Permission</th>
+        <th scope="col" class="px-2 py-2.5 font-medium">Buyer</th>
+        <th scope="col" class="px-2 py-2.5 font-medium">Approver</th>
+        <th scope="col" class="px-2 py-2.5 font-medium">Stores</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal text-zinc-600 sm:px-4">View the register</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="View the register — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="View the register — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="View the register — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-4">Raise an order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="raise:buyer" checked aria-label="Raise an order — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="raise:approver" aria-label="Raise an order — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="raise:stores" aria-label="Raise an order — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal tabular-nums sm:px-4">Approve to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_5l:buyer" aria-label="Approve to ₹5,00,000 — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_5l:approver" checked aria-label="Approve to ₹5,00,000 — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_5l:stores" aria-label="Approve to ₹5,00,000 — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal tabular-nums sm:px-4">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_over:buyer" aria-label="Approve over ₹5,00,000 — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_over:approver" aria-label="Approve over ₹5,00,000 — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_over:stores" aria-label="Approve over ₹5,00,000 — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-4">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="grn:buyer" aria-label="Post a GRN — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="grn:approver" aria-label="Post a GRN — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="grn:stores" checked aria-label="Post a GRN — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-4">Cancel an order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="cancel:buyer" aria-label="Cancel an order — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="cancel:approver" checked aria-label="Cancel an order — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="cancel:stores" aria-label="Cancel an order — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="border-t border-zinc-200 px-3 py-2.5 text-[12px]/4 tabular-nums text-zinc-500 sm:px-4">
+    Viewing the register comes with the role and is set on the role, not here. Orders over ₹20,00,000 go to the plant head whatever this grid says.
+  </p>
+</div>` },
+
       { id: 'states', name: 'Disabled, locked and invalid', code:
 `<div data-kui="checkbox/states" class="max-w-xl space-y-5">
   <!-- disabled: out of the Tab order and out of the POST -->
@@ -3728,7 +7044,7 @@ Test certificate follows by email.</textarea>
       <input type="checkbox" id="cb-declare" name="declared" required
              aria-invalid="true" aria-describedby="cb-declare-err"
              class="mt-0.5 size-4 shrink-0 accent-zinc-700">
-      <span class="tabular-nums">I have counted this material against GRN-24-0912 <span class="text-red-600">*</span></span>
+      <span class="tabular-nums">I have counted this material against GRN-24-0912 <span aria-hidden="true" class="text-red-600">*</span></span>
     </label>
     <p id="cb-declare-err" class="mt-1 flex items-start gap-1.5 pl-[26px] text-[12px]/4 font-medium text-red-600">
       <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>
@@ -3736,6 +7052,248 @@ Test certificate follows by email.</textarea>
     </p>
   </div>
 </div>` },
+
+      { id: 'locked', name: 'Frozen because the record is posted', tagNew: true, code:
+`<!-- disabled on the fieldset, not on eight boxes. One attribute locks every
+     control inside it, and it cannot fall out of step with the list the way
+     eight copies of the same attribute do the first time somebody adds a check.
+
+     What that attribute also does is disable every listed element in there,
+     including <input type="hidden">. So the three values that still have to
+     reach the server sit above the fieldset rather than beside the boxes they
+     belong to — inside it they are as absent from the POST as the boxes are,
+     and a hidden input that silently stops posting is not a thing anyone finds
+     by reading the form.
+
+     The other exception is the first legend: controls in it stay live. That is
+     occasionally what you want, and it is a trap when it is not — an action
+     parked in the legend is the one thing on a frozen form that still works.
+     This legend holds text.
+
+     The checks keep their shape instead of being rendered as a list of ticks.
+     states is right that a value which can never change on this form is text,
+     but this one is frozen by the document being posted rather than by policy:
+     the same page is live for the next GRN, and a form that rearranges itself
+     by status is a different form every time somebody opens it.
+
+     The reason is on screen, at the top, before the grey. A page of disabled
+     controls with nothing saying why is the most-reported fault in every
+     internal application, and the report is always "the form does not work". -->
+<form data-kui="checkbox/locked" method="post" class="max-w-xl rounded-xl border border-zinc-300 bg-white">
+  <!-- posted values that still travel, deliberately outside the disabled fieldset -->
+  <input type="hidden" name="qc_cleared" value="1">
+  <input type="hidden" name="weighbridge" value="1">
+  <input type="hidden" name="damage" value="0">
+
+  <div class="flex items-start gap-2.5 border-b border-zinc-200 px-4 py-2.5">
+    <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+    <p class="text-[12px]/4 tabular-nums text-zinc-600">
+      Posted 04 Sep 2026, 16:20 by Anil Kulkarni. The checks are part of the posted document — a correction goes on a debit note against Gujarat Polymers Ltd, not here.
+    </p>
+  </div>
+
+  <fieldset disabled class="px-4 py-3">
+    <legend class="mb-2 text-[13px]/5 font-medium text-zinc-500 tabular-nums">Checks recorded on GRN-24-0912</legend>
+    <div class="space-y-2">
+      <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+        <input type="checkbox" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>QC cleared against the certificate of analysis</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+        <input type="checkbox" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="tabular-nums">Weighbridge slip attached — 2,945 kg net</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5 text-zinc-500">
+        <input type="checkbox" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Damage or shortage noted on the challan</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- still live, and outside the fieldset because that is the only thing that
+       keeps it live -->
+  <div class="border-t border-zinc-200 px-4 py-3">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" name="email_vendor" value="1" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Email the posted GRN to Gujarat Polymers Ltd</span>
+    </label>
+    <button type="submit" class="mt-3 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Send a copy</button>
+  </div>
+</form>` },
+
+      { id: 'acknowledge', name: 'What the button is waiting for', tagNew: true, code:
+`<!-- The submit is written disabled in the markup and bound as well. The
+     binding alone leaves it live from first paint until Alpine boots, which is
+     long enough for somebody who runs this screen forty times a day to press
+     it, and the declaration is the whole point of the screen.
+
+     disabled and not aria-disabled, because the button is off for the reason a
+     disabled attribute is for: the form has not been filled in yet, and the
+     empty box is the explanation. aria-disabled is for a control that is off
+     because of who you are or what state the record is in, where there is
+     something to say and it has to stay reachable to say it.
+
+     Which is why the reason here is plain text under the button rather than a
+     tooltip on it. A disabled control fires no pointer events and takes no
+     focus, so a tooltip on it never opens, a title reaches nobody, and an
+     aria-describedby pointing at it is never read.
+
+     required on the box as well, so the refusal survives with script off, and
+     the view refuses too. Both of those are advice to the browser; the POST is
+     not obliged to take either.
+
+     One box, so no fieldset. A declaration is one field, not a set. -->
+<form data-kui="checkbox/acknowledge" method="post" x-data="{ ack: false }"
+      class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+  <h3 class="text-[16px]/6 font-semibold tabular-nums">Release DC-24-0455 to the gate</h3>
+  <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+    Sharma Extrusions · 12 cartons · e-way bill 3819 4471 2205 · vehicle MH-04-DQ-1182
+  </p>
+
+  <label class="mt-4 flex items-start gap-2.5 text-[14px]/5">
+    <input type="checkbox" id="cb-ack" name="verified" value="1" required x-model="ack"
+           aria-describedby="cb-ack-help"
+           class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+    <span>The e-way bill matches the invoice and the vehicle standing at the gate</span>
+  </label>
+  <p id="cb-ack-help" class="mt-1 pl-[26px] text-[12px]/4 text-zinc-500">
+    Recorded against your name. It is what a transit check reads back if the vehicle is stopped.
+  </p>
+
+  <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+    <button type="submit" disabled :disabled="!ack"
+            class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">Release</button>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500 sm:text-right">
+    <span x-show="!ack">Release is off until the check is declared.</span>
+    <span x-show="ack" x-cloak class="tabular-nums">Releasing prints the gate pass and closes DC-24-0455.</span>
+  </p>
+</form>` },
+
+      { id: 'htmx', name: 'Ticked and saved', tagNew: true, code:
+`<!-- A checklist against one document, where each tick is written the moment it
+     is made. These are boxes rather than switches on purpose: a switch says a
+     setting is on, a tick says somebody did the thing, and what a supervisor
+     reads here is the work done on one document and what is still open.
+
+     The state lives on each row, never on the list. One flag on the ul and two
+     boxes ticked a second apart share a status line, so the second answer
+     overwrites the first and the row that failed reads as saved.
+
+     There is no hx-disabled-elt. Disabling the box while its own request is in
+     flight takes focus off the element the user is standing on and drops it to
+     the body, which loses a keyboard user their place in a list they were
+     working down. hx-sync="this:replace" is what stops two writes landing out
+     of order, and hx-swap="none" is because the row already looks the way it
+     should — the answer only has to say whether it stuck.
+
+     An unticked box posts nothing at all, so there is one endpoint per check
+     and the URL carries which one it is. A body holding only this field says
+     off by being empty; the same absence inside a form of twelve fields cannot
+     be told from a field that was never rendered.
+
+     want is captured before the request so Try again re-sends what the user
+     asked for, rather than the value the failure reverted to. The status line
+     is role="status" because the revert is script writing checked, and a
+     programmatic change announces nothing — without it the only sign the tick
+     did not stick is a pixel moving back. The CSRF token is in the django
+     variant. -->
+<ul data-kui="checkbox/htmx" class="max-w-xl divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+  <li class="px-4 py-2.5"
+      x-data="{ state: 'idle', want: false }"
+      @htmx:before-request.camel="want = $refs.box.checked; state = 'saving'"
+      @htmx:after-request.camel="
+        if ($event.detail.successful) { state = 'saved' }
+        else { $refs.box.checked = !want; state = 'failed' }">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" x-ref="box" name="done" value="1" checked
+             hx-post="/grn/GRN-24-0918/checks/weighbridge/"
+             hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="tabular-nums">Weighbridge slip attached — 2,945 kg net</span>
+    </label>
+    <p role="status" class="mt-1 pl-[26px] text-[12px]/4">
+      <span x-show="state === 'idle'" class="tabular-nums text-zinc-500">Recorded 05 Sep 2026, 09:12 by Anil Kulkarni</span>
+      <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+      </span>
+      <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+      </span>
+      <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the check is unchanged
+        </span>
+        <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                @click="$refs.box.checked = want; $refs.box.dispatchEvent(new Event('change'))">Try again</button>
+      </span>
+    </p>
+  </li>
+
+  <li class="px-4 py-2.5"
+      x-data="{ state: 'idle', want: false }"
+      @htmx:before-request.camel="want = $refs.box.checked; state = 'saving'"
+      @htmx:after-request.camel="
+        if ($event.detail.successful) { state = 'saved' }
+        else { $refs.box.checked = !want; state = 'failed' }">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" x-ref="box" name="done" value="1"
+             hx-post="/grn/GRN-24-0918/checks/coa/"
+             hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Certificate of analysis checked against the batch</span>
+    </label>
+    <p role="status" class="mt-1 pl-[26px] text-[12px]/4">
+      <span x-show="state === 'idle'" class="text-zinc-500">Not recorded</span>
+      <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+      </span>
+      <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+      </span>
+      <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the check is unchanged
+        </span>
+        <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                @click="$refs.box.checked = want; $refs.box.dispatchEvent(new Event('change'))">Try again</button>
+      </span>
+    </p>
+  </li>
+
+  <li class="px-4 py-2.5"
+      x-data="{ state: 'idle', want: false }"
+      @htmx:before-request.camel="want = $refs.box.checked; state = 'saving'"
+      @htmx:after-request.camel="
+        if ($event.detail.successful) { state = 'saved' }
+        else { $refs.box.checked = !want; state = 'failed' }">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="checkbox" x-ref="box" name="done" value="1"
+             hx-post="/grn/GRN-24-0918/checks/damage/"
+             hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+             class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Damage or shortage noted on the challan</span>
+    </label>
+    <p role="status" class="mt-1 pl-[26px] text-[12px]/4">
+      <span x-show="state === 'idle'" class="text-zinc-500">Not recorded</span>
+      <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+      </span>
+      <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+        <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+      </span>
+      <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+        <span class="flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the check is unchanged
+        </span>
+        <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                @click="$refs.box.checked = want; $refs.box.dispatchEvent(new Event('change'))">Try again</button>
+      </span>
+    </p>
+  </li>
+</ul>` },
 
       { id: 'django', name: 'Django form field', code:
 `<!-- forms.py
@@ -3815,7 +7373,7 @@ Test certificate follows by email.</textarea>
     </div>
   </fieldset>
 
-  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve selected</button>
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve selected</button>
 </form>` }
     ]
   },
@@ -3829,6 +7387,9 @@ Test certificate follows by email.</textarea>
       'Every option carries a value. A radio without one posts on, exactly like every other option in the group, so the server receives priority=on and has no way to tell which of the three was picked — and the bug survives testing, because the field is present and the form validates.',
       'A radio cannot be unticked. Clicking the chosen option again does nothing, and a Clear button that unchecks it in script leaves the group posting no key at all, which the server cannot tell apart from a question nobody was asked. If "none", "any" or "not required" is a real answer it is an option with a value of its own; if the answer is genuinely independent it was a checkbox.',
       'Arrow keys move and select in one action, so a keyboard user passes through every option on the way to the one they want. Never hang anything irreversible off the change event — a group that fires a save, a fetch or a recalculation per keystroke fires it three times before the intended answer lands.',
+      'A follow-up that only one option opens belongs directly under that option, and needs :disabled bound to the inverse of the condition as well as x-show. display:none does not take an input out of the form, so a rework cost typed under one answer travels with a POST that now carries a different one, and the record contradicts itself with nothing on screen having shown it happen. Never move focus into the panel when it appears and never animate it: the arrows answer as they move, so it opens and shuts under anybody passing through the group.',
+      'A group that writes to the server on change writes once per option the arrows touch. Debounce the trigger — hx-trigger="change delay:400ms" — and drop the write still in flight with hx-sync="this:replace", or three keystrokes are three POSTs whose replies can land in the other order. Reverting a failed write is not a flip either: a radio has no opposite, so keep the last value the server acknowledged and restore that, never the value that was on screen a moment ago.',
+      'Where the options are bands of a number rather than names, the order is the meaning and the boundary is the defect. Sort them by anything but their own order and the answer somebody picks by position is an order of magnitude out; let two labels both claim ₹1,00,000 and the same order is routed two ways by two people who each read one of them. Write the edges the way the server applies them, and post a band code rather than the numbers in it — the slabs are revised, and a stored 100000 cannot afterwards be told from the band it used to be the top of.',
       'Roving focus is native. The group is one Tab stop, the arrows wrap at both ends and skip disabled options, and none of it needs a line of code. Adding role="radio", aria-checked or tabindex to native inputs replaces working behaviour with a hand-written copy of it — that machinery belongs to the segmented track in button-group, whose options are buttons and have no semantics of their own.',
       'With nothing checked, the group is still one Tab stop and Tab lands on the first option. Checking one by default moves the tab target to it and changes what a bare POST means: everybody who never read the question has now answered it. Preselect the safe, common case, and preselect nothing at all when the choice has consequences.',
       'required on any one option applies to the whole group — the browser will not submit until something in it is checked. An unanswered group posts nothing: the key is absent, not empty, so a server that reads request.POST.get(\'priority\') gets None and a form field that was never rendered looks identical to a question that was skipped.',
@@ -3845,7 +7406,9 @@ Test certificate follows by email.</textarea>
       ['Group', 'A fieldset whose legend is the question. Radios are never alone, so this is not optional the way it is for a single checkbox.'],
       ['Label', 'Wrapping the input as its direct child, so the text is part of the target and the row is not a 16px hit.'],
       ['Description', 'A 12px zinc-500 line per option, outside the label, indented with pl-[26px] and named by aria-describedby. Group-level help sits under the fieldset instead.'],
-      ['Chosen tile', 'has-[:checked]:bg-zinc-200 with has-[:checked]:border-zinc-700, reading the box\'s own state so the tint cannot disagree with the answer.']
+      ['Chosen tile', 'has-[:checked]:bg-zinc-200 with has-[:checked]:border-zinc-700, reading the box\'s own state so the tint cannot disagree with the answer.'],
+      ['Follow-up', 'The field one option opens, under that option and indented behind a left rule. x-show hides it and :disabled takes it out of the POST and out of validation together.'],
+      ['Band', 'An option whose label is a range rather than a name, low to high, with the consequence beside it inside the label — it is part of the answer, not help about it. Anything that still leaves an answer somebody could give when it is removed is a description and goes outside.']
     ],
     behaviour: [
       'The group is one Tab stop. Tab enters on the checked option, or on the first when none is checked, and the next Tab leaves the group entirely rather than walking through the rest of it.',
@@ -3854,7 +7417,9 @@ Test certificate follows by email.</textarea>
       'Choosing one option releases the previous one silently — there is no intermediate state, so a group can never post two values or an empty one.',
       'A group with nothing checked submits no key at all. The difference between "none of them" and "the field was never on this form" comes from the form definition on the server, never from the request.',
       'A disabled option keeps its place and its explanation. Dropping it changes the shape of a list people scan by position, and re-enabling it later shifts every option below it.',
-      'In a register the choice is the row, so there is no select-all and no bulk bar: the action beneath applies to exactly one record, and it is named in the footer so the answer is readable without hunting for the filled dot.'
+      'In a register the choice is the row, so there is no select-all and no bulk bar: the action beneath applies to exactly one record, and it is named in the footer so the answer is readable without hunting for the filled dot.',
+      'One group per line makes every line its own Tab stop, and the arrows then move across a line rather than down the column. A line nobody answered posts no key at all, so the answers are read back by iterating the lines the record has, never the keys that arrived in the POST.',
+      'A follow-up under one option comes and goes as that option is chosen and released, which on a keyboard happens in passing on the way to the option below it. It never takes focus, never animates and never fetches on appearing.'
     ],
     a11y: [
       'The fieldset and its legend are the question. Browsers already group the inputs by name and announce each option\'s position — "45 days from invoice date, radio button, 2 of 3" — but the group has no name at all without the legend, and "2 of 3" of what is then anybody\'s guess.',
@@ -3863,9 +7428,11 @@ Test certificate follows by email.</textarea>
       'required goes on every option in the group, not just the first, because only the focused option\'s own attribute is announced. Django does this for you: RadioSelect inherits attrs into each input.',
       'An error is real text under the group, referenced by aria-describedby from every option and paired with aria-invalid on each, since focus lands on one radio and only that one\'s description is read out.',
       'A radio in a register carries an aria-label naming the record — "Raise the GRN against PO-24-1187" — because ten radios all called "Select" say nothing about which row the cursor is on.',
+      'A group inside a table row has neither a fieldset nor a legend — a fieldset cannot wrap a <tr> — so every option carries an aria-label holding the line and the answer. The column header does not stand in for it: in forms mode a screen reader reads the control, not the header of the cell the control sits in.',
+      'Where the focus mark is moved off the radio onto a tile, it is an outline and never a ring. ring-* compiles to a box-shadow, forced-colours mode drops every box-shadow, and the tile has already given up the UA outline by drawing its own — so a ring leaves nothing at all for the users who most need the mark.',
       'No option carries outline-none. On a 16px control there is no room to draw a better focus ring than the UA one, and it is the only indicator that survives forced-colours mode.'
     ],
-    related: ['checkbox', 'toggle', 'field'],
+    related: ['checkbox', 'toggle', 'field', 'questionnaire'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<!-- One name across the three options is the entire mechanism. Mistype it on
@@ -3946,8 +7513,13 @@ Test certificate follows by email.</textarea>
       { id: 'cards', name: 'Option tiles', code:
 `<!-- No Alpine. :has() paints each tile from its own radio, so the tint is the
      answer rather than a second copy of it, and has-[:focus-visible] puts the
-     focus indication somewhere it can be seen — a 3px halo drawn round a 16px
-     circle lands on top of the circle.
+     focus indication somewhere it can be seen — a 3px outline drawn round a
+     16px circle lands on top of the circle.
+
+     The indication is an outline and not a ring. ring-* compiles to a
+     box-shadow, forced-colours mode drops every box-shadow, and the tile has
+     already given up the UA outline by moving the indication off the radio — so
+     a ring here leaves the users who most need a focus mark with none at all.
 
      The radio stays visible inside the tile. Hidden with sr-only, the only mark
      of what was chosen is the tint, and forced-colours mode does not paint it.
@@ -3959,7 +7531,7 @@ Test certificate follows by email.</textarea>
   <legend class="mb-2 text-[13px]/5 font-medium">Inspection before dispatch</legend>
 
   <div class="grid gap-2 sm:grid-cols-3">
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="inspection" value="vendor" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">At vendor works</span>
@@ -3967,7 +7539,7 @@ Test certificate follows by email.</textarea>
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="inspection" value="gate" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">At the plant gate</span>
@@ -3975,7 +7547,7 @@ Test certificate follows by email.</textarea>
       </span>
     </label>
 
-    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-zinc-700/15">
+    <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
       <input type="radio" name="inspection" value="third_party" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
       <span class="min-w-0">
         <span class="block text-[13px]/5 font-medium">Third-party agency</span>
@@ -4058,6 +7630,124 @@ Test certificate follows by email.</textarea>
   <p class="mt-2 text-[12px]/4 text-zinc-500">One vendor at a time. To compare two, use the checkbox filter list.</p>
 </fieldset>` },
 
+      { id: 'bands', name: 'Options that are ranges', tagNew: true, code:
+`<!-- The options are bands of one number, so two things carry meaning that a
+     list of names does not have: the order and the boundary.
+
+     The order is low to high and never anything else. Sort these by how often
+     they are picked, or alphabetically because the template had a sort on it,
+     and the third option is no longer between the second and the fourth — which
+     is how somebody who has used the screen twice picks by position and grants
+     a limit an order of magnitude out.
+
+     Every boundary belongs to exactly one band, and the labels say which. "Up
+     to ₹1,00,000" beside "₹1,00,000 to ₹5,00,000" claims the same rupee twice,
+     and the two people reading it route the same order two different ways. The
+     wording here is the rule the server applies: the lower edge is in the band,
+     the upper edge is not.
+
+     The value is a band code, not the numbers. Finance revises the slabs, and a
+     stored 100000 cannot afterwards be told from the band it used to be the top
+     of; a stored limit_b still means the second band whatever it now spans.
+
+     Who signs sits inside the label. It is part of the option rather than help
+     about it — the range means nothing on its own — and the test is whether
+     removing it leaves an answer somebody could give. Anything that fails that
+     test is a description and goes outside the label. -->
+<fieldset data-kui="radio/bands" class="max-w-lg">
+  <legend class="mb-2 text-[13px]/5 font-medium">Approval limit for the Buyer role</legend>
+
+  <div class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+    <label class="flex items-center gap-3 px-3 py-2.5 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <input type="radio" name="approval_limit" value="limit_a" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 tabular-nums">Up to ₹1,00,000</span>
+      <span class="text-right text-zinc-600">Buyer releases</span>
+    </label>
+    <label class="flex items-center gap-3 px-3 py-2.5 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <input type="radio" name="approval_limit" value="limit_b" checked class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 tabular-nums">₹1,00,000 to ₹5,00,000</span>
+      <span class="text-right text-zinc-600">Plant head</span>
+    </label>
+    <label class="flex items-center gap-3 px-3 py-2.5 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <input type="radio" name="approval_limit" value="limit_c" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 tabular-nums">₹5,00,000 to ₹25,00,000</span>
+      <span class="text-right text-zinc-600">Plant head and finance</span>
+    </label>
+    <!-- the top band is open-ended and says so; a range that stops at a number
+         leaves every order above it belonging to no band at all -->
+    <label class="flex items-center gap-3 px-3 py-2.5 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <input type="radio" name="approval_limit" value="limit_d" class="size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 flex-1 tabular-nums">Above ₹25,00,000</span>
+      <span class="text-right text-zinc-600">Director</span>
+    </label>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">A band starts where the one above it ends: an order of exactly ₹5,00,000 goes to the plant head and finance.</p>
+</fieldset>` },
+
+      { id: 'conditional', name: 'One option opens a field', tagNew: true, code:
+`<!-- The follow-up sits under the option that opens it, not at the foot of the
+     group. A field between two options does not disturb the keyboard: the
+     arrows walk the radios in their own order and step over everything else, so
+     all that changes is where Tab goes after the answer — which is the point,
+     because the next thing the user owes is right there.
+
+     x-show alone is the bug this variant exists for. display:none does not take
+     an input out of the form: type the rework cost, change the answer to Return
+     to vendor, and the POST carries a cost for a rework that is not happening.
+     :disabled bound to the inverse of the show condition drops it from the
+     submission and from constraint validation together — which is what lets the
+     required attribute beside it stay static, and what stops a hidden required
+     field making the form unsubmittable with nothing on screen to explain it.
+
+     Nothing here takes focus when it appears, and nothing animates. The arrow
+     keys answer as they move, so a keyboard user on the way to Scrap opens and
+     closes this panel in passing; moving focus into it would strand them
+     mid-group, and a transition would flash.
+
+     Rework is checked here so the follow-up is on screen in the registry. A
+     real disposal screen starts unanswered — x-data="{ action: '' }" and no
+     checked attribute — because writing off material is not a choice to make
+     for somebody who never read the question. Whichever way it starts, the
+     static checked and the Alpine value have to agree: x-model applies its
+     value only once Alpine has booted, so on its own it leaves the first paint
+     showing an unanswered group with the panel already open. -->
+<fieldset data-kui="radio/conditional" class="max-w-xl" x-data="{ action: 'rework' }">
+  <legend class="mb-2 text-[13px]/5 font-medium tabular-nums">What happens to the 180 kg rejected on GRN-24-0912</legend>
+
+  <div class="space-y-2">
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="rejection_action" value="return" x-model="action" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Return to Gujarat Polymers Ltd against a debit note</span>
+    </label>
+
+    <div>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="rejection_action" value="rework" checked x-model="action" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Rework in house and bill the vendor</span>
+      </label>
+
+      <div x-show="action === 'rework'" x-cloak class="mt-2 ml-[26px] border-l-2 border-zinc-200 pl-4">
+        <label for="rc-cost" class="block text-[13px]/5 font-medium">Rework cost to bill <span aria-hidden="true" class="text-red-600">*</span></label>
+        <div class="mt-1.5 flex max-w-[14rem] items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+          <input id="rc-cost" name="rework_cost" value="18,400" inputmode="decimal" required
+                 :disabled="action !== 'rework'" aria-describedby="rc-cost-help"
+                 class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+        </div>
+        <p id="rc-cost-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Goes on the debit note as its own line, so it is recovered separately from the material.</p>
+      </div>
+    </div>
+
+    <label class="flex items-start gap-2.5 text-[14px]/5">
+      <input type="radio" name="rejection_action" value="scrap" x-model="action" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>Scrap at our end and write the value off</span>
+    </label>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500">The lot stays in the quarantine bay until this is answered and the store keeper acts on it.</p>
+</fieldset>` },
+
       { id: 'table', name: 'Picking one record', code:
 `<!-- One name across every row is what makes this pick-one. Give each row its
      own name and every row becomes independently selectable; put a radio group
@@ -4070,7 +7760,12 @@ Test certificate follows by email.</textarea>
      and the checked option in the display:none copy is the one that wins.
 
      No select-all and no bulk bar. The answer is a single record, so it is named
-     in the footer instead — the filled dot alone is not readable at a glance. -->
+     in the footer instead — the filled dot alone is not readable at a glance.
+
+     The chosen row carries a static checked as well as x-model. x-model only
+     applies its value once Alpine has booted, so without it the first paint of
+     the table shows nothing chosen and the footer names a record no dot agrees
+     with, for as long as the page takes to hydrate. -->
 <div data-kui="radio/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
      x-data="{ po: 'PO-24-1191' }">
   <table class="w-full text-[13px]/5">
@@ -4099,7 +7794,7 @@ Test certificate follows by email.</textarea>
       </tr>
       <tr class="border-b border-zinc-100 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
         <td class="px-4 py-2.5">
-          <input type="radio" name="grn_against" value="PO-24-1191" x-model="po"
+          <input type="radio" name="grn_against" value="PO-24-1191" checked x-model="po"
                  aria-label="Raise the GRN against PO-24-1191"
                  class="size-4 accent-zinc-700">
         </td>
@@ -4123,9 +7818,11 @@ Test certificate follows by email.</textarea>
         <td class="px-4 py-2.5 text-right tabular-nums">4,500 kg</td>
         <td class="hidden px-4 py-2.5 text-right tabular-nums text-zinc-600 md:table-cell">02 Aug</td>
       </tr>
-      <!-- closed to receipt, and still in its place: dropping the row would
-           change the shape of a list people scan by position -->
-      <tr class="[&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:bg-zinc-100">
+      <!-- Closed to receipt, and still in its place: dropping the row would
+           change the shape of a list people scan by position. It is the one row
+           with no hover — a row that lights up under the cursor and then refuses
+           the click reads as a broken table rather than as a closed order. -->
+      <tr>
         <td class="px-4 py-2.5">
           <input type="radio" name="grn_against" value="PO-24-1203" disabled
                  aria-label="PO-24-1203, fully received, cannot be picked"
@@ -4144,6 +7841,116 @@ Test certificate follows by email.</textarea>
   <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
     <span class="text-[13px]/5 tabular-nums">Raising GRN against <span class="font-medium" x-text="po"></span></span>
     <button type="button" class="shrink-0 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Continue</button>
+  </div>
+</div>` },
+
+      { id: 'rows', name: 'A group on every line', tagNew: true, code:
+`<!-- The inverse of the register above: there, one name across every row picks
+     one record; here every row is its own question and the name carries the
+     line id — qc_l1, qc_l2. Repeat one name down the column and the four lines
+     become one group four answers long, so answering the second clears the
+     first, the POST carries a single key, and the screen looks correct until
+     somebody notices the GRN posted with one line decided.
+
+     No fieldset and no legend, because a fieldset cannot wrap a table row. That
+     leaves each option with nothing to name it — a screen reader in forms mode
+     reads the control, not the header of the cell it sits in — so every radio
+     carries an aria-label with the line and the answer in it. Twelve radios all
+     called "Accept" say nothing about which line the cursor is on.
+
+     Every line is a separate group, so every line is its own Tab stop and the
+     arrows move within one line rather than down the column. That is the right
+     behaviour and it is also why the count in the footer earns its place: with
+     eighteen lines, which of them are still undecided is not something the eye
+     gets from a column of dots.
+
+     The columns that describe the material drop out below md and reappear under
+     the line name. The three answer columns never drop, and the rows are never
+     rendered twice for a phone: two copies share the name, and the checked
+     option in the display:none copy is the one that posts. -->
+<div data-kui="radio/rows" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{ lines: { l1: 'accept', l2: '', l3: 'hold', l4: '' } }">
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-2.5 font-medium">Line</th>
+        <th scope="col" class="hidden px-3 py-2.5 text-right font-medium md:table-cell">Received</th>
+        <th scope="col" class="w-12 px-2 py-2.5 text-center font-medium">Accept</th>
+        <th scope="col" class="w-12 px-2 py-2.5 text-center font-medium">Hold</th>
+        <th scope="col" class="w-12 px-2 py-2.5 text-center font-medium">Reject</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-medium">Polypropylene granules
+          <span class="mt-0.5 block font-normal tabular-nums text-zinc-600">HD-118 · lot 24-HD-118<span class="md:hidden"> · 4,500 kg</span></span>
+        </th>
+        <td class="hidden px-3 py-2.5 text-right tabular-nums md:table-cell">4,500 kg</td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l1" value="accept" checked x-model="lines.l1" aria-label="Polypropylene granules HD-118 — accept" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l1" value="hold" x-model="lines.l1" aria-label="Polypropylene granules HD-118 — hold" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l1" value="reject" x-model="lines.l1" aria-label="Polypropylene granules HD-118 — reject" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-medium">Masterbatch, black
+          <span class="mt-0.5 block font-normal tabular-nums text-zinc-600">MB-BLK-02 · lot 24-MB-441<span class="md:hidden"> · 200 kg</span></span>
+        </th>
+        <td class="hidden px-3 py-2.5 text-right tabular-nums md:table-cell">200 kg</td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l2" value="accept" x-model="lines.l2" aria-label="Masterbatch, black MB-BLK-02 — accept" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l2" value="hold" x-model="lines.l2" aria-label="Masterbatch, black MB-BLK-02 — hold" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l2" value="reject" x-model="lines.l2" aria-label="Masterbatch, black MB-BLK-02 — reject" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-medium">HDPE liner film
+          <span class="mt-0.5 block font-normal tabular-nums text-zinc-600">FL-HD-40 · lot 24-FL-207<span class="md:hidden"> · 18 MT</span></span>
+        </th>
+        <td class="hidden px-3 py-2.5 text-right tabular-nums md:table-cell">18 MT</td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l3" value="accept" x-model="lines.l3" aria-label="HDPE liner film FL-HD-40 — accept" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l3" value="hold" checked x-model="lines.l3" aria-label="HDPE liner film FL-HD-40 — hold" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l3" value="reject" x-model="lines.l3" aria-label="HDPE liner film FL-HD-40 — reject" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-3 py-2.5 text-left font-medium">Stretch wrap, 23 micron
+          <span class="mt-0.5 block font-normal tabular-nums text-zinc-600">SW-23 · lot 24-SW-090<span class="md:hidden"> · 400 nos</span></span>
+        </th>
+        <td class="hidden px-3 py-2.5 text-right tabular-nums md:table-cell">400 nos</td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l4" value="accept" x-model="lines.l4" aria-label="Stretch wrap, 23 micron SW-23 — accept" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l4" value="hold" x-model="lines.l4" aria-label="Stretch wrap, 23 micron SW-23 — hold" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="radio" name="qc_l4" value="reject" x-model="lines.l4" aria-label="Stretch wrap, 23 micron SW-23 — reject" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- The count is derived from the same state the rows render from. A line
+       nobody answered posts no key at all, so this is also what the view has to
+       be told: read the answers back by iterating the lines on the GRN, never
+       the keys that arrived in the POST. -->
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
+    <span class="text-[13px]/5 tabular-nums"><span x-text="Object.values(lines).filter(Boolean).length"></span> of 4 lines decided</span>
+    <button type="button" class="shrink-0 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Post GRN</button>
   </div>
 </div>` },
 
@@ -4191,7 +7998,7 @@ Test certificate follows by email.</textarea>
        focused one's attribute is announced, and the error is referenced from
        every option for the same reason. The asterisk is decoration. -->
   <fieldset>
-    <legend class="mb-2 text-[13px]/5 font-medium">QC result for GRN-24-0912 <span class="text-red-600">*</span></legend>
+    <legend class="mb-2 text-[13px]/5 font-medium">QC result for GRN-24-0912 <span aria-hidden="true" class="text-red-600">*</span></legend>
     <div class="space-y-2">
       <label class="flex items-start gap-2.5 text-[14px]/5">
         <input type="radio" name="qc" value="pass" required aria-invalid="true" aria-describedby="rd-qc-err"
@@ -4214,6 +8021,123 @@ Test certificate follows by email.</textarea>
       Pick a result. An unanswered group posts nothing at all, so the GRN cannot be saved half-decided.
     </p>
   </fieldset>
+</div>` },
+
+      { id: 'phone', name: 'Answered at 390px', tagNew: true, code:
+`<!-- The same group, answered standing at the gate on a phone. One copy of the
+     markup does it: a second copy behind a media query shares the name, so the
+     two are a single group and the option checked in the display:none copy is
+     the one that posts.
+
+     Each option is a full-width row with py-3 on it, so the target clears 44px
+     in both directions. A bare radio with the label beside it is a 16px target
+     however wide the row is, and the label only enlarges it while it is inside
+     the same box.
+
+     The labels wrap and nothing truncates. In the vendor filter, truncation is
+     right — the count beside the name is what is being read — but here the tail
+     of the sentence is the whole difference between two reasons, and two rows
+     ending in an ellipsis are two identical options.
+
+     The action is a full-width button at the foot, not a save on change: this
+     prints a gate slip and turns a vehicle away, which is exactly the kind of
+     thing the arrow keys would fire three times on a keyboard. -->
+<fieldset data-kui="radio/phone" class="max-w-sm">
+  <legend class="mb-2 text-[13px]/5 font-medium tabular-nums">Why MH-04-GJ-2291 was turned back</legend>
+
+  <div class="space-y-2">
+    <label class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-3 text-[14px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="turnback" value="no_dc" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0">No delivery challan, or the challan does not match the invoice</span>
+    </label>
+    <label class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-3 text-[14px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="turnback" value="no_po" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0">No open purchase order for this material and vendor</span>
+    </label>
+    <label class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-3 text-[14px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="turnback" value="over" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 tabular-nums">Quantity on the vehicle is over the 2,000 kg still open on the order</span>
+    </label>
+    <label class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-3 text-[14px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="turnback" value="damage" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0">Load damaged or wet, visible at the gate</span>
+    </label>
+  </div>
+
+  <button type="submit" class="mt-3 flex h-11 w-full items-center justify-center rounded-lg bg-zinc-700 px-4 text-[14px]/5 font-medium text-white hover:bg-zinc-800">Record and print the gate slip</button>
+</fieldset>` },
+
+      { id: 'htmx', name: 'Saved as it is chosen', tagNew: true, code:
+`<!-- htmx does the writing, because Alpine does not fetch — and the reason this
+     is not the same snippet as a toggle saving itself is the arrow keys. They
+     answer as they move, so walking from Normal to Emergency fires change three
+     times. delay:400ms restarts the timer on each one and only the answer that
+     is still standing goes out; hx-sync="this:replace" drops a write still in
+     flight, so two answers a second apart cannot settle on the older reply.
+
+     The request comes off the wrapper, because change bubbles from whichever
+     option was touched and there is no one element to hang it on. A wrapper is
+     not an input and contributes no value of its own, so hx-include="this" is
+     what puts the chosen option in the body — the rule that a triggering
+     element sends its own value only covers an element that has one. Django
+     also wants the CSRF token on this request, which is an hx-headers decision
+     for the page rather than one this block should make.
+
+     A failed write reverts to settled, the last value the server acknowledged.
+     A radio has no opposite to flip back to, and by the time the failure
+     arrives the user may have moved twice more, so the value that was on screen
+     a moment ago is not the value the record holds. want keeps what they asked
+     for, so Try again re-sends that rather than re-sending the revert.
+
+     The revert is script setting checked, which fires no change event: nothing
+     re-posts, and nothing is announced either — hence role="status" on the line
+     underneath, which is the only thing that says the answer did not stick. -->
+<div data-kui="radio/htmx" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-3"
+     x-data="{ chosen: 'normal', settled: 'normal', want: 'normal', state: 'idle' }"
+     hx-post="/requisitions/PR-24-0442/priority/"
+     hx-trigger="change delay:400ms" hx-include="this" hx-swap="none" hx-sync="this:replace"
+     @change="state = 'saving'"
+     @htmx:after-request.camel="
+       if ($event.detail.successful) { settled = chosen; state = 'saved' }
+       else { want = chosen; chosen = settled; state = 'failed' }">
+
+  <fieldset>
+    <legend class="text-[13px]/5 font-medium">Priority</legend>
+    <div class="mt-2 space-y-2">
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="priority" value="normal" checked x-model="chosen" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Normal — planned into the weekly buying run</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="priority" value="urgent" x-model="chosen" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Urgent — the buyer picks it up the same day</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="priority" value="emergency" x-model="chosen" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Emergency — plant head is notified and the order can go out without three quotes</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <p role="status" class="mt-2 text-[12px]/4">
+    <span x-show="state === 'idle'" class="tabular-nums text-zinc-500">Last changed 04 Sep 2026, 09:12 by Ritu Deshpande</span>
+
+    <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+    </span>
+
+    <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+      <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved on the requisition
+    </span>
+
+    <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the requisition still holds the earlier priority
+      </span>
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+              @click="chosen = want; $nextTick(() => htmx.trigger($root, 'change'))">Try again</button>
+    </span>
+  </p>
 </div>` },
 
       { id: 'django', name: 'Django form field', code:
@@ -4271,7 +8195,7 @@ Test certificate follows by email.</textarea>
 
   <fieldset>
     <legend class="mb-2 text-[13px]/5 font-medium">
-      {{ form.qc.label }}{% if form.qc.field.required %} <span class="text-red-600">*</span>{% endif %}
+      {{ form.qc.label }}{% if form.qc.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
     </legend>
     <div class="space-y-2">
       {% for choice in form.qc %}
@@ -4327,7 +8251,7 @@ Test certificate follows by email.</textarea>
   {
     id: 'toggle', name: 'Toggle', category: 'forms',
     description: 'A setting that takes effect the moment it is touched. A real checkbox carrying role="switch", with the track and the thumb beside it painted by peer-checked utilities.',
-    when: 'A preference that applies at once and is undone just as fast: notifications on a vendor account, a filter over a register, a flag on a rate contract. If the change only lands when a Save button is pressed it is a checkbox, and if it has to be confirmed before it happens it is a button.',
+    when: 'A preference that applies at once and is undone just as fast: notifications on a vendor account, a filter over a register, a flag on a rate contract. If the change only lands when a Save button is pressed it is a checkbox, and if it has to be confirmed before it happens it is almost always a button with a verb on it — the one case where a switch survives the question is drawn in the confirm variant.',
     notes: [
       'Every switch here is a real <input type="checkbox"> with role="switch", hidden with sr-only peer, and the track and thumb are siblings painted by peer-checked. A <button role="switch"> is the other legal shape and it is the wrong one for a setting: it does not submit, it does not bind to a Django BooleanField, and it makes you write aria-checked and keep it in step by hand. The input gets the space bar, the label, form participation and the checked-to-aria-checked mapping for nothing.',
       'Never write aria-checked on the input. role="switch" on a native checkbox already maps the checked property onto it, and an attribute written once in markup does not move when the control does — which is how a switch ends up announced as off for the rest of the session. aria-checked is required only on the button form, and forbidden here.',
@@ -4337,39 +8261,53 @@ Test certificate follows by email.</textarea>
       'Never transition-all. The thumb takes transition-transform and the track transition-colors; nothing else moves. transition-all also picks up the focus outline, so the indicator fades in over 150ms and reads as no indicator at all to somebody tabbing through a settings list. Both carry motion-reduce:transition-none — a switch that jumps is still a switch.',
       'The state cannot be colour alone. In forced-colours mode every background is dropped, so bg-zinc-700 and bg-zinc-200 render identically; what survives is the thumb sitting at one end or the other, plus forced-colors:border on the track and the thumb to give the pill and the disc an edge. Do not put ON and OFF lettering inside the track either — it does not fit at 36×20, it does not translate, and it is the position that is doing the work.',
       'A switch inside a form with a Save button is a checkbox drawn wrong. The whole promise of the shape is that touching it is the write; put it above a Save and half the users will press Save and half will not, and the two groups get different results from the same gesture. Either the control writes on change, or it is a checkbox.',
-      'No "Are you sure?" on a switch. A confirmation dialog says the action is worth stopping for, and anything worth stopping for is a button with a verb on it — Deactivate vendor, not a switch labelled Active. A switch is for settings whose undo is the same gesture as the do.',
+      'The default is no confirmation, and the exception is narrow. A dialog says the act is worth stopping for, and nearly everything worth stopping for is a button with a verb on it — Deactivate vendor, not a switch labelled Active. The case that survives is a switch sitting in a list of settings whose neighbours are ordinary, where moving this one out to a button would break a list people read by position, and where the consequence is one the same gesture cannot take back. Then the switch must not move until the question is answered: a switch that moves and then moves back has already told the user the thing happened. Confirm the direction that is hard to come back from and let the other one through — asking on both is a button that has been drawn as a switch.',
       'Because it writes on change it owes an answer. htmx posts on change, the browser has already painted the new position, so the only work left is the undo: revert checked on a failed request and say so in the row. hx-sync="this:replace" aborts a write still in flight so two toggles inside a second cannot land out of order. A switch that silently lost the write is worse than a slow one, because the screen now disagrees with the database and nothing on it says so.',
+      'Could not and would not are different answers and the row has to say which. A dropped connection or a 500 is retryable, so the row offers Try again. A 403 or a 409 is the server refusing on a rule — the vendor has open orders, the period is closed — and Try again there asks the same question and gets the same answer, so the row prints the reason the response carried instead of a button. Print only the bodies your own views produce, and put them in with x-text: an arbitrary error body is a stack trace or a whole HTML page, and a message you did not write is not markup you may run.',
+      'There is no read-only switch. readonly is ignored on a checkbox — it parses, it reviews as correct, and it leaves a control anybody can move. The lock is disabled, which also takes the field out of the POST, so a value that must not change but must still be submitted needs a hidden input beside it. A value nobody will ever change on this record is not a switch at all: render it as text, the way a posted GRN shows the settings that were in force when it was posted.',
+      'Disabled and locked-to-you are not the same lock. disabled takes the switch out of the Tab order and everything attached to it with aria-describedby goes with it, so a keyboard user cannot reach the sentence explaining why it will not move. A switch that is off because of who you are takes aria-disabled with a prevented click instead: it stays focusable, it keeps its focus outline, and the reason is one tab stop away rather than nowhere. Keep plain disabled for the rows whose reason is already on the screen beside them.',
       'The label names the setting; the switch carries the state. "Enabled" beside a switch that is off is a contradiction read aloud — announced, it comes out "Enabled, switch, off". Write what the setting does — "Email the buyer when an order is approved" — and let the position say whether it is happening.',
-      'There is no mixed state. A checkbox has indeterminate; a switch has two positions and nothing to draw a third with, so a master switch over a group is not a select-all — it is a setting of its own ("send email at all") and the dependants keep their values while it is off. Clear them instead and turning the master back on hands the user a blank slate they have to rebuild from memory.'
+      'There is no mixed state. A checkbox has indeterminate; a switch has two positions and nothing to draw a third with, so a master switch over a group is not a select-all — it is a setting of its own ("send email at all") and the dependants keep their values while it is off. Clear them instead and turning the master back on hands the user a blank slate they have to rebuild from memory.',
+      'A switch that reveals a block below it hands its own contract to everything inside: every control in that block writes when it is touched too. Put one field in there that only lands on a Save and the card grows a Save button, and the switch above it has become a checkbox. Reveal rather than disable when the block only qualifies the setting — a reminder of "3 days before" means nothing while reminders are off — and disable rather than reveal when the dependants are settings in their own right that people scan by position.',
+      'A register of switches has no room for a status line under every row, so the table carries one role="status" beneath it and the message names the record: "Not saved — Sharma Extrusions is unchanged". One handler on the table reads $event.detail.elt and covers every row. Render those rows once and only once: a desktop table and a stacked phone list of the same records put two switches on one value, and after a write the hidden one is wrong.'
     ],
     anatomy: [
       ['Track', 'The 36×20 pill: relative h-5 w-9, bg-zinc-200 with ring-1 ring-inset ring-zinc-300 off, bg-zinc-700 with a matching ring on. It owns the focus indicator, because the input it belongs to is sr-only and paints nothing.'],
       ['Thumb', 'An absolutely positioned size-4 white disc at top-0.5 left-0.5, moved to translate-x-4 by the track\'s peer-checked:[&>span] rule. Its position is the state; the fill only agrees with it.'],
       ['Input', 'A real checkbox with role="switch", class="peer sr-only", and a name if anything is ever going to submit it. Direct child of the label, before the track, or neither the peer selectors nor the pointer work.'],
-      ['Label', 'Wraps the input and names the setting, not its state. It is also the target: the track is 20px tall and WCAG 2.2 asks for 24, so the label is the full width of the row and carries the padding that closes the gap.'],
+      ['Label', 'Wraps the input and names the setting, not its state. It is also the target: the track is 20px tall and WCAG 2.2 asks for 24, so the label is the full width of the row and carries the padding that closes the gap. In a table cell it wraps an input named by aria-label and holds no text of its own.'],
       ['Help text', 'A 12px zinc-500 line outside the label, indented past the switch with pr-13 — the track plus the gap — and pointed at with aria-describedby. Inside the label it joins the switch\'s accessible name and is read back in full on every toggle.'],
-      ['Status line', 'The row\'s answer: last changed, Saving, Saved, or Not saved with a way to try again. role="status", because the revert after a failed write is programmatic and a programmatic change to checked is announced by nothing.'],
+      ['Status line', 'The row\'s answer: last changed, Saving, Saved, or Not saved with a way to try again. role="status", because the revert after a failed write is programmatic and a programmatic change to checked is announced by nothing. One per row on a settings card, one per table under a register.'],
+      ['Question', 'The inline confirmation: a recessed bg-zinc-50 block under the row carrying one sentence and two buttons. Focus moves to Cancel when it opens and back to the switch when it closes either way, and the switch has not moved while it is open. Anything that needs more than a sentence is alert-dialog.'],
+      ['Dependent block', 'What the switch reveals — the qualifiers that mean nothing while the setting is off. Divided from the row above with border-zinc-100, padded on an inner div so x-collapse has a bare element to animate, and every control inside it writes on change like the switch does.'],
       ['Row', 'Label left, switch right, one setting per row, divided by border-zinc-100 inside a bordered card. The switch is shrink-0 so a long setting name wraps rather than squeezing the pill.']
     ],
     behaviour: [
       'Touching it is the write. There is no Save button on a page of switches and no dirty state to track — the change is sent on change, and the row says what happened to it.',
       'The optimistic paint is free: the track and thumb are drawn from the input\'s own checked state, so the switch has already moved before the request leaves. All the code does is undo it — the failure handler flips checked back and the row reports it.',
       'A failed write reverts the switch to the value the server still holds and says so in words, with a Try again that re-applies what the user actually asked for rather than re-posting the reverted value.',
+      'A refused write reverts the same way and offers nothing to press. The row prints the sentence the server sent, because the answer to a rule is not a retry — it is reading the rule.',
       'Two toggles inside a second are one intent, not two. hx-sync="this:replace" drops the request still in flight so the last position is the one the server ends on; without it the replies can land out of order and the row settles on the older one.',
       'Disabled and pending look nothing alike. Disabled drains the whole control to 60% and refuses the pointer; pending stays at full strength, still takes another toggle, and says Saving in the row. Drain a pending switch and you have told the user it is locked when it is not, and hidden which way they just set it.',
+      'A confirmed switch does not move until the answer comes back. It is driven by state rather than by its own checked property and the click is prevented, so a cancelled question leaves a switch that never moved rather than one that moved twice. Escape cancels and puts focus back on the switch, and focus lands on Cancel when the question opens — never on the destructive answer.',
       'A master switch turns its dependants off without clearing them, so switching it back on restores the set somebody chose rather than an empty one. The dependants stay visible and disabled rather than disappearing — a list that changes length is a list nobody can scan by position.',
+      'A revealed block keeps its values while it is hidden, so switching the setting back on restores what was chosen rather than a blank set. Inside a real form a hidden dependent field still posts, which is the server\'s to ignore and not a reason to clear it on the way out.',
+      'One switch per row in a register writes on its own and reports into a single live region under the table, which names the record it is talking about. Twelve rows cannot each carry a Saving line without turning the register into a settings page.',
       'At 390px the row keeps its shape: the setting name wraps, the switch stays 36px on the right, and the help text runs under the name. Nothing scrolls sideways and nothing stacks the switch under its own label, where it stops looking like it belongs to it.'
     ],
     a11y: [
       'role="switch" on the native input is what makes it announce on and off instead of checked and unchecked. The checked property maps to aria-checked by itself, so nothing here writes aria-checked, and nothing should — an attribute set once in markup goes stale the first time the control moves.',
       'The label wraps the input and names the setting rather than its state. Help text stays outside the label and is attached with aria-describedby, or the whole explanation becomes part of the accessible name and is read back on every toggle.',
-      'A switch on a record needs a name of its own: aria-label="Only overdue" on a filter, aria-label="Active — Gujarat Polymers Ltd" in a list. Twelve switches all called Active say nothing about which row the cursor is on.',
+      'A switch on a record needs a name of its own: aria-label="Only overdue" on a filter, aria-label="Active — Gujarat Polymers Ltd" in a register. A column header names nothing — it is not associated with the input under it — and twelve switches all called Active say nothing about which row the cursor is on.',
       'The focus indicator lives on the track, because the input is sr-only and paints nothing itself. It is an outline with an offset rather than a ring, so it stacks with the tinted edge and survives forced-colours mode, where box-shadows are dropped. Nothing here writes outline-none.',
       'The status line is a role="status" region. The user hears their own toggle, but the revert after a failed write is script setting checked, and a programmatic change is announced by nothing — without the live region the only sign the setting did not stick is a pixel moving back.',
       'State never rests on colour. Forced-colours mode drops the fills and both tracks render the same, so the thumb\'s position carries it, with forced-colors:border on the track and the thumb so the pill and the disc still have edges.',
-      'Disabled uses the disabled attribute, which takes the switch out of the Tab order, and it keeps its position so the setting is still readable. A value nobody may ever change is not a dead switch — it is text, the way a locked checkbox is.'
+      'Disabled uses the disabled attribute, which takes the switch out of the Tab order, and it keeps its position so the setting is still readable. A value nobody may ever change is not a dead switch — it is text, the way a locked checkbox is.',
+      'A locked switch that has something to explain takes aria-disabled and a prevented click rather than disabled. A disabled control cannot be focused, so the aria-describedby sentence hanging off it is unreachable from the keyboard, and the one user who most needs the reason is the one who cannot get to it.',
+      'A switch that reveals a block takes no aria-expanded. It already announces on and off, and a second expanded state on the same control is two states where there is one — it promises a disclosure that changes nothing, when what happened is that a setting was written. The block follows the switch in the DOM so it is the next thing read.',
+      'An inline confirmation moves focus into itself, onto Cancel, and returns it to the switch on either answer. Left where it was, focus sits on a switch that did not move while a question nobody was told about waits underneath it.'
     ],
-    related: ['checkbox', 'radio', 'field'],
+    related: ['checkbox', 'radio', 'field', 'alert-dialog'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<!-- A real checkbox with role="switch", sr-only so nothing of it is painted,
@@ -4431,7 +8369,12 @@ Test certificate follows by email.</textarea>
 
      One locked row keeps its place and its position. Dropping it would change
      the shape of a list people scan by position, and repainting it to the off
-     fill would say the setting is off when it is on and out of their hands. -->
+     fill would say the setting is off when it is on and out of their hands.
+
+     That row takes plain disabled rather than aria-disabled, because its reason
+     is already printed under it. The readonly variant carries the other case,
+     where the sentence is the only thing that explains the lock and has to stay
+     reachable from the keyboard. -->
 <div data-kui="toggle/list" class="max-w-xl rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[13px]/5 font-medium">Notifications — Gujarat Polymers Ltd</h3>
@@ -4503,14 +8446,20 @@ Test certificate follows by email.</textarea>
      The dependants stay on screen and go disabled rather than disappearing: a
      list that changes length under the pointer is a list nobody can scan by
      position. peer-disabled:opacity-60 drains the whole switch in one go, which
-     is why the drain sits on the track and not on the thumb inside it. -->
+     is why the drain sits on the track and not on the thumb inside it.
+
+     The master carries checked as well as x-model, and the two agree on
+     purpose. x-model writes the model into the control at boot, so a master
+     rendered unchecked with x-data { email: true } paints off for one frame and
+     then jumps on — and the dependants below it flick from enabled to disabled
+     with it. The markup has to be right before Alpine runs, not after. -->
 <fieldset data-kui="toggle/group" class="max-w-xl rounded-xl border border-zinc-300 bg-white" x-data="{ email: true }">
   <legend class="sr-only">Email notifications for Gujarat Polymers Ltd</legend>
 
   <div class="px-4 py-2.5">
     <label class="flex items-start justify-between gap-4 py-1">
       <span class="text-[14px]/5 font-medium">Email notifications</span>
-      <input type="checkbox" role="switch" x-model="email"
+      <input type="checkbox" role="switch" x-model="email" checked
              aria-describedby="sw-master-help" class="peer sr-only">
       <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
         <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
@@ -4645,8 +8594,358 @@ Test certificate follows by email.</textarea>
     </label>
     <p role="status" class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 pr-13 text-[12px]/4 font-medium text-red-600">
       <span class="flex items-center gap-1.5"><i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged</span>
-      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2">Try again</button>
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Try again</button>
     </p>
+  </div>
+</div>` },
+
+      { id: 'table', name: 'One switch per row in a register', tagNew: true, code:
+`<!-- A column of switches over a register, where the switch is the record's
+     state rather than a preference of the user's. The column header names
+     nothing: it is not associated with the input under it, so every switch
+     carries aria-label with the column and the record in it — twelve switches
+     called Active say nothing about which row the cursor is on. The label wraps
+     the input for the pointer and the target and holds no text of its own.
+
+     There is no status line per row and there is no room for one. The table
+     carries a single role="status" underneath it and the message names the
+     record it is about, so one handler on the table covers every row: htmx
+     events bubble, and $event.detail.elt is the switch that failed. Flipping
+     that element's checked back is the whole revert, because hx-sync has
+     already made sure nothing else was in flight against it.
+
+     Three columns, rendered once. A desktop table with a stacked phone list
+     under it would put two switches on one record, and after a write the hidden
+     one is wrong — so the vendor name wraps instead and the row keeps its
+     shape at 390px.
+
+     The small track is the one for a table: a 20px pill in a 13px row is taller
+     than everything beside it. -->
+<div data-kui="toggle/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{ msg: '' }"
+     @htmx:before-request.camel="msg = ''"
+     @htmx:after-request.camel="
+       if (!$event.detail.successful) {
+         $event.detail.elt.checked = !$event.detail.elt.checked;
+         msg = 'Not saved — ' + $event.detail.elt.dataset.vendor + ' is unchanged';
+       }">
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5">Vendor</th>
+        <th scope="col" class="px-3 py-2.5 text-right">Open</th>
+        <th scope="col" class="px-4 py-2.5 text-right">Active</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2">
+          <span class="block">Gujarat Polymers Ltd</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-500">24AAACG1234F1Z5</span>
+        </td>
+        <td class="px-3 py-2 text-right tabular-nums text-zinc-600">18</td>
+        <td class="px-4 py-2 text-right">
+          <label class="inline-flex py-1">
+            <input type="checkbox" role="switch" checked
+                   aria-label="Active — Gujarat Polymers Ltd" data-vendor="Gujarat Polymers Ltd"
+                   hx-post="/vendors/gujarat-polymers/active/"
+                   hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                   class="peer sr-only">
+            <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+              <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+            </span>
+          </label>
+        </td>
+      </tr>
+
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2">
+          <span class="block">Sharma Extrusions</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-500">27AABCS5678K1Z2</span>
+        </td>
+        <td class="px-3 py-2 text-right tabular-nums text-zinc-600">6</td>
+        <td class="px-4 py-2 text-right">
+          <label class="inline-flex py-1">
+            <input type="checkbox" role="switch" checked
+                   aria-label="Active — Sharma Extrusions" data-vendor="Sharma Extrusions"
+                   hx-post="/vendors/sharma-extrusions/active/"
+                   hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                   class="peer sr-only">
+            <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+              <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+            </span>
+          </label>
+        </td>
+      </tr>
+
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2">
+          <span class="block">Nashik Steel Traders</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-500">27AACCN9012M1Z8</span>
+        </td>
+        <td class="px-3 py-2 text-right tabular-nums text-zinc-600">0</td>
+        <td class="px-4 py-2 text-right">
+          <label class="inline-flex py-1">
+            <input type="checkbox" role="switch"
+                   aria-label="Active — Nashik Steel Traders" data-vendor="Nashik Steel Traders"
+                   hx-post="/vendors/nashik-steel/active/"
+                   hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                   class="peer sr-only">
+            <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+              <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+            </span>
+          </label>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="px-4 py-2">
+          <span class="block">Deccan Fasteners Pvt Ltd</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-500">29AADCD3456P1Z1</span>
+        </td>
+        <td class="px-3 py-2 text-right tabular-nums text-zinc-600">3</td>
+        <td class="px-4 py-2 text-right">
+          <label class="inline-flex py-1">
+            <input type="checkbox" role="switch" checked
+                   aria-label="Active — Deccan Fasteners Pvt Ltd" data-vendor="Deccan Fasteners Pvt Ltd"
+                   hx-post="/vendors/deccan-fasteners/active/"
+                   hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                   class="peer sr-only">
+            <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+              <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+            </span>
+          </label>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p role="status" class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4">
+    <span x-show="!msg" class="text-zinc-500">An inactive vendor keeps its history and takes no new orders. Each switch applies as you set it.</span>
+    <span x-show="msg" x-cloak class="flex items-center gap-1.5 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i><span x-text="msg"></span>
+    </span>
+  </p>
+</div>` },
+
+      { id: 'dependent', name: 'Revealing what it governs', tagNew: true, code:
+`<!-- The block under the switch is not a second setting, it is the qualifier
+     for the first one: "3 days before" means nothing while reminders are off,
+     so it is revealed rather than disabled in place. The group variant does the
+     opposite, and the test between them is whether the dependants are settings
+     in their own right — those stay on screen and go disabled, because a list
+     that changes length is a list nobody can scan by position.
+
+     Everything inside the block writes on change, the same contract the switch
+     itself has. Put one field in here that only lands on a Save and the card
+     needs a Save button, and the switch above it has quietly become a checkbox.
+
+     The switch takes no aria-expanded. It already announces on and off, and a
+     second expanded state on the same control is two states where there is one.
+     The block follows it in the DOM, so it is the next thing read.
+
+     x-collapse animates the wrapper, so the wrapper carries nothing but x-show,
+     x-collapse and the divider: box-sizing is border-box, and height:0 cannot go
+     below a padding of its own, so the panel would bottom out at the padding and
+     then vanish in a single frame. The padding lives on the inner div. There is
+     no x-cloak because the block is open at first paint — cloak something that
+     is already visible and it flashes empty until Alpine boots. -->
+<div data-kui="toggle/dependent" class="max-w-xl rounded-xl border border-zinc-300 bg-white" x-data="{ remind: true }">
+  <div class="px-4 py-2.5">
+    <label class="flex items-start justify-between gap-4 py-1">
+      <span class="text-[14px]/5">Remind the buyer before payment falls due</span>
+      <input type="checkbox" role="switch" x-model="remind" checked name="on" value="1"
+             hx-post="/vendors/gujarat-polymers/settings/payment-reminder/"
+             hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+             aria-describedby="sw-remind-help" class="peer sr-only">
+      <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+        <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+      </span>
+    </label>
+    <p id="sw-remind-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">
+      Every open invoice on the account. 4 invoices, ₹12,45,000 outstanding.
+    </p>
+  </div>
+
+  <div x-show="remind" x-collapse class="border-t border-zinc-100">
+    <div class="space-y-3.5 px-4 py-3.5">
+      <div>
+        <label for="sw-remind-when" class="mb-1.5 block text-[13px]/5 font-medium">How long before the due date</label>
+        <div class="relative max-w-xs rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="sw-remind-when" name="days"
+                  hx-post="/vendors/gujarat-polymers/settings/payment-reminder-days/"
+                  hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 tabular-nums outline-none">
+            <option value="3" selected>3 days before</option>
+            <option value="7">7 days before</option>
+            <option value="14">14 days before</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-4"></i>
+          </span>
+        </div>
+      </div>
+
+      <label class="flex items-center justify-between gap-4 py-1">
+        <span class="text-[13px]/5">Copy the accounts team on every reminder</span>
+        <input type="checkbox" role="switch" name="on" value="1"
+               hx-post="/vendors/gujarat-polymers/settings/payment-reminder-copy/"
+               hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+               class="peer sr-only">
+        <span class="relative h-4 w-7 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-3 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+          <span class="absolute top-0.5 left-0.5 size-3 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+        </span>
+      </label>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'readonly', name: 'Locked to you, and locked for good', tagNew: true, code:
+`<!-- Two different locks, and only one of them is still a switch.
+
+     The first card holds a setting somebody else owns. It takes aria-disabled
+     and a prevented click rather than the disabled attribute, because a
+     disabled control cannot be focused and the sentence hanging off it by
+     aria-describedby is then unreachable from the keyboard — the reason exists
+     and the one user who needs it most cannot get to it. aria-disabled keeps
+     the switch in the Tab order, keeps its focus outline, and puts the reason
+     one tab stop away. It does not stop the change on its own, so @click.prevent
+     does, and the view has to refuse the POST as well: the attribute is advice
+     to a screen reader and the server is not obliged to take it. The track adds
+     peer-aria-disabled:opacity-60 so the drain still says "this will not move";
+     the lock icon beside it says who it will move for.
+
+     The second card is a posted GRN. Nobody will ever change these — they are
+     what applied when the receipt went through — so they are not controls at
+     all. readonly would have been the obvious attribute and it does nothing on
+     a checkbox: it parses, it reviews as correct, and it leaves a switch anyone
+     can move. disabled locks it but drops it out of the POST, so a value that
+     still has to be submitted needs a hidden input beside it. A value that will
+     never change again needs neither, and is text. -->
+<div data-kui="toggle/readonly" class="max-w-xl space-y-4">
+  <div class="rounded-xl border border-zinc-300 bg-white" x-data>
+    <div class="border-b border-zinc-200 px-4 py-3">
+      <h3 class="text-[13px]/5 font-medium tabular-nums">Rate contract RC-24-0088 — Gujarat Polymers Ltd</h3>
+    </div>
+
+    <div class="divide-y divide-zinc-100">
+      <div class="px-4 py-2.5">
+        <label class="flex items-start justify-between gap-4 py-1">
+          <span class="text-[14px]/5 tabular-nums">Auto-approve orders under ₹50,000</span>
+          <input type="checkbox" role="switch" checked
+                 aria-describedby="sw-rc-auto-help" class="peer sr-only">
+          <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+            <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+          </span>
+        </label>
+        <p id="sw-rc-auto-help" class="mt-1 pr-13 text-[12px]/4 text-zinc-500">Yours to change. It applies from the next order.</p>
+      </div>
+
+      <div class="px-4 py-2.5">
+        <label class="flex items-start justify-between gap-4 py-1">
+          <span class="text-[14px]/5 tabular-nums">Skip the second approval above ₹10,00,000</span>
+          <input type="checkbox" role="switch" checked aria-disabled="true" @click.prevent
+                 aria-describedby="sw-rc-second-help" class="peer sr-only">
+          <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 peer-aria-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+            <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+          </span>
+        </label>
+        <p id="sw-rc-second-help" class="mt-1 flex items-start gap-1.5 pr-13 text-[12px]/4 text-zinc-600">
+          <i data-lucide="lock" class="size-3.5 shrink-0 translate-y-px text-zinc-500"></i>
+          <span>Plant policy. Ritu Deshpande, the plant head, is the only person who can turn this off.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-4 py-3">
+      <h3 class="text-[13px]/5 font-medium tabular-nums">GRN-24-0713 — posted 04 Sep 2026</h3>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">What was in force when the receipt was posted. Nothing here is a control any more.</p>
+    </div>
+
+    <dl class="divide-y divide-zinc-100">
+      <div class="flex items-start justify-between gap-4 px-4 py-2.5">
+        <dt class="text-[14px]/5 text-zinc-600">Three-way match against the invoice</dt>
+        <dd class="shrink-0 text-[14px]/5 font-medium">Yes</dd>
+      </div>
+      <div class="flex items-start justify-between gap-4 px-4 py-2.5">
+        <dt class="text-[14px]/5 tabular-nums text-zinc-600">Auto-approved under ₹50,000</dt>
+        <dd class="shrink-0 text-[14px]/5 font-medium">No</dd>
+      </div>
+      <div class="flex items-start justify-between gap-4 px-4 py-2.5">
+        <dt class="text-[14px]/5 text-zinc-600">QC hold on the received batch</dt>
+        <dd class="shrink-0 text-[14px]/5 font-medium">Yes</dd>
+      </div>
+    </dl>
+
+    <div class="border-t border-zinc-200 px-4 py-2.5">
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">Changing the vendor's settings now does not change this receipt.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'confirm', name: 'Asking before it moves', tagNew: true, code:
+`<!-- The exception to the rule, and the rule is worth restating: a switch does
+     not ask. Anything worth stopping for is a button with a verb on it. What
+     buys this one its question is that it lives among ordinary settings on a
+     vendor page — moving it out to a button breaks a list people read by
+     position — and that the same gesture cannot take it back, because
+     unblocking does not restore the orders nobody could raise.
+
+     The switch does not move while the question is open. It is driven by state
+     — :checked="on" with @click.prevent — rather than by its own checked
+     property, so a cancelled question leaves a switch that never moved instead
+     of one that moved and then moved back. A switch that moves first has
+     already told the user the thing happened.
+
+     Only one direction asks. Blocking is the hard way round; unblocking goes
+     straight through. Ask on both and you have written a button that has been
+     drawn as a switch.
+
+     Focus moves to Cancel when the question opens, never to the destructive
+     answer, and Escape or either button puts it back on the switch. Left where
+     it was, focus sits on a control that did not move while a question nobody
+     was told about waits underneath it.
+
+     The write goes on the confirming press, not on the switch: put hx-post on
+     the Block vendor button and never on the input, which is why nothing here
+     posts. If the question needs more than one sentence, or the page behind it
+     has to be held while it is asked, this is alert-dialog instead. -->
+<div data-kui="toggle/confirm" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
+     x-data="{ on: false, asking: false }"
+     @keydown.escape="if (asking) { asking = false; $refs.sw.focus() }">
+
+  <label class="flex items-start justify-between gap-4 py-1">
+    <span class="text-[14px]/5">Block new orders to Gujarat Polymers Ltd</span>
+    <input type="checkbox" role="switch" x-ref="sw" :checked="on"
+           @click.prevent="if (on) { on = false } else { asking = true; $nextTick(() => $refs.cancel.focus()) }"
+           aria-describedby="sw-block-help" class="peer sr-only">
+    <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+      <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+    </span>
+  </label>
+
+  <p id="sw-block-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">
+    Buyers can still receive against the 3 orders already open, worth ₹42,90,000.
+  </p>
+
+  <p role="status" class="mt-1 pr-13 text-[12px]/4">
+    <span x-show="!on" class="tabular-nums text-zinc-500">Not blocked. Last order raised 14 Aug 2026.</span>
+    <span x-show="on" x-cloak class="flex items-center gap-1.5 font-medium text-zinc-900">
+      <i data-lucide="alert-circle" class="size-3.5 shrink-0 text-red-600"></i>Blocked — no new order can be raised
+    </span>
+  </p>
+
+  <div x-show="asking" x-cloak class="mt-2.5 rounded-lg bg-zinc-50 p-3">
+    <p class="text-[13px]/5">Block Gujarat Polymers Ltd? Nobody can raise an order against them until this is switched back, and the 6 lines in draft will not submit.</p>
+    <div class="mt-2.5 flex flex-wrap gap-2">
+      <button type="button" @click="on = true; asking = false; $refs.sw.focus()"
+              class="inline-flex h-8 items-center rounded-lg border border-transparent bg-red-600 px-3 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Block vendor</button>
+      <button type="button" x-ref="cancel" @click="asking = false; $refs.sw.focus()"
+              class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+    </div>
   </div>
 </div>` },
 
@@ -4669,9 +8968,9 @@ Test certificate follows by email.</textarea>
      from a field that was never rendered. Django also needs the CSRF token on
      the request; that is in the django variant.
 
-     The status line is role="status" because the revert is script setting
-     checked, and a programmatic change is announced by nothing. Without it the
-     only sign the setting did not stick is a pixel moving back. -->
+     This handler treats every unsuccessful response the same way. The refused
+     variant is the same row splitting them: a 409 the server can explain is not
+     a 500 you can retry. -->
 <div data-kui="toggle/htmx" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
      x-data="{ state: 'idle', want: true }"
      @htmx:before-request.camel="want = $refs.sw.checked; state = 'saving'"
@@ -4705,7 +9004,87 @@ Test certificate follows by email.</textarea>
       <span class="flex items-center gap-1.5">
         <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged
       </span>
-      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              @click="$refs.sw.checked = want; $refs.sw.dispatchEvent(new Event('change'))">Try again</button>
+    </span>
+  </p>
+</div>` },
+
+      { id: 'refused', name: 'The server said no', tagNew: true, code:
+`<!-- Could not and would not are different answers, and the row has to say
+     which. The htmx variant reverts and offers Try again for everything that
+     was not a 2xx, which is right for a dropped connection and wrong for a
+     rule: pressing Try again against a 409 asks the same question and gets the
+     same answer, and the second refusal reads as a broken button.
+
+     So the handler splits on the status. 403 and 409 are the codes this
+     application's own views return with a plain sentence in the body — you may
+     not change this, and this cannot be changed while something else is true —
+     and that sentence is what the row prints. Everything else keeps the retry.
+
+     Only ever print the bodies your own views produce. A 500 body is a stack
+     trace or a whole HTML error page, and an empty one leaves the row saying
+     nothing at all, which is why there is a fallback string behind it. It goes
+     in with x-text and never x-html: a message you did not write is not markup
+     you may run.
+
+     The tone follows the meaning rather than the severity. A refusal is a rule
+     the record is over — the warning tone, amber-700 with alert-triangle — and
+     a write that never landed is danger, red-600 with alert-circle. Both are an
+     icon and a line of text; neither is a field of colour behind them.
+
+     views.py
+         if vendor.open_orders:
+             return HttpResponse(
+                 'Gujarat Polymers Ltd has 3 open orders. Close or cancel them '
+                 'before blocking the account.',
+                 status=409, content_type='text/plain')
+-->
+<div data-kui="toggle/refused" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
+     x-data="{ state: 'idle', want: false, reason: '' }"
+     @htmx:before-request.camel="want = $refs.sw.checked; state = 'saving'"
+     @htmx:after-request.camel="
+       if ($event.detail.successful) { state = 'saved' }
+       else if ([403, 409].includes($event.detail.xhr.status)) {
+         $refs.sw.checked = !want;
+         reason = $event.detail.xhr.responseText || 'The change was refused.';
+         state = 'refused';
+       }
+       else { $refs.sw.checked = !want; state = 'failed' }">
+
+  <label class="flex items-start justify-between gap-4 py-1">
+    <span class="text-[14px]/5">Block new orders to Gujarat Polymers Ltd</span>
+    <input type="checkbox" role="switch" x-ref="sw" name="on" value="1"
+           hx-post="/vendors/gujarat-polymers/settings/blocked/"
+           hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+           aria-describedby="sw-refused-help" class="peer sr-only">
+    <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+      <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+    </span>
+  </label>
+
+  <p id="sw-refused-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">
+    3 orders open, ₹42,90,000 committed.
+  </p>
+
+  <p role="status" class="mt-1 pr-13 text-[12px]/4">
+    <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+    </span>
+
+    <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+      <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+    </span>
+
+    <span x-show="state === 'refused'" x-cloak class="flex items-start gap-1.5 font-medium text-amber-700">
+      <i data-lucide="alert-triangle" class="size-3.5 shrink-0 translate-y-px"></i><span x-text="reason"></span>
+    </span>
+
+    <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged
+      </span>
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               @click="$refs.sw.checked = want; $refs.sw.dispatchEvent(new Event('change'))">Try again</button>
     </span>
   </p>
@@ -4729,6 +9108,11 @@ Test certificate follows by email.</textarea>
              vendor = get_object_or_404(Vendor, slug=slug)
              if key not in EDITABLE_SETTINGS:          # never setattr a POST key
                  return HttpResponseBadRequest()
+             if key in vendor.locked_settings(request.user):
+                 # 403 with a sentence, not an empty one: the row prints this
+                 # body verbatim. See the refused variant.
+                 return HttpResponse('Only the plant head can change this.',
+                                     status=403, content_type='text/plain')
              form = SettingForm(request.POST)
              form.is_valid()
              setattr(vendor, key, form.cleaned_data['on'])
@@ -4752,6 +9136,12 @@ Test certificate follows by email.</textarea>
              'role': 'switch', 'class': 'peer sr-only',
              'hx-trigger': 'change', 'hx-swap': 'none', 'hx-sync': 'this:replace',
          })
+
+     A locked row renders disabled, and disabled is right here because the
+     reason is printed underneath it in the same loop. A lock that is only
+     explained on request needs aria-disabled instead — see the readonly
+     variant, because a disabled control cannot be focused and its
+     aria-describedby cannot be reached.
 
      hx-headers sits on the card so every switch inside it sends the CSRF token;
      htmx will not find one without a form to read it from. -->
@@ -4791,7 +9181,7 @@ Test certificate follows by email.</textarea>
           <span class="flex items-center gap-1.5">
             <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged
           </span>
-          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                   @click="$refs.sw.checked = want; $refs.sw.dispatchEvent(new Event('change'))">Try again</button>
         </span>
       </p>
@@ -4829,6 +9219,12 @@ Test certificate follows by email.</textarea>
       'Nothing inside role="option" may be focusable, so the tick on a multiselect row is a drawn square and not a real checkbox. A real box there is a tab stop inside a widget that is meant to have none, and if it carries a name it posts the value a second time beside the hidden input.',
       'Lucide icons inside template x-for do not exist when createIcons() first runs, because Alpine renders the rows after DOMContentLoaded. The page needs the guarded re-hydration loop — a MutationObserver calling createIcons() only while document.querySelector("[data-lucide]:not(svg)") finds something — or the ticks and the chip crosses come up empty. Bind x-show on a wrapping span, never on the <i>.',
       'htmx\'s trigger filter binds to the event name, not to the end of the spec: input[this.value.length > 1] changed delay:300ms. Written as input changed delay:300ms[…] it is parsed as part of the modifier and the floor never applies. And below that floor nothing fires at all, so deleting back to one character has to clear the rows in script or last search\'s answer stays on screen under a query that no longer produced it.',
+      'A popup that carries controls of its own cannot close on Tab. Tab is how a keyboard reaches Select all, or Retry after a failed search, and closing on it leaves a control that works with a mouse and does not exist otherwise. Those variants close when focus leaves the component — @focusout guarded by $el.contains($event.relatedTarget), which says where focus went and which blur cannot answer. Everywhere else Tab out of the input is Tab out of the field, and closing on it is right.',
+      'Where the popup lifts the committed rows to the top of a long list, the split is taken when it opens and left alone while it is open. Recomputed on every tick, the row leaves from under the pointer as it is ticked and the next one slides into the space, which makes ticking four items a game of chase. Each record also has to land in exactly one of the two groups: listed in both, one record is two rows carrying the same id inside one listbox.',
+      'A filter bar has no room for a text box per filter, and a filter has to say its value while it is shut, which a search box cannot do — a box reading "Gujarat Polymers Ltd" is text somebody typed and can clear with Backspace. There the trigger is a button carrying aria-expanded and the count, and the search input lives inside the panel. That moves focus off the input and onto the button, so Escape has somewhere to put it back, and the count on the trigger becomes the only thing on screen saying the filter is on.',
+      'An anchored panel is unusable under a focused field on a phone: focusing raises the keyboard, and the keyboard covers where the panel just opened. Below sm the component becomes the screen — the root goes fixed inset-0, the box sits at the top and the list takes what is left and scrolls. One x-data and one input across both shapes, because a phone copy with markup of its own is a second control carrying the same id, and the label then binds to whichever of the two rendered last.',
+      'A combobox in a line-items row needs no clipping ancestor between the field and its popup — no overflow-hidden on the card, no table inside a sideways scroller — and the panel needs its z-20, because the cells below are positioned too and would paint over it in document order. Every id in a repeated row is built from the line number, never from the loop index: deleting line 2 renumbers every index after it, and a label whose for points at the old index then names the row below the one it sits beside.',
+      'Where committing is also the write, the request is dispatched inside $nextTick. Alpine writes the hidden input on the next microtask, so an event fired in the same statement that set the value posts the value that was there before the pick — the field on screen and the row in the database disagree, and neither side looks wrong. A failed write puts the previous value back into the box, the hidden input and the query together; revert two of the three and the field reads one name over a hidden value of another.',
       'In Django the multiselect field needs a widget whose value_from_datadict calls getlist — forms.MultipleHiddenInput or forms.SelectMultiple. A ModelMultipleChoiceField handed a plain HiddenInput reads the POST with .get(), which returns the last hidden input and drops every other vendor the user picked. Seed the option list with json_script and never interpolate a queryset into an x-data attribute: one vendor called M/s D\'Souza Traders ends the attribute early and the component stops parsing.'
     ],
     anatomy: [
@@ -4839,7 +9235,8 @@ Test certificate follows by email.</textarea>
       ['Option', 'role="option" with a stable id and aria-selected. The active row is tinted bg-zinc-100 and named by aria-activedescendant, which is a different fact from being selected.'],
       ['Chip', 'A committed value in a multiselect field: the graphite pill with its ring, a truncating label, and a remove button whose accessible name says which vendor it removes.'],
       ['Empty state', 'What the popup shows at zero matches — the query quoted back and the way out of it.'],
-      ['Live region', 'A sr-only role="status" outside the popup, in the document from first paint, carrying the number of matches.']
+      ['Live region', 'A sr-only role="status" outside the popup, in the document from first paint, carrying the number of matches.'],
+      ['Trigger', 'What replaces the field where a text box at rest would read as typed text — a filter bar, a toolbar. A button carrying aria-expanded, aria-controls and the count, with the search input moved inside the panel.']
     ],
     behaviour: [
       'Typing filters, and the first keystroke moves the highlight to the first match, so Enter always takes the row at the top of the list.',
@@ -4851,7 +9248,13 @@ Test certificate follows by email.</textarea>
       'Select all applies to the rows the filter is showing and says how many that is; Clear releases everything and says how many that is.',
       'Selected values are chips in the field, not a number beside it. Where a bulk control can select nine at once the field shows one name and collapses everything past it into a pill, so the box holds a single row at every count and every width rather than growing one when the pill appears. The popup is where the whole selection is legible and every row can be toggled off.',
       'Remote options are fetched by htmx on a debounced input with a two-character floor. Alpine never fetches: it owns the open state and the keyboard, and because htmx replaced the rows without telling Alpine, the keyboard reads the option elements out of the DOM rather than out of an array.',
-      'A value that is not in the list is offered as the last row whenever there is a query and no exact match, and it posts as text in a second field rather than as an invented id.'
+      'A value that is not in the list is offered as the last row whenever there is a query and no exact match, and it posts as text in a second field rather than as an invented id.',
+      'Home and End jump to the ends of the list while it is open and belong to the caret while it is closed. Every variant with a list answers them.',
+      'A popup holding controls of its own — a bulk select, a retry — stays open on Tab so the keyboard can reach them, and closes when focus leaves the component.',
+      'In a filter bar the trigger is a button that says the filter and how many values are on. Focus moves into the panel when it opens, the filter applies on the tick rather than on an Apply button, and Escape returns focus to the trigger.',
+      'Below sm the panel is the screen: the field moves to the top edge and the list takes everything the keyboard leaves. Above sm the same markup is the anchored panel.',
+      'Committing can be the write. The request fires on commit, a failure restores the value the server last confirmed, and Try again re-sends what the user asked for rather than what the failure reverted to.',
+      'On a long list the rows already committed are lifted into a group at the head of the popup when it opens, and they stay where they are while it is open.'
     ],
     a11y: [
       'The input is role="combobox" with aria-expanded, aria-controls naming the listbox, aria-autocomplete="list" and aria-activedescendant naming the active option.',
@@ -4861,7 +9264,10 @@ Test certificate follows by email.</textarea>
       'Every chip remove button names its own option — "Remove Nashik Steel Traders" — because twelve buttons all called Remove say nothing about which one the cursor is on.',
       'Grouped options sit in role="group" with an aria-label, and the visible sticky heading is aria-hidden: the group is already named, and a bare paragraph is not a permitted child of a listbox.',
       'Escape closes the list and leaves focus in the input, and stops propagating only while the list is open, so a second Escape still reaches the dialog around it.',
-      'A disabled field disables the hidden input as well as the box. An invalid field sets aria-invalid="true" and points aria-describedby at real text under it, never at a title attribute.'
+      'A disabled field disables the hidden input as well as the box. An invalid field sets aria-invalid="true" and points aria-describedby at real text under it, never at a title attribute — and a disabled one still points at the line saying why it is disabled.',
+      'A trigger-shaped combobox splits the roles between two elements: the button carries aria-expanded and aria-controls for the panel, the input inside carries role="combobox" and owns the listbox, and Escape returns focus to the button that opened it.',
+      'A failed search is announced, not only drawn. A red line inside the popup says nothing to a screen reader if the live region only ever reports counts.',
+      'A control repeated down a grid is named by the line it belongs to — a fieldset with an sr-only legend — so eleven controls called Item are announced as "line 4, Item" rather than as eleven identical fields.'
     ],
     related: ['input', 'checkbox', 'command-palette'],
     variants: [
@@ -4920,7 +9326,7 @@ Test certificate follows by email.</textarea>
      @click.outside="close()"
      @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
 
-  <label for="cb-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+  <label for="cb-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span aria-hidden="true" class="text-red-600">*</span></label>
 
   <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
@@ -5142,7 +9548,14 @@ Test certificate follows by email.</textarea>
      ticked in it, and no route back to the other three.
 
      The line under the buttons only appears while a query is typed, so the
-     asymmetry is on screen rather than in the documentation. -->
+     asymmetry is on screen rather than in the documentation.
+
+     A popup carrying its own controls cannot close on Tab. Every other variant
+     here closes on it, because Tab out of the input is Tab out of the field —
+     but here Tab is the only route to Select all, and closing on it left a bulk
+     control that worked with a mouse and did not exist for a keyboard. The list
+     closes when focus leaves the component instead, which relatedTarget on
+     focusout answers and blur cannot. -->
 <div data-kui="combobox/select-all" class="relative max-w-md"
      x-data="{
        open: false, typed: false, q: '', ai: 0,
@@ -5182,6 +9595,7 @@ Test certificate follows by email.</textarea>
          this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
          this.scroll();
        },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
        toggle(o) {
          this.sel = this.has(o.id) ? this.sel.filter(v => v !== o.id) : [...this.sel, o.id];
          this.$refs.q.focus();
@@ -5191,6 +9605,7 @@ Test certificate follows by email.</textarea>
        commit() { const o = this.list[this.ai]; if (o) this.toggle(o); }
      }"
      @click.outside="close()"
+     @focusout="if (open && !$el.contains($event.relatedTarget)) close()"
      @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
 
   <label for="cb-cc" class="mb-1.5 block text-[13px]/5 font-medium">Cost centres this expense is split across</label>
@@ -5223,7 +9638,7 @@ Test certificate follows by email.</textarea>
 
     <button type="button" x-show="extra" x-cloak @click.stop="$refs.q.focus(); show()"
             :aria-label="extra + ' more selected — open the list to see all ' + sel.length"
-            class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300">
       <span x-text="'+' + extra + ' more'"></span>
     </button>
 
@@ -5234,9 +9649,10 @@ Test certificate follows by email.</textarea>
            @input="typed = true; open = true; ai = 0"
            @keydown.arrow-down.prevent="move(1)"
            @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
            @keydown.enter="if (open) { $event.preventDefault(); commit() }"
            @keydown.backspace="if (!q && sel.length) { $event.preventDefault(); sel = sel.slice(0, -1) }"
-           @keydown.tab="close()"
            class="min-w-16 flex-1 bg-transparent px-1 py-1 text-[14px]/5 outline-none placeholder:text-zinc-500">
   </div>
 
@@ -5253,13 +9669,17 @@ Test certificate follows by email.</textarea>
   <div x-show="open" x-cloak
        class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
 
+    <!-- these are the only tab stops inside the popup, which is why the field
+         does not close on Tab. Both take a focus outline of their own: the
+         field's focus-within ring is behind them and says nothing about which
+         of the two the keyboard is on. -->
     <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2">
       <button type="button" @mousedown.prevent @click="takeShown()" :disabled="allShown"
-              class="text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline">
+              class="rounded text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:text-zinc-400 disabled:no-underline">
         <span x-text="filtering ? 'Select all ' + list.length + ' matching' : 'Select all ' + options.length"></span>
       </button>
       <button type="button" @mousedown.prevent @click="clearAll()" :disabled="!sel.length"
-              class="text-[12px]/4 tabular-nums text-zinc-600 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline">
+              class="rounded text-[12px]/4 tabular-nums text-zinc-600 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:text-zinc-400 disabled:no-underline">
         <span x-text="'Clear all ' + sel.length"></span>
       </button>
     </div>
@@ -5352,6 +9772,7 @@ Test certificate follows by email.</textarea>
          this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
          this.scroll();
        },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
        pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
        commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
      }"
@@ -5370,6 +9791,8 @@ Test certificate follows by email.</textarea>
            @input="typed = true; open = true; ai = 0"
            @keydown.arrow-down.prevent="move(1)"
            @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
            @keydown.enter="if (open) { $event.preventDefault(); commit() }"
            @keydown.tab="close()"
            class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
@@ -5458,6 +9881,7 @@ Test certificate follows by email.</textarea>
          this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
          this.scroll();
        },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
        pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
        commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
      }"
@@ -5476,6 +9900,8 @@ Test certificate follows by email.</textarea>
            @input="typed = true; open = true; ai = 0"
            @keydown.arrow-down.prevent="move(1)"
            @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
            @keydown.enter="if (open) { $event.preventDefault(); commit() }"
            @keydown.tab="close()"
            class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
@@ -5544,6 +9970,22 @@ Test certificate follows by email.</textarea>
      clears the rows in script — otherwise last search's answer sits there under
      a query that did not produce it.
 
+     A request that failed is the same problem with a worse cause: the rows on
+     screen are the answer to an older query, and leaving them under an error
+     that says the search did not answer invites somebody to pick one. They go,
+     and Retry sends the query that failed rather than asking the user to type a
+     character they did not want to type. The trigger list carries a second
+     event for it — the [this.value.length > 1] filter belongs to input alone,
+     so the floor is re-checked in the handler before the event is dispatched.
+
+     The failure is announced as well as drawn. A red line inside a popup is
+     nothing at all to a screen reader if the live region only ever reports
+     counts.
+
+     Retry is a control inside the popup, so this field closes on focus leaving
+     it rather than on Tab — the same reason select-all does. Close on Tab and
+     the only way out of a failed search is the mouse.
+
      The search box is named q, never vendor. The value is the hidden input, and
      a Django form ignores a POST key it has no field for. -->
 <div data-kui="combobox/remote" class="relative max-w-md"
@@ -5565,6 +10007,7 @@ Test certificate follows by email.</textarea>
          this.ai = Math.min(r.length - 1, Math.max(0, this.ai + n));
          this.paint();
        },
+       edge(end) { const r = this.rows(); if (!r.length) return; this.ai = end ? r.length - 1 : 0; this.paint(); },
        take(el) {
          if (!el) return;
          this.sel = el.dataset.value; this.label = el.dataset.label; this.term = this.label;
@@ -5578,12 +10021,19 @@ Test certificate follows by email.</textarea>
          this.term = v; this.open = true; this.failed = false;
          if (v.trim().length < 2) { this.searched = false; this.empty = false; this.$refs.list.innerHTML = ''; }
        },
+       retry() {
+         if (this.$refs.q.value.trim().length < 2) { this.$refs.q.focus(); return; }
+         this.$refs.q.dispatchEvent(new Event('retry'));
+       },
        close() { this.open = false; this.aid = null; this.term = this.label; this.$refs.q.value = this.label; }
      }"
      @click.outside="close()"
+     @focusout="if (open && !$el.contains($event.relatedTarget)) close()"
      @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }"
      @htmx:before-request.camel="loading = true; failed = false; open = true"
-     @htmx:after-request.camel="loading = false; if (!$event.detail.successful) failed = true"
+     @htmx:after-request.camel="
+       loading = false;
+       if (!$event.detail.successful) { failed = true; searched = false; empty = false; $refs.list.innerHTML = '' }"
      @htmx:after-swap.camel="searched = true; ai = 0; $nextTick(() => { empty = rows().length === 0; paint() })">
 
   <label for="cb-remote" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
@@ -5595,14 +10045,15 @@ Test certificate follows by email.</textarea>
            :aria-expanded="open" :aria-activedescendant="aid"
            placeholder="Type two characters to search"
            hx-get="/vendors/search/"
-           hx-trigger="input[this.value.length > 1] changed delay:300ms"
+           hx-trigger="input[this.value.length > 1] changed delay:300ms, retry"
            hx-target="#cb-remote-list" hx-swap="innerHTML" hx-sync="this:replace"
            @click="open = true"
            @input="changed($event.target.value)"
            @keydown.arrow-down.prevent="move(1)"
            @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
            @keydown.enter="if (open) { $event.preventDefault(); commit() }"
-           @keydown.tab="close()"
            class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
     <span class="mr-3 flex size-4 shrink-0 items-center justify-center" x-show="loading" x-cloak>
       <i data-lucide="loader-circle" class="size-4 animate-spin text-zinc-600"></i>
@@ -5612,7 +10063,9 @@ Test certificate follows by email.</textarea>
   <input type="hidden" name="vendor" :value="sel">
 
   <p role="status" class="sr-only"
-     x-text="loading ? 'Searching vendors' : (searched ? (empty ? 'No vendor matches' : 'Vendors listed') : '')"></p>
+     x-text="loading ? 'Searching vendors'
+             : (failed ? 'The vendor search did not answer'
+             : (searched ? (empty ? 'No vendor matches' : 'Vendors listed') : ''))"></p>
 
   <div x-show="open" x-cloak
        class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
@@ -5644,7 +10097,11 @@ Test certificate follows by email.</textarea>
       <p class="flex items-center justify-center gap-1.5 text-[13px]/5 font-medium text-red-600">
         <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>The vendor search did not answer
       </p>
-      <p class="mt-1 text-[12px]/4 text-zinc-500">Type another character to try again.</p>
+      <p class="mt-1 text-[12px]/4 text-zinc-500">Nothing was lost. The last search is still in the box.</p>
+      <button type="button" @mousedown.prevent @click="retry()"
+              class="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="rotate-ccw" class="size-3.5 text-zinc-600"></i>Search again
+      </button>
     </div>
   </div>
 </div>` },
@@ -5699,6 +10156,7 @@ Test certificate follows by email.</textarea>
          this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
          this.scroll();
        },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
        pick(o) {
          if (o.isNew) { this.sel = ''; this.fresh = o.label; }
          else { this.sel = o.id; this.fresh = ''; }
@@ -5722,6 +10180,8 @@ Test certificate follows by email.</textarea>
            @input="typed = true; open = true; ai = 0"
            @keydown.arrow-down.prevent="move(1)"
            @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
            @keydown.enter="if (open) { $event.preventDefault(); commit() }"
            @keydown.tab="close()"
            class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
@@ -5775,14 +10235,14 @@ Test certificate follows by email.</textarea>
            and aria-controls naming an id that does not exist is worse than
            leaving it off -->
       <input id="cb-off" type="text" disabled value="Gujarat Polymers Ltd"
-             role="combobox" aria-expanded="false"
+             role="combobox" aria-expanded="false" aria-describedby="cb-off-help"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 text-zinc-400">
       <span class="mr-3 flex size-4 shrink-0 items-center justify-center">
         <i data-lucide="chevron-down" class="size-4 text-zinc-400"></i>
       </span>
     </div>
     <input type="hidden" name="vendor_disabled" value="gujarat-polymers" disabled>
-    <p class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
+    <p id="cb-off-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Set on the rate contract. It changes there, not here.</p>
   </div>
 
   <!-- A locked value is rendered, not made read-only. There is no read-only
@@ -5835,13 +10295,18 @@ Test certificate follows by email.</textarea>
            this.ai = this.next(this.ai, step);
            this.scroll();
          },
+         edge(end) {
+           if (!this.list.length) return;
+           this.ai = end ? this.next(this.list.length, -1) : this.next(-1, 1);
+           this.scroll();
+         },
          pick(o) { if (o.blocked) return; this.sel = o.id; this.close(); this.$refs.q.focus(); },
          commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
        }"
        @click.outside="close()"
        @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
 
-    <label for="cb-bad" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+    <label for="cb-bad" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span aria-hidden="true" class="text-red-600">*</span></label>
 
     <div class="flex items-center rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
@@ -5853,6 +10318,8 @@ Test certificate follows by email.</textarea>
              @input="typed = true; open = true; ai = 0"
              @keydown.arrow-down.prevent="move(1)"
              @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+             @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
              @keydown.enter="if (open) { $event.preventDefault(); commit() }"
              @keydown.tab="close()"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none">
@@ -5893,6 +10360,805 @@ Test certificate follows by email.</textarea>
         <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
         <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Two of these five are locked until their rate contract is renewed.</p>
       </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'selected-first', name: 'What is already selected, at the top', tagNew: true, code:
+`<!-- Six items ticked out of four hundred is a selection nobody can find again.
+     The records already committed are lifted into a group of their own at the
+     head of the list, so opening the popup starts with what is in the field
+     rather than with whatever the item master sorts first.
+
+     The split is taken when the popup opens and is not recomputed while it is
+     open. Recompute it on every tick and the row leaves from under the pointer
+     the moment it is ticked, the next one slides into the space, and ticking
+     four items becomes a game of chase — the same defect as a register that
+     re-sorts itself while somebody is clicking down a column.
+
+     Each record lands in exactly one of the two groups, so the option ids stay
+     unique and aria-activedescendant still names one node. Listing a ticked
+     record in both groups is the obvious alternative and it puts two rows
+     carrying the same id inside one listbox.
+
+     The arrow keys run over both groups as one flattened list, in the order the
+     rows are drawn. An index per group leaves the last row of the top group
+     with nowhere to go. -->
+<div data-kui="combobox/selected-first" class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: '', ai: 0,
+       sel: ['itm-4471', 'itm-6203', 'itm-6244'],
+       pinned: [],
+       options: [
+         { id: 'itm-4471', label: 'MS plate 10 mm, IS 2062 E250', code: 'ITM-4471', stock: '182.400 MT' },
+         { id: 'itm-4488', label: 'MS angle 50 × 50 × 6 mm', code: 'ITM-4488', stock: '46.900 MT' },
+         { id: 'itm-5102', label: 'HT bolt M16 × 60, grade 8.8', code: 'ITM-5102', stock: '12,400 nos' },
+         { id: 'itm-5117', label: 'Hex nut M16, grade 8', code: 'ITM-5117', stock: '18,900 nos' },
+         { id: 'itm-6203', label: 'LDPE granules, film grade', code: 'ITM-6203', stock: '64.250 MT' },
+         { id: 'itm-6210', label: 'HDPE granules, blow moulding', code: 'ITM-6210', stock: '31.800 MT' },
+         { id: 'itm-6244', label: 'Masterbatch, black 2%', code: 'ITM-6244', stock: '1,240 kg' },
+         { id: 'itm-7008', label: 'Hydraulic oil ISO VG 46', code: 'ITM-7008', stock: '820 ltr' },
+         { id: 'itm-7042', label: 'Cotton waste, white', code: 'ITM-7042', stock: '310 kg' },
+         { id: 'itm-8110', label: 'Carton 600 × 400 × 300, 5-ply', code: 'ITM-8110', stock: '4,150 nos' }
+       ],
+       match(rows) {
+         if (!this.typed) return rows;
+         const s = this.q.trim().toLowerCase();
+         return rows.filter(o => (o.label + ' ' + o.code).toLowerCase().includes(s));
+       },
+       get top() { return this.match(this.options.filter(o => this.pinned.includes(o.id))); },
+       get rest() { return this.match(this.options.filter(o => !this.pinned.includes(o.id))); },
+       get list() { return [...this.top, ...this.rest]; },
+       has(id) { return this.sel.includes(id); },
+       label(id) { const o = this.options.find(x => x.id === id); return o ? o.label : id; },
+       get chips() { return this.sel.length > 1 ? this.sel.slice(0, 1) : this.sel; },
+       get extra() { return this.sel.length - this.chips.length; },
+       rowId(o) { return 'cb-item-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.pinned = [...this.sel];
+         this.ai = 0; this.scroll();
+       },
+       close() { this.open = false; this.typed = false; this.q = ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       toggle(o) {
+         this.sel = this.has(o.id) ? this.sel.filter(v => v !== o.id) : [...this.sel, o.id];
+         this.$refs.q.focus();
+       },
+       drop(id) { this.sel = this.sel.filter(v => v !== id); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.toggle(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <label for="cb-item" class="mb-1.5 block text-[13px]/5 font-medium">Items counted in zone A</label>
+
+  <div @click="$refs.q.focus(); show()"
+       class="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+
+    <template x-for="id in chips" :key="id">
+      <span class="inline-flex max-w-full items-center gap-1 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 ring-1 ring-inset ring-zinc-300">
+        <span class="min-w-0 truncate" x-text="label(id)"></span>
+        <button type="button" :aria-label="'Remove ' + label(id)" @click.stop="drop(id)"
+                class="flex size-4 shrink-0 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900">
+          <i data-lucide="x" class="size-3"></i>
+        </button>
+      </span>
+    </template>
+
+    <button type="button" x-show="extra" x-cloak @click.stop="$refs.q.focus(); show()"
+            :aria-label="extra + ' more selected — open the list to see all ' + sel.length"
+            class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300">
+      <span x-text="'+' + extra + ' more'"></span>
+    </button>
+
+    <input id="cb-item" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-item-list" aria-describedby="cb-item-count"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           :placeholder="sel.length ? 'Search' : 'Search the item master'"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.backspace="if (!q && sel.length) { $event.preventDefault(); sel = sel.slice(0, -1) }"
+           @keydown.tab="close()"
+           class="min-w-16 flex-1 bg-transparent px-1 py-1 text-[14px]/5 outline-none placeholder:text-zinc-500">
+  </div>
+
+  <template x-for="id in sel" :key="'post-' + id">
+    <input type="hidden" name="item" :value="id">
+  </template>
+
+  <p id="cb-item-count" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500"
+     x-text="sel.length ? sel.length + ' of 412 items selected' : 'No item selected — the count sheet will print empty'"></p>
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 item matches' : list.length + ' items match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-item-list" role="listbox" aria-multiselectable="true" aria-label="Item master"
+         class="max-h-72 overflow-y-auto pb-1">
+
+      <!-- the heading is aria-hidden and the group carries the name: a bare
+           paragraph is not a permitted child of a listbox, and the sticky
+           heading needs a fill of its own or the rows scroll through the text -->
+      <div role="group" aria-label="Already selected" x-show="top.length" x-cloak>
+        <p aria-hidden="true"
+           class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Already selected</p>
+        <template x-for="o in top" :key="o.id">
+          <div :id="rowId(o)" role="option" :aria-selected="has(o.id)"
+               @mousedown.prevent @click="toggle(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+               :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+               class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="flex size-4 shrink-0 items-center justify-center rounded"
+                  :class="has(o.id) ? 'bg-zinc-700 text-white' : 'bg-white ring-1 ring-inset ring-zinc-300'">
+              <span class="flex" x-show="has(o.id)" x-cloak><i data-lucide="check" class="size-3"></i></span>
+            </span>
+            <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+            <span class="flex shrink-0 items-center gap-2 text-[12px]/4 tabular-nums text-zinc-500">
+              <span x-text="o.code"></span>
+              <!-- the quantity on hand is what a count sheet is checked against, and
+                   the first thing to go at 390px: three facts on a phone row is one
+                   too many and the code is what people search by -->
+              <span class="hidden sm:inline" x-text="o.stock"></span>
+            </span>
+          </div>
+        </template>
+      </div>
+
+      <div role="group" aria-label="All items" x-show="rest.length" x-cloak>
+        <p aria-hidden="true"
+           class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">All items</p>
+        <template x-for="o in rest" :key="o.id">
+          <div :id="rowId(o)" role="option" :aria-selected="has(o.id)"
+               @mousedown.prevent @click="toggle(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+               :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+               class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="flex size-4 shrink-0 items-center justify-center rounded"
+                  :class="has(o.id) ? 'bg-zinc-700 text-white' : 'bg-white ring-1 ring-inset ring-zinc-300'">
+              <span class="flex" x-show="has(o.id)" x-cloak><i data-lucide="check" class="size-3"></i></span>
+            </span>
+            <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+            <span class="flex shrink-0 items-center gap-2 text-[12px]/4 tabular-nums text-zinc-500">
+              <span x-text="o.code"></span>
+              <span class="hidden sm:inline" x-text="o.stock"></span>
+            </span>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No item matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Search by item code instead — ITM-4471.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'dense', name: 'One per line in a line-items grid', tagNew: true, code:
+`<!-- Eleven of these on one screen, one per order line. Dense is less padding
+     and not a smaller target: py-1.5 against 13px/5 text is a 34px control, the
+     height the dense controls in a register toolbar take, and the option rows
+     inside the popup stay at 36px because a row nobody can hit is not denser,
+     it is broken.
+
+     The card holds no overflow-hidden and the lines are a grid rather than a
+     table in a scroller. Either one clips the popup at the edge of the cell,
+     and a clipped popup has nothing to scroll it back into view. The popup is
+     pinned to both edges of the item cell, which is the widest column in the
+     grid for exactly this reason; drop a combobox into a 120px column and the
+     panel has to take a width of its own above sm and cap it at the viewport.
+
+     z-20 on the panel is what puts it over the lines below, whose cells are
+     positioned too and would otherwise paint on top of it in document order.
+
+     Every id is built from the line number, never from the loop index. Deleting
+     line 2 renumbers every index after it, and a label whose for points at the
+     old index now names the row below the one it sits on.
+
+     Each line is a fieldset with an sr-only legend, so eleven controls called
+     Item are announced as "line 4, Item". No padding on the fieldset — a legend
+     is laid out in the block-start border area — so the grid goes on a div
+     inside it. Below md the column headings are gone, so each cell shows its own
+     label; the headings are aria-hidden because they are a ruler for a grid
+     that is not a table. -->
+<div data-kui="combobox/dense" class="max-w-3xl"
+     x-data="{
+       items: [
+         { id: 'ms-plt', label: 'MS plate 10 mm, IS 2062 E250', code: 'ITM-4471', rate: '₹62.40 / kg' },
+         { id: 'ms-ang', label: 'MS angle 50 × 50 × 6 mm', code: 'ITM-4488', rate: '₹58.90 / kg' },
+         { id: 'ht-bolt', label: 'HT bolt M16 × 60, grade 8.8', code: 'ITM-5102', rate: '₹18.50 / no' },
+         { id: 'hex-nut', label: 'Hex nut M16, grade 8', code: 'ITM-5117', rate: '₹4.20 / no' },
+         { id: 'ldpe', label: 'LDPE granules, film grade', code: 'ITM-6203', rate: '₹96.75 / kg' },
+         { id: 'carton', label: 'Carton 600 × 400 × 300, 5-ply', code: 'ITM-8110', rate: '₹34.10 / no' }
+       ],
+       lines: [
+         { n: 1, item: 'ms-plt', qty: '4,200' },
+         { n: 2, item: 'ht-bolt', qty: '600' },
+         { n: 3, item: '', qty: '' }
+       ],
+       find(id) { return this.items.find(x => x.id === id) || null; },
+       label(id) { const o = this.find(id); return o ? o.label : ''; },
+       rate(id) { const o = this.find(id); return o ? o.rate : '—'; }
+     }">
+
+  <div class="rounded-xl border border-zinc-200 bg-white">
+    <div aria-hidden="true"
+         class="hidden border-b border-zinc-200 bg-zinc-50 px-3 py-2 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase md:grid md:grid-cols-[minmax(0,1fr)_6rem_9rem] md:gap-3">
+      <span>Item</span>
+      <span class="text-right">Quantity</span>
+      <span class="text-right">Contract rate</span>
+    </div>
+
+    <template x-for="l in lines" :key="l.n">
+      <fieldset class="border-b border-zinc-100 last:border-b-0">
+        <legend class="sr-only" x-text="'Line ' + l.n"></legend>
+
+        <div class="grid gap-2 px-3 py-2 md:grid-cols-[minmax(0,1fr)_6rem_9rem] md:items-center md:gap-3">
+
+          <div class="relative min-w-0"
+               x-data="{
+                 open: false, typed: false, q: '', ai: 0,
+                 name(id) { const o = items.find(x => x.id === id); return o ? o.label : ''; },
+                 get list() {
+                   if (!this.typed) return items;
+                   const s = this.q.trim().toLowerCase();
+                   return items.filter(o => (o.label + ' ' + o.code).toLowerCase().includes(s));
+                 },
+                 rowId(o) { return 'cb-line-' + l.n + '-' + o.id; },
+                 get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+                 scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+                 show() {
+                   if (this.open) return;
+                   this.open = true; this.typed = false;
+                   this.ai = Math.max(0, this.list.findIndex(o => o.id === l.item));
+                   this.scroll();
+                 },
+                 close() { this.open = false; this.typed = false; this.q = this.name(l.item); },
+                 move(n) {
+                   if (!this.open) { this.show(); return; }
+                   if (!this.list.length) return;
+                   this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+                   this.scroll();
+                 },
+                 edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+                 pick(o) { l.item = o.id; this.close(); this.$refs.q.focus(); },
+                 commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+               }"
+               x-init="q = name(l.item)"
+               @click.outside="close()"
+               @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+            <label :for="'cb-line-' + l.n"
+                   class="mb-1 block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase md:sr-only">Item</label>
+
+            <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input :id="'cb-line-' + l.n" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+                     aria-autocomplete="list" :aria-controls="'cb-line-' + l.n + '-list'"
+                     :aria-expanded="open" :aria-activedescendant="activeId"
+                     placeholder="Item or code"
+                     @click="show()"
+                     @input="typed = true; open = true; ai = 0"
+                     @keydown.arrow-down.prevent="move(1)"
+                     @keydown.arrow-up.prevent="move(-1)"
+                     @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+                     @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+                     @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+                     @keydown.tab="close()"
+                     class="w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+              <span class="mr-2 flex size-4 shrink-0 items-center justify-center transition-transform motion-reduce:transition-none"
+                    :class="open && 'rotate-180'">
+                <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+              </span>
+            </div>
+
+            <input type="hidden" :name="'lines-' + (l.n - 1) + '-item'" :value="l.item">
+
+            <p role="status" class="sr-only"
+               x-text="open ? (list.length === 1 ? '1 item matches' : list.length + ' items match') : ''"></p>
+
+            <div x-show="open" x-cloak
+                 class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+              <div :id="'cb-line-' + l.n + '-list'" role="listbox" :aria-label="'Item master, line ' + l.n"
+                   class="max-h-56 overflow-y-auto py-1">
+                <template x-for="(o, i) in list" :key="o.id">
+                  <div :id="rowId(o)" role="option" :aria-selected="o.id === l.item"
+                       @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+                       :class="i === ai ? 'bg-zinc-100' : ''"
+                       class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+                    <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+                    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.code"></span>
+                  </div>
+                </template>
+              </div>
+              <div x-show="!list.length" x-cloak class="px-3 py-4 text-center">
+                <p class="text-[13px]/5 font-medium">No item matches “<span x-text="q"></span>”</p>
+                <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Codes run from ITM-4000 upwards.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="min-w-0">
+            <label :for="'cb-qty-' + l.n"
+                   class="mb-1 block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase md:sr-only">Quantity</label>
+            <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input :id="'cb-qty-' + l.n" x-model="l.qty" inputmode="decimal" placeholder="0"
+                     :name="'lines-' + (l.n - 1) + '-qty'"
+                     class="w-full min-w-0 bg-transparent px-2.5 py-1.5 text-right text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <p class="flex items-baseline justify-between gap-2 md:justify-end">
+            <span aria-hidden="true" class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase md:hidden">Contract rate</span>
+            <span class="text-[13px]/5 tabular-nums text-zinc-600">
+              <span class="sr-only">Contract rate </span><span x-text="rate(l.item)"></span>
+            </span>
+          </p>
+        </div>
+      </fieldset>
+    </template>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">The rate is read off the live rate contract when the item is committed. Line 3 posts a blank item, which the formset drops as an unchanged extra form.</p>
+</div>` },
+
+      { id: 'filter', name: 'In a filter bar, behind a button', tagNew: true, code:
+`<!-- A filter bar has no room for a text box per filter, and a text box is the
+     wrong shape anyway: at rest a filter has to say what it is filtering on,
+     and a search box showing "Gujarat Polymers Ltd" reads as something somebody
+     typed and can clear with Backspace. So the trigger is a 34px button that
+     says the filter and how many values are on, and the search box lives inside
+     the panel where it is only a search box.
+
+     That is a different keyboard model from the field-shaped combobox, and the
+     difference is the whole reason this variant exists. The button owns
+     aria-expanded and aria-controls; the input inside owns the listbox and is
+     aria-expanded="true" for as long as it exists. Focus moves into the panel
+     on open and Escape puts it back on the trigger, because a panel that closes
+     leaving focus on nothing drops the keyboard at the top of the document.
+
+     The panel holds real controls, so it cannot close on Tab: Tab is how you
+     reach Clear. It closes when focus leaves the component, which is what
+     relatedTarget on focusout answers and what blur cannot.
+
+     No aria-haspopup on the trigger. The panel is neither a menu nor a dialog,
+     and either value is a promise about the keyboard that this panel does not
+     keep — aria-expanded with aria-controls says what is true and nothing more.
+
+     Clear lives in the panel and clears this filter. A filter bar carrying
+     several controls puts a Clear all beside them as well, which is a different
+     control with a different scope; two buttons doing the same thing to the
+     same filter is what makes people distrust both.
+
+     It applies on change and has no Apply button, for the same reason a
+     settings switch has no Save — put one there and half the users press it and
+     half do not, and the two halves get different lists out of the same
+     gesture. The count on the trigger is the only thing left saying the filter
+     is on once the panel is shut, so it is not decoration.
+
+     w-72 with max-w-[calc(100vw-2rem)]: the trigger is 90px and the panel
+     cannot be, but a fixed width hangs off the right edge of a 390px screen. -->
+<div data-kui="combobox/filter"
+     x-data="{
+       open: false, typed: false, q: '', ai: 0,
+       sel: ['gujarat-polymers', 'nashik-steel'],
+       options: [
+         { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', orders: 12 },
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', orders: 8 },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', orders: 6 },
+         { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', orders: 5 },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', orders: 4 },
+         { id: 'baroda-fasteners', label: 'Baroda Fasteners', orders: 4 },
+         { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', orders: 3 }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => o.label.toLowerCase().includes(s));
+       },
+       has(id) { return this.sel.includes(id); },
+       get matched() { return this.sel.length ? this.options.filter(o => this.has(o.id)).reduce((n, o) => n + o.orders, 0) : 42; },
+       rowId(o) { return 'cb-flt-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         this.open = true; this.typed = false; this.q = ''; this.ai = 0;
+         this.$nextTick(() => { this.$refs.q.focus(); this.scroll(); });
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false; this.typed = false; this.q = '';
+         if (toTrigger) this.$refs.trigger.focus();
+       },
+       move(n) {
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       toggle(o) { this.sel = this.has(o.id) ? this.sel.filter(v => v !== o.id) : [...this.sel, o.id]; this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.toggle(o); }
+     }"
+     @click.outside="close(false)"
+     @focusout="if (open && !$el.contains($event.relatedTarget)) close(false)">
+
+  <div class="rounded-xl border border-zinc-200 bg-white px-3 py-3">
+    <div class="flex flex-wrap items-center gap-2">
+
+      <div class="relative">
+        <button type="button" x-ref="trigger" @click="open ? close() : show()"
+                @keydown.arrow-down.prevent="open || show()"
+                :aria-expanded="open" aria-controls="cb-flt-panel"
+                :aria-label="sel.length ? 'Vendor, ' + sel.length + ' selected' : 'Vendor, no filter applied'"
+                class="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-1.5 pr-2 pl-2.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Vendor
+          <span x-show="sel.length" x-cloak aria-hidden="true"
+                class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300"
+                x-text="sel.length"></span>
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+          </span>
+        </button>
+
+        <div id="cb-flt-panel" x-show="open" x-cloak
+             @keydown.escape="$event.stopPropagation(); close()"
+             class="absolute top-full left-0 z-30 mt-1 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+          <div class="flex items-center border-b border-zinc-200 px-2.5 py-1.5">
+            <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+            <label for="cb-flt-q" class="sr-only">Search vendors</label>
+            <input id="cb-flt-q" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+                   aria-autocomplete="list" aria-controls="cb-flt-list" aria-expanded="true"
+                   :aria-activedescendant="activeId"
+                   placeholder="Search vendors"
+                   @input="typed = true; ai = 0"
+                   @keydown.arrow-down.prevent="move(1)"
+                   @keydown.arrow-up.prevent="move(-1)"
+                   @keydown.home="$event.preventDefault(); edge(false)"
+                   @keydown.end="$event.preventDefault(); edge(true)"
+                   @keydown.enter.prevent="commit()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-[13px]/5 outline-none placeholder:text-zinc-500">
+          </div>
+
+          <div id="cb-flt-list" role="listbox" aria-multiselectable="true" aria-label="Vendors"
+               class="max-h-56 overflow-y-auto py-1">
+            <template x-for="(o, i) in list" :key="o.id">
+              <div :id="rowId(o)" role="option" :aria-selected="has(o.id)"
+                   :aria-label="o.label + ', ' + o.orders + ' open orders'"
+                   @mousedown.prevent @click="toggle(o)" @mousemove="ai = i"
+                   :class="i === ai ? 'bg-zinc-100' : ''"
+                   class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+                <span class="flex size-4 shrink-0 items-center justify-center rounded"
+                      :class="has(o.id) ? 'bg-zinc-700 text-white' : 'bg-white ring-1 ring-inset ring-zinc-300'">
+                  <span class="flex" x-show="has(o.id)" x-cloak><i data-lucide="check" class="size-3"></i></span>
+                </span>
+                <span class="min-w-0 flex-1 truncate" aria-hidden="true" x-text="o.label"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" aria-hidden="true" x-text="o.orders"></span>
+              </div>
+            </template>
+          </div>
+
+          <div x-show="!list.length" x-cloak class="px-4 py-5 text-center">
+            <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+          </div>
+
+          <div class="flex items-center justify-between gap-2 border-t border-zinc-200 px-2 py-1.5">
+            <button type="button" @mousedown.prevent @click="sel = []; $refs.q.focus()" :disabled="!sel.length"
+                    class="rounded-lg px-1.5 py-1 text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2 hover:bg-zinc-200 disabled:text-zinc-400 disabled:no-underline disabled:hover:bg-transparent focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span x-text="sel.length ? 'Clear ' + sel.length : 'Clear'"></span>
+            </button>
+            <button type="button" @click="close()"
+                    class="rounded-lg px-2 py-1 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Done</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- the applied filter posts with the register's own query string -->
+      <template x-for="id in sel" :key="'post-' + id">
+        <input type="hidden" name="vendor" :value="id">
+      </template>
+
+    </div>
+
+    <p role="status" class="mt-2.5 border-t border-zinc-100 pt-2.5 text-[12px]/4 tabular-nums text-zinc-600"
+       x-text="sel.length ? matched + ' of 42 purchase orders' : '42 purchase orders'"></p>
+  </div>
+</div>` },
+
+      { id: 'phone', name: 'The panel takes the screen at 390px', tagNew: true, code:
+`<!-- A panel anchored under the field is unusable on a phone the moment the
+     field is focused, because focusing it raises the keyboard and the keyboard
+     takes the bottom half of the screen — which is where the panel just opened.
+     The rows that are left are two, and scrolling them means scrolling a 120px
+     window with a thumb that covers it.
+
+     So below sm the component stops being a field with a panel and becomes the
+     screen: the root goes fixed inset-0, the search box sits at the top where
+     the keyboard cannot reach it, and the list takes everything left over and
+     scrolls. Above sm it is the anchored panel from the default variant,
+     unchanged, which is why both shapes are one x-data and one input rather
+     than a phone copy with its own ids — a second input carrying the same id
+     rebinds the label to whichever of the two rendered last.
+
+     The field leaves the flow while it is open and the page behind it moves up
+     by its own height. That is invisible under a full-bleed layer and it is
+     back the moment the list closes, which is the trade for not having to
+     measure and pin anything.
+
+     No scrim and no focus trap: this is the field taking the screen, not a
+     dialog over it. A scrim is a promise that the page underneath has stopped,
+     and a combobox never stops it. Rows are 44px below sm and 36px above,
+     because a thumb and a mouse do not need the same target.
+
+     There is no Escape key on a phone and no visible trigger left to press
+     again, so the way out is in the layer: Close, at the top, beside the label
+     that says what is being searched. -->
+<div data-kui="combobox/phone" class="w-full sm:max-w-sm"
+     :class="open ? 'fixed inset-0 z-40 flex flex-col bg-white p-4 sm:relative sm:inset-auto sm:z-auto sm:block sm:bg-transparent sm:p-0' : 'relative'"
+     x-data="{
+       open: false, typed: false, q: '', sel: '', ai: 0,
+       options: [
+         { id: 'gujarat-polymers', label: 'Gujarat Polymers Ltd', meta: 'VEN-0142' },
+         { id: 'sharma-extrusions', label: 'Sharma Extrusions', meta: 'VEN-0187' },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', meta: 'VEN-0203' },
+         { id: 'deccan-fasteners', label: 'Deccan Fasteners Pvt Ltd', meta: 'VEN-0219' },
+         { id: 'silvassa-packaging', label: 'Silvassa Packaging and Allied Products', meta: 'VEN-0231' },
+         { id: 'konkan-chemicals', label: 'Konkan Chemicals Pvt Ltd', meta: 'VEN-0244' },
+         { id: 'baroda-fasteners', label: 'Baroda Fasteners', meta: 'VEN-0258' },
+         { id: 'coimbatore-castings', label: 'Coimbatore Castings Ltd', meta: 'VEN-0266' }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       get chosen() { return this.options.find(o => o.id === this.sel) || null; },
+       rowId(o) { return 'cb-ph-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(o => o.id === this.sel));
+         this.scroll();
+       },
+       close() { this.open = false; this.typed = false; this.q = this.chosen ? this.chosen.label : ''; },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
+
+  <div class="flex items-baseline justify-between gap-3">
+    <label for="cb-ph" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+    <button type="button" x-show="open" x-cloak @click="close()"
+            class="mb-1.5 shrink-0 rounded-lg px-2 py-1 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:hidden">Close</button>
+  </div>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-ph" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-ph-list"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Search 248 approved vendors"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2.5 text-[14px]/5 outline-none placeholder:text-zinc-500 sm:py-2">
+  </div>
+
+  <input type="hidden" name="vendor" :value="sel">
+
+  <!-- visible on the phone layer, where there is room for it and nothing else
+       on screen says how much of the list is left. It is not the field's
+       aria-describedby: it is display:none for half the widths and all of the
+       closed state, and a description nobody can reach is worse than none —
+       the count reaches a screen reader through the live region below. -->
+  <p x-show="open" x-cloak
+     class="mt-2 text-[12px]/4 tabular-nums text-zinc-500 sm:hidden"
+     x-text="list.length + ' of 248 vendors'"></p>
+
+  <p role="status" class="sr-only"
+     x-text="open ? (list.length === 1 ? '1 vendor matches' : list.length + ' vendors match') : ''"></p>
+
+  <div x-show="open" x-cloak
+       class="mt-2 min-h-0 flex-1 overflow-y-auto rounded-xl border border-zinc-200 bg-white sm:absolute sm:top-full sm:right-0 sm:left-0 sm:z-20 sm:mt-1 sm:flex-none sm:overflow-hidden sm:shadow-lg">
+
+    <div id="cb-ph-list" role="listbox" aria-label="Approved vendors" class="py-1 sm:max-h-64 sm:overflow-y-auto">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="o.id === sel"
+             @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-center gap-2.5 px-3 py-2.5 text-[14px]/5 sm:py-2 sm:text-[13px]/5">
+          <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+          <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.meta"></span>
+          <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+            <i data-lucide="check" class="size-4 text-zinc-600"></i>
+          </span>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No vendor matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Check the spelling, or search by vendor code — VEN-0142.</p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'htmx', name: 'Committing straight to the record', tagNew: true, code:
+`<!-- Two different jobs share the word htmx in this entry. remote is htmx
+     fetching the options; this is htmx writing the value. A combobox on a
+     record header has no Save button next to it, so committing is the write.
+
+     Alpine does not fetch, so the commit dispatches an event and htmx listens
+     for it on the hidden input, which is the element that holds the value.
+     htmx sends the value of the element that made the request, so the POST is
+     buyer=<id> and nothing else — one endpoint per field is what makes the body
+     readable at the other end.
+
+     The dispatch waits for $nextTick. Alpine writes :value on the next
+     microtask, so an event fired in the same statement that set sel posts the
+     value that was there before the pick — the field on screen and the row in
+     the database then disagree, and nothing on either side looks wrong.
+
+     was is the value the server last confirmed and want is the one being sent.
+     A failed write puts was back into the box, the hidden input and the query
+     together: revert two of the three and the field reads one vendor over a
+     hidden value of another. Try again re-sends want rather than re-posting
+     what the failure reverted to.
+
+     The status line is role="status" because the revert is script writing a
+     value, and a programmatic change is announced by nothing at all. hx-sync
+     this:replace drops a write still in flight, so two commits inside a second
+     cannot settle on the older reply. Django needs the CSRF token on this
+     request; that is in the django variant. -->
+<div data-kui="combobox/htmx" class="relative max-w-md"
+     x-data="{
+       open: false, typed: false, q: 'Ritu Deshpande', ai: 0,
+       sel: 'ritu-deshpande', was: 'ritu-deshpande', want: '', state: 'idle',
+       options: [
+         { id: 'ritu-deshpande', label: 'Ritu Deshpande', meta: 'Purchase' },
+         { id: 'anand-kulkarni', label: 'Anand Kulkarni', meta: 'Purchase' },
+         { id: 'faisal-shaikh', label: 'Faisal Shaikh', meta: 'Stores' },
+         { id: 'meera-nair', label: 'Meera Nair', meta: 'Projects' },
+         { id: 'suresh-patil', label: 'Suresh Patil', meta: 'Maintenance' }
+       ],
+       get list() {
+         if (!this.typed) return this.options;
+         const s = this.q.trim().toLowerCase();
+         return this.options.filter(o => (o.label + ' ' + o.meta).toLowerCase().includes(s));
+       },
+       label(id) { const o = this.options.find(x => x.id === id); return o ? o.label : ''; },
+       rowId(o) { return 'cb-buyer-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() {
+         if (this.open) return;
+         this.open = true; this.typed = false;
+         this.ai = Math.max(0, this.list.findIndex(o => o.id === this.sel));
+         this.scroll();
+       },
+       close() { this.open = false; this.typed = false; this.q = this.label(this.sel); },
+       move(n) {
+         if (!this.open) { this.show(); return; }
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
+       send() {
+         this.want = this.sel;
+         this.$nextTick(() => this.$refs.post.dispatchEvent(new Event('commit')));
+       },
+       pick(o) {
+         if (o.id === this.sel) { this.close(); this.$refs.q.focus(); return; }
+         this.sel = o.id; this.close(); this.$refs.q.focus(); this.send();
+       },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); },
+       revert() { this.sel = this.was; this.q = this.label(this.was); }
+     }"
+     @click.outside="close()"
+     @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }"
+     @htmx:before-request.camel="state = 'saving'"
+     @htmx:after-request.camel="
+       if ($event.detail.successful) { was = want; state = 'saved' }
+       else { revert(); state = 'failed' }">
+
+  <label for="cb-buyer" class="mb-1.5 block text-[13px]/5 font-medium">Buyer on PO-24-1187</label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <i data-lucide="user-round" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+    <input id="cb-buyer" x-ref="q" x-model="q" type="text" role="combobox" autocomplete="off"
+           aria-autocomplete="list" aria-controls="cb-buyer-list" aria-describedby="cb-buyer-state"
+           :aria-expanded="open" :aria-activedescendant="activeId"
+           placeholder="Search buyers"
+           @click="show()"
+           @input="typed = true; open = true; ai = 0"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+           @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
+           @keydown.enter="if (open) { $event.preventDefault(); commit() }"
+           @keydown.tab="close()"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+    <span class="mr-3 flex size-4 shrink-0 items-center justify-center" x-show="state === 'saving'" x-cloak>
+      <i data-lucide="loader-circle" class="size-4 animate-spin text-zinc-600"></i>
+    </span>
+  </div>
+
+  <!-- the value and the request live on the same element: htmx sends the value
+       of the element that fired, so the body is this field and nothing else -->
+  <input type="hidden" x-ref="post" name="buyer" :value="sel"
+         hx-post="/orders/PO-24-1187/buyer/" hx-trigger="commit"
+         hx-swap="none" hx-sync="this:replace">
+
+  <p id="cb-buyer-state" role="status" class="mt-1.5 text-[12px]/4">
+    <span x-show="state === 'idle'" class="tabular-nums text-zinc-500">Assigned 16 Aug 2026, 11:04 by Anand Kulkarni</span>
+
+    <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+      <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+    </span>
+
+    <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+      <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+    </span>
+
+    <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the buyer is unchanged
+      </span>
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+              @click="sel = want; q = label(want); send()">Try again</button>
+    </span>
+  </p>
+
+  <div x-show="open" x-cloak
+       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+    <div id="cb-buyer-list" role="listbox" aria-label="Buyers" class="max-h-64 overflow-y-auto py-1">
+      <template x-for="(o, i) in list" :key="o.id">
+        <div :id="rowId(o)" role="option" :aria-selected="o.id === sel"
+             @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+             :class="i === ai ? 'bg-zinc-100' : ''"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+          <span class="min-w-0 flex-1 truncate" x-text="o.label"></span>
+          <span class="shrink-0 text-[12px]/4 text-zinc-500" x-text="o.meta"></span>
+          <span class="flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+            <i data-lucide="check" class="size-4 text-zinc-600"></i>
+          </span>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+      <p class="text-[13px]/5 font-medium">No buyer matches “<span x-text="q"></span>”</p>
+      <p class="mt-1 text-[12px]/4 text-zinc-500">Only people in a purchasing role can hold an order.</p>
     </div>
   </div>
 </div>` },
@@ -5984,6 +11250,7 @@ Test certificate follows by email.</textarea>
            this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
            this.scroll();
          },
+         edge(end) { if (!this.list.length) return; this.ai = end ? this.list.length - 1 : 0; this.scroll(); },
          pick(o) { this.sel = o.id; this.close(); this.$refs.q.focus(); },
          commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
        }"
@@ -5992,7 +11259,7 @@ Test certificate follows by email.</textarea>
        @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
 
     <label for="{{ form.vendor.id_for_label }}-q" class="mb-1.5 block text-[13px]/5 font-medium">
-      {{ form.vendor.label }} <span class="text-red-600">*</span>
+      {{ form.vendor.label }} <span aria-hidden="true" class="text-red-600">*</span>
     </label>
 
     <div class="flex items-center rounded-lg bg-white {% if form.vendor.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
@@ -6009,6 +11276,8 @@ Test certificate follows by email.</textarea>
              @input="typed = true; open = true; ai = 0"
              @keydown.arrow-down.prevent="move(1)"
              @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home="if (open) { $event.preventDefault(); edge(false) }"
+             @keydown.end="if (open) { $event.preventDefault(); edge(true) }"
              @keydown.enter="if (open) { $event.preventDefault(); commit() }"
              @keydown.tab="close()"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
@@ -6078,15 +11347,23 @@ Test certificate follows by email.</textarea>
   {
     id: 'attachment', name: 'Attachment', category: 'forms',
     description: 'The documents hanging off a record — a drop zone over the list of what is already there. Every file shows its type, size, who attached it and when.',
-    when: 'Any record people staple paperwork to: quotations against an order, a signed GRN, a delivery photo, an invoice PDF. For a single file that is really just one field of a form, use the single-file variant rather than a whole panel.',
+    when: 'Any record people staple paperwork to: quotations against an order, a signed GRN, a delivery photo, an invoice PDF. For a single file that is really just one field of a form, use the single-file variant rather than a whole panel. Inside a register row or a summary card, use the compact variant — a drop zone at that density is a target nobody can aim at.',
     notes: [
       'Keep a real <input type="file"> and hide it with sr-only, never display:none or hidden. A display:none input cannot be focused, so the keyboard can never reach the upload control at all.',
-      'Make the label the peer of the hidden input and put the focus ring on the label with peer-focus-visible. Otherwise the input takes focus invisibly and the keyboard user has no idea where they are.',
+      'Make the label the peer of the hidden input and put the focus ring on the label with peer-focus-visible. Otherwise the input takes focus invisibly and the keyboard user has no idea where they are. The input has to come first in the DOM for peer-* to reach it, and sr-only takes it out of flow so its position costs no layout.',
+      'A <label> wrapping or bound to a file input is the one place in this library that takes cursor-pointer. The base rule covers button, summary, select and [role="button"] and does not reach a label.',
       'Both @dragover.prevent and @drop.prevent are required. Without them the browser leaves the page and opens the dropped file, losing whatever was typed into the form.',
       'Count drag depth with dragenter/dragleave, do not use a boolean. dragleave fires every time the pointer crosses into a child element, so a boolean makes the highlight flicker as the file passes over the icon and the text.',
       'Never fake the progress bar. An animation that reaches 100% before the bytes do produces a user who navigates away mid-upload. Drive it from the real upload progress event, and if you cannot, show an indeterminate state instead of a number.',
       'Show the size and the type limit before the file is chosen, not as an error afterwards. "PDF or JPG, up to 10 MB" prevents the failure; "File too large" only reports it.',
       'A rejected file stays on screen with its reason. Silently dropping it means the user believes it uploaded.',
+      'Rejected and failed are different states and need different rows. A rejected file cannot be fixed by sending it again, so it gets no Retry; a failed one is fine and re-sending it is the entire remedy. One row shape for both teaches people to stop reading the reason.',
+      'A bar left frozen at the percentage it died on is the worst of the failure states. It reads as slow rather than as stopped, so the user waits instead of retrying. Take the bar away and put the reason in its place.',
+      'Name the documents a record cannot be posted without, one row each, before anything is attached. A drop zone says files may be attached; it never says which two the GRN is waiting on.',
+      'A submit disabled for want of a document names the document beside it and binds the sentence with aria-describedby. Grey with nothing next to it is the most-reported fault in every internal application, and the report is always "the button does not work".',
+      'Replacing a document on a record money has moved against keeps the old one. Version 2 is what an audit reads to find out why the amount changed; a control that overwrites in place destroys the answer and nothing on screen says it did.',
+      'hx-encoding="multipart/form-data" is required on any htmx upload. Without it htmx posts urlencoded, the file is dropped on the way out, and the view still returns 200 — a failure that reads as a success from both ends.',
+      'A file dropped onto an htmx-driven zone has to be assigned to the input and the change event dispatched from there. Posting the drop straight out of JavaScript gives the control two upload paths, and they drift apart within a release.',
       'Removing a file that is already saved on the server is destructive and gets an alert dialog. Removing one that is still queued is not, and must not ask.',
       'The filename is the one thing users recognise, so it truncates and never wraps — truncate on a min-w-0 flex child, with the size and the controls shrink-0 beside it.'
     ],
@@ -6094,14 +11371,19 @@ Test certificate follows by email.</textarea>
       ['Drop zone', 'A dashed panel wrapping the hidden input and its label. Carries the drag handlers and the type and size limit.'],
       ['Input', 'A real <input type="file">, sr-only, and the peer of the label so focus is visible.'],
       ['File row', 'Icon, name, size, who and when, then the controls. The name flexes and truncates; everything else is shrink-0.'],
-      ['State', 'A progress bar while uploading, a red reason line when rejected, nothing at all once it is stored.'],
-      ['Controls', 'Download and remove. Remove is the only one that can be destructive.']
+      ['State', 'A progress bar while uploading, a red reason line when rejected or failed, nothing at all once it is stored.'],
+      ['Requirement row', 'A named document the record cannot post without, present whether or not the file is, and marked by an icon and a word rather than by colour.'],
+      ['Version history', 'A collapsed disclosure under the current file. Download only — a trail with a remove button on it is not a trail.'],
+      ['Controls', 'Download, retry and remove. Remove is the only one that can be destructive.']
     ],
     behaviour: [
       'Dragging a file over the zone highlights it; the highlight survives the pointer crossing child elements.',
       'Dropping or picking adds the file to the list immediately, in an uploading state, so the user sees it was accepted before it finishes.',
       'A file that fails validation joins the list too, marked with the reason, and does not count towards the upload.',
       'Progress reflects real bytes. Reaching 100% swaps the bar for the stored metadata line.',
+      'An upload that breaks mid-transfer keeps its row and offers Retry, which re-posts the file from zero. A plain multipart POST cannot resume, so the word is Retry and never Resume.',
+      'Where a real endpoint is behind the control, picking a file uploads it on change. A separate Upload button afterwards is a second click a third of users never make, and the list then looks attached while nothing has been posted.',
+      'Replacing a file adds a version rather than overwriting one. Earlier versions download and cannot be removed from the control.',
       'Removing a queued file happens straight away; removing a stored one goes through an alert dialog first.',
       'The panel is useful with nothing in it — the empty state says what to attach and why, not just "No files".'
     ],
@@ -6109,15 +11391,28 @@ Test certificate follows by email.</textarea>
       'The file input is a real input, focusable, and reachable by keyboard alone.',
       'The label is bound with for/id, so pressing Enter or Space on it opens the file picker.',
       'The focus ring is on the label via peer-focus-visible, because the input itself is visually hidden.',
+      'A field that carries both a name and a Replace button takes aria-labelledby pointing at the name. Two <label for> elements on one input concatenate, and the accessible name comes out as "Signed GRN Replace".',
       'Each remove button carries aria-label naming its file — five buttons all labelled "Remove" are useless in a list.',
       'Upload progress uses role="progressbar" with aria-valuenow, so it is announced rather than only drawn.',
-      'The rejection reason sits in the row it belongs to and is referenced by the row, not left as loose red text nearby.'
+      'A failed upload is announced from a role="status" line. The progressbar does not fail, it stops updating, and a bar that stops updating is silence.',
+      'A finished upload never rests on the green tick alone. The state has a word beside it, sr-only where the row has no room for one.',
+      'The rejection reason sits in the row it belongs to and is referenced by the row, not left as loose red text nearby.',
+      'A version history disclosure puts aria-expanded on its button and aria-controls on the list it opens.'
     ],
     related: ['input', 'field', 'alert-dialog'],
     variants: [
       { id: 'default', name: 'Drop zone and list', code:
-`<div data-kui="attachment/default" x-data="{ depth: 0 }">
-  <label class="mb-1.5 block text-[13px]/5 font-medium">Attachments</label>
+`<!-- The panel heading is a <p>, not a <label>. A <label> with no for and no
+     control inside it is bound to nothing: clicking it does nothing and it is
+     announced as the label of whatever the browser guesses. The one real label
+     here belongs to the file input and reads "Browse files", which is also the
+     visible words on it.
+
+     The limit line has an id and the input points at it with aria-describedby,
+     so the constraint is read out when focus lands on the picker rather than
+     only being visible to somebody looking at the middle of the zone. -->
+<div data-kui="attachment/default" x-data="{ depth: 0 }">
+  <p id="po-files-label" class="mb-1.5 text-[13px]/5 font-medium">Attachments</p>
 
   <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
        class="rounded-lg border border-dashed px-4 py-5 transition"
@@ -6125,28 +11420,28 @@ Test certificate follows by email.</textarea>
     <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
       <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
       <span class="text-[13px]/5 text-zinc-600">Drag files here or</span>
-      <input type="file" id="po-files" name="attachments" multiple class="peer sr-only">
+      <input type="file" id="po-files" name="attachments" multiple aria-describedby="po-files-limit" class="peer sr-only">
       <label for="po-files"
              class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
         Browse files
       </label>
-      <span class="text-[12px]/4 text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</span>
+      <span id="po-files-limit" class="text-[12px]/4 tabular-nums text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</span>
     </div>
   </div>
 
-  <ul class="mt-2 space-y-2">
+  <ul aria-labelledby="po-files-label" class="mt-2 space-y-2">
     <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
       <div class="min-w-0 flex-1">
         <p class="truncate text-[13px]/5 font-medium">quotation-sharma-extrusions-aug.pdf</p>
-        <p class="text-[12px]/4 text-zinc-500">248 KB · Ritu Deshpande · 19 Aug 2024</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">248 KB · Ritu Deshpande · 19 Aug 2026</p>
       </div>
       <a href="#" aria-label="Download quotation-sharma-extrusions-aug.pdf"
-         class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+         class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="download" class="size-4"></i>
       </a>
       <button type="button" aria-label="Remove quotation-sharma-extrusions-aug.pdf"
-              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="x" class="size-4"></i>
       </button>
     </li>
@@ -6154,14 +11449,14 @@ Test certificate follows by email.</textarea>
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="sheet" class="size-4 text-zinc-600"></i></span>
       <div class="min-w-0 flex-1">
         <p class="truncate text-[13px]/5 font-medium">rate-comparison-q3.xlsx</p>
-        <p class="text-[12px]/4 text-zinc-500">54 KB · Anil Kulkarni · 14 Aug 2024</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">54 KB · Anil Kulkarni · 14 Aug 2026</p>
       </div>
       <a href="#" aria-label="Download rate-comparison-q3.xlsx"
-         class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+         class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="download" class="size-4"></i>
       </a>
       <button type="button" aria-label="Remove rate-comparison-q3.xlsx"
-              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="x" class="size-4"></i>
       </button>
     </li>
@@ -6169,40 +11464,46 @@ Test certificate follows by email.</textarea>
 </div>` },
 
       { id: 'empty', name: 'Nothing attached', code:
-`<!-- Say what to attach and why. "No files" is a fact, not an instruction. -->
+`<!-- Say what to attach and why. "No files" is a fact, not an instruction, and
+     the sentence that stops the support call is the one naming the rule the
+     record is about to fail — not the one naming the state it is in. -->
 <div data-kui="attachment/empty" x-data="{ depth: 0 }">
-  <label class="mb-1.5 block text-[13px]/5 font-medium">Attachments</label>
+  <p class="mb-1.5 text-[13px]/5 font-medium">Attachments</p>
   <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
        class="rounded-lg border border-dashed px-4 py-8 text-center transition"
        :class="depth > 0 ? 'border-zinc-700 bg-zinc-50' : 'border-zinc-200 bg-zinc-100'">
     <i data-lucide="paperclip" class="mx-auto size-6 text-zinc-500"></i>
     <p class="mt-3 text-[14px]/5 font-semibold">No documents on this order yet</p>
-    <p class="mx-auto mt-1 max-w-[42ch] text-[12px]/4 text-zinc-600">
+    <p class="mx-auto mt-1 max-w-[42ch] text-[12px]/4 tabular-nums text-zinc-600">
       Approvals above ₹10,00,000 need the vendor quotation attached before the plant head can sign off.
     </p>
-    <input type="file" id="empty-files" name="attachments" multiple class="peer sr-only">
+    <input type="file" id="empty-files" name="attachments" multiple aria-describedby="empty-files-limit" class="peer sr-only">
     <label for="empty-files"
            class="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/30">
       <i data-lucide="upload" class="size-4"></i>Attach a document
     </label>
-    <p class="mt-3 text-[12px]/4 text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</p>
+    <p id="empty-files-limit" class="mt-3 text-[12px]/4 tabular-nums text-zinc-500">PDF, JPG or XLSX · up to 10 MB each</p>
   </div>
 </div>` },
 
       { id: 'uploading', name: 'Uploading', code:
 `<!-- The number comes from the real XHR progress event. If you cannot get it,
-     drop the percentage and show an indeterminate bar instead of inventing one. -->
+     drop the percentage and show an indeterminate bar instead of inventing one.
+
+     The finished row is not a green tick on its own. Colour is never the only
+     signal, and a tick with no word beside it is announced as nothing at all,
+     so the state is carried by sr-only text that costs the row no width. -->
 <ul data-kui="attachment/uploading" class="space-y-2">
   <li class="rounded-lg border border-zinc-200 bg-white px-3 py-2">
     <div class="flex items-center gap-3">
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
       <div class="min-w-0 flex-1">
         <p class="truncate text-[13px]/5 font-medium">signed-grn-1142.pdf</p>
-        <p class="text-[12px]/4 text-zinc-500">1.8 MB of 4.2 MB</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">1.8 MB of 4.2 MB</p>
       </div>
       <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">43%</span>
       <button type="button" aria-label="Cancel upload of signed-grn-1142.pdf"
-              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="x" class="size-4"></i>
       </button>
     </div>
@@ -6216,24 +11517,111 @@ Test certificate follows by email.</textarea>
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="image" class="size-4 text-zinc-600"></i></span>
     <div class="min-w-0 flex-1">
       <p class="truncate text-[13px]/5 font-medium">delivery-gate-photo.jpg</p>
-      <p class="text-[12px]/4 text-zinc-500">1.1 MB · Ritu Deshpande · just now</p>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">1.1 MB · Ritu Deshpande · just now</p>
     </div>
-    <i data-lucide="check-circle-2" class="size-4 shrink-0 text-emerald-600"></i>
+    <span class="flex shrink-0 items-center text-emerald-600">
+      <i data-lucide="check-circle-2" class="size-4"></i><span class="sr-only">Uploaded</span>
+    </span>
   </li>
 </ul>` },
 
+      { id: 'failed', name: 'Broke halfway, with a retry', tagNew: true, code:
+`<!-- The upload that started and stopped. It is not the rejected state and the
+     two must not share a row shape: a rejected file is the wrong file and
+     sending it again changes nothing, a failed file is the right file and
+     sending it again is the whole answer. So this one has Retry and that one
+     does not, and the reason line says which of the two happened.
+
+     The bar goes when the transfer does. A progress bar left frozen at the
+     percentage it died on is the most misread state in any upload control — it
+     reads as slow rather than as stopped, and the user sits waiting for a
+     request that ended two minutes ago. The reason takes the bar's place.
+
+     Nothing announces the failure on its own. The progressbar does not fail, it
+     stops being updated, and silence is not an error message, so the summary
+     line is role="status" and each row's reason is tied to its own Retry with
+     aria-describedby.
+
+     The bytes already sent are gone. The word is Retry, not Resume: Resume
+     promises a range request that a plain multipart POST cannot honour, and a
+     4 MB file on a plant Wi-Fi connection will make that promise a lie often.
+
+     Retry all sits in the header rather than being the only control, because a
+     user who can see three failures usually wants two of them back and not the
+     third — the one that failed because somebody attached the wrong thing. -->
+<div data-kui="attachment/failed" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+    <p role="status" class="flex items-center gap-2 text-[13px]/5 font-medium tabular-nums">
+      <i data-lucide="alert-circle" class="size-4 shrink-0 text-red-600"></i>
+      1 of 3 files did not upload
+    </p>
+    <button type="button"
+            class="inline-flex h-8 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="rotate-ccw" class="size-4"></i>Retry all
+    </button>
+  </div>
+
+  <ul class="divide-y divide-zinc-100">
+    <li class="flex flex-wrap items-start gap-x-3 gap-y-2 px-4 py-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-500"></i></span>
+      <div class="min-w-[12rem] flex-1">
+        <p class="truncate text-[13px]/5 font-medium">test-certificate-heat-8841.pdf</p>
+        <p id="fail-tc" class="mt-0.5 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-red-600">
+          <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+          Connection dropped at 2.6 MB of 4.2 MB. Nothing was saved.
+        </p>
+      </div>
+      <button type="button" aria-describedby="fail-tc"
+              class="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="rotate-ccw" class="size-3.5"></i>Retry
+      </button>
+      <button type="button" aria-label="Remove test-certificate-heat-8841.pdf"
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="x" class="size-4"></i>
+      </button>
+    </li>
+
+    <li class="flex items-center gap-3 px-4 py-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[13px]/5 font-medium">challan-gp-77412.pdf</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">310 KB · Ritu Deshpande · 04 Sep 2026</p>
+      </div>
+      <span class="flex shrink-0 items-center text-emerald-600">
+        <i data-lucide="check-circle-2" class="size-4"></i><span class="sr-only">Uploaded</span>
+      </span>
+    </li>
+
+    <li class="flex items-center gap-3 px-4 py-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="image" class="size-4 text-zinc-600"></i></span>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[13px]/5 font-medium">weighbridge-slip-8841.jpg</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">1.1 MB · Ritu Deshpande · 04 Sep 2026</p>
+      </div>
+      <span class="flex shrink-0 items-center text-emerald-600">
+        <i data-lucide="check-circle-2" class="size-4"></i><span class="sr-only">Uploaded</span>
+      </span>
+    </li>
+  </ul>
+</div>` },
+
       { id: 'rejected', name: 'Rejected file', code:
 `<!-- The rejected file stays visible with its reason. Removing it from the list
-     silently is how users end up believing something uploaded when it did not. -->
+     silently is how users end up believing something uploaded when it did not.
+
+     No Retry on this row, and that omission is the point. The file is the wrong
+     kind of file; re-sending the same bytes produces the same answer, and a
+     button that invites it is a button that trains people to click twice before
+     reading. The failed variant is where Retry belongs. -->
 <ul data-kui="attachment/rejected" class="space-y-2">
   <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
     <div class="min-w-0 flex-1">
       <p class="truncate text-[13px]/5 font-medium">quotation-sharma-extrusions-aug.pdf</p>
-      <p class="text-[12px]/4 text-zinc-500">248 KB · Ritu Deshpande · 19 Aug 2024</p>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">248 KB · Ritu Deshpande · 19 Aug 2026</p>
     </div>
     <button type="button" aria-label="Remove quotation-sharma-extrusions-aug.pdf"
-            class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+            class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="x" class="size-4"></i>
     </button>
   </li>
@@ -6241,97 +11629,317 @@ Test certificate follows by email.</textarea>
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file" class="size-4 text-zinc-500"></i></span>
     <div class="min-w-0 flex-1">
       <p class="truncate text-[13px]/5 font-medium text-zinc-600 line-through">plant-layout-revised.dwg</p>
-      <p id="reject-dwg" class="mt-0.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
-        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>
+      <p id="reject-dwg" class="mt-0.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
         DWG is not accepted. Attach a PDF export instead.
       </p>
     </div>
     <button type="button" aria-label="Dismiss plant-layout-revised.dwg" aria-describedby="reject-dwg"
-            class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+            class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="x" class="size-4"></i>
     </button>
   </li>
 </ul>` },
 
+      { id: 'required', name: 'Missing, and blocking the post', tagNew: true, code:
+`<!-- The paperwork a record cannot be posted without, named one line at a time.
+     A drop zone on its own never says that this GRN wants a signed challan and
+     a mill test certificate. It says files may be attached, and the user learns
+     which two were expected from the error that comes back after they submit.
+
+     So every required document has a row whether or not the file exists, and
+     the list is a checklist rather than a log. The missing one carries an icon
+     and the word Missing beside the red: a row distinguished only by colour is
+     a row a good part of the plant cannot distinguish at all.
+
+     The submit is a real disabled attribute, because the reason is not a policy
+     the user can argue with — the file is not there. What makes that survivable
+     is the sentence next to it, which the button points at with
+     aria-describedby so it is read out with the button rather than found by
+     someone hunting around the footer.
+
+     Optional documents stay in the same list. A second panel for them makes the
+     reader work out which of the two is blocking; one list with two kinds of
+     row does not, and the paperclip against Optional says it without colour.
+
+     Every picker here is its own input with its own id, not one multiple input
+     serving three rows. A GRN needs to know which file is the test certificate,
+     and a single unnamed queue makes that a guess the server has to make. -->
+<div data-kui="attachment/required" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-200 px-4 py-2.5">
+    <h3 id="req-heading" class="text-[13px]/5 font-medium">Documents for GRN-1142</h3>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">1 of 2 required attached</span>
+  </div>
+
+  <ul aria-labelledby="req-heading" class="divide-y divide-zinc-100">
+    <li class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5">
+      <i data-lucide="check-circle-2" class="size-4 shrink-0 text-emerald-600"></i>
+      <div class="min-w-[12rem] flex-1">
+        <p class="text-[13px]/5 font-medium">Signed delivery challan</p>
+        <p class="truncate text-[12px]/4 tabular-nums text-zinc-500">challan-gp-77412.pdf · 310 KB · 04 Sep 2026</p>
+      </div>
+      <input type="file" id="req-challan" name="challan" class="peer sr-only">
+      <label for="req-challan"
+             class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px]/4 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+        Replace
+      </label>
+    </li>
+
+    <li class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5">
+      <i data-lucide="alert-circle" class="size-4 shrink-0 text-red-600"></i>
+      <div class="min-w-[12rem] flex-1">
+        <p class="text-[13px]/5 font-medium">Mill test certificate</p>
+        <p id="req-tc-why" class="text-[12px]/4 font-medium text-red-600">Missing — the GRN cannot be posted without it</p>
+      </div>
+      <input type="file" id="req-tc" name="test_certificate" required aria-describedby="req-tc-why" class="peer sr-only">
+      <label for="req-tc"
+             class="shrink-0 cursor-pointer rounded-lg border border-transparent bg-zinc-700 px-2.5 py-1 text-[12px]/4 font-medium text-white hover:bg-zinc-800 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/30">
+        Attach
+      </label>
+    </li>
+
+    <li class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5">
+      <i data-lucide="paperclip" class="size-4 shrink-0 text-zinc-400"></i>
+      <div class="min-w-[12rem] flex-1">
+        <p class="text-[13px]/5 font-medium">Weighbridge slip</p>
+        <p class="text-[12px]/4 text-zinc-500">Optional — attach it if the load was weighed at the gate</p>
+      </div>
+      <input type="file" id="req-wb" name="weighbridge_slip" class="peer sr-only">
+      <label for="req-wb"
+             class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px]/4 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+        Attach
+      </label>
+    </li>
+  </ul>
+
+  <div class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-50 px-4 py-3">
+    <p id="req-post-why" class="min-w-[12rem] flex-1 text-[12px]/4 text-zinc-600">
+      Attach the mill test certificate to post this GRN.
+    </p>
+    <button type="button" disabled aria-describedby="req-post-why"
+            class="inline-flex h-9 shrink-0 items-center rounded-lg border border-zinc-300 bg-zinc-200 px-4 text-[13px]/5 font-medium text-zinc-400">
+      Post GRN
+    </button>
+  </div>
+</div>` },
+
+      { id: 'versions', name: 'Replaced, with the old one kept', tagNew: true, code:
+`<!-- The vendor sent a corrected invoice and the first one does not go away.
+     Replacing a document on a record money has moved against is not an edit, it
+     is a new version — the superseded file is what an audit reads when it asks
+     why the amount changed — so the control that replaces it has to keep it.
+
+     Current version is the row; the earlier ones are behind a disclosure,
+     collapsed. On an invoice with four revisions the history is longer than
+     everything else on the panel and it is read about once a year, so it starts
+     shut and x-cloak keeps it from painting before Alpine boots.
+
+     Earlier versions download and do nothing else. No remove, because a trail
+     with a delete button on it is not a trail, and no promote, because rolling
+     back is a new upload with its own timestamp and its own name against it.
+
+     The reason for each replacement sits with the version rather than in a
+     separate audit tab. "Freight line corrected" is the only thing that makes
+     three near-identical PDFs tell apart, and a version list without it is a
+     list of dates.
+
+     The chevron rotates on a wrapping span. Bound on the <i>, createIcons()
+     replaces the node and the binding goes with it. -->
+<div data-kui="attachment/versions" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white" x-data="{ open: false }">
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+    <div class="min-w-[12rem] flex-1">
+      <p class="truncate text-[13px]/5 font-medium">invoice-gujarat-polymers-4471.pdf</p>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">Version 3 · 412 KB · ₹12,45,000 · Anil Kulkarni · 04 Sep 2026</p>
+    </div>
+    <input type="file" id="ver-invoice" name="invoice" class="peer sr-only">
+    <label for="ver-invoice"
+           class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+      Replace
+    </label>
+  </div>
+
+  <div class="border-t border-zinc-200">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="ver-history"
+            class="flex w-full items-center gap-2 px-4 py-2 text-left text-[12px]/4 font-medium text-zinc-600 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex transition-transform" :class="open && 'rotate-180'"><i data-lucide="chevron-down" class="size-4"></i></span>
+      <span class="tabular-nums">2 earlier versions</span>
+    </button>
+
+    <ul id="ver-history" x-show="open" x-cloak class="divide-y divide-zinc-100 border-t border-zinc-100">
+      <li class="flex items-center gap-3 py-2 pr-4 pl-15">
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-[12px]/4 tabular-nums text-zinc-600">Version 2 · 408 KB · ₹12,45,000 · 29 Aug 2026</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">Superseded — freight line corrected</p>
+        </div>
+        <a href="#" aria-label="Download version 2 of invoice-gujarat-polymers-4471.pdf"
+           class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="download" class="size-4"></i>
+        </a>
+      </li>
+      <li class="flex items-center gap-3 py-2 pr-4 pl-15">
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-[12px]/4 tabular-nums text-zinc-600">Version 1 · 401 KB · ₹11,98,000 · 22 Aug 2026</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">Superseded — GSTIN on the header was wrong</p>
+        </div>
+        <a href="#" aria-label="Download version 1 of invoice-gujarat-polymers-4471.pdf"
+           class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="download" class="size-4"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>` },
+
       { id: 'readonly', name: 'Read only', code:
 `<!-- No upload rights. Do not render a disabled drop zone — remove it, and let
-     the list stand on its own. -->
+     the list stand on its own. A greyed-out zone occupies the space the panel
+     would use to say what is here, and it invites a drag that will do nothing.
+
+     The list is named by the heading with aria-labelledby, so a screen reader
+     reaching it hears "Attachments, list, 3 items" rather than "list". -->
 <div data-kui="attachment/readonly" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
-    <h3 class="text-[13px]/5 font-medium">Attachments</h3>
+    <h3 id="ro-heading" class="text-[13px]/5 font-medium">Attachments</h3>
     <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">3 files · 2.4 MB</span>
   </div>
-  <ul class="divide-y divide-zinc-100">
+  <ul aria-labelledby="ro-heading" class="divide-y divide-zinc-100">
     <li class="flex items-center gap-3 px-4 py-2.5">
       <i data-lucide="file-text" class="size-4 shrink-0 text-zinc-500"></i>
-      <a href="#" class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-900 underline underline-offset-2">quotation-sharma-extrusions-aug.pdf</a>
+      <a href="#" class="min-w-0 flex-1 truncate rounded-sm text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">quotation-sharma-extrusions-aug.pdf</a>
       <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">248 KB</span>
     </li>
     <li class="flex items-center gap-3 px-4 py-2.5">
       <i data-lucide="sheet" class="size-4 shrink-0 text-zinc-500"></i>
-      <a href="#" class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-900 underline underline-offset-2">rate-comparison-q3.xlsx</a>
+      <a href="#" class="min-w-0 flex-1 truncate rounded-sm text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">rate-comparison-q3.xlsx</a>
       <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">54 KB</span>
     </li>
     <li class="flex items-center gap-3 px-4 py-2.5">
       <i data-lucide="image" class="size-4 shrink-0 text-zinc-500"></i>
-      <a href="#" class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-900 underline underline-offset-2">delivery-gate-photo.jpg</a>
+      <a href="#" class="min-w-0 flex-1 truncate rounded-sm text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">delivery-gate-photo.jpg</a>
       <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">2.1 MB</span>
     </li>
   </ul>
 </div>` },
 
       { id: 'single', name: 'Single file field', code:
-`<!-- One file, inside a form, where a whole panel would be out of proportion. -->
+`<!-- One file, inside a form, where a whole panel would be out of proportion.
+
+     The field name is a <p> with an id and the input takes aria-labelledby, not
+     a second <label for>. Two labels bound to one input concatenate: with the
+     field name above and the Replace button beside it, the input's accessible
+     name comes out as "Signed GRN * Replace", and the asterisk is read aloud
+     too. aria-labelledby wins over both, so the name is the field and Replace
+     stays a working click target that contributes nothing to it. -->
 <div data-kui="attachment/single">
-  <label for="grn-scan" class="mb-1.5 block text-[13px]/5 font-medium">
-    Signed GRN <span class="text-red-600">*</span>
-  </label>
+  <p id="grn-scan-label" class="mb-1.5 text-[13px]/5 font-medium">
+    Signed GRN <span aria-hidden="true" class="text-red-600">*</span>
+  </p>
   <div class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
     <div class="min-w-0 flex-1">
       <p class="truncate text-[13px]/5 font-medium">signed-grn-1142.pdf</p>
-      <p class="text-[12px]/4 text-zinc-500">4.2 MB · attached just now</p>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">4.2 MB · attached just now</p>
     </div>
-    <input type="file" id="grn-scan" name="grn_scan" class="peer sr-only">
+    <input type="file" id="grn-scan" name="grn_scan" required
+           aria-labelledby="grn-scan-label" aria-describedby="grn-scan-hint" class="peer sr-only">
     <label for="grn-scan"
            class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
       Replace
     </label>
   </div>
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">PDF or JPG, up to 10 MB.</p>
+  <p id="grn-scan-hint" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">PDF or JPG, up to 10 MB.</p>
+</div>` },
+
+      { id: 'compact', name: 'Inline on a record card', tagNew: true, code:
+`<!-- Attachments where they are not the point of the screen — a card in a
+     register, a cell in a table row. At this width the only facts worth drawing
+     are that the paperwork exists and that one click reaches it, so the row is
+     chips: no size, no uploader, no date, and no drop zone.
+
+     The drop zone is what has to go first. A drop target inside a list row
+     competes with whatever selects the row, it is a few pixels tall, and a file
+     dropped just outside it lands on the page and navigates away from the
+     register the user spent a minute filtering. Uploading lives on the record's
+     own screen; this is a pointer to it.
+
+     Each chip caps its own width so a 60-character vendor filename cannot push
+     the overflow count off the card, and "+2 more" is a real link to the
+     record — a count that does nothing is the most-clicked dead element in any
+     internal application.
+
+     No per-chip remove. Deleting a document is a decision that wants the record
+     open in front of you, not a stray click while scanning twenty rows. -->
+<div data-kui="attachment/compact" class="max-w-xl rounded-xl border border-zinc-300 bg-white p-4">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold tabular-nums">GRN-1142 · Gujarat Polymers Ltd</h3>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">04 Sep 2026 · ₹12,45,000</span>
+  </div>
+
+  <ul aria-label="Attachments on GRN-1142" class="mt-3 flex flex-wrap items-center gap-1.5">
+    <li>
+      <a href="#" class="flex max-w-[15rem] items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[12px]/4 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="file-text" class="size-3.5 shrink-0 text-zinc-500"></i>
+        <span class="truncate">challan-gp-77412.pdf</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex max-w-[15rem] items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[12px]/4 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="file-text" class="size-3.5 shrink-0 text-zinc-500"></i>
+        <span class="truncate">test-certificate-heat-8841.pdf</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex max-w-[15rem] items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[12px]/4 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="image" class="size-3.5 shrink-0 text-zinc-500"></i>
+        <span class="truncate">weighbridge-slip-8841.jpg</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex items-center rounded-lg px-2 py-1 text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">+2 more</a>
+    </li>
+  </ul>
 </div>` },
 
       { id: 'images', name: 'Image grid', code:
-`<!-- Photographs are recognised by sight, not by filename. Show them. -->
+`<!-- Photographs are recognised by sight, not by filename. Show them.
+
+     The remove button is visible by default and only hides behind hover from sm
+     up. Reveal-on-hover is a desktop affordance with no touch equivalent, and a
+     gate photographer working on a phone had no way to delete the blurred one
+     at all — the control existed and could not be reached. Keyboard users are
+     covered by focus-visible:opacity-100, which has to be paired with a real
+     focus outline or the button becomes visible at exactly the moment nothing
+     says where focus is. -->
 <div data-kui="attachment/images">
   <div class="flex items-end justify-between gap-3">
-    <label class="text-[13px]/5 font-medium">Delivery photographs</label>
+    <p class="text-[13px]/5 font-medium">Delivery photographs</p>
     <span class="text-[12px]/4 tabular-nums text-zinc-500">4 of 10</span>
   </div>
   <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
     <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
       <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
       <button type="button" aria-label="Remove gate-in-truck.jpg"
-              class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 opacity-0 transition hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100">
+              class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 transition hover:text-red-600 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 sm:opacity-0 sm:group-hover:opacity-100">
         <i data-lucide="x" class="size-3.5"></i>
       </button>
-      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pb-1 pt-4 text-[11px]/4 text-white">gate-in-truck.jpg</p>
+      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">gate-in-truck.jpg</p>
     </div>
     <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
       <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
       <button type="button" aria-label="Remove unloading-bay-3.jpg"
-              class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 opacity-0 transition hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100">
+              class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 transition hover:text-red-600 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 sm:opacity-0 sm:group-hover:opacity-100">
         <i data-lucide="x" class="size-3.5"></i>
       </button>
-      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pb-1 pt-4 text-[11px]/4 text-white">unloading-bay-3.jpg</p>
+      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">unloading-bay-3.jpg</p>
     </div>
     <div class="group relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
       <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
       <button type="button" aria-label="Remove weighbridge-slip.jpg"
-              class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 opacity-0 transition hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100">
+              class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 transition hover:text-red-600 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 sm:opacity-0 sm:group-hover:opacity-100">
         <i data-lucide="x" class="size-3.5"></i>
       </button>
-      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pb-1 pt-4 text-[11px]/4 text-white">weighbridge-slip.jpg</p>
+      <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">weighbridge-slip.jpg</p>
     </div>
     <div>
       <input type="file" id="photo-add" name="photos" accept="image/*" multiple class="peer sr-only">
@@ -6344,47 +11952,180 @@ Test certificate follows by email.</textarea>
   </div>
 </div>` },
 
+      { id: 'htmx', name: 'Posted to a real endpoint', tagNew: true, code:
+`<!-- The upload with a server behind it, which is the only place an honest
+     progress number can come from.
+
+     hx-encoding="multipart/form-data" is the whole integration and the one line
+     everybody leaves out. Without it htmx posts urlencoded, the browser drops
+     the file on the way out, and the view returns 200 over an empty
+     request.FILES — a failure that reads as a success from both ends and shows
+     up weeks later as a record with no paperwork on it.
+
+     htmx fires htmx:xhr:progress carrying loaded and total off the
+     XMLHttpRequest, so Alpine paints bytes rather than a timer. lengthComputable
+     is checked before dividing because it is false for a chunked request, and
+     the division then paints NaN% across the bar.
+
+     Picking a file uploads it. hx-trigger="change from:#hx-attach" puts the
+     request on the input rather than on a submit button, because a separate
+     Upload button after choosing is a second click a third of users never make
+     and the row then looks attached while nothing has been posted.
+
+     A dropped file goes through the input too: the handler assigns the
+     DataTransfer FileList to it and dispatches change, which is what htmx is
+     already listening for. Wiring @drop straight to fetch gives the control two
+     upload paths and they drift apart within a release.
+
+     hx-swap="beforeend" appends the row the server rendered to the list already
+     on the page. innerHTML on the same target wipes every attachment the record
+     loaded with, and the server would have to re-send all of them to hide it.
+
+     hx-disabled-elt stops a second pick landing mid-flight. It is an attribute
+     rather than an Alpine flag because htmx re-enables on failure, timeout and
+     abort as well as on success, which are the three endings a hand-written
+     flag is always still stuck in.
+
+     The failed state clears the input, so the retry is Choose it again rather
+     than Retry: there is no file left in the picker to re-send.
+
+     Remove carries no hx-delete of its own. A stored file is destructive to
+     remove, so the request belongs on alert-dialog's confirm button, with
+     hx-target="closest li" and hx-swap="outerHTML" aimed back at this row.
+     hx-confirm is window.confirm — a browser dialog with the page title on it,
+     no styling and no place to say what else the deletion takes with it.
+
+     Under Django the CSRF token goes on the form as hx-headers — that is in the
+     django variant. -->
+<div data-kui="attachment/htmx" class="max-w-xl"
+     x-data="{ depth: 0, state: 'idle', name: '', pct: 0 }"
+     @htmx:before-request.camel="state = 'uploading'; pct = 0; name = $refs.picker.files.length ? $refs.picker.files[0].name : 'The file'"
+     @htmx:xhr:progress.camel="if ($event.detail.lengthComputable) pct = Math.round($event.detail.loaded / $event.detail.total * 100)"
+     @htmx:after-request.camel="state = $event.detail.successful ? 'idle' : 'failed'; $refs.picker.value = ''">
+
+  <form hx-post="/grn/1142/attachments/" hx-encoding="multipart/form-data"
+        hx-trigger="change from:#hx-attach"
+        hx-target="#hx-attach-list" hx-swap="beforeend"
+        hx-disabled-elt="#hx-attach">
+    <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent
+         @drop.prevent="depth = 0; $refs.picker.files = $event.dataTransfer.files; $refs.picker.dispatchEvent(new Event('change'))"
+         class="rounded-lg border border-dashed px-4 py-5 transition"
+         :class="depth > 0 ? 'border-zinc-700 bg-zinc-50' : 'border-zinc-200 bg-zinc-100'">
+      <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
+        <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
+        <span class="text-[13px]/5 text-zinc-600">Drag a document here or</span>
+        <input type="file" id="hx-attach" name="document" x-ref="picker"
+               aria-describedby="hx-attach-limit" class="peer sr-only">
+        <label for="hx-attach"
+               class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+          Browse files
+        </label>
+        <span id="hx-attach-limit" class="text-[12px]/4 tabular-nums text-zinc-500">PDF or JPG · up to 10 MB</span>
+      </div>
+    </div>
+  </form>
+
+  <!-- in the document from first paint, so the live region exists before it has
+       anything to say -->
+  <div role="status">
+    <div x-show="state === 'uploading'" x-cloak class="mt-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+      <div class="flex items-center gap-3">
+        <p class="min-w-0 flex-1 truncate text-[13px]/5 font-medium" x-text="name"></p>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="pct + '%'"></span>
+      </div>
+      <div role="progressbar" aria-valuemin="0" aria-valuemax="100" :aria-valuenow="pct" :aria-label="'Uploading ' + name"
+           class="mt-2 h-1 overflow-hidden rounded-full bg-zinc-200">
+        <div class="h-full rounded-full bg-zinc-700 transition-[width] duration-150" :style="'width: ' + pct + '%'"></div>
+      </div>
+    </div>
+
+    <p x-show="state === 'failed'" x-cloak
+       class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px]/4 font-medium text-red-600">
+      <span class="flex items-center gap-1.5">
+        <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>
+        <span x-text="name + ' did not upload. Nothing was saved.'"></span>
+      </span>
+      <button type="button" @click="$refs.picker.click()"
+              class="rounded-sm font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Choose it again
+      </button>
+    </p>
+  </div>
+
+  <ul id="hx-attach-list" aria-label="Attached documents" class="mt-2 space-y-2">
+    <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[13px]/5 font-medium">challan-gp-77412.pdf</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">310 KB · Ritu Deshpande · 04 Sep 2026</p>
+      </div>
+      <button type="button" aria-label="Remove challan-gp-77412.pdf"
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="x" class="size-4"></i>
+      </button>
+    </li>
+  </ul>
+</div>` },
+
       { id: 'django', name: 'Django ClearableFileInput', code:
 `<!-- Drop-in replacement for {{ form.attachment }} when the field is a FileField.
      Django's ClearableFileInput renders exactly three things: the current file
      link, a clear checkbox named <field>-clear, and the new file input. Keep all
-     three names or the POST does not clear the file.
+     three names or the POST does not clear the file. Its ids are Django's own:
+     id_attachment for the input, attachment-clear_id for the checkbox.
 
-     {% if form.attachment.value %} … {% endif %} guards the first two. -->
-<div data-kui="attachment/django">
+     {% if form.attachment.value %} … {% endif %} guards the first two.
+
+     enctype="multipart/form-data" is on the <form> here rather than in a note
+     under it. It used to be a red line rendered on the page, which is a message
+     to the developer sitting in the space the user reads for messages about
+     their own record — and it stayed there after the form was fixed. Without
+     the attribute request.FILES arrives empty and the view sees a valid form
+     with no file in it.
+
+     Errors come from form.attachment.errors, not from a hand-written check.
+     FileField already enforces required, and a max size validator on the field
+     reports through the same list. -->
+<form data-kui="attachment/django" method="post" enctype="multipart/form-data" class="max-w-xl">
+  {% csrf_token %}
+
   <label for="id_attachment" class="mb-1.5 block text-[13px]/5 font-medium">Attachment</label>
 
   <div class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
-    <a href="/media/po/quotation-sharma-aug.pdf" class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-900 underline underline-offset-2">quotation-sharma-aug.pdf</a>
+    <a href="/media/po/quotation-sharma-aug.pdf" class="min-w-0 flex-1 truncate rounded-sm text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">quotation-sharma-aug.pdf</a>
     <label class="flex shrink-0 items-center gap-2 text-[12px]/4 text-zinc-600">
       <input type="checkbox" name="attachment-clear" id="attachment-clear_id"
-             class="size-4 rounded border-zinc-200 text-zinc-700">
+             class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       Clear
     </label>
   </div>
 
   <div class="mt-2">
-    <input type="file" name="attachment" id="id_attachment" class="peer sr-only">
+    <input type="file" name="attachment" id="id_attachment" aria-describedby="id_attachment_helptext" class="peer sr-only">
     <label for="id_attachment"
            class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
       <i data-lucide="upload" class="size-4"></i>Choose a replacement
     </label>
   </div>
 
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Uploading a new file replaces the current one.</p>
-  <p class="mt-1.5 flex items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
-    <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>
-    Remember enctype="multipart/form-data" on the &lt;form&gt;, or request.FILES arrives empty.
+  <p id="id_attachment_helptext" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    PDF or JPG, up to 10 MB. Uploading a new file replaces the current one.
   </p>
-</div>` }
+
+  {% if form.attachment.errors %}
+    <p class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>{{ form.attachment.errors.0 }}
+    </p>
+  {% endif %}
+</form>` }
     ]
   },
 
   {
     id: 'calendar', name: 'Calendar', category: 'forms',
     description: 'A month grid for picking a date or a range. Monday-first, tabular figures, and the same graphite selection the rest of the system uses.',
-    when: 'Choosing a date the user has to see in context — a delivery date next to the weekend, a range that spans a month end. For a date of birth or anything typed from memory, an input is faster than a grid.',
+    when: 'Choosing a date the user has to see in context — a delivery date next to the weekend, a range that spans a month end, a day that already has three things booked on it. For a date of birth or anything typed from memory, an input is faster than a grid. When the period is a month or a financial quarter rather than a day, the cells are months and quarters and not a day grid.',
     notes: [
       'The week starts on Monday. Every Indian office runs Monday to Saturday, and a Sunday-first grid puts the weekend at both ends of the row where nobody reads it.',
       'Days are tabular-nums inside a fixed square, so the columns line up and 1 sits under 8 sits under 15. Proportional figures make the grid lean.',
@@ -6392,7 +12133,15 @@ Test certificate follows by email.</textarea>
       'Today is the chip treatment — bg-zinc-200 with ring-zinc-300 — and the selected day is solid zinc-700. Today is a fact about the calendar; selection is a fact about the form, and the solid fill outranks the tint.',
       'The grid is one Tab stop. Arrows move by day, Up and Down by week, PageUp and PageDown by month, Home and End to the ends of the week. Without that a month is 31 tab stops.',
       'Changing month carries the focused day with it. The roving tabindex sits on one date, so if the view moves and the focus does not, the month on screen contains no tabbable day and the grid drops out of the Tab order entirely — measured at zero tab stops after paging away.',
-      'A range is two values and one grid. Never two separate single pickers side by side — the user can then set an end before its start, and something has to reject it after the fact.'
+      'A range is two values and one grid. Never two separate single pickers side by side — the user can then set an end before its start, and something has to reject it after the fact.',
+      'A day can carry a mark for what falls on it — a delivery due, an audit, a plant holiday — and the mark is a dot under the number, never a fill behind it. A grid of tinted days reads as a heat map of nothing, and it collides with the two fills the grid already owns for today and for the selection.',
+      'The row that holds those dots is drawn at a fixed height on every day, marked or not. Sized to its contents it collapses on the empty days and the numbers in a week stop sitting on one line.',
+      'A date and a time are one value, not two fields that happen to be adjacent. A delivery slot is 04 Sep 2026 at 13:00 or it is nothing, so the time is chosen inside the same control and moving the date clears it.',
+      'Not every period is a day. A ledger is closed by the month and reported by the quarter, so the picker for one has months or quarters as its cells and never a day grid the user has to hit the first and the last of.',
+      'A financial year runs April to March, which is why an FY grid puts April first and why the year is printed on every cell: Jan, Feb and Mar of FY 2026-27 fall in 2027, and a bare "Mar" is the one cell people pick from the wrong year.',
+      'A day cell is 36px, which is right for a pointer and short of the 44px a thumb needs. The phone grid sizes its columns as fractions of the panel and its cells at 44px, rather than shrinking the padding around the same squares.',
+      'A date that can no longer be changed is not a disabled picker. It is text with a hidden input carrying the ISO string, because there is nothing left to open and a control that opens and refuses is worse than no control.',
+      'When the marks come out of the database, the month comes from the server too. Shipping a year of delivery dates and the holiday table to the browser to draw one month is the wrong half of the work to move.'
     ],
     anatomy: [
       ['Header', 'Month and year, with a previous and next control either side. The label is aria-live so changing month is announced, not just drawn.'],
@@ -6400,23 +12149,35 @@ Test certificate follows by email.</textarea>
       ['Day cell', 'A size-9 square button carrying the full date as its accessible name — "Friday, 14 August 2026", not "14".'],
       ['Today', 'bg-zinc-200 with ring-zinc-300 and aria-current="date".'],
       ['Selection', 'Solid zinc-700. In a range, the two endpoints are solid and the days between take a zinc-200 band behind them.'],
-      ['Presets', 'A column beside the grid for the ranges people actually pick — this month, last 30 days, this financial year.']
+      ['Mark', 'A 6px dot under the day number saying something falls on it, in the status colour of what it is. Up to three; the rest are in the accessible name and in the list under the grid.'],
+      ['Slot', 'The band of time under the grid — 08:00 to 10:00, 13:00 to 15:00 — with what is left of it. Chosen after the day and cleared by changing it.'],
+      ['Period cell', 'What the grid holds when the unit is not a day: twelve months from April, or four quarters, each one a range and not a point.'],
+      ['Presets', 'A column beside the grid for the ranges people actually pick — this month, last 30 days, this financial year.'],
+      ['Locked value', 'The date on a posted record: the formatted date on the locked surface, a lock icon, and the line saying who posted it and what would have to be reversed to change it.']
     ],
     behaviour: [
       'Clicking a day selects it. In a range, the first click sets the start, the second sets the end, and a third starts over.',
       'Picking an end date before the start swaps them rather than refusing — the user has said which two days they mean.',
       'Arrow keys move focus and month, so arrowing off the end of August lands on 1 September with the view following.',
       'A picker closes on selection, on Escape, and on a click outside; a range picker stays open until both ends are set.',
-      'Disabled dates are skipped by nothing — they keep their place in the grid so the shape of the month does not change, but they cannot be focused or clicked.',
+      'Disabled dates keep their place in the grid so the shape of the month does not change, but they cannot be clicked, and the arrow keys step over them rather than landing on one. A disabled button cannot take focus, so a roving tabindex parked on a blocked day takes the whole grid out of the Tab order.',
+      'The same applies at first paint: if today is a Sunday or a holiday, the grid opens with the roving index on the first day that can actually be picked.',
+      'Changing the date clears the time slot chosen against it. The slot list is inert until there is a day to book it on, because 13:00 on no date is not a value.',
+      'Paging the view announces the month and picking announces the value. They are two live regions and they never speak at the same time, because paging does not change the range and picking does not change the month.',
+      'On a phone the panel commits on Done rather than on the tap. A thumb lands on the wrong day often enough that closing on contact means reopening to correct it.',
       'The financial year preset runs April to March, because that is what the year means in an Indian ledger.'
     ],
     a11y: [
       'The grid is a real table with th scope="col" for the weekdays, so row and column position is available without sight.',
       'Each day button is named with its full date. "14" on its own is meaningless when read out of the grid.',
+      'A day carrying marks says how many and what they are in the same name — the dots under the number are decoration to a screen reader and nothing else says they are there.',
       'Today carries aria-current="date" and the selected day aria-pressed, which are different facts and both worth announcing.',
       'The month label is aria-live="polite", so moving month is announced rather than silently redrawn.',
+      'A field that opens the grid is named by its label and its value together. aria-labelledby pointing at the label alone replaces the date on the trigger with the word "Due date", and the one thing the user wanted read out is the one thing that is gone.',
       'A roving tabindex makes the whole month one Tab stop; only the focused day is reachable with Tab.',
-      'Disabled days are real disabled buttons, so they are skipped by the keyboard and announced as unavailable.'
+      'Blocked days are real disabled buttons carrying the reason in their name, because "unavailable" on its own never says why.',
+      'A month nobody can change is drawn aria-hidden. It is a picture of a value that is already written out beside it in text, and thirty-one numbers read aloud with no way to say which one is the answer is worse than silence.',
+      'When the server renders the month, the label that announces it has to already be on the page. An aria-live element that arrives with the new content announces nothing, so it is swapped out of band into an element that was there before the request.'
     ],
     related: ['input', 'field', 'button'],
     variants: [
@@ -6486,12 +12247,12 @@ Test certificate follows by email.</textarea>
      }">
   <div class="flex items-center justify-between pb-2">
     <button type="button" @click="shift(-1)" aria-label="Previous month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
     <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
     <button type="button" @click="shift(1)" aria-label="Next month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
@@ -6520,7 +12281,7 @@ Test certificate follows by email.</textarea>
                         :aria-current="c.iso === today ? 'date' : null"
                         :tabindex="c.iso === focus ? 0 : -1"
                         :data-focus="c.iso === focus ? '1' : null"
-                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                         :class="cls(c.iso)" x-text="c.day"></button>
               </template>
               <template x-if="!c"><span class="block size-9"></span></template>
@@ -6536,6 +12297,12 @@ Test certificate follows by email.</textarea>
 `<!-- A field that opens the grid. The trigger shows the date the way it is read
      — 14 Aug 2026 — while a hidden input carries the ISO string that posts, so
      the display format and the wire format never have to agree.
+
+     aria-labelledby names the trigger with the label and the value span
+     together. Pointing it at the label alone is the version that ships first
+     and it replaces the whole accessible name with "Due date": the button then
+     announces what it is for and never what it holds, which is the one fact the
+     user opened it to check.
 
      x-trap keeps Tab inside the panel and returns focus to the trigger on
      close. Choosing a day closes it, because a single date is finished the
@@ -6595,9 +12362,9 @@ Test certificate follows by email.</textarea>
   <input type="hidden" name="due_date" :value="sel">
 
   <button type="button" x-ref="trigger" @click="open = !open"
-          aria-labelledby="due-label" :aria-expanded="open" aria-haspopup="dialog"
-          class="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 hover:bg-zinc-200">
-    <span class="tabular-nums" :class="sel ? 'text-zinc-900' : 'text-zinc-500'" x-text="sel ? fmt(sel) : 'Select a date'"></span>
+          aria-labelledby="due-label due-value" :aria-expanded="open" aria-haspopup="dialog"
+          class="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <span id="due-value" class="tabular-nums" :class="sel ? 'text-zinc-900' : 'text-zinc-500'" x-text="sel ? fmt(sel) : 'Select a date'"></span>
     <i data-lucide="calendar" class="size-4 shrink-0 text-zinc-600"></i>
   </button>
 
@@ -6605,12 +12372,12 @@ Test certificate follows by email.</textarea>
        class="absolute left-0 z-40 mt-1 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
     <div class="flex items-center justify-between pb-2">
       <button type="button" @click="shift(-1)" aria-label="Previous month"
-              class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+              class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
       <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
       <button type="button" @click="shift(1)" aria-label="Next month"
-              class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+              class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>
     </div>
@@ -6639,7 +12406,7 @@ Test certificate follows by email.</textarea>
                           :aria-current="c.iso === today ? 'date' : null"
                           :tabindex="c.iso === focus ? 0 : -1"
                           :data-focus="c.iso === focus ? '1' : null"
-                          class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                          class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                           :class="cls(c.iso)" x-text="c.day"></button>
                 </template>
                 <template x-if="!c"><span class="block size-9"></span></template>
@@ -6650,9 +12417,9 @@ Test certificate follows by email.</textarea>
       </tbody>
     </table>
     <div class="mt-2 flex items-center justify-between border-t border-zinc-200 pt-2">
-      <button type="button" @click="sel = null" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Clear</button>
+      <button type="button" @click="sel = null" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
       <button type="button" @click="vy = new Date().getFullYear(); vm = new Date().getMonth(); pick(today)"
-              class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Today</button>
+              class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Today</button>
     </div>
   </div>
 </div>` },
@@ -6666,12 +12433,25 @@ Test certificate follows by email.</textarea>
      before its start swaps them rather than refusing: the user has said which
      two days they mean and the order is an implementation detail.
 
+     The roving tabindex spans both tables — one focus value, and the day that
+     matches it is the only tabbable cell in either month. Two months without it
+     is over sixty tab stops. move() always pulls the view so the focused day
+     lands in the left-hand table, because the right-hand one is hidden below
+     lg: focus() on a display:none button is a silent no-op and the grid reads
+     as having no keyboard at all.
+
      The band sits on the td and the endpoints on the button, so one continuous
      stripe runs behind the row while the two ends stay round. Today keeps only
      a ring here, not a fill — a zinc-200 chip inside a zinc-200 band is
-     invisible. -->
+     invisible.
+
+     Two live regions, and they never speak together: the month caption
+     announces paging, the footer announces the range. Wiring the range alone
+     and leaving the previous and next buttons silent is what the first version
+     did. -->
 <div data-kui="calendar/range" class="inline-block rounded-xl border border-zinc-300 bg-white p-3"
      x-data="{
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        vy: new Date().getFullYear(),
        vm: new Date().getMonth(),
        today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
@@ -6704,8 +12484,16 @@ Test certificate follows by email.</textarea>
          const last = new Date(this.vy, this.vm + 1, 0).getDate();
          this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
        },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
        start: null, end: null, hover: null,
        pick(s) {
+         this.focus = s;
          if (!this.start || (this.start && this.end)) { this.start = s; this.end = null; return; }
          if (s < this.start) { this.end = this.start; this.start = s; } else { this.end = s; }
          this.hover = null;
@@ -6730,19 +12518,25 @@ Test certificate follows by email.</textarea>
      }">
   <div class="flex items-center justify-between pb-2">
     <button type="button" @click="shift(-1)" aria-label="Previous month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
-    <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="fmt(start) + ' – ' + fmt(end)"></span>
+    <span class="text-[13px]/5 font-medium tabular-nums" x-text="fmt(start) + ' – ' + fmt(end)"></span>
     <button type="button" @click="shift(1)" aria-label="Next month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
-  <div class="flex flex-col gap-5 lg:flex-row" @mouseleave="hover = null">
+  <div x-ref="grid" class="flex flex-col gap-5 lg:flex-row" @mouseleave="hover = null"
+       @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+       @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+       @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+       @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+       @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
     <template x-for="o in [0, 1]" :key="o">
       <div :class="o === 1 && 'hidden lg:block'">
-        <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600" x-text="title(o)"></p>
+        <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600"
+           :aria-live="o === 0 ? 'polite' : null" x-text="title(o)"></p>
         <table class="border-collapse">
           <caption class="sr-only" x-text="'Calendar, ' + title(o)"></caption>
           <thead>
@@ -6761,7 +12555,9 @@ Test certificate follows by email.</textarea>
                       <button type="button" @click="pick(c.iso)" @mouseenter="if (start && !end) hover = c.iso"
                               :aria-label="long(c.iso)" :aria-pressed="isEnd(c.iso)"
                               :aria-current="c.iso === today ? 'date' : null"
-                              class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                              :tabindex="c.iso === focus ? 0 : -1"
+                              :data-focus="c.iso === focus ? '1' : null"
+                              class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                               :class="cls(c.iso)" x-text="c.day"></button>
                     </template>
                     <template x-if="!c"><span class="block size-9"></span></template>
@@ -6775,9 +12571,9 @@ Test certificate follows by email.</textarea>
     </template>
   </div>
   <div class="mt-3 flex items-center justify-between border-t border-zinc-200 pt-2">
-    <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="span() ? span() + ' days' : 'Pick a start and an end'"></span>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500" aria-live="polite" x-text="span() ? span() + ' days' : 'Pick a start and an end'"></span>
     <button type="button" @click="start = null; end = null; hover = null"
-            class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Clear</button>
+            class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
   </div>
 </div>` },
 
@@ -6785,6 +12581,11 @@ Test certificate follows by email.</textarea>
 `<!-- Chevrons are fine for next week and useless for March 2019 — that is 84
      clicks. The header doubles as two selects, so any month in a twelve-year
      window is one gesture.
+
+     The selects take focus: rather than focus-visible:, which is what every
+     native field in this system does — a select shows its outline on a pointer
+     open as well, and hiding it there is the one case where the two differ
+     visibly.
 
      The year list is built around the current year rather than hard-coded, so
      this markup does not quietly expire. -->
@@ -6841,7 +12642,7 @@ Test certificate follows by email.</textarea>
      }">
   <div class="flex items-center gap-1.5 pb-2">
     <button type="button" @click="shift(-1)" aria-label="Previous month"
-            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
 
@@ -6862,13 +12663,15 @@ Test certificate follows by email.</textarea>
     </select>
 
     <button type="button" @click="shift(1)" aria-label="Next month"
-            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
   <table x-ref="grid" class="border-collapse"
            @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
              @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+             @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+             @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
              @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
     <caption class="sr-only" x-text="'Calendar, ' + title(0)"></caption>
     <thead>
@@ -6889,7 +12692,7 @@ Test certificate follows by email.</textarea>
                         :aria-current="c.iso === today ? 'date' : null"
                         :tabindex="c.iso === focus ? 0 : -1"
                         :data-focus="c.iso === focus ? '1' : null"
-                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                         :class="cls(c.iso)" x-text="c.day"></button>
               </template>
               <template x-if="!c"><span class="block size-9"></span></template>
@@ -6908,6 +12711,17 @@ Test certificate follows by email.</textarea>
 
      Blocked days keep their square. Removing them would reshape the month and
      move every date after them into a different column.
+
+     The keyboard has to step over them, and that is not a nicety. A disabled
+     button cannot take focus, so the roving tabindex landing on one leaves the
+     month with no tabbable cell at all — the grid measures as zero tab stops
+     and reads as having no keyboard. move() therefore keeps walking in the
+     direction of travel until it finds a day that can be picked, and gives up
+     rather than looping when there is none: arrowing back from today runs into
+     the past and simply does nothing.
+
+     init() is the same rule at first paint. Today is the natural place to put
+     the roving index and today is a Sunday one week in seven.
 
      why() puts the reason into the accessible name, because a disabled button
      announces "unavailable" and never says why. -->
@@ -6949,11 +12763,27 @@ Test certificate follows by email.</textarea>
          this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
        },
        move(n) {
+         const dir = n < 0 ? -1 : 1;
          const f = this.parse(this.focus);
          f.setDate(f.getDate() + n);
+         let guard = 0;
+         while (this.blocked(this.iso(f.getFullYear(), f.getMonth(), f.getDate()), f.getDay())) {
+           if (++guard > 370) return;
+           f.setDate(f.getDate() + dir);
+         }
          this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
          this.vy = f.getFullYear(); this.vm = f.getMonth();
          this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
+       init() {
+         let guard = 0;
+         while (this.blocked(this.focus, this.parse(this.focus).getDay()) && ++guard < 370) {
+           const f = this.parse(this.focus);
+           f.setDate(f.getDate() + 1);
+           this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         }
+         const f = this.parse(this.focus);
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
        },
        max: (() => { const t = new Date(); t.setDate(t.getDate() + 90); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        blocked(s, dow) { return s < this.today || s > this.max || dow === 0 || this.holidays.includes(s); },
@@ -6972,18 +12802,20 @@ Test certificate follows by email.</textarea>
      }">
   <div class="flex items-center justify-between pb-2">
     <button type="button" @click="shift(-1)" aria-label="Previous month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
     <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
     <button type="button" @click="shift(1)" aria-label="Next month"
-            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
   <table x-ref="grid" class="border-collapse"
            @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
              @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+             @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+             @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
              @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
     <caption class="sr-only" x-text="'Calendar, ' + title(0)"></caption>
     <thead>
@@ -7005,7 +12837,7 @@ Test certificate follows by email.</textarea>
                         :aria-current="c.iso === today ? 'date' : null"
                         :tabindex="c.iso === focus ? 0 : -1"
                         :data-focus="c.iso === focus ? '1' : null"
-                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                        class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                         :class="cls(c.iso)" x-text="c.day"></button>
               </template>
               <template x-if="!c"><span class="block size-9"></span></template>
@@ -7027,10 +12859,18 @@ Test certificate follows by email.</textarea>
      a bug that only appears in Q1 and only to accounts.
 
      Picking a day in the grid clears the preset label, because the range is no
-     longer the thing the preset named. -->
+     longer the thing the preset named.
+
+     The preset column wraps below sm rather than scrolling sideways. A strip of
+     six chips in a horizontal scroller hides half of them behind a gesture
+     nothing on the page suggests, and on a phone that is the half people want.
+
+     Two live regions again: the panel header carries the range, the caption
+     over the left month carries the month. -->
 <div data-kui="calendar/presets" class="relative inline-block"
      x-data="{
        open: false,
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
        vy: new Date().getFullYear(),
        vm: new Date().getMonth(),
        today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
@@ -7063,8 +12903,16 @@ Test certificate follows by email.</textarea>
          const last = new Date(this.vy, this.vm + 1, 0).getDate();
          this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
        },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
        start: null, end: null, hover: null,
        pick(s) {
+         this.focus = s;
          if (!this.start || (this.start && this.end)) { this.start = s; this.end = null; return; }
          if (s < this.start) { this.end = this.start; this.start = s; } else { this.end = s; }
          this.hover = null;
@@ -7100,13 +12948,15 @@ Test certificate follows by email.</textarea>
          if (name === 'This FY')      { a = new Date(m < 3 ? y - 1 : y, 3, 1); b = new Date(y, m, d); }
          this.start = this.iso(a.getFullYear(), a.getMonth(), a.getDate());
          this.end = this.iso(b.getFullYear(), b.getMonth(), b.getDate());
+         this.focus = this.end;
          this.preset = name;
-         this.vy = a.getFullYear(); this.vm = a.getMonth();
+         const v = new Date(b.getFullYear(), b.getMonth(), 1);
+         this.vy = v.getFullYear(); this.vm = v.getMonth();
        },
        tap(s) { this.preset = null; this.pick(s); }
      }" @click.outside="open = false" @keydown.escape.window="open = false">
   <button type="button" @click="open = !open" :aria-expanded="open" aria-haspopup="dialog"
-          class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200">
+          class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="calendar-range" class="size-4 text-zinc-600"></i>
     <span class="tabular-nums" x-text="preset || (start ? fmt(start) + ' – ' + fmt(end) : 'Select period')"></span>
     <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -7114,11 +12964,11 @@ Test certificate follows by email.</textarea>
 
   <div x-show="open" x-cloak x-trap="open" role="dialog" aria-label="Choose a reporting period"
        class="absolute left-0 z-40 mt-1 flex flex-col rounded-xl border border-zinc-200 bg-white shadow-lg sm:flex-row">
-    <div class="flex shrink-0 gap-1 overflow-x-auto border-b border-zinc-200 p-2 sm:w-44 sm:flex-col sm:gap-0.5 sm:overflow-visible sm:border-r sm:border-b-0">
+    <div class="flex shrink-0 flex-wrap gap-1 border-b border-zinc-200 p-2 sm:w-44 sm:flex-col sm:flex-nowrap sm:gap-0.5 sm:border-r sm:border-b-0">
       <template x-for="p in presets" :key="p">
         <button type="button" @click="apply(p)" :aria-pressed="preset === p"
-                class="inline-flex h-8 shrink-0 items-center rounded-lg px-3 text-left text-[13px]/5 whitespace-nowrap"
-                :class="preset === p ? 'bg-zinc-700 font-medium text-white' : 'text-zinc-900 hover:bg-zinc-200'">
+                class="inline-flex h-8 items-center rounded-lg px-3 text-left text-[13px]/5 whitespace-nowrap focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="preset === p ? 'bg-zinc-700 font-medium text-white hover:bg-zinc-800' : 'text-zinc-900 hover:bg-zinc-200'">
           <span x-text="p"></span>
         </button>
       </template>
@@ -7127,19 +12977,25 @@ Test certificate follows by email.</textarea>
     <div class="p-3">
       <div class="flex items-center justify-between pb-2">
         <button type="button" @click="shift(-1)" aria-label="Previous month"
-                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="chevron-left" class="size-4"></i>
         </button>
         <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="fmt(start) + ' – ' + fmt(end)"></span>
         <button type="button" @click="shift(1)" aria-label="Next month"
-                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900">
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="chevron-right" class="size-4"></i>
         </button>
       </div>
-      <div class="flex flex-col gap-5 lg:flex-row" @mouseleave="hover = null">
+      <div x-ref="grid" class="flex flex-col gap-5 lg:flex-row" @mouseleave="hover = null"
+           @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+           @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+           @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+           @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
         <template x-for="o in [0, 1]" :key="o">
           <div :class="o === 1 && 'hidden lg:block'">
-            <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600" x-text="title(o)"></p>
+            <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600"
+               :aria-live="o === 0 ? 'polite' : null" x-text="title(o)"></p>
             <table class="border-collapse">
               <caption class="sr-only" x-text="'Calendar, ' + title(o)"></caption>
               <thead>
@@ -7158,7 +13014,9 @@ Test certificate follows by email.</textarea>
                           <button type="button" @click="tap(c.iso)" @mouseenter="if (start && !end) hover = c.iso"
                                   :aria-label="long(c.iso)" :aria-pressed="isEnd(c.iso)"
                                   :aria-current="c.iso === today ? 'date' : null"
-                                  class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                                  :tabindex="c.iso === focus ? 0 : -1"
+                                  :data-focus="c.iso === focus ? '1' : null"
+                                  class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
                                   :class="cls(c.iso)" x-text="c.day"></button>
                         </template>
                         <template x-if="!c"><span class="block size-9"></span></template>
@@ -7175,11 +13033,655 @@ Test certificate follows by email.</textarea>
         <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="span() ? span() + ' days' : 'No period set'"></span>
         <div class="flex items-center gap-2">
           <button type="button" @click="start = null; end = null; preset = null"
-                  class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100">Clear</button>
+                  class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
           <button type="button" @click="open = false" :disabled="!start || !end"
-                  class="inline-flex h-8 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400">Apply</button>
+                  class="inline-flex h-8 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Apply</button>
         </div>
       </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'marked', name: 'Days that carry a mark', tagNew: true, code:
+`<!-- The delivery month. Every day here is still selectable, but the reason to
+     look at it is what is already booked on it: a purchase order due, a QC
+     audit, the plant shut for Ganesh Chaturthi.
+
+     The mark is a dot under the number, never a fill behind it. A tinted day
+     collides with the two fills the grid already owns — the zinc-200 chip that
+     means today and the solid zinc-700 that means selected — and a month of
+     coloured squares reads as a heat map of nothing by the second week.
+
+     The dot row is drawn at h-1.5 on every day, marked or not. Sized to its
+     contents it collapses on the empty days, and the numbers in a week stop
+     sitting on one line.
+
+     On the selected day the dots go white. red-600 on zinc-700 is unreadable,
+     and the colour is not where the meaning lives anyway: the count and every
+     label are in the button's accessible name, and the day's records are listed
+     under the grid the moment it is picked.
+
+     Three dots is the cap. A day with five things on it says so in its name and
+     in the list; five dots in a 36px square is a smudge.
+
+     The marks are keyed off today so the demo always has something in view. In
+     an application they arrive as a dict of ISO string to records — see the
+     htmx variant for where they come from. -->
+<div data-kui="calendar/marked" class="inline-block max-w-full rounded-xl border border-zinc-300 bg-white p-3"
+     x-data="{
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       sel: null,
+       vy: new Date().getFullYear(),
+       vm: new Date().getMonth(),
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       marks: (() => {
+         const t = new Date();
+         const k = (n) => { const d = new Date(t.getFullYear(), t.getMonth(), t.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+         const m = {};
+         m[k(-9)] = [{ tone: 'bg-emerald-600', text: 'GRN-26-0431 received — 18 MT HDPE' }];
+         m[k(-3)] = [{ tone: 'bg-red-600', text: 'PO-24-1187 overdue — Gujarat Polymers Ltd' },
+                     { tone: 'bg-zinc-500', text: 'Vendor audit — Nashik' }];
+         m[k(0)]  = [{ tone: 'bg-amber-500', text: 'PO-24-1203 due — 4 MT masterbatch' }];
+         m[k(2)]  = [{ tone: 'bg-zinc-500', text: 'Plant closed — Ganesh Chaturthi' }];
+         m[k(5)]  = [{ tone: 'bg-amber-500', text: 'PO-24-1211 due — 20 MT PP granules' },
+                     { tone: 'bg-emerald-600', text: 'Invoice INV-3391 cleared — ₹12,45,000' },
+                     { tone: 'bg-zinc-500', text: 'Stock count — Store 2' },
+                     { tone: 'bg-zinc-500', text: 'Shift roster published' }];
+         return m;
+       })(),
+       on(s) { return this.marks[s] || []; },
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
+       title(o) { return new Date(this.vy, this.vm + o, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       long(s) { return this.parse(s).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); },
+       fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
+       name(s) {
+         const n = this.on(s);
+         if (!n.length) return this.long(s);
+         return this.long(s) + ' — ' + n.length + (n.length === 1 ? ' entry: ' : ' entries: ') + n.map(x => x.text).join('; ');
+       },
+       weeks(o) {
+         const y = this.vy, m = this.vm + o;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) {
+           const dt = new Date(y, m, d);
+           cells.push({ iso: this.iso(dt.getFullYear(), dt.getMonth(), d), day: d, dow: dt.getDay() });
+         }
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       },
+       shift(n) { const v = new Date(this.vy, this.vm + n, 1); this.vy = v.getFullYear(); this.vm = v.getMonth(); this.clamp(); },
+       clamp() {
+         if (!this.focus) return;
+         const f = this.parse(this.focus);
+         if (f.getFullYear() === this.vy && f.getMonth() === this.vm) return;
+         const last = new Date(this.vy, this.vm + 1, 0).getDate();
+         this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
+       },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
+       cls(s) {
+         if (s === this.sel) return 'bg-zinc-700 font-medium text-white hover:bg-zinc-800';
+         if (s === this.today) return 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300';
+         return 'text-zinc-900 hover:bg-zinc-200';
+       }
+     }">
+  <div class="flex items-center justify-between pb-2">
+    <button type="button" @click="shift(-1)" aria-label="Previous month"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+    <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
+    <button type="button" @click="shift(1)" aria-label="Next month"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+  <table x-ref="grid" class="border-collapse"
+         @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+         @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+         @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+         @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
+    <caption class="sr-only" x-text="'Delivery calendar, ' + title(0)"></caption>
+    <thead>
+      <tr>
+        <template x-for="h in head" :key="h">
+          <th scope="col" class="size-9 text-[11px]/4 font-medium text-zinc-500" x-text="h"></th>
+        </template>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="(week, wi) in weeks(0)" :key="wi">
+        <tr>
+          <template x-for="(c, ci) in week" :key="ci">
+            <td class="p-0">
+              <template x-if="c">
+                <button type="button" @click="sel = c.iso; focus = c.iso"
+                        :aria-label="name(c.iso)" :aria-pressed="c.iso === sel"
+                        :aria-current="c.iso === today ? 'date' : null"
+                        :tabindex="c.iso === focus ? 0 : -1"
+                        :data-focus="c.iso === focus ? '1' : null"
+                        class="inline-flex size-9 flex-col items-center justify-center gap-0.5 rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                        :class="cls(c.iso)">
+                  <span x-text="c.day"></span>
+                  <span aria-hidden="true" class="flex h-1.5 items-center gap-0.5">
+                    <template x-for="(mk, mi) in on(c.iso).slice(0, 3)" :key="mi">
+                      <span class="size-1.5 rounded-full" :class="c.iso === sel ? 'bg-white' : mk.tone"></span>
+                    </template>
+                  </span>
+                </button>
+              </template>
+              <template x-if="!c"><span class="block size-9"></span></template>
+            </td>
+          </template>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <ul class="mt-2 flex flex-wrap gap-x-3 gap-y-1 border-t border-zinc-200 pt-2 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-red-600"></span>Overdue</li>
+    <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>Due</li>
+    <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Received</li>
+    <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-zinc-500"></span>Other</li>
+  </ul>
+
+  <div class="mt-2 max-w-[17rem] border-t border-zinc-200 pt-2" aria-live="polite">
+    <p class="text-[13px]/5 font-medium tabular-nums" x-text="sel ? fmt(sel) : 'No day selected'"></p>
+    <ul class="mt-1 space-y-1">
+      <template x-for="(mk, mi) in (sel ? on(sel) : [])" :key="mi">
+        <li class="flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+          <span class="mt-1.5 size-1.5 shrink-0 rounded-full" :class="mk.tone"></span>
+          <span x-text="mk.text"></span>
+        </li>
+      </template>
+    </ul>
+    <p x-show="!sel || !on(sel).length" x-cloak class="mt-1 text-[12px]/4 text-zinc-500"
+       x-text="sel ? 'Nothing booked on this day.' : 'Pick a day to see what falls on it.'"></p>
+  </div>
+</div>` },
+
+      { id: 'slot', name: 'A date and a delivery slot', tagNew: true, code:
+`<!-- A gate-in booking. The value is 04 Sep 2026 at 13:00 or it is nothing, so
+     the day and the band are chosen in one control and posted as one ISO
+     string. Two separate fields is the arrangement that ends with a truck
+     booked for 13:00 on no date.
+
+     Moving the day clears the slot. 13:00 was two bays free on Friday and full
+     on Saturday, so carrying the time across is carrying a fact that was true
+     about a different day.
+
+     The slot list is inert until a day is picked — disabled buttons, not hidden
+     ones, so the shape of the panel does not change under the pointer and the
+     user can see what the choices will be before choosing the day.
+
+     A full band stays in the list and says it is full. Dropping it makes the
+     08:00 gap look like a slot that was never offered, and the next call to the
+     plant is somebody asking why. -->
+<div data-kui="calendar/slot" class="inline-block max-w-full rounded-xl border border-zinc-300 bg-white p-3"
+     x-data="{
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       sel: null, slot: null,
+       vy: new Date().getFullYear(),
+       vm: new Date().getMonth(),
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       slots: [
+         { t: '08:00', label: '08:00 – 10:00', free: 2 },
+         { t: '10:00', label: '10:00 – 12:00', free: 0 },
+         { t: '13:00', label: '13:00 – 15:00', free: 3 },
+         { t: '15:00', label: '15:00 – 17:00', free: 1 }
+       ],
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
+       title(o) { return new Date(this.vy, this.vm + o, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       long(s) { return this.parse(s).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); },
+       fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
+       weeks(o) {
+         const y = this.vy, m = this.vm + o;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) {
+           const dt = new Date(y, m, d);
+           cells.push({ iso: this.iso(dt.getFullYear(), dt.getMonth(), d), day: d, dow: dt.getDay() });
+         }
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       },
+       shift(n) { const v = new Date(this.vy, this.vm + n, 1); this.vy = v.getFullYear(); this.vm = v.getMonth(); this.clamp(); },
+       clamp() {
+         if (!this.focus) return;
+         const f = this.parse(this.focus);
+         if (f.getFullYear() === this.vy && f.getMonth() === this.vm) return;
+         const last = new Date(this.vy, this.vm + 1, 0).getDate();
+         this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
+       },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
+       day(s) { if (s !== this.sel) this.slot = null; this.sel = s; this.focus = s; },
+       value() { return this.sel && this.slot ? this.sel + 'T' + this.slot : ''; },
+       band() { const s = this.slots.find(x => x.t === this.slot); return s ? s.label : ''; },
+       cls(s) {
+         if (s === this.sel) return 'bg-zinc-700 font-medium text-white hover:bg-zinc-800';
+         if (s === this.today) return 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300';
+         return 'text-zinc-900 hover:bg-zinc-200';
+       }
+     }">
+  <input type="hidden" name="gate_slot" :value="value()">
+
+  <div class="flex flex-col gap-4 sm:flex-row">
+    <div>
+      <div class="flex items-center justify-between pb-2">
+        <button type="button" @click="shift(-1)" aria-label="Previous month"
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>
+        </button>
+        <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
+        <button type="button" @click="shift(1)" aria-label="Next month"
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-right" class="size-4"></i>
+        </button>
+      </div>
+      <table x-ref="grid" class="border-collapse"
+             @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+             @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+             @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+             @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+             @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
+        <caption class="sr-only" x-text="'Gate-in date, ' + title(0)"></caption>
+        <thead>
+          <tr>
+            <template x-for="h in head" :key="h">
+              <th scope="col" class="size-9 text-[11px]/4 font-medium text-zinc-500" x-text="h"></th>
+            </template>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="(week, wi) in weeks(0)" :key="wi">
+            <tr>
+              <template x-for="(c, ci) in week" :key="ci">
+                <td class="p-0">
+                  <template x-if="c">
+                    <button type="button" @click="day(c.iso)"
+                            :aria-label="long(c.iso)" :aria-pressed="c.iso === sel"
+                            :aria-current="c.iso === today ? 'date' : null"
+                            :tabindex="c.iso === focus ? 0 : -1"
+                            :data-focus="c.iso === focus ? '1' : null"
+                            class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                            :class="cls(c.iso)" x-text="c.day"></button>
+                  </template>
+                  <template x-if="!c"><span class="block size-9"></span></template>
+                </td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sm:w-56">
+      <p id="slot-head" class="pb-2 text-[13px]/5 font-medium">Gate 2 — Silvassa</p>
+      <div role="group" aria-labelledby="slot-head" class="space-y-1">
+        <template x-for="s in slots" :key="s.t">
+          <button type="button" @click="slot = s.t" :disabled="!sel || s.free === 0"
+                  :aria-pressed="slot === s.t"
+                  :aria-label="s.label + (s.free ? ' — ' + s.free + ' bays free' : ' — full')"
+                  class="flex h-9 w-full items-center justify-between gap-3 rounded-lg border border-zinc-200 px-3 text-[13px]/5 tabular-nums disabled:border-zinc-200 disabled:bg-zinc-200 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="slot === s.t ? 'border-transparent bg-zinc-700 font-medium text-white hover:bg-zinc-800' : 'bg-white hover:bg-zinc-100'">
+            <span x-text="s.label"></span>
+            <span aria-hidden="true" :class="slot === s.t ? 'text-white' : 'text-zinc-500'"
+                  x-text="s.free ? s.free + ' free' : 'Full'"></span>
+          </button>
+        </template>
+      </div>
+      <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500" aria-live="polite"
+         x-text="!sel ? 'Pick a date first.' : (slot ? 'Booked for ' + fmt(sel) + ', ' + band() + '.' : 'Now pick a slot on ' + fmt(sel) + '.')"></p>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'period', name: 'Months and quarters, not days', tagNew: true, code:
+`<!-- Closing the books is a month and reporting is a quarter, so the cells are
+     months and quarters. A day grid for a period means hitting the 1st and the
+     30th exactly, and off-by-one there is a GST return that does not tie out.
+
+     April first, because the year in an Indian ledger runs April to March. The
+     calendar year is on every cell for the same reason: Jan, Feb and Mar of
+     FY 2026-27 fall in 2027, and a bare "Mar" is the cell people pick out of
+     the wrong year.
+
+     Each cell is a range, not a point, which is why what posts is two ISO
+     strings and not one. last() takes day 0 of the following month so February
+     and a leap year are the calendar's problem rather than this markup's.
+
+     The grid is a radiogroup with a roving tabindex, like every other set of
+     one-of-many in this system. Twelve tab stops for twelve months is the same
+     defect as thirty-one for thirty-one days, only smaller.
+
+     Switching the unit clears the selection. Q2 and August are not the same
+     period and carrying an index across pretends they are. -->
+<div data-kui="calendar/period" class="inline-block max-w-full rounded-xl border border-zinc-300 bg-white p-3"
+     x-data="{
+       fy: (() => { const t = new Date(); return t.getMonth() < 3 ? t.getFullYear() - 1 : t.getFullYear(); })(),
+       unit: 'month',
+       sel: null,
+       names: ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       cell(i) { return { y: this.fy + (i < 9 ? 0 : 1), m: (i + 3) % 12 }; },
+       first(i) { const c = this.cell(i); return this.iso(c.y, c.m, 1); },
+       last(i) { const c = this.cell(i); const d = new Date(c.y, c.m + 1, 0); return this.iso(d.getFullYear(), d.getMonth(), d.getDate()); },
+       count() { return this.unit === 'month' ? 12 : 4; },
+       lo(i) { return this.unit === 'month' ? i : i * 3; },
+       hi(i) { return this.unit === 'month' ? i : i * 3 + 2; },
+       start() { return this.sel === null ? '' : this.first(this.lo(this.sel)); },
+       end() { return this.sel === null ? '' : this.last(this.hi(this.sel)); },
+       label(i) {
+         if (this.unit === 'month') return this.names[i] + ' ' + this.cell(i).y;
+         return 'Q' + (i + 1) + ' · ' + this.names[i * 3] + ' – ' + this.names[i * 3 + 2] + ' ' + this.cell(i * 3).y;
+       },
+       fyLabel() { return 'FY ' + this.fy + '–' + String(this.fy + 1).slice(2); },
+       current(i) { return this.today >= this.first(this.lo(i)) && this.today <= this.last(this.hi(i)); },
+       fmt(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); },
+       step(n) {
+         const c = this.count();
+         this.sel = this.sel === null ? (n > 0 ? 0 : c - 1) : (this.sel + n + c) % c;
+         this.$nextTick(() => { const b = this.$refs.tiles.querySelector('[aria-checked=true]'); if (b) b.focus(); });
+       },
+       setUnit(u) { if (u !== this.unit) { this.unit = u; this.sel = null; } }
+     }">
+  <div class="flex items-center justify-between gap-3 pb-2">
+    <button type="button" @click="fy--" aria-label="Previous financial year"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+    <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="fyLabel()"></span>
+    <button type="button" @click="fy++" aria-label="Next financial year"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+
+  <div role="radiogroup" aria-label="Period unit" x-ref="unitgrp"
+       @keydown.arrow-right.prevent="setUnit(unit === 'month' ? 'quarter' : 'month'); $nextTick(() => $refs.unitgrp.querySelector('[aria-checked=true]').focus())"
+       @keydown.arrow-left.prevent="setUnit(unit === 'month' ? 'quarter' : 'month'); $nextTick(() => $refs.unitgrp.querySelector('[aria-checked=true]').focus())"
+       class="mb-3 flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+    <template x-for="u in ['month', 'quarter']" :key="u">
+      <button type="button" role="radio" :aria-checked="unit === u" :tabindex="unit === u ? 0 : -1"
+              @click="setUnit(u)"
+              class="inline-flex h-8 flex-1 items-center justify-center rounded-md px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="unit === u ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+        <span x-text="u === 'month' ? 'Months' : 'Quarters'"></span>
+      </button>
+    </template>
+  </div>
+
+  <input type="hidden" name="period_start" :value="start()">
+  <input type="hidden" name="period_end" :value="end()">
+
+  <div x-ref="tiles" role="radiogroup" :aria-label="(unit === 'month' ? 'Month' : 'Quarter') + ' in ' + fyLabel()"
+       @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+       @keydown.arrow-down.prevent="step(unit === 'month' ? 3 : 1)"
+       @keydown.arrow-up.prevent="step(unit === 'month' ? -3 : -1)"
+       class="grid w-64 gap-1" :class="unit === 'month' ? 'grid-cols-3' : 'grid-cols-1'">
+    <template x-for="i in count()" :key="i">
+      <button type="button" role="radio" @click="sel = i - 1"
+              :aria-checked="sel === i - 1" :tabindex="(sel === null ? i === 1 : sel === i - 1) ? 0 : -1"
+              :aria-current="current(i - 1) ? 'true' : null"
+              class="inline-flex h-9 w-full items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i - 1 ? 'bg-zinc-700 font-medium text-white hover:bg-zinc-800'
+                      : (current(i - 1) ? 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300' : 'text-zinc-900 hover:bg-zinc-100')"
+              x-text="label(i - 1)"></button>
+    </template>
+  </div>
+
+  <p class="mt-3 border-t border-zinc-200 pt-2 text-[12px]/4 tabular-nums text-zinc-500"
+     x-text="sel === null ? 'No period set' : fmt(start()) + ' – ' + fmt(end())"></p>
+</div>` },
+
+      { id: 'locked', name: 'The date on a posted record', tagNew: true, code:
+`<!-- The GRN is posted, so its date is a fact and not a field. Nothing here
+     opens.
+
+     It is not a disabled picker. A disabled trigger is a control that still
+     looks like a way in, and readonly on <input type="date"> is honoured
+     unevenly enough that the picker button opens anyway in more than one
+     browser. There is nothing to type into and nothing to choose from, so the
+     value is text on the locked surface with a hidden input carrying the ISO
+     string for whatever else the form posts.
+
+     The month is drawn because "12 Aug 2026" does not say it was a Wednesday
+     three days before the month end. It is aria-hidden and made of spans, not
+     of thirty-one disabled buttons: read-only is not disabled, and a grid
+     nobody can act on announcing "unavailable" thirty-one times is worse than a
+     grid that says nothing while the date, the month and the reason are all
+     written out above it in text.
+
+     No previous or next either. There is nothing to look for in another month.
+
+     The reason line names the record to reverse. "This field is locked" is the
+     version that generates the support call. -->
+<div data-kui="calendar/locked" class="max-w-xs"
+     x-data="{
+       sel: '2026-08-12',
+       vy: 2026, vm: 7,
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       title() { return new Date(this.vy, this.vm, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       weeks() {
+         const y = this.vy, m = this.vm;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) cells.push({ iso: this.iso(y, m, d), day: d });
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       }
+     }">
+  <p class="mb-1.5 text-[13px]/5 font-medium text-zinc-600">GRN date</p>
+  <input type="hidden" name="grn_date" value="2026-08-12">
+
+  <div class="flex h-9 items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-zinc-200 px-3">
+    <span class="text-[14px]/5 tabular-nums text-zinc-900">12 Aug 2026</span>
+    <i data-lucide="lock" class="size-4 shrink-0 text-zinc-600"></i>
+  </div>
+
+  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Posted to stock on 12 Aug 2026 by Ritu Deshpande. Reverse GRN-26-0455 to change it.
+  </p>
+
+  <div aria-hidden="true" class="mt-3 inline-block rounded-xl border border-zinc-300 bg-white p-3">
+    <p class="pb-1 text-center text-[12px]/4 font-medium text-zinc-600" x-text="title()"></p>
+    <table class="border-collapse">
+      <thead>
+        <tr>
+          <template x-for="h in head" :key="h">
+            <th scope="col" class="size-9 text-[11px]/4 font-medium text-zinc-400" x-text="h"></th>
+          </template>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="(week, wi) in weeks()" :key="wi">
+          <tr>
+            <template x-for="(c, ci) in week" :key="ci">
+              <td class="p-0">
+                <span class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums"
+                      :class="c && c.iso === sel ? 'bg-zinc-700 font-medium text-white' : 'text-zinc-500'"
+                      x-text="c ? c.day : ''"></span>
+              </td>
+            </template>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+</div>` },
+
+      { id: 'phone', name: 'The grid under a thumb', tagNew: true, code:
+`<!-- The same picker at 390px. Three things change and they are the three that
+     always change.
+
+     The cells are 44px, not 36. A size-9 square is right under a pointer and
+     under the recommended touch target, and the fix is not tighter padding
+     around the same square — the table is table-fixed and w-full, so the seven
+     columns are fractions of whatever width the panel has and the cell grows
+     into its share.
+
+     The panel is in the flow, not absolutely positioned. A popover anchored to
+     a field near the right edge of a 390px screen hangs off it, and the usual
+     answer — a fixed overlay — is a drawer, which is its own component. Here it
+     pushes the page down, which on a phone is what the user expects anyway.
+
+     Done commits; the tap only drafts. A thumb lands on 13 instead of 14 often
+     enough that a panel closing on contact means opening it again to correct
+     the value, and Cancel puts the draft back to what was committed. That is
+     also why closing by tapping outside cancels rather than saves. -->
+<div data-kui="calendar/phone" class="w-full max-w-sm"
+     x-data="{
+       open: false,
+       sel: null, draft: null,
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       vy: new Date().getFullYear(),
+       vm: new Date().getMonth(),
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
+       title(o) { return new Date(this.vy, this.vm + o, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       long(s) { return this.parse(s).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); },
+       fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
+       weeks(o) {
+         const y = this.vy, m = this.vm + o;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) {
+           const dt = new Date(y, m, d);
+           cells.push({ iso: this.iso(dt.getFullYear(), dt.getMonth(), d), day: d, dow: dt.getDay() });
+         }
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       },
+       shift(n) { const v = new Date(this.vy, this.vm + n, 1); this.vy = v.getFullYear(); this.vm = v.getMonth(); this.clamp(); },
+       clamp() {
+         if (!this.focus) return;
+         const f = this.parse(this.focus);
+         if (f.getFullYear() === this.vy && f.getMonth() === this.vm) return;
+         const last = new Date(this.vy, this.vm + 1, 0).getDate();
+         this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
+       },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
+       show() {
+         this.draft = this.sel;
+         if (this.draft) { const f = this.parse(this.draft); this.vy = f.getFullYear(); this.vm = f.getMonth(); this.focus = this.draft; }
+         this.open = true;
+       },
+       done() { this.sel = this.draft; this.close(); },
+       close(back = true) { this.open = false; if (back) this.$nextTick(() => this.$refs.trigger.focus()); },
+       cls(s) {
+         if (s === this.draft) return 'bg-zinc-700 font-medium text-white hover:bg-zinc-800';
+         if (s === this.today) return 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300';
+         return 'text-zinc-900 hover:bg-zinc-200';
+       }
+     }" @click.outside="if (open) close(false)" @keydown.escape.window="if (open) close()">
+  <span id="ph-label" class="mb-1.5 block text-[13px]/5 font-medium">Expected delivery</span>
+  <input type="hidden" name="expected_on" :value="sel">
+
+  <button type="button" x-ref="trigger" @click="open ? close() : show()"
+          aria-labelledby="ph-label ph-value" :aria-expanded="open" aria-haspopup="dialog"
+          class="flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[14px]/5 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <span id="ph-value" class="tabular-nums" :class="sel ? 'text-zinc-900' : 'text-zinc-500'" x-text="sel ? fmt(sel) : 'Select a date'"></span>
+    <i data-lucide="calendar" class="size-4 shrink-0 text-zinc-600"></i>
+  </button>
+
+  <div x-show="open" x-cloak x-trap="open" role="dialog" aria-label="Choose the expected delivery date"
+       class="mt-1 w-full rounded-xl border border-zinc-300 bg-white p-2">
+    <div class="flex items-center justify-between pb-1">
+      <button type="button" @click="shift(-1)" aria-label="Previous month"
+              class="inline-flex size-11 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-5"></i>
+      </button>
+      <span class="text-[14px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
+      <button type="button" @click="shift(1)" aria-label="Next month"
+              class="inline-flex size-11 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-right" class="size-5"></i>
+      </button>
+    </div>
+
+    <table x-ref="grid" class="w-full table-fixed border-collapse"
+           @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+           @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+           @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+           @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
+      <caption class="sr-only" x-text="'Calendar, ' + title(0)"></caption>
+      <thead>
+        <tr>
+          <template x-for="h in head" :key="h">
+            <th scope="col" class="h-8 text-[11px]/4 font-medium text-zinc-500" x-text="h"></th>
+          </template>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="(week, wi) in weeks(0)" :key="wi">
+          <tr>
+            <template x-for="(c, ci) in week" :key="ci">
+              <td class="p-0 text-center">
+                <template x-if="c">
+                  <button type="button" @click="draft = c.iso; focus = c.iso"
+                          :aria-label="long(c.iso)" :aria-pressed="c.iso === draft"
+                          :aria-current="c.iso === today ? 'date' : null"
+                          :tabindex="c.iso === focus ? 0 : -1"
+                          :data-focus="c.iso === focus ? '1' : null"
+                          class="mx-auto flex size-11 items-center justify-center rounded-lg text-[14px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                          :class="cls(c.iso)" x-text="c.day"></button>
+                </template>
+                <template x-if="!c"><span class="mx-auto block size-11"></span></template>
+              </td>
+            </template>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+
+    <div class="mt-2 flex items-center gap-2 border-t border-zinc-200 pt-2">
+      <button type="button" @click="close()"
+              class="inline-flex h-11 flex-1 items-center justify-center rounded-lg border border-zinc-200 bg-white text-[14px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+      <button type="button" @click="done()" :disabled="!draft"
+              class="inline-flex h-11 flex-1 items-center justify-center rounded-lg border border-transparent bg-zinc-700 text-[14px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Done</button>
     </div>
   </div>
 </div>` },
@@ -7189,26 +13691,131 @@ Test certificate follows by email.</textarea>
      any grid rendered in a page; it validates, it respects the device locale,
      and it posts an ISO string that Django parses with no format setting at all.
 
+     max and the help text say the same date. A control that allows what the
+     line under it forbids is the version that ships, and the user finds out
+     from the server.
+
      Use the grid instead when the choice depends on seeing the month — a
      delivery date next to the weekend, a range across a month end. Use this
      when the user already knows the date. -->
 <div data-kui="calendar/native" class="max-w-xs">
   <label for="grn-date" class="mb-1.5 block text-[13px]/5 font-medium">GRN date</label>
   <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-    <input type="date" id="grn-date" name="grn_date" value="2026-08-14" max="2026-12-31"
+    <input type="date" id="grn-date" name="grn_date" value="2026-08-14" max="2026-08-20"
+           aria-describedby="grn-date-msg"
            class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
   </div>
-  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Cannot be later than the invoice date.</p>
+  <p id="grn-date-msg" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Cannot be later than the invoice date, 20 Aug 2026.</p>
+</div>` },
+
+      { id: 'htmx', name: 'The month comes from the server', tagNew: true, code:
+`<!-- Once the days carry marks, the month is a request. The delivery schedule,
+     the holiday table and who is on shift are rows in a database, and shipping
+     a year of them to the browser to draw thirty cells is moving the wrong half
+     of the work.
+
+     The two chevrons sit outside the swap target on purpose. Swapping the
+     element the user just pressed destroys it mid-gesture and the caret lands
+     back on <body>, so paging with the keyboard walks the whole page again
+     every month. Everything that changes is inside #hxcal-view; everything that
+     is pressed is outside it.
+
+     The cursor is a hidden input rather than a month baked into each button's
+     URL, so the server decides what "next" means — it is the only side that
+     knows the schedule starts in April and ends where the data does. It is
+     swapped out of band, along with the month label.
+
+     The label is out of band because a live region has to be on the page before
+     its content changes. Swapped in with the grid it is a brand new element and
+     announces nothing, which is the failure that reads as "the calendar works
+     for me" for as long as nobody tests it with a screen reader.
+
+     The response body is the grid, and two elements addressed by id:
+
+       <span id="hxcal-month" hx-swap-oob="innerHTML">October 2026</span>
+       <input type="hidden" id="hxcal-cursor" name="m" value="2026-10" hx-swap-oob="true">
+
+     The skeleton is six rows of seven squares — the shape of the answer, so the
+     panel does not resize under the pointer when the month lands. -->
+<div data-kui="calendar/htmx" class="inline-block max-w-full rounded-xl border border-zinc-300 bg-white p-3"
+     x-data="{ busy: false, failed: false }"
+     @htmx:before-request.camel="busy = true; failed = false"
+     @htmx:after-request.camel="busy = false"
+     @htmx:response-error.camel="failed = true"
+     @htmx:send-error.camel="failed = true">
+
+  <input type="hidden" id="hxcal-cursor" name="m" value="2026-09">
+
+  <div class="flex items-center justify-between gap-2 pb-2">
+    <button type="button" aria-label="Previous month"
+            hx-get="/planning/deliveries/calendar/" hx-vals='{"step": "-1"}'
+            hx-include="#hxcal-cursor" hx-target="#hxcal-view" hx-swap="innerHTML"
+            hx-disabled-elt="this"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+
+    <span class="flex items-center gap-2">
+      <span id="hxcal-month" class="text-[13px]/5 font-medium tabular-nums" aria-live="polite">September 2026</span>
+      <span x-show="busy" x-cloak role="status" class="flex items-center gap-1 text-[12px]/4 text-zinc-500">
+        <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin motion-reduce:animate-none"></i>Loading
+      </span>
+    </span>
+
+    <button type="button" aria-label="Next month"
+            hx-get="/planning/deliveries/calendar/" hx-vals='{"step": "1"}'
+            hx-include="#hxcal-cursor" hx-target="#hxcal-view" hx-swap="innerHTML"
+            hx-disabled-elt="this"
+            class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+
+  <div id="hxcal-view" :aria-busy="busy"
+       hx-get="/planning/deliveries/calendar/" hx-trigger="load" hx-swap="innerHTML"
+       hx-include="#hxcal-cursor">
+    <div aria-hidden="true" class="grid w-[15.75rem] grid-cols-7 gap-0 animate-pulse motion-reduce:animate-none">
+      <template x-for="i in 42" :key="i">
+        <span class="flex size-9 items-center justify-center">
+          <span class="block size-8 rounded-lg bg-zinc-200"></span>
+        </span>
+      </template>
+    </div>
+  </div>
+
+  <p x-show="failed" x-cloak class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-zinc-200 pt-2 text-[12px]/4 font-medium text-red-600">
+    <span class="flex items-center gap-1.5">
+      <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>The month did not load
+    </span>
+    <button type="button"
+            hx-get="/planning/deliveries/calendar/" hx-include="#hxcal-cursor"
+            hx-target="#hxcal-view" hx-swap="innerHTML"
+            class="rounded font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Try again</button>
+  </p>
 </div>` },
 
       { id: 'django', name: 'Django form fields', code:
-`<!-- Two named inputs, one clean(). The values that post are ISO strings, which
+`<!-- Two named fields, one clean(). The values that post are ISO strings, which
      is the one format DateField parses without touching DATE_INPUT_FORMATS.
 
      # forms.py
      class PeriodForm(forms.Form):
-         start = forms.DateField(input_formats=['%Y-%m-%d'])
-         end   = forms.DateField(input_formats=['%Y-%m-%d'])
+         # format='%Y-%m-%d' is not optional. Without it an unbound form renders
+         # its initial through the locale — "20 August 2026" — and a
+         # type="date" input silently discards anything that is not ISO, so the
+         # field paints empty and nobody can say why.
+         start = forms.DateField(
+             input_formats=['%Y-%m-%d'],
+             widget=forms.DateInput(format='%Y-%m-%d', attrs={
+                 'type': 'date', 'x-ref': 's',
+                 'class': 'h-9 w-full bg-transparent px-3 text-[14px]/5 '
+                          'tabular-nums outline-none'}))
+         end = forms.DateField(
+             input_formats=['%Y-%m-%d'],
+             widget=forms.DateInput(format='%Y-%m-%d', attrs={
+                 'type': 'date', 'x-ref': 'e', ':min': 'start',
+                 'class': 'h-9 w-full bg-transparent px-3 text-[14px]/5 '
+                          'tabular-nums outline-none'}))
 
          def clean(self):
              c = super().clean()
@@ -7218,28 +13825,44 @@ Test certificate follows by email.</textarea>
 
      The clean() check is not optional even though the widget prevents it — a
      POST does not have to come from this page. :min on the end input is a
-     convenience for the user, never a guarantee to the view. -->
+     convenience for the user, never a guarantee to the view, and the error it
+     is meant to prevent still has to be rendered: raising in clean() and never
+     printing non_field_errors is a form that refuses and does not say so.
+
+     Alpine reads the two inputs; it does not own them. x-model would write its
+     own value back into the field on init, which is the same silent wipe the
+     widget format above prevents. sync() runs on x-init and on every input
+     event, and the summary is derived from what the inputs actually hold.
+
+     method="get", so the period is in the URL and the report is a link somebody
+     can send. That is also why there is no csrf_token here — a GET is not a
+     write. -->
 <form data-kui="calendar/django" method="get" class="max-w-md"
       x-data="{
-        start: '2026-04-01', end: '2026-08-20',
+        start: '', end: '',
+        sync() { this.start = this.$refs.s.value; this.end = this.$refs.e.value; },
         parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
         fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
         span() { return (this.start && this.end) ? Math.round((this.parse(this.end) - this.parse(this.start)) / 86400000) + 1 : 0; }
-      }">
+      }" x-init="$nextTick(() => sync())" @input="sync()">
   <fieldset>
     <legend class="mb-1.5 text-[13px]/5 font-medium">Reporting period</legend>
 
+    {% if form.non_field_errors %}
+      <p id="period-err" role="alert" class="mb-2 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.non_field_errors.0 }}
+      </p>
+    {% endif %}
+
     <div class="flex items-center gap-2">
-      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-        <label for="id_start" class="sr-only">Start date</label>
-        <input type="date" id="id_start" name="start" x-model="start"
-               class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
+      <div class="flex-1 rounded-lg bg-white {% if form.start.errors or form.non_field_errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+        <label for="{{ form.start.id_for_label }}" class="sr-only">{{ form.start.label }}</label>
+        {{ form.start }}
       </div>
       <span class="text-[13px]/5 text-zinc-500" aria-hidden="true">to</span>
-      <div class="flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-        <label for="id_end" class="sr-only">End date</label>
-        <input type="date" id="id_end" name="end" x-model="end" :min="start"
-               class="h-9 w-full bg-transparent px-3 text-[14px]/5 tabular-nums outline-none">
+      <div class="flex-1 rounded-lg bg-white {% if form.end.errors or form.non_field_errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+        <label for="{{ form.end.id_for_label }}" class="sr-only">{{ form.end.label }}</label>
+        {{ form.end }}
       </div>
     </div>
 
@@ -7247,7 +13870,7 @@ Test certificate follows by email.</textarea>
        x-text="span() ? fmt(start) + ' to ' + fmt(end) + ' · ' + span() + ' days' : 'Both dates are required.'"></p>
   </fieldset>
 
-  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Run report</button>
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Run report</button>
 </form>` }
     ]
   },
@@ -7261,12 +13884,18 @@ Test certificate follows by email.</textarea>
       'Do not put padding on a fieldset, and do not make one a flex or grid row. The rendered legend is laid out in the fieldset\'s block-start border area rather than in its content box, so padding-top applies below the legend and the legend is not a flex item at all: give a question block px-4 py-3 and the question renders flush against the top edge, and try to sit the question beside its answers with flex and the question jumps above the row. The legend goes on its own line and the answers go under it.',
       'Answers belong in a fixed grid, not in a row of loose radios. Three inline radios ragged to their own label widths give a different left edge on every question, and a sheet of eighteen of them reads as noise; the same three as an equal grid-cols-3 put the chosen tile in the same place on every row, so Fail is always the middle position and a column of tiles can be scanned for failures without reading a word. It is the toggle argument — the position carries the state — applied to a checklist.',
       'Every question\'s name carries the parameter, never the answer type. name="qc_certificate", name="qc_moisture" — not name="result" repeated down the sheet, which makes eighteen parameters into one radio group eighteen options long where answering the second one clears the first. Nothing looks wrong at the moment it breaks; the sheet just refuses to hold more than one answer and the POST carries one key.',
+      'Not applicable needs a reason, and the reason is a code rather than a note. An N/A with nothing behind it is the one answer on a sheet that cannot be audited — six months on it reads the same whether the parameter genuinely does not apply to this material or the meter was flat that morning. Codes are also the only form a reason can be counted in, and counting is what finds the parameter that reads N/A on forty of the last fifty GRNs because nobody is inspecting it any more. Keep Other on the list: a closed list that does not fit gets the nearest wrong code picked instead.',
+      'Evidence belongs to the answer, not to the sheet. One Attachments box at the foot of an eighteen-question audit comes back with nine photographs and no way to say which question any of them is about, and the one that matters is the one nobody can place — so the input is named for the parameter. Upload on selection and post the returned reference rather than the file: a file input cannot be given a value, so a sheet that fails validation keeps every radio and silently drops every attachment, and the inspector re-answers nothing and re-photographs everything. That also means required on the file input is wrong, because it is empty once the upload has happened; the requirement is the server\'s and the failed-submit summary is what reports it.',
+      'A number that only exists as x-text is blank until Alpine boots. "of answered" with two holes in it, a progress rail at zero width, a denominator missing from a legend — all of them paint for as long as it takes the script to run, and on a phone at an unloading bay that is not instant. Write the server\'s figure into the element as its text and let x-text replace it, and pair every bound aria-valuenow and :style width with the static one underneath. This is the x-cloak rule turned inside out: x-cloak hides what should not be seen yet, and a rendered fallback shows what should.',
       'Not applicable is an answer with a value of its own, never the absence of one. An unanswered radio group posts no key at all, so "this parameter does not apply to this material" and "nobody reached this line" arrive at the server identically, and a sheet that cannot tell those apart cannot be audited. The same goes for a multi-select: "None of the above" is an explicit value, because zero ticked boxes and a question that was never rendered are the same empty POST.',
       'Nothing is preselected. A checklist that arrives with every parameter already reading Pass is signed off by inertia — the inspector scrolls to the bottom and presses the button — and the record cannot distinguish an answer somebody gave from a default nobody read. Preselect only where the safe answer is also the overwhelmingly common one and being wrong about it costs nothing, which on an inspection sheet is never.',
       'A conditional follow-up needs disabled as well as x-show. x-show is display:none, and a display:none input is still in the form and still posts: hide a remark box that already has text in it and the fail note travels with a POST that says the parameter passed. Bind :disabled to the inverse of the show condition and the field leaves the submission the moment it leaves the screen. Disabled also bars the control from constraint validation, which is the second half of the fix — a plain required attribute inside a hidden block makes the form unsubmittable with "An invalid form control is not focusable" in the console and nothing at all on screen, because the browser cannot scroll to a control it is not painting.',
       'Progress counts the questions that are on screen now, and the denominator moves. With three follow-ups that only exist on a fail, a fixed denominator of eighteen can never reach the end on a clean sheet, and a fixed fifteen shows "16 of 15 answered" the moment one fails. Both read as a bug in the counter rather than as the truth about the sheet. Derive both numbers from the same state the questions render from, and keep the bar small — it is a footnote on the header, not the largest object on the page.',
       'Never disable the submit button until the sheet is complete. A dead button says the form is not ready and nothing about which of eighteen parameters is missing, so the user scrolls the whole sheet looking for the gap. Leave it live, let the submit fail, and answer with a summary that names every unanswered question and links into it. That summary is the whole mechanism — the browser\'s own required validation reports one control at a time in a bubble that vanishes, which is useless across eighteen questions.',
       'Saving as you go and one submit at the end owe the user different things. Save-as-you-go — the right choice for a sheet filled on a phone at an unloading bay — owes a per-answer acknowledgement and a draft that survives the tab closing, and it owes the distinction between saved and signed: a draft with every answer in it is still not an inspection until somebody attests to it. One submit at the end owes every entered value back on a failed submit; a sheet that returns blank after twenty answers is filled in once and then never again.',
+      'Saving as you go is one endpoint per question, keyed by the parameter, and hx-sync on the question rather than on the sheet. A single draft endpoint taking the whole sheet on every change re-posts seventeen answers to record one, and its body cannot be read afterwards, because an unanswered group posts no key at all and nothing separates "not answered yet" from "not sent". A sheet-level sync is worse than none: it drops the answer to question 5 because question 4 was still in flight, which is exactly what working down a sheet at speed causes. Per question, the only thing replaced is a second change to the same question, which is the race that exists.',
+      'A long sheet is sectioned with headings that count, never with accordions. Collapsing a finished section is the wizard mistake in another costume — a collapsed section prints shut, breaks Ctrl-F, and hides the two answers that contradict each other from the reviewer who has to hold all of them at once. A count and a tick beside the heading is everything the collapse was offering, and it survives being printed.',
+      'A server-rendered sheet is a formset, and the formset has to be rebuilt with the same initial on the POST branch. The question text is not a form field — it rides along in initial so the template can print it — so a formset reconstructed from the posted data alone redisplays the whole sheet as radio groups with no questions above them, every one still carrying the answer somebody gave it. It reads as though the questions were deleted. The formset earns its place for the prefix alone: form-0-answer, form-1-answer is the rule about a name carrying the parameter, enforced rather than remembered.',
       'A questionnaire is not a wizard and never hides answered questions. The reviewer who countersigns has to read all eighteen answers at once and compare them against the material; a one-question-at-a-time flow makes that eighteen clicks, breaks Ctrl-F, prints as a single question, and stops anyone noticing that questions 4 and 11 contradict each other. It also costs the inspector who knows the sheet by heart eighteen page transitions to do what scrolling does for free.',
       'Colour goes on the consequence, never on the row. A fail is already legible from the tile that is filled, so tinting the whole question red adds nothing and turns a sheet with four failures into a wall of colour where none of them stands out — and a fill is the first thing forced-colours mode drops. Spend the red on one short line saying what the fail causes, and only on the rows where it causes something. An observed value outside its spec is amber-700, because it is a warning about a number and not yet a verdict.'
     ],
@@ -7276,7 +13905,12 @@ Test certificate follows by email.</textarea>
       ['Answer tiles', 'An equal grid-cols-3 of labels, each wrapping a real radio — Pass, Fail, N/A. Equal columns are what give every row the same left edge and put Fail in the same place on all of them.'],
       ['Criterion', 'One short 12px zinc-500 line under the question: the spec, the tolerance, the document it is checked against. Referenced from every option, so it has to stay to one line.'],
       ['Follow-up', 'The question that only exists under one answer, indented behind a left rule. x-show to hide it and :disabled to take it out of the POST and out of validation together.'],
+      ['Reason for N/A', 'The coded list that opens under Not applicable, and the one-line box that opens under Other. Each carries the whole condition in its :disabled, not just its own half.'],
+      ['Evidence', 'The photographs or documents attached to one answer, named for the parameter. Thumbnails of what is already uploaded, hidden inputs carrying their references, and a label over an sr-only file input to add more.'],
+      ['Section header', 'A bg-zinc-50 band naming a group of questions and counting it — answered of applicable, with a tick when the group is complete. It never collapses what is under it.'],
       ['Progress line', 'A 4px rail no wider than the count beside it, plus the jump to the first gap. Both numbers derive from the same state the questions render from.'],
+      ['Remaining panel', 'The live list at the foot of a long sheet naming every question still unanswered and linking to it. It is not an error and not a live region.'],
+      ['Answer status', 'The 12px line under one question on a sheet that saves as it goes: when that answer was last written, or that it is being written, or that it was not.'],
       ['Unanswered summary', 'The panel a failed submit renders above the sheet: how many are missing and a link to each, taking focus when it appears.'],
       ['Sign-off', 'The attestation at the foot — what is certified, by whom, when — and the countersignature the GRN waits on. A required checkbox before signing, plain text after.']
     ],
@@ -7285,6 +13919,9 @@ Test certificate follows by email.</textarea>
       'The chosen tile is painted from its own radio with has-[:checked], so the tint is the answer rather than a second copy of it, and the radio stays visible inside the tile — hidden with sr-only the only mark left is the tint, which forced-colours mode does not paint.',
       'The progress line counts answered against applicable, and the denominator moves when a conditional follow-up appears or goes. A section with one fail in it legitimately reads "of 5" where a clean one reads "of 4".',
       'A conditional follow-up appears directly under the answer that caused it, is enabled while it is visible and disabled the moment it is not, so what is on screen and what is in the POST are always the same set of questions.',
+      'Sections count and never collapse. A section header shows answered of applicable and takes a tick when it is complete; the questions under it stay on screen whether they are answered or not.',
+      'The remaining list at the foot updates as answers are given and says nothing while it does. It is a sheet in progress rather than a sheet that failed, so nothing is announced and nothing takes focus until a submit actually fails.',
+      'Where the sheet saves as it goes, each question reports its own write and nothing reports for the sheet. A failed write puts the last confirmed answer back on screen and offers to re-send what was asked for, so the tiles never show an answer the server does not hold.',
       'An observed value outside its spec range warns and does not block. The measurement is the point of the sheet, and a control that refuses out-of-range numbers gets an in-range number typed into it instead.',
       'Submit is always live. A failed submit renders the summary above the sheet, moves focus to it, and every entry in it links to a question block that can take focus, so the next Tab enters that group.',
       'Every answer survives a failed submit, and where the sheet saves as it goes each answer is written on change and the header says draft until it is signed. The draft is not the inspection.',
@@ -7299,9 +13936,13 @@ Test certificate follows by email.</textarea>
       'The progress rail is role="progressbar" with aria-valuenow, aria-valuemin, aria-valuemax and an aria-label naming what is progressing. It is not a live region — announcing "4 of 5" after every answer talks over the control the user just operated.',
       'The failed-submit summary takes focus and does not also carry role="alert". Focusing it is what reads it; a live region on top of that reads the whole list twice, the first time before the user has any idea where they are.',
       'Each summary entry links to the question block, which carries tabindex="-1". Without the tabindex the fragment scrolls the question into view but leaves focus on the summary, so the next Tab walks down the rest of the links instead of entering the group. Linking to the first radio instead does move focus, but scrolls that control to the top of the viewport with its own question above the fold.',
+      'Anything that takes focus without being operated draws its own focus style. The failed-submit summary, and every question block a summary link jumps to, carry the same outline as a control — they are focused by script and by fragment, and without it the jump moves focus somewhere invisible and the next Tab starts from a place nobody can see.',
+      'A warning is never only a border. An amber edge round an out-of-spec reading is a colour with no text under it: forced-colours mode repaints it and a screen reader is told nothing, so the line that says what is wrong is always rendered and the field points at it with aria-describedby only while it is on screen. A describedby aimed at a display:none paragraph reads out a warning nobody is being shown.',
+      'A file control is named by its own label and described by the requirement above it. Folding the two together gives the control the name "Photograph of the gauge and the service tag, required, Take a photo", which is a sentence rather than a name; aria-describedby keeps the requirement where it can be read without being the thing the button is called.',
+      'A per-answer save status is role="status" on each question, never one region for the sheet. The revert after a failed write is a script setting .checked, which is announced by nothing, and a single shared region would attribute question 4\'s failure to whichever question the user is standing in.',
       'Settled answers are text. There is no read-only radio or checkbox, and a disabled group is both silent about why it is locked and absent from the POST, so a signed sheet is rendered rather than frozen.'
     ],
-    related: ['radio', 'field', 'form-page'],
+    related: ['radio', 'field', 'attachment', 'form-page'],
     variants: [
       { id: 'question', name: 'One question', code:
 `<!-- The question is the <legend> of a <fieldset>, not a <label>. The answer is
@@ -7457,6 +14098,13 @@ Test certificate follows by email.</textarea>
      rejected is a separate question with a separate answer, and this sheet does
      not decide it.
 
+     Out of spec is never only a border. An amber edge is a colour with no text
+     under it: forced-colours mode repaints it, and a screen reader is told
+     nothing at all. Every field that can go out of range carries the warning
+     line as well, hidden until it applies, and the field points at it with
+     aria-describedby only while it is on screen — a describedby aimed at a
+     display:none paragraph reads out a warning that is not being shown.
+
      type="number" gives a numeric keypad on a phone and silently drops anything
      that is not a number, which is why the empty string is tested on its own —
      a blank field is unanswered, not zero.
@@ -7477,12 +14125,16 @@ Test certificate follows by email.</textarea>
       <div class="flex w-32 items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
            :class="out(thickness, 2.35, 2.55) ? 'border-amber-700' : 'border-zinc-200 focus-within:border-zinc-700'">
         <input id="qo-thk" name="obs_thickness" type="number" step="0.01" inputmode="decimal"
-               x-model="thickness" aria-describedby="qo-spec-thk"
+               x-model="thickness"
+               :aria-describedby="out(thickness, 2.35, 2.55) ? 'qo-spec-thk qo-warn-thk' : 'qo-spec-thk'"
                class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
         <span class="pr-3 text-[13px]/5 text-zinc-600">mm</span>
       </div>
       <span id="qo-spec-thk" class="text-[12px]/4 tabular-nums text-zinc-500">Spec 2.35 – 2.55 mm</span>
     </div>
+    <p id="qo-warn-thk" x-show="out(thickness, 2.35, 2.55)" x-cloak class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-amber-700">
+      <i data-lucide="alert-triangle" class="mt-px size-3.5 shrink-0"></i>Outside 2.35 – 2.55 mm. Recorded as measured.
+    </p>
   </div>
 
   <div>
@@ -7491,12 +14143,13 @@ Test certificate follows by email.</textarea>
       <div class="flex w-32 items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15"
            :class="out(mfi, 0.28, 0.42) ? 'border-amber-700' : 'border-zinc-200 focus-within:border-zinc-700'">
         <input id="qo-mfi" name="obs_mfi" type="number" step="0.01" inputmode="decimal"
-               x-model="mfi" aria-describedby="qo-spec-mfi"
+               x-model="mfi"
+               :aria-describedby="out(mfi, 0.28, 0.42) ? 'qo-spec-mfi qo-warn-mfi' : 'qo-spec-mfi'"
                class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
       </div>
       <span id="qo-spec-mfi" class="text-[12px]/4 tabular-nums text-zinc-500">Spec 0.28 – 0.42 g/10 min</span>
     </div>
-    <p x-show="out(mfi, 0.28, 0.42)" x-cloak class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-amber-700">
+    <p id="qo-warn-mfi" x-show="out(mfi, 0.28, 0.42)" x-cloak class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-amber-700">
       <i data-lucide="alert-triangle" class="mt-px size-3.5 shrink-0"></i>Above the upper limit. Recorded as measured — accepting it is a separate answer.
     </p>
   </div>
@@ -7531,7 +14184,7 @@ Test certificate follows by email.</textarea>
   <fieldset>
     <legend>
       <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">
-        Safety audit · question 7 of <span x-text="ppe === 'fail' ? 5 : 4"></span>
+        Safety audit · question 7 of <span x-text="ppe === 'fail' ? 5 : 4">5</span>
       </span>
       <span class="mt-1.5 block text-[14px]/5 font-medium">Every person on the unloading bay was wearing helmet, safety shoes and hi-vis</span>
     </legend>
@@ -7551,7 +14204,7 @@ Test certificate follows by email.</textarea>
 
   <div x-show="ppe === 'fail'" x-cloak class="mt-4 border-l-2 border-zinc-200 pl-4">
     <label for="qf-note" class="block text-[13px]/5 font-medium">
-      Who was missing what, and what was done <span class="text-red-600">*</span>
+      Who was missing what, and what was done <span aria-hidden="true" class="text-red-600">*</span>
     </label>
     <div class="mt-1.5 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <textarea id="qf-note" name="qc_ppe_note" rows="3" required :disabled="ppe !== 'fail'"
@@ -7560,6 +14213,166 @@ Test certificate follows by email.</textarea>
                 class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"></textarea>
     </div>
     <p id="qf-note-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Goes to the safety officer and onto the contractor gate pass record.</p>
+  </div>
+</div>` },
+
+      { id: 'not-applicable', name: 'Not applicable, and why', tagNew: true, code:
+`<!-- N/A already has a value of its own. What it does not have is a reason, and
+     an N/A with no reason is the one answer on a sheet that cannot be audited:
+     six months later "not applicable" reads the same whether the parameter
+     genuinely does not apply to this material or the meter was flat that
+     morning.
+
+     The reason is a closed list rather than a note, because counting is the
+     point. A parameter that reads N/A on forty of the last fifty GRNs is a
+     parameter nobody is inspecting any more, and that only shows up if the
+     reasons are codes. Other is on the list because a closed list that does not
+     fit gets the nearest wrong code picked instead.
+
+     Both conditional fields carry the whole condition, not their own half. The
+     nested box is disabled when the reason is not Other and when the answer is
+     not N/A: bind it to why !== 'other' alone and it stays enabled and posting
+     the moment the answer goes back to Pass, so the question posts a pass
+     alongside a written reason for not having inspected it. That is the
+     follow-up trap one level deeper, and it is where it is usually missed. -->
+<div data-kui="questionnaire/not-applicable" class="max-w-xl" x-data="{ ans: 'na', why: 'not_bought' }">
+  <fieldset>
+    <legend>
+      <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">Incoming inspection · question 12 of 18</span>
+      <span class="mt-1.5 block text-[14px]/5 font-medium">Third-party inspection report from the agency named on the purchase order</span>
+    </legend>
+
+    <p id="qn-crit" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">PO-24-1188 names Geo-Chem, Vapi. Clause 7 of the rate contract.</p>
+
+    <div class="mt-3 grid max-w-sm grid-cols-3 gap-2">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="qc_third_party" value="pass" x-model="ans" aria-describedby="qn-crit" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="qc_third_party" value="fail" x-model="ans" aria-describedby="qn-crit" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="qc_third_party" value="na" x-model="ans" aria-describedby="qn-crit" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div x-show="ans === 'na'" x-cloak class="mt-4 border-l-2 border-zinc-200 pl-4">
+    <label for="qn-why" class="block text-[13px]/5 font-medium">
+      Why it does not apply <span aria-hidden="true" class="text-red-600">*</span>
+    </label>
+
+    <div class="relative mt-1.5 max-w-sm rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <select id="qn-why" name="qc_third_party_na" required x-model="why" :disabled="ans !== 'na'"
+              aria-describedby="qn-why-help"
+              class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+        <option value="not_bought">Not bought on this purchase order</option>
+        <option value="waived">Waived in writing by the plant head</option>
+        <option value="material">Does not apply to this material</option>
+        <option value="other">Something else — one line below</option>
+      </select>
+      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </div>
+    <p id="qn-why-help" class="mt-1.5 text-[12px]/4 text-zinc-500">Counted across every sheet this quarter, which is how a parameter that quietly stopped being inspected gets found.</p>
+
+    <div x-show="why === 'other'" x-cloak class="mt-3">
+      <label for="qn-other" class="block text-[13px]/5 font-medium">
+        In one line <span aria-hidden="true" class="text-red-600">*</span>
+      </label>
+      <div class="mt-1.5 max-w-sm rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <input id="qn-other" name="qc_third_party_na_other" type="text" maxlength="120" required
+               :disabled="ans !== 'na' || why !== 'other'"
+               placeholder="Agency could not reach Silvassa before unloading closed"
+               class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+      </div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'evidence', name: 'The answer that needs a photograph', tagNew: true, code:
+`<!-- Evidence belongs to the answer, not to the sheet. One Attachments box at
+     the foot of an eighteen-question audit comes back with nine photographs and
+     no way to say which question any of them is about, and the one that matters
+     is the one nobody can place. The input is named for the parameter, so the
+     file arrives keyed to the question it proves.
+
+     The photographs are already uploaded and what the sheet posts is their ids.
+     A file input cannot be given a value, so a sheet that fails validation
+     drops every attachment while keeping every radio — the inspector re-answers
+     nothing and re-photographs everything. Upload on select, render what came
+     back, and carry the id in a hidden input that survives the round trip like
+     any other field.
+
+     The hidden inputs take the same :disabled binding as the file input. Hidden
+     is not exempt: a hidden input inside a display:none block still posts, so
+     an answer changed from Fail back to Pass would keep the evidence for a
+     failure that is no longer recorded.
+
+     required is deliberately absent. The requirement is real, but the file
+     input is empty once the upload has happened, so required on it blocks a
+     sheet that already has two photographs attached. The asterisk states it,
+     the server enforces it, and the failed submit answers with the summary.
+
+     Remove is always visible rather than appearing on hover. This is filled on
+     a phone at an unloading bay, where there is no hover at all. -->
+<div data-kui="questionnaire/evidence" class="max-w-xl" x-data="{ ans: 'fail' }">
+  <fieldset>
+    <legend>
+      <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">Safety audit · unloading bay 3</span>
+      <span class="mt-1.5 block text-[14px]/5 font-medium">Fire extinguisher at the bay is in date and the gauge needle sits in the green</span>
+    </legend>
+
+    <p id="qe-crit" class="mt-1.5 text-[12px]/4 text-zinc-500">Checked against the extinguisher register. A fail is photographed before it is written down.</p>
+
+    <div class="mt-3 grid max-w-sm grid-cols-3 gap-2">
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="audit_extinguisher" value="pass" x-model="ans" aria-describedby="qe-crit" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="audit_extinguisher" value="fail" x-model="ans" aria-describedby="qe-crit" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+      </label>
+      <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <input type="radio" name="audit_extinguisher" value="na" x-model="ans" aria-describedby="qe-crit" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div x-show="ans === 'fail'" x-cloak class="mt-4 border-l-2 border-zinc-200 pl-4">
+    <p id="qe-label" class="text-[13px]/5 font-medium">
+      Photograph of the gauge and the service tag <span class="text-red-600">*</span>
+    </p>
+
+    <ul class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <li class="relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
+        <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
+        <input type="hidden" name="audit_extinguisher_evidence" value="EV-4471" :disabled="ans !== 'fail'">
+        <button type="button" aria-label="Remove gauge-needle-red.jpg"
+                class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 hover:text-red-600 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-3.5"></i>
+        </button>
+        <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">gauge-needle-red.jpg</p>
+      </li>
+      <li class="relative aspect-4/3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200">
+        <div class="flex h-full items-center justify-center"><i data-lucide="image" class="size-5 text-zinc-500"></i></div>
+        <input type="hidden" name="audit_extinguisher_evidence" value="EV-4472" :disabled="ans !== 'fail'">
+        <button type="button" aria-label="Remove service-tag-2025.jpg"
+                class="absolute top-1 right-1 flex size-6 items-center justify-center rounded-md bg-white/90 text-zinc-600 hover:text-red-600 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-3.5"></i>
+        </button>
+        <p class="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-zinc-900/70 to-transparent px-2 pt-4 pb-1 text-[11px]/4 text-white">service-tag-2025.jpg</p>
+      </li>
+    </ul>
+
+    <input type="file" id="qe-add" name="audit_extinguisher_photo" accept="image/*" capture="environment" multiple
+           :disabled="ans !== 'fail'" aria-describedby="qe-label qe-add-help" class="peer sr-only">
+    <label for="qe-add"
+           class="mt-2.5 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+      <i data-lucide="camera" class="size-4 text-zinc-600"></i>Take a photo
+    </label>
+
+    <p id="qe-add-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Uploaded as it is taken, up to 10 MB each. The sheet posts the reference, not the file.</p>
   </div>
 </div>` },
 
@@ -7724,12 +14537,12 @@ Test certificate follows by email.</textarea>
     <div class="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2">
       <div class="h-1 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
            role="progressbar" aria-label="Parameters answered on GRN-24-0912"
-           :aria-valuenow="done" aria-valuemin="0" :aria-valuemax="total">
+           aria-valuenow="3" :aria-valuenow="done" aria-valuemin="0" aria-valuemax="5" :aria-valuemax="total">
         <div class="h-full rounded-full bg-zinc-700 transition-[width] motion-reduce:transition-none"
-             :style="'width: ' + Math.round(done / total * 100) + '%'"></div>
+             style="width: 60%" :style="'width: ' + Math.round(done / total * 100) + '%'"></div>
       </div>
       <p class="text-[12px]/4 tabular-nums text-zinc-600">
-        <span x-text="done"></span> of <span x-text="total"></span> answered
+        <span x-text="done">3</span> of <span x-text="total">5</span> answered
       </p>
       <button type="button" x-show="done !== total" x-cloak
               @click="$root.querySelector('[data-open] input')?.focus()"
@@ -7743,13 +14556,13 @@ Test certificate follows by email.</textarea>
     <fieldset class="py-4" :data-open="a.marking === ''">
       <legend class="text-[13px]/5 font-medium">Bag markings — grade, lot and net weight legible on every bag</legend>
       <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_marking" value="pass" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_marking" value="fail" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_marking" value="na" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
         </label>
       </div>
@@ -7758,13 +14571,13 @@ Test certificate follows by email.</textarea>
     <fieldset class="py-4" :data-open="a.seal === ''">
       <legend class="text-[13px]/5 font-medium">Bags sealed, no tears and no damp patches on the pallet</legend>
       <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_seal" value="pass" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_seal" value="fail" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_seal" value="na" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
         </label>
       </div>
@@ -7773,13 +14586,13 @@ Test certificate follows by email.</textarea>
     <fieldset class="py-4" :data-open="a.cert === ''">
       <legend class="text-[13px]/5 font-medium">Test certificate lot number matches the bags</legend>
       <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_cert" value="pass" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_cert" value="fail" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_cert" value="na" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
         </label>
       </div>
@@ -7791,13 +14604,13 @@ Test certificate follows by email.</textarea>
     <fieldset class="py-4" :data-open="a.moisture === ''">
       <legend class="text-[13px]/5 font-medium tabular-nums">Moisture on the hand-held meter at or below 0.05%</legend>
       <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_moisture" value="pass" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_moisture" value="fail" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_moisture" value="na" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
         </label>
       </div>
@@ -7806,13 +14619,13 @@ Test certificate follows by email.</textarea>
     <fieldset class="py-4" :data-open="a.sample === ''">
       <legend class="text-[13px]/5 font-medium tabular-nums">Retention sample of 500 g drawn and labelled</legend>
       <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_sample" value="pass" x-model="a.sample" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_sample" value="fail" x-model="a.sample" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qs_sample" value="na" x-model="a.sample" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
         </label>
       </div>
@@ -7822,6 +14635,215 @@ Test certificate follows by email.</textarea>
   <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-zinc-200 px-5 py-3.5">
     <p class="text-[12px]/4 tabular-nums text-zinc-500">Draft saved 11:04 · Ritu Deshpande</p>
     <button type="submit" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Review and sign</button>
+  </div>
+</form>` },
+
+      { id: 'remaining', name: 'How far through, and what is left', tagNew: true, code:
+`<!-- The count and the list answer two different questions, and a long sheet
+     needs both. "4 of 6" says how much is left and nothing about which, which
+     on an eighteen-line audit is the difference between finishing and
+     scrolling. The rail answers the first, the panel at the foot answers the
+     second, and both read the same object the questions render from, so they
+     cannot disagree with the sheet or with each other.
+
+     Sections are headings with counts, not accordions. Collapsing a finished
+     section is the wizard mistake in another costume: the countersigner has to
+     read all of the answers at once, and a collapsed section prints shut,
+     breaks Ctrl-F and hides the two answers that contradict each other. The
+     tick beside the count is all the collapse was ever offering.
+
+     The remaining panel is not a live region. It changes on every answer, and a
+     list that reads itself out each time talks over the radio the user has just
+     operated. Nothing is wrong here — this is a sheet in progress, not a sheet
+     that failed — so nothing has to be interrupted for.
+
+     Each link is the question's text character for character, not a shortened
+     version of it. A summary that paraphrases is a second wording of the same
+     question, and the reader has to work out that the two are one row before
+     the link is any use.
+
+     No Lucide icon inside the x-for. createIcons() hydrates once at load, so an
+     <i> rendered later by Alpine stays a bare <i> and never appears; the loop
+     is links only, and the section ticks are static markup with x-show on a
+     wrapping span. -->
+<form data-kui="questionnaire/remaining" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+      x-data="{
+        a: { marking: 'pass', seal: 'pass', cert: '', challan: 'pass', moisture: '', mfi: 'pass' },
+        q: [
+          { k: 'marking',  s: 'pack', n: 'Bag markings — grade, lot and net weight legible on every bag' },
+          { k: 'seal',     s: 'pack', n: 'Bags sealed, no tears and no damp patches on the pallet' },
+          { k: 'cert',     s: 'docs', n: 'Test certificate lot number matches the bags' },
+          { k: 'challan',  s: 'docs', n: 'Pallet count matches delivery challan DC-8871' },
+          { k: 'moisture', s: 'test', n: 'Moisture on the hand-held meter at or below 0.05%' },
+          { k: 'mfi',      s: 'test', n: 'Melt flow index within 0.28 – 0.42 g/10 min' }
+        ],
+        inSection(s) { return this.q.filter(x => x.s === s) },
+        doneIn(s) { return this.inSection(s).filter(x => this.a[x.k] !== '').length },
+        get open() { return this.q.filter(x => this.a[x.k] === '') },
+        get done() { return this.q.length - this.open.length }
+      }">
+
+  <div class="border-b border-zinc-200 px-5 py-4">
+    <h2 class="text-[16px]/6 font-semibold">Incoming inspection — GRN-24-0912</h2>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">HDPE granules, natural · lot 24-HD-118 · Gujarat Polymers Ltd · 16 Aug 2026</p>
+
+    <div class="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div class="h-1 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-label="Parameters answered on GRN-24-0912"
+           aria-valuenow="4" :aria-valuenow="done" aria-valuemin="0" aria-valuemax="6" :aria-valuemax="q.length">
+        <div class="h-full rounded-full bg-zinc-700 transition-[width] motion-reduce:transition-none"
+             style="width: 67%" :style="'width: ' + Math.round(done / q.length * 100) + '%'"></div>
+      </div>
+      <p class="text-[12px]/4 tabular-nums text-zinc-600">
+        <span x-text="done">4</span> of <span x-text="q.length">6</span> answered
+      </p>
+    </div>
+  </div>
+
+  <section>
+    <h3 class="flex items-center justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-5 py-2">
+      <span class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Packaging and identification</span>
+      <span class="flex shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <span x-show="doneIn('pack') === inSection('pack').length" class="flex"><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+        <span><span x-text="doneIn('pack')">2</span> of <span x-text="inSection('pack').length">2</span></span>
+      </span>
+    </h3>
+    <div class="divide-y divide-zinc-100 px-5">
+      <fieldset id="qg-marking" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium">Bag markings — grade, lot and net weight legible on every bag</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_marking" value="pass" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_marking" value="fail" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_marking" value="na" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset id="qg-seal" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium">Bags sealed, no tears and no damp patches on the pallet</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_seal" value="pass" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_seal" value="fail" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_seal" value="na" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+    </div>
+  </section>
+
+  <section>
+    <h3 class="flex items-center justify-between gap-3 border-y border-zinc-200 bg-zinc-50 px-5 py-2">
+      <span class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Documents</span>
+      <span class="flex shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <span x-show="doneIn('docs') === inSection('docs').length" x-cloak class="flex"><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+        <span><span x-text="doneIn('docs')">1</span> of <span x-text="inSection('docs').length">2</span></span>
+      </span>
+    </h3>
+    <div class="divide-y divide-zinc-100 px-5">
+      <fieldset id="qg-cert" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium">Test certificate lot number matches the bags</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_cert" value="pass" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_cert" value="fail" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_cert" value="na" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset id="qg-challan" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium tabular-nums">Pallet count matches delivery challan DC-8871</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_challan" value="pass" x-model="a.challan" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_challan" value="fail" x-model="a.challan" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_challan" value="na" x-model="a.challan" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+    </div>
+  </section>
+
+  <section>
+    <h3 class="flex items-center justify-between gap-3 border-y border-zinc-200 bg-zinc-50 px-5 py-2">
+      <span class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Material tests</span>
+      <span class="flex shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <span x-show="doneIn('test') === inSection('test').length" x-cloak class="flex"><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+        <span><span x-text="doneIn('test')">1</span> of <span x-text="inSection('test').length">2</span></span>
+      </span>
+    </h3>
+    <div class="divide-y divide-zinc-100 px-5">
+      <fieldset id="qg-moisture" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium tabular-nums">Moisture on the hand-held meter at or below 0.05%</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_moisture" value="pass" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_moisture" value="fail" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_moisture" value="na" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset id="qg-mfi" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium tabular-nums">Melt flow index within 0.28 – 0.42 g/10 min</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_mfi" value="pass" x-model="a.mfi" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_mfi" value="fail" x-model="a.mfi" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_mfi" value="na" x-model="a.mfi" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+    </div>
+  </section>
+
+  <div class="border-t border-zinc-200 px-5 py-4">
+    <div x-show="open.length" x-cloak>
+      <h3 class="text-[13px]/5 font-medium tabular-nums"><span x-text="open.length">2</span> still unanswered</h3>
+      <ul class="mt-2 space-y-1.5 text-[13px]/5">
+        <template x-for="item in open" :key="item.k">
+          <li>
+            <a :href="'#qg-' + item.k" x-text="item.n"
+               class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></a>
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <p x-show="!open.length" x-cloak class="text-[13px]/5 font-medium tabular-nums">
+      All <span x-text="q.length">6</span> parameters answered. Ready to sign.
+    </p>
+
+    <div class="mt-3.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">Draft saved 11:04 · Ritu Deshpande</p>
+      <button type="submit" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Review and sign</button>
+    </div>
   </div>
 </form>` },
 
@@ -7852,31 +14874,31 @@ Test certificate follows by email.</textarea>
      marking one leaves the message unread for anybody who arrows onto the
      second. -->
 <div data-kui="questionnaire/invalid" class="max-w-2xl">
-  <div id="qv-summary" tabindex="-1" class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3.5">
+  <div id="qv-summary" tabindex="-1" class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
     <div class="min-w-0">
       <h2 class="text-[13px]/5 font-medium tabular-nums">Not signed — 2 of 18 parameters are unanswered</h2>
       <p class="mt-1 text-[12px]/4 text-zinc-600">Everything you have already answered is still here. Nothing was submitted.</p>
       <ul class="mt-2.5 space-y-1.5 text-[13px]/5 tabular-nums">
-        <li><a href="#qv-q4" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Q4 · Moisture on the hand-held meter</a></li>
-        <li><a href="#qv-q9" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Q9 · Pallet count against the delivery challan</a></li>
+        <li><a href="#qv-q4" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Q4 · Moisture on the hand-held meter at or below 0.05%</a></li>
+        <li><a href="#qv-q9" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Q9 · Pallet count matches the delivery challan</a></li>
       </ul>
     </div>
   </div>
 
   <div class="mt-5 divide-y divide-zinc-100">
-    <fieldset id="qv-q4" tabindex="-1" class="py-4 first:pt-0">
+    <fieldset id="qv-q4" tabindex="-1" class="py-4 first:pt-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <legend class="text-[13px]/5 font-medium tabular-nums">
-        Q4 · Moisture on the hand-held meter at or below 0.05% <span class="text-red-600">*</span>
+        Q4 · Moisture on the hand-held meter at or below 0.05% <span aria-hidden="true" class="text-red-600">*</span>
       </legend>
       <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_moisture" value="pass" required aria-invalid="true" aria-describedby="qv-q4-err" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_moisture" value="fail" required aria-invalid="true" aria-describedby="qv-q4-err" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_moisture" value="na" required aria-invalid="true" aria-describedby="qv-q4-err" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
         </label>
       </div>
@@ -7885,18 +14907,18 @@ Test certificate follows by email.</textarea>
       </p>
     </fieldset>
 
-    <fieldset id="qv-q9" tabindex="-1" class="py-4">
+    <fieldset id="qv-q9" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <legend class="text-[13px]/5 font-medium tabular-nums">
-        Q9 · Pallet count matches the delivery challan <span class="text-red-600">*</span>
+        Q9 · Pallet count matches the delivery challan <span aria-hidden="true" class="text-red-600">*</span>
       </legend>
       <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_pallets" value="pass" required aria-invalid="true" aria-describedby="qv-q9-err" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_pallets" value="fail" required aria-invalid="true" aria-describedby="qv-q9-err" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
         </label>
-        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
           <input type="radio" name="qv_pallets" value="na" required aria-invalid="true" aria-describedby="qv-q9-err" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
         </label>
       </div>
@@ -7906,6 +14928,169 @@ Test certificate follows by email.</textarea>
     </fieldset>
   </div>
 </div>` },
+
+      { id: 'autosave', name: 'Each answer written as it is given', tagNew: true, code:
+`<!-- One endpoint per question, named for the parameter. A single draft endpoint
+     taking the whole sheet on every change re-posts seventeen answers to record
+     one, and the body cannot be read afterwards: an unanswered group posts no
+     key at all, so nothing in it separates "not answered yet" from "not sent".
+     A body carrying qa_marking and nothing else says exactly what happened.
+
+     hx-sync is per question, and that is not a detail. Put it on the form and
+     the answer to question 5 is dropped because question 4 was still in flight,
+     which is what somebody working down a sheet at speed causes constantly. Per
+     question it only replaces a second change to the same question, which is
+     the race that actually exists.
+
+     hx-swap="none" because the tile is painted from its own radio and is
+     already right before the request leaves. Returning the question's markup
+     and swapping it in would replace the control the user still has focus on.
+
+     want is captured before the request, so Try again re-sends what was asked
+     for rather than what the failure reverted to, and the revert re-checks the
+     last confirmed answer — the screen never shows an answer the server does
+     not hold. Each status line is role="status" because that revert is a script
+     setting .checked, and a programmatic change is announced by nothing.
+
+     The header says Draft and the button still says sign: a draft with every
+     answer in it is not an inspection until somebody attests to it. Signing
+     posts the whole form, so the attestation is checked against what is on
+     screen rather than against whatever the drafts accumulated. htmx needs the
+     CSRF token on each of these requests; that is in the django variant. -->
+<form data-kui="questionnaire/autosave" method="post" action="/qc/GRN-24-0912/sign/"
+      class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+  <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-zinc-200 px-5 py-4">
+    <div class="min-w-0">
+      <h2 class="text-[16px]/6 font-semibold">Incoming inspection — GRN-24-0912</h2>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Answers are written as they are given · last write 11:06</p>
+    </div>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">
+      <span class="size-1.5 shrink-0 rounded-full bg-zinc-400"></span>Draft
+    </span>
+  </div>
+
+  <div class="divide-y divide-zinc-100 px-5">
+    <fieldset class="py-4"
+              hx-post="/qc/GRN-24-0912/answers/marking/"
+              hx-trigger="change" hx-include="this" hx-swap="none" hx-sync="this:replace"
+              x-data="{ state: 'idle', saved: 'pass', want: '' }"
+              @htmx:before-request.camel="want = $refs.group.querySelector(':checked')?.value ?? ''; state = 'saving'"
+              @htmx:after-request.camel="
+                if ($event.detail.successful) { saved = want; state = 'saved' }
+                else { $refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === saved); state = 'failed' }">
+      <legend class="text-[13px]/5 font-medium">Bag markings — grade, lot and net weight legible on every bag</legend>
+      <div x-ref="group" class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_marking" value="pass" checked class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_marking" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_marking" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+      <p role="status" class="mt-2 text-[12px]/4">
+        <span x-show="state === 'idle'" x-cloak class="tabular-nums text-zinc-500">Saved 11:04</span>
+        <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+          <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+        </span>
+        <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+          <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+        </span>
+        <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+          <span class="flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the answer shown is the last one that was
+          </span>
+          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  @click="$refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === want); $refs.group.querySelector(':checked').dispatchEvent(new Event('change', { bubbles: true }))">Try again</button>
+        </span>
+      </p>
+    </fieldset>
+
+    <fieldset class="py-4"
+              hx-post="/qc/GRN-24-0912/answers/cert/"
+              hx-trigger="change" hx-include="this" hx-swap="none" hx-sync="this:replace"
+              x-data="{ state: 'failed', saved: 'pass', want: 'fail' }"
+              @htmx:before-request.camel="want = $refs.group.querySelector(':checked')?.value ?? ''; state = 'saving'"
+              @htmx:after-request.camel="
+                if ($event.detail.successful) { saved = want; state = 'saved' }
+                else { $refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === saved); state = 'failed' }">
+      <legend class="text-[13px]/5 font-medium">Test certificate lot number matches the bags</legend>
+      <div x-ref="group" class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_cert" value="pass" checked class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_cert" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_cert" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+      <p role="status" class="mt-2 text-[12px]/4">
+        <span x-show="state === 'idle'" x-cloak class="tabular-nums text-zinc-500">Saved 11:05</span>
+        <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+          <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+        </span>
+        <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+          <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+        </span>
+        <span x-show="state === 'failed'" class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+          <span class="flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the answer shown is the last one that was
+          </span>
+          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  @click="$refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === want); $refs.group.querySelector(':checked').dispatchEvent(new Event('change', { bubbles: true }))">Try again</button>
+        </span>
+      </p>
+    </fieldset>
+
+    <fieldset class="py-4"
+              hx-post="/qc/GRN-24-0912/answers/moisture/"
+              hx-trigger="change" hx-include="this" hx-swap="none" hx-sync="this:replace"
+              x-data="{ state: 'idle', saved: '', want: '' }"
+              @htmx:before-request.camel="want = $refs.group.querySelector(':checked')?.value ?? ''; state = 'saving'"
+              @htmx:after-request.camel="
+                if ($event.detail.successful) { saved = want; state = 'saved' }
+                else { $refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === saved); state = 'failed' }">
+      <legend class="text-[13px]/5 font-medium tabular-nums">Moisture on the hand-held meter at or below 0.05%</legend>
+      <div x-ref="group" class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_moisture" value="pass" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_moisture" value="fail" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+        </label>
+        <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="qa_moisture" value="na" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+        </label>
+      </div>
+      <p role="status" class="mt-2 text-[12px]/4">
+        <span x-show="state === 'idle'" class="text-zinc-500">Not answered yet</span>
+        <span x-show="state === 'saving'" x-cloak class="flex items-center gap-1.5 text-zinc-500">
+          <i data-lucide="loader-circle" class="size-3.5 shrink-0 animate-spin"></i>Saving
+        </span>
+        <span x-show="state === 'saved'" x-cloak class="flex items-center gap-1.5 text-zinc-600">
+          <i data-lucide="check" class="size-3.5 shrink-0 text-emerald-600"></i>Saved
+        </span>
+        <span x-show="state === 'failed'" x-cloak class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-red-600">
+          <span class="flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — this question is still unanswered on the server
+          </span>
+          <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  @click="$refs.group.querySelectorAll('input').forEach(i => i.checked = i.value === want); $refs.group.querySelector(':checked').dispatchEvent(new Event('change', { bubbles: true }))">Try again</button>
+        </span>
+      </p>
+    </fieldset>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-zinc-200 px-5 py-3.5">
+    <p class="text-[12px]/4 text-zinc-500">A draft with every answer in it is still not an inspection.</p>
+    <button type="submit" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Review and sign</button>
+  </div>
+</form>` },
 
       { id: 'signed', name: 'Signed off', code:
 `<!-- Nothing here is a form control. A signed sheet built out of disabled
@@ -7989,7 +15174,172 @@ Test certificate follows by email.</textarea>
       <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-600">GRN-24-0912 cannot be posted to stores until this is signed.</p>
     </div>
   </div>
-</div>` }
+</div>` },
+
+      { id: 'django', name: 'Django formset', tagNew: true, code:
+`<!-- forms.py
+     class AnswerForm(forms.Form):
+         ANSWERS = [('pass', 'Pass'), ('fail', 'Fail'), ('na', 'N/A')]
+
+         question = forms.IntegerField(widget=forms.HiddenInput)
+         answer = forms.ChoiceField(
+             choices=ANSWERS,
+             widget=forms.RadioSelect(attrs={
+                 'class': 'size-4 shrink-0 accent-zinc-700',
+                 'x-model': 'ans',
+             }))
+         # required=False on the field, enforced in clean(). A conditionally
+         # shown field is disabled while it is hidden and a disabled field posts
+         # nothing, so required=True makes a clean sheet permanently invalid.
+         remark = forms.CharField(
+             required=False, max_length=200,
+             widget=forms.TextInput(attrs={
+                 ':disabled': "ans !== 'fail'",
+                 'class': ('w-full bg-transparent px-3 py-2 text-[14px]/5 '
+                           'outline-none placeholder:text-zinc-500'),
+             }))
+
+         def clean(self):
+             cleaned = super().clean()
+             if cleaned.get('answer') == 'fail' and not cleaned.get('remark'):
+                 self.add_error('remark', 'A fail needs a note.')
+             return cleaned
+
+     AnswerFormSet = forms.formset_factory(AnswerForm, extra=0)
+
+     views.py
+         questions = Question.objects.filter(sheet=sheet).order_by('seq')
+         initial = [{'question': q.pk, 'text': q.text, 'criterion': q.criterion}
+                    for q in questions]
+         formset = AnswerFormSet(request.POST or None, initial=initial)
+
+         if formset.is_valid():
+             ...
+         for form in formset:
+             ids = [form['answer'].auto_id + '-crit']
+             if form['answer'].errors:
+                 ids.append(form['answer'].auto_id + '-err')
+                 form.fields['answer'].widget.attrs['aria-invalid'] = 'true'
+             form.fields['answer'].widget.attrs['aria-describedby'] = ' '.join(ids)
+
+     initial is passed on the POST branch too, and that is the whole trick. text
+     and criterion are not fields — they ride along so the template can print
+     {{ form.initial.text }} — so a formset rebuilt from request.POST alone
+     redisplays eighteen radio groups with no questions above them, every one of
+     them still carrying the user's answer. It reads as though the questions
+     were deleted.
+
+     The widget attrs loop is how the group gets marked invalid at all. A
+     template cannot reach inside {{ choice.tag }}, and widget attrs are
+     inherited into every option, which is exactly what is needed here: aria-
+     invalid and the describedby have to be on all three radios, because only
+     the focused one is announced. The same inheritance carries x-model onto
+     each option, which is what lets the remark box open on a fail — and
+     x-data seeds it through escapejs, because on a redisplay
+     form.answer.value is the raw posted string rather than one of the three
+     choices, and it is landing inside a JavaScript string literal.
+
+     extra=0, always. An extra form is empty_permitted, so it validates clean
+     with nothing in it and adds a nineteenth blank answer to cleaned_data. A
+     checklist has exactly the questions it has.
+
+     {{ formset.management_form }} has to render, and unconditionally. It
+     carries TOTAL_FORMS and INITIAL_FORMS, and without them the POST comes back
+     as "ManagementForm data is missing or has been tampered with" — a non-form
+     error, so it appears nowhere near a field and every answer is lost.
+
+     The prefix is what keeps the names apart: form-0-answer, form-1-answer.
+     That is the rule about a question's name carrying the parameter, enforced
+     by the formset rather than by hand.
+
+     {{ form.question }} goes after the legend. A legend is laid out in the
+     fieldset's border area only as its first child, and the hidden key has
+     nowhere else it needs to be. -->
+<form data-kui="questionnaire/django" method="post" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  {% csrf_token %}
+  {{ formset.management_form }}
+
+  <div class="border-b border-zinc-200 px-5 py-4">
+    <h2 class="text-[16px]/6 font-semibold">Incoming inspection — {{ sheet.grn }}</h2>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+      {{ sheet.item }} · lot {{ sheet.lot }} · {{ sheet.vendor }} · {{ sheet.received|date:"d M Y" }}
+    </p>
+  </div>
+
+  {% if formset.total_error_count %}
+    <div id="fs-summary" tabindex="-1" class="m-5 flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+      <div class="min-w-0">
+        <h3 class="text-[13px]/5 font-medium tabular-nums">
+          Not signed — {{ formset.total_error_count }} of {{ formset.total_form_count }} parameters need an answer
+        </h3>
+        <p class="mt-1 text-[12px]/4 text-zinc-600">Everything already answered is still here. Nothing was submitted.</p>
+        <ul class="mt-2.5 space-y-1.5 text-[13px]/5 tabular-nums">
+          {% for form in formset %}{% if form.errors %}
+            <li>
+              <a href="#q-{{ forloop.counter }}" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                Q{{ forloop.counter }} · {{ form.initial.text }}
+              </a>
+            </li>
+          {% endif %}{% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="divide-y divide-zinc-100 px-5">
+    {% for form in formset %}
+      <fieldset id="q-{{ forloop.counter }}" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                x-data="{ ans: '{{ form.answer.value|default_if_none:''|escapejs }}' }">
+        <legend class="text-[13px]/5 font-medium tabular-nums">
+          Q{{ forloop.counter }} · {{ form.initial.text }}{% if form.fields.answer.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+        </legend>
+        {{ form.question }}
+
+        <p id="{{ form.answer.auto_id }}-crit" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">{{ form.initial.criterion }}</p>
+
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          {% for choice in form.answer %}
+            <label class="flex items-center justify-center gap-2 rounded-lg border {% if form.answer.errors %}border-red-600{% else %}border-zinc-200{% endif %} bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+              {{ choice.tag }}<span>{{ choice.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+
+        {% if form.answer.errors %}
+          <p id="{{ form.answer.auto_id }}-err" class="mt-2.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+            <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>{{ form.answer.errors.0 }}
+          </p>
+        {% endif %}
+
+        <div x-show="ans === 'fail'" x-cloak class="mt-3 border-l-2 border-zinc-200 pl-4">
+          <label for="{{ form.remark.id_for_label }}" class="block text-[13px]/5 font-medium">
+            What failed, and what was done <span aria-hidden="true" class="text-red-600">*</span>
+          </label>
+          <div class="mt-1.5 rounded-lg border {% if form.remark.errors %}border-red-600{% else %}border-zinc-200{% endif %} bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            {{ form.remark }}
+          </div>
+          {% if form.remark.errors %}
+            <p class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+              <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>{{ form.remark.errors.0 }}
+            </p>
+          {% endif %}
+        </div>
+      </fieldset>
+    {% endfor %}
+  </div>
+
+  <div class="border-t border-zinc-200 px-5 py-4">
+    <label class="flex items-start gap-2.5 text-[13px]/5">
+      <input type="checkbox" name="attest" value="1" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span>I inspected the material listed above on {{ sheet.received|date:"d M Y" }} and the results are as recorded.</span>
+    </label>
+    <div class="mt-3.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">Draft saved {{ sheet.saved_at|time:"H:i" }} · {{ request.user.get_full_name }}</p>
+      <button type="submit" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sign and post</button>
+    </div>
+  </div>
+</form>` }
     ]
   },
 

@@ -18,10 +18,17 @@
      wraps although the arrows clamp — clamped, r finds nothing from the bottom.
 
      A <label for> does not name a <button>, so the label is a span and the
-     trigger takes aria-labelledby with two ids. The trigger shows one line: the
-     second belongs to the list, and in the closed control it makes every field
-     in the form a different height. -->
-<div data-kui="select/rich" class="relative max-w-md"
+     trigger takes aria-labelledby with two ids. That replaces the accessible
+     name outright, so the help text under the control needs aria-describedby
+     or it is on screen and nowhere in the announcement. The trigger shows one
+     line: the second belongs to the list, and in the closed control it makes
+     every field in the form a different height.
+
+     The popup is positioned against a wrapper round the trigger alone, never
+     against the component root. top-full on the root measures from the bottom
+     of the help text, so the list opens a line and a half below the control it
+     belongs to and the two read as unrelated objects. -->
+<div data-kui="select/rich" class="max-w-md"
      x-data="{
        open: false, sel: 'sharma-extrusions', buf: '', timer: null,
        options: [
@@ -72,61 +79,63 @@
 
   <span id="lb-vendor-label" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</span>
 
-  <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
-          aria-labelledby="lb-vendor-label lb-vendor-value"
-          @click="open ? close(false) : show()"
-          @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
-          class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
-    <span class="flex min-w-0 flex-1 items-baseline gap-2">
-      <span id="lb-vendor-value" class="min-w-0 truncate text-[14px]/5" x-text="chosen ? chosen.label : 'Choose a vendor'"></span>
-      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="chosen ? chosen.code : ''"></span>
-    </span>
-    <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
-      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
-    </span>
-  </button>
+  <div class="relative">
+    <button type="button" x-ref="trigger" aria-haspopup="listbox" :aria-expanded="open"
+            aria-labelledby="lb-vendor-label lb-vendor-value" aria-describedby="lb-vendor-help"
+            @click="open ? close(false) : show()"
+            @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
+            class="flex w-full items-center gap-2 rounded-lg border border-zinc-200 bg-white py-2 pr-2.5 pl-3 text-left focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex min-w-0 flex-1 items-baseline gap-2">
+        <span id="lb-vendor-value" class="min-w-0 truncate text-[14px]/5" x-text="chosen ? chosen.label : 'Choose a vendor'"></span>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="chosen ? chosen.code : ''"></span>
+      </span>
+      <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+
+    <div x-show="open" x-cloak
+         class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+
+      <div x-ref="list" role="listbox" aria-labelledby="lb-vendor-label"
+           class="max-h-72 overflow-y-auto py-1"
+           @click="take($event.target.closest('[role=option]'))"
+           @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)"
+           @keydown.end.prevent="edge(true)"
+           @keydown.enter.prevent="commit()"
+           @keydown.space.prevent="buf ? type(' ') : commit()"
+           @keydown.tab="close(false)"
+           @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }">
+
+        <template x-for="o in options" :key="o.id">
+          <!-- the whole row gets one aria-label. Left alone it is read as a
+               single run: the name, then a GSTIN spelled out character by
+               character. The label is the name and the code; the rest is
+               aria-hidden and stays on screen for the people reading it. -->
+          <div role="option" tabindex="-1" :data-value="o.id" :data-label="o.label"
+               :aria-selected="o.id === sel" :aria-label="o.label + ', ' + o.code"
+               class="flex items-start gap-3 px-3 py-2 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <span class="min-w-0 flex-1" aria-hidden="true">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="min-w-0 truncate text-[13px]/5 font-medium" x-text="o.label"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.code"></span>
+              </span>
+              <span class="mt-0.5 block truncate font-mono text-[12px]/4 text-zinc-500" x-text="o.gstin"></span>
+            </span>
+            <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
+              <i data-lucide="check" class="size-4 text-zinc-600"></i>
+            </span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
 
   <!-- what actually posts. The field is still a ChoiceField on the server; only
        the widget changed, and only the server can say whether the id is real. -->
   <input type="hidden" name="vendor" :value="sel">
 
-  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Seven approved vendors. The GSTIN is on the row because two of them are called Sharma.</p>
-
-  <div x-show="open" x-cloak
-       class="absolute top-full right-0 left-0 z-20 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
-
-    <div x-ref="list" role="listbox" aria-labelledby="lb-vendor-label"
-         class="max-h-72 overflow-y-auto py-1"
-         @click="take($event.target.closest('[role=option]'))"
-         @keydown.arrow-down.prevent="move(1)"
-         @keydown.arrow-up.prevent="move(-1)"
-         @keydown.home.prevent="edge(false)"
-         @keydown.end.prevent="edge(true)"
-         @keydown.enter.prevent="commit()"
-         @keydown.space.prevent="buf ? type(' ') : commit()"
-         @keydown.tab="close(false)"
-         @keydown="if ($event.key.length === 1 && $event.key !== ' ' && !$event.ctrlKey && !$event.metaKey && !$event.altKey) { $event.preventDefault(); type($event.key) }">
-
-      <template x-for="o in options" :key="o.id">
-        <!-- the whole row gets one aria-label. Left alone it is read as a single
-             run: the name, then a GSTIN spelled out character by character. The
-             label is the name and the code; the rest is aria-hidden and stays on
-             screen for the people reading it. -->
-        <div role="option" tabindex="-1" :data-value="o.id" :data-label="o.label"
-             :aria-selected="o.id === sel" :aria-label="o.label + ', ' + o.code"
-             class="flex items-start gap-3 px-3 py-2 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
-          <span class="min-w-0 flex-1" aria-hidden="true">
-            <span class="flex items-baseline justify-between gap-3">
-              <span class="min-w-0 truncate text-[13px]/5 font-medium" x-text="o.label"></span>
-              <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="o.code"></span>
-            </span>
-            <span class="mt-0.5 block truncate font-mono text-[12px]/4 text-zinc-500" x-text="o.gstin"></span>
-          </span>
-          <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center" x-show="o.id === sel" x-cloak>
-            <i data-lucide="check" class="size-4 text-zinc-600"></i>
-          </span>
-        </div>
-      </template>
-    </div>
-  </div>
+  <p id="lb-vendor-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Seven approved vendors. The GSTIN is on the row because two of them are called Sharma.</p>
 </div>

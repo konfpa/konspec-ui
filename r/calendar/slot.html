@@ -1,0 +1,146 @@
+<!-- A gate-in booking. The value is 04 Sep 2026 at 13:00 or it is nothing, so
+     the day and the band are chosen in one control and posted as one ISO
+     string. Two separate fields is the arrangement that ends with a truck
+     booked for 13:00 on no date.
+
+     Moving the day clears the slot. 13:00 was two bays free on Friday and full
+     on Saturday, so carrying the time across is carrying a fact that was true
+     about a different day.
+
+     The slot list is inert until a day is picked — disabled buttons, not hidden
+     ones, so the shape of the panel does not change under the pointer and the
+     user can see what the choices will be before choosing the day.
+
+     A full band stays in the list and says it is full. Dropping it makes the
+     08:00 gap look like a slot that was never offered, and the next call to the
+     plant is somebody asking why. -->
+<div data-kui="calendar/slot" class="inline-block max-w-full rounded-xl border border-zinc-300 bg-white p-3"
+     x-data="{
+       focus: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       sel: null, slot: null,
+       vy: new Date().getFullYear(),
+       vm: new Date().getMonth(),
+       today: (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); })(),
+       head: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+       slots: [
+         { t: '08:00', label: '08:00 – 10:00', free: 2 },
+         { t: '10:00', label: '10:00 – 12:00', free: 0 },
+         { t: '13:00', label: '13:00 – 15:00', free: 3 },
+         { t: '15:00', label: '15:00 – 17:00', free: 1 }
+       ],
+       iso(y, m, d) { return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0'); },
+       parse(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); },
+       title(o) { return new Date(this.vy, this.vm + o, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); },
+       long(s) { return this.parse(s).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); },
+       fmt(s) { return s ? this.parse(s).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; },
+       weeks(o) {
+         const y = this.vy, m = this.vm + o;
+         const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+         const total = new Date(y, m + 1, 0).getDate();
+         const cells = [];
+         for (let i = 0; i < lead; i++) cells.push(null);
+         for (let d = 1; d <= total; d++) {
+           const dt = new Date(y, m, d);
+           cells.push({ iso: this.iso(dt.getFullYear(), dt.getMonth(), d), day: d, dow: dt.getDay() });
+         }
+         while (cells.length % 7) cells.push(null);
+         const out = [];
+         for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7));
+         return out;
+       },
+       shift(n) { const v = new Date(this.vy, this.vm + n, 1); this.vy = v.getFullYear(); this.vm = v.getMonth(); this.clamp(); },
+       clamp() {
+         if (!this.focus) return;
+         const f = this.parse(this.focus);
+         if (f.getFullYear() === this.vy && f.getMonth() === this.vm) return;
+         const last = new Date(this.vy, this.vm + 1, 0).getDate();
+         this.focus = this.iso(this.vy, this.vm, Math.min(f.getDate(), last));
+       },
+       move(n) {
+         const f = this.parse(this.focus);
+         f.setDate(f.getDate() + n);
+         this.focus = this.iso(f.getFullYear(), f.getMonth(), f.getDate());
+         this.vy = f.getFullYear(); this.vm = f.getMonth();
+         this.$nextTick(() => { const b = this.$refs.grid.querySelector('[data-focus]'); if (b) b.focus(); });
+       },
+       day(s) { if (s !== this.sel) this.slot = null; this.sel = s; this.focus = s; },
+       value() { return this.sel && this.slot ? this.sel + 'T' + this.slot : ''; },
+       band() { const s = this.slots.find(x => x.t === this.slot); return s ? s.label : ''; },
+       cls(s) {
+         if (s === this.sel) return 'bg-zinc-700 font-medium text-white hover:bg-zinc-800';
+         if (s === this.today) return 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300';
+         return 'text-zinc-900 hover:bg-zinc-200';
+       }
+     }">
+  <input type="hidden" name="gate_slot" :value="value()">
+
+  <div class="flex flex-col gap-4 sm:flex-row">
+    <div>
+      <div class="flex items-center justify-between pb-2">
+        <button type="button" @click="shift(-1)" aria-label="Previous month"
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>
+        </button>
+        <span class="text-[13px]/5 font-medium tabular-nums" aria-live="polite" x-text="title(0)"></span>
+        <button type="button" @click="shift(1)" aria-label="Next month"
+                class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-right" class="size-4"></i>
+        </button>
+      </div>
+      <table x-ref="grid" class="border-collapse"
+             @keydown.arrow-left.prevent="move(-1)"  @keydown.arrow-right.prevent="move(1)"
+             @keydown.arrow-up.prevent="move(-7)"    @keydown.arrow-down.prevent="move(7)"
+             @keydown.home.prevent="move(-((parse(focus).getDay() + 6) % 7))"
+             @keydown.end.prevent="move(6 - ((parse(focus).getDay() + 6) % 7))"
+             @keydown.page-up.prevent="shift(-1)"    @keydown.page-down.prevent="shift(1)">
+        <caption class="sr-only" x-text="'Gate-in date, ' + title(0)"></caption>
+        <thead>
+          <tr>
+            <template x-for="h in head" :key="h">
+              <th scope="col" class="size-9 text-[11px]/4 font-medium text-zinc-500" x-text="h"></th>
+            </template>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="(week, wi) in weeks(0)" :key="wi">
+            <tr>
+              <template x-for="(c, ci) in week" :key="ci">
+                <td class="p-0">
+                  <template x-if="c">
+                    <button type="button" @click="day(c.iso)"
+                            :aria-label="long(c.iso)" :aria-pressed="c.iso === sel"
+                            :aria-current="c.iso === today ? 'date' : null"
+                            :tabindex="c.iso === focus ? 0 : -1"
+                            :data-focus="c.iso === focus ? '1' : null"
+                            class="inline-flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                            :class="cls(c.iso)" x-text="c.day"></button>
+                  </template>
+                  <template x-if="!c"><span class="block size-9"></span></template>
+                </td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sm:w-56">
+      <p id="slot-head" class="pb-2 text-[13px]/5 font-medium">Gate 2 — Silvassa</p>
+      <div role="group" aria-labelledby="slot-head" class="space-y-1">
+        <template x-for="s in slots" :key="s.t">
+          <button type="button" @click="slot = s.t" :disabled="!sel || s.free === 0"
+                  :aria-pressed="slot === s.t"
+                  :aria-label="s.label + (s.free ? ' — ' + s.free + ' bays free' : ' — full')"
+                  class="flex h-9 w-full items-center justify-between gap-3 rounded-lg border border-zinc-200 px-3 text-[13px]/5 tabular-nums disabled:border-zinc-200 disabled:bg-zinc-200 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="slot === s.t ? 'border-transparent bg-zinc-700 font-medium text-white hover:bg-zinc-800' : 'bg-white hover:bg-zinc-100'">
+            <span x-text="s.label"></span>
+            <span aria-hidden="true" :class="slot === s.t ? 'text-white' : 'text-zinc-500'"
+                  x-text="s.free ? s.free + ' free' : 'Full'"></span>
+          </button>
+        </template>
+      </div>
+      <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500" aria-live="polite"
+         x-text="!sel ? 'Pick a date first.' : (slot ? 'Booked for ' + fmt(sel) + ', ' + band() + '.' : 'Now pick a slot on ' + fmt(sel) + '.')"></p>
+    </div>
+  </div>
+</div>

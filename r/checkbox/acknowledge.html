@@ -1,0 +1,49 @@
+<!-- The submit is written disabled in the markup and bound as well. The
+     binding alone leaves it live from first paint until Alpine boots, which is
+     long enough for somebody who runs this screen forty times a day to press
+     it, and the declaration is the whole point of the screen.
+
+     disabled and not aria-disabled, because the button is off for the reason a
+     disabled attribute is for: the form has not been filled in yet, and the
+     empty box is the explanation. aria-disabled is for a control that is off
+     because of who you are or what state the record is in, where there is
+     something to say and it has to stay reachable to say it.
+
+     Which is why the reason here is plain text under the button rather than a
+     tooltip on it. A disabled control fires no pointer events and takes no
+     focus, so a tooltip on it never opens, a title reaches nobody, and an
+     aria-describedby pointing at it is never read.
+
+     required on the box as well, so the refusal survives with script off, and
+     the view refuses too. Both of those are advice to the browser; the POST is
+     not obliged to take either.
+
+     One box, so no fieldset. A declaration is one field, not a set. -->
+<form data-kui="checkbox/acknowledge" method="post" x-data="{ ack: false }"
+      class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+  <h3 class="text-[16px]/6 font-semibold tabular-nums">Release DC-24-0455 to the gate</h3>
+  <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+    Sharma Extrusions · 12 cartons · e-way bill 3819 4471 2205 · vehicle MH-04-DQ-1182
+  </p>
+
+  <label class="mt-4 flex items-start gap-2.5 text-[14px]/5">
+    <input type="checkbox" id="cb-ack" name="verified" value="1" required x-model="ack"
+           aria-describedby="cb-ack-help"
+           class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+    <span>The e-way bill matches the invoice and the vehicle standing at the gate</span>
+  </label>
+  <p id="cb-ack-help" class="mt-1 pl-[26px] text-[12px]/4 text-zinc-500">
+    Recorded against your name. It is what a transit check reads back if the vehicle is stopped.
+  </p>
+
+  <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+    <button type="submit" disabled :disabled="!ack"
+            class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">Release</button>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500 sm:text-right">
+    <span x-show="!ack">Release is off until the check is declared.</span>
+    <span x-show="ack" x-cloak class="tabular-nums">Releasing prints the gate pass and closes DC-24-0455.</span>
+  </p>
+</form>

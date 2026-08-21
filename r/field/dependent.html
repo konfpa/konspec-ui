@@ -1,0 +1,94 @@
+<!-- Two fields that only exist if the question above them was answered one
+     particular way, and the whole variant is about what "only exists" is
+     allowed to mean.
+
+     They lock, they do not disappear. A form that grows and shrinks under the
+     pointer is one nobody can learn the shape of, and a field that is not on
+     the page cannot tell anyone it is there or what turns it on. Locked, it
+     keeps its place and its message, and the message names the answer that
+     unlocks it.
+
+     The lock is disabled and never display:none. A required control hidden
+     rather than disabled is still a required control: the browser refuses the
+     submit on something it cannot scroll into view, says "An invalid form
+     control is not focusable" to a console nobody has open, and the user gets a
+     Save button that does nothing with no message anywhere on the page.
+     disabled is exempt from constraint validation and drops out of the POST,
+     which is the right thing to send for not applicable.
+
+     What unlocks them is said on the radio group, not on the locked fields.
+     A disabled control never takes focus, and a description is only read when
+     focus arrives, so aria-describedby on a locked field is text nobody hears.
+     The consequence — an agency, a window, a fee — belongs on the control the
+     user can still reach.
+
+     The message under each locked field is still worth writing. It is read by
+     eye, by the person looking at a greyed box wondering whether it is broken. -->
+<div data-kui="field/dependent" class="max-w-md space-y-5" x-data="{ mode: 'gate' }">
+
+  <fieldset aria-describedby="fp-mode-msg">
+    <legend class="mb-2 text-[13px]/5 font-medium">
+      Inspection <span aria-hidden="true" class="text-red-600">*</span>
+    </legend>
+    <div class="space-y-2">
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="inspection" value="none" required x-model="mode"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Not required</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="inspection" value="gate" checked required x-model="mode"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>At the plant gate, by stores</span>
+      </label>
+      <label class="flex items-start gap-2.5 text-[14px]/5">
+        <input type="radio" name="inspection" value="third_party" required x-model="mode"
+               class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span>Third-party agency</span>
+      </label>
+    </div>
+    <p id="fp-mode-msg" class="mt-2 min-h-4 text-[12px]/4 text-zinc-500">
+      A third-party inspection needs an agency and a window, and their fee is added to the order.
+    </p>
+  </fieldset>
+
+  <div>
+    <label for="fp-agency" class="mb-1.5 block text-[13px]/5 font-medium"
+           :class="mode === 'third_party' ? '' : 'text-zinc-500'">Agency</label>
+    <div class="rounded-lg border border-zinc-200"
+         :class="mode === 'third_party'
+                   ? 'bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'
+                   : 'bg-zinc-200'">
+      <select id="fp-agency" name="agency" aria-describedby="fp-agency-msg"
+              :disabled="mode !== 'third_party'" :required="mode === 'third_party'"
+              class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none disabled:text-zinc-400">
+        <option value="">Choose an agency</option>
+        <option value="sgs">SGS India — Vapi</option>
+        <option value="tuv">TUV Rheinland — Silvassa</option>
+        <option value="bv">Bureau Veritas — Daman</option>
+      </select>
+    </div>
+    <p id="fp-agency-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+      <span x-show="mode === 'third_party'" x-cloak class="block">Their report is attached to the GRN before it can be posted.</span>
+      <span x-show="mode !== 'third_party'" x-cloak class="block">Locked, and posts nothing, until Inspection is a third-party agency.</span>
+    </p>
+  </div>
+
+  <div>
+    <label for="fp-window" class="mb-1.5 block text-[13px]/5 font-medium"
+           :class="mode === 'third_party' ? '' : 'text-zinc-500'">Inspection window</label>
+    <div class="flex items-center rounded-lg border border-zinc-200"
+         :class="mode === 'third_party'
+                   ? 'bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'
+                   : 'bg-zinc-200'">
+      <input id="fp-window" name="window_days" value="3" inputmode="numeric"
+             aria-describedby="fp-window-unit"
+             :disabled="mode !== 'third_party'"
+             class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none disabled:text-zinc-400">
+      <span id="fp-window-unit" class="pr-3 text-[14px]/5"
+            :class="mode === 'third_party' ? 'text-zinc-600' : 'text-zinc-400'">working days</span>
+    </div>
+    <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+  </div>
+
+</div>

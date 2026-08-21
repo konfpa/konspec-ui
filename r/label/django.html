@@ -1,0 +1,139 @@
+<!-- forms.py
+     class GrnForm(forms.Form):
+         QC = [('pass', 'Passed — release to stores'),
+               ('deviation', 'Passed on deviation'),
+               ('reject', 'Rejected — raise a debit note')]
+
+         # A ModelForm takes the label from verbose_name with capfirst applied,
+         # which is right for "vendor" and wrong for every acronym in a
+         # procurement schema. Write those out.
+         gstin = forms.CharField(
+             label='Vendor GSTIN', max_length=15,
+             help_text='15 characters, as printed on the certificate.',
+             widget=forms.TextInput(attrs={
+                 'class': 'w-full bg-transparent px-3 py-2 font-mono '
+                          'text-[14px]/5 tabular-nums uppercase outline-none'}))
+
+         # RadioSelect and CheckboxSelectMultiple return '' from id_for_label,
+         # on purpose: a label pointing at the group would toggle its first
+         # option. <label for=""> is valid markup, binds to nothing and reports
+         # nothing, so the question is a <legend>. See label/legend.
+         qc = forms.ChoiceField(
+             choices=QC, label='Lab result',
+             help_text='Locks the lot against issue until a result is recorded.',
+             widget=forms.RadioSelect(attrs={
+                 'class': 'mt-0.5 size-4 shrink-0 accent-zinc-700'}))
+
+         # Every MultiWidget renders two inputs with suffixed ids and no label
+         # of its own for either half. id_for_label on the field is empty here
+         # too; each subwidget carries its own.
+         received_at = forms.SplitDateTimeField(
+             label='Received at',
+             widget=forms.SplitDateTimeWidget(attrs={
+                 'class': 'w-full min-w-0 bg-transparent px-3 py-2 '
+                          'text-[14px]/5 tabular-nums outline-none'}))
+
+         def __init__(self, *args, **kwargs):
+             # label_suffix is a colon Django appends inside the <label>, so
+             # label_tag renders "Vendor GSTIN:" and the colon lands in the
+             # accessible name. Kill it on the form rather than with a filter.
+             kwargs.setdefault('label_suffix', '')
+             super().__init__(*args, **kwargs)
+             # aria-describedby cannot be decided in the template — widget
+             # attrs are fixed before it renders, and this is the only place
+             # that knows both the errors and the ids.
+             for name in self.fields:
+                 bf, widget = self[name], self.fields[name].widget
+                 # attrs on a group widget are inherited by every subwidget, so
+                 # this would put the group's help line on all three radios and
+                 # it would be read back on every arrow-key pass through them.
+                 # Groups take aria-describedby on the <fieldset> instead.
+                 if isinstance(widget, (forms.RadioSelect,
+                                        forms.CheckboxSelectMultiple,
+                                        forms.MultiWidget)):
+                     continue
+                 widget.attrs['aria-describedby'] = bf.auto_id + ('-err' if bf.errors else '-help')
+                 if bf.errors:
+                     widget.attrs['aria-invalid'] = 'true'
+
+     views.py
+         def receive(request):
+             # Two forms on one page share auto_id: id_gstin is generated for
+             # both, for binds to the first, and the second form's label drives
+             # the first form's input. A prefix is the whole fix — the ids
+             # become id_ship-gstin and id_bill-gstin, and nothing else changes.
+             return render(request, 'grn/receive.html', {
+                 'form': GrnForm(prefix='ship'),
+                 'bill_form': GrnForm(prefix='bill')})
+
+     Write the <label> out rather than printing {{ form.gstin.label_tag }}.
+     label_tag takes its attrs as a Python argument, which a template has no way
+     to pass, so the tag it renders carries no classes and there is nowhere to
+     put them. id_for_label and label are the two halves it is built from, and
+     id_for_label is the one to bind to: it is the same string as auto_id for a
+     TextInput and it is not for a RadioSelect or a MultiWidget, which is
+     exactly where a hand-built for goes wrong.
+
+     In a formset the ids already vary — form.prefix gives lines-0-gstin — but a
+     hand-written id="qty" inside the row loop does not, and that is the
+     duplicate this entry keeps warning about. See label/row. -->
+<form data-kui="label/django" method="post" class="max-w-xl space-y-5">
+  {% csrf_token %}
+
+  <div>
+    <label for="{{ form.gstin.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.gstin.label }}{% if form.gstin.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+
+    <div class="rounded-lg bg-white {% if form.gstin.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.gstin }}
+    </div>
+
+    {% if form.gstin.errors %}
+      <p id="{{ form.gstin.auto_id }}-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.gstin.errors.0 }}
+      </p>
+    {% else %}
+      <p id="{{ form.gstin.auto_id }}-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">{{ form.gstin.help_text }}</p>
+    {% endif %}
+  </div>
+
+  {# id_for_label is empty on a RadioSelect, so the question is a legend and  #}
+  {# each option's own label wraps the tag Django hands back. The group's     #}
+  {# help line is described from the fieldset, which is announced once as the #}
+  {# group is entered rather than on every option in it.                      #}
+  <fieldset aria-describedby="{{ form.qc.auto_id }}-help">
+    <legend class="mb-2 text-[13px]/5 font-medium">{{ form.qc.label }}</legend>
+    <div class="space-y-2">
+      {% for choice in form.qc %}
+        <label class="flex items-start gap-2.5 py-1 text-[14px]/5">
+          {{ choice.tag }}<span>{{ choice.choice_label }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    <p id="{{ form.qc.auto_id }}-help" class="mt-2 text-[12px]/4 text-zinc-500">{{ form.qc.help_text }}</p>
+  </fieldset>
+
+  {# a MultiWidget: the legend names the pair, and each half is labelled by #}
+  {# its own subwidget id. Printing {{ form.received_at }} emits both boxes  #}
+  {# with nothing naming either.                                            #}
+  <fieldset>
+    <legend class="mb-2 text-[13px]/5 font-medium">{{ form.received_at.label }}</legend>
+    <div class="flex flex-wrap gap-3">
+      {% for part in form.received_at.subwidgets %}
+        <div class="min-w-0 flex-1">
+          <label for="{{ part.id_for_label }}" class="mb-1.5 block text-[12px]/4 text-zinc-500">
+            {% if forloop.first %}Date{% else %}Time{% endif %}
+          </label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            {{ part }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Post GRN
+  </button>
+</form>

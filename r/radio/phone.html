@@ -1,0 +1,42 @@
+<!-- The same group, answered standing at the gate on a phone. One copy of the
+     markup does it: a second copy behind a media query shares the name, so the
+     two are a single group and the option checked in the display:none copy is
+     the one that posts.
+
+     Each option is a full-width row with py-3 on it, so the target clears 44px
+     in both directions. A bare radio with the label beside it is a 16px target
+     however wide the row is, and the label only enlarges it while it is inside
+     the same box.
+
+     The labels wrap and nothing truncates. In the vendor filter, truncation is
+     right — the count beside the name is what is being read — but here the tail
+     of the sentence is the whole difference between two reasons, and two rows
+     ending in an ellipsis are two identical options.
+
+     The action is a full-width button at the foot, not a save on change: this
+     prints a gate slip and turns a vehicle away, which is exactly the kind of
+     thing the arrow keys would fire three times on a keyboard. -->
+<fieldset data-kui="radio/phone" class="max-w-sm">
+  <legend class="mb-2 text-[13px]/5 font-medium tabular-nums">Why MH-04-GJ-2291 was turned back</legend>
+
+  <div class="space-y-2">
+    <label class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-3 text-[14px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="turnback" value="no_dc" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0">No delivery challan, or the challan does not match the invoice</span>
+    </label>
+    <label class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-3 text-[14px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="turnback" value="no_po" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0">No open purchase order for this material and vendor</span>
+    </label>
+    <label class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-3 text-[14px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="turnback" value="over" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0 tabular-nums">Quantity on the vehicle is over the 2,000 kg still open on the order</span>
+    </label>
+    <label class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white px-3 py-3 text-[14px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+      <input type="radio" name="turnback" value="damage" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+      <span class="min-w-0">Load damaged or wet, visible at the gate</span>
+    </label>
+  </div>
+
+  <button type="submit" class="mt-3 flex h-11 w-full items-center justify-center rounded-lg bg-zinc-700 px-4 text-[14px]/5 font-medium text-white hover:bg-zinc-800">Record and print the gate slip</button>
+</fieldset>

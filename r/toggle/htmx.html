@@ -16,9 +16,9 @@
      from a field that was never rendered. Django also needs the CSRF token on
      the request; that is in the django variant.
 
-     The status line is role="status" because the revert is script setting
-     checked, and a programmatic change is announced by nothing. Without it the
-     only sign the setting did not stick is a pixel moving back. -->
+     This handler treats every unsuccessful response the same way. The refused
+     variant is the same row splitting them: a 409 the server can explain is not
+     a 500 you can retry. -->
 <div data-kui="toggle/htmx" class="max-w-xl rounded-xl border border-zinc-300 bg-white px-4 py-2.5"
      x-data="{ state: 'idle', want: true }"
      @htmx:before-request.camel="want = $refs.sw.checked; state = 'saving'"
@@ -52,7 +52,7 @@
       <span class="flex items-center gap-1.5">
         <i data-lucide="alert-circle" class="size-3.5 shrink-0"></i>Not saved — the setting is unchanged
       </span>
-      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2"
+      <button type="button" class="font-normal text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
               @click="$refs.sw.checked = want; $refs.sw.dispatchEvent(new Event('change'))">Try again</button>
     </span>
   </p>

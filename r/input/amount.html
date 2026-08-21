@@ -28,11 +28,11 @@
        get raw() { return this.amount.replace(/[^0-9.]/g, ''); }
      }">
   <div>
-    <label for="in-amt" class="mb-1.5 block text-[13px]/5 font-medium">Order value <span class="text-red-600">*</span></label>
+    <label for="in-amt" class="mb-1.5 block text-[13px]/5 font-medium">Order value <span aria-hidden="true" class="text-red-600">*</span></label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+      <span id="in-amt-unit" class="shrink-0 pl-3 text-[14px]/5 text-zinc-600">₹</span>
       <input id="in-amt" x-model="amount" @focus="strip()" @blur="group()"
-             inputmode="decimal" autocomplete="off" aria-describedby="in-amt-help"
+             inputmode="decimal" autocomplete="off" aria-describedby="in-amt-unit in-amt-help"
              class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
     </div>
     <!-- the digits, with nothing dressed onto them -->
@@ -45,9 +45,9 @@
   <div>
     <label for="in-qty" class="mb-1.5 block text-[13px]/5 font-medium">Quantity ordered</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <input id="in-qty" name="qty" value="12.500" inputmode="decimal" aria-describedby="in-qty-help"
+      <input id="in-qty" name="qty" value="12.500" inputmode="decimal" aria-describedby="in-qty-unit in-qty-help"
              class="w-full min-w-0 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
-      <span class="pr-3 shrink-0 text-[14px]/5 text-zinc-600">MT</span>
+      <span id="in-qty-unit" class="shrink-0 pr-3 text-[14px]/5 text-zinc-600">MT</span>
     </div>
     <p id="in-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Three decimal places. 12.500 MT against a contracted 15.000 MT.</p>
   </div>

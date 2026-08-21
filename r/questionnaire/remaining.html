@@ -1,0 +1,207 @@
+<!-- The count and the list answer two different questions, and a long sheet
+     needs both. "4 of 6" says how much is left and nothing about which, which
+     on an eighteen-line audit is the difference between finishing and
+     scrolling. The rail answers the first, the panel at the foot answers the
+     second, and both read the same object the questions render from, so they
+     cannot disagree with the sheet or with each other.
+
+     Sections are headings with counts, not accordions. Collapsing a finished
+     section is the wizard mistake in another costume: the countersigner has to
+     read all of the answers at once, and a collapsed section prints shut,
+     breaks Ctrl-F and hides the two answers that contradict each other. The
+     tick beside the count is all the collapse was ever offering.
+
+     The remaining panel is not a live region. It changes on every answer, and a
+     list that reads itself out each time talks over the radio the user has just
+     operated. Nothing is wrong here — this is a sheet in progress, not a sheet
+     that failed — so nothing has to be interrupted for.
+
+     Each link is the question's text character for character, not a shortened
+     version of it. A summary that paraphrases is a second wording of the same
+     question, and the reader has to work out that the two are one row before
+     the link is any use.
+
+     No Lucide icon inside the x-for. createIcons() hydrates once at load, so an
+     <i> rendered later by Alpine stays a bare <i> and never appears; the loop
+     is links only, and the section ticks are static markup with x-show on a
+     wrapping span. -->
+<form data-kui="questionnaire/remaining" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+      x-data="{
+        a: { marking: 'pass', seal: 'pass', cert: '', challan: 'pass', moisture: '', mfi: 'pass' },
+        q: [
+          { k: 'marking',  s: 'pack', n: 'Bag markings — grade, lot and net weight legible on every bag' },
+          { k: 'seal',     s: 'pack', n: 'Bags sealed, no tears and no damp patches on the pallet' },
+          { k: 'cert',     s: 'docs', n: 'Test certificate lot number matches the bags' },
+          { k: 'challan',  s: 'docs', n: 'Pallet count matches delivery challan DC-8871' },
+          { k: 'moisture', s: 'test', n: 'Moisture on the hand-held meter at or below 0.05%' },
+          { k: 'mfi',      s: 'test', n: 'Melt flow index within 0.28 – 0.42 g/10 min' }
+        ],
+        inSection(s) { return this.q.filter(x => x.s === s) },
+        doneIn(s) { return this.inSection(s).filter(x => this.a[x.k] !== '').length },
+        get open() { return this.q.filter(x => this.a[x.k] === '') },
+        get done() { return this.q.length - this.open.length }
+      }">
+
+  <div class="border-b border-zinc-200 px-5 py-4">
+    <h2 class="text-[16px]/6 font-semibold">Incoming inspection — GRN-24-0912</h2>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">HDPE granules, natural · lot 24-HD-118 · Gujarat Polymers Ltd · 16 Aug 2026</p>
+
+    <div class="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div class="h-1 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-label="Parameters answered on GRN-24-0912"
+           aria-valuenow="4" :aria-valuenow="done" aria-valuemin="0" aria-valuemax="6" :aria-valuemax="q.length">
+        <div class="h-full rounded-full bg-zinc-700 transition-[width] motion-reduce:transition-none"
+             style="width: 67%" :style="'width: ' + Math.round(done / q.length * 100) + '%'"></div>
+      </div>
+      <p class="text-[12px]/4 tabular-nums text-zinc-600">
+        <span x-text="done">4</span> of <span x-text="q.length">6</span> answered
+      </p>
+    </div>
+  </div>
+
+  <section>
+    <h3 class="flex items-center justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-5 py-2">
+      <span class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Packaging and identification</span>
+      <span class="flex shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <span x-show="doneIn('pack') === inSection('pack').length" class="flex"><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+        <span><span x-text="doneIn('pack')">2</span> of <span x-text="inSection('pack').length">2</span></span>
+      </span>
+    </h3>
+    <div class="divide-y divide-zinc-100 px-5">
+      <fieldset id="qg-marking" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium">Bag markings — grade, lot and net weight legible on every bag</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_marking" value="pass" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_marking" value="fail" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_marking" value="na" x-model="a.marking" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset id="qg-seal" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium">Bags sealed, no tears and no damp patches on the pallet</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_seal" value="pass" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_seal" value="fail" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_seal" value="na" x-model="a.seal" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+    </div>
+  </section>
+
+  <section>
+    <h3 class="flex items-center justify-between gap-3 border-y border-zinc-200 bg-zinc-50 px-5 py-2">
+      <span class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Documents</span>
+      <span class="flex shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <span x-show="doneIn('docs') === inSection('docs').length" x-cloak class="flex"><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+        <span><span x-text="doneIn('docs')">1</span> of <span x-text="inSection('docs').length">2</span></span>
+      </span>
+    </h3>
+    <div class="divide-y divide-zinc-100 px-5">
+      <fieldset id="qg-cert" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium">Test certificate lot number matches the bags</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_cert" value="pass" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_cert" value="fail" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_cert" value="na" x-model="a.cert" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset id="qg-challan" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium tabular-nums">Pallet count matches delivery challan DC-8871</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_challan" value="pass" x-model="a.challan" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_challan" value="fail" x-model="a.challan" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_challan" value="na" x-model="a.challan" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+    </div>
+  </section>
+
+  <section>
+    <h3 class="flex items-center justify-between gap-3 border-y border-zinc-200 bg-zinc-50 px-5 py-2">
+      <span class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Material tests</span>
+      <span class="flex shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <span x-show="doneIn('test') === inSection('test').length" x-cloak class="flex"><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+        <span><span x-text="doneIn('test')">1</span> of <span x-text="inSection('test').length">2</span></span>
+      </span>
+    </h3>
+    <div class="divide-y divide-zinc-100 px-5">
+      <fieldset id="qg-moisture" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium tabular-nums">Moisture on the hand-held meter at or below 0.05%</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_moisture" value="pass" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_moisture" value="fail" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_moisture" value="na" x-model="a.moisture" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset id="qg-mfi" tabindex="-1" class="py-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <legend class="text-[13px]/5 font-medium tabular-nums">Melt flow index within 0.28 – 0.42 g/10 min</legend>
+        <div class="mt-2.5 grid max-w-sm grid-cols-3 gap-2">
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_mfi" value="pass" x-model="a.mfi" class="size-4 shrink-0 accent-zinc-700"><span>Pass</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_mfi" value="fail" x-model="a.mfi" class="size-4 shrink-0 accent-zinc-700"><span>Fail</span>
+          </label>
+          <label class="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-2 text-[13px]/5 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+            <input type="radio" name="qg_mfi" value="na" x-model="a.mfi" class="size-4 shrink-0 accent-zinc-700"><span>N/A</span>
+          </label>
+        </div>
+      </fieldset>
+    </div>
+  </section>
+
+  <div class="border-t border-zinc-200 px-5 py-4">
+    <div x-show="open.length" x-cloak>
+      <h3 class="text-[13px]/5 font-medium tabular-nums"><span x-text="open.length">2</span> still unanswered</h3>
+      <ul class="mt-2 space-y-1.5 text-[13px]/5">
+        <template x-for="item in open" :key="item.k">
+          <li>
+            <a :href="'#qg-' + item.k" x-text="item.n"
+               class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></a>
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <p x-show="!open.length" x-cloak class="text-[13px]/5 font-medium tabular-nums">
+      All <span x-text="q.length">6</span> parameters answered. Ready to sign.
+    </p>
+
+    <div class="mt-3.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">Draft saved 11:04 · Ritu Deshpande</p>
+      <button type="submit" class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Review and sign</button>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,81 @@
+<!-- The enclosure is never the target. It contains the input somebody is
+     typing in, and a swap replaces that input with a fresh one — the caret, the
+     selection and every keystroke not yet sent go with it, while the request
+     the user triggered looks from the outside like it worked. The target is one
+     addon and nothing else.
+
+     outerHTML rather than innerHTML, because the answer carries a state as well
+     as a string: found, or no such code. That state lives on the addon's own
+     data-ok, and innerHTML cannot reach an attribute of the element it fills.
+     The price is one class list living in a template as well as here, and it is
+     cheaper than the alternatives — a second out-of-band swap, or targeting the
+     wrapper and destroying the field.
+
+     The live region wraps the target and is never the target. A region that is
+     itself replaced announces nothing, because the announcement is made by the
+     region that was already on the page when the text under it changed.
+
+     The field triggers its own lookup and so contributes its own value; no
+     hx-include is needed for that. hx-sync="this:replace" abandons a lookup
+     still in flight, so a fast typist cannot end up with the unit of a code
+     that is no longer in the box, and the delay keeps a held key to one
+     request.
+
+     Nothing inside the enclosure turns red. The addon reports what the server
+     found in the ordinary zinc, and the red is the wrapper's border and the
+     message under it — a red unit inside the box reads as the wrong unit, the
+     way a red ₹ reads as a negative amount. aria-invalid goes on the field,
+     which is the control that is wrong.
+
+     border stays in the static class list and only its colour is bound, which
+     is the idiom the input entry uses for the same reason: two border-colour
+     utilities in one class list are settled by the stylesheet rather than by
+     the order they were written in, and an enclosure whose entire border
+     arrives with Alpine has no border at all at first paint.
+
+     views.py
+         def item_lookup(request):
+             item = Item.objects.live().filter(
+                 code__iexact=request.GET.get("item_code", "").strip()).first()
+             return render(request, "orders/_item_info.html", {"item": item})
+
+     orders/_item_info.html, which is the whole response:
+         {% if item %}
+           <span id="igh-info" data-ok="1" class="text-[13px]/5 tabular-nums
+                 text-zinc-500">{{ item.uom }} · {{ item.free_stock }} in stock</span>
+         {% else %}
+           <span id="igh-info" data-ok="0" class="text-[13px]/5 tabular-nums
+                 text-zinc-500">No such code</span>
+         {% endif %} -->
+<div data-kui="input-group/htmx" class="max-w-xl"
+     x-data="{ loading: false, bad: false }"
+     @htmx:before-request.camel="loading = true"
+     @htmx:after-request.camel="loading = false"
+     @htmx:after-swap.camel="bad = $el.querySelector('#igh-info').dataset.ok === '0'">
+  <label for="igh-code" class="mb-1.5 block text-[13px]/5 font-medium">Item code</label>
+
+  <div class="flex items-stretch rounded-lg border bg-white"
+       :class="bad ? 'border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15'
+                   : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15'">
+    <input id="igh-code" name="item_code" value="HDPE-BLM-5502"
+           aria-describedby="igh-info" :aria-invalid="bad ? 'true' : null"
+           hx-get="/items/lookup/" hx-trigger="change, keyup changed delay:400ms"
+           hx-target="#igh-info" hx-swap="outerHTML" hx-sync="this:replace"
+           class="min-w-0 flex-1 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+
+    <span role="status" class="flex shrink-0 items-center pr-3 pl-1">
+      <span x-show="loading" x-cloak aria-hidden="true" class="flex items-center">
+        <i data-lucide="loader-circle" class="size-4 animate-spin text-zinc-500"></i>
+      </span>
+      <span x-show="!loading" class="flex items-center">
+        <span id="igh-info" data-ok="1" class="text-[13px]/5 tabular-nums text-zinc-500">MT · 18.400 in stock</span>
+      </span>
+    </span>
+  </div>
+
+  <p class="mt-1.5 text-[12px]/4 tabular-nums"
+     :class="bad ? 'font-medium text-red-600' : 'text-zinc-500'"
+     x-text="bad
+               ? 'No live item with this code. Stores opens one against the rate contract before it can be ordered.'
+               : 'Unit and free stock come from the item master as the code is typed.'"></p>
+</div>

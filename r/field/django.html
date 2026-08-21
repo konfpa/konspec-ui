@@ -1,0 +1,103 @@
+<!-- forms.py
+     class InvoiceForm(forms.Form):
+         CTRL = ('w-full bg-transparent px-3 py-2 text-[14px]/5 '
+                 'tabular-nums outline-none')
+
+         number = forms.CharField(
+             label='Vendor invoice number', max_length=32,
+             help_text='As printed on the vendor copy. Unique per vendor per financial year.',
+             widget=forms.TextInput(attrs={'class': CTRL}))
+
+         amount = forms.DecimalField(
+             label='Invoice value', max_digits=12, decimal_places=2,
+             help_text='Excluding GST. The tax lines are read off the vendor GSTIN.',
+             widget=forms.NumberInput(attrs={
+                 'class': CTRL + ' text-right', 'inputmode': 'decimal'}))
+
+         def __init__(self, *args, **kwargs):
+             super().__init__(*args, **kwargs)
+             for name in self.fields:
+                 bf, attrs = self[name], self.fields[name].widget.attrs
+                 # One id, and it does not depend on the state. The paragraph is
+                 # always rendered — that is what min-h-4 buys — so there is no
+                 # -err id to switch to and no branch here to get wrong.
+                 attrs['aria-describedby'] = bf.auto_id + '-msg'
+                 # Decided at render time from the errors that exist at render
+                 # time. Typed into the template by hand it is right once, and
+                 # then the field is announced as invalid for the rest of the
+                 # session no matter what the user does about it.
+                 attrs['aria-invalid'] = 'true' if bf.errors else 'false'
+
+         def clean(self):
+             cleaned = super().clean()
+             # A mismatch between the two belongs to neither of them. add_error
+             # with None puts it in non_field_errors, which the error summary at
+             # the top of the page renders and takes focus on. Attached to
+             # whichever field the user touched last, the same mistake reports
+             # itself somewhere different on the next visit.
+             return cleaned
+
+     The widget renders the control and only the control. The wrapper that owns
+     the border and the focus outline, the label and the message paragraph are
+     template markup, so form.number on its own is never the whole field — the
+     one thing that catches everybody arriving from a form renderer.
+
+     Write the label rather than field.label_tag. label_tag builds its own
+     element, appends label_suffix, and leaves nowhere to hang the asterisk or
+     the classes. Take the asterisk from field.field.required so it cannot drift
+     from the constraint the server actually enforces.
+
+     field.errors is a <ul class="errorlist">, which is why the paragraph takes
+     field.errors.0. min-h-4 stays on it in both branches: a failed POST
+     re-renders the whole page, and without the reserved line every field that
+     errored shifts the ones under it before the user has read anything.
+
+     The block below is nine lines and every field on the form needs all nine.
+     Put it in an include and pass the bound field to it — the wiring is only
+     ever right if it is written once. -->
+<form data-kui="field/django" method="post" class="max-w-sm space-y-5">
+  {% csrf_token %}
+
+  <div>
+    <label for="{{ form.number.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.number.label }}{% if form.number.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+    <div class="rounded-lg bg-white focus-within:outline-3 focus-within:outline-offset-2 {% if form.number.errors %}border border-red-600 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15{% endif %}">
+      {{ form.number }}
+    </div>
+    <p id="{{ form.number.auto_id }}-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+      {% if form.number.errors %}
+        <span class="flex items-start gap-1.5 font-medium text-red-600">
+          <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+          <span class="tabular-nums">{{ form.number.errors.0 }}</span>
+        </span>
+      {% else %}
+        <span class="block tabular-nums text-zinc-500">{{ form.number.help_text }}</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <div>
+    <label for="{{ form.amount.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+      {{ form.amount.label }}{% if form.amount.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+    </label>
+    <div class="flex items-center rounded-lg bg-white focus-within:outline-3 focus-within:outline-offset-2 {% if form.amount.errors %}border border-red-600 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15{% endif %}">
+      <span class="pl-3 text-[14px]/5 text-zinc-600">₹</span>
+      {{ form.amount }}
+    </div>
+    <p id="{{ form.amount.auto_id }}-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+      {% if form.amount.errors %}
+        <span class="flex items-start gap-1.5 font-medium text-red-600">
+          <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+          <span class="tabular-nums">{{ form.amount.errors.0 }}</span>
+        </span>
+      {% else %}
+        <span class="block tabular-nums text-zinc-500">{{ form.amount.help_text }}</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Book invoice
+  </button>
+</form>

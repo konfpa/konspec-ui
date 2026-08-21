@@ -1,16 +1,20 @@
 <!-- The number comes from the real XHR progress event. If you cannot get it,
-     drop the percentage and show an indeterminate bar instead of inventing one. -->
+     drop the percentage and show an indeterminate bar instead of inventing one.
+
+     The finished row is not a green tick on its own. Colour is never the only
+     signal, and a tick with no word beside it is announced as nothing at all,
+     so the state is carried by sr-only text that costs the row no width. -->
 <ul data-kui="attachment/uploading" class="space-y-2">
   <li class="rounded-lg border border-zinc-200 bg-white px-3 py-2">
     <div class="flex items-center gap-3">
       <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
       <div class="min-w-0 flex-1">
         <p class="truncate text-[13px]/5 font-medium">signed-grn-1142.pdf</p>
-        <p class="text-[12px]/4 text-zinc-500">1.8 MB of 4.2 MB</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">1.8 MB of 4.2 MB</p>
       </div>
       <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">43%</span>
       <button type="button" aria-label="Cancel upload of signed-grn-1142.pdf"
-              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600">
+              class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="x" class="size-4"></i>
       </button>
     </div>
@@ -24,8 +28,10 @@
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="image" class="size-4 text-zinc-600"></i></span>
     <div class="min-w-0 flex-1">
       <p class="truncate text-[13px]/5 font-medium">delivery-gate-photo.jpg</p>
-      <p class="text-[12px]/4 text-zinc-500">1.1 MB · Ritu Deshpande · just now</p>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">1.1 MB · Ritu Deshpande · just now</p>
     </div>
-    <i data-lucide="check-circle-2" class="size-4 shrink-0 text-emerald-600"></i>
+    <span class="flex shrink-0 items-center text-emerald-600">
+      <i data-lucide="check-circle-2" class="size-4"></i><span class="sr-only">Uploaded</span>
+    </span>
   </li>
 </ul>

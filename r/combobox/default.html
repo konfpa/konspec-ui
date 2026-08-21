@@ -52,7 +52,7 @@
      @click.outside="close()"
      @keydown.escape="if (open) { $event.stopPropagation(); close(); $refs.q.focus() }">
 
-  <label for="cb-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span class="text-red-600">*</span></label>
+  <label for="cb-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor <span aria-hidden="true" class="text-red-600">*</span></label>
 
   <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
     <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>

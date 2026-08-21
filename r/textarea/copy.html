@@ -1,0 +1,64 @@
+<!-- The vendor's reply, pasted into the record by whoever read the email, and
+     read here by three people who will each need a line of it somewhere else —
+     a debit note, a reply, the transporter's complaint. So it is read-only
+     rather than disabled: disabled drops the box out of the tab order and, in
+     more than one browser, out of reach of a selection as well, which means the
+     one thing this box exists for cannot be done at all.
+
+     The copy button rather than select-on-focus. Selecting the whole value when
+     the box takes focus fights the mouse — the click that starts a drag through
+     one paragraph also fires focus, which selects the lot and throws the drag
+     away — and it does nothing for a keyboard user, who is still holding a
+     selection they have to copy by hand.
+
+     Both words of the button live in one grid cell, so the label row does not
+     jump three pixels when Copy becomes Copied. Neither carries aria-hidden:
+     invisible is visibility:hidden, which takes the hidden string out of the
+     accessibility tree too, so the button is always named by whichever of the
+     two is showing.
+
+     The two icons are spans with x-show rather than one bound <i>.
+     createIcons() replaces that node with an <svg> and anything bound on it
+     goes with it.
+
+     No resize-none. The reply is longer than six rows and the handle is the
+     cheapest way to see the rest of it without scrolling a box inside a page
+     that also scrolls. -->
+<div data-kui="textarea/copy" class="max-w-xl"
+     x-data="{ done: false, t: null,
+               copy() { navigator.clipboard?.writeText(this.$refs.body.value);
+                        this.done = true;
+                        clearTimeout(this.t);
+                        this.t = setTimeout(() => this.done = false, 2000) } }">
+  <div class="mb-1.5 flex items-center justify-between gap-3">
+    <label for="ta-copy" class="text-[13px]/5 font-medium tabular-nums">Vendor reply · 18 Aug 2026</label>
+    <button type="button" @click="copy()"
+            class="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span x-show="!done"><i data-lucide="copy" class="size-3.5"></i></span>
+      <span x-show="done" x-cloak><i data-lucide="check" class="size-3.5 text-emerald-600"></i></span>
+      <span class="grid">
+        <span class="col-start-1 row-start-1" :class="done && 'invisible'">Copy</span>
+        <span class="col-start-1 row-start-1" :class="!done && 'invisible'">Copied</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="rounded-lg border border-zinc-200 bg-zinc-200">
+    <textarea id="ta-copy" x-ref="body" rows="6" readonly aria-describedby="ta-copy-help"
+              class="block w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Balance 40 kg of HDPE-BLM-45 was dispatched on 18 Aug 2026 by Gati,
+LR 4471029, against your PO-24-1187.
+
+Mill test certificate for heat 2026-B-114 follows by email today.
+Rate holds at ₹87.00 per kg until 30 Sep 2026, per our quotation of
+02 Aug 2026.
+
+Mahesh Patel
+Gujarat Polymers Ltd</textarea>
+  </div>
+
+  <p id="ta-copy-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Recorded by Ritu Deshpande on 18 Aug 2026. It cannot be edited here — corrections go on a new remark.
+  </p>
+
+  <span class="sr-only" aria-live="polite" x-text="done ? 'Vendor reply copied' : ''"></span>
+</div>

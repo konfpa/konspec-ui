@@ -15,8 +15,15 @@
 
      The legend names the question. Every input inside still needs its own
      label; a legend does not stand in for one, and two fields under one legend
-     with no labels are announced as "Tax registration, edit" twice. -->
-<fieldset data-kui="field/group" class="max-w-md" aria-describedby="fg-msg">
+     with no labels are announced as "Tax registration, edit" twice.
+
+     Both flags come off one getter. Two inputs, one fact, one place it is
+     decided — and it is decided live rather than written into the markup,
+     because the mismatch stops being true the moment either half is corrected
+     and an aria-invalid that was typed by hand does not. -->
+<fieldset data-kui="field/group" class="max-w-md" aria-describedby="fg-msg"
+          x-data="{ pan: 'AAACG4171B', gstin: '24AAACG9902B1ZP',
+                    get bad() { return this.gstin.slice(2, 12).toUpperCase() !== this.pan.toUpperCase() } }">
   <legend class="mb-2 text-[13px]/5 font-medium">
     Tax registration <span aria-hidden="true" class="text-red-600">*</span>
   </legend>
@@ -24,22 +31,32 @@
   <div class="grid gap-3 sm:grid-cols-2">
     <div>
       <label for="fg-pan" class="mb-1.5 block text-[12px]/4 text-zinc-600">PAN</label>
-      <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
-        <input id="fg-pan" name="pan" value="AAACG4171B" required aria-invalid="true"
+      <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+           :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                       : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+        <input id="fg-pan" name="pan" required x-model="pan"
+               :aria-invalid="bad ? 'true' : 'false'"
                class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums uppercase outline-none">
       </div>
     </div>
     <div>
       <label for="fg-gstin" class="mb-1.5 block text-[12px]/4 text-zinc-600">GSTIN</label>
-      <div class="rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
-        <input id="fg-gstin" name="gstin" value="24AAACG9902B1ZP" required aria-invalid="true"
+      <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+           :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                       : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+        <input id="fg-gstin" name="gstin" required maxlength="15" x-model="gstin"
+               :aria-invalid="bad ? 'true' : 'false'"
                class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums uppercase outline-none">
       </div>
     </div>
   </div>
 
-  <p id="fg-msg" class="mt-2 flex items-start gap-1.5 min-h-4 text-[12px]/4 font-medium text-red-600">
-    <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
-    <span class="tabular-nums">Characters 3 to 12 of the GSTIN are the PAN. This pair reads AAACG9902B against AAACG4171B.</span>
+  <p id="fg-msg" class="mt-2 min-h-4 text-[12px]/4">
+    <span x-show="!bad" x-cloak class="block tabular-nums text-zinc-500">Characters 3 to 12 of the GSTIN are the PAN.</span>
+    <span x-show="bad" x-cloak class="flex items-start gap-1.5 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+      <span class="tabular-nums"
+            x-text="'Characters 3 to 12 of the GSTIN are the PAN. This pair reads ' + gstin.slice(2, 12).toUpperCase() + ' against ' + pan.toUpperCase() + '.'"></span>
+    </span>
   </p>
 </fieldset>

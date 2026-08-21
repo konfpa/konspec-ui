@@ -1,0 +1,83 @@
+<!-- Two different locks, and only one of them is still a switch.
+
+     The first card holds a setting somebody else owns. It takes aria-disabled
+     and a prevented click rather than the disabled attribute, because a
+     disabled control cannot be focused and the sentence hanging off it by
+     aria-describedby is then unreachable from the keyboard — the reason exists
+     and the one user who needs it most cannot get to it. aria-disabled keeps
+     the switch in the Tab order, keeps its focus outline, and puts the reason
+     one tab stop away. It does not stop the change on its own, so @click.prevent
+     does, and the view has to refuse the POST as well: the attribute is advice
+     to a screen reader and the server is not obliged to take it. The track adds
+     peer-aria-disabled:opacity-60 so the drain still says "this will not move";
+     the lock icon beside it says who it will move for.
+
+     The second card is a posted GRN. Nobody will ever change these — they are
+     what applied when the receipt went through — so they are not controls at
+     all. readonly would have been the obvious attribute and it does nothing on
+     a checkbox: it parses, it reviews as correct, and it leaves a switch anyone
+     can move. disabled locks it but drops it out of the POST, so a value that
+     still has to be submitted needs a hidden input beside it. A value that will
+     never change again needs neither, and is text. -->
+<div data-kui="toggle/readonly" class="max-w-xl space-y-4">
+  <div class="rounded-xl border border-zinc-300 bg-white" x-data>
+    <div class="border-b border-zinc-200 px-4 py-3">
+      <h3 class="text-[13px]/5 font-medium tabular-nums">Rate contract RC-24-0088 — Gujarat Polymers Ltd</h3>
+    </div>
+
+    <div class="divide-y divide-zinc-100">
+      <div class="px-4 py-2.5">
+        <label class="flex items-start justify-between gap-4 py-1">
+          <span class="text-[14px]/5 tabular-nums">Auto-approve orders under ₹50,000</span>
+          <input type="checkbox" role="switch" checked
+                 aria-describedby="sw-rc-auto-help" class="peer sr-only">
+          <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+            <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+          </span>
+        </label>
+        <p id="sw-rc-auto-help" class="mt-1 pr-13 text-[12px]/4 text-zinc-500">Yours to change. It applies from the next order.</p>
+      </div>
+
+      <div class="px-4 py-2.5">
+        <label class="flex items-start justify-between gap-4 py-1">
+          <span class="text-[14px]/5 tabular-nums">Skip the second approval above ₹10,00,000</span>
+          <input type="checkbox" role="switch" checked aria-disabled="true" @click.prevent
+                 aria-describedby="sw-rc-second-help" class="peer sr-only">
+          <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 peer-aria-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+            <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+          </span>
+        </label>
+        <p id="sw-rc-second-help" class="mt-1 flex items-start gap-1.5 pr-13 text-[12px]/4 text-zinc-600">
+          <i data-lucide="lock" class="size-3.5 shrink-0 translate-y-px text-zinc-500"></i>
+          <span>Plant policy. Ritu Deshpande, the plant head, is the only person who can turn this off.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-4 py-3">
+      <h3 class="text-[13px]/5 font-medium tabular-nums">GRN-24-0713 — posted 04 Sep 2026</h3>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">What was in force when the receipt was posted. Nothing here is a control any more.</p>
+    </div>
+
+    <dl class="divide-y divide-zinc-100">
+      <div class="flex items-start justify-between gap-4 px-4 py-2.5">
+        <dt class="text-[14px]/5 text-zinc-600">Three-way match against the invoice</dt>
+        <dd class="shrink-0 text-[14px]/5 font-medium">Yes</dd>
+      </div>
+      <div class="flex items-start justify-between gap-4 px-4 py-2.5">
+        <dt class="text-[14px]/5 tabular-nums text-zinc-600">Auto-approved under ₹50,000</dt>
+        <dd class="shrink-0 text-[14px]/5 font-medium">No</dd>
+      </div>
+      <div class="flex items-start justify-between gap-4 px-4 py-2.5">
+        <dt class="text-[14px]/5 text-zinc-600">QC hold on the received batch</dt>
+        <dd class="shrink-0 text-[14px]/5 font-medium">Yes</dd>
+      </div>
+    </dl>
+
+    <div class="border-t border-zinc-200 px-4 py-2.5">
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">Changing the vendor's settings now does not change this receipt.</p>
+    </div>
+  </div>
+</div>

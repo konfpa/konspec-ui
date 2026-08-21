@@ -105,7 +105,7 @@
                    ? orders.length + ' purchase orders'
                    : rows.length + ' of ' + orders.length + ' purchase orders'"></p>
       <button type="button" x-show="applied" x-cloak @click="clear()"
-              class="text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2">
+              class="rounded-sm text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Clear <span x-text="applied"></span> filters
       </button>
     </div>

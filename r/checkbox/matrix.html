@@ -1,0 +1,113 @@
+<!-- A box in a grid cell has no name of its own. Row and column headers are
+     announced when a screen reader walks a table, and not when it tabs through
+     the controls inside one — which is how anybody using this screen will move
+     — so every box carries an aria-label saying both axes: "Approve over
+     ₹5,00,000 — Approver". Without it eighteen boxes announce as "checkbox".
+
+     Three columns is the ceiling. Every role column costs the width of its
+     heading, and the permission column is the one that pays: past three or four
+     the row label wraps to four lines on a phone. A fourth role is a second
+     matrix on the page, not a sideways scroll.
+
+     There is no row tint here, and no has-[:checked] on the tr. A matrix row is
+     not a selected row — it holds three separate answers, and painting the row
+     from one of them says the whole row is on. The hover band is the only thing
+     that tracks the eye across, which is what a grid this wide is for.
+
+     Viewing comes with every role and is not editable here, so those three
+     boxes are ticked and disabled. Disabled posts nothing, and nothing needs to
+     be posted: the server does not read view off this form. A value that has to
+     travel while it cannot be changed needs a hidden input — see states. -->
+<div data-kui="checkbox/matrix" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full text-[13px]/5">
+    <caption class="border-b border-zinc-200 px-3 py-2.5 text-left text-[13px]/5 font-medium sm:px-4">
+      What each role may do with purchase orders
+    </caption>
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-2.5 text-left font-medium sm:px-4">Permission</th>
+        <th scope="col" class="px-2 py-2.5 font-medium">Buyer</th>
+        <th scope="col" class="px-2 py-2.5 font-medium">Approver</th>
+        <th scope="col" class="px-2 py-2.5 font-medium">Stores</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal text-zinc-600 sm:px-4">View the register</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="View the register — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="View the register — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="View the register — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-4">Raise an order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="raise:buyer" checked aria-label="Raise an order — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="raise:approver" aria-label="Raise an order — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="raise:stores" aria-label="Raise an order — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal tabular-nums sm:px-4">Approve to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_5l:buyer" aria-label="Approve to ₹5,00,000 — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_5l:approver" checked aria-label="Approve to ₹5,00,000 — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_5l:stores" aria-label="Approve to ₹5,00,000 — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal tabular-nums sm:px-4">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_over:buyer" aria-label="Approve over ₹5,00,000 — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_over:approver" aria-label="Approve over ₹5,00,000 — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="approve_over:stores" aria-label="Approve over ₹5,00,000 — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-4">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="grn:buyer" aria-label="Post a GRN — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="grn:approver" aria-label="Post a GRN — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="grn:stores" checked aria-label="Post a GRN — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-4">Cancel an order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="cancel:buyer" aria-label="Cancel an order — Buyer" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="cancel:approver" checked aria-label="Cancel an order — Approver" class="size-4 accent-zinc-700">
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="cancel:stores" aria-label="Cancel an order — Stores" class="size-4 accent-zinc-700">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="border-t border-zinc-200 px-3 py-2.5 text-[12px]/4 tabular-nums text-zinc-500 sm:px-4">
+    Viewing the register comes with the role and is set on the role, not here. Orders over ₹20,00,000 go to the plant head whatever this grid says.
+  </p>
+</div>

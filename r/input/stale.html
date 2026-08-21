@@ -1,0 +1,64 @@
+<!-- Somebody else amended the rate two minutes after this form was opened. The
+     field is not invalid — the number in it is a perfectly good number, typed
+     by somebody who was told it was current — so nothing here turns red. Red
+     says you made a mistake, and this is not one.
+
+     The border stays grey and the notice under the box carries the amber mark,
+     which is the same rule the alerts follow: colour in the icon, never behind
+     the text.
+
+     Nothing refills the field on the user's behalf. A value that changes while
+     somebody is looking at it is the worst way this can go, because the one
+     thing nobody does is re-read a field they have already filled in. Both ways
+     out are a click, and both name the figure they commit to rather than saying
+     mine and theirs.
+
+     What actually makes the save safe is the hidden version, not the notice.
+     The form posts the version it was rendered against, and a server that
+     writes without comparing it has picked last-write-wins by not picking
+     anything. Both buttons write the current version back, because the version
+     records what the user has seen rather than which number won.
+
+     The notice is role="status" and the paragraph is on the page from the
+     start, so a version that lands from a poll is announced. A region that
+     arrives with its own message announces nothing, because it was not a live
+     region when the message was put in it. -->
+<div data-kui="input/stale" class="max-w-xl"
+     x-data="{
+       mine: '52,900', theirs: '53,400',
+       version: 7, latest: 9,
+       get stale() { return this.latest > this.version; },
+       take() { this.mine = this.theirs; this.version = this.latest; },
+       keep() { this.version = this.latest; }
+     }">
+  <label for="in-stale-rate" class="mb-1.5 block text-[13px]/5 font-medium">Rate per MT <span aria-hidden="true" class="text-red-600">*</span></label>
+
+  <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <span id="in-stale-unit" class="shrink-0 pl-3 text-[14px]/5 text-zinc-600">₹</span>
+    <input id="in-stale-rate" name="rate" x-model="mine" inputmode="decimal" autocomplete="off"
+           aria-describedby="in-stale-unit in-stale-msg"
+           class="w-full min-w-0 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+  </div>
+
+  <!-- what the form was rendered against, and what the server compares -->
+  <input type="hidden" name="rate_version" :value="version">
+
+  <p id="in-stale-msg" role="status" class="mt-1.5 text-[12px]/4 tabular-nums">
+    <span x-show="!stale" x-cloak class="text-zinc-500">
+      Editing the current version of PO-24-1187. Contracted floor is ₹52,400 per MT.
+    </span>
+
+    <span x-show="stale" class="flex flex-wrap items-start gap-x-3 gap-y-1">
+      <span class="flex items-start gap-1.5 text-zinc-600">
+        <i data-lucide="alert-triangle" aria-hidden="true" class="mt-0.5 size-3.5 shrink-0 text-amber-700"></i>
+        <span>Ritu Deshpande set this to ₹53,400 at 11:04, after this form was opened.</span>
+      </span>
+      <span class="flex shrink-0 items-center gap-3">
+        <button type="button" @click="take()"
+                class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Use ₹53,400</button>
+        <button type="button" @click="keep()"
+                class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Keep ₹52,900</button>
+      </span>
+    </span>
+  </p>
+</div>

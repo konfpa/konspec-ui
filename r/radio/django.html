@@ -52,7 +52,7 @@
 
   <fieldset>
     <legend class="mb-2 text-[13px]/5 font-medium">
-      {{ form.qc.label }}{% if form.qc.field.required %} <span class="text-red-600">*</span>{% endif %}
+      {{ form.qc.label }}{% if form.qc.field.required %} <span aria-hidden="true" class="text-red-600">*</span>{% endif %}
     </legend>
     <div class="space-y-2">
       {% for choice in form.qc %}

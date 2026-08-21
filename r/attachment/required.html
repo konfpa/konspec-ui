@@ -1,0 +1,80 @@
+<!-- The paperwork a record cannot be posted without, named one line at a time.
+     A drop zone on its own never says that this GRN wants a signed challan and
+     a mill test certificate. It says files may be attached, and the user learns
+     which two were expected from the error that comes back after they submit.
+
+     So every required document has a row whether or not the file exists, and
+     the list is a checklist rather than a log. The missing one carries an icon
+     and the word Missing beside the red: a row distinguished only by colour is
+     a row a good part of the plant cannot distinguish at all.
+
+     The submit is a real disabled attribute, because the reason is not a policy
+     the user can argue with — the file is not there. What makes that survivable
+     is the sentence next to it, which the button points at with
+     aria-describedby so it is read out with the button rather than found by
+     someone hunting around the footer.
+
+     Optional documents stay in the same list. A second panel for them makes the
+     reader work out which of the two is blocking; one list with two kinds of
+     row does not, and the paperclip against Optional says it without colour.
+
+     Every picker here is its own input with its own id, not one multiple input
+     serving three rows. A GRN needs to know which file is the test certificate,
+     and a single unnamed queue makes that a guess the server has to make. -->
+<div data-kui="attachment/required" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-200 px-4 py-2.5">
+    <h3 id="req-heading" class="text-[13px]/5 font-medium">Documents for GRN-1142</h3>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">1 of 2 required attached</span>
+  </div>
+
+  <ul aria-labelledby="req-heading" class="divide-y divide-zinc-100">
+    <li class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5">
+      <i data-lucide="check-circle-2" class="size-4 shrink-0 text-emerald-600"></i>
+      <div class="min-w-[12rem] flex-1">
+        <p class="text-[13px]/5 font-medium">Signed delivery challan</p>
+        <p class="truncate text-[12px]/4 tabular-nums text-zinc-500">challan-gp-77412.pdf · 310 KB · 04 Sep 2026</p>
+      </div>
+      <input type="file" id="req-challan" name="challan" class="peer sr-only">
+      <label for="req-challan"
+             class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px]/4 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+        Replace
+      </label>
+    </li>
+
+    <li class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5">
+      <i data-lucide="alert-circle" class="size-4 shrink-0 text-red-600"></i>
+      <div class="min-w-[12rem] flex-1">
+        <p class="text-[13px]/5 font-medium">Mill test certificate</p>
+        <p id="req-tc-why" class="text-[12px]/4 font-medium text-red-600">Missing — the GRN cannot be posted without it</p>
+      </div>
+      <input type="file" id="req-tc" name="test_certificate" required aria-describedby="req-tc-why" class="peer sr-only">
+      <label for="req-tc"
+             class="shrink-0 cursor-pointer rounded-lg border border-transparent bg-zinc-700 px-2.5 py-1 text-[12px]/4 font-medium text-white hover:bg-zinc-800 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/30">
+        Attach
+      </label>
+    </li>
+
+    <li class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5">
+      <i data-lucide="paperclip" class="size-4 shrink-0 text-zinc-400"></i>
+      <div class="min-w-[12rem] flex-1">
+        <p class="text-[13px]/5 font-medium">Weighbridge slip</p>
+        <p class="text-[12px]/4 text-zinc-500">Optional — attach it if the load was weighed at the gate</p>
+      </div>
+      <input type="file" id="req-wb" name="weighbridge_slip" class="peer sr-only">
+      <label for="req-wb"
+             class="shrink-0 cursor-pointer rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[12px]/4 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+        Attach
+      </label>
+    </li>
+  </ul>
+
+  <div class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-50 px-4 py-3">
+    <p id="req-post-why" class="min-w-[12rem] flex-1 text-[12px]/4 text-zinc-600">
+      Attach the mill test certificate to post this GRN.
+    </p>
+    <button type="button" disabled aria-describedby="req-post-why"
+            class="inline-flex h-9 shrink-0 items-center rounded-lg border border-zinc-300 bg-zinc-200 px-4 text-[13px]/5 font-medium text-zinc-400">
+      Post GRN
+    </button>
+  </div>
+</div>

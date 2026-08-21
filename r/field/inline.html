@@ -1,0 +1,123 @@
+<!-- The comfortable field costs about 90px of height. Eight order lines of it
+     is a screen and a half of scrolling to type sixteen numbers, so in a
+     line-items row the label moves to the column header, the control drops to
+     32px, and the reserved message line goes.
+
+     Losing the reserved line is the part that costs something, and it is not
+     the layout. A message that is only rendered when it exists is a message
+     aria-describedby has to be bound to — so the third row binds it, and the id
+     is dropped from the attribute rather than left pointing at a paragraph that
+     is display:none, which resolves to nothing and takes the whole description
+     with it. Reserve the line in a form; pay this price only in a table.
+
+     The header is aria-hidden and every control still carries a real <label
+     for>, sr-only from sm up. At 390px there is no header to borrow from, so
+     the labels come back and each row stacks into a small form of its own. An
+     aria-label on the input would have named the column and said nothing about
+     which line it belongs to; the item name in the first cell does that, and it
+     is read first because it comes first.
+
+     The inputs hold 2000 and the value reads ₹2,28,400. Digit grouping belongs
+     to a number being read — in a box somebody types into, the commas are
+     characters they have to delete and a parse the server has to undo.
+
+     The value is an <output>, not a disabled input — nobody was ever going to
+     edit it, and a greyed box says the opposite. It carries aria-live="off"
+     because an output is a live region by default and this one recomputes on
+     every keystroke in the two boxes beside it, which is a total announced
+     character by character while somebody is still typing the quantity. -->
+<div data-kui="field/inline" class="max-w-3xl">
+
+  <div aria-hidden="true" class="hidden px-3 pb-1.5 sm:grid sm:grid-cols-[minmax(0,1fr)_6rem_7rem_7rem] sm:gap-3">
+    <span class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Item</span>
+    <span class="text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Qty (kg)</span>
+    <span class="text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Rate</span>
+    <span class="text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Value</span>
+  </div>
+
+  <div class="divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+
+    <div class="grid gap-3 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_6rem_7rem_7rem] sm:items-start sm:gap-3">
+      <p class="text-[13px]/5 sm:pt-1.5">HDPE granules — natural, M60075</p>
+      <div>
+        <label for="fl-qty-1" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Quantity in kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="fl-qty-1" name="qty_1" value="2000" inputmode="numeric"
+                 class="w-full min-w-0 bg-transparent px-2.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-rate-1" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Rate per kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <span class="pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+          <input id="fl-rate-1" name="rate_1" value="114.20" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-value-1" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Line value</label>
+        <output id="fl-value-1" for="fl-qty-1 fl-rate-1" aria-live="off"
+                class="flex h-8 items-center justify-end text-[13px]/5 font-medium tabular-nums">₹2,28,400</output>
+      </div>
+    </div>
+
+    <div class="grid gap-3 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_6rem_7rem_7rem] sm:items-start sm:gap-3">
+      <p class="text-[13px]/5 sm:pt-1.5">LDPE granules — grade 24FS040</p>
+      <div>
+        <label for="fl-qty-2" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Quantity in kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="fl-qty-2" name="qty_2" value="500" inputmode="numeric"
+                 class="w-full min-w-0 bg-transparent px-2.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-rate-2" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Rate per kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <span class="pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+          <input id="fl-rate-2" name="rate_2" value="121.75" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-value-2" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Line value</label>
+        <output id="fl-value-2" for="fl-qty-2 fl-rate-2" aria-live="off"
+                class="flex h-8 items-center justify-end text-[13px]/5 font-medium tabular-nums">₹60,875</output>
+      </div>
+    </div>
+
+    <div class="grid gap-3 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_6rem_7rem_7rem] sm:items-start sm:gap-3"
+         x-data="{ qty: 2010, bag: 25, get bad() { return this.qty % this.bag !== 0 } }">
+      <p class="text-[13px]/5 sm:pt-1.5">HDPE granules — black, M60075B</p>
+      <div>
+        <label for="fl-qty-3" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Quantity in kg</label>
+        <div class="flex h-8 items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+             :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                         : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+          <input id="fl-qty-3" name="qty_3" inputmode="numeric" x-model.number="qty"
+                 :aria-invalid="bad ? 'true' : 'false'"
+                 :aria-describedby="bad ? 'fl-qty-3-msg' : null"
+                 class="w-full min-w-0 bg-transparent px-2.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+        <p id="fl-qty-3-msg" x-show="bad" x-cloak class="mt-1 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+          <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+          <span class="tabular-nums">Sold in 25 kg bags.</span>
+        </p>
+      </div>
+      <div>
+        <label for="fl-rate-3" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Rate per kg</label>
+        <div class="flex h-8 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <span class="pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+          <input id="fl-rate-3" name="rate_3" value="109.60" inputmode="decimal"
+                 class="w-full min-w-0 bg-transparent px-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+      <div>
+        <label for="fl-value-3" class="mb-1 block text-[12px]/4 text-zinc-600 sm:sr-only">Line value</label>
+        <output id="fl-value-3" for="fl-qty-3 fl-rate-3" aria-live="off"
+                class="flex h-8 items-center justify-end text-[13px]/5 font-medium tabular-nums"
+                x-text="'₹' + (qty * 109.6).toLocaleString('en-IN', { maximumFractionDigits: 0 })">₹2,20,296</output>
+      </div>
+    </div>
+
+  </div>
+</div>

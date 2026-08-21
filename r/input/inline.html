@@ -1,0 +1,111 @@
+<!-- The cells are fields all the time and they draw no border at rest.
+     Thirty rows of bordered boxes is a spreadsheet rendered inside a register,
+     and the border says nothing the column heading has not: hover is what
+     declares the cell editable, focus is what says the keyboard is in it.
+
+     The row itself takes no hover tint. A row tint under a cell tint is two
+     surfaces changing at once and neither of them says where the click lands —
+     and the row is not a link here, so there is nothing for a row hover to
+     promise. In a register whose rows do open, the fields go back to being
+     text and the edit moves to a form.
+
+     The cells keep 8px of padding because the halo is 3px at offset 2 and needs
+     five of them. A field flush against the clipped edge of the card loses the
+     outline on the side that touches it, and a register is exactly where a
+     control is most likely to be flush. table-fixed with a width on each number
+     column is what keeps the item cell truncating instead of the table growing
+     until the page scrolls sideways.
+
+     Escape puts back the value the cell held when focus arrived rather than
+     emptying it, and stops propagating so a register inside a sheet does not
+     lose the sheet with it. The commit is on the way out: in a real screen this
+     input carries hx-post with hx-trigger="change", which fires once, on blur,
+     and only if the value moved. Committing on input posts a rate of 5 on the
+     way to 52,900.
+
+     Every field is named by its row and its column together. Three fields
+     called Quantity are three fields with one name between them. -->
+<div data-kui="input/inline" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full table-fixed">
+    <thead class="bg-zinc-50">
+      <tr class="border-b border-zinc-200">
+        <th scope="col" class="px-3 py-2 text-left text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Item</th>
+        <th scope="col" class="w-20 px-2 py-2 text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Qty MT</th>
+        <th scope="col" class="w-24 px-2 py-2 text-right text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Rate ₹</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-100">
+      <tr>
+        <td class="px-3 py-1.5">
+          <p class="truncate text-[13px]/5 font-medium">HDPE-BLM-45</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">Blow moulding grade</p>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Quantity in MT, HDPE-BLM-45" value="12.500" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Rate per MT in rupees, HDPE-BLM-45" value="51,800" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-3 py-1.5">
+          <p class="truncate text-[13px]/5 font-medium">LLDPE-FLM-18</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">Film grade</p>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Quantity in MT, LLDPE-FLM-18" value="4.000" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Rate per MT in rupees, LLDPE-FLM-18" value="54,200" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-3 py-1.5">
+          <p class="truncate text-[13px]/5 font-medium">MB-WHT-207</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">White masterbatch</p>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Quantity in MT, MB-WHT-207" value="0.250" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+        <td class="px-2 py-1.5">
+          <div x-data="{ was: '' }" class="rounded-lg border border-transparent hover:border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input aria-label="Rate per MT in rupees, MB-WHT-207" value="1,64,000" inputmode="decimal"
+                   @focus="was = $el.value"
+                   @keydown.escape="$event.stopPropagation(); $el.value = was; $el.blur()"
+                   class="w-full min-w-0 bg-transparent px-2 py-1 text-right text-[13px]/5 tabular-nums outline-none">
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-3 py-2">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Three lines against PO-24-1187. A cell saves when it is left; Escape puts it back.</p>
+    <button type="button" class="inline-flex h-8 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Post the GRN</button>
+  </div>
+</div>
