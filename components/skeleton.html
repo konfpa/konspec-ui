@@ -149,6 +149,18 @@
         <div class="rounded-2xl border border-zinc-200">
           <div class="flex flex-wrap items-center gap-3 rounded-t-2xl border-b border-zinc-200 bg-white px-4 py-3">
             <span class="text-[14px]/5 font-semibold" x-text="v.name"></span>
+            <!-- NEW-TAG start · temporary. To retire the tag: delete the block between
+                 the NEW-TAG markers from every components/*.html, drop every
+                 `tagNew: true,` from assets/reg/*.js, and run node tools/build.js.
+                 The flag is tagNew rather than isNew because combobox already has an
+                 Alpine local called isNew inside its markup that a blunt regex would
+                 eat. Nothing else reads tagNew: build.js copies only id, name and code,
+                 so it never reaches registry.json, llms.txt or the /r endpoints, and
+                 removing it changes no generated file. -->
+            <template x-if="v.tagNew">
+              <span class="rounded-full bg-zinc-900 px-2 py-0.5 text-[11px]/4 font-medium uppercase tracking-wide text-white">New</span>
+            </template>
+            <!-- NEW-TAG end -->
             <code class="rounded-md bg-zinc-100 px-2 py-0.5 font-mono text-[11px]/4 text-zinc-600" x-text="v.id"></code>
             <div class="ml-auto flex items-center gap-1.5">
               <div class="flex rounded-lg bg-zinc-100 p-0.5">

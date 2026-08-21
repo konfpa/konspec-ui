@@ -215,7 +215,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'destructive', name: 'Three weights of destroy', code:
+      { id: 'destructive', name: 'Three weights of destroy', tagNew: true, code:
 `<!-- One verb, three weights, and the weight is set by what the click costs
      rather than by how the row looks. Solid red is the one action a screen
      exists to warn about and cannot be undone. Bordered red is the same act
@@ -246,7 +246,7 @@ register(
   </button>
 </div>` },
 
-      { id: 'confirm', name: 'Confirm in place', code:
+      { id: 'confirm', name: 'Confirm in place', tagNew: true, code:
 `<!-- The cheap half of alert-dialog. A dialog is right when the act is
      irreversible and there is something the user has to read first. For a line
      item that can be typed back in ten seconds it is more ceremony than the act
@@ -326,7 +326,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'toggle', name: 'Pressed', code:
+      { id: 'toggle', name: 'Pressed', tagNew: true, code:
 `<!-- A button that stays down. aria-pressed is the whole component: it lets one
      control carry two states without a second control beside it and without a
      label that changes meaning under the user.
@@ -375,7 +375,7 @@ register(
   </button>
 </div>` },
 
-      { id: 'async', name: 'Submitting to the server', code:
+      { id: 'async', name: 'Submitting to the server', tagNew: true, code:
 `<!-- The busy state when there is a real request behind it. The states variant
      fakes the wait with a timer because it has nothing to talk to; here htmx
      owns it, which means the spinner starts when the POST starts and stops when
@@ -432,7 +432,7 @@ register(
   </p>
 </form>` },
 
-      { id: 'unavailable', name: 'Off, and why', code:
+      { id: 'unavailable', name: 'Off, and why', tagNew: true, code:
 `<!-- Why the button is off, said where the user is already looking. A greyed
      button with no reason beside it is the most-reported fault in every
      internal application there has ever been, and the report is always the same
@@ -484,7 +484,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'upload', name: 'Opening the file picker', code:
+      { id: 'upload', name: 'Opening the file picker', tagNew: true, code:
 `<!-- A file picker is a <label> for a real <input type="file">, never a button
      that calls .click() on a hidden input. The label is what the browser itself
      wires to the picker; a button doing it by script loses the association the
@@ -923,7 +923,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'counts', name: 'Segmented control with counts', code:
+      { id: 'counts', name: 'Segmented control with counts', tagNew: true, code:
 `<!-- The count belongs inside the option and not beside it. "Overdue" and "6"
      are one fact, and a badge parked outside the pill is a second thing to
      click and a second thing to line up.
@@ -968,7 +968,7 @@ register(
   </template>
 </div>` },
 
-      { id: 'toggle-group', name: 'Filters that can be on at once', code:
+      { id: 'toggle-group', name: 'Filters that can be on at once', tagNew: true, code:
 `<!-- Not a radiogroup, and the difference is not cosmetic. Several of these are
      on at the same time, so there is no single value for a roving tabindex to
      follow: it is role="group" with aria-pressed on each member, Tab reaches
@@ -1020,7 +1020,7 @@ register(
      x-text="on.length ? total + ' receipts match' : 'No status filter — showing all 1,284 receipts'"></p>
 </div>` },
 
-      { id: 'sizes', name: 'Sizes', code:
+      { id: 'sizes', name: 'Sizes', tagNew: true, code:
 `<!-- Three, matched to the button scale: 28, 36 and 44px overall, so a group
      never sits two pixels out of line with the button beside it. The two
      shapes reach those numbers by different arithmetic, and this is the
@@ -1108,7 +1108,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'disabled', name: 'A member that is not available', code:
+      { id: 'disabled', name: 'A member that is not available', tagNew: true, code:
 `<!-- Two mechanisms, because the two shapes are two different controls.
 
      In the strip it is the real disabled attribute. The action cannot be
@@ -1177,7 +1177,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'stepper', name: 'Stepper', code:
+      { id: 'stepper', name: 'Stepper', tagNew: true, code:
 `<!-- Minus, a value, plus. It is one object rather than three controls sitting
      near each other, so it is a strip and takes the strip\'s border, dividers
      and inner radii.
@@ -1220,7 +1220,7 @@ register(
   </button>
 </div>` },
 
-      { id: 'row-actions', name: 'Compact actions in a table row', code:
+      { id: 'row-actions', name: 'Compact actions in a table row', tagNew: true, code:
 `<!-- h-7, because a 36px strip in a 40px row leaves two pixels above and below
      it and the register stops reading as a table. Small is the one size that
      is a density decision rather than an importance one, and a row is where
@@ -1293,7 +1293,7 @@ register(
   </table>
 </div>` },
 
-      { id: 'htmx', name: 'Server-driven filter group', code:
+      { id: 'htmx', name: 'Server-driven filter group', tagNew: true, code:
 `<!-- The chosen scope is server state, so the server has to be the thing that
      draws the chosen pill. That is why the target is the whole panel and not
      just the rows: swap only the table and the group keeps showing whatever it
@@ -2559,7 +2559,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'split', name: 'Split button trigger', code:
+      { id: 'split', name: 'Split button trigger', tagNew: true, code:
 `<!-- One control, two halves, and the split is the point: the left half does the
      thing 90% of the time and never opens anything, so the common path is one
      click rather than a click, a read and a second click. Fold it into a plain
@@ -2651,7 +2651,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'descriptions', name: 'Items with descriptions', code:
+      { id: 'descriptions', name: 'Items with descriptions', tagNew: true, code:
 `<!-- Four items whose labels do not distinguish them. Release, Refresh and
      Reopen all mean something specific to a production order and something
      different to whoever last used a different ERP, so the consequence goes on
@@ -2749,7 +2749,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'scrolling', name: 'Long list, capped and scrolled', code:
+      { id: 'scrolling', name: 'Long list, capped and scrolled', tagNew: true, code:
 `<!-- Seven items is the ceiling for a menu you wrote. This is the exception,
      and the exception is narrow: a list the user generates and then keeps. Two
      shared views ship with the register and everything under My views is
@@ -2880,7 +2880,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'context-menu', name: 'Right-click on a row', code:
+      { id: 'context-menu', name: 'Right-click on a row', tagNew: true, code:
 `<!-- A right-click menu is an accelerator over actions that are also on a
      button, exactly as the command palette is an accelerator over navigation.
      There is no right-click on a touch screen and no keyboard gesture for it
@@ -3026,7 +3026,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'responsive', name: 'Sheet below sm', code:
+      { id: 'responsive', name: 'Sheet below sm', tagNew: true, code:
 `<!-- The same menu, twice. At sm and up it is a 224px panel hanging off an icon
      in the last column of a register. Below sm that panel opens under the thumb
      that pressed it, with half of it off the right edge, so the shape changes
@@ -3138,7 +3138,7 @@ register(
   </div>
 </div>` },
 
-      { id: 'htmx', name: 'Fetched on first open', code:
+      { id: 'htmx', name: 'Fetched on first open', tagNew: true, code:
 `<!-- Who a purchase order can be assigned to depends on the plant, the approval
      limit and who is on leave this week, so the list is not in the template. It
      is fetched, and the two words that matter in hx-trigger are "click once":
