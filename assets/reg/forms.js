@@ -3835,14 +3835,16 @@ register(
                  code__iexact=request.GET.get("item_code", "").strip()).first()
              return render(request, "orders/_item_info.html", {"item": item})
 
-     orders/_item_info.html, which is the whole response:
-         {% if item %}
+     orders/_item_info.html, which is the whole response. The tags are written
+     here without their braces, because Django compiles a tag inside an HTML
+     comment and this snippet would not paste:
+         if item
            <span id="igh-info" data-ok="1" class="text-[13px]/5 tabular-nums
                  text-zinc-500">{{ item.uom }} · {{ item.free_stock }} in stock</span>
-         {% else %}
+         else
            <span id="igh-info" data-ok="0" class="text-[13px]/5 tabular-nums
                  text-zinc-500">No such code</span>
-         {% endif %} -->
+         endif -->
 <div data-kui="input-group/htmx" class="max-w-xl"
      x-data="{ loading: false, bad: false }"
      @htmx:before-request.camel="loading = true"
@@ -6184,7 +6186,11 @@ Gujarat Polymers Ltd</textarea>
       'A parent box over a subtree is the select-all rule one level down: no name, no value, and the leaves are what post. It also fixes what a ticked parent means — the children that exist now, not a standing subscription to the group, so an item added under it in October does not quietly join a report somebody set up in August. If the intent is everything under here for ever, that is a value of its own with a name on it.',
       'disabled on a fieldset locks every control inside it with one attribute, which is what keeps it from falling out of step with a list somebody adds a line to. It also disables every listed element in there, <input type="hidden"> included, so a value that must still reach the server sits outside the fieldset — inside it, it stops posting and nothing on the form says so. The exception is the first legend, whose controls stay live; an action parked there is the one thing on a frozen form that still works.',
       'A long list of flags goes in columns-2, never grid-cols-2. Multi-column fills the first column to the bottom before starting the second, so the order the eye takes down the page and the order Tab takes are the same list; a grid lays the same DOM across the rows, and from the second item on the two disagree. Each label takes break-inside-avoid, or a column boundary is allowed to fall between a box and its text.',
-      'A box in a grid cell has no name of its own. Row and column headers are announced when a screen reader walks a table and not when it tabs through the controls in one, which is how anybody filling in a permission matrix moves, so every cell carries an aria-label naming both axes. Three or four role columns is the ceiling: each one costs the width of its heading and the row label pays, so a fifth role is a second matrix rather than a sideways scroll.',
+      'A box in a grid cell has no name of its own. Row and column headers are announced when a screen reader walks a table and not when it tabs through the controls in one, which is how anybody filling in a permission matrix moves, so every cell carries an aria-label naming both axes. That rule holds at every width and neither matrix variant is allowed to trade it away.',
+      'The line between matrix and wide-matrix is whether the grid fits. Up to three or four columns it does: the whole thing is on screen at every width, Tab walks it left to right in the order the eye reads it, and nothing is off screen when focus lands on it — that is matrix, and it costs nothing. Past that, every role column costs the width of its heading and the capability column is the one that pays, so the grid has to scroll sideways to stay legible. That is wide-matrix, and the price is a two-axis sticky: border-separate, an opaque fill on both sticky planes, group-hover put back on every frozen cell, a z-20 corner, and a scroller a keyboard user has to be let into. Real cost, paid deliberately. Splitting six roles into two matrices by module is not the escape it looks like — it puts one role\'s full picture in two places, which is the one thing a permissions screen must not do.',
+      'A role column the current user may not grant stays on the grid, locked, rather than being dropped. You cannot hand out a permission you do not hold, but a grid missing that column reads as the role having no permissions when it in fact has more than the person reading. The reason goes in the column heading, which is the one thing announced alongside the cell it governs, and in every cell\'s aria-label; two kinds of disabled box can sit on one grid — comes with the role, and locked to you — and grey says neither of them.',
+      'A permission form has to name the columns it is authoritative for, in a hidden field. Disabled posts nothing and absence is indistinguishable from unticked, so a server that diffs the POST against all six roles lets an admin holding five of them strip the sixth by pressing Save.',
+      'A six-column matrix on a phone is one role at a time behind a select, not a smaller grid and not one capability across the roles. Capability-first is the audit question — who may approve over ₹7,50,000 — which is read rather than edited; editing is role-first, because what somebody has to see before saving is everything one role may do, in one list. The phone arrangement is a separate variant and never a media query on the wide one: two renderings in one DOM post every permission twice, and where they disagree the save is a coin toss.',
       'A box that writes on change is a record of work done, not a setting — a setting that takes effect the moment it is touched is a toggle. Give every row its own request state: one flag on the list means two boxes ticked a second apart share a status line, and the second answer overwrites the first. Do not disable the box while its own request is in flight either; disabling the focused element drops focus to the body and loses a keyboard user their place in the list. hx-sync="this:replace" is what keeps two writes in order.'
     ],
     anatomy: [
@@ -6197,6 +6203,8 @@ Gujarat Polymers Ltd</textarea>
       ['Bulk bar', 'The strip above the rows once something is selected: how many, what will happen to them, and the way back out.'],
       ['Parent box', 'A box over a subtree with its children indented to pl-[26px] below it. Same rules as the select-all — no name, no value, indeterminate written by script.'],
       ['Matrix cell', 'A box in a table cell, named by an aria-label carrying its row and its column, because the cell gives it neither.'],
+      ['Frozen capability column', 'Past three or four roles, the row header sticks left with an opaque fill of its own, and takes group-hover so the row band does not stop where the name starts. The corner cell above it is sticky on both axes at z-20.'],
+      ['Locked column', 'A role the current user may not grant: still on the grid, tinted bg-zinc-50, every box disabled, the reason in the heading and in each box\'s name. Its counterpart is the hidden scope field naming the columns the form does save.'],
       ['Row status', 'The 12px line under a box that writes on change: when it was recorded, or that it is saving, saved, or not saved and why. role="status", one per row.']
     ],
     behaviour: [
@@ -6206,7 +6214,9 @@ Gujarat Polymers Ltd</textarea>
       'The selection is an array of record ids on the component root, so the count, the row tint and the bulk bar cannot drift apart, and re-sorting the rows does not lose it.',
       'The bulk bar appears only once something is selected, names the number it will act on, and is x-cloaked so it is not on screen for the first frame.',
       'A group posts its name once for every ticked box and not at all when none are ticked. The difference between "none of them" and "the field was never on this form" comes from the form definition on the server, never from the request.',
-      'A disabled option keeps its place in the list rather than disappearing, so a policy locking one does not change the shape of a set people have learned to scan.',
+      'A disabled option keeps its place in the list rather than disappearing, so a policy locking one does not change the shape of a set people have learned to scan. A whole locked column follows the same rule for a stronger reason: dropping it changes what the grid says about that role.',
+      'A wide matrix scrolls in both axes inside its own box, and the page behind it never moves sideways at any width. The head stays while the capabilities scroll and the capability column stays while the roles are panned; the row hover band is what carries the eye across, so it is painted back onto the frozen cell with group-hover rather than being allowed to stop at the fill.',
+      'Switching the role on the phone arrangement reloads the pane, so anything ticked and not saved goes with it. The switch is held until the form is saved and the reason is text beside the control, not a tooltip on it.',
       'A box that gates a submit disables the button in the markup and binds it as well. The binding on its own leaves the button live from first paint until Alpine boots, which is long enough for somebody who runs the screen forty times a day to press it.',
       'A tick that writes on change paints first and reconciles after: the box has already moved when the request leaves, and a failure puts it back and says so beside the box it belongs to. The outcome stays on the row rather than going into a toast, because it is a fact about the record and the row is where anyone will look for it.'
     ],
@@ -6218,6 +6228,8 @@ Gujarat Polymers Ltd</textarea>
       'Disabled uses the disabled attribute, which drops the box out of the Tab order and out of the POST. There is no read-only checkbox — readonly does nothing on one — so a value that must not change is rendered as text, and one that must still be submitted gets a hidden input beside it.',
       'The selected count is plain text and not a live region. The box announces its own state on every toggle already; a live count makes that two announcements per keystroke and a stream of them on a shift-click.',
       'An error is real text under the group, referenced with aria-describedby, and a required single box carries both required and aria-invalid. A red asterisk on its own is decoration.',
+      'The scroller a wide matrix lives in takes tabindex="0", role="region" and a name. Chromium will not focus an overflow container, so without the tabindex a keyboard user reaches every box in the grid and cannot move it one pixel to see which column they are standing in. It also takes relative, or an sr-only caption inside it escapes the clip and widens the whole page.',
+      'On the phone arrangement the boxes carry no aria-label and do not need one: each has visible words of its own — the capability — and the role axis is the fieldset legend, announced on the way in. aria-label belongs to a box a table cell has left nameless.',
       'The visible words beside a box are part of its accessible name, so an aria-label that does not contain them breaks voice control, which matches on what is on screen. A select-all with the words "All 5 lines" next to it is named by them; aria-label belongs to the box that has no visible text at all — the one in a table header, and the one in a matrix cell.',
       'The reason a submit is off is text under the button, never a tooltip on it. A disabled control fires no pointer events and takes no focus, so the tooltip never opens, a title reaches nobody and an aria-describedby on it is never read.'
     ],
@@ -6895,10 +6907,16 @@ Gujarat Polymers Ltd</textarea>
      — so every box carries an aria-label saying both axes: "Approve over
      ₹5,00,000 — Approver". Without it eighteen boxes announce as "checkbox".
 
-     Three columns is the ceiling. Every role column costs the width of its
-     heading, and the permission column is the one that pays: past three or four
-     the row label wraps to four lines on a phone. A fourth role is a second
-     matrix on the page, not a sideways scroll.
+     Three columns, and the reason to stop there is not width for its own sake.
+     A grid this size is entirely on screen at every width, so Tab walks it left
+     to right in the order the eye reads it, nothing moves under the cursor, and
+     no box is off screen when focus lands on it. Every role column costs the
+     width of its heading and the permission column is the one that pays, so past
+     three or four the row label wraps to four lines on a phone and the grid has
+     to scroll sideways to be legible at all. That is wide-matrix, and it pays
+     for six columns with a two-axis sticky, a frozen first column and a scroller
+     a keyboard user has to be let into. Take this variant wherever three columns
+     is the honest shape of the screen; take that one where it is not.
 
      There is no row tint here, and no has-[:checked] on the tr. A matrix row is
      not a selected row — it holds three separate answers, and painting the row
@@ -7001,6 +7019,295 @@ Gujarat Polymers Ltd</textarea>
   <p class="border-t border-zinc-200 px-3 py-2.5 text-[12px]/4 tabular-nums text-zinc-500 sm:px-4">
     Viewing the register comes with the role and is set on the role, not here. Orders over ₹20,00,000 go to the plant head whatever this grid says.
   </p>
+</div>` },
+
+      { id: 'wide-matrix', name: 'Six roles, both axes pinned', tagNew: true, code:
+`<!-- Six roles is what a deployment has, and matrix cannot draw it: matrix stops
+     at three because a grid that size is on screen whole and Tab walks it in
+     reading order. Six columns has to scroll, and everything below is what
+     scrolling costs. The alternative — two matrices split by module — puts one
+     role's full picture in two places, which is the question the screen exists
+     to answer.
+
+     border-separate border-spacing-0 first. Preflight collapses borders onto the
+     table, and a collapsed border belongs to the table rather than the cell, so
+     it stays behind when the cell travels: the head floats over the rows with no
+     rule under it and the capability column slides across the boxes with no edge
+     to stop at. The price is every rule moving onto the cells — 48 <td>s with
+     border-b instead of 8 <tr>s carrying it once.
+
+     Every sticky cell needs an opaque fill or the boxes scroll through it, and an
+     opaque cell stops taking the row hover, so the tint goes back with
+     group-hover — without it a hovered row lights six columns and leaves the
+     capability white, which reads as the row ending where its name starts. One
+     corner cell, z-20 against z-10 on the two axes; no sticky foot here, so no
+     second corner. Without the z-20 it is painted over from one side or the
+     other, which is where a two-axis sticky ships broken: it looks right until
+     somebody scrolls right and down at once.
+
+     tabindex="0" with role="region" and a name on the scroller, because Chromium
+     will not focus an overflow container — otherwise a keyboard user reaches all
+     48 boxes and cannot move the grid one pixel to see which column they are in.
+     And relative on the scroller, or the sr-only caption escapes the clip and
+     widens the entire page.
+
+     None of it costs the aria-labels. A cell gives its box neither axis, and
+     headers are announced when a screen reader walks a table and not when it
+     tabs the controls in one, so every box still names both.
+
+     Plant head is a role this user may not grant, and the column stays, locked,
+     rather than being dropped: a grid without it reads as the plant head having
+     no permissions when they in fact have more than the person reading. The
+     reason is in the heading and in every cell's name, because two kinds of
+     disabled box sit here for two reasons and grey says neither. Disabled posts
+     nothing, so the form names the columns it is authoritative for, or a server
+     diffing against all six lets an admin holding five strip the sixth on Save.
+
+     390px is wide-matrix-phone, an arrangement and not a media query, and the
+     two must never render together — see the comment there. -->
+<form data-kui="checkbox/wide-matrix" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="wm-h" class="text-[13px]/5 font-semibold">What each role may do with purchase orders</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 roles · 8 capabilities · Silvassa and Vapi</p>
+  </div>
+
+  <div role="region" aria-labelledby="wm-h" tabindex="0"
+       class="relative max-h-[24rem] overflow-auto overscroll-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <table class="w-full min-w-[56rem] table-fixed border-separate border-spacing-0 text-[13px]/5">
+      <caption class="sr-only">What each of six roles may do with purchase orders. Capabilities down the rows, roles across the columns. The Plant head column is locked because you do not hold that role.</caption>
+      <thead>
+        <tr>
+          <th scope="col" class="sticky top-0 left-0 z-20 w-56 border-r border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Capability</th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Buyer</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">7 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Approver</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">4 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Stores</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">11 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Quality</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">6 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Finance</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">5 users</span>
+          </th>
+          <!-- the reason this column cannot be edited goes in the heading, which
+               is the one thing announced with the cell it governs -->
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-l border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Plant head</span>
+            <span class="mt-0.5 flex items-center justify-center gap-1 text-[11px]/4 font-normal text-zinc-500">
+              <i data-lucide="lock" class="size-3.5 shrink-0"></i>You cannot grant this
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="[&>tr:last-child>th]:border-b-0 [&>tr:last-child>td]:border-b-0">
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal text-zinc-600 group-hover:bg-zinc-100">View the register</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Buyer, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Approver, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Stores, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Quality, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Finance, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="View the register — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Raise an order</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:buyer" checked aria-label="Raise an order — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:approver" aria-label="Raise an order — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:stores" aria-label="Raise an order — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:quality" aria-label="Raise an order — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:finance" aria-label="Raise an order — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Raise an order — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal tabular-nums group-hover:bg-zinc-100">Approve to ₹7,50,000</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:buyer" aria-label="Approve to ₹7,50,000 — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:approver" checked aria-label="Approve to ₹7,50,000 — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:stores" aria-label="Approve to ₹7,50,000 — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:quality" aria-label="Approve to ₹7,50,000 — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:finance" aria-label="Approve to ₹7,50,000 — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Approve to ₹7,50,000 — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal tabular-nums group-hover:bg-zinc-100">Approve over ₹7,50,000</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:buyer" aria-label="Approve over ₹7,50,000 — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:approver" aria-label="Approve over ₹7,50,000 — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:stores" aria-label="Approve over ₹7,50,000 — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:quality" aria-label="Approve over ₹7,50,000 — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:finance" aria-label="Approve over ₹7,50,000 — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Approve over ₹7,50,000 — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Amend an approved order</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:buyer" checked aria-label="Amend an approved order — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:approver" checked aria-label="Amend an approved order — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:stores" aria-label="Amend an approved order — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:quality" aria-label="Amend an approved order — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:finance" aria-label="Amend an approved order — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Amend an approved order — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Post a GRN</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:buyer" aria-label="Post a GRN — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:approver" aria-label="Post a GRN — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:stores" checked aria-label="Post a GRN — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:quality" aria-label="Post a GRN — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:finance" aria-label="Post a GRN — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Post a GRN — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Record a QC result</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:buyer" aria-label="Record a QC result — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:approver" aria-label="Record a QC result — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:stores" aria-label="Record a QC result — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:quality" checked aria-label="Record a QC result — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:finance" aria-label="Record a QC result — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Record a QC result — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Match the invoice against the GRN</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:buyer" aria-label="Match the invoice against the GRN — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:approver" aria-label="Match the invoice against the GRN — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:stores" aria-label="Match the invoice against the GRN — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:quality" aria-label="Match the invoice against the GRN — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:finance" checked aria-label="Match the invoice against the GRN — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Match the invoice against the GRN — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- the columns this form is authoritative for. Without it a server diffing
+       the POST against all six roles revokes everything the locked column holds,
+       because a disabled box posts nothing and absence is indistinguishable from
+       unticked. -->
+  <input type="hidden" name="scope" value="buyer,approver,stores,quality,finance">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">
+      5 of the 6 columns are saved from here. Plant head is shown because a grid that dropped it would read as the plant head having no permissions; it is changed by someone who holds that role.
+    </p>
+  </div>
+</form>` },
+
+      { id: 'wide-matrix-phone', name: 'One role at a time on a phone', tagNew: true, code:
+`<!-- Six columns cannot be a matrix at 390px. Frozen or not, a role column is
+     down to fifty pixels and the capability names wrap to four lines each, and
+     panning a grid with one thumb while the other hand holds the phone is not a
+     way anybody fills in a permissions screen.
+
+     One role at a time, picked by a select. The alternative was one capability
+     at a time across the six roles, and it was rejected because it answers the
+     wrong question: capability-first is the audit question — who may approve
+     over ₹7,50,000 — which is read, not edited, and is better served by the
+     grid or a report. Editing is role-first. Somebody is setting up a role or
+     handing one to a new joiner, and what they have to see before they save is
+     everything that role may do, in one list, without paging through eight
+     capabilities to assemble it. It is also six screens rather than eight.
+
+     A separate variant and not a media query on wide-matrix. Both renderings in
+     one DOM with one of them display:none posts every permission twice, because
+     a display:none checkbox still submits — and here the two copies can disagree,
+     so the save is a coin toss. The server renders one arrangement or the other.
+
+     Two forms, side by side, because a form cannot nest. The picker is a GET
+     that reloads with the chosen role; the permissions are a POST. Which leaves
+     a real hole: switching the select throws away ticks that were never saved.
+     The picker's button is bound to a dirty flag and the reason is text under
+     it, never a tooltip — a disabled control takes no focus and fires no pointer
+     events, so a tooltip on one opens for nobody.
+
+     Nothing here carries an aria-label. Each box has visible words of its own —
+     the capability — and the role axis is the legend on the fieldset, which is
+     announced on the way in. That is what a fieldset is for; the aria-labels in
+     the grid exist only because a table cell gives its box neither axis. -->
+<div data-kui="checkbox/wide-matrix-phone" class="max-w-md rounded-xl border border-zinc-300 bg-white"
+     x-data="{ dirty: false }">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-semibold">Role permissions</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 roles · 8 capabilities · one role on screen at a time</p>
+  </div>
+
+  <form method="get" class="flex items-end gap-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0 flex-1">
+      <label for="wmp-role" class="block text-[12px]/4 font-medium text-zinc-600">Role</label>
+      <!-- the locked role stays in the list, with the reason in the words. A
+           disabled <option> is silently unreachable and says nothing about why. -->
+      <select id="wmp-role" name="role"
+              class="mt-1 h-9 w-full rounded-lg border border-zinc-300 bg-white px-2.5 text-[14px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option value="buyer">Buyer</option>
+        <option value="approver" selected>Approver</option>
+        <option value="stores">Stores</option>
+        <option value="quality">Quality</option>
+        <option value="finance">Finance</option>
+        <option value="plant_head">Plant head — you cannot edit this one</option>
+      </select>
+    </div>
+    <button type="submit" :disabled="dirty"
+            class="h-9 shrink-0 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400">Show</button>
+  </form>
+
+  <p x-show="dirty" x-cloak class="border-b border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 text-zinc-600">
+    Approver has changes that are not saved. Save them before switching roles — the switch reloads this pane and they go with it.
+  </p>
+
+  <form method="post" class="px-4 py-3">
+    <!-- the one role this POST is authoritative for, the phone counterpart of
+         the scope field on wide-matrix -->
+    <input type="hidden" name="role" value="approver">
+
+    <fieldset>
+      <legend class="mb-2 text-[13px]/5 font-medium">Approver — what this role may do with purchase orders</legend>
+
+      <div class="-mx-4 divide-y divide-zinc-100 border-y border-zinc-100">
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 text-zinc-500">
+          <input type="checkbox" checked disabled class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">View the register</span>
+          <span class="shrink-0 text-[12px]/4 text-zinc-500">With the role</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="raise:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Raise an order</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="approve_750:approver" checked @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 tabular-nums">Approve to ₹7,50,000</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="approve_over:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 tabular-nums">Approve over ₹7,50,000</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="amend:approver" checked @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Amend an approved order</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="grn:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Post a GRN</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="qc:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Record a QC result</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="match:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Match the invoice against the GRN</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="mt-3 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save Approver</button>
+    <p class="mt-2 text-[12px]/4 text-zinc-500">Saves this role only. The other five are unchanged by this form.</p>
+  </form>
 </div>` },
 
       { id: 'states', name: 'Disabled, locked and invalid', code:
@@ -12074,7 +12381,7 @@ Gujarat Polymers Ltd</textarea>
      three names or the POST does not clear the file. Its ids are Django's own:
      id_attachment for the input, attachment-clear_id for the checkbox.
 
-     {% if form.attachment.value %} … {% endif %} guards the first two.
+     An if form.attachment.value guard wraps the first two.
 
      enctype="multipart/form-data" is on the <form> here rather than in a note
      under it. It used to be a red line rendered on the page, which is a message

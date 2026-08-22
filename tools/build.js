@@ -44,6 +44,11 @@ const json = {
     acc[s.s.toLowerCase()] = { pill: s.pill, dot: s.dot, meaning: s.why };
     return acc;
   }, {}),
+  status_meanings: {
+    note: S.statusMeanings.d,
+    dots: S.statusMeanings.map.reduce((acc, [dot, means]) => { acc[dot] = means; return acc; }, {}),
+    verdicts: S.statusMeanings.note
+  },
   typography: {
     families: { sans: 'Inter', mono: 'JetBrains Mono' },
     hosting: 'self-hosted, assets/fonts.css — no font CDN at runtime',
@@ -266,6 +271,14 @@ P('| status | pill | dot | meaning |');
 P('|---|---|---|---|');
 S.status.forEach(s => P('| ' + s.s + ' | `' + s.pill + '` | `' + s.dot + '` | ' + s.why + ' |'));
 P('');
+P(S.statusMeanings.d);
+P('');
+P('| dot | what it means |');
+P('|---|---|');
+S.statusMeanings.map.forEach(([dot, means]) => P('| `' + dot + '` | ' + means + ' |'));
+P('');
+P(S.statusMeanings.note);
+P('');
 
 P('## Components');
 P('');
@@ -456,7 +469,16 @@ for (const c of R.components) for (const v of c.variants) {
                             sidebar link, a strip member whose corners are
                             shared with its wrapper. Steps once off the band it
                             crosses: zinc-100 in a white panel, zinc-200 on the
-                            page. */
+                            page.
+
+   One exception, and it is the reason this lint was widened. A selectable tile
+   — an option card, an answer tile, a radio band — marks SELECTED with the
+   tinted-shape token has-[:checked]:bg-zinc-200. Hover cannot also be zinc-200
+   there, because hovering an unselected tile would then be indistinguishable
+   from a selected one, which is a worse defect than a soft hover. Those tiles
+   take zinc-50 from white, and they scope the hover to :not(:has(:checked)) so
+   it cannot fight the selected fill. Detected here rather than exempted by
+   hand, so a tile that does NOT mark selection still has to obey the model. */
 const STEP = { 'bg-white': 'bg-zinc-100', 'bg-zinc-50': 'bg-zinc-100',
                'bg-zinc-100': 'bg-zinc-200', 'bg-zinc-200': 'bg-zinc-300',
                'bg-zinc-300': 'bg-zinc-400', 'bg-zinc-700': 'bg-zinc-800',
@@ -486,18 +508,29 @@ for (const c of R.components) for (const v of c.variants) {
     if (close) { stack.pop(); ctx.pop(); continue; }
     const cls = (attrs.match(/(?<![:\w-])class="([^"]*)"/) || [])[1] || '';
     const resting = (cls.match(/(?:^|\s)(bg-(?:white|zinc-\d+|red-\d+))(?:\s|$)/) || [])[1] || null;
-    const hov = (cls.match(/(?:^|\s)(?:enabled:)?hover:(bg-(?:white|zinc-\d+|red-\d+))/) || [])[1];
+    /* the boundary is whitespace OR a colon: a hover written inside an arbitrary
+       variant — [&:not(:has(:checked))]:hover:bg-zinc-50 — is still a hover, and
+       for a long time this lint could not see one. group-hover: and peer-hover:
+       stay excluded, because the character before hover: there is a hyphen. */
+    const hov = (cls.match(/(?:^|\s|:)(?:enabled:)?hover:(bg-(?:white|zinc-\d+|red-\d+))/) || [])[1];
     const surface = [...stack].reverse().find(Boolean) || 'bg-zinc-100';
     /* rounded on one side only means the other corners belong to a wrapper */
     const partial = /\brounded-[lrtbse]-/.test(cls) || /\brounded-[lrtb][lrtb]-/.test(cls);
     const isShape = /\brounded-/.test(cls) && !partial && !/\bw-full\b/.test(cls)
                     && !/^(tr|li)$/i.test(tag) && !ctx.some(Boolean);
+    /* the fill this element uses to mean SELECTED is spoken for — see the note above */
+    const selectedFill = (cls.match(/:checked\]:(bg-(?:white|zinc-\d+))/) || [])[1] || null;
     if (hov) {
       const id = c.id + '/' + v.id;
       if (hov === surface)
         hoverProblems.push(id + ': hover:' + hov + ' is the fill behind it — the control dissolves');
       else {
-        const want = wantHover(surface, resting, isShape);
+        let want = wantHover(surface, resting, isShape);
+        /* Hover has to differ from the resting fill AND from the selected fill, or
+           hovering an unselected tile looks exactly like a selected one. Off white,
+           that leaves zinc-50 — which is why every selectable tile and band in the
+           library reaches for it, and why this lint used to disagree with all of them. */
+        if (selectedFill && (resting || surface) === 'bg-white') want = 'bg-zinc-50';
         if (want && want !== hov)
           hoverProblems.push(id + ': ' + (isShape ? 'shape' : 'row') + ' on ' + surface +
                              ' resting ' + (resting || 'none') + ' hovers to ' + hov +
@@ -537,6 +570,96 @@ if (focusProblems.length) {
   console.error('FOCUS LINT failed:');
   [...new Set(focusProblems)].forEach(f => console.error('  ' + f));
   process.exit(1);
+}
+
+/* ── template lint ─────────────────────────────────────────────────────────
+   Django does not know what an HTML comment is. It compiles the whole file, so
+   a template tag written as prose inside <!-- --> executes: {% comment %} opens
+   a real block and swallows the template to the next {% endcomment %}, a bare
+   {% if %} raises Unclosed tag, {% empty %} outside a for raises Invalid block
+   tag, {% extends %} silently reparents, {% include %} tries to resolve. Nine
+   entries shipped with the first of those, and the worst of them was the
+   preamble WARNING about the {# #} trap, which mentioned {% comment %} in
+   prose. Name tags in words inside a comment, or write them without braces.
+
+   Also here: a filter that needs a {% load %} in the same fragment, because a
+   template is compiled per file and a load in a base or a sibling does nothing;
+   a multi-line {# #}, which is not a comment at all since tag_re has no DOTALL;
+   and a focus trap that renders open, which traps the whole component gallery
+   page and makes every other variant on it unreachable. */
+const LIVE_OK = /^(load|csrf_token|url|static|now|spaceless|endspaceless)\b/;
+const NEEDS_LOAD = { humanize: ['intcomma','naturaltime','naturalday','intword','ordinal','apnumber'],
+                     money: ['rupees'], ui: ['status_dot'] };
+const tplProblems = [];
+for (const c of R.components) for (const v of c.variants) {
+  const id = c.id + '/' + v.id;
+  for (const m of v.code.matchAll(/<!--[\s\S]*?-->/g))
+    for (const t of m[0].matchAll(/\{%\s*([a-z_]+)[^%]*%\}/g))
+      if (!LIVE_OK.test(t[1]))
+        tplProblems.push(id + ': ' + t[0].trim() + ' written as prose inside an HTML comment — Django executes it');
+  for (const m of v.code.matchAll(/\{#(?![^#]*#\})[\s\S]{0,400}?#\}/g))
+    if (m[0].includes('\n'))
+      tplProblems.push(id + ': multi-line {# #} — tag_re has no DOTALL, so only the first line is a comment');
+  for (const [lib, filters] of Object.entries(NEEDS_LOAD))
+    for (const f of filters)
+      if (new RegExp('\\|\\s*' + f + '\\b').test(v.code) &&
+          !new RegExp('\\{%\\s*load\\b[^%]*\\b' + lib + '\\b').test(v.code))
+        tplProblems.push(id + ': uses |' + f + ' with no {% load ' + lib + ' %} in the same fragment');
+  for (const m of v.code.matchAll(/x-trap[.\w]*="([a-zA-Z_$][\w]*)"/g))
+    if (new RegExp(m[1] + '\\s*:\\s*true').test(v.code))
+      tplProblems.push(id + ': x-trap on "' + m[1] + '" is initialised true — it traps the whole gallery page');
+}
+/* ── sr-only escape lint ───────────────────────────────────────────────────
+   sr-only is position:absolute. With no positioned ancestor it resolves against
+   the document, escapes whatever was clipping it, and stretches the PAGE — a
+   390px overflow whose cause is invisible, because the element doing it cannot
+   be seen. It has now done this in popover (390 to 510), board (390 to 1129),
+   compare-page (390 to 823) and table/sticky-both. The fix is `relative` on the
+   scroller. So: between an sr-only element and its nearest clipping ancestor
+   there must be something positioned. */
+/* Only a HORIZONTAL scroller can do the damage. sr-only is a 1px box, so it
+   never widens anything by itself — what widens the page is its static
+   POSITION: deep inside content wider than the viewport, resolved against the
+   document instead of against the scroller. A plain overflow-hidden card is
+   never wider than itself, so nothing escapes it. */
+const CLIP = /\boverflow-x-(?:auto|scroll)\b|\boverflow-(?:auto|scroll)\b/;
+const POS  = /\b(?:relative|absolute|fixed|sticky)\b/;
+const srProblems = [];
+for (const c of R.components) for (const v of c.variants) {
+  const src = v.code.replace(/<!--[\s\S]*?-->/g, '');
+  const stack = [];
+  const re = /<(\/?)([a-z0-9-]+)((?:"[^"]*"|'[^']*'|[^>'"])*?)(\/?)>/gi;
+  let m;
+  while ((m = re.exec(src))) {
+    const [, close, tag, attrs, self] = m;
+    if (close) { stack.pop(); continue; }
+    const cls = (attrs.match(/(?<![:\w-])class="([^"]*)"/) || [])[1] || '';
+    const node = { clip: CLIP.test(cls), pos: POS.test(cls) };
+    if (/\bsr-only\b/.test(cls)) {
+      /* walk out to the nearest clipping ancestor, looking for anything positioned */
+      let positioned = node.pos;
+      for (let i = stack.length - 1; i >= 0; i--) {
+        if (stack[i].pos) positioned = true;
+        if (stack[i].clip) {
+          if (!positioned)
+            srProblems.push(c.id + '/' + v.id + ': an sr-only element inside a scroller with nothing positioned between them — it escapes the clip and widens the page');
+          break;
+        }
+      }
+    }
+    if (!self && !/^(br|hr|img|input|meta|link|source|area|base|col|embed|track|wbr)$/i.test(tag)) stack.push(node);
+  }
+}
+if (srProblems.length) {
+  console.error('SR-ONLY LINT failed — position:absolute with no positioned ancestor:');
+  [...new Set(srProblems)].forEach(f => console.error('  ' + f));
+  process.exitCode = 1;
+}
+
+if (tplProblems.length) {
+  console.error('TEMPLATE LINT failed — these snippets cannot be pasted:');
+  [...new Set(tplProblems)].forEach(f => console.error('  ' + f));
+  process.exitCode = 1;
 }
 
 if (hoverProblems.length) {

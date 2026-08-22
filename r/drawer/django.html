@@ -14,7 +14,7 @@
      link a prefetcher, a crawler or an over-eager browser will follow on its
      own. This is the shape that keeps that impossible rather than unlikely.
 
-     The permission check is {% if perms %} around the row rather than a
+     The permission check is an if perms guard around the row rather than a
      disabled attribute on it, because a user who may not cancel an order is
      not looking at a cancel button that is off — they have no business seeing
      the verb at all. The one exception is the row that is unavailable because
@@ -22,12 +22,12 @@
      way button/unavailable does it: that is information, not a permission.
 
      Every id in the block is suffixed with the order's pk. This template is
-     rendered once per drawer today and inside a {% for %} the day somebody
+     rendered once per drawer today and inside a for loop the day somebody
      puts an actions drawer on every row of the register, and an
      aria-labelledby pointing at the first of six identical ids is a bug that
      only shows up in a screen reader.
 
-     Django's {% url %} tags and the drawer's Alpine state do not interact.
+     Django's url tags and the drawer's Alpine state do not interact.
      Alpine owns open and nothing else; the server owns every route. -->
 {% load humanize %}
 <div data-kui="drawer/django" x-data="{ open: false }">

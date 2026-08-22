@@ -40,7 +40,11 @@
                        {'job': job, 'announce': crossed})
 
      {# imports/_progress.html, at the end #}
-     {% if announce %}<span hx-swap-oob="innerHTML:#import-8841-status">{{ job.percent }} per cent imported</span>{% endif %} -->
+     The tags are written here without their braces, because Django compiles a
+     tag inside an HTML comment and this snippet would not paste:
+         if announce
+           <span hx-swap-oob="innerHTML:#import-8841-status">{{ job.percent }} per cent imported</span>
+         endif -->
 <div data-kui="progress/htmx" class="max-w-md">
 
   <div id="import-8841"

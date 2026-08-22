@@ -2,11 +2,14 @@
    not execute. Never interpolate JSON into an attribute: one apostrophe in a
    supplier name ends the attribute and takes the page with it.
 
-   humanize is loaded here rather than assumed: intcomma is the only filter in
-   this block that is not a builtin, and a template that omits the load tag
-   raises TemplateSyntaxError on the row loop rather than on the line that
-   needs it, which sends the next person looking in the wrong place. {% endcomment %}
-{% load humanize %}
+   money is loaded here rather than assumed. rupees is the only filter in this
+   block that is not a builtin, and a template that omits the load tag raises
+   TemplateSyntaxError on the row loop rather than on the line that needs it,
+   which sends the next person looking in the wrong place. It is rupees and not
+   intcomma because Indian grouping is 2,2,3 above the last three digits:
+   intcomma returns 1,245,000 where the figure reads 12,45,000, and a number
+   wrong by a factor of ten is read straight past. table/django defines it. {% endcomment %}
+{% load money %}
 {{ spend_by_month|json_script:"spend-by-month" }}
 
 <div data-kui="chart/django" class="rounded-xl border border-zinc-300 bg-white p-5"
@@ -81,7 +84,7 @@
       <thead><tr><th scope="col">Month</th><th scope="col">Committed value</th></tr></thead>
       <tbody>
         {% for row in spend_by_month %}
-          <tr><th scope="row">{{ row.month }}</th><td>₹{{ row.value|intcomma }}</td></tr>
+          <tr><th scope="row">{{ row.month }}</th><td>{{ row.value|rupees }}</td></tr>
         {% endfor %}
       </tbody>
     </table>

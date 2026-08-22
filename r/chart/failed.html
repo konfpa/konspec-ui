@@ -24,8 +24,14 @@
 
      No live region on the message. This block arrives as a swap into something
      that already announces, and a role="alert" written into static markup
-     fires on first paint whether or not anything just went wrong. -->
-<div data-kui="chart/failed" class="rounded-xl border border-zinc-300 bg-white p-5">
+     fires on first paint whether or not anything just went wrong. 
+
+     The retry targets this card's own id, never hx-target="closest [data-kui]".
+     A card is usually one region of a composed page, and a composed page carries
+     exactly one data-kui — its own — so the closest form walks past the card and
+     swaps the whole screen: the plot that failed takes out the four regions that
+     loaded. Give the region an id and target that. -->
+<div data-kui="chart/failed" id="chart-committed" class="rounded-xl border border-zinc-300 bg-white p-5">
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
     <h3 class="text-[14px]/5 font-semibold">Committed value by month</h3>
     <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa plant · 2026</p>
@@ -47,7 +53,7 @@
     </p>
     <div class="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
       <button type="button"
-              hx-get="/dashboard/committed/" hx-target="closest [data-kui]" hx-swap="outerHTML"
+              hx-get="/dashboard/committed/" hx-target="#chart-committed" hx-swap="outerHTML"
               class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="rotate-ccw" class="size-3.5 text-zinc-600"></i>Try again
       </button>

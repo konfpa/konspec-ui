@@ -1071,7 +1071,7 @@ register(
   {
     id: 'app-shell', name: 'App shell', category: 'layout',
     description: 'The page skeleton: an icon rail that expands to a labelled sidebar, a topbar carrying the hamburger, breadcrumb, command palette and account menu, and a single scrolling main column. Everything else in the app renders inside the main column.',
-    when: 'Every signed-in page, without exception beyond the two named here. This is mandatory rather than recommended: if a signed-in user can reach the screen, it renders inside this shell, with the page\'s own content in <main>. auth-page and error-page are the only two screens that do not, because the shell reads the nav, the counts and the signed-in user out of context a signed-out visitor or a failed request may not have. Never hand-assemble a substitute out of sidebar and topbar, and never start a page at <main> because the screen looked simple: the shell carries the skip link, the nav landmark, the off-canvas focus trap, the palette and the keyboard shortcuts, and a screen without it drops all of them without looking wrong.',
+    when: 'Every signed-in page, without exception beyond the four named here. This is mandatory rather than recommended: if a signed-in user can reach the screen, it renders inside this shell, with the page\'s own content in <main>. auth-page, error-page, portal-page and focus-page are the only four screens that do not. The first two are out because the shell reads the nav, the counts and the signed-in user out of context a signed-out visitor or a failed request may not have; portal-page because its reader is an external supplier for whom that context does not exist at all; and focus-page because on a shop floor the chrome is actively harmful rather than merely unhelpful — a rail takes target area from a gloved hand, and a nav link is a route to losing an uncommitted count. Expect to fail that second test: a screen that merely feels cluttered is still app-shell. The original two are out because the shell reads the nav, the counts and the signed-in user out of context a signed-out visitor or a failed request may not have. Never hand-assemble a substitute out of sidebar and topbar, and never start a page at <main> because the screen looked simple: the shell carries the skip link, the nav landmark, the off-canvas focus trap, the palette and the keyboard shortcuts, and a screen without it drops all of them without looking wrong.',
     notes: [
       'Nothing inside the sidebar changes class when the rail narrows. Each row is a fixed 32px icon box at a fixed offset followed by a label the row clips, so collapsing is a width transition and nothing else. Switching rows to lg:justify-center lg:px-0 on collapse — the obvious way to write it — relays out every row on the first frame while the sidebar is still 256px wide, and the create button visibly flashes full width before it shrinks.',
       'The geometry is what makes that work: the nav container is px-3 and every row is px-1.5, so a 32px icon box starts at 18px and centres at 34px — the centre of the 68px rail. The icon lands in the same place expanded and collapsed without a single conditional class.',
@@ -1085,7 +1085,9 @@ register(
       'Rotation and other bindings go on a wrapping <span>, never on <i data-lucide>. Lucide replaces the <i> with an <svg> and any binding on it dies.',
       'Sidebar state persists under the localStorage key kon-sidebar. The [ shortcut drives the same toggle() as the hamburger and is ignored while focus is in an input, textarea or select.',
       'Only the <main> scrolls. The shell root is h-[720px] here so it previews in a box — as a real page put h-screen overflow-hidden on <body> and drop the wrapper border.',
-      'x-cloak on the sidebar, or it renders at its expanded width for one frame before Alpine reads kon-sidebar and the rail jumps shut on every load.'
+      'x-cloak on the sidebar, or it renders at its expanded width for one frame before Alpine reads kon-sidebar and the rail jumps shut on every load.',
+      'A group label fades out on the rail and leaves its height behind, which reads as a gap somebody forgot to close. A hairline fades in over the same box as the label fades out: the group is still divided, and because both halves are opacity the row heights never change and nothing relays out — the same reason every other label here fades rather than hides. The rule is aria-hidden and the label stays in the DOM at opacity 0, so the group is still named to a screen reader on the collapsed rail, where the icons alone would not say it.',
+      'The rail, the topbar and the backdrop carry print:hidden. document-page and label-sheet are printed from inside this shell, and without it the navigation comes out down the left margin of every sheet and the first column of every sheet of labels. The chrome is what does not print; the document is what is left.'
     ],
     anatomy: [
       ['Icon rail', 'The 68px column the sidebar collapses to. Always visible above lg; it is the sidebar, narrowed, not a separate component.'],
@@ -1164,7 +1166,7 @@ register(
          x-trap.noscroll="!wide && nav"
          :role="wide ? null : 'dialog'"
          :aria-modal="!wide && nav ? 'true' : null"
-         class="absolute inset-y-0 left-0 z-40 flex w-full shrink-0 sm:w-72 flex-col overflow-hidden border-r border-zinc-200 bg-white shadow-lg transition-[width,transform] duration-200 ease-out lg:static lg:shadow-none"
+         class="absolute inset-y-0 left-0 z-40 flex w-full shrink-0 sm:w-72 flex-col overflow-hidden border-r border-zinc-200 bg-white shadow-lg transition-[width,transform] duration-200 ease-out lg:static lg:shadow-none print:hidden"
          :class="[ sidebar ? 'lg:w-64' : 'lg:w-[68px]', nav ? 'translate-x-0' : 'max-lg:-translate-x-full' ]">
 
     <div class="flex h-14 shrink-0 items-center gap-2.5 overflow-hidden px-3">
@@ -1189,7 +1191,12 @@ register(
     </div>
 
     <nav aria-label="Procurement" class="min-h-0 flex-1 space-y-0.5 overflow-x-hidden overflow-y-auto px-3 pb-3">
-      <p class="overflow-hidden px-1.5 pt-2 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Procurement</p>
+      <p class="overflow-hidden px-1.5 pt-2 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase">
+        <span class="relative block">
+          <span class="block transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Procurement</span>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-zinc-200 opacity-0 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-100'"></span>
+        </span>
+      </p>
 
       <a @mouseenter="showTip($el, 'Overview')" @mouseleave="hideTip()" @focus="showTip($el, 'Overview')" @blur="hideTip()" href="#" aria-current="page"
          class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg bg-zinc-200 px-1.5 text-[13px]/5 font-medium whitespace-nowrap text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -1221,7 +1228,12 @@ register(
         <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">4</span>
       </a>
 
-      <p class="overflow-hidden px-1.5 pt-4 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Master data</p>
+      <p class="overflow-hidden px-1.5 pt-4 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase">
+        <span class="relative block">
+          <span class="block transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Master data</span>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-zinc-200 opacity-0 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-100'"></span>
+        </span>
+      </p>
 
       <a @mouseenter="showTip($el, 'Vendors')" @mouseleave="hideTip()" @focus="showTip($el, 'Vendors')" @blur="hideTip()" href="#"
          class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -1241,19 +1253,21 @@ register(
       </a>
     </nav>
 
-    <!-- The company mark sits here rather than in the header: an internal user
-         knows who they work for, and what needs naming at a glance is which
-         system they are in. A signature at the foot says it once. The version
-         is beside it because the two questions a bug report has to answer,
-         which app and which build, are then both on one screenshot. Collapsed,
-         only the version survives: the mark is 4:1 and cannot read at 43px. -->
-    <div class="shrink-0 overflow-hidden border-t border-zinc-200 px-3 py-2.5">
-      <div class="flex items-center justify-between gap-2" :class="!sidebar && 'lg:justify-center'">
-        <img src="data:image/png;base64,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"
-             alt="Konspec" width="121" height="28" class="h-7 w-auto shrink-0" :class="!sidebar && 'lg:hidden'">
-        <span class="font-mono text-[11px]/4 tabular-nums text-zinc-400">v2.4.0</span>
-      </div>
-    </div>
+    <!-- The foot is the way back out to the rest of the estate, not a signature.
+         It is built as a nav row and not as a logo: it has somewhere to go, so it
+         has to be a link with a target big enough to hit, and the moment it is a
+         link it should look like every other link in this panel. Same 36px row,
+         same 32px icon box at the same offset, same label fade — so it lands on
+         the rail centred with the icons above it and needs no rule of its own.
+         The wordmark that used to sit here could not: at 4:1 it is unreadable at
+         43px, so the collapsed rail showed a version string and nothing else. -->
+    <nav aria-label="Applications" class="shrink-0 overflow-hidden border-t border-zinc-200 px-3 py-1.5">
+      <a @mouseenter="showTip($el, 'Konspec Gateway')" @mouseleave="hideTip()" @focus="showTip($el, 'Konspec Gateway')" @blur="hideTip()" href="#"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="layout-grid" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Konspec Gateway</span>
+      </a>
+    </nav>
   </aside>
 
   <div x-show="tipOn" x-cloak aria-hidden="true"
@@ -1261,11 +1275,11 @@ register(
        class="pointer-events-none fixed z-50 -translate-y-1/2 rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 whitespace-nowrap text-white"
        x-text="tip"></div>
 
-  <div x-show="nav" x-cloak @click="nav = false" class="absolute inset-0 z-30 hidden bg-zinc-900/40 sm:block lg:hidden"></div>
+  <div x-show="nav" x-cloak @click="nav = false" class="absolute inset-0 z-30 hidden bg-zinc-900/40 sm:block lg:hidden print:hidden"></div>
 
   <!-- ── main column ──────────────────────────────────────────────────── -->
   <div class="flex min-w-0 flex-1 flex-col">
-    <header class="flex h-14 shrink-0 items-center gap-2 border-b border-zinc-200 bg-white px-3 lg:gap-3 lg:px-5">
+    <header class="flex h-14 shrink-0 items-center gap-2 border-b border-zinc-200 bg-white px-3 lg:gap-3 lg:px-5 print:hidden">
 
       <!-- one control, two jobs: it opens the off-canvas sheet below lg and
            collapses the rail above it, which is why it is never hidden -->
@@ -1547,7 +1561,7 @@ register(
                   <td class="px-4 py-2.5 text-zinc-600">Sudarshan Chemicals</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">02 Sep 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹18,42,000</td>
-                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span></td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-500"></span>Open</span></td>
                 </tr>
                 <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0450</a></td>
@@ -1575,7 +1589,7 @@ register(
                   <td class="px-4 py-2.5 text-zinc-600">Clean Science</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">20 Aug 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹5,94,000</td>
-                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span></td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-500"></span>Open</span></td>
                 </tr>
                 <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0441</a></td>
@@ -1609,7 +1623,7 @@ register(
                 </span>
                 <span class="shrink-0 text-right">
                   <span class="block text-[13px]/5 font-medium tabular-nums">₹18,42,000</span>
-                  <span class="mt-1 inline-flex items-center gap-1.5 text-[11px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span>
+                  <span class="mt-1 inline-flex items-center gap-1.5 text-[11px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-500"></span>Open</span>
                 </span>
               </li>
               <li class="flex items-start gap-3 px-4 py-3">
@@ -2700,12 +2714,18 @@ register(
 </div>` },
 
       { id: 'django', name: 'Django loop', code:
-`<!-- One card per record, and the empty case handled by {% empty %} rather than
-     by a separate {% if %} further up the template — the two get out of step
-     otherwise, and the page renders an empty grid with a heading over it.
+`<!-- One card per record, and the empty case handled by the empty clause rather
+     than by a separate if guard further up the template — the two get out of
+     step otherwise, and the page renders an empty grid with a heading over it.
 
      get_absolute_url on the model, not a hard-coded path, so the card keeps
-     working when the URL conf moves. Nothing else in the card is a link. -->
+     working when the URL conf moves. Nothing else in the card is a link.
+
+     The value goes through the project's own rupees filter, which prints the
+     symbol and groups 2,2,3 — intcomma returns 1,245,000 where the card has to
+     read 12,45,000. -->
+{% load money ui %}
+
 <div data-kui="card/django" class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
   {% for order in orders %}
     <a href="{{ order.get_absolute_url }}"
@@ -2721,7 +2741,7 @@ register(
         <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
           <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>{{ order.get_status_display }}
         </span>
-        <span class="text-[13px]/5 font-medium tabular-nums">₹{{ order.value|intcomma }}</span>
+        <span class="text-[13px]/5 font-medium tabular-nums">{{ order.value|rupees }}</span>
       </div>
     </a>
   {% empty %}
@@ -2959,7 +2979,7 @@ register(
      off the button and it belongs to the button: measured with the items above
      it conditionally hidden, the border still painted 5px below the panel's top
      edge, introducing nothing. As its own element it can be dropped in the same
-     {% if %} as the item it introduces.
+     if guard as the item it introduces.
 
      zinc-100 and full bleed, my-1 for the breathing room the items already have
      through their padding. The panel is the zinc-300 edge; the divider inside
@@ -2998,7 +3018,7 @@ register(
      on the wrapper.
 
      And the server is the only place divide-y is safe on a list that can
-     change. {% if %} removes the node, so :last-child lands on the last row
+     change. An if guard removes the node, so :last-child lands on the last row
      that actually rendered. Alpine cannot do this: x-show leaves the row in the
      DOM and x-if leaves the <template> in the DOM, and either way the rule
      above the hidden row is stranded at the bottom of the card.
@@ -3008,12 +3028,14 @@ register(
      def separator(orientation='horizontal'):
          return {'vertical': orientation == 'vertical'}
 
-     # templates/ui/_separator.html
-     {% if vertical %}
+     # templates/ui/_separator.html. The tags are written here without their
+     braces, because Django compiles a tag inside an HTML comment and this
+     snippet would not paste:
+     if vertical
        <div role="separator" aria-orientation="vertical" class="h-5 w-px shrink-0 bg-zinc-200"></div>
-     {% else %}
+     else
        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
-     {% endif %} -->
+     endif -->
 {% load humanize ui %}
 
 <div data-kui="separator/django" role="menu" aria-label="Order actions"
@@ -6164,7 +6186,7 @@ register(
             <label class="mb-1.5 block text-[13px]/5 font-medium">GST certificate and cancelled cheque</label>
             <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
                  class="rounded-lg border border-dashed px-4 py-5 transition"
-                 :class="depth > 0 ? 'border-zinc-700 bg-white' : 'border-zinc-200 bg-zinc-100'">
+                 :class="depth > 0 ? 'border-zinc-700 bg-white' : 'border-zinc-200 bg-zinc-50'">
               <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
                 <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
                 <span class="text-[13px]/5 text-zinc-600">Drag files here or</span>
@@ -6653,7 +6675,7 @@ register(
             <div class="px-5 py-4">
               <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
                    class="rounded-lg border border-dashed px-4 py-5 transition"
-                   :class="depth > 0 ? 'border-zinc-700 bg-white' : 'border-zinc-200 bg-zinc-100'">
+                   :class="depth > 0 ? 'border-zinc-700 bg-white' : 'border-zinc-200 bg-zinc-50'">
                 <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
                   <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
                   <span class="text-[13px]/5 text-zinc-600">Drag files here or</span>
@@ -7642,7 +7664,7 @@ register(
       <p class="mt-1 text-[13px]/5 text-zinc-600">Use your Konspec Industries email address.</p>
 
       <div x-show="failed" x-ref="err" role="alert" tabindex="-1"
-           class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 outline-none">
+           class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
         <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
         <div class="min-w-0">
           <p class="text-[13px]/5 font-medium">That email address and password do not match an active account.</p>
@@ -7882,7 +7904,7 @@ register(
 
       <div class="mt-5">
         <label for="rp-username" class="mb-1.5 block text-[13px]/5 font-medium">Account</label>
-        <div class="rounded-lg border border-zinc-200 bg-zinc-100">
+        <div class="rounded-lg border border-zinc-200 bg-zinc-100 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
           <input id="rp-username" name="username" type="email" value="akshay.prabhu@konspec.com"
                  autocomplete="username" readonly aria-describedby="rp-username-help"
                  class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
@@ -8692,10 +8714,10 @@ register(
 `<!-- templates/404.html, and the shape 403.html takes as well. Three things
      make these files different from every other template in the project.
 
-     They do not {% extends "base.html" %}. base.html reads the nav, the counts
-     and the signed-in user out of context, and the request that just failed may
-     have none of it; a base that raises while rendering the error page drops
-     the user on Django's own bare page instead. So each handler is a whole
+     They do not extend base.html. It reads the nav, the counts and the
+     signed-in user out of context, and the request that just failed may have
+     none of it; a base that raises while rendering the error page drops the
+     user on Django's own bare page instead. So each handler is a whole
      document with its own <head>:
 
        <title>Page not found · Konspec Operations</title>
@@ -10625,7 +10647,7 @@ register(
      json_script escapes the chart payload into a script tag the browser will
      not execute. Never interpolate JSON into an attribute: one apostrophe in a
      vendor name ends the attribute and takes the page with it. -->
-{% load humanize %}
+{% load humanize money %}
 {% comment %}
   A multi-line {# #} is not a comment. Django's tag_re has no DOTALL, so it
   matches to the end of the first line only and the rest of the block renders
@@ -12825,7 +12847,7 @@ shape is written once here and only the dot changes.
       'Sections are stacked down the page until there are enough of them to be worth switching. Stacked, the whole record prints in one pass, Ctrl+F finds all of it, and nobody has to remember which tab the GRN was under. Tabs earn their place past about four sections or where one of them is expensive to render, and then the tabs variant is the shape — never both, because a page with three stacked sections and a tab row over two more has no answer to where anything is.',
       'Line items are table\'s markup unchanged: the same header cells, the same tabular-nums and text-right on the figures, the same total in a <tfoot>, and the same stacked cards below md. The one thing this page adds is that the table is read-only. A record page that makes its lines editable has become form-page/line-items wearing the wrong header, and the two then disagree about what a line is.',
       'An action the state has removed is gone, not disabled. A disabled Record GRN on a cancelled order is a dead Tab stop that explains nothing and invites the press it will refuse; the banner is what carries the reason, and the button is simply not drawn. Disable a control only while its own request is in flight — that is the case where the control still exists.',
-      'Cancelled and On hold are not in the locked five, and there is no sixth dot. On hold takes Approved\'s amber-500, because its meaning is exactly the one amber has: waiting on someone. Cancelled takes Open\'s zinc-500, which is the fallback badge/status names and the same fallback the Django status_dot filter already returns for a value it does not know. Emerald was the other candidate and is wrong: a cancelled order is finished in the sense that nothing more will happen to it, and green says the opposite of that.',
+      'Cancelled and On hold are not in the locked five, and there is no sixth dot. On hold takes Approved\'s amber-500, because its meaning is exactly the one amber has: waiting on someone. Cancelled takes Draft\'s zinc-400, the inert shade: the record is over, and neither of the other candidates says that. Emerald would say it finished well, and zinc-500 would say it is still live. Both words are in the status table now — this entry was written before they were, and reached the same two answers on its own.',
       'The rail here is first in the DOM and placed second by the grid, which is the reverse of form-page/side-rail. The reason that entry puts its rail last is that the rail is context beside a form the user is filling, and the tab order should be the form and then the context. This rail is the record\'s identity and standing, it is what a phone reader wants above the lines rather than below them, and it holds nothing focusable at all — so there is no tab order to get wrong, and lg:col-start-2 lg:row-start-1 is free. Put one control in it and that stops being true; move the control into the page.',
       'One h1 and it is the record\'s own identity — the order number, the vendor\'s name, the batch code. Not "Purchase order", which names the register this came from and is the same string on 1,438 pages. Everything below the band is h2, and a subsection inside a section is h3.',
       'A deep link to a tab selects that panel and does not move focus. The page has just loaded, so the browser is already at the top of the document and the reader has not asked to be anywhere else; pulling focus into the panel at boot skips the band that says which record they are looking at. Focus moves on a tab the reader pressed, and on nothing else.',
@@ -12869,7 +12891,7 @@ shape is written once here and only the dot changes.
       'The permission sentence is prose in the region it applies to, not a title attribute and not a disabled control. There is nothing to hover on a phone, and a dead Tab stop explains nothing.',
       'At 390px the section select is a real <select> with a real label and no tab roles at all, and each section is a <section> with its own heading. Giving a select role="tab" breaks the one thing it was brought in to do.'
     ],
-    related: ['page-header', 'form-page', 'tabs', 'table', 'badge', 'marker', 'list-detail', 'card'],
+    related: ['document-page', 'page-header', 'form-page', 'tabs', 'table', 'badge', 'marker', 'list-detail', 'card'],
     variants: [
       { id: 'default', name: 'Header, summary and stacked sections', code:
 `<!-- The reference arrangement, and the one to reach for before any of the
@@ -14257,15 +14279,10 @@ shape is written once here and only the dot changes.
 
      None of these three states is in the locked five and there is no sixth dot.
      On hold takes Approved's amber-500 — its meaning is exactly amber's,
-     waiting on someone. Cancelled takes Open's zinc-500, which is the fallback
-     badge/status names and the same one the Django status_dot filter returns
-     for a value it has never seen. Emerald was the other candidate for
-     Cancelled and is wrong: nothing more will happen to the order, but green
-     says that is good news.
-
-     The select at the top of the frame is the preview, not the page. A real
-     record is in one state and the server renders that one; delete the strip
-     and keep whichever branch applies. -->
+     waiting on someone. Cancelled takes Draft's zinc-400, the inert shade: the
+     record is over, and emerald would say it finished well while zinc-500 would
+     say it is still live. Both are in the status table now; this entry predates
+     them and reached the same two answers on its own. -->
 <div data-kui="record-page/states" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{ state: 'cancelled' }">
 
@@ -14307,7 +14324,7 @@ shape is written once here and only the dot changes.
                    text and never on a Lucide <i>. -->
               <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
                 <span class="size-1.5 rounded-full" aria-hidden="true"
-                      :class="{ 'bg-zinc-500': state === 'cancelled', 'bg-amber-500': state === 'hold', 'bg-emerald-600': state === 'closed' }"></span>
+                      :class="{ 'bg-zinc-400': state === 'cancelled', 'bg-amber-500': state === 'hold', 'bg-emerald-600': state === 'closed' }"></span>
                 <span x-text="state === 'cancelled' ? 'Cancelled' : state === 'hold' ? 'On hold' : 'Closed'">Cancelled</span>
               </span>
             </div>
@@ -15024,7 +15041,7 @@ shape is written once here and only the dot changes.
      colspan cell, never as a div after the table — a sibling div is outside the
      table in the accessibility tree, so somebody reading with table navigation
      walks a table of zero rows and is never told why. -->
-{% load humanize ui %}
+{% load humanize money ui %}
 
 <div data-kui="record-page/django" class="min-h-[560px] bg-zinc-100 text-zinc-900">
 
@@ -22967,7 +22984,7 @@ here and only the dot changes.
      forloop.counter0 is what indexes the totals against the vendors, and it is
      the one place a mismatch between the two lists shows up as plausible
      figures rather than as an error. -->
-{% load humanize ui %}
+{% load humanize money ui %}
 
 <div data-kui="compare-page/django" class="min-h-[560px] bg-zinc-100 text-zinc-900">
 
@@ -31326,7 +31343,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
       'Sections the user may not open are absent from the nav, not disabled in it. A greyed row advertises a section, refuses it, and gives no reason; and it is the one component in the page that a screen reader cannot reach to be told why. The filtering is the view\'s job — the template guard is the second lock, not the first, because the section still has a URL somebody can type.',
       'Every section is a URL and the nav is real links. That is what lets an error message elsewhere in the application say where the rule lives — "orders above ₹5,00,000 need a second approver, set in Settings, Approval limits" — and link straight to it. A tablist cannot be linked into, and a settings screen that cannot be linked into gets explained in a wiki instead.',
       'The numbering series preview is computed in the page from the same four fields the server concatenates, so the string the user is about to commit is the string they read. It is an <output>, never a disabled input, and the half that cannot be undone is gated by an acknowledgement with the actual next number printed in it rather than by a dialog that says Are you sure.',
-      'Three role columns is the ceiling on a permission matrix and that rule belongs to checkbox, not to this entry. Six roles is two matrices split by module, stacked down the pane — never six columns, never a sideways scroll, and never a second copy of the same boxes restacked for a phone, because two renderings of one checkbox is two values for one permission and after a save the hidden one is wrong.',
+      'How many role columns a matrix can carry belongs to checkbox, not to this entry: checkbox/matrix up to three, checkbox/wide-matrix past that, with a frozen capability column and both axes pinned. This section shows the split-by-module arrangement, which is the other way to spend the room a settings pane has and reads better when the modules are genuinely separate concerns. Either is right here. What is never right is a second copy of the same boxes restacked for a phone, because two renderings of one checkbox is two values for one permission and after a save the hidden one is wrong — checkbox/wide-matrix-phone is a separate variant for exactly that reason.',
       'Below lg the nav stacks above the pane in DOM order, which is honest for nine sections and nothing more. At 390px a permanent side nav cannot be permanent: the index and the section become two screens, and the Back control is a real link because in production those are two URLs.',
       'The destructive section is last in the nav, below a rule, and it is a white card like every other section. The colour is in the icon and in the button, and the consequence is written out in figures — 34 orders, 61 invoices — because that sentence is what stops the click, not a red panel behind it.',
       'The snippet root is a bounded scroller — h-[640px], rounded-xl, border-zinc-300 — so a whole screen previews in a box, and any dialog is absolute inset-0 against that frame. As a real page it is the shell\'s <main>: drop the wrapper\'s height and border, keep the max-width and the padding, and make the dialog fixed inset-0.'
@@ -32267,11 +32284,13 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      wraps to four lines at 390px and the matrix stops being readable exactly
      where it is hardest to read.
 
-     So six roles is not six columns and it is not a sideways scroll. It is two
-     matrices split by module, stacked down the pane, which is the arrangement
-     the settings page has the room for and a card on a record page does not.
-     That is this layout's contribution here: the shape of the section, not the
-     shape of the table.
+     So six roles is drawn here as two matrices split by module, stacked down the
+     pane — the arrangement a settings page has the room for and a card on a
+     record page does not. That is this layout's contribution: the shape of the
+     section, not the shape of the table. The other answer is one matrix six
+     columns wide with the capability column frozen and both axes pinned, which
+     is checkbox/wide-matrix; take that one when the roles have to be compared
+     against each other rather than read module by module.
 
      What it is not is a second copy of the matrix restacked into cards below
      md. Two renderings of one checkbox is two inputs for one permission, and
@@ -32373,7 +32392,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
             <div class="border-t border-zinc-100 px-5 py-4">
               <h3 class="text-[13px]/5 font-semibold">Goods receipt and quality</h3>
-              <p class="mt-0.5 text-[12px]/4 text-zinc-500">A second matrix rather than three more columns on the first one.</p>
+              <p class="mt-0.5 text-[12px]/4 text-zinc-500">Split from the first by module, not by running out of columns.</p>
             </div>
 
             <table class="w-full text-[13px]/5">
@@ -38698,7 +38717,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
       'Rules that have to survive paper stop at border-zinc-300. The Divider token, border-zinc-100, is a 4% grey and is simply not there on a printed sheet; border-zinc-200 is marginal and is used only for the row rules inside a line table, where the rows are close enough together that the eye supplies the rest. Hierarchy comes from weight — border-b-2 under the letterhead, border-t-2 over the totals — and not from a darker colour, because the system has no ink-weight border token. That is a real gap and this entry left it open rather than inventing one.',
       'Physical size is @page, and @page is not a utility. A4 is 210 by 297mm: the sheet is max-w-[210mm] with min-h-[297mm] so the screen preview is the shape of the paper, and print:min-h-0 because the printable area is 297mm less the page margin — a 297mm minimum on paper pushes a blank second sheet out of every one-page document. The margin itself, @page { size: A4; margin: 14mm 12mm }, cannot be written as a Tailwind class and belongs once in the project stylesheet. The preview variant carries the rule to copy.',
       'Do not trust a breakpoint to mean paper. A4 portrait is 794 CSS px at 96dpi, so md: applies while printing and lg: does not — but the Scale field in the print dialog changes the layout width, and at 50% the same sheet lays out at about 1588px with every lg: rule switched on. Where the printed shape has to differ from the screen, write print: and let it win. A table that only becomes a table at md is a stack of cards on somebody\'s paper.',
-      'The line table is the one region here allowed to scroll sideways at 390px, inside its own overflow-x-auto box, and it is cancelled again with md:overflow-visible print:overflow-visible. Both halves matter. A preview that restacks the lines into cards is a preview of something that will never come out of the printer, which is the whole reason the exception is taken. And an element with overflow other than visible is monolithic in paged media, so a line table left inside a live scroller is clipped at the first page break instead of splitting across sheets. The same trap makes overflow-hidden rounded-xl — the card idiom every other panel in this system uses — wrong on a document. What the exception costs is an affordance: at 390px the line table simply looks cut off at the right edge, because the system has no mark for a region that scrolls sideways — carousel peeks and dots, but the peek is the carousel itself. That gap is flagged rather than filled here.',
+      'The line table is the one region here allowed to scroll sideways at 390px, inside its own overflow-x-auto box, and it is cancelled again with md:overflow-visible print:overflow-visible. Both halves matter. A preview that restacks the lines into cards is a preview of something that will never come out of the printer, which is the whole reason the exception is taken. And an element with overflow other than visible is monolithic in paged media, so a line table left inside a live scroller is clipped at the first page break instead of splitting across sheets. The same trap makes overflow-hidden rounded-xl — the card idiom every other panel in this system uses — wrong on a document. The exception used to cost an affordance — at 390px the line table simply looked cut off at the right edge. The framework has an answer for that now and this entry takes it: the scroller carries relative, tabindex=\'0\', role=\'region\' and a name, so it is reachable and announced, and a line under it says it scrolls. relative is not cosmetic there: an sr-only span inside a scroller with no positioned ancestor resolves against the document and widens the page, which is a 390px overflow with no visible cause.',
       'A table splits across sheets by itself and repeats its <thead> while it does, because display: table-header-group is the browser\'s own default for a real <thead>. It stops the moment the table is wrapped in a flex or grid container, a transform, or a scroller. break-inside-avoid goes on every <tr>: a row split across the fold is not a shorter row, it is two rows carrying half a figure each.',
       'Nothing that adds up may be orphaned. break-inside-avoid on the tax summary, on the amount in words, on each signature block and on the foot. A totals block that lands on a sheet of its own with no lines above it is a defect the reader cannot detect, because it reads as a total of what is on that sheet.',
       'Page numbers and carried-forward subtotals are the view\'s job, not the browser\'s. counter(page) inside an @page margin box is not implemented in Chrome, and no CSS anywhere can sum the lines that fell on the sheet before. So a document that needs "Page 2 of 3" and a brought-forward figure is paginated on the server into one <section> per sheet, each ending in break-after-page — that is multi-page. Where neither is needed, do not paginate: let the table flow and repeat its own header, which is purchase-order.',
@@ -38833,7 +38852,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
       <section aria-labelledby="po-lines-h" class="mt-4">
         <h2 id="po-lines-h" class="sr-only">Order lines</h2>
-        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+        <div class="relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
           <table class="w-full min-w-[36rem] text-[12px]/4">
             <caption class="sr-only">Four lines ordered from Sharma Steel and Alloys against PO-2026-0418</caption>
             <thead class="bg-zinc-50 print:bg-white">
@@ -39053,7 +39073,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
       <section aria-labelledby="in-lines-h" class="mt-4">
         <h2 id="in-lines-h" class="sr-only">Invoice lines</h2>
-        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+        <div class="relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
           <table class="w-full min-w-[36rem] text-[12px]/4">
             <caption class="sr-only">Three lines invoiced to Deccan Fasteners against INV-2026-0774</caption>
             <thead class="bg-zinc-50 print:bg-white">
@@ -39108,7 +39129,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
       <section aria-labelledby="in-hsn-h" class="mt-4 break-inside-avoid">
         <h2 id="in-hsn-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">HSN summary</h2>
-        <div class="mt-1.5 overflow-x-auto md:overflow-visible print:overflow-visible">
+        <div class="mt-1.5 relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
           <table class="w-full min-w-[30rem] border border-zinc-300 text-[12px]/4">
             <caption class="sr-only">Taxable value and IGST grouped by HSN code</caption>
             <thead class="bg-zinc-50 print:bg-white">
@@ -39294,7 +39316,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
       <section aria-labelledby="ch-lines-h" class="mt-4">
         <h2 id="ch-lines-h" class="sr-only">Goods sent</h2>
-        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+        <div class="relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
           <table class="w-full min-w-[32rem] text-[12px]/4">
             <caption class="sr-only">Three lines sent on challan DC-2026-0917. No rates are shown; this consignment is not a sale.</caption>
             <thead class="bg-zinc-50 print:bg-white">
@@ -39464,7 +39487,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
       <section aria-labelledby="gr-lines-h" class="mt-4">
         <h2 id="gr-lines-h" class="sr-only">Lines received</h2>
-        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+        <div class="relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
           <table class="w-full min-w-[42rem] text-[12px]/4">
             <caption class="sr-only">Four lines received against PO-2026-0418, with ordered, received, accepted, short and rejected quantities</caption>
             <thead class="bg-zinc-50 print:bg-white">
@@ -39682,7 +39706,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
       <section aria-labelledby="dr-lines-h" class="mt-4">
         <h2 id="dr-lines-h" class="sr-only">Proposed order lines</h2>
-        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+        <div class="relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
           <table class="w-full min-w-[34rem] text-[12px]/4">
             <caption class="sr-only">Four proposed lines on an unapproved purchase order</caption>
             <thead class="bg-zinc-50 print:bg-white">
@@ -39863,7 +39888,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
           </section>
         </div>
 
-        <div class="mt-4 overflow-x-auto md:overflow-visible print:overflow-visible">
+        <div class="mt-4 relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
           <table class="w-full min-w-[32rem] text-[12px]/4">
             <caption class="sr-only">Three lines invoiced against INV-2026-0774</caption>
             <thead class="bg-zinc-50 print:bg-white">
@@ -40006,7 +40032,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
         </section>
       </div>
 
-      <div class="mt-4 overflow-x-auto md:overflow-visible print:overflow-visible">
+      <div class="mt-4 relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
         <table class="w-full min-w-[32rem] text-[12px]/4">
           <caption class="sr-only">Lines 1 to 6 of 15 on invoice INV-2026-0774</caption>
           <thead class="bg-zinc-50 print:bg-white">
@@ -40090,7 +40117,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
         <p class="text-[12px]/4 font-medium tabular-nums">Page 2 of 3 · Konspec Industries Pvt Ltd · GSTIN 26AABCK9021M1Z4</p>
       </header>
 
-      <div class="mt-4 overflow-x-auto md:overflow-visible print:overflow-visible">
+      <div class="mt-4 relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
         <table class="w-full min-w-[32rem] text-[12px]/4">
           <caption class="sr-only">Lines 7 to 12 of 15 on invoice INV-2026-0774, continued from page 1</caption>
           <thead class="bg-zinc-50 print:bg-white">
@@ -40178,7 +40206,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
         <p class="text-[12px]/4 font-medium tabular-nums">Page 3 of 3 · Konspec Industries Pvt Ltd · GSTIN 26AABCK9021M1Z4</p>
       </header>
 
-      <div class="mt-4 overflow-x-auto md:overflow-visible print:overflow-visible">
+      <div class="mt-4 relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
         <table class="w-full min-w-[32rem] text-[12px]/4">
           <caption class="sr-only">Lines 13 to 15 of 15 on invoice INV-2026-0774, and the totals</caption>
           <thead class="bg-zinc-50 print:bg-white">
@@ -40386,7 +40415,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
       <section aria-labelledby="pv-lines-h" class="mt-4">
         <h2 id="pv-lines-h" class="sr-only">Order lines</h2>
-        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+        <div class="relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
           <table class="w-full min-w-[32rem] text-[12px]/4">
             <caption class="sr-only">Three lines ordered from Sharma Steel and Alloys against PO-2026-0418</caption>
             <thead class="bg-zinc-50 print:bg-white">
@@ -40558,7 +40588,8 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
           splitting across sheets — and the <thead> that repeats itself on every
           sheet stops repeating with it.
         {% endcomment %}
-        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+        <div class="relative overflow-x-auto md:overflow-visible print:overflow-visible"
+             tabindex="0" role="region" aria-label="Line items, scrolls sideways">
           <table class="w-full min-w-[34rem] text-[12px]/4">
             <caption class="sr-only">{{ order.lines.count|intcomma }} lines ordered from {{ order.vendor.name }} against {{ order.number }}</caption>
             <thead class="bg-zinc-50 print:bg-white">

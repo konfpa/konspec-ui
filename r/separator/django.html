@@ -8,7 +8,7 @@
      on the wrapper.
 
      And the server is the only place divide-y is safe on a list that can
-     change. {% if %} removes the node, so :last-child lands on the last row
+     change. An if guard removes the node, so :last-child lands on the last row
      that actually rendered. Alpine cannot do this: x-show leaves the row in the
      DOM and x-if leaves the <template> in the DOM, and either way the rule
      above the hidden row is stranded at the bottom of the card.
@@ -18,12 +18,14 @@
      def separator(orientation='horizontal'):
          return {'vertical': orientation == 'vertical'}
 
-     # templates/ui/_separator.html
-     {% if vertical %}
+     # templates/ui/_separator.html. The tags are written here without their
+     braces, because Django compiles a tag inside an HTML comment and this
+     snippet would not paste:
+     if vertical
        <div role="separator" aria-orientation="vertical" class="h-5 w-px shrink-0 bg-zinc-200"></div>
-     {% else %}
+     else
        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
-     {% endif %} -->
+     endif -->
 {% load humanize ui %}
 
 <div data-kui="separator/django" role="menu" aria-label="Order actions"

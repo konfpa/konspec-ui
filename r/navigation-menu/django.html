@@ -69,7 +69,7 @@
           <div x-ref="{{ section.key }}Panel" x-show="open === '{{ section.key }}'" x-cloak
                id="nmdj-p-{{ section.key }}" role="group" aria-labelledby="nmdj-t-{{ section.key }}"
                class="absolute top-full left-0 z-40 pt-2">
-            <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+            <ul class="w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
               {% for page in section.pages %}
                 <li>
                   <a href="{% url page.url_name %}"

@@ -4395,7 +4395,7 @@ register(
       <div x-ref="vendorsPanel" x-show="open === 'vendors'" x-cloak
            id="nmp-p-vendors" role="group" aria-labelledby="nmp-t-vendors"
            class="absolute top-full left-0 z-40 pt-2">
-        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <ul class="w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li>
             <a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All vendors</a>
           </li>
@@ -4796,7 +4796,7 @@ register(
       <div x-ref="invPanel" x-show="open === 'inv'" x-cloak
            id="nmi-p-inv" role="group" aria-labelledby="nmi-t-inv"
            class="absolute top-full left-0 z-40 pt-2">
-        <ul class="w-72 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <ul class="w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li>
             <a href="/inventory/stock/" class="flex items-center gap-3 rounded-lg p-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
               <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
@@ -4933,7 +4933,7 @@ register(
       <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
            id="nmm-p-proc" role="group" aria-labelledby="nmm-t-proc"
            class="absolute top-full left-0 z-40 pt-2">
-        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <ul class="w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
           <li><a href="/procurement/orders/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
           <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
@@ -4960,7 +4960,7 @@ register(
       <div x-ref="invPanel" x-show="open === 'inv'" x-cloak
            id="nmm-p-inv" role="group" aria-labelledby="nmm-t-inv"
            class="absolute top-full left-0 z-40 pt-2">
-        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <ul class="w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/inventory/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Inventory</a></li>
           <li><a href="/inventory/stock/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stock on hand</a></li>
           <li><a href="/inventory/grn/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a></li>
@@ -5046,7 +5046,7 @@ register(
       <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
            id="nmcur-p-proc" role="group" aria-labelledby="nmcur-t-proc"
            class="absolute top-full left-0 z-40 pt-2">
-        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <ul class="w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
           <li>
             <a href="/procurement/orders/" aria-current="page"
@@ -5136,7 +5136,7 @@ register(
       <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
            id="nmd-p-proc" role="group" aria-labelledby="nmd-t-proc"
            class="absolute top-full left-0 z-40 pt-2">
-        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <ul class="w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
           <li>
             <a href="/procurement/orders/" aria-current="true"
@@ -5227,7 +5227,7 @@ register(
       <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
            id="nmr-p-proc" role="group" aria-labelledby="nmr-t-proc"
            class="absolute top-full left-0 z-40 pt-2">
-        <ul class="w-72 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <ul class="w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
           <li><a href="/procurement/orders/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
           <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
@@ -5338,7 +5338,7 @@ register(
       <div x-ref="invPanel" x-show="open === 'inv'" x-cloak
            id="nms-p-inv" role="group" aria-labelledby="nms-t-inv"
            class="absolute top-full left-0 z-40 pt-2">
-        <div class="flex w-72 max-w-[calc(100vw_-_1.5rem)] flex-col rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <div class="flex w-72 max-w-[calc(100vw-2rem)] flex-col rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <ul class="mt-1">
             <li><a href="/p/vasai/inventory/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Inventory</a></li>
             <li><a href="/p/vasai/inventory/stock/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stock on hand</a></li>
@@ -5434,7 +5434,7 @@ register(
       <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
            id="nme-p-proc" role="group" aria-labelledby="nme-t-proc"
            class="absolute top-full left-0 z-40 pt-2">
-        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <ul class="w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
           <li><a href="/procurement/orders/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
           <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
@@ -5465,7 +5465,7 @@ register(
       <div x-ref="repPanel" x-show="open === 'rep'" x-cloak
            id="nme-p-rep" role="group" aria-labelledby="nme-t-rep"
            class="absolute top-full right-0 z-40 pt-2">
-        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+        <ul class="w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/reports/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All reports</a></li>
           <li><a href="/reports/consumption/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Consumption by project</a></li>
           <li><a href="/reports/ageing/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Invoice ageing</a></li>
@@ -5773,7 +5773,7 @@ register(
           <div x-ref="{{ section.key }}Panel" x-show="open === '{{ section.key }}'" x-cloak
                id="nmdj-p-{{ section.key }}" role="group" aria-labelledby="nmdj-t-{{ section.key }}"
                class="absolute top-full left-0 z-40 pt-2">
-            <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+            <ul class="w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
               {% for page in section.pages %}
                 <li>
                   <a href="{% url page.url_name %}"
@@ -6229,10 +6229,11 @@ register(
 
       { id: 'nested', name: 'Nested children', code:
 `<!-- The open map is seeded, not empty. In Django it is rendered — open: { orders:
-     {% if section == 'orders' %}true{% else %}false{% endif %}, ... } — because
-     the click that moves between the children of a section is a full page load,
-     and a map that starts empty folds the section up underneath the user on
-     every one of those navigations. That is the bug this variant exists for.
+     true, ... }, each flag printed as true or false by an if test comparing the
+     current section to that key — because the click that moves between the
+     children of a section is a full page load, and a map that starts empty
+     folds the section up underneath the user on every one of those navigations.
+     That is the bug this variant exists for.
 
      Opening one section does not close another. A nav is not an accordion: the
      single-open rule saves two rows of height and costs a click on every journey
@@ -7965,7 +7966,7 @@ register(
     </button>
 
     <div id="tb-alerts" x-show="open === 'bell'" x-cloak
-         class="absolute right-0 z-40 mt-1 w-80 max-w-[calc(100vw-1.5rem)] rounded-xl border border-zinc-200 bg-white shadow-lg">
+         class="absolute right-0 z-40 mt-1 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white shadow-lg">
       <div class="flex items-center justify-between gap-2 border-b border-zinc-100 px-3 py-2">
         <p class="text-[13px]/5 font-medium">Notifications</p>
         <p class="text-[12px]/4 tabular-nums text-zinc-500">3 unread</p>
@@ -8233,7 +8234,7 @@ register(
 
     <div id="tb-ctx" x-show="open" x-cloak
          @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.tab="close(false)"
-         class="absolute left-0 z-40 mt-1 w-72 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+         class="absolute left-0 z-40 mt-1 w-72 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
 
       <p class="px-3 pt-1.5 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Company</p>
       <div x-ref="menu">

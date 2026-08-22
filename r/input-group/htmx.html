@@ -39,14 +39,16 @@
                  code__iexact=request.GET.get("item_code", "").strip()).first()
              return render(request, "orders/_item_info.html", {"item": item})
 
-     orders/_item_info.html, which is the whole response:
-         {% if item %}
+     orders/_item_info.html, which is the whole response. The tags are written
+     here without their braces, because Django compiles a tag inside an HTML
+     comment and this snippet would not paste:
+         if item
            <span id="igh-info" data-ok="1" class="text-[13px]/5 tabular-nums
                  text-zinc-500">{{ item.uom }} · {{ item.free_stock }} in stock</span>
-         {% else %}
+         else
            <span id="igh-info" data-ok="0" class="text-[13px]/5 tabular-nums
                  text-zinc-500">No such code</span>
-         {% endif %} -->
+         endif -->
 <div data-kui="input-group/htmx" class="max-w-xl"
      x-data="{ loading: false, bad: false }"
      @htmx:before-request.camel="loading = true"

@@ -594,7 +594,7 @@ register(
      that refused, which takes focus.
 
      The icon and its colour come from one filter over message.tags rather than
-     from a chain of {% if %} in the template, so the mapping cannot differ
+     from a chain of if tags in the template, so the mapping cannot differ
      between two screens showing the same message. Add the templatetags module
      to Tailwind's content globs: these class names live in Python and nothing
      the scanner already reads mentions them.
@@ -6031,7 +6031,7 @@ register(
      link a prefetcher, a crawler or an over-eager browser will follow on its
      own. This is the shape that keeps that impossible rather than unlikely.
 
-     The permission check is {% if perms %} around the row rather than a
+     The permission check is an if perms guard around the row rather than a
      disabled attribute on it, because a user who may not cancel an order is
      not looking at a cancel button that is off — they have no business seeing
      the verb at all. The one exception is the row that is unavailable because
@@ -6039,12 +6039,12 @@ register(
      way button/unavailable does it: that is information, not a permission.
 
      Every id in the block is suffixed with the order\'s pk. This template is
-     rendered once per drawer today and inside a {% for %} the day somebody
+     rendered once per drawer today and inside a for loop the day somebody
      puts an actions drawer on every row of the register, and an
      aria-labelledby pointing at the first of six identical ids is a bug that
      only shows up in a screen reader.
 
-     Django\'s {% url %} tags and the drawer\'s Alpine state do not interact.
+     Django\'s url tags and the drawer\'s Alpine state do not interact.
      Alpine owns open and nothing else; the server owns every route. -->
 {% load humanize %}
 <div data-kui="drawer/django" x-data="{ open: false }">
@@ -8012,7 +8012,7 @@ register(
       ['Wrapper', 'relative inline-block. It owns the state and every handler, because mouseleave has to mean "left the trigger and the panel", and only their common parent knows that.'],
       ['Trigger', 'A real link to the record, or a real button. It works with the card never opening, and it keeps its own accessible name.'],
       ['Bridge', 'pt-2 or pb-2 on the positioned wrapper, not mt-2 on the panel. It is the strip the pointer crosses, and it has to belong to the component.'],
-      ['Panel', 'The positioned wrapper\'s child: w-80, max-w-[calc(100vw_-_1.5rem)], rounded-xl, white, border-zinc-300, shadow-lg, z-40. It floats above the page, so it takes the page edge every floating panel in the system takes, not the zinc-200 border used inside a surface.'],
+      ['Panel', 'The positioned wrapper\'s child: w-80, max-w-[calc(100vw-2rem)], rounded-xl, white, border-zinc-300, shadow-lg, z-40. It floats above the page, so it takes the page edge every floating panel in the system takes, not the zinc-200 border used inside a surface.'],
       ['Identity', 'The first line of the panel — the record number or the person\'s name — with the status pill or presence dot beside it.'],
       ['Figures', 'A dl of two to four facts, dt in zinc-600, dd in zinc-900 and tabular-nums. More than four and the thing being previewed is a page.'],
       ['Remainder', 'One line counting what the card did not show — 15 more lines, and what they come to. The panel is not a scroller, so this line is the only honest way to say there is more.'],
@@ -8087,7 +8087,7 @@ register(
                  belong to the component or the pointer leaves it crossing -->
             <div x-show="open" x-cloak x-transition.opacity.duration.150ms
                  class="absolute top-full left-0 z-40 pt-2">
-              <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+              <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
                 <div class="flex items-start justify-between gap-3">
                   <div class="min-w-0">
                     <p class="truncate text-[14px]/5 font-semibold tabular-nums">PO-24-1187</p>
@@ -8144,7 +8144,7 @@ register(
 
             <div x-show="open" x-cloak x-transition.opacity.duration.150ms
                  class="absolute top-full left-0 z-40 pt-2">
-              <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+              <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
                 <div class="flex items-start justify-between gap-3">
                   <div class="min-w-0">
                     <p class="truncate text-[14px]/5 font-semibold tabular-nums">PO-24-1191</p>
@@ -8218,7 +8218,7 @@ register(
 
     <div x-show="open" x-cloak x-transition.opacity.duration.150ms
          class="absolute top-full left-0 z-40 pt-2">
-      <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+      <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
         <div class="flex items-start gap-3">
           <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">GP</span>
           <div class="min-w-0 flex-1">
@@ -8301,7 +8301,7 @@ register(
 
     <div x-show="open" x-cloak x-transition.opacity.duration.150ms
          class="absolute top-full left-0 z-40 pt-2">
-      <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+      <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
         <div class="flex items-start gap-3">
           <span class="relative shrink-0">
             <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">RD</span>
@@ -8391,7 +8391,7 @@ register(
 
             <div x-show="open" x-cloak x-transition.opacity.duration.150ms
                  class="absolute top-full left-0 z-40 pt-2">
-              <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+              <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
                 <div class="flex items-start justify-between gap-3">
                   <div class="min-w-0">
                     <p class="truncate text-[14px]/5 font-semibold tabular-nums">HDPE-BLM-45</p>
@@ -8453,7 +8453,7 @@ register(
 
             <div x-show="open" x-cloak x-transition.opacity.duration.150ms
                  class="absolute top-full left-0 z-40 pt-2">
-              <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+              <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
                 <div class="flex items-start justify-between gap-3">
                   <div class="min-w-0">
                     <p class="truncate text-[14px]/5 font-semibold tabular-nums">LDPE-FLM-12</p>
@@ -8522,7 +8522,7 @@ register(
      The remainder line carries its own value. "15 more lines" invites exactly
      the question the card was opened to settle; "15 more lines · ₹7,50,000"
      settles it, and the link underneath is where the other fifteen live. -->
-<div data-kui="hovercard/long" class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+<div data-kui="hovercard/long" class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
   <div class="flex items-start justify-between gap-3">
     <div class="min-w-0">
       <p class="truncate text-[14px]/5 font-semibold tabular-nums">PO-24-1193</p>
@@ -8620,7 +8620,7 @@ register(
            :class="up ? 'bottom-full pb-2' : 'top-full pt-2'"
            :style="'left: ' + dx + 'px'"
            class="absolute left-0 z-40">
-        <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+        <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
           <p class="truncate text-[14px]/5 font-semibold tabular-nums" x-text="po.id"></p>
           <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600" x-text="po.vendor"></p>
           <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
@@ -8715,7 +8715,7 @@ register(
                  :class="up ? 'bottom-full pb-2' : 'top-full pt-2'"
                  :style="'left: ' + dx + 'px'"
                  class="absolute left-0 z-40">
-              <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 text-left shadow-lg">
+              <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 text-left shadow-lg">
                 <p class="truncate text-[14px]/5 font-semibold tabular-nums" x-text="e.id"></p>
                 <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600" x-text="e.vendor"></p>
                 <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
@@ -8794,7 +8794,7 @@ register(
 
       <div x-show="open" x-cloak x-transition.opacity.duration.150ms
            class="absolute top-full left-0 z-40 pt-2">
-        <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+        <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
 
           <!-- the skeleton is the panel's own content until the response
                replaces it, and it is the shape of the answer, so the card does
@@ -8900,7 +8900,7 @@ register(
                    hx-get="/vendors/142/card/" hx-trigger="hovercard-fetch"
                    hx-swap="innerHTML" hx-sync="this:drop"
                    :aria-busy="loaded ? 'false' : 'true'"
-                   class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+                   class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
                 <div role="status">
                   <span class="sr-only">Loading Gujarat Polymers Ltd</span>
                   <div class="animate-pulse" aria-hidden="true">
@@ -8946,7 +8946,7 @@ register(
                    hx-get="/vendors/207/card/" hx-trigger="hovercard-fetch"
                    hx-swap="innerHTML" hx-sync="this:drop"
                    :aria-busy="loaded ? 'false' : 'true'"
-                   class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+                   class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
                 <div role="status">
                   <span class="sr-only">Loading Nashik Steel Traders</span>
                   <div class="animate-pulse" aria-hidden="true">
@@ -8995,7 +8995,7 @@ register(
                    hx-get="/vendors/142/card/" hx-trigger="hovercard-fetch"
                    hx-swap="innerHTML" hx-sync="this:drop"
                    :aria-busy="loaded ? 'false' : 'true'"
-                   class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+                   class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
                 <div role="status">
                   <span class="sr-only">Loading Gujarat Polymers Ltd</span>
                   <div class="animate-pulse" aria-hidden="true">
@@ -9056,7 +9056,7 @@ register(
      and a live region with no text in it announces nothing when it appears.
      One sentence of hidden text is what is actually read out. aria-busy is
      cleared when the swap lands — see the htmx variant. -->
-<div data-kui="hovercard/loading" class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg"
+<div data-kui="hovercard/loading" class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg"
      role="status" aria-busy="true">
   <span class="sr-only">Loading order PO-24-1187</span>
   <div class="animate-pulse" aria-hidden="true">
@@ -9096,7 +9096,7 @@ register(
      that is gone are the server answering exactly, they come back 200, and
      they are the restricted variant. Drawing them here — red icon, retry
      button — tells a user to press a button that will refuse them twice. -->
-<div data-kui="hovercard/error" class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+<div data-kui="hovercard/error" class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
   <div class="flex items-start gap-2.5">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
     <div class="min-w-0">
@@ -9143,7 +9143,7 @@ register(
      the same reduced page or the same tombstone, which is what keeps the card
      supplementary rather than the only place the answer exists. -->
 <div data-kui="hovercard/restricted" class="flex flex-wrap items-start gap-4">
-  <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+  <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <p class="truncate text-[14px]/5 font-semibold tabular-nums">PO-24-1187</p>
@@ -9169,7 +9169,7 @@ register(
     </div>
   </div>
 
-  <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+  <div class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
     <div class="flex items-start gap-2.5">
       <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
       <div class="min-w-0">
@@ -9323,7 +9323,7 @@ register(
                hx-get="{% url 'order-card' order.pk %}" hx-trigger="hovercard-fetch"
                hx-swap="innerHTML" hx-sync="this:drop"
                :aria-busy="loaded ? 'false' : 'true'"
-               class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+               class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
             <div role="status">
               <span class="sr-only">Loading {{ order.number }}</span>
               <div class="animate-pulse" aria-hidden="true">
@@ -9398,7 +9398,7 @@ register(
     anatomy: [
       ['Root', 'relative inline-block. It owns open, the handlers and both refs, because click-outside, focus-out and Escape all have to mean "left the trigger and the panel", and only their common parent knows that. Put @click.outside on the panel instead and the trigger counts as outside, so it closes on mousedown and reopens on click and can never be shut by its own button.'],
       ['Trigger', 'A real button with :aria-expanded and aria-controls, x-ref="trigger" so close() can hand focus back, and a chevron or an icon that says something is behind it. It is a button and not a link, because it reveals rather than navigates.'],
-      ['Panel', 'The disclosed thing: role="dialog", tabindex="-1", an id, aria-labelledby or aria-label, x-cloak, w-80 with max-w-[calc(100vw_-_1.5rem)], rounded-xl, white, shadow-lg, z-40. Immediately after the trigger in the DOM, never portalled. Its edge is border-zinc-300 and not the border-zinc-200 that fields and nested strips take, because the panel floats over the page rather than sitting inside a card — white on zinc-100 measures 1.10, and a zinc-200 edge is the first thing to disappear when a screenshot is compressed or a projector washes the room out. Everything drawn inside it steps back down: zinc-200 on the field wrappers, zinc-100 on the rules between sections.'],
+      ['Panel', 'The disclosed thing: role="dialog", tabindex="-1", an id, aria-labelledby or aria-label, x-cloak, w-80 with max-w-[calc(100vw-2rem)], rounded-xl, white, shadow-lg, z-40. Immediately after the trigger in the DOM, never portalled. Its edge is border-zinc-300 and not the border-zinc-200 that fields and nested strips take, because the panel floats over the page rather than sitting inside a card — white on zinc-100 measures 1.10, and a zinc-200 edge is the first thing to disappear when a screenshot is compressed or a projector washes the room out. Everything drawn inside it steps back down: zinc-200 on the field wrappers, zinc-100 on the rules between sections.'],
       ['Title', 'A 13px medium line at the head of the panel, and the target of aria-labelledby. A panel with no title takes aria-label instead; a panel with neither is announced as "dialog" and nothing else.'],
       ['Body', 'The controls. Fields wear the same bordered wrapper as everywhere else, with focus-within drawing the outline. Past about five controls the answer is a sheet or a page, because a popover has no scroll of its own and should not grow one.'],
       ['Footer', 'Only on a panel that batches: Clear on the left as underlined text, Apply on the right as the primary. On a zinc-100 strip inside the panel, which needs the panel to be overflow-hidden — and overflow-hidden is what clips an arrow, so a panel gets a footer or an arrow, not both.'],
@@ -9485,7 +9485,7 @@ register(
 
   <div id="pop-det" x-ref="panel" x-show="open" x-cloak
        role="dialog" tabindex="-1" aria-labelledby="pop-det-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
@@ -9590,7 +9590,7 @@ register(
 
   <div id="pop-flt" x-ref="panel" x-show="open" x-cloak
        role="dialog" tabindex="-1" aria-labelledby="pop-flt-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <div class="space-y-3 px-4 py-3.5">
       <p id="pop-flt-title" class="text-[13px]/5 font-medium">Filter purchase orders</p>
@@ -9735,7 +9735,7 @@ register(
 
       <div id="pop-col" x-ref="panel" x-show="open" x-cloak
            role="dialog" tabindex="-1" aria-labelledby="pop-col-title"
-           class="absolute top-full right-0 z-40 mt-1.5 w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-3 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+           class="absolute top-full right-0 z-40 mt-1.5 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-3 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
         <p id="pop-col-title" class="text-[13px]/5 font-medium">Columns</p>
         <p class="mt-0.5 text-[12px]/4 text-zinc-500">Each change applies to the table at once.</p>
@@ -9895,7 +9895,7 @@ register(
 
               <div id="pop-cf" x-ref="panel" x-show="open" x-cloak
                    role="dialog" tabindex="-1" aria-labelledby="pop-cf-title"
-                   class="absolute top-full left-0 z-40 mt-1.5 w-56 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-2 text-left text-[13px]/5 tracking-normal text-zinc-900 normal-case shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                   class="absolute top-full left-0 z-40 mt-1.5 w-56 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-2 text-left text-[13px]/5 tracking-normal text-zinc-900 normal-case shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
                 <div class="flex items-center justify-between gap-3 px-1.5 pt-1 pb-1.5">
                   <p id="pop-cf-title" class="text-[12px]/4 font-medium text-zinc-600">Vendor</p>
@@ -10011,7 +10011,7 @@ register(
 
   <div id="pop-dt" x-ref="panel" x-show="open" x-cloak
        role="dialog" tabindex="-1" aria-labelledby="pop-dt-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <div class="space-y-3 px-4 py-3.5">
       <p id="pop-dt-title" class="text-[13px]/5 font-medium">Delivery date between</p>
@@ -10281,7 +10281,7 @@ register(
 
     <div id="pop-ro" x-ref="panel" x-show="open" x-cloak
          role="dialog" tabindex="-1" aria-labelledby="pop-ro-title"
-         class="absolute top-full right-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="absolute top-full right-0 z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
       <p id="pop-ro-title" class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · line 2</p>
 
@@ -10394,7 +10394,7 @@ register(
 
   <div id="pop-un" x-ref="panel" x-show="open" x-cloak
        role="dialog" tabindex="-1" aria-labelledby="pop-un-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <p id="pop-un-title" class="text-[13px]/5 font-medium tabular-nums">Note on GRN-24-4471</p>
 
@@ -10530,7 +10530,7 @@ register(
 
   <div id="pop-sv" x-ref="panel" x-show="open" x-cloak :aria-busy="busy"
        role="dialog" tabindex="-1" aria-labelledby="pop-sv-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <form hx-post="/grn/4471/lines/2/reject/" hx-target="#sv-qty-field" hx-swap="outerHTML" hx-sync="this:drop">
       <p id="pop-sv-title" class="text-[13px]/5 font-medium tabular-nums">GRN-24-4471 · line 2</p>
@@ -10656,7 +10656,7 @@ register(
     <div id="pop-arw" x-ref="panel" x-show="open" x-cloak
          :style="'transform: translateX(' + dx + 'px)'"
          role="dialog" tabindex="-1" aria-labelledby="pop-arw-title"
-         class="absolute top-full left-0 z-40 mt-1.5 w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-3 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="absolute top-full left-0 z-40 mt-1.5 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-3 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
       <span :style="'left: ' + ax + 'px'"
             class="absolute -top-1.5 size-3 -translate-x-1/2 rotate-45 border-t border-l border-zinc-300 bg-white"
@@ -10755,7 +10755,7 @@ register(
          :class="up ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
          :style="'transform: translateX(' + dx + 'px)'"
          role="dialog" tabindex="-1" aria-labelledby="pop-plc-a-title"
-         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="absolute left-0 z-40 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p id="pop-plc-a-title" class="text-[13px]/5 font-medium">Start aligned</p>
       <p class="mt-1 text-[12px]/4 text-zinc-600">The panel starts at the trigger's left edge, and shifts right only if that would put it off the left of the screen.</p>
       <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Flips above the trigger near the foot of the page.</p>
@@ -10796,7 +10796,7 @@ register(
          :class="up ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
          :style="'transform: translateX(' + dx + 'px)'"
          role="dialog" tabindex="-1" aria-labelledby="pop-plc-b-title"
-         class="absolute left-0 z-40 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         class="absolute left-0 z-40 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <p id="pop-plc-b-title" class="text-[13px]/5 font-medium">End aligned</p>
       <p class="mt-1 text-[12px]/4 text-zinc-600">The panel ends at the trigger's right edge. left-0 plus a translate rather than right-0, so one clamp covers both alignments.</p>
       <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">At 390px both panels land 12px from the edge and nothing scrolls sideways.</p>
@@ -10855,7 +10855,7 @@ register(
 
   <div id="pop-sh" x-ref="panel" x-show="open" x-cloak
        role="dialog" tabindex="-1" aria-labelledby="pop-sh-title"
-       class="fixed inset-x-0 bottom-0 z-40 w-full overflow-hidden rounded-t-2xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:absolute sm:inset-auto sm:top-full sm:left-0 sm:mt-1.5 sm:w-80 sm:max-w-[calc(100vw_-_1.5rem)] sm:rounded-xl">
+       class="fixed inset-x-0 bottom-0 z-40 w-full overflow-hidden rounded-t-2xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:absolute sm:inset-auto sm:top-full sm:left-0 sm:mt-1.5 sm:w-80 sm:max-w-[calc(100vw-2rem)] sm:rounded-xl">
 
     <div class="flex justify-center pt-2 sm:hidden">
       <span class="h-1 w-10 rounded-full bg-zinc-300" aria-hidden="true"></span>
@@ -10962,7 +10962,7 @@ register(
 
   <div id="pop-hx" x-ref="panel" x-show="open" x-cloak
        role="dialog" tabindex="-1" aria-labelledby="pop-hx-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <p id="pop-hx-title" class="text-[13px]/5 font-medium tabular-nums">Match · GRN-24-4471</p>
 
@@ -11114,7 +11114,7 @@ register(
 
   <div id="pop-dj" x-ref="panel" x-show="open" x-cloak
        role="dialog" tabindex="-1" aria-labelledby="pop-dj-title"
-       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
     <form x-ref="form" method="get" action="{% url 'orders:list' %}">
       {# what the register is already showing and this form does not own #}
@@ -11691,9 +11691,10 @@ register(
      are the signal to draw the icon, and they are returned rather than guessed,
      because the guess would be letters off an email address.
 
-     # the call sites
-     {% include "people/_avatar.html" with person=entry.actor named=True %}
-     {% include "people/_avatar.html" with person=order.approver %}
+     # the call sites — written here without their braces, because Django
+     compiles a tag inside an HTML comment and this snippet would not paste:
+     include "people/_avatar.html" with person=entry.actor named=True
+     include "people/_avatar.html" with person=order.approver
 
      named is what the caller promises: the full name is written next to this,
      so the circle can go silent. Leaving it off labels the avatar, and that is

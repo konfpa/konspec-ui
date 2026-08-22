@@ -1,0 +1,238 @@
+<!-- The head stays, the item column stays and the totals row stays, in one
+     scroller. This is not sticky-header plus sticky-column: it is those two
+     plus everything their intersections cost, and the intersections are the
+     whole variant. Stock ageing is the register that needs it — seven columns
+     of money across, and an item name you cannot afford to lose while reading
+     the far right of the row.
+
+     border-separate border-spacing-0, for the reason both single-axis variants
+     give: preflight collapses the borders onto the table, and a collapsed
+     border does not travel with the cell that sticks, so the rule under the
+     head and the rule down the frozen column both stay behind. Separated
+     borders move every rule onto the cells — six rows by eight columns is 42
+     <td>s carrying border-b instead of six <tr>s carrying it once.
+
+     Every sticky plane needs an opaque fill of its own — the head, the frozen
+     column and the foot — or the rows scroll straight through it. Because the
+     fill is opaque it also stops taking the row hover, so the tint is put back
+     on the frozen cell with group-hover; without that, hovering a row lights up
+     seven columns and leaves the eighth white, which reads as the row ending
+     where the item name starts.
+
+     Two corner cells, not none. The top-left <th> is sticky on both axes, and
+     once the foot sticks the bottom-left <th> is as well. Both take z-20
+     against the z-10 of the head, the frozen column and the foot, or they are
+     painted over from one side or the other. This is where a two-axis sticky
+     ships broken: a reviewer scrolls one axis at a time, and both corners look
+     perfect until somebody scrolls right and down together.
+
+     tabindex="0" with role="region" and a name on the scroller. Chromium will
+     not focus an overflow container, so without them a keyboard user reaches
+     every control on the page and cannot move this matrix one pixel. Firefox
+     makes scrollable regions focusable on its own, which is how the defect
+     passes review on one machine and fails on the next.
+
+     relative on the scroller, and it is load-bearing rather than decorative.
+     The sr-only caption and the words behind every em dash are position:
+     absolute, so with no positioned ancestor they resolve against the document
+     and report their static position from a cell several hundred pixels past
+     the right edge of the panel. The scroller clips them out of sight and the
+     page keeps the horizontal scrollbar they grew, which is the one thing this
+     system does not allow. Three components have shipped that bug.
+
+     Below md this is cards, like every other table here. A frozen column makes
+     a narrow desktop window workable; it does not make a phone workable. -->
+<div data-kui="table/sticky-both" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="tsb-ageing" class="text-[14px]/5 font-semibold">Stock ageing — Silvassa</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">As on 31 Aug 2026, at weighted average cost. Columns are days since receipt.</p>
+  </div>
+
+  <div role="region" aria-labelledby="tsb-ageing" tabindex="0"
+       class="relative hidden max-h-96 overflow-auto overscroll-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 md:block">
+    <table class="w-full min-w-[72rem] table-fixed border-separate border-spacing-0 text-[13px]/5">
+      <caption class="sr-only">Stock ageing at Silvassa as on 31 August 2026. Items down the rows, ageing buckets in days across the columns, and the column totals in the last row.</caption>
+      <thead>
+        <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="sticky top-0 left-0 z-20 w-64 border-r border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">Item</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">0–30 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">31–60 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">61–90 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">91–180 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">181–365 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Over 365 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Total</th>
+        </tr>
+      </thead>
+      <tbody class="[&>tr:last-child>th]:border-b-0 [&>tr:last-child>td]:border-b-0">
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">HDPE granules — natural</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-1042 · 10,680 kg</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹6,96,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,08,800</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹24,360</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹9,29,160</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">Masterbatch — white 60%</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-1091 · 480 kg</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹61,250</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹34,300</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹22,050</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹1,17,600</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">M12 hex bolt — 8.8 zinc</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-3310 · 16,250 nos</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹96,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,50,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹72,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹48,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹24,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹3,90,000</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">Stretch film — 23 micron</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-5140 · 840 kg</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹52,500</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹42,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹31,500</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹21,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹1,47,000</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">MS angle — 50×50×5</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-7702 · 5,850 kg</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹76,800</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,05,600</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,28,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹64,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹3,74,400</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-r-zinc-200 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">Die steel H13 — 40 mm</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-6208 · 600 kg</span>
+          </th>
+          <td class="px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,59,200</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>₹6,04,800
+              <span class="sr-only">held for more than a year</span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹8,64,000</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row" class="sticky bottom-0 left-0 z-20 border-t border-r border-zinc-200 bg-zinc-50 px-4 py-3 text-left align-top text-[12px]/4 font-medium text-zinc-600">
+            All 6 items at this plant
+            <span class="mt-0.5 block font-normal text-zinc-500">At weighted average cost</span>
+          </th>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹9,05,750</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹5,11,900</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹2,55,510</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹1,97,000</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹3,47,200</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹6,04,800</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top text-[14px]/5 font-semibold tabular-nums whitespace-nowrap">₹28,22,160</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <p class="hidden border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 text-zinc-600 md:block">
+    The head, the item column and the totals row all stay put. The matrix pans inside this panel; the page behind it does not move sideways at any width.
+  </p>
+
+  <!-- at 390px the buckets that hold nothing are simply absent from the card
+       rather than drawn as em dashes. An empty bucket is not a fact a phone
+       needs a row for, and the total is on the first line either way. -->
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">HDPE granules — natural</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹9,29,160</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-1042 · 10,680 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">0–30 days ₹6,96,000 · 31–60 ₹2,08,800 · 61–90 ₹24,360</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Masterbatch — white 60%</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹1,17,600</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-1091 · 480 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">0–30 days ₹61,250 · 31–60 ₹34,300 · 61–90 ₹22,050</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">M12 hex bolt — 8.8 zinc</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹3,90,000</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-3310 · 16,250 nos</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">0–30 days ₹96,000 · 31–60 ₹1,50,000 · 61–90 ₹72,000 · 91–180 ₹48,000 · 181–365 ₹24,000</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Stretch film — 23 micron</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹1,47,000</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-5140 · 840 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">0–30 days ₹52,500 · 31–60 ₹42,000 · 61–90 ₹31,500 · 91–180 ₹21,000</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">MS angle — 50×50×5</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹3,74,400</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-7702 · 5,850 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">31–60 days ₹76,800 · 61–90 ₹1,05,600 · 91–180 ₹1,28,000 · 181–365 ₹64,000</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Die steel H13 — 40 mm</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹8,64,000</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-6208 · 600 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+        181–365 days ₹2,59,200 ·
+        <span class="inline-flex items-center gap-1.5">
+          <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>over 365 ₹6,04,800
+          <span class="sr-only">held for more than a year</span>
+        </span>
+      </p>
+    </li>
+  </ul>
+
+  <dl class="flex items-baseline justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-3 md:hidden">
+    <dt class="text-[12px]/4 font-medium text-zinc-600">All 6 items at this plant</dt>
+    <dd class="shrink-0 text-[14px]/5 font-semibold tabular-nums">₹28,22,160</dd>
+  </dl>
+</div>

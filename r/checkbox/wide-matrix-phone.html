@@ -1,0 +1,109 @@
+<!-- Six columns cannot be a matrix at 390px. Frozen or not, a role column is
+     down to fifty pixels and the capability names wrap to four lines each, and
+     panning a grid with one thumb while the other hand holds the phone is not a
+     way anybody fills in a permissions screen.
+
+     One role at a time, picked by a select. The alternative was one capability
+     at a time across the six roles, and it was rejected because it answers the
+     wrong question: capability-first is the audit question — who may approve
+     over ₹7,50,000 — which is read, not edited, and is better served by the
+     grid or a report. Editing is role-first. Somebody is setting up a role or
+     handing one to a new joiner, and what they have to see before they save is
+     everything that role may do, in one list, without paging through eight
+     capabilities to assemble it. It is also six screens rather than eight.
+
+     A separate variant and not a media query on wide-matrix. Both renderings in
+     one DOM with one of them display:none posts every permission twice, because
+     a display:none checkbox still submits — and here the two copies can disagree,
+     so the save is a coin toss. The server renders one arrangement or the other.
+
+     Two forms, side by side, because a form cannot nest. The picker is a GET
+     that reloads with the chosen role; the permissions are a POST. Which leaves
+     a real hole: switching the select throws away ticks that were never saved.
+     The picker's button is bound to a dirty flag and the reason is text under
+     it, never a tooltip — a disabled control takes no focus and fires no pointer
+     events, so a tooltip on one opens for nobody.
+
+     Nothing here carries an aria-label. Each box has visible words of its own —
+     the capability — and the role axis is the legend on the fieldset, which is
+     announced on the way in. That is what a fieldset is for; the aria-labels in
+     the grid exist only because a table cell gives its box neither axis. -->
+<div data-kui="checkbox/wide-matrix-phone" class="max-w-md rounded-xl border border-zinc-300 bg-white"
+     x-data="{ dirty: false }">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-semibold">Role permissions</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 roles · 8 capabilities · one role on screen at a time</p>
+  </div>
+
+  <form method="get" class="flex items-end gap-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0 flex-1">
+      <label for="wmp-role" class="block text-[12px]/4 font-medium text-zinc-600">Role</label>
+      <!-- the locked role stays in the list, with the reason in the words. A
+           disabled <option> is silently unreachable and says nothing about why. -->
+      <select id="wmp-role" name="role"
+              class="mt-1 h-9 w-full rounded-lg border border-zinc-300 bg-white px-2.5 text-[14px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option value="buyer">Buyer</option>
+        <option value="approver" selected>Approver</option>
+        <option value="stores">Stores</option>
+        <option value="quality">Quality</option>
+        <option value="finance">Finance</option>
+        <option value="plant_head">Plant head — you cannot edit this one</option>
+      </select>
+    </div>
+    <button type="submit" :disabled="dirty"
+            class="h-9 shrink-0 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400">Show</button>
+  </form>
+
+  <p x-show="dirty" x-cloak class="border-b border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 text-zinc-600">
+    Approver has changes that are not saved. Save them before switching roles — the switch reloads this pane and they go with it.
+  </p>
+
+  <form method="post" class="px-4 py-3">
+    <!-- the one role this POST is authoritative for, the phone counterpart of
+         the scope field on wide-matrix -->
+    <input type="hidden" name="role" value="approver">
+
+    <fieldset>
+      <legend class="mb-2 text-[13px]/5 font-medium">Approver — what this role may do with purchase orders</legend>
+
+      <div class="-mx-4 divide-y divide-zinc-100 border-y border-zinc-100">
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 text-zinc-500">
+          <input type="checkbox" checked disabled class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">View the register</span>
+          <span class="shrink-0 text-[12px]/4 text-zinc-500">With the role</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="raise:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Raise an order</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="approve_750:approver" checked @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 tabular-nums">Approve to ₹7,50,000</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="approve_over:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 tabular-nums">Approve over ₹7,50,000</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="amend:approver" checked @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Amend an approved order</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="grn:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Post a GRN</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="qc:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Record a QC result</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="match:approver" @change="dirty = true" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Match the invoice against the GRN</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="mt-3 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save Approver</button>
+    <p class="mt-2 text-[12px]/4 text-zinc-500">Saves this role only. The other five are unchanged by this form.</p>
+  </form>
+</div>

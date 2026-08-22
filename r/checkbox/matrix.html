@@ -4,10 +4,16 @@
      — so every box carries an aria-label saying both axes: "Approve over
      ₹5,00,000 — Approver". Without it eighteen boxes announce as "checkbox".
 
-     Three columns is the ceiling. Every role column costs the width of its
-     heading, and the permission column is the one that pays: past three or four
-     the row label wraps to four lines on a phone. A fourth role is a second
-     matrix on the page, not a sideways scroll.
+     Three columns, and the reason to stop there is not width for its own sake.
+     A grid this size is entirely on screen at every width, so Tab walks it left
+     to right in the order the eye reads it, nothing moves under the cursor, and
+     no box is off screen when focus lands on it. Every role column costs the
+     width of its heading and the permission column is the one that pays, so past
+     three or four the row label wraps to four lines on a phone and the grid has
+     to scroll sideways to be legible at all. That is wide-matrix, and it pays
+     for six columns with a two-axis sticky, a frozen first column and a scroller
+     a keyboard user has to be let into. Take this variant wherever three columns
+     is the honest shape of the screen; take that one where it is not.
 
      There is no row tint here, and no has-[:checked] on the tr. A matrix row is
      not a selected row — it holds three separate answers, and painting the row

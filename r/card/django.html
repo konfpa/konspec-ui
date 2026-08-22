@@ -1,9 +1,15 @@
-<!-- One card per record, and the empty case handled by {% empty %} rather than
-     by a separate {% if %} further up the template — the two get out of step
-     otherwise, and the page renders an empty grid with a heading over it.
+<!-- One card per record, and the empty case handled by the empty clause rather
+     than by a separate if guard further up the template — the two get out of
+     step otherwise, and the page renders an empty grid with a heading over it.
 
      get_absolute_url on the model, not a hard-coded path, so the card keeps
-     working when the URL conf moves. Nothing else in the card is a link. -->
+     working when the URL conf moves. Nothing else in the card is a link.
+
+     The value goes through the project's own rupees filter, which prints the
+     symbol and groups 2,2,3 — intcomma returns 1,245,000 where the card has to
+     read 12,45,000. -->
+{% load money ui %}
+
 <div data-kui="card/django" class="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
   {% for order in orders %}
     <a href="{{ order.get_absolute_url }}"
@@ -19,7 +25,7 @@
         <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
           <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>{{ order.get_status_display }}
         </span>
-        <span class="text-[13px]/5 font-medium tabular-nums">₹{{ order.value|intcomma }}</span>
+        <span class="text-[13px]/5 font-medium tabular-nums">{{ order.value|rupees }}</span>
       </div>
     </a>
   {% empty %}

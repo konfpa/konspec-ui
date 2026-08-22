@@ -48,10 +48,10 @@
          path('grn/', views.receipt_register, name='grn-register'),
          path('grn/rows/', views.receipt_rows, name='grn-rows'),
 
-     Six fragments, one per state, and not a single {% if %} between them. That
+     Six fragments, one per state, and not a single if tag between them. That
      is the point of doing it here: by the time a queryset reaches a template
-     every one of these empties is a list of length zero, so {% if not receipts %}
-     cannot tell them apart and picks whichever message was typed first.
+     every one of these empties is a list of length zero, so an if not receipts
+     guard cannot tell them apart and picks whichever message was typed first.
 
      The status line lives in the page, outside hx-target, and the fragment
      writes into it with hx-swap-oob="innerHTML:#grn-count". The innerHTML: prefix

@@ -16,15 +16,10 @@
 
      None of these three states is in the locked five and there is no sixth dot.
      On hold takes Approved's amber-500 — its meaning is exactly amber's,
-     waiting on someone. Cancelled takes Open's zinc-500, which is the fallback
-     badge/status names and the same one the Django status_dot filter returns
-     for a value it has never seen. Emerald was the other candidate for
-     Cancelled and is wrong: nothing more will happen to the order, but green
-     says that is good news.
-
-     The select at the top of the frame is the preview, not the page. A real
-     record is in one state and the server renders that one; delete the strip
-     and keep whichever branch applies. -->
+     waiting on someone. Cancelled takes Draft's zinc-400, the inert shade: the
+     record is over, and emerald would say it finished well while zinc-500 would
+     say it is still live. Both are in the status table now; this entry predates
+     them and reached the same two answers on its own. -->
 <div data-kui="record-page/states" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
      x-data="{ state: 'cancelled' }">
 
@@ -66,7 +61,7 @@
                    text and never on a Lucide <i>. -->
               <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
                 <span class="size-1.5 rounded-full" aria-hidden="true"
-                      :class="{ 'bg-zinc-500': state === 'cancelled', 'bg-amber-500': state === 'hold', 'bg-emerald-600': state === 'closed' }"></span>
+                      :class="{ 'bg-zinc-400': state === 'cancelled', 'bg-amber-500': state === 'hold', 'bg-emerald-600': state === 'closed' }"></span>
                 <span x-text="state === 'cancelled' ? 'Cancelled' : state === 'hold' ? 'On hold' : 'Closed'">Cancelled</span>
               </span>
             </div>

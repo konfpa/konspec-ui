@@ -1,0 +1,176 @@
+<!-- Six roles is what a deployment has, and matrix cannot draw it: matrix stops
+     at three because a grid that size is on screen whole and Tab walks it in
+     reading order. Six columns has to scroll, and everything below is what
+     scrolling costs. The alternative — two matrices split by module — puts one
+     role's full picture in two places, which is the question the screen exists
+     to answer.
+
+     border-separate border-spacing-0 first. Preflight collapses borders onto the
+     table, and a collapsed border belongs to the table rather than the cell, so
+     it stays behind when the cell travels: the head floats over the rows with no
+     rule under it and the capability column slides across the boxes with no edge
+     to stop at. The price is every rule moving onto the cells — 48 <td>s with
+     border-b instead of 8 <tr>s carrying it once.
+
+     Every sticky cell needs an opaque fill or the boxes scroll through it, and an
+     opaque cell stops taking the row hover, so the tint goes back with
+     group-hover — without it a hovered row lights six columns and leaves the
+     capability white, which reads as the row ending where its name starts. One
+     corner cell, z-20 against z-10 on the two axes; no sticky foot here, so no
+     second corner. Without the z-20 it is painted over from one side or the
+     other, which is where a two-axis sticky ships broken: it looks right until
+     somebody scrolls right and down at once.
+
+     tabindex="0" with role="region" and a name on the scroller, because Chromium
+     will not focus an overflow container — otherwise a keyboard user reaches all
+     48 boxes and cannot move the grid one pixel to see which column they are in.
+     And relative on the scroller, or the sr-only caption escapes the clip and
+     widens the entire page.
+
+     None of it costs the aria-labels. A cell gives its box neither axis, and
+     headers are announced when a screen reader walks a table and not when it
+     tabs the controls in one, so every box still names both.
+
+     Plant head is a role this user may not grant, and the column stays, locked,
+     rather than being dropped: a grid without it reads as the plant head having
+     no permissions when they in fact have more than the person reading. The
+     reason is in the heading and in every cell's name, because two kinds of
+     disabled box sit here for two reasons and grey says neither. Disabled posts
+     nothing, so the form names the columns it is authoritative for, or a server
+     diffing against all six lets an admin holding five strip the sixth on Save.
+
+     390px is wide-matrix-phone, an arrangement and not a media query, and the
+     two must never render together — see the comment there. -->
+<form data-kui="checkbox/wide-matrix" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="wm-h" class="text-[13px]/5 font-semibold">What each role may do with purchase orders</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 roles · 8 capabilities · Silvassa and Vapi</p>
+  </div>
+
+  <div role="region" aria-labelledby="wm-h" tabindex="0"
+       class="relative max-h-[24rem] overflow-auto overscroll-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <table class="w-full min-w-[56rem] table-fixed border-separate border-spacing-0 text-[13px]/5">
+      <caption class="sr-only">What each of six roles may do with purchase orders. Capabilities down the rows, roles across the columns. The Plant head column is locked because you do not hold that role.</caption>
+      <thead>
+        <tr>
+          <th scope="col" class="sticky top-0 left-0 z-20 w-56 border-r border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Capability</th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Buyer</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">7 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Approver</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">4 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Stores</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">11 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Quality</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">6 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Finance</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">5 users</span>
+          </th>
+          <!-- the reason this column cannot be edited goes in the heading, which
+               is the one thing announced with the cell it governs -->
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-l border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Plant head</span>
+            <span class="mt-0.5 flex items-center justify-center gap-1 text-[11px]/4 font-normal text-zinc-500">
+              <i data-lucide="lock" class="size-3.5 shrink-0"></i>You cannot grant this
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="[&>tr:last-child>th]:border-b-0 [&>tr:last-child>td]:border-b-0">
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal text-zinc-600 group-hover:bg-zinc-100">View the register</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Buyer, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Approver, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Stores, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Quality, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Finance, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="View the register — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Raise an order</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:buyer" checked aria-label="Raise an order — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:approver" aria-label="Raise an order — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:stores" aria-label="Raise an order — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:quality" aria-label="Raise an order — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="raise:finance" aria-label="Raise an order — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Raise an order — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal tabular-nums group-hover:bg-zinc-100">Approve to ₹7,50,000</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:buyer" aria-label="Approve to ₹7,50,000 — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:approver" checked aria-label="Approve to ₹7,50,000 — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:stores" aria-label="Approve to ₹7,50,000 — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:quality" aria-label="Approve to ₹7,50,000 — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_750:finance" aria-label="Approve to ₹7,50,000 — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Approve to ₹7,50,000 — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal tabular-nums group-hover:bg-zinc-100">Approve over ₹7,50,000</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:buyer" aria-label="Approve over ₹7,50,000 — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:approver" aria-label="Approve over ₹7,50,000 — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:stores" aria-label="Approve over ₹7,50,000 — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:quality" aria-label="Approve over ₹7,50,000 — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="approve_over:finance" aria-label="Approve over ₹7,50,000 — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Approve over ₹7,50,000 — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Amend an approved order</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:buyer" checked aria-label="Amend an approved order — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:approver" checked aria-label="Amend an approved order — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:stores" aria-label="Amend an approved order — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:quality" aria-label="Amend an approved order — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="amend:finance" aria-label="Amend an approved order — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Amend an approved order — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Post a GRN</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:buyer" aria-label="Post a GRN — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:approver" aria-label="Post a GRN — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:stores" checked aria-label="Post a GRN — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:quality" aria-label="Post a GRN — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn:finance" aria-label="Post a GRN — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Post a GRN — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Record a QC result</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:buyer" aria-label="Record a QC result — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:approver" aria-label="Record a QC result — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:stores" aria-label="Record a QC result — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:quality" checked aria-label="Record a QC result — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc:finance" aria-label="Record a QC result — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Record a QC result — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Match the invoice against the GRN</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:buyer" aria-label="Match the invoice against the GRN — Buyer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:approver" aria-label="Match the invoice against the GRN — Approver" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:stores" aria-label="Match the invoice against the GRN — Stores" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:quality" aria-label="Match the invoice against the GRN — Quality" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="match:finance" checked aria-label="Match the invoice against the GRN — Finance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Match the invoice against the GRN — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- the columns this form is authoritative for. Without it a server diffing
+       the POST against all six roles revokes everything the locked column holds,
+       because a disabled box posts nothing and absence is indistinguishable from
+       unticked. -->
+  <input type="hidden" name="scope" value="buyer,approver,stores,quality,finance">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">
+      5 of the 6 columns are saved from here. Plant head is shown because a grid that dropped it would read as the plant head having no permissions; it is changed by someone who holds that role.
+    </p>
+  </div>
+</form>

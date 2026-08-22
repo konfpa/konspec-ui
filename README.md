@@ -11,7 +11,7 @@
 
 [![CI](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml)
 [![components](https://img.shields.io/badge/components-74-18181b?style=flat-square)](#components)
-[![variants](https://img.shields.io/badge/variants-857-18181b?style=flat-square)](#components)
+[![variants](https://img.shields.io/badge/variants-860-18181b?style=flat-square)](#components)
 [![build step](https://img.shields.io/badge/build_step-none-18181b?style=flat-square)](#running-it-locally)
 [![licence](https://img.shields.io/badge/licence-MIT-18181b?style=flat-square)](LICENSE)
 
@@ -41,7 +41,7 @@ Arrived without reading llms.txt:         /r/index.json
 Never fetch /registry.json — the whole system in one file, ~725k tokens.
 ```
 
-`llms.txt` is 46 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
+`llms.txt` is 53 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 
@@ -72,7 +72,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**74 components · 857 variants · 74 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
+**74 components · 860 variants · 74 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
 
 ### Actions
 
@@ -92,7 +92,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Input group | `input-group` | 15 | [open](https://konfpa.github.io/konspec-ui/components/input-group.html) |
 | Select | `select` | 14 | [open](https://konfpa.github.io/konspec-ui/components/select.html) |
 | Textarea | `textarea` | 13 | [open](https://konfpa.github.io/konspec-ui/components/textarea.html) |
-| Checkbox | `checkbox` | 14 | [open](https://konfpa.github.io/konspec-ui/components/checkbox.html) |
+| Checkbox | `checkbox` | 16 | [open](https://konfpa.github.io/konspec-ui/components/checkbox.html) |
 | Radio | `radio` | 13 | [open](https://konfpa.github.io/konspec-ui/components/radio.html) |
 | Toggle | `toggle` | 13 | [open](https://konfpa.github.io/konspec-ui/components/toggle.html) |
 | Combobox | `combobox` | 14 | [open](https://konfpa.github.io/konspec-ui/components/combobox.html) |
@@ -104,7 +104,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 
 | Component | id | Variants | Page |
 |---|---|--:|---|
-| Table | `table` | 12 | [open](https://konfpa.github.io/konspec-ui/components/table.html) |
+| Table | `table` | 13 | [open](https://konfpa.github.io/konspec-ui/components/table.html) |
 | Data table | `data-table` | 11 | [open](https://konfpa.github.io/konspec-ui/components/data-table.html) |
 | Pagination | `pagination` | 15 | [open](https://konfpa.github.io/konspec-ui/components/pagination.html) |
 | Stat card | `stat-card` | 14 | [open](https://konfpa.github.io/konspec-ui/components/stat-card.html) |

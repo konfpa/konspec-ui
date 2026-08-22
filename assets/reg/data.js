@@ -6,7 +6,7 @@ register(
     notes: [
       'Money and quantity cells get tabular-nums and text-right so digits line up. Text cells stay left.',
       'Status pills use the locked mapping: Open zinc-500, Approved amber-500, Overdue red-600, Closed emerald-600, Draft zinc-400. The pill itself is bg-zinc-200 with a zinc-300 ring and zinc-700 text in every case — only the dot changes. Do not reinterpret it per screen.',
-      'Below md the table must not scroll sideways — render the same rows as stacked cards instead. The panel is rounded and clipped, so a table too wide for the phone is not merely awkward there, it is cut off: the last column is behind the panel edge and nothing indicates it exists.',
+      'Below md a register must not scroll sideways — render the same rows as stacked cards instead, which is what selection, totals, grouped, linked-rows, long-values, responsive and django all do. The exception is a variant demonstrating a control rather than a register: row-actions and sticky-column keep the table and scroll it inside its own box, because the alternative is a second copy of a row menu or a frozen column with nothing to freeze. A box that scrolls carries relative, tabindex="0", role="region", a name, and a line below it saying which way to scroll.  The panel is rounded and clipped, so a table too wide for the phone is not merely awkward there, it is cut off: the last column is behind the panel edge and nothing indicates it exists.',
       'The sort indicator belongs inside the <th> button, not beside the table. Only one column is sorted at a time.',
       'Selection state is an array of PO numbers on the component root. Nothing outside the snippet is read.',
       'The sort chevron is a plain icon inside a span, and the span is what carries the state. createIcons() replaces the <i> with an <svg>, and any binding written on the icon goes with it.',
@@ -14,12 +14,17 @@ register(
       'A column that has to total does it in a <tfoot>, never as one more <tr> at the end of the body. In the body a total is a record: a select-all ticks it, a sort carries it into the middle of the table, and a reader walking rows is read one more line without being told it is a sum.',
       'Anything sticky — a header that stays, a column that stays — needs border-separate border-spacing-0 on the table. Preflight sets border-collapse: collapse, and in a collapsed table the borders belong to the table rather than to the cell, so the rule under a sticky header does not travel with it and the header floats over the rows with nothing between them. The price is that the row rules move onto the <td>.',
       'A sticky cell needs an opaque fill of its own or the rows scroll straight through it. Because that fill is opaque it also stops taking the row\'s hover tint, so the tint has to be put back on the sticky cell with group-hover.',
+      'The header band is bg-zinc-50 in every variant here. It is the recessed fill the spec gives a table head — a band inside a white panel, lighter than the page so it can never be read as the page showing through — and a plain border-b with nothing behind it is drift, not a lighter alternative. A sticky header does not merely take the fill, it depends on it: with no fill of its own the head is transparent and the rows travel up through the labels, which stays readable for about two rows and then is not a header at all.',
+      'Both axes sticking at once costs more than the two single-axis variants added together, and the extra is the intersections. Where a sticky head meets a frozen column there is a corner cell that is sticky on both axes, and once the foot sticks there is a second one at the bottom left; both need z-20 against the z-10 of the three planes around them or they are painted over from one side or the other. It ships broken because a reviewer scrolls one axis at a time and both corners look right until the two are scrolled together. sticky-both is the variant that draws them; sticky-header and sticky-column each own one axis and no corner.',
+      'A scroller that pans needs tabindex="0", role="region" and an accessible name. Chromium does not make an overflow container focusable, so a matrix that scrolls in two axes is operable by pointer and by nothing else — the content is on screen, reachable by every other means, and unreachable by the arrow keys. Firefox does make scrollable regions focusable, which is how this passes review on one machine.',
+      'A scroller holding an sr-only span needs position: relative on it. An sr-only span is position: absolute, so with no positioned ancestor its containing block is the document: it takes its static position from a column several hundred pixels past the right edge of a phone, the scroller clips it out of sight, and the page keeps the horizontal scrollbar it grew. Remove the sr-only text and the defect vanishes and the fix looks unnecessary, which is why it has been reintroduced three times.',
       'A row that opens its record carries exactly one anchor, stretched over the row with after:absolute after:inset-0. An <a> around a <tr> is deleted by the parser, an <a> in every cell is six tab stops per row, and a click handler on the <tr> loses middle-click, Ctrl-click and the URL in the status bar.',
       'An identifier is never truncated. A PO number, a batch code or an HSN cut off at the column edge is not a shortened value, it is a different value, and somebody will read it into an email. Identifiers wrap; only prose truncates.',
+      'Django has no idea what an HTML comment is. A template tag written as prose between the angle brackets is lexed and executed exactly where it sits, so an empty clause with no for loop around it raises TemplateSyntaxError: Invalid block tag and the snippet cannot be pasted at all. In a comment, name the tag in words; a tag is only inert inside a real comment block.',
       'Indian digit grouping is 2,2,3 above the last three digits — ₹12,45,000, not ₹1,245,000. toLocaleString(\'en-IN\') does it in the browser; on the server it is a project filter, because intcomma groups in threes unless the locale overrides it and the resulting figure is wrong by a factor of ten to anyone reading it quickly.'
     ],
     anatomy: [
-      ['Header cell', 'A button inside the <th>. The button carries the label and the sort chevron and is the thing clicked; the <th> carries scope and aria-sort.'],
+      ['Header cell', 'A button inside the <th>. The button carries the label and the sort chevron and is the thing clicked; the <th> carries scope and aria-sort. The band behind it is bg-zinc-50 in every variant, and a sticky head carries that fill on each cell rather than on the row.'],
       ['Row', 'One record. Where rows can be selected the selected tint is zinc-100 and hover a step lighter, so the two states never read as one.'],
       ['Numeric cell', 'tabular-nums and text-right, so digits stack into a readable column. whitespace-nowrap as well, or ₹12,45,000 wraps between the symbol and the digits in a narrow column.'],
       ['Status cell', 'A pill from the locked mapping, and the only colour in the row.'],
@@ -28,6 +33,8 @@ register(
       ['Foot', 'A <tfoot> under the body carrying the totals. Each figure is named by a <th scope="row">, sits in the column it totals, and keeps that column\'s alignment and tabular-nums. A recessed bg-zinc-50 band over a border-zinc-200 rule, because the foot changes what the region is rather than dividing it.'],
       ['Group heading', 'A <th scope="colgroup"> spanning the row at the top of its own <tbody>, naming the group and carrying its subtotal in the column the subtotal belongs to.'],
       ['Frozen column', 'The identifying column, sticky left-0 with a fill of its own and a border-r, so the figures scroll under a label that stays readable.'],
+      ['Corner cell', 'The cell where a sticky head crosses a frozen column, and the second one where a sticky foot crosses it. Sticky on both axes and z-20 against the z-10 of the planes around it. sticky-both draws both of them; the single-axis variants have no corner to draw.'],
+      ['Matrix scroller', 'The div that owns the scroll on a two-axis table: overflow-auto, overscroll-contain, relative, and tabindex="0" with role="region" and a name. Its focus outline takes the negative offset, because it sits flush inside a panel clipped for its rounded corners and a positive offset draws three sides of an outline.'],
       ['Stacked card', 'The same record rendered as a card below md, because a table that scrolls sideways on a phone is unusable.']
     ],
     behaviour: [
@@ -41,7 +48,9 @@ register(
       'A total is computed from the same array the rows are drawn from, so the foot and the body cannot disagree. On a paged register the figure comes from the server over the whole query instead, and the label in the foot says which of the two it is.',
       'A quantity column in mixed units does not total. kg and nos do not add up, so the cell carries an em dash and the reason sits under the table — a number there would be read as a figure rather than as nonsense.',
       'A bounded scroller takes overscroll-contain, so reaching the last row does not hand the wheel to the page behind it.',
-      'A wide table scrolls sideways inside its own bounded scroller from md up, and only there. At 390px it is cards, like every other table: a sideways scroll on a phone is indistinguishable from a layout that broke.'
+      'A wide table scrolls sideways inside its own bounded scroller from md up, and only there. At 390px it is cards, like every other table: a sideways scroll on a phone is indistinguishable from a layout that broke.',
+      'Where both axes stick, the head stays while the rows scroll, the first column stays while the columns scroll, and the foot stays under both. All of it happens inside the scroller; the page behind it does not move sideways at any width, and below md the whole arrangement is cards rather than a smaller grid.',
+      'The scroller is in the tab order and the arrow keys pan it. That is the only keyboard way through a matrix wider than the screen, and it exists because of the tabindex on the div rather than because the div scrolls.'
     ],
     a11y: [
       'Header cells are <th scope="col">, so a screen reader can name the column when reading a cell.',
@@ -53,7 +62,10 @@ register(
       'A group heading is a <th scope="colgroup"> at the head of its own <tbody>, not a <td>. As a <td> the group name is a data value in an unnamed column, and the rows under it are attached to nothing.',
       'In a wide table the identifying cell is a <th scope="row">, so a figure eight columns along is announced with the item it belongs to instead of on its own.',
       'A total in the foot is named by a <th scope="row"> in the same row. A bare figure at the bottom of a table is announced as a number with no word attached to it.',
-      'A stretched row link keeps its accessible name from the text inside the anchor, not from the row. "PO-24-1187" is the name; the rest of the row is read as cells, as it should be.'
+      'A stretched row link keeps its accessible name from the text inside the anchor, not from the row. "PO-24-1187" is the name; the rest of the row is read as cells, as it should be.',
+      'A scroller that pans is a role="region" with an accessible name and tabindex="0", so it appears in the tab order and the arrow keys move it. Chromium does not make an overflow container focusable on its own, so without this a matrix is operable by mouse and by nothing else.',
+      'A two-axis table carries an sr-only <caption> saying what the rows are and what the columns are. Entering it, a screen reader is told a row count and a column count and nothing about which axis is which.',
+      'An empty cell is an em dash for the eye and words in an sr-only span. An em dash on its own is announced as nothing, which is indistinguishable from a cell the page failed to fill.'
     ],
     related: ['data-table', 'empty-state', 'checkbox', 'skeleton'],
     variants: [
@@ -93,7 +105,7 @@ register(
      class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-[13px]/5">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" :aria-sort="ariaSort('po')" class="px-4 py-2.5">
           <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'po' && 'text-zinc-900'">
             PO number
@@ -172,7 +184,7 @@ register(
 
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="w-10 px-4 py-2.5">
           <input type="checkbox" aria-label="Select all 3 orders on this page" class="size-4 shrink-0 accent-zinc-700"
                  :checked="sel.length === all.length"
@@ -313,9 +325,10 @@ register(
        ]
      }"
      class="rounded-xl border border-zinc-300 bg-white">
-  <table class="w-full text-[13px]/5">
+  <div class="relative overflow-x-auto md:overflow-visible" tabindex="0" role="region" aria-label="Orders, scrolls sideways">
+  <table class="w-full min-w-[34rem] text-[13px]/5 md:min-w-0">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
         <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
         <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
@@ -389,6 +402,8 @@ register(
       </template>
     </tbody>
   </table>
+  <p class="border-t border-zinc-200 px-4 py-2 text-[12px]/4 text-zinc-500 md:hidden">Scroll sideways for status and actions.</p>
+  </div>
 </div>` },
 
       { id: 'totals', name: 'A column that totals', tagNew: true, code:
@@ -434,7 +449,7 @@ register(
 
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="px-4 py-2.5 font-medium">Item</th>
         <th scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
         <th scope="col" class="px-4 py-2.5 text-right font-medium">Rate</th>
@@ -552,7 +567,7 @@ register(
      class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
         <th scope="col" class="px-4 py-2.5 font-medium">Department</th>
         <th scope="col" class="px-4 py-2.5 font-medium">Due</th>
@@ -638,7 +653,7 @@ register(
 <div data-kui="table/linked-rows" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
         <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
         <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
@@ -783,7 +798,7 @@ register(
 <div data-kui="table/long-values" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full table-fixed text-[13px]/5 md:table">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="w-[34%] px-4 py-2.5 font-medium">Item</th>
         <th scope="col" class="w-[22%] px-4 py-2.5 font-medium">Vendor batch</th>
         <th scope="col" class="w-[16%] px-4 py-2.5 text-right font-medium">Received</th>
@@ -864,7 +879,7 @@ register(
 <div data-kui="table/dense" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-[13px]/5">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="px-3 py-1.5 font-medium">PO number</th>
         <th scope="col" class="px-3 py-1.5 font-medium">Vendor</th>
         <th scope="col" class="px-3 py-1.5 font-medium">Dept</th>
@@ -1080,15 +1095,17 @@ register(
      bare figure is read out with no idea which item it belongs to; scope="row"
      is what attaches the two.
 
-     If the head is sticky as well, the top-left cell is sticky on both axes and
-     has to outrank both: z-20 on the corner, z-10 on the rest of the head and
-     on the frozen column, or the corner is painted over from one side or the
-     other as the ledger is scrolled.
+     The head does not stick here, so there is no corner cell and nothing in
+     this variant draws one. Add a sticky head and the top-left cell becomes
+     sticky on both axes and has to outrank both — z-20 against the z-10 of the
+     head and of the frozen column — and a sticky foot adds a second corner at
+     the bottom left. Both corners belong to sticky-both, which owns them and
+     pays for them. This variant owns one axis and stops there.
 
      Closing stock below the reorder level takes a red dot, not a red cell. It
      is one fact about one figure and the row is otherwise fine. -->
 <div data-kui="table/sticky-column" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
-  <div class="hidden overflow-x-auto overscroll-x-contain md:block">
+  <div class="relative hidden overflow-x-auto overscroll-x-contain md:block">
     <table class="w-full min-w-[60rem] border-separate border-spacing-0 text-[13px]/5">
       <thead>
         <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
@@ -1243,6 +1260,246 @@ register(
   </ul>
 </div>` },
 
+      { id: 'sticky-both', name: 'Both axes stay put', tagNew: true, code:
+`<!-- The head stays, the item column stays and the totals row stays, in one
+     scroller. This is not sticky-header plus sticky-column: it is those two
+     plus everything their intersections cost, and the intersections are the
+     whole variant. Stock ageing is the register that needs it — seven columns
+     of money across, and an item name you cannot afford to lose while reading
+     the far right of the row.
+
+     border-separate border-spacing-0, for the reason both single-axis variants
+     give: preflight collapses the borders onto the table, and a collapsed
+     border does not travel with the cell that sticks, so the rule under the
+     head and the rule down the frozen column both stay behind. Separated
+     borders move every rule onto the cells — six rows by eight columns is 42
+     <td>s carrying border-b instead of six <tr>s carrying it once.
+
+     Every sticky plane needs an opaque fill of its own — the head, the frozen
+     column and the foot — or the rows scroll straight through it. Because the
+     fill is opaque it also stops taking the row hover, so the tint is put back
+     on the frozen cell with group-hover; without that, hovering a row lights up
+     seven columns and leaves the eighth white, which reads as the row ending
+     where the item name starts.
+
+     Two corner cells, not none. The top-left <th> is sticky on both axes, and
+     once the foot sticks the bottom-left <th> is as well. Both take z-20
+     against the z-10 of the head, the frozen column and the foot, or they are
+     painted over from one side or the other. This is where a two-axis sticky
+     ships broken: a reviewer scrolls one axis at a time, and both corners look
+     perfect until somebody scrolls right and down together.
+
+     tabindex="0" with role="region" and a name on the scroller. Chromium will
+     not focus an overflow container, so without them a keyboard user reaches
+     every control on the page and cannot move this matrix one pixel. Firefox
+     makes scrollable regions focusable on its own, which is how the defect
+     passes review on one machine and fails on the next.
+
+     relative on the scroller, and it is load-bearing rather than decorative.
+     The sr-only caption and the words behind every em dash are position:
+     absolute, so with no positioned ancestor they resolve against the document
+     and report their static position from a cell several hundred pixels past
+     the right edge of the panel. The scroller clips them out of sight and the
+     page keeps the horizontal scrollbar they grew, which is the one thing this
+     system does not allow. Three components have shipped that bug.
+
+     Below md this is cards, like every other table here. A frozen column makes
+     a narrow desktop window workable; it does not make a phone workable. -->
+<div data-kui="table/sticky-both" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="tsb-ageing" class="text-[14px]/5 font-semibold">Stock ageing — Silvassa</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">As on 31 Aug 2026, at weighted average cost. Columns are days since receipt.</p>
+  </div>
+
+  <div role="region" aria-labelledby="tsb-ageing" tabindex="0"
+       class="relative hidden max-h-96 overflow-auto overscroll-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 md:block">
+    <table class="w-full min-w-[72rem] table-fixed border-separate border-spacing-0 text-[13px]/5">
+      <caption class="sr-only">Stock ageing at Silvassa as on 31 August 2026. Items down the rows, ageing buckets in days across the columns, and the column totals in the last row.</caption>
+      <thead>
+        <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="sticky top-0 left-0 z-20 w-64 border-r border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">Item</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">0–30 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">31–60 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">61–90 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">91–180 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">181–365 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Over 365 days</th>
+          <th scope="col" class="sticky top-0 z-10 w-32 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Total</th>
+        </tr>
+      </thead>
+      <tbody class="[&>tr:last-child>th]:border-b-0 [&>tr:last-child>td]:border-b-0">
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">HDPE granules — natural</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-1042 · 10,680 kg</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹6,96,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,08,800</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹24,360</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹9,29,160</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">Masterbatch — white 60%</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-1091 · 480 kg</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹61,250</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹34,300</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹22,050</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹1,17,600</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">M12 hex bolt — 8.8 zinc</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-3310 · 16,250 nos</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹96,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,50,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹72,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹48,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹24,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹3,90,000</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">Stretch film — 23 micron</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-5140 · 840 kg</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹52,500</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹42,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹31,500</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹21,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹1,47,000</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">MS angle — 50×50×5</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-7702 · 5,850 kg</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹76,800</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,05,600</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,28,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹64,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹3,74,400</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-r-zinc-200 bg-white px-4 py-2.5 text-left align-top font-medium group-hover:bg-zinc-100">
+            <span class="block">Die steel H13 — 40 mm</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-6208 · 600 kg</span>
+          </th>
+          <td class="px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="px-4 py-2.5 text-right text-zinc-500">—<span class="sr-only">Nothing in this bucket</span></td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,59,200</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>₹6,04,800
+              <span class="sr-only">held for more than a year</span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹8,64,000</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row" class="sticky bottom-0 left-0 z-20 border-t border-r border-zinc-200 bg-zinc-50 px-4 py-3 text-left align-top text-[12px]/4 font-medium text-zinc-600">
+            All 6 items at this plant
+            <span class="mt-0.5 block font-normal text-zinc-500">At weighted average cost</span>
+          </th>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹9,05,750</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹5,11,900</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹2,55,510</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹1,97,000</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹3,47,200</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top tabular-nums whitespace-nowrap">₹6,04,800</td>
+          <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top text-[14px]/5 font-semibold tabular-nums whitespace-nowrap">₹28,22,160</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <p class="hidden border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 text-zinc-600 md:block">
+    The head, the item column and the totals row all stay put. The matrix pans inside this panel; the page behind it does not move sideways at any width.
+  </p>
+
+  <!-- at 390px the buckets that hold nothing are simply absent from the card
+       rather than drawn as em dashes. An empty bucket is not a fact a phone
+       needs a row for, and the total is on the first line either way. -->
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">HDPE granules — natural</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹9,29,160</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-1042 · 10,680 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">0–30 days ₹6,96,000 · 31–60 ₹2,08,800 · 61–90 ₹24,360</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Masterbatch — white 60%</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹1,17,600</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-1091 · 480 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">0–30 days ₹61,250 · 31–60 ₹34,300 · 61–90 ₹22,050</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">M12 hex bolt — 8.8 zinc</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹3,90,000</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-3310 · 16,250 nos</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">0–30 days ₹96,000 · 31–60 ₹1,50,000 · 61–90 ₹72,000 · 91–180 ₹48,000 · 181–365 ₹24,000</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Stretch film — 23 micron</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹1,47,000</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-5140 · 840 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">0–30 days ₹52,500 · 31–60 ₹42,000 · 61–90 ₹31,500 · 91–180 ₹21,000</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">MS angle — 50×50×5</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹3,74,400</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-7702 · 5,850 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">31–60 days ₹76,800 · 61–90 ₹1,05,600 · 91–180 ₹1,28,000 · 181–365 ₹64,000</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Die steel H13 — 40 mm</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">₹8,64,000</span>
+      </div>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-6208 · 600 kg</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+        181–365 days ₹2,59,200 ·
+        <span class="inline-flex items-center gap-1.5">
+          <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>over 365 ₹6,04,800
+          <span class="sr-only">held for more than a year</span>
+        </span>
+      </p>
+    </li>
+  </ul>
+
+  <dl class="flex items-baseline justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-3 md:hidden">
+    <dt class="text-[12px]/4 font-medium text-zinc-600">All 6 items at this plant</dt>
+    <dd class="shrink-0 text-[14px]/5 font-semibold tabular-nums">₹28,22,160</dd>
+  </dl>
+</div>` },
+
       { id: 'responsive', name: 'Responsive', code:
 `<!-- Two renderings of the same records, one hidden at each breakpoint. Not a
      table in a horizontal scroller, and not a table with three columns hidden
@@ -1265,7 +1522,7 @@ register(
 <div data-kui="table/responsive" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
         <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
         <th scope="col" class="px-4 py-2.5 font-medium">Department</th>
@@ -1366,22 +1623,31 @@ register(
      it. aria-sort still goes on the <th>, as in the default variant, and only
      on the columns that actually sort.
 
-     {% empty %} draws the no-rows case as a <tr> with one colspan cell inside
-     the <tbody>, never as a div after the table: a sibling div is outside the
-     table in the accessibility tree, so somebody reading with table navigation
-     walks a table of zero rows and is never told why. The message itself
-     belongs to empty-state — copy the wording from there. If the columns are
-     optional, the colspan comes from the view rather than being typed here.
+     Every template tag named in this comment is named in words, and that is not
+     a style choice. Django's lexer does not know what an HTML comment is, so a
+     tag written between the angle brackets is executed exactly where it sits —
+     and an empty clause with no for loop around it raises TemplateSyntaxError:
+     Invalid block tag before a single row renders, which makes the whole
+     snippet impossible to paste. Prose names the tag; only a real comment block
+     makes one inert.
+
+     The empty clause draws the no-rows case as a <tr> with one colspan cell
+     inside the <tbody>, never as a div after the table: a sibling div is
+     outside the table in the accessibility tree, so somebody reading with table
+     navigation walks a table of zero rows and is never told why. The message
+     itself belongs to empty-state — copy the wording from there. If the columns
+     are optional, the colspan comes from the view rather than being typed here.
 
      The foot is skipped entirely when there is nothing to total, and its count
      is pluralized, so a register with one receipt in it does not say 1 orders.
 
      Paging around all of this is data-table, not table. -->
 {# orders/register.html #}
+{% load money %}
 <div data-kui="table/django" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="px-4 py-2.5"
             aria-sort="{% if sort == 'number' %}ascending{% elif sort == '-number' %}descending{% else %}none{% endif %}">
           <a href="?sort={% if sort == 'number' %}-{% endif %}number"
@@ -1470,6 +1736,8 @@ register(
     description: 'The register screen assembled: a table with a search box, filters, sortable headers, column visibility, row selection, totals and a pager, all running off one array of records.',
     when: 'The main list screen of a module — the order register, the GRN register, the vendor list. If all you want is rows on a page, use table; this is table with working state around it, and every control it shows is one you then have to point at something real.',
     notes: [
+      'Selectable rows hover to zinc-50, not to the zinc-100 a surface in a white panel would normally take, because zinc-100 is already spoken for: it is what marks a row as selected. Hover has to differ from the resting fill and from the selected fill, and off white that leaves zinc-50. checkbox/table, radio/bands, radio/table and table/selection all reach for the same step for the same reason, and the build models it.',
+      'That hover is written inside a :class binding, where the build lint cannot see it — the lint reads the static class attribute only, because it cannot evaluate an Alpine expression. A hover moved into a binding is a hover nobody checks, so keep the resting and hover fills in the static class wherever the markup allows it, and treat a bound one as something review has to read by eye.',
       'Where the register holds its own data, every control is real state on the component root: the search filters the array, the column boxes hide cells, the headers reorder rows and the footer cuts the page out of the result. A toolbar whose controls do nothing is worse than no toolbar.',
       'The footer states the range and the total. "Next" with no count tells the user nothing.',
       'A filter that matches nothing has to say so. A register that filters to zero rows and shows a bare header reads as broken.',
@@ -2869,7 +3137,7 @@ register(
 
      Selection is deliberately absent: which rows are ticked is client state and
      does not survive a swap. Reach for the full register when you need it. -->
-{% load humanize %}
+{% load humanize money %}
 
 {# orders/register.html #}
 <div data-kui="data-table/server" id="register" class="rounded-xl border border-zinc-300 bg-white">
@@ -2889,7 +3157,7 @@ register(
   </form>
 
   {% if page_obj %}
-    <table class="w-full text-[13px]/5">
+    <table class="hidden w-full text-[13px]/5 md:table">
       <thead>
         <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
           {% for c in columns %}
@@ -2910,11 +3178,25 @@ register(
           <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
             <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
             <td class="px-4 py-2.5">{{ o.vendor.name }}</td>
-            <td class="px-4 py-2.5 text-right tabular-nums">₹{{ o.amount|intcomma }}</td>
+            <td class="px-4 py-2.5 text-right tabular-nums">{{ o.amount|rupees }}</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
+
+    <ul class="divide-y divide-zinc-100 md:hidden">
+      {% for o in page_obj %}
+        <li class="px-4 py-3">
+          <a href="{{ o.get_absolute_url }}" class="flex items-baseline justify-between gap-3 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0">
+              <span class="block text-[14px]/5 font-medium tabular-nums">{{ o.number }}</span>
+              <span class="mt-0.5 block text-[13px]/5 text-zinc-600">{{ o.vendor.name }}</span>
+            </span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">{{ o.amount|rupees }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
 
     <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
       <p class="text-[13px]/5 text-zinc-600 tabular-nums">
@@ -4384,7 +4666,7 @@ register(
       'The loading tile carries aria-busy="true" and its grey blocks are aria-hidden, so the tile is announced as waiting rather than read out as a wall of nothing.',
       'A no-data tile spells out "No data" as sr-only text beside the aria-hidden em dash, because an em dash resolves to nothing and a silent tile is indistinguishable from a missing one.',
       'A figure that refreshes in place goes in a role="status" only when the refresh is something the user asked for. A tile polling on a timer stays silent, because a live region firing every thirty seconds makes the rest of the page unusable. The region is the wrapper that was already on the page, never the message that arrives: a live region added with its text already in it announces nothing, because it was not a live region when the text was put there.',
-      'A tile that rebases on a control the user just pressed takes role="status" with aria-atomic="true", so the label, the new figure and the new comparison clause are read as one sentence rather than as a number with no period attached to it.',
+      'A tile that rebases on a control the user just pressed takes role="status" with aria-atomic="true", so the label, the new figure and the new comparison clause are read as one sentence rather than as a number with no period attached to it. That holds only while the tile owns the control. Where one period control rebases a strip of tiles and a plot together, every tile drops the live region and the radiogroup\'s aria-checked is the whole announcement — see chart/period, and dashboard/period for the assembled case. Four tiles and a chart each announcing their own new figure is five sentences for one keypress.',
       'A filter strip is anchors, one tab stop each, with aria-current="true" on the filter in force. A strip that is one tab stop with arrow keys inside it is a radiogroup, and a filter that is a URL is not one.',
       'A failed tile says "Not read" in sr-only text beside the aria-hidden em dash, and its retry names what it is retrying — "Try again" with sr-only "reading QC holds open" after it, so the visible label still opens the accessible name. Four tiles that all failed are otherwise four buttons called "Try again" in the tab order.'
     ],
@@ -4877,6 +5159,13 @@ register(
      they asked, and aria-atomic is what makes it read as "Orders raised, 1,712,
      -38 vs. the twelve months before" rather than as a bare number. A tile that
      repolls on a timer stays silent.
+
+     Here means: this tile owns this control. The moment one control rebases a
+     strip of four tiles and a plot — which is what a dashboard is — the live
+     region moves off the tiles entirely, because five of them fire at once and
+     the reader gets five clauses for one keypress and can hold none of them.
+     Then the announcement is the radiogroup's own aria-checked and nothing
+     else, which is the rule chart/period states. One control, one voice.
 
      The control is button-group/segmented at its own size. On a real screen
      each button also carries hx-get with the period in the query and swaps the
@@ -5491,7 +5780,7 @@ register(
       'A sparkline is the one chart with no fallback table, and it is not an exception to the rule above. It carries no scale and no axis, so there are no figures in it to repeat — the figure printed beside it is the data, and the aria-label names both ends of the range and the shape between them.',
       'Where the figures are on the screen as a real table, that table is the text and the sr-only copy is deleted. Point it at the card heading with aria-labelledby rather than giving it a second name of its own, and leave role="img" and its sentence on the canvas: the shape is the part the table does not carry.',
       'Legend switches are buttons with aria-pressed, and pressed means the series is drawn. The last one still on is aria-disabled rather than disabled, so it keeps its Tab stop and can still be read — a disabled control blurs to the body and drops a keyboard user at the top of the document.',
-      'The period control is a radiogroup and its aria-checked is the announcement. Do not add a live region beside it: a role="status" firing as the radio announces is two things talking at once, and the reader loses both.',
+      'The period control is a radiogroup and its aria-checked is the announcement. Do not add a live region beside it: a role="status" firing as the radio announces is two things talking at once, and the reader loses both. stat-card/period does put role="status" on its tile, and that is not a contradiction — it holds while a tile owns its own control. Once one control rebases a strip of tiles and a plot together, the tiles go silent and this rule is the one that applies.',
       'A loading chart is aria-busy with one sr-only role="status" naming the chart that is coming. The skeleton blocks are aria-hidden, because eight rectangles announced one at a time is noise standing in for a wait.',
       'A failed read says so in the card, as ordinary text — the icon repeats what the sentence already said and carries nothing on its own. No role="alert" in static markup — it fires on first paint whether or not anything just went wrong, and the swap that put the card there is what announces.'
     ],
@@ -6672,8 +6961,14 @@ register(
 
      No live region on the message. This block arrives as a swap into something
      that already announces, and a role="alert" written into static markup
-     fires on first paint whether or not anything just went wrong. -->
-<div data-kui="chart/failed" class="rounded-xl border border-zinc-300 bg-white p-5">
+     fires on first paint whether or not anything just went wrong. 
+
+     The retry targets this card's own id, never hx-target="closest [data-kui]".
+     A card is usually one region of a composed page, and a composed page carries
+     exactly one data-kui — its own — so the closest form walks past the card and
+     swaps the whole screen: the plot that failed takes out the four regions that
+     loaded. Give the region an id and target that. -->
+<div data-kui="chart/failed" id="chart-committed" class="rounded-xl border border-zinc-300 bg-white p-5">
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
     <h3 class="text-[14px]/5 font-semibold">Committed value by month</h3>
     <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa plant · 2026</p>
@@ -6695,7 +6990,7 @@ register(
     </p>
     <div class="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
       <button type="button"
-              hx-get="/dashboard/committed/" hx-target="closest [data-kui]" hx-swap="outerHTML"
+              hx-get="/dashboard/committed/" hx-target="#chart-committed" hx-swap="outerHTML"
               class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="rotate-ccw" class="size-3.5 text-zinc-600"></i>Try again
       </button>
@@ -6710,11 +7005,14 @@ register(
    not execute. Never interpolate JSON into an attribute: one apostrophe in a
    supplier name ends the attribute and takes the page with it.
 
-   humanize is loaded here rather than assumed: intcomma is the only filter in
-   this block that is not a builtin, and a template that omits the load tag
-   raises TemplateSyntaxError on the row loop rather than on the line that
-   needs it, which sends the next person looking in the wrong place. {% endcomment %}
-{% load humanize %}
+   money is loaded here rather than assumed. rupees is the only filter in this
+   block that is not a builtin, and a template that omits the load tag raises
+   TemplateSyntaxError on the row loop rather than on the line that needs it,
+   which sends the next person looking in the wrong place. It is rupees and not
+   intcomma because Indian grouping is 2,2,3 above the last three digits:
+   intcomma returns 1,245,000 where the figure reads 12,45,000, and a number
+   wrong by a factor of ten is read straight past. table/django defines it. {% endcomment %}
+{% load money %}
 {{ spend_by_month|json_script:"spend-by-month" }}
 
 <div data-kui="chart/django" class="rounded-xl border border-zinc-300 bg-white p-5"
@@ -6789,7 +7087,7 @@ register(
       <thead><tr><th scope="col">Month</th><th scope="col">Committed value</th></tr></thead>
       <tbody>
         {% for row in spend_by_month %}
-          <tr><th scope="row">{{ row.month }}</th><td>₹{{ row.value|intcomma }}</td></tr>
+          <tr><th scope="row">{{ row.month }}</th><td>{{ row.value|rupees }}</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -7931,7 +8229,11 @@ register(
                        {'job': job, 'announce': crossed})
 
      {# imports/_progress.html, at the end #}
-     {% if announce %}<span hx-swap-oob="innerHTML:#import-8841-status">{{ job.percent }} per cent imported</span>{% endif %} -->
+     The tags are written here without their braces, because Django compiles a
+     tag inside an HTML comment and this snippet would not paste:
+         if announce
+           <span hx-swap-oob="innerHTML:#import-8841-status">{{ job.percent }} per cent imported</span>
+         endif -->
 <div data-kui="progress/htmx" class="max-w-md">
 
   <div id="import-8841"
@@ -7960,7 +8262,7 @@ register(
 `<!-- Every figure on this bar is computed in the model, because both of the
      things a template can reach for are wrong.
 
-     {% widthratio received ordered 100 %} rounds to a whole number, so 40 kg
+     A widthratio of received over ordered rounds to a whole number, so 40 kg
      against 12,000 renders 0 and the fill collapses to nothing — the exact case
      min-w-[2px] exists for, defeated one level above it. It has no clamp either,
      so an over-receipt renders width: 104%, and the same tag reused for
@@ -7983,8 +8285,8 @@ register(
      w-[{{, Tailwind emits no rule, and the rail comes back empty rather than
      broken, which is why it survives review.
 
-     {% if po.received_qty %} around the fill, so a Decimal('0') renders no fill
-     element at all rather than one floored to 2px.
+     An if po.received_qty guard around the fill, so a Decimal('0') renders no
+     fill element at all rather than one floored to 2px.
 
      # models.py
      class PurchaseOrder(models.Model):
@@ -9124,10 +9426,10 @@ register(
          path('grn/', views.receipt_register, name='grn-register'),
          path('grn/rows/', views.receipt_rows, name='grn-rows'),
 
-     Six fragments, one per state, and not a single {% if %} between them. That
+     Six fragments, one per state, and not a single if tag between them. That
      is the point of doing it here: by the time a queryset reaches a template
-     every one of these empties is a list of length zero, so {% if not receipts %}
-     cannot tell them apart and picks whichever message was typed first.
+     every one of these empties is a list of length zero, so an if not receipts
+     guard cannot tell them apart and picks whichever message was typed first.
 
      The status line lives in the page, outside hx-target, and the fragment
      writes into it with hx-swap-oob="innerHTML:#grn-count". The innerHTML: prefix
@@ -10713,11 +11015,11 @@ register(
      the skeleton.
 
      All three outcomes are here, because a region that only handles the loaded
-     case pulses forever on the other two. {% empty %} is what makes the empty
-     branch impossible to forget — it is part of the loop rather than a template
-     somebody has to remember exists — and the empty state is the list's single
-     item rather than a second root, because one item saying there are none
-     reads correctly where a list of zero items reads as nothing at all. The
+     case pulses forever on the other two. The empty clause is what makes the
+     empty branch impossible to forget — it is part of the loop rather than a
+     template somebody has to remember exists — and the empty state is the list's
+     single item rather than a second root, because one item saying there are
+     none reads correctly where a list of zero items reads as nothing at all. The
      failure is not a list, so it comes back as a div with the same id; outerHTML
      does not care what the element it replaces was.
 

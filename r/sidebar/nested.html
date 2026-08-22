@@ -1,8 +1,9 @@
 <!-- The open map is seeded, not empty. In Django it is rendered — open: { orders:
-     {% if section == 'orders' %}true{% else %}false{% endif %}, ... } — because
-     the click that moves between the children of a section is a full page load,
-     and a map that starts empty folds the section up underneath the user on
-     every one of those navigations. That is the bug this variant exists for.
+     true, ... }, each flag printed as true or false by an if test comparing the
+     current section to that key — because the click that moves between the
+     children of a section is a full page load, and a map that starts empty
+     folds the section up underneath the user on every one of those navigations.
+     That is the bug this variant exists for.
 
      Opening one section does not close another. A nav is not an accordion: the
      single-open rule saves two rows of height and costs a click on every journey

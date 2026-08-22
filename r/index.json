@@ -22,19 +22,21 @@
   },
   "rules": [
     "Use what is already here — Before writing any markup, look for it in the component list in llms.txt. If a component or a page layout is already defined, copy its markup from /r/<id>/<variant>.html — writing your own version of something the registry defines is the defect this rule exists to prevent, because two implementations of one thing drift apart and only one of them ever gets the accessibility work. The layout entries are mandatory, not examples: a screen with a title and actions is page-header, a create-or-edit screen is form-page, and a queue worked one record at a time is list-detail. The shell that holds all of them is the next rule, and it is not optional. If what you need is not here, stop and flag it: name the thing, say what it has to do, and let a person add it to the framework. Do not invent a component, a layout or a pattern to fill the gap, and do not ship a one-off approximation of one under another name. A missing entry is a decision for a person; an invented one is a defect that ships and then gets copied. The same applies one level down, to variants: if the component is here but the variant you need is not, flag that too. Changing the labels, figures and records inside a variant is expected and is what copying it is for; reshaping one into a state, density or arrangement the registry does not list is a new variant, and a new variant is an addition to the framework rather than a local edit.",
-    "Every signed-in screen is app-shell — This is the one layout decision that is already made, and it is not a default you may weigh against alternatives. If a signed-in user can reach the page, the page is app-shell with the screen's own content inside <main>, copied from /r/app-shell/default.html like any other component. There are exactly two exceptions, auth-page and error-page, and they are exceptions for a reason rather than by taste: the shell reads the navigation, the counts and the signed-in user out of context that a signed-out visitor or a failed request may not have. Do not assemble a shell of your own out of sidebar and topbar. Those entries document the shell's parts and exist so its own variants can be built; a hand-rolled sidebar-plus-topbar is a second implementation of app-shell, and two implementations of one thing drift apart while only one of them keeps the accessibility work. Do not ship a lighter shell for one screen, and do not start a page at <main> because the screen looked simple enough not to need chrome. The shell owns the skip link, the nav landmark, the off-canvas focus trap, the collapse persistence, the command palette and the keyboard shortcuts; a page that skips it loses every one of them silently and still reviews as fine, because everything it dropped is invisible until somebody uses a keyboard or a phone. The test is the response, not the screen: if a signed-in request returns a page, it is app-shell. An htmx partial swapped into a shell already on screen is not a page and must not repeat it.",
+    "Every signed-in screen is app-shell — This is the one layout decision that is already made, and it is not a default you may weigh against alternatives. If a signed-in user can reach the page, the page is app-shell with the screen's own content inside <main>, copied from /r/app-shell/default.html like any other component. There are four exceptions and no more. Two are about context the shell cannot get: auth-page and error-page, because the shell reads the navigation, the counts and the signed-in user out of context that a signed-out visitor or a failed request may not have. Two are about a user the shell was not built for: portal-page, where the reader is an external supplier and the nav, the counts and the internal identity do not exist for them at all; and focus-page, the shop-floor screen where the chrome is not merely useless but harmful, because a rail takes target area away from a gloved hand and a nav link is a route to losing an uncommitted count. The test for the last two is narrow and you should expect to fail it: the shell has to be actively wrong for this reader, not merely unnecessary. A screen that simply feels cluttered is app-shell. Do not assemble a shell of your own out of sidebar and topbar. Those entries document the shell's parts and exist so its own variants can be built; a hand-rolled sidebar-plus-topbar is a second implementation of app-shell, and two implementations of one thing drift apart while only one of them keeps the accessibility work. Do not ship a lighter shell for one screen, and do not start a page at <main> because the screen looked simple enough not to need chrome. The shell owns the skip link, the nav landmark, the off-canvas focus trap, the collapse persistence, the command palette and the keyboard shortcuts; a page that skips it loses every one of them silently and still reviews as fine, because everything it dropped is invisible until somebody uses a keyboard or a phone. The test is the response, not the screen: if a signed-in request returns a page, it is app-shell unless it is one of the four named above. An htmx partial swapped into a shell already on screen is not a page and must not repeat it.",
     "Keep the data-kui attribute — Every variant's root element carries data-kui=\"<component>/<variant>\" — badge/table, app-shell/default. It is the only way to find, in an application nobody has touched for a year, which markup came from this framework and which entry it came from: grep data-kui across the repo and every pasted component answers for itself. Keep it on the element you copied it onto, keep the value exactly as the registry gives it, and do not add one by hand to markup that is not a copy of that variant — a wrong id is worse than none, because the next person updating that component will trust it. It is inert: no styling, no behaviour, no script reads it at runtime. Updating from it is something you do when a person asks for it and never on your own initiative: grep data-kui across the application, and for each hit fetch /r/<component>/<variant>.html, which is always the current markup for that entry, and diff it against the pasted copy. Nothing records which copies are stale, and nothing needs to — the diff is the answer. What you carry across is the class list and the structure. What you leave alone is everything the application put there: the labels, the template variables and tags, the hx-* attributes, the Alpine state and handlers, the ids and the form field names. A component is a shape, not content, so replacing a pasted block wholesale with the registry version silently deletes the work that made it a real screen. Where the two disagree on structure rather than on classes, stop and say so rather than reshaping the copy to match: the local version may have been changed deliberately, and that is a question for a person.",
     "Stock Tailwind only — No custom CSS, no @theme colours, no arbitrary hex. Arbitrary values are for one-off sizes, never for colour.",
     "Light theme only — There is no dark mode and none is planned. A second theme doubles the review surface for no benefit in an office tool.",
-    "Never bind Alpine on a Lucide icon — createIcons() replaces the <i> with an <svg>, destroying any :class on it. Bind on a wrapping span instead.",
+    "Never bind Alpine on a Lucide icon — createIcons() replaces the <i> with an <svg>, destroying any :class on it. Bind on a wrapping span instead. The same class of bug bites one step further out: Alpine removes only the classes it added, so a class written into the markup on an element whose class is also bound survives every state change — a scroll-spy rail written that way marks two headings at once, forever. And a state class with no colour of its own, border-l-2 with no border-*, renders in currentColor until Alpine boots, which on a slow page is a dark rule down every item and on a page where Alpine fails is permanent. A marker element that is transparent at rest and carries no static class is the shape that cannot fail either way.",
     "Never add cursor-pointer — Tailwind v4 preflight drops it from buttons. One base rule fixes every element; 300 utility classes do not.",
     "Colour means data state — Red, amber and green describe what a record is doing. Never decoration, never a brand accent. They appear as a dot or an icon, never as a field of colour behind text.",
     "The accent is graphite — zinc-700. Interactive text is zinc-900 plus an underline, not a colour.",
     "Alerts are neutral — White card, zinc border, colour only in the icon. A full-width red field shouts louder than the overdue rows it describes.",
     "Focus is an outline, never a ring — ring-* compiles to box-shadow, and forced-colours mode drops every box-shadow, so a ring is the one focus style guaranteed to vanish for the users who most need it. Write focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15, and take the negative offset when the control sits flush inside a scroller that would clip it. outline-none is allowed only on a field whose wrapper draws the outline for it, because Tailwind resolves outline-style through a variable: outline-none on the same element kills its own focus outline while leaving the width and colour set, which measures as styled and renders as nothing.",
-    "Every tinted shape carries its ring — A tinted shape is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 — pills, chips, avatars, icon wells, control tracks, the selected nav item, all of them. A tinted surface is bg-zinc-100 — the page, a selected row, the highlighted option in a menu — and a band recessed inside a white surface is bg-zinc-50, which is a table header or a zebra row. Give a shape the surface fill and it measures 1.00 contrast against the surface it sits on, which is not low contrast but the identical colour, and it disappears. One step of fill separates them and the ring holds the edge. Solid shapes need no ring, and it is ring rather than border so adding it reflows nothing.",
+    "Every tinted shape carries its ring — A tinted shape is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 — pills, chips, avatars, icon wells, control tracks, the selected nav item, all of them. A tinted surface is bg-zinc-100 — the page, a selected row, the highlighted option in a menu — and a band recessed inside a white surface is bg-zinc-50, which is a table header or a zebra row. Give a shape the surface fill and it measures 1.00 contrast against the surface it sits on, which is not low contrast but the identical colour, and it disappears. One step of fill separates them and the ring holds the edge. Solid shapes need no ring, and it is ring rather than border so adding it reflows nothing. One exception, and only one: inline code inside a sentence takes the tint without the ring. A ring drawn around two words mid-paragraph cuts the line of the text it sits in, and the shape is already separated from the prose by the mono face.",
     "Hover never lands on the surface behind it — A hover fill that equals the fill underneath it is not a subtle hover, it is no hover: the control loses its surface and the one thing the cursor is on reads as less present than the things it is not on. The page is bg-zinc-100, so a bordered white button sitting on the page cannot hover to zinc-100 — it dissolves and leaves its border behind. Two kinds of interactive thing, and the split is the same one the tinted-shape rule draws. A SHAPE is self-sized and rounded on every corner: a button, an icon button, a menu trigger, a chip. It hovers to the chip fill zinc-200 wherever it sits, because a shape has to read against whatever it is dropped onto — white if it rests white on a white card, and one step further to zinc-300 if it is already sitting on a zinc-200 track. A SURFACE is a full-bleed band: a table row, a menu item, a sidebar link, a member of a joined strip whose corners are shared with its wrapper. It steps once off the band it crosses, so zinc-100 inside a white panel and zinc-200 on the page. Anything with a solid fill of its own ignores all of this and steps one deeper: zinc-700 to zinc-800, red-600 to red-700, zinc-200 to zinc-300. node tools/build.js checks every variant against this and fails the build rather than warning, so the rule is not something anyone has to remember at the call site.",
+    "A region may scroll sideways. The page may not — Nothing in this system produces a horizontal scrollbar on the document at 390px — that is the rule the build cannot check and every review has to. What a wide thing does instead is scroll inside its own box: a comparison matrix, a rate grid, a board of stages, a printed line table. Three things come with that box and none of them is optional. It carries relative, because an sr-only span inside a scroller has no positioned ancestor otherwise, resolves against the document, escapes the clip and widens the whole page — this has now been the cause of a 390px overflow in four separate components and it is invisible in review because the element it comes from is invisible. It carries role=\"region\", tabindex=\"0\" and an accessible name, because Chromium will not give keyboard focus to an overflow container on its own and a matrix nobody can scroll without a mouse is a matrix half the users cannot read. And below the width at which it starts to clip it carries a line of text saying so, at text-[12px]/4 text-zinc-500 — there is no gradient, no fade and no arrow in this system, so the affordance is a sentence.",
     "Status colour lives in the dot — Every status pill is the same graphite shape — bg-zinc-200, ring-zinc-300, zinc-700 text, the same fill an avatar takes. What separates Open from Overdue is a 6px dot. A column of tinted pills reads as a traffic light and stops meaning anything by the twelfth row; a column of identical pills with one red dot in it reads at a glance. This is the alert rule — colour only in the marker — applied to a pill.",
+    "Paper is a medium, not a breakpoint — Two entries print: document-page for A4 paperwork and label-sheet for die-cut label stock. What they established holds for anything else that ever does. Screen chrome carries print:hidden and the document is what is left. Backgrounds do not print, so nothing may carry meaning in a fill — which means a printed document has no status pill at all, because the 6px dot is a background circle and on paper the state has to become a word. A watermark is the same mistake twice. Structure comes from borders, and hierarchy from weight rather than from a darker grey: border-zinc-300 is about 16% grey on paper and a thermal printer, which is one bit deep, dithers it. Do not trust a breakpoint to mean paper — A4 portrait is 794 CSS px so md: applies and lg: does not, but the print dialog's Scale field changes the layout width, and at 50% every lg: rule switches on; where the printed shape must differ, write print:. Put break-inside-avoid on every row, on a totals block and on a signature block, because a total split across two sheets is a defect. Nothing inside a sheet is sticky: it prints on the first page and leaves a hole on the rest. Page numbers and carried-forward subtotals come from the view, because counter(page) in an @page margin box is not implemented in Chrome and no CSS can sum the previous sheet. And a barcode is an <img> whose src the server renders — not a font, which cannot do QR error correction, and not a JavaScript library, which draws after paint and is therefore not there when window.print() fires, so the sheet comes out blank exactly where every symbol should be. @page itself is an at-rule and can never be a Tailwind utility: it is the one piece of hand-written CSS this system needs, it goes in the project stylesheet beside the x-cloak rule, and because the last @page parsed wins for every printed page in the document, a deployment that prints both A4 paperwork and 100x50mm labels needs one print base per medium rather than one stylesheet for both.",
     "One shade per meaning — Info is zinc-400, success emerald-600, warning amber-700, danger red-600 — and a warning is amber-700 in a component and amber-500 only when it is a dot, because a 1.5px stroke and a 6px disc need different weights of the same colour. Nothing takes a -50 tint or a -200 ring: a coloured icon well is still bg-zinc-200 with ring-zinc-300. Pick the shade from the token table, never by eye.",
     "Survive 390px — Tables become stacked cards. Nothing scrolls sideways on a phone, with one exception: a carousel, where the sideways scroll is the component itself, and which snaps and peeks so it never looks like a layout that broke.",
     "No template x-for inside svg — It is parsed in the SVG namespace and has no .content. Use divs, or a conic-gradient for donuts.",
@@ -82,31 +84,57 @@
     }
   },
   "status_colours": {
+    "draft": {
+      "pill": "bg-zinc-200 text-zinc-600 ring-1 ring-inset ring-zinc-300",
+      "dot": "bg-zinc-400",
+      "meaning": "Not real yet — nothing has been submitted"
+    },
+    "cancelled": {
+      "pill": "bg-zinc-200 text-zinc-600 ring-1 ring-inset ring-zinc-300",
+      "dot": "bg-zinc-400",
+      "meaning": "Ended without completing. Inert, like a draft — not emerald, because it is over but that is not good news"
+    },
     "open": {
       "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
       "dot": "bg-zinc-500",
-      "meaning": "The ordinary case"
+      "meaning": "Live, and nothing is wrong with it"
+    },
+    "pending": {
+      "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
+      "dot": "bg-amber-500",
+      "meaning": "Awaiting somebody's decision — this is the word for an item sitting in an approval inbox"
     },
     "approved": {
       "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
       "dot": "bg-amber-500",
-      "meaning": "Waiting on someone"
+      "meaning": "Approved, and now waiting on the vendor to deliver. It does NOT mean awaiting approval — that is Pending"
+    },
+    "on hold": {
+      "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
+      "dot": "bg-amber-500",
+      "meaning": "Stopped on purpose, waiting on a person to release it"
     },
     "overdue": {
       "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
       "dot": "bg-red-600",
-      "meaning": "The alarm state"
+      "meaning": "The alarm state — past its date, failed, or refused"
     },
     "closed": {
       "pill": "bg-zinc-200 text-zinc-700 ring-1 ring-inset ring-zinc-300",
       "dot": "bg-emerald-600",
-      "meaning": "Finished"
-    },
-    "draft": {
-      "pill": "bg-zinc-200 text-zinc-600 ring-1 ring-inset ring-zinc-300",
-      "dot": "bg-zinc-400",
-      "meaning": "Not real yet"
+      "meaning": "Finished, and finished well"
     }
+  },
+  "status_meanings": {
+    "note": "The five dots are meanings, not words. A state this table does not list takes the dot whose meaning matches, and never a new colour.",
+    "dots": {
+      "bg-zinc-400": "Inert. Not real yet, or over without completing. Draft, Cancelled, Void, Superseded.",
+      "bg-zinc-500": "Live and ordinary. Nothing is wrong and nobody is waiting. Open, In progress, Carried forward.",
+      "bg-amber-500": "Waiting on somebody before it can move. Pending, Approved, On hold, Needs a reason, With finance.",
+      "bg-red-600": "Stopped, failed or past its date. Overdue, Rejected, Blocked, Failed inspection, Short received.",
+      "bg-emerald-600": "Finished and correct. Closed, Received in full, In tolerance, Passed."
+    },
+    "verdicts": "A verdict about a figure — In tolerance, Needs a reason, Blocked — is not a record state and does not belong in the table above, but it takes its dot from the same five meanings. Amber is a 6px disc at -500 and a 1.5px stroke at -700; that is the one place the same meaning takes two shades."
   },
   "typography": {
     "families": {
@@ -143,6 +171,10 @@
       {
         "token": "text-[24px]/7",
         "use": "page titles, KPI figures"
+      },
+      {
+        "token": "text-[32px]/9",
+        "use": "the one value read at arm's length on a shop-floor screen — a scanned code, a counted quantity. focus-page only, and never more than one per screen"
       }
     ],
     "weight": [
@@ -479,6 +511,10 @@
         {
           "id": "sticky-column",
           "name": "The first column stays put"
+        },
+        {
+          "id": "sticky-both",
+          "name": "Both axes stay put"
         },
         {
           "id": "responsive",
@@ -2324,6 +2360,14 @@
           "name": "Roles across permissions"
         },
         {
+          "id": "wide-matrix",
+          "name": "Six roles, both axes pinned"
+        },
+        {
+          "id": "wide-matrix-phone",
+          "name": "One role at a time on a phone"
+        },
+        {
           "id": "states",
           "name": "Disabled, locked and invalid"
         },
@@ -3313,6 +3357,7 @@
       "category": "layout",
       "description": "The screen for one record: the band that identifies it and says what state it is in, a strip of the figures that matter, and the sections of detail below it — line items, approvals, documents, activity — carrying only the actions the record's current state allows.",
       "related": [
+        "document-page",
         "page-header",
         "form-page",
         "tabs",

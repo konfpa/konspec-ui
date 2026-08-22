@@ -18,11 +18,11 @@
      the skeleton.
 
      All three outcomes are here, because a region that only handles the loaded
-     case pulses forever on the other two. {% empty %} is what makes the empty
-     branch impossible to forget — it is part of the loop rather than a template
-     somebody has to remember exists — and the empty state is the list's single
-     item rather than a second root, because one item saying there are none
-     reads correctly where a list of zero items reads as nothing at all. The
+     case pulses forever on the other two. The empty clause is what makes the
+     empty branch impossible to forget — it is part of the loop rather than a
+     template somebody has to remember exists — and the empty state is the list's
+     single item rather than a second root, because one item saying there are
+     none reads correctly where a list of zero items reads as nothing at all. The
      failure is not a list, so it comes back as a div with the same id; outerHTML
      does not care what the element it replaces was.
 

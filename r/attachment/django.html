@@ -4,7 +4,7 @@
      three names or the POST does not clear the file. Its ids are Django's own:
      id_attachment for the input, attachment-clear_id for the checkbox.
 
-     {% if form.attachment.value %} … {% endif %} guards the first two.
+     An if form.attachment.value guard wraps the first two.
 
      enctype="multipart/form-data" is on the <form> here rather than in a note
      under it. It used to be a red line rendered on the page, which is a message

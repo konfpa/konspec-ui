@@ -225,7 +225,7 @@
             <label class="mb-1.5 block text-[13px]/5 font-medium">GST certificate and cancelled cheque</label>
             <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
                  class="rounded-lg border border-dashed px-4 py-5 transition"
-                 :class="depth > 0 ? 'border-zinc-700 bg-white' : 'border-zinc-200 bg-zinc-100'">
+                 :class="depth > 0 ? 'border-zinc-700 bg-white' : 'border-zinc-200 bg-zinc-50'">
               <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
                 <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
                 <span class="text-[13px]/5 text-zinc-600">Drag files here or</span>

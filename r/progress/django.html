@@ -1,7 +1,7 @@
 <!-- Every figure on this bar is computed in the model, because both of the
      things a template can reach for are wrong.
 
-     {% widthratio received ordered 100 %} rounds to a whole number, so 40 kg
+     A widthratio of received over ordered rounds to a whole number, so 40 kg
      against 12,000 renders 0 and the fill collapses to nothing — the exact case
      min-w-[2px] exists for, defeated one level above it. It has no clamp either,
      so an over-receipt renders width: 104%, and the same tag reused for
@@ -24,8 +24,8 @@
      w-[{{, Tailwind emits no rule, and the rail comes back empty rather than
      broken, which is why it survives review.
 
-     {% if po.received_qty %} around the fill, so a Decimal('0') renders no fill
-     element at all rather than one floored to 2px.
+     An if po.received_qty guard around the fill, so a Decimal('0') renders no
+     fill element at all rather than one floored to 2px.
 
      # models.py
      class PurchaseOrder(models.Model):

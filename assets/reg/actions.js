@@ -4,6 +4,7 @@ register(
     description: 'The standard action control. Exactly one primary button per view; everything else is secondary, ghost or a link.',
     when: 'Any action the user takes on this page. Anything that goes to another page is an anchor, not a button. A control that writes a setting to the server the moment it is touched is toggle, not a pressed button; a button that only carries a number is a badge; and the drop zone, the list of files and the upload progress around a file picker are attachment.',
     notes: [
+      'Whether a submit disables while its request is in flight depends on the input, and the two entries that answer it are both right. form-page says never: disabling the control the user just pressed blurs it to <body> and drops a keyboard user at the top of the document, so it stays enabled and the form guards against the second submit. focus-page disables it, because a shop-floor tablet has no keyboard focus to lose and a second tap really does post a second GRN. The rule is the pointer, not the taste: if the screen can be operated by keyboard, keep it enabled and guard; if it is touch-only, disable it and say so in the label.',
       'Tailwind v4 preflight drops cursor:pointer from <button>. One base rule in the page stylesheet restores it for every interactive element — never add cursor-pointer to a button. A <label> acting as a file picker is the one exception: it is neither a button nor a click handler, so the base rule does not reach it.',
       'Hover is one step deeper than the resting fill, except where that step lands on the surface behind it. zinc-700 goes to zinc-800 and red-600 to red-700 anywhere. White and ghost depend on what they sit on: inside a white card they hover to zinc-100, but on the page zinc-100 is the page fill, so both hover to zinc-200 instead. A white button that hovers to zinc-100 on the page does not darken — it dissolves into the page and leaves its border behind, so the hovered control reads as less present than the ones beside it, which is the inverse of what hover is for.',
       'Height is set with h-*, never left to padding, and every variant carries a border — border-transparent on the ones with no visible edge. Padding-derived height cannot match an icon-only button: measured, a bordered secondary came out at 38 against a 36 primary, and a size-9 icon button at 36 against a 38 label. Fixing the height fixes both at once and px-* then controls width alone.',
@@ -1240,7 +1241,7 @@ register(
      verb. Twelve rows of a button called Print say nothing about which GRN is
      about to come out of the printer, and the row heading is not part of the
      button\'s accessible name. -->
-<div data-kui="button-group/row-actions" class="overflow-x-auto rounded-xl border border-zinc-300 bg-white">
+<div data-kui="button-group/row-actions" class="relative overflow-x-auto rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-[13px]/5">
     <thead>
       <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
@@ -1416,6 +1417,7 @@ register(
     description: 'A menu of actions anchored to a trigger. Real focus walks the items one tabindex="-1" at a time; destructive items sit last, below a divider.',
     when: 'Row actions, export options, view settings, account menus — the second to seventh thing you can do to the record on screen, where only the first belongs on the page as a button. More than about seven items means you want a page with a search box, not a longer menu, and the one list allowed to run past that is a set the user generated themselves, which is capped and scrolled rather than trusted to stay short. If it has a text box in it, it is a combobox or a command palette and the keyboard model is the other one: a menu moves real focus between its items, and the moment a caret has to stay in a field, every rule below stops applying.',
     notes: [
+      'Do not put this menu inside a region that scrolls in two axes — a board column, a matrix, a pinned-header table. overflow-y-auto clips both axes, so an anchored panel is cut off by the scroller; and the fixed-panel answer this entry offers instead has to close on scroll, which on a surface somebody scrolls while reading means the menu shuts under their hand. board hit this and uses an in-flow disclosure in the card instead, which costs a row of height and works. The test is whether the panel and its trigger can end up on different sides of a clip.',
       '@click.outside on the root closes the panel, so no document-level handler and no global store is needed to keep one menu open at a time. It fires on a click anywhere else, including on another menu\'s trigger, which is what opens that one and closes this one in the same gesture.',
       'Roving focus is the whole model. Real focus moves from item to item, every item is tabindex="-1", and items() reads the buttons out of the DOM on every keystroke rather than off an array held in x-data. A permission check that drops Approve drops it from the keyboard order for free, and the separator is skipped without being special-cased because it is not a menuitem. Keep the list in JavaScript instead and it goes stale the first time the server renders a shorter menu, and the arrows start landing on an element that is no longer there.',
       'Anything an item can be hidden by has to be filtered out of the walk, and a breakpoint class is the case that catches people. focus() on a display:none element is a silent no-op, so an item wearing sm:hidden, or an error row sitting behind x-show, leaves the arrows landing on nothing at all and the menu looking dead for one press. Where a variant hides items — the phone sheet, the htmx failure row — items() filters on offsetParent !== null, which is false for anything display:none and costs one property read per keystroke. Where nothing is ever hidden, do not add the filter: it is not free insurance, it is a claim that items come and go.',
@@ -1490,7 +1492,7 @@ register(
      Hung off the button it belongs to the button, so an item above it that is
      hidden by a permission check takes the rule to the top of the panel where
      it introduces nothing. As its own element it drops out with the same
-     {% if %} as the item it introduces.
+     if guard as the item it introduces.
 
      Three fills, three borders, one step apart. The panel floats over the page
      so its edge is border-zinc-300, the Edge token; the rule inside it is

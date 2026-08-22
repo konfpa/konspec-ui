@@ -1,10 +1,10 @@
 <!-- templates/404.html, and the shape 403.html takes as well. Three things
      make these files different from every other template in the project.
 
-     They do not {% extends "base.html" %}. base.html reads the nav, the counts
-     and the signed-in user out of context, and the request that just failed may
-     have none of it; a base that raises while rendering the error page drops
-     the user on Django's own bare page instead. So each handler is a whole
+     They do not extend base.html. It reads the nav, the counts and the
+     signed-in user out of context, and the request that just failed may have
+     none of it; a base that raises while rendering the error page drops the
+     user on Django's own bare page instead. So each handler is a whole
      document with its own <head>:
 
        <title>Page not found · Konspec Operations</title>

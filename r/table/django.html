@@ -42,22 +42,31 @@
      it. aria-sort still goes on the <th>, as in the default variant, and only
      on the columns that actually sort.
 
-     {% empty %} draws the no-rows case as a <tr> with one colspan cell inside
-     the <tbody>, never as a div after the table: a sibling div is outside the
-     table in the accessibility tree, so somebody reading with table navigation
-     walks a table of zero rows and is never told why. The message itself
-     belongs to empty-state — copy the wording from there. If the columns are
-     optional, the colspan comes from the view rather than being typed here.
+     Every template tag named in this comment is named in words, and that is not
+     a style choice. Django's lexer does not know what an HTML comment is, so a
+     tag written between the angle brackets is executed exactly where it sits —
+     and an empty clause with no for loop around it raises TemplateSyntaxError:
+     Invalid block tag before a single row renders, which makes the whole
+     snippet impossible to paste. Prose names the tag; only a real comment block
+     makes one inert.
+
+     The empty clause draws the no-rows case as a <tr> with one colspan cell
+     inside the <tbody>, never as a div after the table: a sibling div is
+     outside the table in the accessibility tree, so somebody reading with table
+     navigation walks a table of zero rows and is never told why. The message
+     itself belongs to empty-state — copy the wording from there. If the columns
+     are optional, the colspan comes from the view rather than being typed here.
 
      The foot is skipped entirely when there is nothing to total, and its count
      is pluralized, so a register with one receipt in it does not say 1 orders.
 
      Paging around all of this is data-table, not table. -->
 {# orders/register.html #}
+{% load money %}
 <div data-kui="table/django" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="px-4 py-2.5"
             aria-sort="{% if sort == 'number' %}ascending{% elif sort == '-number' %}descending{% else %}none{% endif %}">
           <a href="?sort={% if sort == 'number' %}-{% endif %}number"

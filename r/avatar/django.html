@@ -21,9 +21,10 @@
      are the signal to draw the icon, and they are returned rather than guessed,
      because the guess would be letters off an email address.
 
-     # the call sites
-     {% include "people/_avatar.html" with person=entry.actor named=True %}
-     {% include "people/_avatar.html" with person=order.approver %}
+     # the call sites — written here without their braces, because Django
+     compiles a tag inside an HTML comment and this snippet would not paste:
+     include "people/_avatar.html" with person=entry.actor named=True
+     include "people/_avatar.html" with person=order.approver
 
      named is what the caller promises: the full name is written next to this,
      so the circle can go silent. Leaving it off labels the avatar, and that is

@@ -17,7 +17,7 @@
      json_script escapes the chart payload into a script tag the browser will
      not execute. Never interpolate JSON into an attribute: one apostrophe in a
      vendor name ends the attribute and takes the page with it. -->
-{% load humanize %}
+{% load humanize money %}
 {% comment %}
   A multi-line {# #} is not a comment. Django's tag_re has no DOTALL, so it
   matches to the end of the first line only and the rest of the block renders

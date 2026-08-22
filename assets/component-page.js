@@ -33,7 +33,16 @@ function componentPage() {
         .map(r => ({ ...r, href: (index.find(i => i.id === r.id) || {}).page ? r.id + '.html' : null }));
     },
 
-    mode(v) { return this.tab[v.id] || (v.id === 'django' || v.id === 'setup' ? 'code' : 'preview'); },
+    /* A variant carrying Django block tags cannot be previewed: the browser has no
+       template engine, so {% if %} and {% else %} are literal text and BOTH branches
+       render at once. data-table/server drew two pagers side by side that way and
+       pushed the gallery page to 1039px at 390. Anything with a block tag opens on
+       the code tab; the reader can still switch. */
+    mode(v) {
+      if (this.tab[v.id]) return this.tab[v.id];
+      if (v.id === 'django' || v.id === 'setup') return 'code';
+      return /\{%\s*(?:for|if|block|extends|include)\b/.test(v.code) ? 'code' : 'preview';
+    },
     setMode(v, m) { this.tab[v.id] = m; },
 
     /* Undo the preview boxing on the root element only, so the markup gets a

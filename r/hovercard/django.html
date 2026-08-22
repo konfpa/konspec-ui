@@ -63,7 +63,7 @@
                hx-get="{% url 'order-card' order.pk %}" hx-trigger="hovercard-fetch"
                hx-swap="innerHTML" hx-sync="this:drop"
                :aria-busy="loaded ? 'false' : 'true'"
-               class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+               class="w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
             <div role="status">
               <span class="sr-only">Loading {{ order.number }}</span>
               <div class="animate-pulse" aria-hidden="true">

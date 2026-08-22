@@ -20,15 +20,17 @@
      bare figure is read out with no idea which item it belongs to; scope="row"
      is what attaches the two.
 
-     If the head is sticky as well, the top-left cell is sticky on both axes and
-     has to outrank both: z-20 on the corner, z-10 on the rest of the head and
-     on the frozen column, or the corner is painted over from one side or the
-     other as the ledger is scrolled.
+     The head does not stick here, so there is no corner cell and nothing in
+     this variant draws one. Add a sticky head and the top-left cell becomes
+     sticky on both axes and has to outrank both — z-20 against the z-10 of the
+     head and of the frozen column — and a sticky foot adds a second corner at
+     the bottom left. Both corners belong to sticky-both, which owns them and
+     pays for them. This variant owns one axis and stops there.
 
      Closing stock below the reorder level takes a red dot, not a red cell. It
      is one fact about one figure and the row is otherwise fine. -->
 <div data-kui="table/sticky-column" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
-  <div class="hidden overflow-x-auto overscroll-x-contain md:block">
+  <div class="relative hidden overflow-x-auto overscroll-x-contain md:block">
     <table class="w-full min-w-[60rem] border-separate border-spacing-0 text-[13px]/5">
       <thead>
         <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">

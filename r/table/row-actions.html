@@ -21,9 +21,10 @@
        ]
      }"
      class="rounded-xl border border-zinc-300 bg-white">
-  <table class="w-full text-[13px]/5">
+  <div class="relative overflow-x-auto md:overflow-visible" tabindex="0" role="region" aria-label="Orders, scrolls sideways">
+  <table class="w-full min-w-[34rem] text-[13px]/5 md:min-w-0">
     <thead>
-      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
         <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
         <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
@@ -97,4 +98,6 @@
       </template>
     </tbody>
   </table>
+  <p class="border-t border-zinc-200 px-4 py-2 text-[12px]/4 text-zinc-500 md:hidden">Scroll sideways for status and actions.</p>
+  </div>
 </div>

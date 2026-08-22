@@ -17,7 +17,7 @@
 
      Selection is deliberately absent: which rows are ticked is client state and
      does not survive a swap. Reach for the full register when you need it. -->
-{% load humanize %}
+{% load humanize money %}
 
 {# orders/register.html #}
 <div data-kui="data-table/server" id="register" class="rounded-xl border border-zinc-300 bg-white">
@@ -37,7 +37,7 @@
   </form>
 
   {% if page_obj %}
-    <table class="w-full text-[13px]/5">
+    <table class="hidden w-full text-[13px]/5 md:table">
       <thead>
         <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
           {% for c in columns %}
@@ -58,11 +58,25 @@
           <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
             <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
             <td class="px-4 py-2.5">{{ o.vendor.name }}</td>
-            <td class="px-4 py-2.5 text-right tabular-nums">₹{{ o.amount|intcomma }}</td>
+            <td class="px-4 py-2.5 text-right tabular-nums">{{ o.amount|rupees }}</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
+
+    <ul class="divide-y divide-zinc-100 md:hidden">
+      {% for o in page_obj %}
+        <li class="px-4 py-3">
+          <a href="{{ o.get_absolute_url }}" class="flex items-baseline justify-between gap-3 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0">
+              <span class="block text-[14px]/5 font-medium tabular-nums">{{ o.number }}</span>
+              <span class="mt-0.5 block text-[13px]/5 text-zinc-600">{{ o.vendor.name }}</span>
+            </span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">{{ o.amount|rupees }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
 
     <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
       <p class="text-[13px]/5 text-zinc-600 tabular-nums">

@@ -42,7 +42,7 @@
          x-trap.noscroll="!wide && nav"
          :role="wide ? null : 'dialog'"
          :aria-modal="!wide && nav ? 'true' : null"
-         class="absolute inset-y-0 left-0 z-40 flex w-full shrink-0 sm:w-72 flex-col overflow-hidden border-r border-zinc-200 bg-white shadow-lg transition-[width,transform] duration-200 ease-out lg:static lg:shadow-none"
+         class="absolute inset-y-0 left-0 z-40 flex w-full shrink-0 sm:w-72 flex-col overflow-hidden border-r border-zinc-200 bg-white shadow-lg transition-[width,transform] duration-200 ease-out lg:static lg:shadow-none print:hidden"
          :class="[ sidebar ? 'lg:w-64' : 'lg:w-[68px]', nav ? 'translate-x-0' : 'max-lg:-translate-x-full' ]">
 
     <div class="flex h-14 shrink-0 items-center gap-2.5 overflow-hidden px-3">
@@ -67,7 +67,12 @@
     </div>
 
     <nav aria-label="Procurement" class="min-h-0 flex-1 space-y-0.5 overflow-x-hidden overflow-y-auto px-3 pb-3">
-      <p class="overflow-hidden px-1.5 pt-2 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Procurement</p>
+      <p class="overflow-hidden px-1.5 pt-2 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase">
+        <span class="relative block">
+          <span class="block transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Procurement</span>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-zinc-200 opacity-0 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-100'"></span>
+        </span>
+      </p>
 
       <a @mouseenter="showTip($el, 'Overview')" @mouseleave="hideTip()" @focus="showTip($el, 'Overview')" @blur="hideTip()" href="#" aria-current="page"
          class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg bg-zinc-200 px-1.5 text-[13px]/5 font-medium whitespace-nowrap text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -99,7 +104,12 @@
         <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">4</span>
       </a>
 
-      <p class="overflow-hidden px-1.5 pt-4 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Master data</p>
+      <p class="overflow-hidden px-1.5 pt-4 pb-1 text-[11px]/4 font-semibold tracking-wider whitespace-nowrap text-zinc-500 uppercase">
+        <span class="relative block">
+          <span class="block transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Master data</span>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-zinc-200 opacity-0 transition-opacity duration-150" :class="!sidebar && 'lg:opacity-100'"></span>
+        </span>
+      </p>
 
       <a @mouseenter="showTip($el, 'Vendors')" @mouseleave="hideTip()" @focus="showTip($el, 'Vendors')" @blur="hideTip()" href="#"
          class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -119,19 +129,21 @@
       </a>
     </nav>
 
-    <!-- The company mark sits here rather than in the header: an internal user
-         knows who they work for, and what needs naming at a glance is which
-         system they are in. A signature at the foot says it once. The version
-         is beside it because the two questions a bug report has to answer,
-         which app and which build, are then both on one screenshot. Collapsed,
-         only the version survives: the mark is 4:1 and cannot read at 43px. -->
-    <div class="shrink-0 overflow-hidden border-t border-zinc-200 px-3 py-2.5">
-      <div class="flex items-center justify-between gap-2" :class="!sidebar && 'lg:justify-center'">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeQAAABwCAMAAAD48PMqAAAAP1BMVEUEBAT2Agjvz9CXl5fkCBflCBe6AABbW1vkEh/zrqt/AABAQD/AwL8AAADjCBf+/v4AAAAAAAAAAAAAAAAAAADiGkysAAAAEHRSTlP/DP//oF8D/9r/Av//AP7/nnyCgQAAB8lJREFUeNrtndGa6ioMhUNQsJ7j+P5vu52xVVoIDS1QoHCz98yndcpvFukiADzO0IQS4u9fcb38/Fyu00/jr1tv0DzfF8nHBPj2M7XL9Tr+WinRIVcNWKj3f0y+n3b7hnTbEQ2tR7BwA7ZAP1S72g1t8lUPBuDTaDc0C5jH9xTaDW0BFiEB7AGtmiINbfHdDtih3aIV7YYWAH9z6MtPlDYL6Q75eMAiTgD7QNdOGirmG5hDb9LuSwt5d52QPyoaT6Fbzruhxgi+pw7gxgZpqIxveoVmeSZ1kYb6AB/Bt27trgLyPV0OfQrPBMoPYPEoCHCV2l0y5M9jS44cuuV0DMpV6HuJAewbpIslDUUqtHpUAbgW7YbSFFqUrdCMkC4vG4OSFFqJugK4lkEaukK3r91QgEIrValC1+KZwMEKLUQrAVywZwIHKrR4NAu4LO2GgxRaNKfQBWs3dIVuHzTkVWj1OCHgw7Ubsim0OJNCl+WZQBaFVuLMAXy4ZwJdoY/W7vTFoJBSoVVX6PWQfqRPxyCVQouu0IHafU82SkNehb5hb6825M27Ia9C3569vdqQN++GiBHMUOgOmYaczjOBWArNG4I7ZD/kNNoN+xU6xOXokBmQZ3l3DO2GnREcmEN3yEzIUT0TSK7QHfJWyDPQezwTSJFDd8jRIEfRbtiYQ6ttLscfZJS/Dac7fv8opbM7UGr4bfr7+mWz3774ANcFNXVBOW+sF9EvJG5g2OOZhIOGpEOwG7L8u+uJCsK7uXpJgtE00Y/aev/7bdrV5dq8oOt7BcvGepH7ZS+a2nkDw05zLHCUhmCFvu7xoR2Qacb436IjtQ8yGG+kul0uL4gMfpr+yDXImnjRsNMGDQQNfIW+R/ChbcgauESocNcWDAqyZFwQOJR5kJG81BDL7xbjaqI9kDfm0AGQZRBjJ+VPjw8rkBG2QbavxILs+riR8hChK3/42g3JFdoLGUlFxO/IiThlLyvaiX7Ik2j8Xm+8oCTkesym7JHAvNJK4uW+ARkN8h/oC2fTMUiVYrEg04wnIp9RU5IRoy1dJSAvvgna+cFzqoTQaCd6txLJ+c86KmRrrpIHObpC+yDTGiwt/EhElamd0gcZl++X+rkGeby4dn4k+hjbDw34/aOG6P3q9UzAXfAeUaE9kPVqNuXoNu8AiSGQnW3xIumBzAlknP0qRnbN0O4laAiaKYwLmU66JiDo6FrtzYLWIWsMgYxbI9n39JwIMpl3Q9Ih2AsZPf0gXVGH7sAfsyBD371j8jsTSh3JCL7vwZC2k5d5NyRXaBKyz+CQTkw+yGjoAgFZztwu5EBGX+Lle5aWnptLDXmRdysB40RDpmq7m9XZPqtSBvwWjREeV/PwUUtIyO9SLCnB970Ca5xY+5ZmhGyGNIhrznJZC7L0QcYgyM/P14a0NfW6TQUcy6sSyGNIC8hbM2tBJvphSyR/tZXuYblKmWWzVQT5N5ohb3W0Ddmdm2yC/HlsQU8Pow62NfG5FbI+FvJULAYi60IlB2SgEy8dkngZD1noDaPn12N0YLC1mrTLZ6XUhUE2S4fukHfJoQlZe0xN3yOUZ/zG9YFgGdDohKynJj1CU/wj1FRIAnmXpt1mBP9fm56QfDMEn8ycbgUDyxZjmyE6N2RnOS84lzCpVKAX3jXteQXbmkgZ2TOdXicVAHmDrYkJIc8K84V/FirpYsTlVCPpXmPoBAVaY6orc9arI3ysSCYmKN4j/JByCBb8qcY02k3MJwP9SMudakRrqt4d8tI77MeLZGqqEaJDXl9wAXmXn1qVIWTyZRQNSCMd1qthJSnI0jWJr3dA1mbzPGdp8waiFg0wtwqDvAvJ7RovGVQ9AwztpCDzyokCIG8p/4k3nxywgB2SLZbgVmvqgE7SyICMRLcjq5A2HuSl72K8akiu0JvqriNt7hJUd40Mq9mVBUngTVB4vOsokJOU5G5ZIBVUXL/fM3FA9lXXS80ursf1B+rl10bjcyNkdnE9pimuD1y9HL5MZlfe7VomM62TQcKC1L5VLe5FMd4VLv4LepbsbF0mY3/ekFyh969q3J539wVvGyDTLkfq9cnb8u4OORBylDXKexehB2p3hxwAOdq2Evv3DAnKuztkHuS4G6LH2f3n9afwjhjokNchx98BKOYWTwzt7pD9kNNs2hZ5R777yuHGHTIJ2VBoVexmbSzPpG+76Nx2MfG+9ok2UD3JMSJ5ZgqL3u+6mkM1j2q5DvNMvXN93/Q6pctRCOSu3V6FFi0cTzAj3bX7oGPfsp4L9bqtj2dyO/UQnPdsqOyHf5306BFjJalq+vCvDBvPFK7Q6iTH+MWsM+kKXTrkPDvRnFWhC4L8MLcwaUi7j1fo0iDP07HqQf8CVplcjrogW55J9S6HEuX0bEGQ6/ZMopwjcBLIVXomZeTQdUFeDNJlky4nh64Pcg2eSckKXQ/kgrV7tvFK6X1YPOQCPZMaFLo+yA8zqTlUu6tR6EohHz5IV6XQFUM+TLt5Zz10yLWGdJ0K3QLkmfOQDnTg+Usdcm3aXV0O3SzkNNrdgEI3B9n0THaDrjeHbh9yFO3+nrkjlGioY1qCPGVjW7S7sFqODjn2IN2iQrcPOUC763Y5zg55ysbokN56rniHXIln0ojL0SGboI2Na24B28s20v4BA9BOhWgX6MQAAAAASUVORK5CYII="
-             alt="Konspec" width="121" height="28" class="h-7 w-auto shrink-0" :class="!sidebar && 'lg:hidden'">
-        <span class="font-mono text-[11px]/4 tabular-nums text-zinc-400">v2.4.0</span>
-      </div>
-    </div>
+    <!-- The foot is the way back out to the rest of the estate, not a signature.
+         It is built as a nav row and not as a logo: it has somewhere to go, so it
+         has to be a link with a target big enough to hit, and the moment it is a
+         link it should look like every other link in this panel. Same 36px row,
+         same 32px icon box at the same offset, same label fade — so it lands on
+         the rail centred with the icons above it and needs no rule of its own.
+         The wordmark that used to sit here could not: at 4:1 it is unreadable at
+         43px, so the collapsed rail showed a version string and nothing else. -->
+    <nav aria-label="Applications" class="shrink-0 overflow-hidden border-t border-zinc-200 px-3 py-1.5">
+      <a @mouseenter="showTip($el, 'Konspec Gateway')" @mouseleave="hideTip()" @focus="showTip($el, 'Konspec Gateway')" @blur="hideTip()" href="#"
+         class="flex h-9 items-center gap-2.5 overflow-hidden rounded-lg px-1.5 text-[13px]/5 whitespace-nowrap text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex w-8 shrink-0 items-center justify-center"><i data-lucide="layout-grid" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1 truncate transition-opacity duration-150" :class="!sidebar && 'lg:opacity-0'">Konspec Gateway</span>
+      </a>
+    </nav>
   </aside>
 
   <div x-show="tipOn" x-cloak aria-hidden="true"
@@ -139,11 +151,11 @@
        class="pointer-events-none fixed z-50 -translate-y-1/2 rounded-md bg-zinc-900 px-2 py-1 text-[11px]/4 whitespace-nowrap text-white"
        x-text="tip"></div>
 
-  <div x-show="nav" x-cloak @click="nav = false" class="absolute inset-0 z-30 hidden bg-zinc-900/40 sm:block lg:hidden"></div>
+  <div x-show="nav" x-cloak @click="nav = false" class="absolute inset-0 z-30 hidden bg-zinc-900/40 sm:block lg:hidden print:hidden"></div>
 
   <!-- ── main column ──────────────────────────────────────────────────── -->
   <div class="flex min-w-0 flex-1 flex-col">
-    <header class="flex h-14 shrink-0 items-center gap-2 border-b border-zinc-200 bg-white px-3 lg:gap-3 lg:px-5">
+    <header class="flex h-14 shrink-0 items-center gap-2 border-b border-zinc-200 bg-white px-3 lg:gap-3 lg:px-5 print:hidden">
 
       <!-- one control, two jobs: it opens the off-canvas sheet below lg and
            collapses the rail above it, which is why it is never hidden -->
@@ -425,7 +437,7 @@
                   <td class="px-4 py-2.5 text-zinc-600">Sudarshan Chemicals</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">02 Sep 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹18,42,000</td>
-                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span></td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-500"></span>Open</span></td>
                 </tr>
                 <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0450</a></td>
@@ -453,7 +465,7 @@
                   <td class="px-4 py-2.5 text-zinc-600">Clean Science</td>
                   <td class="px-4 py-2.5 tabular-nums text-zinc-600">20 Aug 2026</td>
                   <td class="px-4 py-2.5 text-right font-medium tabular-nums">₹5,94,000</td>
-                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span></td>
+                  <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-500"></span>Open</span></td>
                 </tr>
                 <tr class="hover:bg-zinc-100">
                   <td class="px-4 py-2.5"><a href="#" class="font-medium text-zinc-900 underline underline-offset-2">PO-2026-0441</a></td>
@@ -487,7 +499,7 @@
                 </span>
                 <span class="shrink-0 text-right">
                   <span class="block text-[13px]/5 font-medium tabular-nums">₹18,42,000</span>
-                  <span class="mt-1 inline-flex items-center gap-1.5 text-[11px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-400"></span>Open</span>
+                  <span class="mt-1 inline-flex items-center gap-1.5 text-[11px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 rounded-full bg-zinc-500"></span>Open</span>
                 </span>
               </li>
               <li class="flex items-start gap-3 px-4 py-3">
