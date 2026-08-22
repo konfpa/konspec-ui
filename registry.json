@@ -2,7 +2,7 @@
   "$schema": "https://konspec.internal/ui/registry.schema.json",
   "warning": "This file is the entire system in one response: 7.2 MB, roughly 2,107,496 tokens. It will not fit in an agent context window. Fetch /r/index.json, then /r/<id>/<variant>.html.",
   "name": "Konspec UI",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "purpose": "Copy-paste HTML components for internal data applications. Light theme only.",
   "generated_by": "node tools/build.js",
   "read_first": "llms.txt",
