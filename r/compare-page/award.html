@@ -1,0 +1,220 @@
+<!-- The end of the screen: one vendor for the whole order, or a vendor per
+     line. They are two different shapes and the second is not a matrix — a
+     split award is a list of six decisions, so it is drawn as six decisions
+     with a running total under them rather than as a grid with radio buttons
+     scattered through it.
+
+     The bar restates the award in the units of the record on every change, and
+     the count of purchase orders is the fact that is easiest to leave out and
+     most expensive to discover afterwards. Awarding line by line saves ₹21,680
+     against the lowest single total and raises three orders instead of one;
+     both halves belong in the same sentence, because the second one is what
+     the person signing is actually agreeing to.
+
+     A reason is required when the award is not the lowest, and it is a field
+     rather than a checkbox. A comparative statement is filed with the
+     requisition and read by audit a year later, and "lowest not accepted" with
+     nothing after it is what turns a routine file into a question nobody can
+     answer.
+
+     Award is guarded, never disabled. A disabled button beside an empty box
+     explains nothing, and a browser moves focus off a disabled control to the
+     body — so the person who pressed it is at the top of the document with no
+     idea why. The handler returns early and moves focus into the field that is
+     missing.
+
+     The summary is an <output>, which is a live region by default, so the
+     restatement is heard as it changes rather than only seen. -->
+<div data-kui="compare-page/award" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       shape: 'whole',
+       vendor: 'v-0219',
+       reason: '',
+       vendors: [
+         { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', basic: 1560370, landed: 1608370, on: '12 Oct 2026', terms: '30 days from GRN' },
+         { id: 'v-0219', name: 'Deccan Fasteners Pvt Ltd', basic: 1565600, landed: 1565600, on: '28 Sep 2026', terms: '45 days from GRN' },
+         { id: 'v-0361', name: 'Nashik Steel Traders', basic: 1564190, landed: 1626190, on: '05 Oct 2026', terms: 'Against delivery' },
+         { id: 'v-0407', name: 'Qureshi Metals', basic: 1577390, landed: 1608890, on: '02 Nov 2026', terms: '60 days from invoice' }
+       ],
+       lines: [
+         { code: 'ITM-7702', name: 'MS angle — 50×50×5', qty: 12000, uom: 'kg', to: 'v-0361', values: { 'v-0288': 748800, 'v-0219': 757200, 'v-0361': 741600, 'v-0407': 768000 } },
+         { code: 'ITM-7715', name: 'MS plate — 6 mm', qty: 4500, uom: 'kg', to: 'v-0407', values: { 'v-0288': 308250, 'v-0219': 311400, 'v-0361': 315450, 'v-0407': 305550 } },
+         { code: 'ITM-3310', name: 'M12×60 hex bolt — 8.8 zinc', qty: 8000, uom: 'nos', to: 'v-0219', values: { 'v-0288': 196800, 'v-0219': 190400, 'v-0361': 200800, 'v-0407': 193600 } },
+         { code: 'ITM-3318', name: 'M12 hex nut — 8.8 zinc', qty: 8000, uom: 'nos', to: 'v-0219', values: { 'v-0288': 75200, 'v-0219': 71600, 'v-0361': 76800, 'v-0407': 72800 } },
+         { code: 'ITM-4120', name: 'Welding electrode — 3.15 mm', qty: 400, uom: 'kg', to: 'v-0361', values: { 'v-0288': 59200, 'v-0219': 60800, 'v-0361': 58200, 'v-0407': 59600 } },
+         { code: 'ITM-7728', name: 'MS flat — 40×6', qty: 2600, uom: 'kg', to: 'v-0361', values: { 'v-0288': 172120, 'v-0219': 174200, 'v-0361': 171340, 'v-0407': 177840 } }
+       ],
+       money(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       qty(l) { return l.qty.toLocaleString('en-IN') + ' ' + l.uom },
+       named(id) { return this.vendors.find(v => v.id === id).name },
+       lowLanded() { return Math.min(...this.vendors.map(v => v.landed)) },
+       get orders() { return this.shape === 'whole' ? 1 : [...new Set(this.lines.map(l => l.to))].length },
+       get value() {
+         return this.shape === 'whole'
+           ? this.vendors.find(v => v.id === this.vendor).landed
+           : this.lines.reduce((s, l) => s + l.values[l.to], 0);
+       },
+       get isLowest() { return this.shape === 'whole' &amp;&amp; this.vendors.find(v => v.id === this.vendor).landed === this.lowLanded() },
+       get sentence() {
+         if (this.shape === 'whole') return 'All 6 lines to ' + this.named(this.vendor) + ', ' + this.money(this.value) + ' landed, raising 1 purchase order.';
+         return '6 lines split across ' + this.orders + ' vendors, ' + this.money(this.value) + ' basic, raising ' + this.orders + ' purchase orders.';
+       },
+       commit() {
+         /* guarded, never disabled: the button keeps focus and the handler
+            puts the keyboard in the field that is missing. */
+         if (!this.isLowest &amp;&amp; this.reason.trim() === '') { this.$refs.reason.focus(); return }
+         this.posted = true;
+       },
+       posted: false
+     }">
+
+  <main class="mx-auto max-w-6xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Enquiries</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium tabular-nums text-zinc-900">ENQ-2026-0117</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Award the order</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">ENQ-2026-0117 · 6 lines · 4 quotations · compared on landed cost</p>
+    </div>
+
+    <fieldset class="mt-4">
+      <legend class="mb-2 text-[13px]/5 font-medium">Shape of the award</legend>
+      <div class="grid gap-2 sm:grid-cols-2">
+        <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="shape" value="whole" x-model="shape" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0">
+            <span class="block text-[13px]/5 font-medium">The whole order to one vendor</span>
+            <span class="mt-0.5 block text-[12px]/4 text-zinc-500">One purchase order, one delivery, one set of receipt paperwork.</span>
+          </span>
+        </label>
+        <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+          <input type="radio" name="shape" value="split" x-model="shape" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0">
+            <span class="block text-[13px]/5 font-medium">Split across vendors by line</span>
+            <span class="mt-0.5 block text-[12px]/4 text-zinc-500">One order per vendor chosen. Cheaper on paper, dearer to receive.</span>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+
+    <!-- whole-order: one row per vendor, the whole offer on it, one name. -->
+    <div x-show="shape === 'whole'" x-cloak class="relative mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 class="text-[16px]/6 font-semibold">Award every line to</h2>
+      </div>
+      <table class="w-full table-fixed text-[13px]/5">
+        <caption class="sr-only">Choose one vendor for the whole order. Each row is one quotation with its landed cost, promised delivery and terms.</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="w-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5"><span class="sr-only">Award to</span></th>
+            <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Vendor</th>
+            <th scope="col" class="w-40 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Landed cost</th>
+            <th scope="col" class="hidden w-40 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase sm:table-cell">Promised</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="v in vendors" :key="v.id">
+            <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+              <td class="px-4 py-2.5 align-top">
+                <input type="radio" name="award_to" :value="v.id" x-model="vendor"
+                       :aria-label="'Award the whole order to ' + v.name"
+                       class="size-4 accent-zinc-700">
+              </td>
+              <th scope="row" class="px-4 py-2.5 text-left align-top font-normal">
+                <span class="block font-medium" x-text="v.name"></span>
+                <span class="mt-0.5 block text-[12px]/4 text-zinc-500" x-text="v.terms"></span>
+              </th>
+              <td class="px-4 py-2.5 text-right align-top">
+                <span class="flex items-baseline justify-end gap-1.5">
+                  <span x-show="v.landed === lowLanded()" x-cloak
+                        class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                  <span class="font-medium tabular-nums whitespace-nowrap" x-text="money(v.landed)"></span>
+                </span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-500" x-text="money(v.basic) + ' basic'"></span>
+              </td>
+              <td class="hidden px-4 py-2.5 text-right align-top tabular-nums whitespace-nowrap text-zinc-600 sm:table-cell" x-text="v.on"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- split: six decisions, not a grid. The select names the vendor and the
+         value beside it is that vendor's price for that line. -->
+    <div x-show="shape === 'split'" x-cloak class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 class="text-[16px]/6 font-semibold">Award each line to</h2>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-600">Six decisions. Every distinct vendor chosen becomes its own purchase order.</p>
+      </div>
+      <ul class="divide-y divide-zinc-100">
+        <template x-for="l in lines" :key="l.code">
+          <li class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
+            <div class="min-w-[12rem] flex-1">
+              <p class="text-[13px]/5 font-medium" x-text="l.name"></p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code + ' · ' + qty(l)"></p>
+            </div>
+            <div class="w-full sm:w-64">
+              <label class="mb-1 block text-[12px]/4 text-zinc-600" :for="'aw-' + l.code" x-text="'Vendor for ' + l.name"></label>
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select :id="'aw-' + l.code" x-model="l.to" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                  <template x-for="v in vendors" :key="v.id">
+                    <option :value="v.id" x-text="v.name + ' — ' + money(l.values[v.id])"></option>
+                  </template>
+                </select>
+              </div>
+            </div>
+            <p class="w-full shrink-0 text-[13px]/5 font-medium tabular-nums whitespace-nowrap sm:w-28 sm:text-right"
+               x-text="money(l.values[l.to])"></p>
+          </li>
+        </template>
+      </ul>
+      <div class="flex flex-wrap items-baseline justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-5 py-3">
+        <p class="text-[12px]/4 font-medium text-zinc-600">Basic value of the split</p>
+        <p class="text-[16px]/6 font-semibold tabular-nums" x-text="money(lines.reduce((s, l) => s + l.values[l.to], 0))">₹15,38,690</p>
+      </div>
+    </div>
+
+    <!-- the reason, and it only exists when it is needed. A field that is
+         always there is a field people fill with a full stop. -->
+    <div x-show="!isLowest" x-cloak class="mt-4 rounded-xl border border-zinc-300 bg-white px-5 py-4">
+      <label for="aw-reason" class="block text-[13px]/5 font-medium">Why the lowest offer is not being accepted</label>
+      <p id="aw-reason-help" class="mt-1 text-[12px]/4 text-zinc-600">
+        Filed with the requisition and read with it. Delivery, quality history, capacity and payment terms are all reasons; "management decision" is not one.
+      </p>
+      <div class="mt-2 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <textarea id="aw-reason" x-ref="reason" x-model="reason" rows="3" aria-describedby="aw-reason-help"
+                  class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                  placeholder="Deccan promises 28 Sep against Nashik's 05 Oct, and the fabrication slot at Silvassa opens on 30 Sep."></textarea>
+      </div>
+    </div>
+
+    <!-- the bar. Opaque, top-bordered, stuck to the bottom of the scrolling
+         column, and it states the award before it takes it. -->
+    <div :aria-busy="posted ? 'true' : 'false'"
+         class="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <div class="min-w-[16rem] flex-1">
+        <output class="block text-[13px]/5 font-medium tabular-nums" x-text="sentence">All 6 lines to Deccan Fasteners Pvt Ltd, ₹15,65,600 landed, raising 1 purchase order.</output>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+          <span x-show="isLowest">This is the lowest landed cost of the four quotations.</span>
+          <span x-show="!isLowest" x-cloak class="inline-flex items-center gap-1.5">
+            <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+            The lowest landed offer is being passed over. A reason is required.
+          </span>
+        </p>
+      </div>
+      <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+        <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="commit()"
+                class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <span x-show="!posted" x-text="orders === 1 ? 'Award and raise 1 order' : 'Award and raise ' + orders + ' orders'">Award and raise 1 order</span>
+          <span x-show="posted" x-cloak>Raising the order…</span>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,328 @@
+<!-- The reference screen, and every decision in it follows from this being a
+     checklist rather than a wizard. The tasks take days, several are somebody
+     else's job, and the person who opens this on Friday is not the one who
+     opened it on Tuesday — so the state is on the server, every row is reachable
+     at any time, and nothing is behind a Next.
+
+     The bar is counted in tasks, not per cent. Seventeen tasks exist, two were
+     skipped, fifteen are counted and nine are done; aria-valuemax is 15 and the
+     valuetext says what happened to the other two. A bar that reports 60% and
+     nothing else is a figure somebody can improve by skipping things.
+
+     Three figures under it and never one total. Two hours of typing and four
+     days of waiting on a trial balance do not add up to anything anybody can
+     plan against, so what you can start now, what is waiting on a person and
+     what is waiting on a task are three separate readings.
+
+     The blocked row's blocker is a paragraph after the row and outside its
+     anchor. A link inside a link is repaired by the parser and the inner one
+     stops existing, so the one thing the row is for — the route to what is
+     holding it up — would silently not be clickable.
+
+     Two marks for two kinds of waiting. A dependency is a lock in zinc-500,
+     the neutral shade, because nothing is wrong and it clears by itself. A
+     person who has not answered is amber-700, because it will not clear unless
+     somebody rings them. One mark for both and the screen cannot say which of
+     the stalled tasks a phone call would fix. -->
+<div data-kui="onboarding-page/checklist" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
+
+    <!-- page-header, unchanged. No status pill: setup is not a record and none
+         of the five locked statuses describes it. -->
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Set up Konspec</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · Silvassa and Vapi · FY 2026–27 · go live 01 Oct 2026</p>
+    </div>
+
+    <div class="mt-5 rounded-xl border border-zinc-300 bg-white p-4">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h2 id="ck-progress" class="text-[16px]/6 font-semibold tabular-nums">9 of 15 tasks done</h2>
+        <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600">6 left · 60%</p>
+      </div>
+
+      <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="ck-progress"
+           aria-valuenow="9" aria-valuemin="0" aria-valuemax="15"
+           aria-valuetext="9 of 15 counted tasks done. Two more were skipped and are not counted.">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 60%"></div>
+      </div>
+      <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">17 tasks in all · 2 were skipped on 19 Aug and are not counted here</p>
+
+      <dl class="mt-3 grid gap-3 border-t border-zinc-100 pt-3 text-[13px]/5 sm:grid-cols-3">
+        <div>
+          <dt class="text-zinc-600">You can start now</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">2 tasks · about 2 h 15 min</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">Waiting on a person</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">2 tasks · no date on either</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">Waiting on another task</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">2 tasks · one of them clears on its own</dd>
+        </div>
+      </dl>
+
+      <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-3">
+        <p class="min-w-0 flex-1 text-[13px]/5 tabular-nums">
+          Next: <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Item masters</a> — 1,240 rows in the sheet, and two tasks are waiting on it.
+        </p>
+        <a href="#" class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          Open the item import<i data-lucide="arrow-up-right" class="size-4" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-4 space-y-4">
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <div class="min-w-0">
+            <h2 class="text-[16px]/6 font-semibold">Company and plants</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">What is printed on every document, and where stock is held.</p>
+          </div>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">4 of 4 done</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Done — </span>Company profile</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Akshay Prabhu · 12 Aug 2026 · GSTIN, PAN and the registered address</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Done — </span>Plants and stores</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Akshay Prabhu · 12 Aug 2026 · Silvassa and Vapi, 6 stores</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Done — </span>Financial year and book closing</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Meera Iyer · 13 Aug 2026 · 01 Apr 2026 to 31 Mar 2027</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Done — </span>Numbering series</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Meera Iyer · 13 Aug 2026 · next order PO-2026-0001</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <div class="min-w-0">
+            <h2 class="text-[16px]/6 font-semibold">Money and tax</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">What a document costs, who signs it and which ledger it lands in.</p>
+          </div>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">3 of 4 done</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Done — </span>Chart of accounts</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Meera Iyer · 14 Aug 2026 · 412 ledgers imported from Tally</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Done — </span>Tax defaults</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Meera Iyer · 18 Aug 2026 · 18% GST, HSN required on every line</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Done — </span>Payment terms</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Meera Iyer · 15 Aug 2026 · 30 days from GRN, 45 for MSME vendors</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 pt-3 pb-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Waiting on somebody — </span>Approval limits</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Meera Iyer · asked 15 Aug 2026, six days ago</span>
+              </span>
+              <span class="mt-0.5 shrink-0 text-[12px]/4 tabular-nums text-zinc-500">15 min</span>
+            </a>
+            <p class="px-4 pb-3 pl-11 text-[12px]/4 tabular-nums text-zinc-600">
+              Waiting on <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Nilesh Patil</a> — he is confirming the ₹7,50,000 second-approver limit with the board on 22 Aug. Orders can still be raised at the ₹5,00,000 default until then.
+            </p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <div class="min-w-0">
+            <h2 class="text-[16px]/6 font-semibold">Master data</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">The lists every other screen picks from. Mostly imported, not typed.</p>
+          </div>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">2 of 3 done · 1 skipped</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Done — </span>Units and HSN codes</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Sanjay More · 15 Aug 2026 · 14 units, 96 HSN codes</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Done — </span>Vendor masters</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Sanjay More · 18 Aug 2026 · 214 vendors imported, 3 rejected</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Not started — </span>Item masters</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Sanjay More · opens the item import · 1,240 rows in the sheet</span>
+              </span>
+              <span class="mt-0.5 shrink-0 text-[12px]/4 tabular-nums text-zinc-500">about 2 h</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 pt-3 pb-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="minus-circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium text-zinc-600"><span class="sr-only">Skipped — </span>Customer masters</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Skipped by Akshay Prabhu · 19 Aug 2026</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+            <p class="px-4 pb-3 pl-11 text-[12px]/4 text-zinc-600">
+              &ldquo;We are not raising sales orders from this system yet.&rdquo; One task is waiting on this one and will stay waiting — see <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Opening customer balances</a>.
+            </p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <div class="min-w-0">
+            <h2 class="text-[16px]/6 font-semibold">Opening balances</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">What the old system was holding on the day this one starts.</p>
+          </div>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">0 of 3 done</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 pt-3 pb-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Blocked — </span>Opening stock</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Sanjay More · about 1 h once it clears</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+            <p class="px-4 pb-3 pl-11 text-[12px]/4 text-zinc-600">
+              Waiting for <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Item masters</a> — stock is counted against item codes and there are none yet. This clears itself the moment the item import posts.
+            </p>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 pt-3 pb-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Waiting on somebody — </span>Opening vendor balances</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Meera Iyer · asked 19 Aug 2026</span>
+              </span>
+              <span class="mt-0.5 shrink-0 text-[12px]/4 tabular-nums text-zinc-500">about 40 min</span>
+            </a>
+            <p class="px-4 pb-3 pl-11 text-[12px]/4 tabular-nums text-zinc-600">
+              Waiting on the closing balances as at 30 Sep from the outgoing system. There is no date, and go-live on 01 Oct is waiting on it.
+            </p>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 pt-3 pb-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Blocked — </span>Opening customer balances</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Nobody owns this one</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+            <p class="px-4 pb-3 pl-11 text-[12px]/4 text-zinc-600">
+              Waiting for <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Customer masters</a>, which was skipped on 19 Aug. A skipped task never finishes, so this one will not clear on its own.
+            </p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <div class="min-w-0">
+            <h2 class="text-[16px]/6 font-semibold">People and access</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Who signs in, and what each of them may do once they are in.</p>
+          </div>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">0 of 1 done · 1 skipped</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Not started — </span>Invite users</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Akshay Prabhu · 41 people on the list from HR</span>
+              </span>
+              <span class="mt-0.5 shrink-0 text-[12px]/4 tabular-nums text-zinc-500">15 min</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 pt-3 pb-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="minus-circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium text-zinc-600"><span class="sr-only">Skipped — </span>Roles and permissions</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Skipped by Akshay Prabhu · 19 Aug 2026</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+            <p class="px-4 pb-3 pl-11 text-[12px]/4 text-zinc-600">
+              &ldquo;The four built-in roles cover everybody at both plants.&rdquo; Nothing is waiting on this one.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</div>

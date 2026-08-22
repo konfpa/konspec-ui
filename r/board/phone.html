@@ -1,0 +1,141 @@
+<!-- Five columns cannot be five columns at 390px, and the answer is not a
+     narrower column but a different arrangement: the stage becomes a control,
+     one column takes the whole width, and the shape of the pipeline moves into
+     the option labels so it can be read without being seen.
+
+     A select rather than a scrolling tab strip. Five stage names with counts do
+     not fit across 390px, a strip that scrolls sideways hides the stage
+     somebody is hunting for behind the edge of the screen, and the native
+     picker is a full-screen list with 44px rows — the best target on the board
+     for somebody wearing gloves.
+
+     The options are written out rather than looped: x-model runs on the select
+     before an x-for inside it has filled it, so the binding would set a value
+     with no option behind it and the control would show one stage while the
+     board showed another.
+
+     The arrows walk the stages in the direction work travels and clamp rather
+     than wrap — wrapping from QC hands somebody Planned. The columns are bound
+     with :class in the object form and never x-show: an inline display:none
+     beats sm:flex, and they would never come back on a wide screen. -->
+<main data-kui="board/phone" class="mx-auto flex h-[600px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+      x-data="{
+        said: '', open: null, stage: 'welded',
+        stages: [
+          { id: 'planned', name: 'Planned' },
+          { id: 'cut', name: 'Cut' },
+          { id: 'welded', name: 'Welded' },
+          { id: 'painted', name: 'Painted' },
+          { id: 'qc', name: 'QC' }
+        ],
+        cards: [
+          { no: 'JOB-2026-3312', stage: 'planned', item: 'Conveyor frame 6 m', mt: 1.8 },
+          { no: 'JOB-2026-3318', stage: 'cut', item: 'Hopper shell 2.4 m', mt: 2.4 },
+          { no: 'JOB-2026-3301', stage: 'welded', item: 'Chute liner assembly', mt: 1.2 },
+          { no: 'JOB-2026-3302', stage: 'welded', item: 'Conveyor frame 4 m', mt: 1.4 },
+          { no: 'JOB-2026-3303', stage: 'welded', item: 'Guard rail run A', mt: 0.9 },
+          { no: 'JOB-2026-3288', stage: 'painted', item: 'Hopper shell 1.8 m', mt: 1.9 },
+          { no: 'JOB-2026-3277', stage: 'qc', item: 'Conveyor frame 6 m', mt: 1.8 }
+        ],
+        at(s) { return this.cards.filter(c => c.stage === s) },
+        label(s) { return this.stages.find(x => x.id === s).name },
+        step(n) {
+          const i = this.stages.findIndex(x => x.id === this.stage);
+          this.stage = this.stages[Math.min(Math.max(i + n, 0), this.stages.length - 1)].id;
+        },
+        get first() { return this.stage === this.stages[0].id },
+        get last() { return this.stage === this.stages[this.stages.length - 1].id },
+        commit(no, to) {
+          const board = this.$refs.board;
+          const c = this.cards.find(x => x.no === no);
+          const from = this.label(c.stage);
+          c.stage = to;
+          this.open = null;
+          this.stage = to;
+          this.said = no + ' moved from ' + from + ' to ' + this.label(to) + '. Showing ' + this.label(to) + ', ' + this.at(to).length + ' jobs.';
+          this.$nextTick(() => requestAnimationFrame(() => {
+            const el = board.querySelector('[data-move=' + no + ']');
+            if (el) { el.focus(); el.scrollIntoView({ block: 'nearest' }) }
+          }));
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="shrink-0 border-b border-zinc-300 bg-white px-3 py-3">
+    <h1 class="text-[16px]/6 font-semibold">Fabrication board</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Silvassa · shift A · 7 jobs</p>
+
+    <div class="mt-2.5 flex items-stretch gap-2 sm:hidden">
+      <button type="button" @click="step(-1)" :disabled="first" aria-label="Previous stage"
+              class="flex size-10 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+      <div class="min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <label for="ph-stage" class="sr-only">Stage</label>
+        <select id="ph-stage" x-model="stage" class="h-10 w-full bg-transparent px-3 text-[14px]/5 font-medium outline-none">
+          <option value="planned" x-text="'Planned (' + at('planned').length + ')'">Planned (1)</option>
+          <option value="cut" x-text="'Cut (' + at('cut').length + ')'">Cut (1)</option>
+          <option value="welded" x-text="'Welded (' + at('welded').length + ')'">Welded (3)</option>
+          <option value="painted" x-text="'Painted (' + at('painted').length + ')'">Painted (1)</option>
+          <option value="qc" x-text="'QC (' + at('qc').length + ')'">QC (1)</option>
+        </select>
+      </div>
+      <button type="button" @click="step(1)" :disabled="last" aria-label="Next stage"
+              class="flex size-10 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:pointer-events-none disabled:opacity-40">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <div x-ref="board" class="flex min-h-0 flex-1 gap-3 overflow-x-auto p-3">
+    <template x-for="s in stages" :key="s.id">
+      <section :aria-labelledby="'ph-h-' + s.id"
+               class="relative flex w-full shrink-0 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white sm:w-72"
+               :class="{ 'hidden sm:flex': s.id !== stage, 'flex': s.id === stage }">
+
+        <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+          <h2 :id="'ph-h-' + s.id" class="truncate text-[13px]/5 font-medium" x-text="s.name"></h2>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="at(s.id).length + ' jobs'"></p>
+        </div>
+
+        <ul role="list" class="min-h-0 flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-2">
+          <template x-for="c in at(s.id)" :key="c.no">
+            <li class="rounded-lg border border-zinc-200 bg-white p-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <a href="#" class="text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="c.no"></a>
+                  <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600" x-text="c.item"></p>
+                </div>
+                <button type="button" :data-move="c.no" @click="open = open === c.no ? null : c.no"
+                        :aria-expanded="open === c.no" :aria-label="'Move ' + c.no + ', now in ' + label(c.stage)"
+                        class="flex size-10 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="arrow-right-left" class="size-4"></i>
+                </button>
+              </div>
+              <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500" x-text="c.mt + ' MT'"></p>
+
+              <div x-show="open === c.no" x-cloak class="mt-3 border-t border-zinc-100 pt-3"
+                   @keydown.escape.stop="open = null; $nextTick(() => $refs.board.querySelector('[data-move=' + c.no + ']').focus())">
+                <p class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Move to</p>
+                <div role="group" :aria-label="'Move ' + c.no + ' to'" class="mt-1.5 space-y-1.5">
+                  <template x-for="d in stages.filter(x => x.id !== c.stage)" :key="d.id">
+                    <button type="button" @click="commit(c.no, d.id)"
+                            class="flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-left text-[14px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                      <span class="truncate" x-text="d.name"></span>
+                      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="at(d.id).length"></span>
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </li>
+          </template>
+
+          <li x-show="!at(s.id).length" x-cloak class="px-2 py-8 text-center text-[12px]/4 text-zinc-500">
+            Nothing at this stage
+          </li>
+        </ul>
+      </section>
+    </template>
+  </div>
+</main>

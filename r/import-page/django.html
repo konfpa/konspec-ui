@@ -1,0 +1,470 @@
+<!-- imports/templates/imports/run.html — one page template for all four
+     stages, extending the base that renders app-shell. Every signed-in screen
+     is the shell; an import that starts its own document loses the skip link,
+     the nav landmark and the keyboard shortcuts, and reviews as fine because
+     everything it dropped is invisible until somebody uses a keyboard.
+
+     The trap that costs a day. Only the first form carries
+     enctype="multipart/form-data", and only the first one has a file input.
+     After that POST the file is written to a staged copy under run.token and
+     the browser has nothing left to send — a mapping form with an enctype and
+     no file posts an empty request.FILES, and a view that reaches for
+     request.FILES['file'] there raises MultiValueDictKeyError on every mapping
+     submit. The mapping form posts the token and the selects, nothing else.
+
+     The staged file is fetched with the run scoped to request.user, not by
+     token alone. A token in a URL is a readable copy of somebody's price list.
+
+     The commit is POST then redirect to the result URL, and that is the whole
+     defence against running the import twice. Rendering the result straight out
+     of the POST means F5 re-posts 1,240 rows, and the browser's "Confirm form
+     resubmission" dialog is a question nobody reads.
+
+     Which contract runs is decided by one radio and it has to be the same
+     decision in the view: mode="all" wraps the loop in transaction.atomic() so
+     nothing is visible until everything has posted, mode="partial" takes a
+     savepoint per row so the good ones survive. The sentence on the screen and
+     the sentence in the view are one decision written twice, and they drift the
+     moment somebody edits the template alone.
+
+     Two traps this repo has hit before. A multi-line {# #} is not a comment —
+     Django's tag_re has no DOTALL, so everything after the first line renders
+     on the page; use a comment/endcomment block. And |intcomma raises without
+     {% load humanize %} in this same file, which is why the load line is here
+     rather than only in base.html.
+
+     {{ form.file.errors }} is the only place a file problem is reported. The
+     size limit stated on screen is enforced in clean_file — FileField does not
+     check size, and DATA_UPLOAD_MAX_MEMORY_SIZE raises a 400 with no form to
+     hang the message on. -->
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block main %}
+<div data-kui="import-page/django" class="text-zinc-900">
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <nav aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+        <li><a href="{% url 'masters:home' %}" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Master data</a></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><a href="{% url 'items:index' %}" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Items</a></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><span aria-current="page" class="font-medium text-zinc-900">Import</span></li>
+      </ol>
+    </nav>
+    <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Import items</h1>
+    {% if run %}
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+        {{ run.filename }} · {{ run.total_rows|intcomma }} rows · uploaded {{ run.uploaded_at|date:"d M Y, H:i" }} by {{ run.uploaded_by.get_full_name }}
+      </p>
+    {% else %}
+      <p class="mt-1 text-[13px]/5 text-zinc-600">Silvassa plant · FY 2026–27 · adds and updates the item master</p>
+    {% endif %}
+
+    {% comment %}
+    stages is a list of {number, label, state} built in the view, where state is
+    'done', 'current' or 'ahead'. Working it out in the template means writing
+    the same comparison three times and getting aria-current and the circle out
+    of step with each other.
+    {% endcomment %}
+    <nav aria-label="Import stages" class="mt-5">
+      <ol class="hidden items-center gap-2 sm:flex">
+        {% for s in stages %}
+          <li class="flex min-w-0 flex-1 items-center gap-2">
+            <a href="{% if s.state == 'done' %}{% url 'imports:stage' run.token s.slug %}{% else %}#{% endif %}"
+               {% if s.state == 'current' %}aria-current="step"{% endif %}
+               {% if s.state == 'ahead' %}aria-disabled="true"{% endif %}
+               class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[11px]/4 font-semibold tabular-nums ring-1 ring-inset {% if s.state == 'done' %}bg-zinc-700 text-white ring-zinc-700{% elif s.state == 'current' %}bg-zinc-200 text-zinc-900 ring-zinc-300{% else %}bg-white text-zinc-500 ring-zinc-200{% endif %}">{{ s.number }}</span>
+              <span class="min-w-0 truncate text-[13px]/5 {% if s.state == 'current' %}font-semibold text-zinc-900{% elif s.state == 'ahead' %}text-zinc-500{% endif %}">{{ s.label }}</span>
+            </a>
+            {% if not forloop.last %}<span class="h-px w-4 shrink-0 bg-zinc-200" aria-hidden="true"></span>{% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+      <div class="sm:hidden">
+        <p class="text-[13px]/5 font-medium tabular-nums">Step {{ current_stage.number }} of {{ stages|length }} · {{ current_stage.label }}</p>
+        <div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-zinc-200">
+          {% comment %}
+          The width is an inline style and has to be. Tailwind compiles its
+          stylesheet out of the literal strings in the source, so
+          class="w-[{{ pct }}%]" scans as the token w-[{{ and emits no rule at
+          all — the rail comes back empty rather than broken, which is why it
+          ships. run.stage_pct is a property on the model rather than
+          {% widthratio %}, which rounds to a whole number and has no clamp.
+          {% endcomment %}
+          <div class="h-full rounded-full bg-zinc-700" style="width: {{ run.stage_pct }}%"></div>
+        </div>
+      </div>
+    </nav>
+
+    {% if stage == 'upload' %}
+      <form method="post" action="{% url 'imports:create' 'items' %}" enctype="multipart/form-data" class="mt-5">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div role="alert" tabindex="-1" x-data x-init="$el.focus()"
+               class="mb-4 flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            <p class="text-[13px]/5 font-medium">{{ form.non_field_errors.0 }}</p>
+          </div>
+        {% endif %}
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 class="text-[16px]/6 font-semibold">The file</h2>
+          </div>
+          <div class="px-5 py-4" x-data="{ depth: 0 }">
+            <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent
+                 @drop.prevent="depth = 0; $refs.picker.files = $event.dataTransfer.files"
+                 class="rounded-lg border border-dashed px-4 py-6 transition"
+                 :class="depth > 0 ? 'border-zinc-700 bg-zinc-100' : 'border-zinc-200 bg-zinc-50'">
+              <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
+                <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
+                <span class="text-[13px]/5 text-zinc-600">Drag the spreadsheet here or</span>
+                <input type="file" name="file" id="id_file" x-ref="picker" accept=".xlsx,.csv"
+                       aria-describedby="id_file_helptext" class="peer sr-only">
+                <label for="id_file"
+                       class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+                  Choose a file
+                </label>
+                <span id="id_file_helptext" class="text-[12px]/4 tabular-nums text-zinc-500">XLSX or CSV · up to 20 MB · up to 5,000 rows</span>
+              </div>
+            </div>
+
+            {% if form.file.errors %}
+              <p id="id_file_error" class="mt-2 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+                <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>{{ form.file.errors.0 }}
+              </p>
+            {% endif %}
+
+            <p class="mt-4 text-[13px]/5 tabular-nums text-zinc-600">
+              Rows are matched on the item code — an existing code is updated, a new one is created, and nothing is ever deleted. Every row posts together, so nothing reaches the item master until all of them have.
+            </p>
+            <a href="{% url 'imports:template' 'items' %}" class="mt-2 inline-block text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Download the template (XLSX)</a>
+          </div>
+        </div>
+
+        <div class="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+          <p class="min-w-[14rem] flex-1 text-[12px]/4 text-zinc-600">Every row posts together. Nothing reaches the item master until all of them have.</p>
+          <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <a href="{% url 'items:index' %}" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</a>
+            <button type="submit" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Continue to mapping<i data-lucide="chevron-right" class="size-4"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+
+    {% elif stage == 'map' %}
+      {% comment %}
+      No enctype and no file input on this form. The file was staged on the
+      upload POST and the browser cannot re-send it; an enctype here posts an
+      empty request.FILES and a view reading request.FILES['file'] raises on
+      every submit. The token is what identifies the staged copy.
+      {% endcomment %}
+      <form method="post" action="{% url 'imports:map' run.token %}" class="mt-5">
+        {% csrf_token %}
+        <input type="hidden" name="token" value="{{ run.token }}">
+
+        {% if unmapped_required %}
+          <div role="alert" tabindex="-1" x-data x-init="$el.focus()"
+               class="mb-4 flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            <div class="min-w-0">
+              <p class="text-[13px]/5 font-medium tabular-nums">{{ unmapped_required|length }} required field{{ unmapped_required|length|pluralize }} with nothing mapped to {{ unmapped_required|length|pluralize:"it,them" }}</p>
+              <p class="mt-1 text-[12px]/4 text-zinc-600">
+                {% for f in unmapped_required %}{{ f.label }}{% if not forloop.last %}, {% endif %}{% endfor %} — no column in this file matched. Map a column below, or add the column to the sheet and upload again.
+              </p>
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+            <h2 class="text-[16px]/6 font-semibold">Map columns</h2>
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">{{ mapped_required_count }} of {{ required_count }} required fields mapped</p>
+          </div>
+
+          <table class="hidden w-full text-[13px]/5 md:table">
+            <thead>
+              <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                <th scope="col" class="px-4 py-2.5 font-medium">Column in the file</th>
+                <th scope="col" class="w-64 px-4 py-2.5 font-medium">Field in the item master</th>
+                <th scope="col" class="px-4 py-2.5 font-medium">How this was decided</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in run.columns %}
+                <tr class="border-b border-zinc-100 last:border-0">
+                  <th scope="row" class="px-4 py-2.5 text-left align-top font-medium">
+                    {{ c.header }}
+                    <span class="mt-0.5 block max-w-[22rem] truncate text-[12px]/4 font-normal tabular-nums text-zinc-500">Row 2: {{ c.sample }}</span>
+                  </th>
+                  <td class="px-4 py-2.5 align-top">
+                    <div class="relative rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2 {% if c.clashes %}border-red-600 focus-within:outline-red-600/15{% else %}border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15{% endif %}">
+                      {% comment %}
+                      aria-label rather than <label for>, because this grid is
+                      rendered twice — a table above md and cards below it — and
+                      one for/id pair cannot serve two copies of one control. A
+                      <th scope="col"> names the column for a reader walking the
+                      table and contributes nothing to the accessible name of a
+                      control that has been tabbed to.
+                      {% endcomment %}
+                      <select name="map-{{ c.index }}" aria-label="Field for the column {{ c.header }}"
+                              {% if c.clashes %}aria-invalid="true"{% endif %}
+                              class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                        <option value="">Do not import this column</option>
+                        {% for f in fields %}
+                          <option value="{{ f.key }}" {% if c.mapped == f.key %}selected{% endif %}>{{ f.label }}{% if f.required %} — required{% endif %}</option>
+                        {% endfor %}
+                      </select>
+                      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                        <i data-lucide="chevron-down" class="size-3.5"></i>
+                      </span>
+                    </div>
+                    {% if c.clashes %}
+                      <p class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+                        <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>Two columns are mapped to {{ c.clashes }}. Only one can be.
+                      </p>
+                    {% endif %}
+                  </td>
+                  <td class="px-4 py-2.5 align-top text-[12px]/4 text-zinc-500">
+                    {% if c.guessed %}<span class="text-amber-700"><i data-lucide="alert-triangle" class="inline size-3.5"></i></span> {% endif %}{{ c.how }}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="3" class="px-6 py-12 text-center">
+                    <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                      <i data-lucide="file-x" class="size-5 text-zinc-600"></i>
+                    </span>
+                    <h3 class="mt-3 text-[16px]/6 font-semibold">No columns were read from this file</h3>
+                    <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">The first row is read as the header and it is empty. Upload a file whose first row names the columns.</p>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="divide-y divide-zinc-100 md:hidden">
+            {% for c in run.columns %}
+              <div class="px-4 py-3">
+                <p class="text-[13px]/5 font-medium">{{ c.header }}</p>
+                <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-500">Row 2: {{ c.sample }}</p>
+                <div class="relative mt-2 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  {% comment %}
+                  A second control with the same name posts twice. Both copies
+                  are in the DOM with one of them display:none, and a
+                  display:none control still submits — so the phone copy takes
+                  the same name deliberately and the view reads getlist and uses
+                  the last value, which is the one the visible copy wrote.
+                  {% endcomment %}
+                  <select name="map-{{ c.index }}" aria-label="Field for the column {{ c.header }}"
+                          class="block h-11 w-full min-w-0 appearance-none bg-transparent pr-9 pl-3 text-[14px]/5 outline-none">
+                    <option value="">Do not import this column</option>
+                    {% for f in fields %}
+                      <option value="{{ f.key }}" {% if c.mapped == f.key %}selected{% endif %}>{{ f.label }}{% if f.required %} — required{% endif %}</option>
+                    {% endfor %}
+                  </select>
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+                    <i data-lucide="chevron-down" class="size-4"></i>
+                  </span>
+                </div>
+                <p class="mt-1.5 text-[12px]/4 text-zinc-500">{{ c.how }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+          <div class="min-w-[14rem] flex-1">
+            <p class="text-[12px]/4 text-zinc-600">Every row posts together. Nothing reaches the item master until all of them have.</p>
+            {% if unmapped_required %}
+              <p id="dj-block" class="mt-0.5 text-[12px]/4 font-medium text-zinc-900">
+                Map {% for f in unmapped_required %}{{ f.label }}{% if not forloop.last %} and {% endif %}{% endfor %} before you can continue.
+              </p>
+            {% endif %}
+          </div>
+          <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <a href="{% url 'imports:stage' run.token 'upload' %}" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-left" class="size-4"></i>Back
+            </a>
+            <button type="submit" {% if unmapped_required %}disabled aria-describedby="dj-block"{% endif %}
+                    class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white enabled:hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Continue to review<i data-lucide="chevron-right" class="size-4"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+
+    {% elif stage == 'review' %}
+      <form method="post" action="{% url 'imports:commit' run.token %}" class="mt-5">
+        {% csrf_token %}
+        <input type="hidden" name="token" value="{{ run.token }}">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <div class="flex items-start gap-3">
+              {% if run.error_count %}<i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>{% else %}<i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>{% endif %}
+              <div class="min-w-0">
+                <h2 class="text-[16px]/6 font-semibold tabular-nums">
+                  {% if run.error_count %}{{ run.error_count|intcomma }} of {{ run.total_rows|intcomma }} rows will not post{% else %}All {{ run.total_rows|intcomma }} rows are ready{% endif %}
+                </h2>
+                <p role="status" class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">
+                  {{ run.ok_count|intcomma }} ready · {{ run.create_count|intcomma }} to create · {{ run.update_count|intcomma }} to update
+                </p>
+              </div>
+            </div>
+            {% if run.error_count %}
+              <a href="{% url 'imports:rejects' run.token %}"
+                 class="mt-3 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="download" class="size-3.5 text-zinc-600"></i>Download the {{ run.error_count|intcomma }} rejected rows as XLSX
+              </a>
+            {% endif %}
+          </div>
+
+          <div class="divide-y divide-zinc-100">
+            {% for g in error_groups %}
+              <section aria-labelledby="dj-g{{ forloop.counter }}" class="px-5 py-4">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                  <h3 id="dj-g{{ forloop.counter }}" class="text-[13px]/5 font-semibold">{{ g.title }}</h3>
+                  <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">{{ g.count|intcomma }} row{{ g.count|pluralize }}</p>
+                </div>
+                <p id="dj-r{{ forloop.counter }}" class="mt-1 max-w-[70ch] text-[12px]/4 tabular-nums text-zinc-600">{{ g.rule }}</p>
+                <table aria-describedby="dj-r{{ forloop.counter }}" class="mt-2.5 w-full text-[13px]/5">
+                  <thead>
+                    <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                      <th scope="col" class="py-1.5 pr-4 text-right font-medium">Row</th>
+                      <th scope="col" class="py-1.5 pr-4 font-medium">Item code</th>
+                      <th scope="col" class="py-1.5 font-medium">{{ g.column }} cell</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for e in g.sample %}
+                      <tr class="border-t border-zinc-100">
+                        <td class="py-1.5 pr-4 text-right tabular-nums text-zinc-600">{{ e.row|intcomma }}</td>
+                        <th scope="row" class="py-1.5 pr-4 text-left font-medium tabular-nums">{{ e.code }}</th>
+                        <td class="py-1.5 tabular-nums">&quot;{{ e.value }}&quot;</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                {% if g.count > g.sample|length %}
+                  <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">and {{ g.count|add:"-3"|intcomma }} more rows of this kind</p>
+                {% endif %}
+              </section>
+            {% empty %}
+              <div class="px-6 py-10 text-center">
+                <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                  <i data-lucide="check" class="size-5 text-zinc-600"></i>
+                </span>
+                <h3 class="mt-3 text-[16px]/6 font-semibold">Nothing needs attention</h3>
+                <p class="mx-auto mt-1 max-w-sm text-[13px]/5 tabular-nums text-zinc-600">Every one of the {{ run.total_rows|intcomma }} rows read cleanly against the mapping you set.</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% if run.error_count %}
+          <div class="mt-4 rounded-xl border border-zinc-300 bg-white px-5 py-4">
+            <fieldset>
+              <legend class="text-[13px]/5 font-semibold tabular-nums">What should happen to the {{ run.ok_count|intcomma }} rows that are ready?</legend>
+              <div class="mt-3 space-y-3">
+                <label class="flex items-start gap-2.5 text-[14px]/5">
+                  <input type="radio" name="mode" value="all" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                  <span>Post nothing until every row is fixed
+                    <span class="mt-0.5 block max-w-[70ch] text-[12px]/4 tabular-nums text-zinc-600">The view wraps the whole run in transaction.atomic(), so the item master is untouched and this run stays staged.</span>
+                  </span>
+                </label>
+                <label class="flex items-start gap-2.5 text-[14px]/5">
+                  <input type="radio" name="mode" value="partial" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                  <span>Post the {{ run.ok_count|intcomma }} and skip the {{ run.error_count|intcomma }}
+                    <span class="mt-0.5 block max-w-[70ch] text-[12px]/4 tabular-nums text-zinc-600">A savepoint per row, so the good ones survive. The {{ run.error_count|intcomma }} come back as a file and those items keep the rate they have now.</span>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+          </div>
+        {% endif %}
+
+        <div class="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+          <p class="min-w-[14rem] flex-1 text-[12px]/4 tabular-nums text-zinc-600">Every row posts together unless you choose otherwise above. Nothing has been written yet.</p>
+          <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <a href="{% url 'imports:stage' run.token 'map' %}" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-left" class="size-4"></i>Back to mapping
+            </a>
+            <button type="submit" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium tabular-nums text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Post {{ run.ok_count|intcomma }} rows
+            </button>
+          </div>
+        </div>
+      </form>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}
+
+{% comment %}
+imports/views.py — the four stages, and the two that write
+
+    @require_POST
+    def create(request, kind):
+        form = UploadForm(request.POST, request.FILES)   # both, or is_valid()
+        if not form.is_valid():                          # is always False
+            return render(request, 'imports/run.html',
+                          {'stage': 'upload', 'form': form, **stage_ctx('upload')})
+        run = ImportRun.stage(form.cleaned_data['file'], kind, request.user)
+        return redirect('imports:stage', token=run.token, slug='map')
+
+    @require_POST
+    def commit(request, token):
+        run = get_object_or_404(ImportRun, token=token, uploaded_by=request.user)
+        mode = request.POST.get('mode', 'all')
+        run.post(mode)
+        # POST then redirect, and this line is the whole defence against the
+        # import running twice. Render the result out of the POST and F5
+        # re-posts 1,240 rows behind a browser dialog nobody reads.
+        return redirect('imports:result', token=run.token)
+
+    imports/models.py
+
+        def post(self, mode):
+            if mode == 'all':
+                with transaction.atomic():
+                    for row in self.rows.valid():
+                        row.apply()          # one transaction, all or nothing
+            else:
+                for row in self.rows.valid():
+                    with transaction.atomic():   # a savepoint per row
+                        row.apply()
+
+    imports/forms.py
+
+        class UploadForm(forms.Form):
+            file = forms.FileField()
+
+            def clean_file(self):
+                f = self.cleaned_data['file']
+                # FileField does not check size. Leaving it to
+                # DATA_UPLOAD_MAX_MEMORY_SIZE raises a 400 with no form to hang
+                # the message on, and the user sees a bare error page instead of
+                # the limit that was printed under the picker.
+                if f.size > 20 * 1024 * 1024:
+                    raise ValidationError('That file is %(mb)s MB. The limit is 20 MB — split the sheet and import it in two runs.',
+                                          params={'mb': round(f.size / 1048576)})
+                return f
+
+get_object_or_404 takes uploaded_by as well as token, because a token in a URL
+is otherwise a readable copy of somebody else's price list.
+
+stage_ctx() builds stages — number, label, slug and state, one of 'done',
+'current' or 'ahead' — plus stage_pct for the rail below sm. Working the state
+out in the template means writing the same comparison three times and getting
+aria-current out of step with the circle it is meant to describe.
+
+The rejected-rows download is built from run.rows.invalid() with the original
+columns in their original order plus a Problem column, because the correction
+happens in Excel and a list on a web page cannot be pasted back into one.
+{% endcomment %}

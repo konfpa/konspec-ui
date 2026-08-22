@@ -1,0 +1,107 @@
+<!-- The page never scrolls sideways and a box inside it sometimes does. The
+     difference is entirely in where overflow-x-auto is written, and every one
+     in the registry is on a box and none on a page: sixteen a snapping rail,
+     five a scrollable tab strip, three a genuinely wide table inside its own
+     bordered box, and the rest a row of chips.
+
+     A rate comparison is the honest case. Eight vendors against four grades is
+     a matrix, not a register — the whole point of it is reading across a row,
+     so the cards a phone would otherwise get would destroy the comparison. It
+     gets its own scroller, the table gets a min-w so it does not compress into
+     illegibility, and the page around it never moves.
+
+     overscroll-x-contain, or a flick that runs off the end of the table keeps
+     going into the browser's back gesture and the user loses the screen.
+
+     The scroller is a real tab stop with a name. A box that scrolls but holds
+     no focusable content is unreachable from the keyboard in Firefox and
+     Safari, and "scrollable region" with no name tells nobody what they landed
+     in. The name comes from the h2, and the panel around it is a plain div
+     rather than a named section so the landmark list gets one entry for this
+     matrix and not two identical ones.
+
+     Everything above it is the other half of the rule: min-w-0 on the flex
+     children that hold text, and truncate on the one that may be long. A flex
+     child will not shrink below its intrinsic minimum, so without it a vendor
+     name that ran long widens the row, then the card, then the page — and that
+     is what a sideways scrollbar on the page usually turns out to be. -->
+<div data-kui="container/overflow" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
+
+    <h1 class="text-[24px]/7 font-semibold tracking-tight">Rate comparison</h1>
+
+    <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[13px]/5 text-zinc-600">
+      <span class="min-w-0 truncate">Enquiry ENQ-2026-0093 · MS angles and plates, August lot</span>
+      <span class="text-zinc-500">·</span>
+      <span class="tabular-nums whitespace-nowrap">4 quotes · closed 02 Sep 2026</span>
+    </div>
+
+    <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="ct-overflow-matrix" class="text-[16px]/6 font-semibold">Landed rate per MT</h2>
+      </div>
+
+      <div tabindex="0" role="region" aria-labelledby="ct-overflow-matrix"
+           class="overflow-x-auto overscroll-x-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <table class="w-full min-w-[60rem] text-[13px]/5">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">IS 2062 E250</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">IS 2062 E350</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Plate 12mm</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Plate 25mm</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Freight</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Landed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5 whitespace-nowrap">Sharma Steel &amp; Alloys</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹58,400</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹62,900</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹64,100</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹66,800</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,850</td>
+              <td class="px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹63,010</td>
+            </tr>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5 whitespace-nowrap">Nashik Steel Traders</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹57,900</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹63,400</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹64,900</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹67,200</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,400</td>
+              <td class="px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹63,760</td>
+            </tr>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5 whitespace-nowrap">Deccan Fasteners Pvt Ltd</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹59,100</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹62,200</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹63,700</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹66,100</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,600</td>
+              <td class="px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹62,880</td>
+            </tr>
+            <tr class="hover:bg-zinc-100">
+              <td class="px-4 py-2.5 whitespace-nowrap">Qureshi Metals</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹58,800</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹63,000</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹64,400</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹67,900</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,050</td>
+              <td class="px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">₹63,530</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="text-[12px]/4 text-zinc-500">
+      The matrix scrolls inside
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">overflow-x-auto overscroll-x-contain</code>.
+      A register in the same position would be table/responsive instead, and would not scroll at all.
+    </p>
+
+  </main>
+</div>

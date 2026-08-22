@@ -1,0 +1,256 @@
+<!-- Four things become different things at this width, and none of them is a
+     reflow of the desktop arrangement.
+
+     The breadcrumb becomes a back link. Three crumbs wrap to two lines at 390px
+     and the only one anybody presses is the parent, so it is an <a> with a real
+     href — not history.back(), because the record is opened from a register in
+     a new tab often enough that there is nothing to go back to in that tab.
+
+     The rail is gone and nothing is lost with it. Its facts were the record's
+     identity and standing, and those are already in the band's <dl> and the
+     summary strip; a rail folded into a sideways strip above the record is the
+     one thing this system does not allow, and a second copy of the same figures
+     at the bottom of the page is worse.
+
+     The tab row becomes a native select, and with the row gone the tab roles go
+     with it. There is no tablist here, so nothing carries role="tab": the
+     select is a select, each section is a real <section> with its own h2, and
+     the platform gives a full-height wheel instead of a 44px strip to drag. A
+     scrolling strip would show one and a half of four phrases and give no sign
+     that the other two exist.
+
+     The actions move to a bar stuck to the bottom of the scrolling column,
+     opaque and top-bordered. On a phone the decision is taken after reading and
+     the band is 900px above by then; transparent, the last row scrolls under it
+     and reads as clipped. Nothing is dropped to get there — Gate copy is an
+     icon button with a real name up in the band, because an action missing from
+     the phone build is a job the phone cannot do, and nobody finds that out
+     until somebody is standing at a weighbridge. -->
+<div data-kui="record-page/phone" class="mx-auto h-[680px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ section: 'items' }">
+  <main>
+
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="px-4 py-3.5">
+        <div class="flex items-start justify-between gap-3">
+          <a href="#" class="inline-flex items-center gap-1.5 rounded text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="chevron-left" class="size-4"></i>Orders to receive
+          </a>
+          <button type="button" aria-label="Print the gate copy of PO-2026-0418"
+                  class="-mt-1 flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="printer" class="size-4"></i>
+          </button>
+        </div>
+
+        <h1 class="mt-2 text-[20px]/7 font-semibold tracking-tight tabular-nums">PO-2026-0418</h1>
+        <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+          </span>
+          <span class="text-[12px]/4 tabular-nums text-zinc-600">4 of 9 lines received</span>
+        </div>
+
+        <dl class="mt-3 space-y-1.5 text-[13px]/5">
+          <div class="flex items-baseline gap-2">
+            <dt class="w-24 shrink-0 text-zinc-500">Vendor</dt>
+            <dd class="min-w-0 font-medium">Sharma Steel &amp; Alloys</dd>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <dt class="w-24 shrink-0 text-zinc-500">Deliver to</dt>
+            <dd class="min-w-0 font-medium">Silvassa · gate 2</dd>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <dt class="w-24 shrink-0 text-zinc-500">Promised</dt>
+            <dd class="min-w-0 font-medium tabular-nums">22 Aug 2026</dd>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <dt class="w-24 shrink-0 text-zinc-500">Value</dt>
+            <dd class="min-w-0 font-semibold tabular-nums">₹18,42,000</dd>
+          </div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="space-y-3 px-4 py-4">
+
+      <!-- 2 by 2, because four figures across a 390px screen is four columns of
+           six characters and every one of them wraps. -->
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <dl class="grid grid-cols-2">
+          <div class="border-b border-zinc-200 px-4 py-3">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Ordered</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹18,42,000</dd>
+          </div>
+          <div class="border-b border-l border-zinc-200 px-4 py-3">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Received</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹8,16,400</dd>
+          </div>
+          <div class="px-4 py-3">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Invoiced</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹6,04,000</dd>
+          </div>
+          <div class="border-l border-zinc-200 px-4 py-3">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Left</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹10,25,600</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div>
+        <label for="mb-section" class="sr-only">Section of this order</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="mb-section" x-model="section"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-2.5 pr-9 pl-3 text-[14px]/5 font-medium outline-none">
+            <option value="items">Items (14)</option>
+            <option value="approvals">Approvals (3)</option>
+            <option value="documents">Documents (2)</option>
+            <option value="activity">Activity</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-4"></i>
+          </span>
+        </div>
+      </div>
+
+      <section x-show="section === 'items'" aria-labelledby="mb-items-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="mb-items-h" class="text-[14px]/5 font-semibold">Items</h2>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">3 of 14 lines shown</p>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 text-[13px]/5 font-medium">MS angle 50×50×6</span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹6,84,000</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-2041 · 1,200 of 1,200 kg received</p>
+          </li>
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 text-[13px]/5 font-medium">MS plate 8 mm</span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹5,16,000</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-2088 · 680 of 860 kg received</p>
+          </li>
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 text-[13px]/5 font-medium">Channel 100×50</span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹4,47,000</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-2114 · nothing received of 1,840 kg</p>
+          </li>
+        </ul>
+        <div class="flex items-baseline justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-3">
+          <span class="text-[12px]/4 font-medium text-zinc-600">All 14 lines</span>
+          <span class="text-[14px]/5 font-semibold tabular-nums">₹18,42,000</span>
+        </div>
+      </section>
+
+      <section x-show="section === 'approvals'" x-cloak aria-labelledby="mb-appr-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="mb-appr-h" class="text-[14px]/5 font-semibold">Approvals</h2>
+        </div>
+        <ol class="px-4 py-3">
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5"><span class="font-medium">Ritu Deshpande</span> approved as buyer.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">04 Aug 2026, 16:12</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5"><span class="font-medium">Anil Kulkarni</span> approved as plant head.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">05 Aug 2026, 09:40</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 text-zinc-600">Released to the vendor by email.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">05 Aug 2026, 09:41</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section x-show="section === 'documents'" x-cloak aria-labelledby="mb-docs-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="mb-docs-h" class="text-[14px]/5 font-semibold">Documents</h2>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="flex items-center gap-3 px-4 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[13px]/5 font-medium">PO-2026-0418-signed.pdf</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">186 KB · 05 Aug 2026</p>
+            </div>
+            <a href="#" aria-label="Download PO-2026-0418-signed.pdf"
+               class="flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>
+            </a>
+          </li>
+          <li class="flex items-center gap-3 px-4 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="sheet" class="size-4 text-zinc-600"></i></span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[13px]/5 font-medium">rate-comparison-aug.xlsx</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">54 KB · 02 Aug 2026</p>
+            </div>
+            <a href="#" aria-label="Download rate-comparison-aug.xlsx"
+               class="flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section x-show="section === 'activity'" x-cloak aria-labelledby="mb-act-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="mb-act-h" class="text-[14px]/5 font-semibold">Activity</h2>
+        </div>
+        <ol class="px-4 py-3">
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 tabular-nums">GRN-4830 posted against lines 2 and 4.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">18 Aug 2026 · Nilesh Patil</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 tabular-nums">Promised delivery moved to 22 Aug 2026.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">12 Aug 2026 · Ritu Deshpande</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <div class="sticky bottom-0 -mx-4 flex items-center gap-2 border-t border-zinc-200 bg-white px-4 py-3">
+        <button type="button" class="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Amend
+        </button>
+        <button type="button" class="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-700 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="truck" class="size-4"></i>Record GRN
+        </button>
+      </div>
+
+    </div>
+  </main>
+</div>

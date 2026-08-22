@@ -1,0 +1,181 @@
+<!-- The accident this layout exists to catch. On a form page the way changes
+     are lost is closing the tab; here it is clicking Tax defaults while
+     Approval limits has an edit in it, and that click never reaches
+     beforeunload because nothing navigated — the section swapped inside the
+     page. So the guard is bound to the nav links as well, with .prevent, and it
+     remembers which section was asked for so the answer can complete the move.
+
+     Three answers, because forcing a two-way choice makes people pick the
+     destructive one to get out. Focus lands on Keep editing: the dialog exists
+     because something is about to be lost, so the safe answer is the one under
+     the fingers.
+
+     The footer does not appear when the form goes dirty — it was already
+     there. What changes is the line inside it, which swaps the last-changed
+     stamp for the count of what is pending. A bar that materialises adds 52px
+     to the pane under the pointer while somebody is still typing.
+
+     The dirty flag is armed by input and change and by nothing else. Armed on
+     focusin, tabbing through a section to read it leaves the guard set, the
+     dialog fires on a section change nobody edited, and by the third time
+     people press Discard without reading it.
+
+     The nav marks the pending section with a dot, not with a colour: it is a
+     state the record is in, and the mark has to survive being the only thing
+     that says so. Alpine binds the wrapping span, never the Lucide <i> —
+     createIcons() replaces that element and takes the binding with it. -->
+<div data-kui="settings-page/dirty" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       dirty: true, leaving: false, target: '',
+       arm(e) { if (e.target.matches('input, select, textarea')) this.dirty = true },
+       go(name) { if (this.dirty) { this.target = name; this.leaving = true; this.$nextTick(() => this.$refs.keep.focus()) } },
+       discard() { this.dirty = false; this.leaving = false },
+       save() { this.dirty = false; this.leaving = false }
+     }"
+     @beforeunload.window="if (dirty) $event.preventDefault()">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Settings</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · Silvassa and Vapi · FY 2026–27</p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:items-start lg:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+
+      <nav aria-label="Settings sections" class="lg:sticky lg:top-6 lg:self-start">
+        <ul role="list" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li>
+            <a href="#" @click.prevent="go('Company profile')"
+               class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Company profile</a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="go('Numbering series')"
+               class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Numbering series</a>
+          </li>
+          <li>
+            <a href="#" aria-current="page"
+               class="-ml-px flex items-center gap-2 border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1">Approval limits</span>
+              <span x-show="dirty" x-cloak class="flex items-center">
+                <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                <span class="sr-only">Unsaved changes</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="go('Tax defaults')"
+               class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Tax defaults</a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="go('Users and roles')"
+               class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Users and roles</a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="go('Master lists')"
+               class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Master lists</a>
+          </li>
+        </ul>
+      </nav>
+
+      <section id="dy-pane" tabindex="-1" aria-labelledby="dy-h"
+               class="mt-4 min-w-0 rounded-xl focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 lg:mt-0">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="dy-h" class="text-[16px]/6 font-semibold">Approval limits</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Who has to sign off before an order is released to the vendor. Applies to orders raised from tomorrow onward.</p>
+          </div>
+
+          <form class="px-5 py-4" @input="arm($event)" @change="arm($event)">
+            <div class="grid gap-4 sm:grid-cols-2">
+
+              <div class="min-w-0">
+                <label for="dy-first" class="mb-1.5 block text-[13px]/5 font-medium">Second approver above (₹)</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+                  <input id="dy-first" name="second_approver_above" required inputmode="numeric" value="7,50,000" aria-describedby="dy-first-msg"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p id="dy-first-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+                  Was ₹5,00,000. 18 open orders sit between the two figures.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="dy-plant" class="mb-1.5 block text-[13px]/5 font-medium">Plant head approves above (₹)</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+                  <input id="dy-plant" name="plant_head_above" required inputmode="numeric" value="25,00,000"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0 sm:col-span-2">
+                <label for="dy-who" class="mb-1.5 block text-[13px]/5 font-medium">Second approver</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="dy-who" name="second_approver" required aria-describedby="dy-who-msg"
+                          class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="np" selected>Nilesh Patil — Head of Procurement</option>
+                    <option value="rd">Ritu Deshpande — Purchase</option>
+                    <option value="ak">Anil Kulkarni — Plant head, Silvassa</option>
+                  </select>
+                </div>
+                <p id="dy-who-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+                  Orders already in the queue keep the approver they were routed to.
+                </p>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="flex items-start gap-2.5 text-[14px]/5">
+                  <input type="checkbox" name="block_no_contract" checked class="mt-0.5 size-4 shrink-0 rounded accent-zinc-700">
+                  <span>Block release when the vendor has no live rate contract
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">14 vendors would be affected today.</span>
+                  </span>
+                </label>
+              </div>
+
+            </div>
+          </form>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <p class="text-[12px]/4 tabular-nums text-zinc-600">
+              <span x-show="!dirty">Last changed 12 Jul 2026, 09:41 by Nilesh Patil</span>
+              <span x-show="dirty" x-cloak class="flex items-center gap-1.5 font-medium text-zinc-900">
+                <i data-lucide="pencil" class="size-3.5 shrink-0 text-zinc-600"></i>Unsaved changes in this section
+              </span>
+            </p>
+            <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              <button type="button" @click="discard()"
+                      class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Discard</button>
+              <button type="button" @click="save()"
+                      class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save approval limits</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- absolute inset-0 against the preview frame; fixed inset-0 as a real page -->
+  <div x-show="leaving" x-cloak x-trap.noscroll="leaving" @keydown.escape.window="leaving = false"
+       class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="dy-leave-t" aria-describedby="dy-leave-b"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <h2 id="dy-leave-t" class="text-[16px]/6 font-semibold">Approval limits has unsaved changes</h2>
+      <p id="dy-leave-b" class="mt-1.5 text-[13px]/5 text-zinc-600">
+        Opening <span class="font-medium text-zinc-900" x-text="target">Tax defaults</span> now loses them. Nothing has been written yet.
+      </p>
+      <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
+        <button type="button" x-ref="keep" @click="leaving = false"
+                class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Keep editing</button>
+        <button type="button" @click="discard()"
+                class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Discard and switch</button>
+        <button type="button" @click="save()"
+                class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save and switch</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,241 @@
+<!-- The document with the most rules attached to it, and every one of them is
+     somebody else's rule rather than this framework's: the title has to read
+     TAX INVOICE, both GSTINs appear, the place of supply appears, the HSN
+     summary appears, the amount in words appears, and the declaration appears.
+     Leave one out and the recipient cannot claim the credit.
+
+     Whether the tax is IGST or a CGST and SGST pair is decided by the supplier
+     state against the place of supply, and it is decided in the view. A
+     template that tests state codes with an if block is a tax rule living in the
+     presentation layer, where nobody will find it when the rule changes and
+     where it is invisible to every test. The view hands down a list of tax rows
+     and this sheet prints whatever is in it — here Silvassa (26) supplying
+     Maharashtra (27), so one IGST row and no split.
+
+     The HSN summary is a second small table under the lines, not a rearranged
+     version of them. It groups by HSN and rate, which is what the return asks
+     for, and a reader checks it against the lines above by adding the taxable
+     column — so both columns keep the same alignment and the same two decimals.
+
+     The copy marking sits at the head as a word in a bordered box. A tint would
+     print as nothing and all three copies would come out identical, which is
+     the whole failure the copies variant exists to prevent.
+
+     No status pill anywhere. The dot that carries the state is a background
+     circle, and on paper the pill is an empty ring around a word. A document
+     says its state in words or does not say it. -->
+<div data-kui="document-page/invoice" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm]">
+    <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-300 pb-2">
+        <p class="text-[11px]/4 font-medium uppercase tracking-wider">Tax invoice</p>
+        <p class="border border-zinc-300 px-2 py-0.5 text-[11px]/4 font-medium uppercase tracking-wider">Original for recipient</p>
+      </div>
+
+      <header class="mt-3 flex flex-wrap items-start justify-between gap-x-6 gap-y-4 border-b-2 border-zinc-300 pb-4">
+        <div class="flex min-w-0 flex-1 items-start gap-3 sm:min-w-[15rem]">
+          <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-[14px]/5 font-semibold">K</span>
+          <div class="min-w-0">
+            <p class="text-[16px]/6 font-semibold">Konspec Industries Pvt Ltd</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">GSTIN 26AABCK9021M1Z4 · PAN AABCK9021M · State code 26</p>
+          </div>
+        </div>
+        <div class="min-w-0 sm:shrink-0 sm:text-right">
+          <h1 class="text-[20px]/7 font-semibold tracking-tight">Tax invoice</h1>
+          <p class="mt-1 text-[13px]/5 font-medium tabular-nums">INV-2026-0774</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Dated 09 Sep 2026 · FY 2026–27 · Reverse charge: No</p>
+        </div>
+      </header>
+
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <section aria-labelledby="in-bill-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="in-bill-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Bill to</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">Deccan Fasteners Pvt Ltd</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Gat 412, Chakan MIDC Phase II, Pune, Maharashtra 410501</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">GSTIN 27AAECD8812P1ZK · State code 27</p>
+        </section>
+        <section aria-labelledby="in-ship-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="in-ship-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Ship to</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">Deccan Fasteners Pvt Ltd — Ranjangaon store</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot D-18, Ranjangaon MIDC, Pune, Maharashtra 412220</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums font-medium">Place of supply: Maharashtra (27)</p>
+        </section>
+      </div>
+
+      <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border border-zinc-300 p-3 text-[12px]/4 sm:grid-cols-4">
+        <div>
+          <dt class="text-zinc-600">Your order</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">DF/PO/26-3318</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">Challan</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">DC-2026-0917 · 08 Sep 2026</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">e-Way bill</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">2716 4488 1902</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">Payment due</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">24 Oct 2026 · 45 days</dd>
+        </div>
+      </dl>
+
+      <section aria-labelledby="in-lines-h" class="mt-4">
+        <h2 id="in-lines-h" class="sr-only">Invoice lines</h2>
+        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+          <table class="w-full min-w-[36rem] text-[12px]/4">
+            <caption class="sr-only">Three lines invoiced to Deccan Fasteners against INV-2026-0774</caption>
+            <thead class="bg-zinc-50 print:bg-white">
+              <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+                <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+                <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+                <th scope="col" class="w-12 px-2 py-2 font-medium">UOM</th>
+                <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Quantity</th>
+                <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Rate</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Taxable value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">1</td>
+                <td class="px-2 py-2">HDPE granules — natural<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-2001 · grade M60075 · batch B-26-0914</span></td>
+                <td class="px-2 py-2 tabular-nums">3901</td>
+                <td class="px-2 py-2">kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">12,000.000</td>
+                <td class="px-2 py-2 text-right tabular-nums">87.00</td>
+                <td class="px-2 py-2 text-right tabular-nums">10,44,000.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">2</td>
+                <td class="px-2 py-2">Masterbatch — white 60%<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-1091 · batch B-26-0902</span></td>
+                <td class="px-2 py-2 tabular-nums">3206</td>
+                <td class="px-2 py-2">kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">250.000</td>
+                <td class="px-2 py-2 text-right tabular-nums">245.00</td>
+                <td class="px-2 py-2 text-right tabular-nums">61,250.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">3</td>
+                <td class="px-2 py-2">Stretch film — 23 micron<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-5140 · 500 mm × 1500 m rolls</span></td>
+                <td class="px-2 py-2 tabular-nums">3920</td>
+                <td class="px-2 py-2">kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">300.000</td>
+                <td class="px-2 py-2 text-right tabular-nums">175.00</td>
+                <td class="px-2 py-2 text-right tabular-nums">52,500.00</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="break-inside-avoid border-t-2 border-zinc-300">
+                <th scope="row" colspan="6" class="px-2 py-2 text-right font-medium">Total taxable value</th>
+                <td class="px-2 py-2 text-right font-semibold tabular-nums">11,57,750.00</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="in-hsn-h" class="mt-4 break-inside-avoid">
+        <h2 id="in-hsn-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">HSN summary</h2>
+        <div class="mt-1.5 overflow-x-auto md:overflow-visible print:overflow-visible">
+          <table class="w-full min-w-[30rem] border border-zinc-300 text-[12px]/4">
+            <caption class="sr-only">Taxable value and IGST grouped by HSN code</caption>
+            <thead class="bg-zinc-50 print:bg-white">
+              <tr class="border-b border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="px-3 py-1.5 font-medium">HSN</th>
+                <th scope="col" class="px-3 py-1.5 text-right font-medium">Taxable value</th>
+                <th scope="col" class="px-3 py-1.5 text-right font-medium">Rate</th>
+                <th scope="col" class="px-3 py-1.5 text-right font-medium">IGST</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="break-inside-avoid border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal tabular-nums">3901</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">10,44,000.00</td>
+                <td class="px-3 py-1.5 text-right tabular-nums">18%</td>
+                <td class="px-3 py-1.5 text-right tabular-nums">1,87,920.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal tabular-nums">3206</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">61,250.00</td>
+                <td class="px-3 py-1.5 text-right tabular-nums">18%</td>
+                <td class="px-3 py-1.5 text-right tabular-nums">11,025.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal tabular-nums">3920</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">52,500.00</td>
+                <td class="px-3 py-1.5 text-right tabular-nums">18%</td>
+                <td class="px-3 py-1.5 text-right tabular-nums">9,450.00</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="break-inside-avoid border-t border-zinc-300">
+                <th scope="row" class="px-3 py-1.5 text-left font-medium">Total</th>
+                <td class="px-3 py-1.5 text-right font-medium tabular-nums">11,57,750.00</td>
+                <td class="px-3 py-1.5"></td>
+                <td class="px-3 py-1.5 text-right font-medium tabular-nums">2,08,395.00</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <div class="space-y-3">
+          <div class="break-inside-avoid border border-zinc-300 p-3">
+            <h2 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Amount chargeable, in words</h2>
+            <p class="mt-1 text-[13px]/5 font-medium">Rupees Thirteen Lakh Sixty Six Thousand One Hundred Forty Five Only</p>
+          </div>
+          <section aria-labelledby="in-bank-h" class="break-inside-avoid border border-zinc-300 p-3">
+            <h2 id="in-bank-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Bank details</h2>
+            <p class="mt-1 text-[12px]/4 tabular-nums">HDFC Bank, Silvassa · A/c 50200041188207 · IFSC HDFC0001842</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Quote INV-2026-0774 in the payment narration.</p>
+          </section>
+        </div>
+
+        <section aria-labelledby="in-tax-h" class="break-inside-avoid self-start">
+          <h2 id="in-tax-h" class="sr-only">Tax summary</h2>
+          <table class="w-full border border-zinc-300 text-[12px]/4">
+            <tbody>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">Taxable value</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">11,57,750.00</td>
+              </tr>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">IGST at 18%</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">2,08,395.00</td>
+              </tr>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">Rounded off</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">0.00</td>
+              </tr>
+              <tr class="border-t-2 border-zinc-300">
+                <th scope="row" class="px-3 py-2 text-left text-[13px]/5 font-semibold">Invoice total</th>
+                <td class="px-3 py-2 text-right text-[13px]/5 font-semibold tabular-nums">₹13,66,145.00</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="mt-1.5 text-[11px]/4 text-zinc-600">Supplier is in Dadra and Nagar Haveli (26) and the place of supply is Maharashtra (27), so the whole tax is IGST and there is no CGST and SGST split.</p>
+        </section>
+      </div>
+
+      <div class="mt-8 grid gap-6 sm:grid-cols-2">
+        <div class="break-inside-avoid">
+          <h2 class="text-[11px]/4 uppercase tracking-wider text-zinc-600">Declaration</h2>
+          <p class="mt-1 text-[11px]/4 text-zinc-600">We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct. Goods once dispatched are not taken back except against a written approval quoting this invoice number. Interest at 18% per annum applies on payments beyond the due date. Subject to Silvassa jurisdiction. E &amp; O.E.</p>
+        </div>
+        <div class="break-inside-avoid sm:text-right">
+          <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">For Konspec Industries Pvt Ltd</p>
+          <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Authorised signatory</p>
+        </div>
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+        Page 1 of 1 · INV-2026-0774 · IRN 8f2c41a9e07b4d3e · computer generated
+      </footer>
+    </article>
+  </main>
+</div>

@@ -1,0 +1,94 @@
+<!-- One screen for two different answers, and that is the entire design. A
+     record belonging to another vendor and a record that was never raised
+     return this page, with these words, under the same status code. Answer them
+     differently and the URL space can be walked to find out which of our
+     suppliers exist and how many orders we place with them — a 403 here and a
+     404 next door is an enumeration oracle with a friendly tone.
+
+     So it never confirms the record exists. It does not name the vendor it
+     belongs to, it does not say who could grant access, and it offers no
+     request-access route, because all three of those are the same leak written
+     three ways. error-page's 403 does name the scope and the person who opens
+     it, and that is right inside the company where the reader is a colleague
+     and the enumeration risk is one they already carry. Outside it, it is not.
+
+     It says out loud that the portal answers the same way either way. A user
+     who is not told that tries the URL again, then tries the one before it, and
+     then telephones — the sentence is what turns a dead end into an answer.
+
+     It keeps the portal header, which is where this parts company with
+     error-page. That screen drops the chrome because there is no working page
+     left to hang it on; here the portal is working perfectly and this header is
+     the supplier's only navigation, so dropping it strands somebody who mistyped
+     a URL with nothing but the browser back button.
+
+     Everything else is error-page's shape: graphite icon well, the status label
+     above the heading, the heading as a sentence rather than a number, one
+     primary route back and one human to ask. No role="alert" — this arrives as
+     a document load, the <title> states it first, and a live region present at
+     first paint announces nothing. -->
+<div data-kui="portal-page/restricted" class="relative flex h-[640px] flex-col overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <a href="#pp-rs-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
+      <a href="/portal/" class="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-semibold">Konspec Industries</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Supplier portal</span>
+        </span>
+      </a>
+      <div class="ml-auto flex min-w-0 items-center gap-2.5">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">GP</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-medium">Gujarat Polymers Ltd</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Mehul Trivedi</span>
+        </span>
+        <form method="post" action="/portal/sign-out/" class="shrink-0">
+          <button type="submit" class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sign out</button>
+        </form>
+      </div>
+    </div>
+    <nav aria-label="Supplier portal" class="mx-auto max-w-5xl px-2 pb-2">
+      <ul class="flex flex-wrap items-center gap-1">
+        <li><a href="/portal/orders/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Orders</a></li>
+        <li><a href="/portal/invoices/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Invoices</a></li>
+        <li><a href="/portal/payments/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Payments</a></li>
+        <li><a href="/portal/details/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Your details</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="pp-rs-main" tabindex="-1" class="flex flex-1 items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md text-center">
+      <span class="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="search-x" class="size-5 text-zinc-600" aria-hidden="true"></i>
+      </span>
+
+      <p class="mt-4 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-500">Not on this portal</p>
+      <h1 tabindex="-1" class="mt-1 text-[20px]/7 font-semibold tracking-tight">This page is not part of your account</h1>
+      <p class="mx-auto mt-2 max-w-md text-[14px]/5 text-zinc-600">
+        Whatever is at this address, it is not one of the records Konspec Industries shares with Gujarat Polymers Ltd.
+      </p>
+      <p class="mx-auto mt-3 max-w-md text-[13px]/5 text-zinc-600">
+        That is all this portal can tell you, and it is deliberate: it answers exactly the same way for a record that belongs to another supplier and for one that was never raised. Trying the address again, or the one next to it, will not give a different answer.
+      </p>
+
+      <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+        <a href="/portal/orders/"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          Back to your orders
+        </a>
+        <a href="mailto:ritu.deshpande@konspec.com?subject=A%20portal%20link%20I%20cannot%20open"
+           class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-300 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Ask Ritu Deshpande
+        </a>
+      </div>
+
+      <p class="mt-6 text-[11px]/4 text-zinc-500">
+        Signed in as mehul.trivedi@gujpolymers.in. If somebody else at Gujarat Polymers should be seeing this, they need their own sign-in.
+      </p>
+    </div>
+  </main>
+</div>

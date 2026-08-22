@@ -1,0 +1,184 @@
+<!-- In this domain an SOP is a controlled document: it carries a number, a
+     revision, an effective date, an owner and an approver, and "which version
+     am I reading" is a real question with a consequence at the other end of it.
+     None of that is decoration and none of it belongs in a footer.
+
+     The superseded notice sits in the flow of the document, above the lead,
+     inside the article. Not a dismissible banner and not a toast: it is the
+     first fact about the text underneath it, it has to survive being printed,
+     and a notice the reader can swat is a notice that is gone from the copy
+     that ends up on a noticeboard. It follows alert's shape exactly — white
+     card, zinc-300 edge, colour only in the icon — because it is a notice about
+     the record on screen and that is what alert is.
+
+     The revision is stated in figures and never relatively. "Updated 5 months
+     ago" is decoration on a document somebody has to place in time; an auditor
+     asking which revision was in force on 12 May 2026 needs the effective date,
+     and the relative phrase, if it appears at all, goes in brackets beside it.
+
+     The control block takes the width of the card and not the measure. It is
+     the document's identity block rather than prose — nobody reads it as
+     sentences, they look one value up in it — which is the same reason a
+     letterhead runs the width of the sheet on document-page. The measure starts
+     below it, at the first paragraph.
+
+     The control block is a two-column <dl> from sm and one column at 390px, and
+     every value is tabular-nums — these are the figures the document is
+     identified by, and a column of them that does not line up is the same bug
+     it is in a ledger.
+
+     The history table is three columns, which is the cap this entry puts on a
+     table in prose. A fourth column is a register and belongs on a screen of
+     its own with a link to it from here. -->
+<div data-kui="docs-page/controlled" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="/manual/" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Manual</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><a href="/manual/procurement/" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium text-zinc-900">Approval limits</span></li>
+        </ol>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Approval limits</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">SOP-PUR-006 · Revision 2 · Superseded 01 Apr 2026</p>
+    </div>
+
+    <article class="mt-5 rounded-xl border border-zinc-300 bg-white px-5 py-5 sm:px-6">
+
+      <div class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+        <div class="min-w-0">
+          <p class="text-[13px]/5 font-medium">You are reading revision <span class="tabular-nums">2</span>, which was superseded on 01 Apr 2026.</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">
+            The limits below are not the ones in force.
+            <a href="/manual/procurement/approval-limits/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Read revision 3</a>,
+            effective 01 Apr 2026.
+          </p>
+        </div>
+      </div>
+
+      <section aria-labelledby="dp-ct-control" class="mt-5 rounded-xl border border-zinc-200 px-4 py-3.5">
+        <h2 id="dp-ct-control" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Document control</h2>
+        <dl class="mt-2.5 grid gap-x-6 gap-y-2.5 text-[13px]/5 sm:grid-cols-2">
+          <div class="min-w-0">
+            <dt class="text-[12px]/4 text-zinc-600">Document number</dt>
+            <dd class="mt-0.5 font-medium tabular-nums">SOP-PUR-006</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-[12px]/4 text-zinc-600">Revision</dt>
+            <dd class="mt-0.5 font-medium tabular-nums">2 · superseded</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-[12px]/4 text-zinc-600">Effective</dt>
+            <dd class="mt-0.5 tabular-nums">01 Apr 2024 to 31 Mar 2026</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-[12px]/4 text-zinc-600">Superseded by</dt>
+            <dd class="mt-0.5 tabular-nums">
+              <a href="/manual/procurement/approval-limits/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Revision 3</a>
+            </dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-[12px]/4 text-zinc-600">Owner</dt>
+            <dd class="mt-0.5">Materials, Silvassa</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-[12px]/4 text-zinc-600">Approved by</dt>
+            <dd class="mt-0.5">Anil Kulkarni, Plant Head · 22 Mar 2024</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-[12px]/4 text-zinc-600">Applies at</dt>
+            <dd class="mt-0.5">Silvassa and Vapi</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-[12px]/4 text-zinc-600">Retention</dt>
+            <dd class="mt-0.5 tabular-nums">8 years from supersession</dd>
+          </div>
+        </dl>
+      </section>
+
+      <div class="mt-6 max-w-xl text-[14px]/6">
+
+        <p class="text-zinc-600">
+          These were the limits for FY 2024–25 and FY 2025–26. They are kept because a purchase order raised in
+          that period was approved under them, and an audit of that order is read against the revision in force
+          on the day it was raised.
+        </p>
+
+        <h2 class="mt-10 text-[20px]/7 font-semibold tracking-tight">Limits, revision 2</h2>
+
+        <div class="mt-3 overflow-hidden rounded-xl border border-zinc-200">
+          <table class="w-full text-[13px]/5">
+            <caption class="sr-only">Approval limits under revision 2, in force from 01 Apr 2024 to 31 Mar 2026</caption>
+            <thead>
+              <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                <th scope="col" class="px-4 py-2.5 font-medium">Order value</th>
+                <th scope="col" class="px-4 py-2.5 font-medium">Approver</th>
+                <th scope="col" class="px-4 py-2.5 font-medium">Second approval</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Up to ₹1,00,000</th>
+                <td class="px-4 py-2.5">Buyer</td>
+                <td class="px-4 py-2.5 text-zinc-600">—</td>
+              </tr>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">₹1,00,001 to ₹5,00,000</th>
+                <td class="px-4 py-2.5">Plant head</td>
+                <td class="px-4 py-2.5 text-zinc-600">—</td>
+              </tr>
+              <tr>
+                <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Above ₹5,00,000</th>
+                <td class="px-4 py-2.5">Plant head</td>
+                <td class="px-4 py-2.5">Director</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 class="mt-10 text-[20px]/7 font-semibold tracking-tight">Revision history</h2>
+
+        <p class="mt-3">
+          Every revision of this document is kept and readable. What changed is recorded here rather than in a
+          note on the change request, because the request is closed and this is what the next reader has.
+        </p>
+
+        <div class="mt-3 overflow-hidden rounded-xl border border-zinc-200">
+          <table class="w-full text-[13px]/5">
+            <caption class="sr-only">Revisions of SOP-PUR-006, what changed and who approved each one</caption>
+            <thead>
+              <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                <th scope="col" class="px-4 py-2.5 font-medium">Rev</th>
+                <th scope="col" class="px-4 py-2.5 font-medium">What changed</th>
+                <th scope="col" class="px-4 py-2.5 font-medium">Approved</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">3</th>
+                <td class="px-4 py-2.5">Buyer limit raised to ₹2,00,000; Finance added between ₹2L and ₹10L</td>
+                <td class="px-4 py-2.5 tabular-nums text-zinc-600">18 Mar 2026</td>
+              </tr>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">2</th>
+                <td class="px-4 py-2.5">Vapi brought under the same limits as Silvassa</td>
+                <td class="px-4 py-2.5 tabular-nums text-zinc-600">22 Mar 2024</td>
+              </tr>
+              <tr>
+                <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">1</th>
+                <td class="px-4 py-2.5">First issue</td>
+                <td class="px-4 py-2.5 tabular-nums text-zinc-600">04 Apr 2022</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </article>
+  </main>
+</div>

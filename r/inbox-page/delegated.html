@@ -1,0 +1,217 @@
+<!-- A plant head is on leave and their approvals do not stop arriving, so
+     somebody else is signing them. Three things follow and none of them is
+     cosmetic.
+
+     The delegation is a property of the session, not a choice taken per record,
+     so it is stated once in a strip under the page header and never as a
+     dropdown beside the button. A per-record switch is an invitation to sign
+     the wrong document under the wrong authority, and after the second week
+     nobody reads it at all. The strip carries the dates, because a delegation
+     that has silently expired and one that is running look identical from the
+     inside.
+
+     The limit travels with the authority and not with the person. Signing for a
+     general manager means signing up to the general manager's limit, which is the
+     whole point of the arrangement and the thing most likely to be got wrong —
+     so the rail says whose limit is in force and what it is, in the same place
+     it says the value.
+
+     Both names are written. An audit trail that records only the delegate
+     cannot answer who was accountable, and one that records only the principal
+     cannot answer who was at the keyboard, and the two questions get asked by
+     different people for different reasons. So the verb on the button carries
+     the principal — Approve as Nilesh Patil, not Approve — and the trail
+     entry reads Akshay Prabhu for Nilesh Patil.
+
+     The way out is on the strip. A delegate who has finished for the day and
+     forgets they are still holding somebody else's authority is how a document
+     gets signed by the wrong person entirely, and hunting for it in a settings
+     screen is not a way out.
+
+     The strip is a plain bordered band and not an alert. Nothing is wrong; a
+     red or amber field across the top of a screen somebody sits in for a
+     fortnight is an alarm that stops meaning anything on day two. -->
+<main data-kui="inbox-page/delegated" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, said: '',
+        principal: 'Nilesh Patil', signer: 'Akshay Prabhu', until: '04 Sep 2026',
+        queue: [
+          { no: 'PO-2026-0441', party: 'Gujarat Polymers Ltd', value: '₹9,84,000', age: '3 days', status: 'Overdue', why: 'Above the ₹5,00,000 limit held by Akshay Prabhu' },
+          { no: 'GRN-4821', party: 'Sharma Steel & Alloys', value: '₹10,14,000', age: '2 days', status: 'Approved', why: 'Short by 400 kg against the challan' },
+          { no: 'PO-2026-0444', party: 'Konkan Packaging Co', value: '₹2,08,400', age: '1 day', status: 'Approved', why: 'Delivery address is not a registered plant' },
+          { no: 'CN-2026-0114', party: 'Konkan Packaging Co', value: '₹1,86,300', age: 'today', status: 'Approved', why: 'A credit note against a posted GRN always needs approval' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.queue[this.sel] },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.queue.length - 1)) },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) },
+        approve() {
+          const gone = this.rec.no;
+          this.queue.splice(this.sel, 1);
+          if (!this.queue.length) { this.said = gone + ' approved by ' + this.signer + ' for ' + this.principal + '. The inbox is clear.'; this.detail = false; return }
+          this.sel = Math.min(this.sel, this.queue.length - 1);
+          this.said = gone + ' approved by ' + this.signer + ' for ' + this.principal + '. ' + this.queue.length + ' left.';
+          this.$nextTick(() => { this.$refs.detail.focus(); if (this.$refs.body) this.$refs.body.scrollTop = 0 });
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Waiting on Nilesh Patil</h1>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-text="queue.length + ' documents · Silvassa and Vapi · FY 2026–27'"></p>
+  </div>
+
+  <!-- Nothing is wrong, so nothing is coloured. Stated once, with the dates
+       and the way out. -->
+  <div class="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 lg:px-5">
+    <div class="flex min-w-0 flex-1 items-start gap-2.5">
+      <i data-lucide="user-check" class="mt-0.5 size-4 shrink-0 text-zinc-600"></i>
+      <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-900">
+        You are signing as <span class="font-medium" x-text="principal"></span>, general manager, until <span class="font-medium" x-text="until"></span>.
+        Their limit of ₹25,00,000 is in force, not your own, and both names are written onto everything you decide.
+      </p>
+    </div>
+    <button type="button"
+            class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span x-text="'Stop signing as ' + principal"></span>
+    </button>
+  </div>
+
+  <div class="flex min-h-0 flex-1" @keydown.escape="back()">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">Their inbox</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="queue.length ? (sel + 1) + ' of ' + queue.length : 'none left'"></p>
+      </div>
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')" x-show="queue.length"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(queue.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(o, i) in queue" :key="o.no">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[o.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="o.no"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="o.value"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="o.status"></span> · <span x-text="o.party"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500">
+                With <span x-text="principal"></span> <span x-text="o.age"></span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+      <div x-show="!queue.length" x-cloak class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+        </span>
+        <h3 class="mt-3 text-[14px]/5 font-semibold">Nothing left waiting</h3>
+      </div>
+    </section>
+
+    <div class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex lg:flex-row"
+         :class="{ 'hidden': !detail, 'flex': detail }">
+      <template x-if="queue.length">
+        <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+                 class="flex min-h-0 min-w-0 flex-1 flex-col focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <button type="button" @click="back()"
+                    class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+              <i data-lucide="chevron-left" class="size-4"></i>Back to the inbox
+            </button>
+            <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+              <span class="tabular-nums" x-text="rec.no"></span>
+              <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+              </span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.party + ' · with ' + principal + ' ' + rec.age"></p>
+          </div>
+          <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+            <div class="rounded-xl border border-zinc-200 p-4">
+              <div class="flex items-start gap-2.5">
+                <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                <div class="min-w-0">
+                  <p class="text-[13px]/5 font-medium">Why this is here</p>
+                  <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600" x-text="rec.why"></p>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="mt-5 text-[13px]/5 font-medium">What will be written</h3>
+            <ol class="mt-2 space-y-2.5">
+              <li class="flex items-start gap-2.5">
+                <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+                <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-600">
+                  <span class="font-medium text-zinc-900">Approved by <span x-text="signer"></span> for <span x-text="principal"></span></span> — 22 Aug 2026, under a delegation running to <span x-text="until"></span>.
+                </p>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+                <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-600">
+                  <span class="font-medium text-zinc-900">Limit applied</span> — ₹25,00,000, the limit of the authority being used, not the ₹5,00,000 held by <span x-text="signer"></span>.
+                </p>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+                <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-600">
+                  <span class="font-medium text-zinc-900">Notified</span> — the raiser, the vendor, and <span x-text="principal"></span> on their return.
+                </p>
+              </li>
+            </ol>
+          </div>
+        </section>
+      </template>
+
+      <aside aria-label="Your decision" x-show="queue.length"
+             class="flex shrink-0 flex-col border-t border-zinc-200 lg:w-72 lg:border-t-0 lg:border-l">
+        <div class="hidden min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:block">
+          <p class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">This document</p>
+          <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="rec.value"></p>
+          <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+            Within the ₹25,00,000 limit held by <span x-text="principal"></span>.
+          </p>
+          <p class="mt-4 text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Signing as</p>
+          <p class="mt-1 text-[13px]/5 font-medium" x-text="principal"></p>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600" x-text="'By ' + signer + ' · delegation to ' + until"></p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 border-zinc-200 px-4 py-3 lg:flex-col lg:items-stretch lg:border-t">
+          <button type="button" @click="approve()"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="check" class="size-4"></i><span x-text="'Approve as ' + principal"></span>
+          </button>
+          <button type="button"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,209 @@
+<!-- Past about twenty destinations a tree stops being scannable and starts
+     being a wall, and a manual passes twenty in its first year. Three things
+     answer that and none of them is a redesign of the tree.
+
+     The groups collapse and the current one is seeded open by the server. It is
+     rendered — open: { procurement: true, ... } written by the template — and
+     not defaulted in Alpine, because moving between two pages of a manual is a
+     full page load, and a map that starts empty folds the tree up underneath
+     the reader on every one of them. That is the bug this shape exists for.
+
+     Opening one group does not close another. A manual is walked across
+     sections as often as down one, and the single-open rule saves two rows of
+     height and costs a click on every journey.
+
+     The filter walks the DOM instead of rebuilding the list, because there is
+     no model here — the rows are server-rendered and an x-for over one invented
+     in Alpine to make the filter tidy throws away the permission branches and
+     the template tags that made them real rows. Rows hide with the hidden
+     attribute so they leave the tab order and the accessibility tree at the
+     same moment they leave the screen, and groups are hidden in a second pass
+     by asking whether anything under them survived: a group label standing over
+     nothing is what makes a filtered tree look broken.
+
+     This is sidebar/filter's mechanism on settings-page's presentation, and the
+     mix is deliberate. The presentation may not be the sidebar's, because the
+     application sidebar is already on screen to the left of this and two white
+     panels claiming to be the navigation is a screen the user reads wrong.
+
+     aria-expanded is written twice, once as a literal matching the seed and
+     once bound, so a reader arriving mid-load is told the truth. -->
+<div data-kui="docs-page/nav" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       open: { procurement: true, stores: false, quality: false, reference: false },
+       q: '', shown: 0, total: 0,
+       run() {
+         const q = this.q.trim().toLowerCase();
+         let n = 0;
+         this.$refs.tree.querySelectorAll('[data-doc]').forEach(el => {
+           const on = !q || el.dataset.doc.includes(q);
+           el.hidden = !on;
+           if (on) n++;
+         });
+         this.$refs.tree.querySelectorAll('[data-group]').forEach(g => {
+           g.hidden = !g.querySelector('[data-doc]:not([hidden])');
+         });
+         this.shown = n;
+       },
+       clear() { this.q = ''; this.run(); this.$refs.q.focus() }
+     }"
+     x-init="$nextTick(() => { total = $refs.tree.querySelectorAll('[data-doc]').length; shown = total })">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Amending an order</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">SOP-PUR-007 · Revision 4 · Effective 01 Apr 2026</p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-6">
+
+      <div class="lg:sticky lg:top-6 lg:self-start">
+
+        <label for="dp-nv-q" class="sr-only">Filter the manual</label>
+        <div class="relative">
+          <i data-lucide="search" class="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-zinc-500"></i>
+          <input id="dp-nv-q" type="search" x-ref="q" x-model="q" placeholder="Filter 204 pages"
+                 @input.debounce.150ms="run()" @search="run()" @keydown.escape.prevent.stop="clear()"
+                 class="h-9 w-full rounded-lg border border-zinc-200 bg-white pr-8 pl-8 text-[13px]/5 text-zinc-900 placeholder:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <button type="button" x-show="q" x-cloak @click="clear()" aria-label="Clear the filter"
+                  class="absolute top-1/2 right-1.5 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-3.5"></i>
+          </button>
+        </div>
+        <p class="sr-only" role="status" x-text="q ? shown + ' of ' + total + ' pages match' : ''"></p>
+
+        <nav aria-label="Manual sections" x-ref="tree" class="mt-3">
+
+          <p x-show="q &amp;&amp; shown === 0" x-cloak class="px-1 py-6 text-[13px]/5 text-zinc-500">
+            Nothing in the manual matches “<span class="font-medium text-zinc-900" x-text="q"></span>”.
+          </p>
+
+          <div data-group>
+            <button type="button" @click="open.procurement = !open.procurement" aria-expanded="true" :aria-expanded="open.procurement" aria-controls="dp-nv-procurement"
+                    class="flex w-full items-center gap-2 py-1.5 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1">Procurement</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-500">18</span>
+              <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.procurement &amp;&amp; 'rotate-180'">
+                <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+              </span>
+            </button>
+            <div id="dp-nv-procurement" x-show="open.procurement" x-collapse.duration.200ms>
+              <ul role="list" class="space-y-0.5 border-l border-zinc-200 py-1 text-[13px]/5">
+                <li data-doc="onboarding a vendor kyc vendor master">
+                  <a href="/manual/procurement/vendor-onboarding/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Onboarding a vendor</a>
+                </li>
+                <li data-doc="raising a capital indent capex budget code">
+                  <a href="/manual/procurement/capital-indent/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Raising a capital indent</a>
+                </li>
+                <li data-doc="approval limits who approves po">
+                  <a href="/manual/procurement/approval-limits/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approval limits</a>
+                </li>
+                <li data-doc="amending an order po amendment revision">
+                  <a href="/manual/procurement/amending-an-order/" aria-current="page" class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Amending an order</a>
+                </li>
+                <li data-doc="closing an order short po close balance">
+                  <a href="/manual/procurement/closing-short/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Closing an order short</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div data-group class="mt-2">
+            <button type="button" @click="open.stores = !open.stores" aria-expanded="false" :aria-expanded="open.stores" aria-controls="dp-nv-stores"
+                    class="flex w-full items-center gap-2 py-1.5 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1">Stores</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-500">31</span>
+              <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.stores &amp;&amp; 'rotate-180'">
+                <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+              </span>
+            </button>
+            <div id="dp-nv-stores" x-show="open.stores" x-cloak x-collapse.duration.200ms>
+              <ul role="list" class="space-y-0.5 border-l border-zinc-200 py-1 text-[13px]/5">
+                <li data-doc="booking a goods receipt grn gate weighbridge">
+                  <a href="/manual/stores/goods-receipt/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Booking a goods receipt</a>
+                </li>
+                <li data-doc="short and excess receipts shortage note grn">
+                  <a href="/manual/stores/short-receipts/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Short and excess receipts</a>
+                </li>
+                <li data-doc="material issue ms cost centre work order">
+                  <a href="/manual/stores/material-issue/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Material issue</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div data-group class="mt-2">
+            <button type="button" @click="open.quality = !open.quality" aria-expanded="false" :aria-expanded="open.quality" aria-controls="dp-nv-quality"
+                    class="flex w-full items-center gap-2 py-1.5 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1">Quality</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-500">24</span>
+              <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.quality &amp;&amp; 'rotate-180'">
+                <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+              </span>
+            </button>
+            <div id="dp-nv-quality" x-show="open.quality" x-cloak x-collapse.duration.200ms>
+              <ul role="list" class="space-y-0.5 border-l border-zinc-200 py-1 text-[13px]/5">
+                <li data-doc="inward inspection iqc sampling plan">
+                  <a href="/manual/quality/inward-inspection/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Inward inspection</a>
+                </li>
+                <li data-doc="qc hold and release quarantine block lot">
+                  <a href="/manual/quality/qc-hold/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">QC hold and release</a>
+                </li>
+                <li data-doc="rejections and debit notes vendor claim">
+                  <a href="/manual/quality/rejections/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rejections and debit notes</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div data-group class="mt-2">
+            <button type="button" @click="open.reference = !open.reference" aria-expanded="false" :aria-expanded="open.reference" aria-controls="dp-nv-reference"
+                    class="flex w-full items-center gap-2 py-1.5 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1">Reference</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-500">12</span>
+              <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.reference &amp;&amp; 'rotate-180'">
+                <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+              </span>
+            </button>
+            <div id="dp-nv-reference" x-show="open.reference" x-cloak x-collapse.duration.200ms>
+              <ul role="list" class="space-y-0.5 border-l border-zinc-200 py-1 text-[13px]/5">
+                <li data-doc="document numbering series po grn ms">
+                  <a href="/manual/reference/numbering/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Document numbering</a>
+                </li>
+                <li data-doc="glossary terms abbreviations grn hsn gstin">
+                  <a href="/manual/reference/glossary/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Glossary</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </nav>
+      </div>
+
+      <article class="mt-4 min-w-0 rounded-xl border border-zinc-300 bg-white px-5 py-5 sm:px-6 lg:mt-0">
+        <div class="max-w-xl text-[14px]/6">
+          <p class="text-zinc-600">
+            An order is amended when a term on it changes after it has been approved — the quantity, the rate,
+            the delivery date or the freight. Every amendment raises the revision number and reissues the
+            document to the vendor.
+          </p>
+
+          <h2 class="mt-10 text-[20px]/7 font-semibold tracking-tight">What may be amended</h2>
+
+          <p class="mt-3">
+            Anything except the vendor and the plant. Changing either of those is a new order, because the first
+            one has already been sent to a vendor who may have started against it.
+          </p>
+
+          <ul class="mt-3 list-disc space-y-1 pl-5 marker:text-zinc-400">
+            <li>Quantity, up or down, on a line that has not been fully received.</li>
+            <li>Rate, which re-routes the order for approval if the new value crosses a limit.</li>
+            <li>Delivery date, which is the amendment that does not need re-approval.</li>
+          </ul>
+        </div>
+      </article>
+
+    </div>
+  </main>
+</div>

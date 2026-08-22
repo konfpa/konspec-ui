@@ -1,0 +1,93 @@
+<!-- The base, and every measurement in it is the stock rather than a choice.
+     63.5 × 38.1 mm, three across and seven down, and the three numbers across
+     the page have to add back to 210.0 exactly:
+
+         7.25 + 63.5 + 2.5 + 63.5 + 2.5 + 63.5 + 7.25 = 210.0
+         15.15 + (7 × 38.1) + 15.15 = 297.0
+
+     grid-cols-3 with gap-x-[2.5mm] inside a 195.5 mm content box resolves each
+     column to 63.5 mm on its own, so the die-cut is described once and the
+     browser does the arithmetic. Write the widths a second time on the cells
+     and the two copies drift the first time somebody changes the stock.
+
+     The sheet keeps w-[210mm] at every viewport and scrolls sideways inside its
+     own box at 390px. A max-w-[210mm] would be right for a document, which is
+     allowed to reflow because what matters is that the figures are on the page;
+     it is wrong here, because a label that lays out at 340px on a phone is a
+     preview of stock nobody sells.
+
+     overflow-x-auto is cancelled with print:overflow-visible. An element with
+     overflow other than visible is monolithic in paged media, so a job of four
+     sheets left inside a live scroller prints the first one and stops.
+
+     print:border-0 on the sheet is not only because paper has no edge. Preflight
+     sets box-sizing: border-box, so a 1px border on a w-[210mm] box takes two
+     pixels out of the content width and every column comes out 0.18 mm narrow —
+     which is nothing on a screen and a fifth of a millimetre of creep by the
+     third column of a real sheet.
+
+     The labels are one shape repeated twenty-one times, so they are written
+     once inside x-for. Twenty-one hand-copied blocks drift the first time
+     somebody edits one, and the position that drifts is the one nobody checks.
+     No ids inside the loop: twenty-one of the same id is one id.
+
+     Nothing on the stock is zinc-600. A thermal printer is one bit deep and
+     dithers grey into a checkerboard, so the item code and the description are
+     separated by size and weight and by nothing else. -->
+<div data-kui="label-sheet/sheet" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+     x-data="{
+       labels: [
+         { loc: 'B-04-01', code: 'ITM-1042', desc: 'MS angle 50 × 50 × 6 mm' },
+         { loc: 'B-04-02', code: 'ITM-1088', desc: 'MS plate 10 mm' },
+         { loc: 'B-04-03', code: 'ITM-1120', desc: 'MS channel 100 × 50 mm' },
+         { loc: 'B-04-04', code: 'ITM-1164', desc: 'MS flat 50 × 8 mm' },
+         { loc: 'B-04-05', code: 'ITM-1201', desc: 'MS round bar 20 mm' },
+         { loc: 'B-04-06', code: 'ITM-1247', desc: 'MS square tube 40 × 40 × 3 mm' },
+         { loc: 'B-04-07', code: 'ITM-1310', desc: 'GI sheet 1.6 mm' },
+         { loc: 'B-05-01', code: 'ITM-3310', desc: 'HT bolt M16 × 60, grade 8.8' },
+         { loc: 'B-05-02', code: 'ITM-3318', desc: 'HT nut M16, grade 8' },
+         { loc: 'B-05-03', code: 'ITM-3326', desc: 'Spring washer M16' },
+         { loc: 'B-05-04', code: 'ITM-3344', desc: 'HT bolt M12 × 50, grade 8.8' },
+         { loc: 'B-05-05', code: 'ITM-3390', desc: 'Anchor fastener M12 × 100' },
+         { loc: 'B-05-06', code: 'ITM-3412', desc: 'Hex nut M12' },
+         { loc: 'B-05-07', code: 'ITM-3455', desc: 'Plain washer M12' },
+         { loc: 'C-01-01', code: 'ITM-2001', desc: 'HDPE granules — natural, M60075' },
+         { loc: 'C-01-02', code: 'ITM-2014', desc: 'HDPE granules — black, M65' },
+         { loc: 'C-01-03', code: 'ITM-2030', desc: 'LDPE granules 24FS040' },
+         { loc: 'C-01-04', code: 'ITM-2088', desc: 'PP copolymer 3120MA' },
+         { loc: 'C-01-05', code: 'ITM-1091', desc: 'Masterbatch — white 60%' },
+         { loc: 'C-01-06', code: 'ITM-1097', desc: 'Masterbatch — black 40%' },
+         { loc: 'C-01-07', code: 'ITM-5140', desc: 'Stretch film — 23 micron' }
+       ]
+     }">
+  <main class="mx-auto w-full max-w-[210mm]">
+
+    <div class="mb-4 print:hidden">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Bin labels — Silvassa raw material yard</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">21 labels on one A4 sheet · 63.5 × 38.1 mm, 3 across and 7 down · racks B-04, B-05 and C-01</p>
+      <p class="mt-1 text-[12px]/4 text-zinc-600">Print at scale 100% with Fit to page off and margins set to None. The stock carries its own margins and the dialog will add its own on top of them.</p>
+    </div>
+
+    <div class="overflow-x-auto print:overflow-visible">
+      <ol role="list" class="mx-auto grid w-[210mm] grid-cols-3 gap-x-[2.5mm] gap-y-0 rounded-xl border border-zinc-300 bg-white px-[7.25mm] py-[15.15mm] print:rounded-none print:border-0">
+        <template x-for="l in labels" :key="l.loc">
+          <li class="flex h-[38.1mm] break-inside-avoid flex-col overflow-hidden border border-zinc-300 p-[2.5mm] print:border-0">
+            <p class="text-[20px]/7 font-semibold tabular-nums tracking-tight" x-text="l.loc">B-04-01</p>
+            <p class="text-[12px]/4 font-medium tabular-nums" x-text="l.code">ITM-1042</p>
+            <p class="truncate text-[11px]/4" x-text="l.desc">MS angle 50 × 50 × 6 mm</p>
+
+            <div class="mt-auto">
+              <!-- SUBSTITUTE. The Code 128 symbol for this location goes here at
+                   exactly 53.5 × 9 mm. Drop in an <img> or an inline <svg> from
+                   the server at that size and nothing else on the label moves.
+                   The ruled edge is left on so a sheet printed before the
+                   substitution comes out visibly empty rather than blank. -->
+              <div aria-hidden="true" class="flex h-[9mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+              <p class="mt-[0.6mm] text-center text-[12px]/4 font-medium tabular-nums" x-text="l.loc">B-04-01</p>
+            </div>
+          </li>
+        </template>
+      </ol>
+    </div>
+  </main>
+</div>

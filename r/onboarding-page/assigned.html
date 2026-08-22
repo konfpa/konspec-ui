@@ -1,0 +1,207 @@
+<!-- Nothing here is one person's job, so the default question is not "what is
+     left" but "what is left on me, and who is holding up the rest". Yours comes
+     first as its own card and is then absent from the team cards below, because
+     a task listed twice is a task somebody counts twice.
+
+     The team cards list only what is unfinished and print the finished count as
+     a figure. Nine done rows across three cards is the same information as the
+     word nine, and it pushes the two rows that matter off the screen.
+
+     The IT card is the state that has to render and usually does not: every
+     task in it is yours, so the card has nothing to list. It still appears, and
+     it says why it is empty. Dropped from the page it reads as a team with
+     nothing to do, which is the opposite of true.
+
+     Unassigned is a block of its own and not an empty cell in a Who column. The
+     task nobody owns is the one still not done on 01 Oct, and in a list sorted
+     by group or by state it is invisible — it looks exactly like a task that is
+     merely waiting its turn.
+
+     The filter is a real radiogroup with one Tab stop and arrow keys, copied
+     from button-group's segmented shape. Two options, because a third — one per
+     team — is the team cards again in a control. -->
+<div data-kui="onboarding-page/assigned" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       v: 'Everyone', opts: ['Everyone', 'Only mine'],
+       move(step) {
+         const i = (this.opts.indexOf(this.v) + step + this.opts.length) % this.opts.length;
+         this.v = this.opts[i];
+         this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());
+       }
+     }">
+
+  <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
+
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="min-w-0">
+        <h1 class="text-[24px]/7 font-semibold tracking-tight">Set up Konspec</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">17 tasks · 9 done · 2 skipped · 1 with no owner</p>
+      </div>
+      <div role="radiogroup" aria-label="Whose tasks to show" x-ref="grp"
+           @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+           class="inline-flex shrink-0 rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+        <template x-for="o in opts" :key="o">
+          <button type="button" role="radio" :aria-checked="v === o" :tabindex="v === o ? 0 : -1" @click="v = o"
+                  class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="v === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+            <span x-text="o"></span>
+          </button>
+        </template>
+      </div>
+    </div>
+
+    <div class="mt-5 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+        <div class="min-w-0">
+          <h2 class="text-[16px]/6 font-semibold">Yours</h2>
+          <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">Akshay Prabhu · IT · 5 tasks, 1 left</p>
+        </div>
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">15 min of work</p>
+      </div>
+      <ul role="list" class="divide-y divide-zinc-100">
+        <li>
+          <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[13px]/5 font-medium"><span class="sr-only">Not started — </span>Invite users</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">People and access · 41 people on the list from HR</span>
+            </span>
+            <span class="mt-0.5 shrink-0 text-[12px]/4 tabular-nums text-zinc-500">15 min</span>
+          </a>
+        </li>
+      </ul>
+      <p class="border-t border-zinc-100 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+        2 done on 12 Aug · 2 skipped on 19 Aug · <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">show all five</a>
+      </p>
+    </div>
+
+    <div class="mt-4 space-y-4" x-show="v === 'Everyone'" x-cloak>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <div class="min-w-0 flex-1">
+            <h2 class="text-[16px]/6 font-semibold">Finance</h2>
+            <p class="mt-0.5 flex items-center gap-2 text-[13px]/5 tabular-nums text-zinc-600">
+              <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">MI</span>
+              Meera Iyer · 7 tasks, 2 left
+            </p>
+          </div>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">both waiting on somebody</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Waiting on somebody — </span>Approval limits</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Waiting on Nilesh Patil since 15 Aug · board meets 22 Aug</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Waiting on somebody — </span>Opening vendor balances</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Waiting on the closing balances as at 30 Sep · no date</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+          </li>
+        </ul>
+        <p class="border-t border-zinc-100 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+          5 done between 13 and 18 Aug · <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">show them</a>
+        </p>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <div class="min-w-0 flex-1">
+            <h2 class="text-[16px]/6 font-semibold">Stores</h2>
+            <p class="mt-0.5 flex items-center gap-2 text-[13px]/5 tabular-nums text-zinc-600">
+              <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">SM</span>
+              Sanjay More · 4 tasks, 2 left
+            </p>
+          </div>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">about 3 h of work</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Not started — </span>Item masters</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">1,240 rows in the sheet · two tasks are waiting on it</span>
+              </span>
+              <span class="mt-0.5 shrink-0 text-[12px]/4 tabular-nums text-zinc-500">about 2 h</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 pt-3 pb-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Blocked — </span>Opening stock</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">About 1 h once it clears</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+            <p class="px-4 pb-3 pl-11 text-[12px]/4 text-zinc-600">
+              Waiting for <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Item masters</a>, the row above. One person, two tasks, in order.
+            </p>
+          </li>
+        </ul>
+        <p class="border-t border-zinc-100 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+          2 done on 15 and 18 Aug · <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">show them</a>
+        </p>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <div class="min-w-0 flex-1">
+            <h2 class="text-[16px]/6 font-semibold">IT</h2>
+            <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">Akshay Prabhu · 5 tasks, 1 left</p>
+          </div>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">nothing listed here</p>
+        </div>
+        <p class="px-4 py-4 text-[13px]/5 text-zinc-600">
+          Every IT task is yours, so all five are in the card at the top of this page rather than repeated here. Nobody else in IT has a setup task.
+        </p>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <div class="min-w-0">
+            <h2 class="text-[16px]/6 font-semibold">Nobody</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">One task has no owner. It is the one that is still open on 01 Oct.</p>
+          </div>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">1 task</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li>
+            <a href="#" class="flex items-start gap-3 px-4 pt-3 pb-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[13px]/5 font-medium"><span class="sr-only">Blocked — </span>Opening customer balances</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Opening balances · unassigned since 19 Aug</span>
+              </span>
+              <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            </a>
+            <p class="px-4 pb-3 pl-11 text-[12px]/4 text-zinc-600">
+              Waiting for <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Customer masters</a>, which was skipped. Somebody has to own the decision before it can be either done or skipped.
+            </p>
+          </li>
+        </ul>
+        <div class="flex flex-wrap items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-4 py-3">
+          <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Take Opening customer balances
+          </button>
+          <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Give it to somebody
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

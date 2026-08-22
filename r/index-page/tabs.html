@@ -1,0 +1,175 @@
+<!-- Status tabs are a filter wearing a tab shape, and the consequence is that
+     there is one panel and it is relabelled rather than five panels each holding
+     a copy of the same table. Five tabpanels would be five tables of the same
+     columns differing only in their WHERE clause, and four of them are in the
+     accessibility tree at all times doing nothing.
+
+     It is still the tabs component in full — role="tablist" with a name,
+     aria-selected, aria-controls out, aria-labelledby bound back the other way,
+     roving tabindex, and arrow, Home and End all preventing default. A row of
+     styled buttons that merely looks like this promises a screen reader that
+     arrows switch panels, and then nothing does.
+
+     What the tabs do to the pager is the part that gets missed. Switching a tab
+     is a new query, so it returns to page one and the footer's total becomes
+     that tab's total. Leave the page number alone and somebody on page 7 of
+     Approved lands on page 7 of Draft, which has two pages, and gets an empty
+     register that reads as a fault.
+
+     The counts are the same query with the status predicate removed, which
+     means they narrow along with everything else the register is filtered by.
+     Count off an unfiltered total instead and the tab that says 34 opens onto
+     6 rows, after which nobody trusts any of the five.
+
+     The tab row is the one region on this page allowed to scroll sideways.
+     Five tabs and their counts do not fit 390px, and a second line of tabs
+     reads as a different control. Its scrollbar is hidden and the focus outline
+     takes a negative offset, because a positive one is clipped by the
+     scroller. -->
+<div data-kui="index-page/tabs" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-id="['ix-tb-tab', 'ix-tb-panel']"
+     x-data="{
+       tab: 'pending', page: 1, size: 4,
+       tabs: [
+         { id: 'all', label: 'All' },
+         { id: 'draft', label: 'Draft', status: 'Draft' },
+         { id: 'pending', label: 'Pending approval', status: 'Approved' },
+         { id: 'open', label: 'Open', status: 'Open' },
+         { id: 'closed', label: 'Closed', status: 'Closed' }
+       ],
+       rows: [
+         { po: 'PO-2026-0411', vendor: 'Sharma Steel &amp; Alloys', amount: 1842000, status: 'Approved', age: '6 days' },
+         { po: 'PO-2026-0414', vendor: 'Gujarat Polymers Ltd', amount: 468500, status: 'Approved', age: '4 days' },
+         { po: 'PO-2026-0418', vendor: 'Deccan Fasteners Pvt Ltd', amount: 2710400, status: 'Approved', age: '3 days' },
+         { po: 'PO-2026-0421', vendor: 'Sharma Steel &amp; Alloys', amount: 132900, status: 'Approved', age: '2 days' },
+         { po: 'PO-2026-0424', vendor: 'Konkan Chemicals Pvt Ltd', amount: 96750, status: 'Approved', age: '1 day' },
+         { po: 'PO-2026-0427', vendor: 'Gujarat Polymers Ltd', amount: 5460000, status: 'Open', age: '11 days' },
+         { po: 'PO-2026-0430', vendor: 'Deccan Fasteners Pvt Ltd', amount: 214300, status: 'Open', age: '9 days' },
+         { po: 'PO-2026-0433', vendor: 'Sharma Steel &amp; Alloys', amount: 78900, status: 'Draft', age: '—' },
+         { po: 'PO-2026-0436', vendor: 'Konkan Chemicals Pvt Ltd', amount: 1290500, status: 'Closed', age: '31 days' },
+         { po: 'PO-2026-0439', vendor: 'Gujarat Polymers Ltd', amount: 43200, status: 'Closed', age: '44 days' }
+       ],
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       count(t) { return t.status ? this.rows.filter(r => r.status === t.status).length : this.rows.length },
+       get current() { return this.tabs.find(t => t.id === this.tab) },
+       get filtered() { return this.current.status ? this.rows.filter(r => r.status === this.current.status) : this.rows },
+       get pages() { return Math.max(1, Math.ceil(this.filtered.length / this.size)) },
+       get shown() { return this.filtered.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return this.filtered.length ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.filtered.length) },
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')) },
+       move(step) {
+         const n = this.tabs.length, i = this.tabs.findIndex(t => t.id === this.tab);
+         this.pick(this.tabs[(i + step + n) % n].id);
+       },
+       pick(id) {
+         this.tab = id;
+         this.page = 1;
+         this.$nextTick(() => {
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 pt-4 lg:px-6">
+
+        <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Purchase orders</h1>
+            <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600"
+               x-text="filtered.length + ' ' + current.label.toLowerCase() + ' · Silvassa · FY 2026–27'"></p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>Export
+            </button>
+            <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="plus" class="size-4"></i>New order
+            </button>
+          </div>
+        </div>
+
+        <div x-ref="list" role="tablist" aria-label="Order status"
+             @keydown.arrow-right.prevent="move(1)"
+             @keydown.arrow-left.prevent="move(-1)"
+             @keydown.home.prevent="pick(tabs[0].id)"
+             @keydown.end.prevent="pick(tabs[tabs.length - 1].id)"
+             class="-mb-px mt-4 flex gap-6 overflow-x-auto [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+          <template x-for="t in tabs" :key="t.id">
+            <button type="button" role="tab" :data-tab="t.id"
+                    :id="$id('ix-tb-tab', t.id)" :aria-controls="$id('ix-tb-panel', 'register')"
+                    :aria-selected="tab === t.id ? 'true' : 'false'"
+                    :tabindex="tab === t.id ? 0 : -1"
+                    @click="pick(t.id)"
+                    class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
+              <span x-text="t.label"></span>
+              <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="count(t)"></span>
+            </button>
+          </template>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+      <div role="tabpanel" tabindex="0" :id="$id('ix-tb-panel', 'register')" :aria-labelledby="$id('ix-tb-tab', tab)"
+           class="rounded-xl border border-zinc-300 bg-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+        <table x-show="filtered.length" class="w-full text-[13px]/5">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+              <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+              <th scope="col" class="hidden px-4 py-2.5 text-right font-medium sm:table-cell">Waiting</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="r in shown" :key="r.po">
+              <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+                <td class="px-4 py-2.5">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+                  </span>
+                </td>
+                <td class="hidden px-4 py-2.5 text-right text-zinc-600 tabular-nums sm:table-cell" x-text="r.age"></td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums" x-text="money(r.amount)"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+
+        <div x-show="!filtered.length" x-cloak class="px-6 py-12 text-center">
+          <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+          </span>
+          <h2 class="mt-3 text-[16px]/6 font-semibold">Nothing in this tab</h2>
+          <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">No orders are in this state right now. The other tabs still have theirs.</p>
+        </div>
+
+        <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <p class="text-[13px]/5 text-zinc-600 tabular-nums"
+             x-text="filtered.length ? from + '–' + to + ' of ' + filtered.length + ' orders' : 'No orders to show'"></p>
+          <div class="flex items-center gap-2">
+            <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
+            <button type="button" @click="page--" :disabled="page === 1"
+                    class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-left" class="size-4"></i>Previous
+            </button>
+            <button type="button" @click="page++" :disabled="page === pages"
+                    class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Next<i data-lucide="chevron-right" class="size-4"></i>
+            </button>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </main>
+</div>

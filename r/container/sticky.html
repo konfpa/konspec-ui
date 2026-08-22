@@ -1,0 +1,121 @@
+<!-- The other half of the region rule, and the one a real page actually uses.
+     A page inside app-shell has no scroller of its own — the shell's <main> is
+     the one scrolling column in the application — so a band that has to stay
+     put is sticky against that column rather than a second overflow-y-auto.
+     The wrapper here is standing in for the shell's column so the stickiness
+     has something to stick to; drop it and this is the page.
+
+     sticky, never fixed. A fixed band is positioned against the viewport, so it
+     leaves the flow, sits over whatever is under it, and is wrong the moment
+     the same markup is pasted inside a dialog or a sheet. sticky stays in the
+     flow and stays correct in both.
+
+     Opaque, and bordered on the edge the content passes. Transparent, the rows
+     scroll through the title and the band reads as broken glass; unbordered,
+     the last visible row looks clipped rather than covered.
+
+     The action bar is sticky bottom-0 inside the body it belongs to, with mt-4
+     and the panel's own border and radius, which is what form-page writes. It
+     is not fixed inset-x-0, and the difference is the whole reason to use
+     sticky: a sticky element is still in the flow and reserves its own space,
+     so nothing on the page needs a padding-bottom to clear it. A fixed tray
+     covers the last row of its own list, and the padding every screen then
+     grows to compensate never matches its height.
+
+     pb-16 on the body is not that clearance and is not doing anything for the
+     bar. It is the longer tail app-shell and dashboard put under the last card
+     of a long scrolling page, so the page does not end a hair below its own
+     content.
+
+     The z ladder, counted: z-10 for a band sticking inside a card or a scrolling
+     list, z-30 for a band sticking across the page, z-40 for menus and
+     backdrops, z-50 for dialogs and toasts, and one z-60 in the registry, on
+     app-shell's skip link. -->
+<div data-kui="container/sticky" class="h-[520px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <main>
+
+    <header class="sticky top-0 z-30 border-b border-zinc-200 bg-white">
+      <div class="mx-auto flex max-w-[1600px] flex-wrap items-start justify-between gap-x-6 gap-y-3 px-4 py-4 lg:px-6">
+        <div class="min-w-0">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight">PO-2026-0418</h1>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Gujarat Polymers Ltd · raised 28 Aug 2026</p>
+        </div>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+        </span>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
+
+      <section aria-labelledby="ct-sticky-lines" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="ct-sticky-lines" class="text-[16px]/6 font-semibold">Order lines</h2>
+        </div>
+        <table class="w-full text-[13px]/5">
+          <thead>
+            <tr class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-4 py-2.5 font-medium">Item</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Quantity</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5">PET resin, bottle grade</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">4.000 MT</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹4,12,000</td>
+            </tr>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5">PET resin, film grade</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">2.400 MT</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,64,000</td>
+            </tr>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5">Polyurethane binder</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">1.200 MT</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹3,18,000</td>
+            </tr>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5">Masterbatch, blue</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0.400 MT</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹86,000</td>
+            </tr>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5">Masterbatch, white</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0.600 MT</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹94,500</td>
+            </tr>
+            <tr class="hover:bg-zinc-100">
+              <td class="px-4 py-2.5">Plasticiser</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0.900 MT</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹70,500</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section aria-labelledby="ct-sticky-terms" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="ct-sticky-terms" class="text-[16px]/6 font-semibold">Terms</h2>
+        </div>
+        <div class="px-5 py-4">
+          <dl class="space-y-0.5 text-[13px]/5">
+            <div class="flex justify-between gap-4"><dt class="text-zinc-600">Payment</dt><dd>45 days from invoice</dd></div>
+            <div class="flex justify-between gap-4"><dt class="text-zinc-600">Freight</dt><dd>To pay, vendor arranged</dd></div>
+            <div class="flex justify-between gap-4"><dt class="text-zinc-600">Delivery</dt><dd class="tabular-nums">On or before 12 Sep 2026</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <div class="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+        <p class="text-[13px]/5 tabular-nums text-zinc-600">6 lines · ₹12,45,000</p>
+        <div class="flex items-center gap-2">
+          <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Amend</button>
+          <button type="button" class="rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Release to vendor</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

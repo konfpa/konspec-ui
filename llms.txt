@@ -232,6 +232,7 @@ keeping it to yourself in one screen.
 
 ### Layout
 
+- **Container** `container` — The measurements every screen in this library is already making: how wide a page is, how far its content sits from the edge of the column, the three vertical spacings, the responsive column grid, and the rules for what may scroll and in which direction. A reference for the box the other layouts sit in, not a screen of its own. Variants: page, narrow, wide, stack, grid, regions, sticky, overflow, phone.
 - **App shell** `app-shell` — The page skeleton: an icon rail that expands to a labelled sidebar, a topbar carrying the hamburger, breadcrumb, command palette and account menu, and a single scrolling main column. Everything else in the app renders inside the main column. Variants: default.
 - **Page header** `page-header` — The top block of a page: where it sits in the app, what it is, what state it is in, and what you can do to it. One h1 per page and it lives here. Variants: default, trail, record, tabs, filters, back, sticky, overflow.
 - **Card** `card` — A bordered white panel that groups one thing. A header names it, the body holds the content, and an optional footer carries totals or actions. Variants: default, actions, stats, section, table, clickable, grid, empty, django.
@@ -241,6 +242,24 @@ keeping it to yourself in one screen.
 - **Form page** `form-page` — The layout a create or edit screen uses: one h1, the fields grouped in cards, a validation summary that links to every field that failed, and Save and Cancel where the user can always reach them. Variants: two-column, side-rail, sections, invalid, sticky-actions, line-items, wizard, readonly.
 - **Auth page** `auth-page` — The signed-out screen: one centred card, the fewest fields that will do, and nothing else on the page. Sign in, the second factor after it, and every screen the user lands on when one of the two fails. Variants: signin, failed, forgot, sent, reset, otp, sso, locked.
 - **Error page** `error-page` — The whole screen the user gets when the page could not be produced at all. It says what failed in their own terms, whether anything they did was saved, and gives one way back into an application whose navigation is not on this page. Variants: 404, 403, 500, maintenance, offline, expired, django.
+- **Dashboard** `dashboard` — The screen a user lands on after signing in: a strip of figures, one plot, and the queues that are actually waiting for them. Every part of it already exists — this entry is the composition and the rules that govern it. Variants: default, queues, alerts, period, regions, role, empty, phone, django.
+- **Index page** `index-page` — The register screen as a whole page: the breadcrumb and the one h1, the saved views, the filter band, the toolbar that becomes a selection toolbar, the table, the pager, and the states the page as a whole can be in. Variants: default, saved-views, filters, tabs, bulk, dense, empty, loading, django.
+- **Record page** `record-page` — The screen for one record: the band that identifies it and says what state it is in, a strip of the figures that matter, and the sections of detail below it — line items, approvals, documents, activity — carrying only the actions the record's current state allows. Variants: default, rail, tabs, approvals, activity, states, permissions, phone, django.
+- **Approval inbox** `inbox-page` — The screen an approver lives in: everything waiting on their signature in one queue, the record beside it, and the decision on a rail where the hand already is. Deciding removes the record from the queue and lands the user on the next one without a reload. Variants: default, advance, reject, pending, bulk, limits, delegated, empty, phone, django.
+- **Board** `board` — Records in columns by the stage they are at, where each column is one stage and moving a card between two of them is a state change on the server. The column header carries the count, and every move can be made from the keyboard. Variants: default, card, totals, wip, pending, drag, empty, filters, phone, django.
+- **Schedule page** `schedule-page` — What is planned and when, drawn with time as the axis: promised deliveries across a month, production against each line, a shift roster. Position carries meaning — further right is later, and a block twice as wide takes twice as long. Variants: month, week, resource, day, block, conflict, empty, filters, phone, django.
+- **Compare page** `compare-page` — Several vendors' quotations against one enquiry, side by side, so a buyer can award the order. Line items down, vendors across, rates in the cells and the totals along the bottom — the comparative statement that is attached to the requisition and shown to whoever signs it. Variants: default, sticky, lowest, landed, terms, partial, award, phone, django.
+- **Reconcile page** `reconcile-page` — Two sets of records that ought to agree, with the difference between them written out as a figure and the controls that make them agree — pairing, explaining and posting. The variance is the content; the rows that already agree are a count. Variants: three-way, tolerance, unmatched, match, partial, ledger, phone, post, clean, django.
+- **Import page** `import-page` — The screen that takes a spreadsheet into the system: the file and the rules stated before it is picked, the column mapping, the review of what the system understood, the failures grouped by kind, and the write itself with a report at the end. Variants: upload, mapping, preview, errors, fix, committing, result, phone, django.
+- **Search page** `search-page` — The whole-page answer to a query typed into the global search: the query echoed as the one h1, the results grouped by record type with a count on every group, the facets that narrow them, and the states the page is in when there is nothing to show yet or nothing to show at all. Variants: results, exact, facets, scoped, empty, loading, recent, syntax, phone, django.
+- **Focus page** `focus-page` — One task on the whole screen with the application chrome removed: a bag scanned into a GRN at the gate, a bin counted at a rack, a sample passed or failed at the QC bench. Large targets, type one step up, and a scan field that never gives up the keyboard. Variants: scan, unknown, confirm, count, inspect, progress, offline, exit, django.
+- **Settings page** `settings-page` — The configuration screen: a permanent nav of sections down one side and the section being changed beside it. One h1 for the whole screen, an h2 per section, and a Save that belongs to the section rather than to the page. Variants: default, dirty, immediate, grouped, series, roles, danger, phone, django.
+- **Onboarding page** `onboarding-page` — The screen that tracks a deployment being configured: every task that has to be finished before a document can be raised, grouped, with what is done, what is blocked and on what, who owns each one, and what the page becomes once it is finished. Variants: checklist, task, blocked, resume, assigned, optional, complete, phone, django.
+- **Audit page** `audit-page` — The whole system's audit trail as a page: who changed what, when, and what the value was before. Queried across records, actors, fields and dates, grouped by day, newest first, and append-only — nothing on this screen edits anything. Variants: default, diff, events, filters, record, more, export, empty, phone, django.
+- **Docs page** `docs-page` — The manual inside the application: the standard operating procedures, the approval limits, the definitions a screen assumes you already know. The only screen in this library that is mostly prose, so the measure, the heading rhythm and what a link looks like inside a sentence are the component. Variants: article, prose, procedure, controlled, callouts, nav, search, phone, print, django.
+- **Document page** `document-page` — The record as a sheet of paper: a purchase order, a GST tax invoice, a delivery challan, a goods receipt note. Laid out on A4, printed from the browser, and built so that what comes out of the printer is the same document that was on screen. Variants: purchase-order, invoice, challan, grn, draft, copies, multi-page, preview, django.
+- **Label sheet** `label-sheet` — Labels that come off a printer and get stuck onto things: a bin label on a rack, a batch label on a drum, a pallet tag, a QC hold sticker. Either a grid of them on an A4 sheet of die-cut stock or one at a time on a continuous roll, sized in millimetres because the stock in the printer is. Variants: sheet, roll, sizes, content, start-position, align, preview, phone, django.
+- **Portal page** `portal-page` — The screens a supplier signs in to: the orders you have placed with them, the acknowledgement, an invoice against a receipt, what has been paid, and their own details. One vendor is the whole application, and the layout is built to make that visible. Variants: shell, orders, acknowledge, upload, payments, profile, restricted, phone, django.
 
 ## Machine-readable
 
@@ -249,17 +268,17 @@ thing that answers the question.
 
 | endpoint | size | cost | what it is |
 |---|---|--:|---|
-| [r/index.json](r/index.json) | 100 KB | ~29k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
-| `r/<id>.json` | median 79 KB, largest 178 KB (`menubar`) | ~23k tokens / ~51k tokens | One component: rules, anatomy, behaviour, accessibility, and every variant with its html. |
-| `r/<id>/<variant>.html` | median 5 KB, largest 47 KB (`app-shell/default`) | ~1k tokens / ~13k tokens | The markup, raw. No JSON envelope, no escaping, paste as-is. |
-| [registry.json](registry.json) | 4.6 MB | ~1331k tokens | Everything at once. **Do not fetch this.** It is roughly 7× a 200k context window and exists only so older integrations do not break. |
+| [r/index.json](r/index.json) | 129 KB | ~37k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
+| `r/<id>.json` | median 90 KB, largest 189 KB (`search-page`) | ~26k tokens / ~54k tokens | One component: rules, anatomy, behaviour, accessibility, and every variant with its html. |
+| `r/<id>/<variant>.html` | median 6 KB, largest 47 KB (`app-shell/default`) | ~2k tokens / ~13k tokens | The markup, raw. No JSON envelope, no escaping, paste as-is. |
+| [registry.json](registry.json) | 7.2 MB | ~2087k tokens | Everything at once. **Do not fetch this.** It is roughly 10× a 200k context window and exists only so older integrations do not break. |
 
 The component list above prints every variant id, so once you have read this
 file you can build a variant URL yourself and skip r/index.json entirely:
 `GET /r/button/variants.html` returns the markup for button/variants and nothing
 else. That is the common path — one read of llms.txt, then a few small ones.
 
-Read the ids; do not guess them. Only 32 of the 55 components have a variant
-called `default`, and 23 do not, so a guessed URL is a 404 rather
+Read the ids; do not guess them. Only 40 of the 74 components have a variant
+called `default`, and 34 do not, so a guessed URL is a 404 rather
 than a fallback. The ids are listed above precisely because they are not
 predictable from the component name.

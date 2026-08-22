@@ -1,0 +1,211 @@
+<!-- The filter apparatus is the reason this page exists separately from
+     record-page/activity. Four axes — actor, record type, field and date range
+     — and the question an auditor actually walks in with is a combination of
+     them: who changed a rate after the order was approved, between the first of
+     August and today.
+
+     The field filter is the one that does not exist on a register and is the
+     one that answers the question. Filtering to entries that touched "rate"
+     turns forty pages of trail into eleven entries, and it is the difference
+     between an audit tool and a log viewer.
+
+     The actor select is deliberately left empty here. In this question who is
+     the answer rather than a predicate, and the three names in the result are
+     the finding — setting an actor first is how somebody confirms the suspicion
+     they arrived with and never sees the other two people who did it.
+
+     "After approval" is a fifth predicate and it is a checkbox rather than a
+     select, because it is not one of a set — it is a flag on the entry that the
+     server already computed when it wrote the row. Working it out on the client
+     means walking the trail twice and getting a different answer from the one
+     the export gives.
+
+     Chips say which filters are doing something; the controls only say which
+     ones exist. The usual cause of an empty trail is one filter set an hour ago
+     and never cleared, and the chips are the only thing on screen that can
+     answer for it. Each drops on its own — clearing all four throws away the
+     three that were right.
+
+     The count line is a role="status" on the panel and it was in the document
+     before the first keystroke, so a new figure written into it is a change a
+     screen reader reports. Built inside the result block instead, it arrives
+     already speaking and is announced to nobody.
+
+     Below sm the four controls stack two to a row rather than folding into a
+     drawer. That is index-page/django’s grid arrangement, and the drawer is in
+     the phone variant, where the entries need the rest of the work anyway. -->
+<div data-kui="audit-page/filters" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       actor: '', kind: '', field: 'rate', range: 'aug-sep', after: true,
+       entries: [
+         { id: 'e1', actor: 'akshay', who: 'Akshay Prabhu', kind: 'order', field: 'rate', after: true,
+           at: '04 Sep 2026, 14:22', rec: 'PO-2026-0418', what: 'changed the rate on line 3',
+           was: '₹58,400 / MT', now: '₹61,200 / MT', meta: 'Deccan Fasteners Pvt Ltd · Vapi · approved 03 Sep' },
+         { id: 'e2', actor: 'ritu', who: 'Ritu Deshpande', kind: 'order', field: 'rate', after: true,
+           at: '28 Aug 2026, 16:09', rec: 'PO-2026-0411', what: 'changed the rate on line 1',
+           was: '₹57,000 / MT', now: '₹60,000 / MT', meta: 'Sharma Steel &amp; Alloys · Silvassa · approved 27 Aug' },
+         { id: 'e3', actor: 'akshay', who: 'Akshay Prabhu', kind: 'order', field: 'rate', after: false,
+           at: '14 Aug 2026, 10:55', rec: 'PO-2026-0430', what: 'changed the rate on line 2 before sending for approval',
+           was: '₹41,800 / MT', now: '₹43,500 / MT', meta: 'Deccan Fasteners Pvt Ltd · Silvassa · draft at the time' },
+         { id: 'e4', actor: 'meena', who: 'Meena Iyer', kind: 'contract', field: 'rate', after: true,
+           at: '11 Aug 2026, 12:30', rec: 'RC-2026-0042', what: 'revised the contract rate for MS plate 8 mm',
+           was: '₹56,000 / MT', now: '₹58,400 / MT', meta: 'Rate contract · signed 04 Apr 2026' }
+       ],
+       names: {
+         actor: { akshay: 'Akshay Prabhu', ritu: 'Ritu Deshpande', meena: 'Meena Iyer' },
+         kind: { order: 'Purchase orders', grn: 'Goods receipts', vendor: 'Vendors', contract: 'Rate contracts' },
+         field: { rate: 'Rate', qty: 'Quantity', date: 'Promised delivery', status: 'Status' },
+         range: { 'aug-sep': '01 Aug – 04 Sep 2026', q2: 'Jul–Sep 2026', fy: 'FY 2026–27' }
+       },
+       get shown() {
+         return this.entries.filter(e =>
+           (!this.actor || e.actor === this.actor) &amp;&amp;
+           (!this.kind || e.kind === this.kind) &amp;&amp;
+           (!this.field || e.field === this.field) &amp;&amp;
+           (!this.after || e.after));
+       },
+       get chips() {
+         return [
+           this.actor ? { key: 'actor', label: 'Actor: ' + this.names.actor[this.actor] } : null,
+           this.kind ? { key: 'kind', label: 'Record: ' + this.names.kind[this.kind] } : null,
+           this.field ? { key: 'field', label: 'Field: ' + this.names.field[this.field] } : null,
+           this.range ? { key: 'range', label: this.names.range[this.range] } : null,
+           this.after ? { key: 'after', label: 'Changed after approval' } : null
+         ].filter(Boolean);
+       },
+       drop(k) { this[k] = k === 'after' ? false : '' },
+       clear() { this.actor = ''; this.kind = ''; this.field = ''; this.range = ''; this.after = false }
+     }">
+  <main>
+
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-5xl px-4 py-4 lg:px-6">
+        <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Audit trail</h1>
+            <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600"
+               x-text="shown.length + ' of 1,284 entries match ' + chips.length + ' filters · newest first'">3 of 1,284 entries match 3 filters · newest first</p>
+          </div>
+          <button type="button" class="flex shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="download" class="size-4"></i>Export these entries
+          </button>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+          <div class="min-w-0">
+            <label for="ad-fl-actor" class="sr-only">Actor</label>
+            <select id="ad-fl-actor" x-model="actor"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:w-auto">
+              <option value="">Actor: anyone</option>
+              <option value="akshay">Actor: Akshay Prabhu</option>
+              <option value="ritu">Actor: Ritu Deshpande</option>
+              <option value="meena">Actor: Meena Iyer</option>
+            </select>
+          </div>
+          <div class="min-w-0">
+            <label for="ad-fl-kind" class="sr-only">Record type</label>
+            <select id="ad-fl-kind" x-model="kind"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:w-auto">
+              <option value="">Record: all types</option>
+              <option value="order">Record: purchase orders</option>
+              <option value="grn">Record: goods receipts</option>
+              <option value="vendor">Record: vendors</option>
+              <option value="contract">Record: rate contracts</option>
+            </select>
+          </div>
+          <div class="min-w-0">
+            <label for="ad-fl-field" class="sr-only">Field changed</label>
+            <select id="ad-fl-field" x-model="field"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:w-auto">
+              <option value="">Field: any</option>
+              <option value="rate">Field: rate</option>
+              <option value="qty">Field: quantity</option>
+              <option value="date">Field: promised delivery</option>
+              <option value="status">Field: status</option>
+            </select>
+          </div>
+          <div class="min-w-0">
+            <label for="ad-fl-range" class="sr-only">Date range</label>
+            <select id="ad-fl-range" x-model="range"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:w-auto">
+              <option value="">Any date</option>
+              <option value="aug-sep">01 Aug – 04 Sep 2026</option>
+              <option value="q2">Jul–Sep 2026</option>
+              <option value="fy">FY 2026–27</option>
+            </select>
+          </div>
+          <label class="col-span-2 flex items-center gap-2 text-[13px]/5 font-medium sm:col-span-1">
+            <input type="checkbox" x-model="after"
+                   class="size-4 shrink-0 rounded border-zinc-300 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Only changes made after approval
+          </label>
+        </div>
+
+        <div x-show="chips.length" x-cloak class="mt-3 flex flex-wrap items-center gap-2">
+          <template x-for="c in chips" :key="c.key">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span x-text="c.label"></span>
+              <button type="button" @click="drop(c.key)" :aria-label="'Remove the filter ' + c.label"
+                      class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-3"></i>
+              </button>
+            </span>
+          </template>
+          <button type="button" @click="clear()" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-5xl px-4 py-5 lg:px-6">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+        <h2 id="ad-fl-h" class="border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Matching entries</h2>
+        <ul x-show="shown.length" role="list" aria-labelledby="ad-fl-h" class="divide-y divide-zinc-100">
+          <template x-for="e in shown" :key="e.id">
+            <li class="flex gap-3 px-4 py-3">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+              <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+                <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-32" x-text="e.at"></p>
+                <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+                  <p class="text-[13px]/5 tabular-nums">
+                    <span class="font-medium" x-text="e.who"></span>
+                    <span x-text="' ' + e.what + ' of '"></span>
+                    <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="e.rec"></a>.
+                  </p>
+                  <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500" x-text="e.meta"></p>
+                  <dl class="mt-2 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                    <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                      <dt class="text-zinc-600">Rate</dt>
+                      <dd class="tabular-nums text-zinc-500 line-through"><span x-text="e.was"></span><span class="sr-only"> changed to</span></dd>
+                      <dd class="flex items-baseline gap-1.5 font-medium tabular-nums">
+                        <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i><span x-text="e.now"></span>
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              </div>
+            </li>
+          </template>
+        </ul>
+
+        <div x-show="!shown.length" x-cloak class="px-6 py-12 text-center">
+          <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+          </span>
+          <h3 class="mt-3 text-[16px]/6 font-semibold">No entries match these filters</h3>
+          <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+            The trail holds <span class="font-medium tabular-nums text-zinc-900">1,284</span> entries for this period. Every chip above is in force — drop one and the answer widens.
+          </p>
+          <button type="button" @click="if (chips.length) drop(chips[chips.length - 1].key)"
+                  class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Drop the last filter
+          </button>
+        </div>
+
+        <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-600">
+          The filters are the querystring. This answer is a URL that can go straight into the finding.
+        </p>
+      </div>
+    </div>
+  </main>
+</div>

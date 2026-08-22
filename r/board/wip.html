@@ -1,0 +1,138 @@
+<!-- Two facts that look alike and must not be drawn alike.
+
+     Over the limit is advisory. Welded is carrying seven against a limit of
+     five and the header says so with an alert-triangle in amber-700 beside the
+     count — the mark and nothing else. A field of colour behind a whole stage
+     is the loudest thing on the board and it would still be there tomorrow.
+
+     A stage that refuses is not advisory, and it refuses at the destination
+     rather than at the source. Painted is a bay that holds four trolleys and is
+     holding four, so its button in every move panel is aria-disabled with the
+     reason inside it. aria-disabled and not disabled: the disabled attribute
+     takes the one destination somebody is hunting for out of the Tab order and
+     leaves nothing to say where it went.
+
+     Being aria-disabled it still receives the click, so the handler refuses out
+     loud. A button that does nothing when pressed is indistinguishable from a
+     board that has stopped working, and the next thing that happens on a shop
+     floor is somebody pressing it eleven more times. The limit itself is the
+     plant's, and it is checked again on the server. -->
+<main data-kui="board/wip" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+      x-data="{
+        said: '',  open: null,
+        stages: [
+          { id: 'planned', name: 'Planned', cap: null },
+          { id: 'cut', name: 'Cut', cap: 6 },
+          { id: 'welded', name: 'Welded', cap: 5 },
+          { id: 'painted', name: 'Painted', cap: 4, hard: true },
+          { id: 'qc', name: 'QC', cap: null }
+        ],
+        cards: [
+          { no: 'JOB-2026-3312', stage: 'planned', item: 'Conveyor frame 6 m', mt: 1.8 },
+          { no: 'JOB-2026-3318', stage: 'cut', item: 'Hopper shell 2.4 m', mt: 2.4 },
+          { no: 'JOB-2026-3319', stage: 'cut', item: 'Support bracket set', mt: 0.6 },
+          { no: 'JOB-2026-3301', stage: 'welded', item: 'Chute liner assembly', mt: 1.2 },
+          { no: 'JOB-2026-3302', stage: 'welded', item: 'Conveyor frame 4 m', mt: 1.4 },
+          { no: 'JOB-2026-3303', stage: 'welded', item: 'Guard rail run A', mt: 0.9 },
+          { no: 'JOB-2026-3304', stage: 'welded', item: 'Guard rail run B', mt: 0.9 },
+          { no: 'JOB-2026-3305', stage: 'welded', item: 'Idler stand set', mt: 1.1 },
+          { no: 'JOB-2026-3306', stage: 'welded', item: 'Skirt board pair', mt: 0.7 },
+          { no: 'JOB-2026-3307', stage: 'welded', item: 'Drive base plate', mt: 1.6 },
+          { no: 'JOB-2026-3288', stage: 'painted', item: 'Hopper shell 1.8 m', mt: 1.9 },
+          { no: 'JOB-2026-3289', stage: 'painted', item: 'Chute body', mt: 2.2 },
+          { no: 'JOB-2026-3291', stage: 'painted', item: 'Guard rail run C', mt: 0.9 },
+          { no: 'JOB-2026-3293', stage: 'painted', item: 'Idler stand set', mt: 1.1 },
+          { no: 'JOB-2026-3277', stage: 'qc', item: 'Conveyor frame 6 m', mt: 1.8 }
+        ],
+        at(s) { return this.cards.filter(c => c.stage === s) },
+        mt(s) { return this.at(s).reduce((t, c) => t + c.mt, 0).toFixed(1) },
+        label(s) { return this.stages.find(x => x.id === s).name },
+        over(s) { return s.cap !== null &amp;&amp; this.at(s.id).length > s.cap },
+        full(s) { return s.hard === true &amp;&amp; this.at(s.id).length >= s.cap },
+        refuse(s) {
+          this.said = 'Cannot move to ' + s.name + '. The bay holds ' + s.cap + ' and is holding ' + this.at(s.id).length + '. Move one out first.';
+        },
+        commit(no, to) {
+          const board = this.$refs.board;
+          const c = this.cards.find(x => x.no === no);
+          const from = this.label(c.stage);
+          c.stage = to;
+          this.open = null;
+          this.said = no + ' moved from ' + from + ' to ' + this.label(to) + '. ' + this.label(to) + ' now holds ' + this.at(to).length + ' jobs.';
+          this.$nextTick(() => requestAnimationFrame(() => {
+            const el = board.querySelector('[data-move=' + no + ']');
+            if (el) { el.focus(); el.scrollIntoView({ block: 'nearest', inline: 'nearest' }) }
+          }));
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="shrink-0 border-b border-zinc-300 bg-white px-4 py-3">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Fabrication board</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Silvassa · shift A · 15 jobs · 19.5 MT</p>
+  </div>
+
+  <div x-ref="board" class="flex min-h-0 flex-1 snap-x snap-mandatory gap-3 overflow-x-auto p-3">
+    <template x-for="s in stages" :key="s.id">
+      <section :aria-labelledby="'wp-h-' + s.id"
+               class="relative flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+        <div class="shrink-0 border-b border-zinc-200 px-3 py-2.5">
+          <div class="flex items-baseline justify-between gap-2">
+            <h2 :id="'wp-h-' + s.id" class="truncate text-[13px]/5 font-medium" x-text="s.name"></h2>
+            <p class="flex shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-600">
+              <span x-show="over(s)" x-cloak class="flex" aria-hidden="true">
+                <i data-lucide="alert-triangle" class="size-3.5 text-amber-700"></i>
+              </span>
+              <span x-text="at(s.id).length + (s.cap ? ' of ' + s.cap : '')"></span>
+            </p>
+          </div>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+            <span x-text="mt(s.id) + ' MT'"></span><span x-show="over(s)" x-cloak> · over the limit by <span x-text="at(s.id).length - s.cap"></span></span>
+          </p>
+        </div>
+
+        <ul role="list" class="min-h-0 flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-2">
+          <template x-for="c in at(s.id)" :key="c.no">
+            <li class="rounded-lg border border-zinc-200 bg-white p-2.5">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="c.no"></a>
+                  <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600" x-text="c.item"></p>
+                </div>
+                <button type="button" :data-move="c.no" @click="open = open === c.no ? null : c.no"
+                        :aria-expanded="open === c.no" :aria-label="'Move ' + c.no + ', now in ' + label(c.stage)"
+                        class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="arrow-right-left" class="size-4"></i>
+                </button>
+              </div>
+              <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500" x-text="c.mt + ' MT'"></p>
+
+              <div x-show="open === c.no" x-cloak class="mt-2.5 border-t border-zinc-100 pt-2.5"
+                   @keydown.escape.stop="open = null; $nextTick(() => $refs.board.querySelector('[data-move=' + c.no + ']').focus())">
+                <p class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Move to</p>
+                <div role="group" :aria-label="'Move ' + c.no + ' to'" class="mt-1.5 space-y-1">
+                  <template x-for="d in stages.filter(x => x.id !== c.stage)" :key="d.id">
+                    <button type="button" :aria-disabled="full(d)"
+                            @click="full(d) ? refuse(d) : commit(c.no, d.id)"
+                            class="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-left text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                            :class="full(d) &amp;&amp; 'text-zinc-500'">
+                      <span class="flex items-center justify-between gap-2">
+                        <span class="truncate" x-text="d.name"></span>
+                        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="at(d.id).length + (d.cap ? ' of ' + d.cap : '')"></span>
+                      </span>
+                      <span x-show="full(d)" x-cloak class="mt-0.5 block text-[12px]/4 font-normal text-zinc-500">
+                        Bay full — move one out before adding another
+                      </span>
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </li>
+          </template>
+        </ul>
+      </section>
+    </template>
+  </div>
+</main>

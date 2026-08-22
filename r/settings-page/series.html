@@ -1,0 +1,164 @@
+<!-- The section where getting it wrong cannot be undone, so the screen is
+     built around showing the answer before it is committed rather than around
+     warning about it afterwards.
+
+     The preview concatenates the same four fields the server concatenates, in
+     the same order, so the string on screen is the string that will be issued.
+     Describing the format in prose instead — "prefix, then the financial year,
+     then a five-digit counter" — is how a series ships with two separators and
+     nobody notices until the first document prints.
+
+     It is an <output>, not a disabled input: nobody was ever going to type in
+     it. aria-live="off" because an <output> is a live region by default and it
+     recomputes on every keystroke, so left on it reads the whole document
+     number back one character at a time while the prefix is still being typed.
+
+     The irreversible half is gated by an acknowledgement with the actual number
+     in it, and the Save carries a real disabled attribute rather than a handler
+     that quietly returns. A dialog asking Are you sure buys nothing here: it is
+     the number that has to be read, and a dialog is the one place people have
+     learned not to read. Documents already issued keep their numbers whatever
+     this does, and the sentence says so, because the fear that stops somebody
+     making a legitimate change is usually that one.
+
+     Changing the running number down is refused rather than warned about — the
+     numbers between are already on paper. That check belongs on the server as
+     well; this is the half that stops the round trip. -->
+<div data-kui="settings-page/series" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       prefix: 'PO', sep: '-', fy: true, width: 4, next: 419, ack: false,
+       get fyLabel() { return '2026' },
+       get counter() { return String(this.next).padStart(Number(this.width) || 1, '0') },
+       get preview() { return [this.prefix, this.fy ? this.fyLabel : null, this.counter].filter(Boolean).join(this.sep) }
+     }">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Settings</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · Silvassa and Vapi · FY 2026–27</p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:items-start lg:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+
+      <nav aria-label="Settings sections" class="lg:sticky lg:top-6 lg:self-start">
+        <ul role="list" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Company profile</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Financial year</a></li>
+          <li><a href="#" aria-current="page" class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Numbering series</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approval limits</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Tax defaults</a></li>
+        </ul>
+      </nav>
+
+      <section id="ns-pane" tabindex="-1" aria-labelledby="ns-h"
+               class="mt-4 min-w-0 rounded-xl focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 lg:mt-0">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="ns-h" class="text-[16px]/6 font-semibold">Purchase order numbering</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Silvassa plant · FY 2026–27. The number is issued when the order is first saved.</p>
+          </div>
+
+          <form class="px-5 py-4">
+
+            <!-- the answer, before it is committed -->
+            <div class="rounded-lg bg-zinc-50 px-4 py-3">
+              <p class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-500">Next order will be numbered</p>
+              <output aria-live="off" class="mt-1 block font-mono text-[20px]/7 font-semibold tracking-tight tabular-nums" x-text="preview">PO-2026-0419</output>
+              <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">
+                Last issued <span class="font-medium text-zinc-700">PO-2026-0418</span> on 20 Aug 2026 by Ritu Deshpande.
+              </p>
+            </div>
+
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+
+              <div class="min-w-0">
+                <label for="ns-prefix" class="mb-1.5 block text-[13px]/5 font-medium">Prefix</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="ns-prefix" name="prefix" required maxlength="6" x-model="prefix" aria-describedby="ns-prefix-msg"
+                         class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 uppercase outline-none">
+                </div>
+                <p id="ns-prefix-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">Up to 6 characters. Letters and digits only.</p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="ns-sep" class="mb-1.5 block text-[13px]/5 font-medium">Separator</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="ns-sep" name="separator" x-model="sep" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="-">Hyphen — PO-2026-0419</option>
+                    <option value="/">Slash — PO/2026/0419</option>
+                  </select>
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="ns-width" class="mb-1.5 block text-[13px]/5 font-medium">Counter width</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="ns-width" name="width" type="number" min="3" max="8" x-model.number="width" aria-describedby="ns-width-unit ns-width-msg"
+                         class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                  <span id="ns-width-unit" class="flex items-center pr-3 text-[14px]/5 text-zinc-600">digits</span>
+                </div>
+                <p id="ns-width-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">Padded with leading zeros. 4 digits runs out at 9,999 orders in a year.</p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="ns-next" class="mb-1.5 block text-[13px]/5 font-medium">Next running number</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="ns-next" name="next" type="number" min="419" x-model.number="next" aria-describedby="ns-next-msg"
+                         class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                </div>
+                <p id="ns-next-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">Cannot be moved below 419. Those numbers are already on paper.</p>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="flex items-start gap-2.5 text-[14px]/5">
+                  <input type="checkbox" name="include_fy" x-model="fy" class="mt-0.5 size-4 shrink-0 rounded accent-zinc-700">
+                  <span>Include the financial year in the number
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">The year the financial year opens in — 2026 for FY 2026–27. The counter restarts at 1 on 01 Apr while this is on.</span>
+                  </span>
+                </label>
+              </div>
+
+            </div>
+
+            <!-- alert's shape: neutral card, colour only in the icon -->
+            <div class="mt-4 flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+              <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+              <div class="min-w-0">
+                <p class="text-[13px]/5 font-medium">Changing a series mid-year cannot be undone</p>
+                <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+                  The 418 orders already issued keep the numbers they were given, so the register will hold two formats for FY 2026–27. Nothing renumbers them and there is no way back to one format short of a data fix.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-4 rounded-lg bg-zinc-50 px-4 py-3">
+              <label class="flex items-start gap-2.5 text-[14px]/5">
+                <input type="checkbox" x-model="ack" class="mt-0.5 size-4 shrink-0 rounded accent-zinc-700">
+                <span class="tabular-nums">I understand the next order will be numbered
+                  <span class="font-mono font-medium" x-text="preview">PO-2026-0419</span>
+                  and that PO-2026-0001 to PO-2026-0418 keep their numbers.
+                </span>
+              </label>
+            </div>
+
+          </form>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <p role="status" class="text-[12px]/4 tabular-nums text-zinc-600">Series last changed 01 Apr 2026, 08:00 by the financial year rollover</p>
+            <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Discard</button>
+              <button type="submit" :disabled="!ack"
+                      class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:border-zinc-300 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
+                Save numbering series
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+</div>

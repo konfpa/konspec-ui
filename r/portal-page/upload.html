@@ -1,0 +1,218 @@
+<!-- An invoice starts from the receipt, not from the order. A supplier who
+     invoices an order invoices what they sent; a receipt is what we actually
+     took in and accepted, and the gap between the two is where every payment
+     dispute in this business starts. Picking the receipt first makes the amount
+     a comparison rather than a guess.
+
+     The mismatch is stated and the submit is not blocked. Refusing the invoice
+     sends the supplier to the telephone and leaves us with no record of what
+     they think they are owed; taking it and holding it puts the disagreement in
+     the system where a buyer can settle it. So the difference is written in
+     rupees, the consequence is written in working days, and the note field
+     beside it is already labelled for the explanation.
+
+     The amount is seeded here at a figure that does not match, because the
+     matching case draws nothing and the interesting half of this screen is what
+     happens when it does not.
+
+     Two lines with x-show and x-cloak rather than one line with bound text: the
+     agreeing case and the disagreeing case say different things in different
+     numbers of sentences, and one string that switches would be a sentence
+     assembled out of fragments in whichever order the template was written.
+
+     The drop zone is attachment's: a real file input hidden with sr-only, the
+     label as its peer so the focus outline lands somewhere visible, both
+     dragover and drop prevented so a missed drop does not navigate away, and
+     the depth counter so the highlight does not flicker as the file crosses the
+     icon. Its idle fill is the one thing that changes, and only because of
+     where it sits. attachment draws the zone standing on the page, so its idle
+     fill is bg-zinc-100; here it is inside a white card, and bg-zinc-100 inside
+     a white surface is the page fill showing through a hole. The band recessed
+     inside white is bg-zinc-50, so the idle and drag fills step up one each and
+     the Choose-a-file button hovers to zinc-100 rather than zinc-200.
+
+     Like the acknowledgement, this is a task rather than a destination, so the
+     header keeps both names and drops the four links. Cancel is the way out and
+     it goes back to the list. -->
+<div data-kui="portal-page/upload" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       expected: 1065600, amount: 1089600, depth: 0,
+       get diff() { return Number(this.amount || 0) - this.expected },
+       money(n) { return '₹' + Math.abs(n).toLocaleString('en-IN') }
+     }">
+  <a href="#pp-up-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
+      <a href="/portal/" class="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-semibold">Konspec Industries</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Supplier portal</span>
+        </span>
+      </a>
+      <div class="ml-auto flex min-w-0 items-center gap-2.5">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">GP</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-medium">Gujarat Polymers Ltd</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Mehul Trivedi</span>
+        </span>
+        <form method="post" action="/portal/sign-out/" class="shrink-0">
+          <button type="submit" class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sign out</button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <main id="pp-up-main" tabindex="-1" class="mx-auto max-w-3xl px-4 py-5">
+    <a href="/portal/orders/" class="inline-flex items-center gap-1.5 rounded text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>All your orders
+    </a>
+
+    <h1 class="mt-2 text-[24px]/7 font-semibold tracking-tight">Send an invoice</h1>
+    <p class="mt-1.5 max-w-2xl text-[14px]/5 text-zinc-600">
+      One invoice against one delivery receipt. The receipt is what we accepted into the plant, so raising the invoice from it is what keeps the two figures the same.
+    </p>
+
+    <form method="post" enctype="multipart/form-data" action="/portal/invoices/" class="mt-4 space-y-4">
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold">Which delivery is this for</h2>
+        </div>
+        <div class="px-5 py-4">
+          <fieldset>
+            <legend class="sr-only">Choose the delivery receipt this invoice is against</legend>
+            <div class="space-y-2">
+              <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&amp;:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+                <input type="radio" name="receipt" value="4821" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                <span class="min-w-0">
+                  <span class="block text-[14px]/5 font-medium tabular-nums">Delivery receipt 4821 · 09 Aug 2026</span>
+                  <span class="mt-0.5 block text-[13px]/5 tabular-nums text-zinc-600">9.000 MT HDPE granules M60075 accepted against PO-2026-0311 · your reference GP/SO/2026/1061</span>
+                  <span class="mt-0.5 block text-[13px]/5 font-medium tabular-nums">Value accepted ₹10,65,600</span>
+                </span>
+              </label>
+              <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&amp;:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+                <input type="radio" name="receipt" value="4796" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                <span class="min-w-0">
+                  <span class="block text-[14px]/5 font-medium tabular-nums">Delivery receipt 4796 · 18 Jul 2026</span>
+                  <span class="mt-0.5 block text-[13px]/5 tabular-nums text-zinc-600">5.000 MT LDPE granules 24FS040 accepted against PO-2026-0288 · your reference GP/SO/2026/0994</span>
+                  <span class="mt-0.5 block text-[13px]/5 font-medium tabular-nums">Value accepted ₹6,21,000</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+          <p class="mt-3 text-[12px]/4 text-zinc-500">
+            Only receipts with no invoice against them are listed. A delivery that has been invoiced already is on the Payments screen.
+          </p>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold">Your invoice</h2>
+        </div>
+        <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+
+          <div class="min-w-0">
+            <label for="pp-up-number" class="mb-1.5 block text-[13px]/5 font-medium">Your invoice number</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="pp-up-number" name="invoice_number" required value="GP/24-25/0418" aria-describedby="pp-up-number-msg"
+                     class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+            <p id="pp-up-number-msg" class="mt-1.5 text-[12px]/4 text-zinc-500">Exactly as it appears on the GST invoice. It is what we quote back on the payment advice.</p>
+          </div>
+
+          <div class="min-w-0">
+            <label for="pp-up-date" class="mb-1.5 block text-[13px]/5 font-medium">Invoice date</label>
+            <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <i data-lucide="calendar" aria-hidden="true" class="ml-3 size-4 shrink-0 self-center text-zinc-500"></i>
+              <input id="pp-up-date" name="invoice_date" type="date" required value="2026-08-21" aria-describedby="pp-up-date-msg"
+                     class="min-w-0 flex-1 bg-transparent px-2 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+            <p id="pp-up-date-msg" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Your 45 days run from 09 Aug 2026, the date we received the material.</p>
+          </div>
+
+          <div class="min-w-0 sm:col-span-2">
+            <label for="pp-up-amount" class="mb-1.5 block text-[13px]/5 font-medium">Invoice value, exclusive of GST</label>
+            <div class="flex max-w-xs items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+              <input id="pp-up-amount" name="amount" required inputmode="decimal" value="1089600" x-model.number="amount"
+                     aria-describedby="pp-up-match"
+                     class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+            </div>
+
+            <!-- the match line, and it is a description rather than an error.
+                 aria-describedby points here from the amount, so the constraint
+                 is read when focus lands rather than only seen beside it. -->
+            <div id="pp-up-match" class="mt-2 max-w-xl rounded-lg border border-zinc-200 bg-white px-3 py-2.5">
+              <p class="text-[13px]/5 tabular-nums text-zinc-600">
+                Delivery receipt 4821 was accepted at <span class="font-medium text-zinc-900">₹10,65,600</span>.
+              </p>
+              <p x-show="diff === 0" x-cloak class="mt-1.5 flex items-start gap-2 text-[13px]/5 text-zinc-700">
+                <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
+                <span class="tabular-nums">Your invoice matches it. It goes straight into the payment run.</span>
+              </p>
+              <p x-show="diff !== 0" x-cloak class="mt-1.5 flex items-start gap-2 text-[13px]/5 text-zinc-700">
+                <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                <span class="tabular-nums">
+                  Your invoice is <span class="font-medium text-zinc-900" x-text="money(diff)">₹24,000</span>
+                  <span x-text="diff > 0 ? 'more than' : 'less than'">more than</span> the receipt. We will still take it, and it goes to Ritu Deshpande to check before it is passed for payment — that usually adds three to five working days. If the difference is a rate change already agreed, say so in the note below and attach the mail.
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div class="min-w-0 sm:col-span-2">
+            <label for="pp-up-note" class="mb-1.5 flex items-baseline gap-2 text-[13px]/5 font-medium">
+              Note for Konspec
+              <span aria-hidden="true" class="font-normal text-zinc-500">Optional</span>
+            </label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <textarea id="pp-up-note" name="note" rows="3"
+                        class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                        placeholder="Rate revision agreed with Ritu on 06 Aug, freight billed separately, anything that explains a difference"></textarea>
+            </div>
+          </div>
+
+          <!-- attachment's drop zone, unchanged -->
+          <div class="min-w-0 sm:col-span-2">
+            <p id="pp-up-files-label" class="mb-1.5 text-[13px]/5 font-medium">The invoice itself</p>
+            <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
+                 class="rounded-lg border border-dashed px-4 py-5 transition"
+                 :class="depth > 0 ? 'border-zinc-700 bg-white' : 'border-zinc-200 bg-zinc-50'">
+              <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
+                <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
+                <span class="text-[13px]/5 text-zinc-600">Drag the PDF here or</span>
+                <input type="file" id="pp-up-files" name="invoice_file" required accept="application/pdf,image/jpeg" aria-describedby="pp-up-files-limit" class="peer sr-only">
+                <label for="pp-up-files"
+                       class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+                  Choose a file
+                </label>
+                <span id="pp-up-files-limit" class="text-[12px]/4 tabular-nums text-zinc-500">PDF or JPG · up to 10 MB · the signed GST invoice</span>
+              </div>
+            </div>
+            <ul aria-labelledby="pp-up-files-label" class="mt-2 space-y-2">
+              <li class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-[13px]/5 font-medium">GP-24-25-0418-konspec.pdf</p>
+                  <p class="text-[12px]/4 tabular-nums text-zinc-500">412 KB · chosen just now</p>
+                </div>
+                <button type="button" aria-label="Remove GP-24-25-0418-konspec.pdf"
+                        class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-red-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="x" class="size-4"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+        <div class="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 bg-zinc-50 px-5 py-3">
+          <a href="/portal/orders/" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</a>
+          <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">Send this invoice</button>
+        </div>
+      </div>
+    </form>
+  </main>
+</div>

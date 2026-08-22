@@ -1,0 +1,290 @@
+<!-- Pairing two records is a claim somebody is accountable for, so the whole
+     interaction is built as one: select on the left, choose from the candidates
+     on the right, press the button that makes the pair. Every step is a real
+     control with a real name, and the sequence works end to end from a keyboard.
+
+     This is deliberately not drag-and-drop. HTML5 drag has no keyboard gesture
+     anybody uses and does not fire on a touch screen at all, and this screen is
+     worked on a tablet by somebody in accounts. Where a project wants drag it is
+     layered over this, calling the same commit and adding nothing of its own —
+     a matching screen whose only move is a drag is not a screen with an
+     accessibility gap, it is a screen half the people who need it cannot use.
+
+     The left list is a listbox with one Tab stop and a roving tabindex, and the
+     arrow handler is bound on the listbox rather than the window: bound globally
+     it eats the caret keys in any field on the page. Nothing focusable goes
+     inside an option — that is list-detail's rule and it is why the candidates
+     are a separate fieldset beside the list rather than controls on the row.
+
+     The candidates are real radios in a fieldset whose legend carries the
+     receipt being matched, so the group announces as the destinations for that
+     receipt. The last option means none of them, because the only way to say
+     none is an option that says so; without it people pick the nearest wrong
+     answer to get the row out of the list.
+
+     Focus after a pair or an unpair has to be put back by hand, and three
+     things have to be right or it fails silently. reveal() focuses and scrolls
+     and schedules nothing — the caller decides, because a tick hidden inside
+     the helper stacks on top of the caller's, and the focus call then lands
+     after Alpine has torn the old row down. Moving the selection is one tick.
+     Pairing is the frame after the tick, because the row is destroyed in one
+     x-for iteration and created in another. And unpairing parks focus in the
+     queue before it touches the arrays, because the Unpair button that was just
+     pressed is the node about to be removed, and a browser resets activeElement
+     to the body when the focused node leaves the tree — restoring afterwards is
+     a race against a teardown that is not on a schedule you control. Every one
+     of the three measures as correct: the element is found, focus() is called,
+     and the keyboard is on the document. The status region carries what focus
+     cannot: what was paired, and how many are left.
+
+     Every pair is reversible until it is posted, which is what makes the claim
+     safe to make. Unpair puts the receipt back at the index it left from and
+     moves focus onto it, because the button that was just pressed no longer
+     exists and focus would otherwise fall to the body — a restore that only
+     deletes the pair and announces that the record is back is a sentence the
+     code does not honour. Posting is reconcile-page/post. -->
+<div data-kui="reconcile-page/match" class="bg-zinc-100 text-zinc-900"
+     x-data="{
+       sel: 0, choice: '', pairs: [], said: '',
+       left: [
+         { id: 'GRN-4771', who: 'Nashik Steel Traders', on: '31 Jul 2026', ref: 'PO-2026-0377', val: 486300, days: 41,
+           cands: [
+             { id: 'INV-2026-1152', on: '30 Jul 2026', val: 486300, why: 'Same vendor · same value · dated one day earlier' },
+             { id: 'INV-2026-1149', on: '29 Jul 2026', val: 243150, why: 'Same vendor · half the value · dated two days earlier' },
+             { id: 'INV-2026-1168', on: '12 Aug 2026', val: 492100, why: 'Same vendor · ₹5,800 more · dated twelve days later' }
+           ] },
+         { id: 'GRN-4794', who: 'Konkan Packaging Co', on: '14 Aug 2026', ref: 'PO-2026-0391', val: 52500, days: 27,
+           cands: [
+             { id: 'INV-2026-1163', on: '16 Aug 2026', val: 56700, why: 'Same vendor · ₹4,200 more · carriage added' },
+             { id: 'INV-2026-1170', on: '21 Aug 2026', val: 52500, why: 'Same vendor · same value · quotes a different order' }
+           ] },
+         { id: 'GRN-4802', who: 'Deccan Fasteners Pvt Ltd', on: '21 Aug 2026', ref: 'PO-2026-0399', val: 95520, days: 20,
+           cands: [
+             { id: 'INV-2026-1174', on: '22 Aug 2026', val: 96000, why: 'Same vendor · ₹480 more · inside tolerance' }
+           ] }
+       ],
+       fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       sgn(n) { return (n > 0 ? '+' : n < 0 ? '−' : '') + '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN') },
+       age(d) { return d > 30 ? 'bg-red-600' : d > 14 ? 'bg-amber-500' : 'bg-zinc-500' },
+       get rec() { return this.left[this.sel] },
+       get gap() { return this.pairs.reduce((s, p) => s + Math.abs(p.diff), 0) },
+       move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.left.length - 1)) },
+       go(i) { this.sel = i; this.choice = ''; this.$nextTick(() => this.reveal()) },
+       reveal() {
+         const el = this.$refs.list && this.$refs.list.querySelector('[aria-selected=true]');
+         if (!el) return;
+         el.focus({ preventScroll: true });
+         el.scrollIntoView({ block: 'nearest' });
+       },
+       open() {
+         this.$nextTick(() => {
+           const r = this.$refs.cands && this.$refs.cands.querySelector('input[type=radio]');
+           r && r.focus();
+         });
+       },
+       pair() {
+         if (!this.choice || this.choice === 'none') return;
+         const r = this.rec, c = r.cands.find(x => x.id === this.choice);
+         this.pairs.push({ grn: r.id, inv: c.id, who: r.who, grnVal: r.val, invVal: c.val, diff: c.val - r.val, rec: r, at: this.sel });
+         this.left.splice(this.sel, 1);
+         this.sel = Math.max(0, Math.min(this.sel, this.left.length - 1));
+         this.choice = '';
+         this.said = r.id + ' paired with ' + c.id + '. ' + this.left.length + ' receipts still unmatched. Nothing has been posted.';
+         this.$nextTick(() => requestAnimationFrame(() => this.reveal()));
+       },
+       unpair(i) {
+         const p = this.pairs[i];
+         this.reveal();
+         this.pairs.splice(i, 1);
+         const at = Math.min(p.at, this.left.length);
+         this.left.splice(at, 0, p.rec);
+         this.sel = at;
+         this.choice = '';
+         this.said = p.grn + ' and ' + p.inv + ' are unpaired. ' + p.grn + ' is back in the queue and ' + this.left.length + ' receipts are unmatched.';
+         this.$nextTick(() => this.reveal());
+       }
+     }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Invoice matching</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">Match by hand</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Match by hand</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">
+        Pick a receipt, choose the invoice it belongs to, and pair them. Nothing is written until the reconciliation is posted, and a pair can be undone until then.
+      </p>
+    </div>
+
+    <div class="grid items-start gap-4 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+
+      <section aria-labelledby="mt-q-h" class="min-w-0 rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="mt-q-h" class="text-[13px]/5 font-semibold">Receipts with no invoice</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="left.length ? (sel + 1) + ' of ' + left.length : '0 left'">1 of 3</p>
+        </div>
+
+        <ul x-ref="list" role="listbox" aria-labelledby="mt-q-h" x-show="left.length"
+            @keydown.arrow-down.prevent="move(1)"
+            @keydown.arrow-up.prevent="move(-1)"
+            @keydown.home.prevent="go(0)"
+            @keydown.end.prevent="go(left.length - 1)"
+            @keydown.enter.prevent="open()"
+            class="max-h-96 divide-y divide-zinc-100 overflow-y-auto overscroll-contain">
+          <template x-for="(r, i) in left" :key="r.id">
+            <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+                @click="go(i)"
+                class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="sel === i && 'bg-zinc-100'">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+                <span class="size-1.5 rounded-full" :class="age(r.days)"></span>
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="flex items-baseline justify-between gap-3">
+                  <span class="text-[13px]/5 font-medium tabular-nums" x-text="r.id"></span>
+                  <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="fmt(r.val)"></span>
+                </span>
+                <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-500">
+                  <span x-text="r.who"></span> · <span x-text="r.on"></span> · waiting <span x-text="r.days"></span> days
+                </span>
+              </span>
+            </li>
+          </template>
+        </ul>
+
+        <!-- empty-state/all-clear, scoped to one pane: the evidence, not the mood -->
+        <div x-show="!left.length" x-cloak class="flex flex-col items-center px-6 py-10 text-center">
+          <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+          </span>
+          <h3 class="mt-3 text-[14px]/5 font-semibold">Every receipt has an invoice against it</h3>
+          <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+            Three pairs made in this session and none of them posted yet.
+          </p>
+        </div>
+      </section>
+
+      <div class="min-w-0 space-y-4">
+
+        <!-- x-if, not x-show. x-show only hides: with the list empty its
+             children still evaluate, and rec is undefined, so the whole
+             component dies on rec.id with nothing on screen to say why. -->
+        <template x-if="left.length">
+        <section aria-labelledby="mt-c-h" class="rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <h2 id="mt-c-h" class="text-[16px]/6 font-semibold">
+              Candidates for <span class="tabular-nums" x-text="rec.id"></span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+              <span x-text="rec.who"></span> · received <span x-text="rec.on"></span> against <span x-text="rec.ref"></span> · <span x-text="fmt(rec.val)"></span>
+            </p>
+          </div>
+
+          <div class="px-4 py-4 lg:px-5">
+            <fieldset x-ref="cands">
+              <legend class="mb-2 text-[13px]/5 font-medium">
+                Which invoice is <span class="tabular-nums" x-text="rec.id"></span>?
+              </legend>
+              <div class="space-y-2">
+                <template x-for="c in rec.cands" :key="c.id">
+                  <label class="flex items-start gap-3 rounded-lg border border-zinc-200 bg-white p-3 hover:bg-zinc-100">
+                    <input type="radio" name="candidate" :value="c.id" x-model="choice"
+                           class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                    <span class="min-w-0 flex-1">
+                      <span class="flex flex-wrap items-baseline justify-between gap-x-3">
+                        <span class="text-[14px]/5 font-medium tabular-nums" x-text="c.id"></span>
+                        <span class="shrink-0 text-[13px]/5 tabular-nums">
+                          <span x-text="fmt(c.val)"></span>
+                          <span class="ml-1.5 text-zinc-500" x-text="c.val === rec.val ? 'exact' : sgn(c.val - rec.val)"></span>
+                        </span>
+                      </span>
+                      <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-600">
+                        dated <span x-text="c.on"></span> · <span x-text="c.why"></span>
+                      </span>
+                    </span>
+                  </label>
+                </template>
+
+                <!-- the only way to mean none is an option that says so -->
+                <label class="flex items-start gap-3 rounded-lg border border-zinc-200 bg-white p-3 hover:bg-zinc-100">
+                  <input type="radio" name="candidate" value="none" x-model="choice"
+                         class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                  <span class="min-w-0 flex-1">
+                    <span class="block text-[14px]/5 font-medium">None of these</span>
+                    <span class="mt-0.5 block text-[12px]/4 text-zinc-600">Leave the receipt unmatched and come back to it. Nothing is recorded.</span>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-3 lg:px-5">
+            <p id="mt-guard" class="text-[12px]/4 tabular-nums text-zinc-600"
+               x-text="!choice ? 'Choose an invoice, or say that none of them is the one.' : choice === 'none' ? 'Nothing to pair. Move to the next receipt with the arrow keys.' : 'Pairing writes nothing yet — it can be undone until the reconciliation is posted.'">
+              Choose an invoice, or say that none of them is the one.
+            </p>
+            <button type="button" aria-describedby="mt-guard"
+                    :aria-disabled="choice &amp;&amp; choice !== 'none' ? 'false' : 'true'"
+                    @click="pair()"
+                    class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
+                    :class="choice &amp;&amp; choice !== 'none' ? '' : 'opacity-60'">
+              <i data-lucide="link" class="size-4"></i>Pair these two
+            </button>
+          </div>
+        </section>
+        </template>
+
+        <section aria-labelledby="mt-p-h" class="rounded-xl border border-zinc-300 bg-white">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <h2 id="mt-p-h" class="text-[16px]/6 font-semibold">Paired, not posted</h2>
+            <p class="text-[12px]/4 tabular-nums text-zinc-600">
+              <span x-text="pairs.length"></span> pairs · <span x-text="fmt(gap)"></span> of variance between them
+            </p>
+          </div>
+
+          <ul role="list" class="divide-y divide-zinc-100" x-show="pairs.length" x-cloak>
+            <template x-for="(p, i) in pairs" :key="p.grn">
+              <li class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 lg:px-5">
+                <span class="min-w-0">
+                  <span class="block text-[13px]/5 font-medium tabular-nums">
+                    <span x-text="p.grn"></span> · <span x-text="p.inv"></span>
+                  </span>
+                  <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">
+                    <span x-text="p.who"></span> · receipt <span x-text="fmt(p.grnVal)"></span> · invoice <span x-text="fmt(p.invVal)"></span> · difference <span x-text="p.diff === 0 ? 'none' : sgn(p.diff)"></span>
+                  </span>
+                </span>
+                <button type="button" @click="unpair(i)"
+                        class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="unlink" class="size-3.5 text-zinc-600"></i>
+                  <span>Unpair <span class="sr-only"><span x-text="p.grn"></span> from <span x-text="p.inv"></span></span></span>
+                </button>
+              </li>
+            </template>
+          </ul>
+
+          <p x-show="!pairs.length" class="px-4 py-6 text-center text-[13px]/5 text-zinc-600 lg:px-5">
+            No pairs made yet in this session.
+          </p>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-3 lg:px-5">
+            <p class="text-[12px]/4 tabular-nums text-zinc-600">
+              Nothing on this screen has been written. Posting is a separate act and it states the figures before it runs.
+            </p>
+            <button type="button" :aria-disabled="pairs.length ? 'false' : 'true'"
+                    class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="pairs.length ? '' : 'text-zinc-400'">
+              <i data-lucide="file-check-2" class="size-4"></i>Review and post
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,255 @@
+<!-- A dashboard is not one query, it is eight, against four systems, answering
+     at four different speeds. Three landed, one is still out and one did not
+     answer. The page is usable in that state, which is the variant.
+
+     Every region reserves its height before it has data — four tiles, five
+     rows, a plot box of h-64, known from the dashboard definition rather than
+     from the query. Regions resolving into boxes that grow on arrival walk the
+     page up and down, and the click aimed at an approval lands on the row under
+     it.
+
+     The retry targets the region, never the page, and this is the one place a
+     composed screen departs from the component it copies. chart/failed writes
+     hx-target="closest [data-kui]", which is right when the card is the whole
+     snippet and catastrophic here: inside a page there is exactly one data-kui
+     and it is the dashboard's, so a chart that did not answer would swap out
+     the four regions that did. Every region gets an id and targets itself.
+
+     A failed region says what still works. "The orders themselves are
+     unaffected" stops a chart outage being escalated as data loss. No
+     role="alert" here: static markup fires it on first paint regardless. -->
+<div data-kui="dashboard/regions" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Procurement</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Friday 21 Aug 2026 · Silvassa, Vapi and Daman · read at 09:12</p>
+    </div>
+
+    <!-- arrived -->
+    <section id="dbr-figures" aria-labelledby="dbr-fig-h">
+      <h2 id="dbr-fig-h" class="sr-only">Figures</h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
+        <a href="/orders/?status=open" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>Open orders</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight tabular-nums">148</dd>
+            <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+              <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+                <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+11
+              </span>
+              <span class="text-zinc-500">vs. July</span>
+            </dd>
+          </dl>
+        </a>
+
+        <a href="/orders/?status=overdue" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>Overdue value</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 flex h-7 items-baseline gap-1">
+              <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+              <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">27.10 L</span>
+            </dd>
+            <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+              <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+                <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+₹4.10 L
+              </span>
+              <span class="text-zinc-500">vs. 12 Aug</span>
+            </dd>
+          </dl>
+        </a>
+
+        <a href="/receipts/?posted=today" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>GRNs posted today</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight tabular-nums">12</dd>
+            <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+              <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+                <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+4
+              </span>
+              <span class="text-zinc-500">vs. same time yesterday</span>
+            </dd>
+          </dl>
+        </a>
+
+        <!-- one tile of the four did not answer, and the strip keeps the other
+             three. An em dash in a box the height of the figure, never a zero:
+             somebody who reads zero QC holds stops checking. -->
+        <div class="rounded-xl border border-zinc-300 bg-white p-4">
+          <dl>
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">QC holds open</dt>
+            <dd class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight text-zinc-400">
+              <span aria-hidden="true">—</span><span class="sr-only">Not read</span>
+            </dd>
+          </dl>
+          <p class="mt-2 flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+            <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600" aria-hidden="true"></i>
+            <span class="tabular-nums">The QC register did not answer. Reference 8f21c4 · 09:12.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid gap-4 xl:grid-cols-3">
+
+      <!-- arrived -->
+      <section id="dbr-approvals" aria-labelledby="dbr-appr-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white xl:col-span-2">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbr-appr-h" class="text-[14px]/5 font-semibold">Waiting on your approval</h2>
+          <a href="/orders/?status=approval" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            All <span class="tabular-nums">9</span><span class="sr-only"> orders waiting on your approval</span>
+          </a>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/orders/PO-2026-0418/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · ₹18,42,000 · with you 3 days</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/orders/PO-2026-0421/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0421</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers Ltd · ₹6,04,500 · with you 2 days</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/orders/PO-2026-0424/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0424</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Deccan Fasteners Pvt Ltd · ₹1,18,400 · with you 1 day</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/orders/PO-2026-0426/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0426</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Konkan Fabricators · ₹94,200 · raised this morning</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/orders/PO-2026-0427/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0427</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Nashik Steel Traders · ₹2,76,000 · raised this morning</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- still out. skeleton/list at this queue's own measurements: five rows
+           of an h-5 line, mt-0.5 and an h-4 line, so the card is the same
+           height loading as loaded. The header is real text — it came from the
+           dashboard definition and was never waiting on the query. -->
+      <section id="dbr-late" aria-labelledby="dbr-late-h" aria-busy="true"
+               hx-get="/dashboard/regions/overdue/" hx-trigger="load" hx-swap="outerHTML"
+               class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbr-late-h" class="flex items-center gap-1.5 text-[14px]/5 font-semibold">
+            <span class="size-1.5 shrink-0 rounded-full bg-zinc-300" aria-hidden="true"></span>Past the promised date
+          </h2>
+          <p role="status" class="sr-only">Loading the orders past their promised date</p>
+        </div>
+        <ul class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none" aria-hidden="true">
+          <li class="px-4 py-2.5">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+          </li>
+          <li class="px-4 py-2.5">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+          </li>
+          <li class="px-4 py-2.5">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+          </li>
+          <li class="px-4 py-2.5">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+          </li>
+          <li class="px-4 py-2.5">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+          </li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="grid gap-4 xl:grid-cols-3">
+
+      <!-- did not answer. chart/failed's card, holding the plot box's own h-64
+           so the row does not change height, and keeping the legend, which is
+           markup describing what this card plots and is still true of a card
+           whose figures never arrived. -->
+      <section id="dbr-plot" aria-labelledby="dbr-plot-h" class="rounded-xl border border-zinc-300 bg-white p-5 xl:col-span-2">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <h2 id="dbr-plot-h" class="text-[14px]/5 font-semibold">Committed value by month</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-500">Three plants · to 21 Aug 2026</p>
+        </div>
+
+        <ul class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+          <li class="flex items-center gap-1.5">
+            <span class="size-2 rounded-full bg-zinc-800" aria-hidden="true"></span>Committed value
+          </li>
+        </ul>
+
+        <div class="mt-4 flex h-64 flex-col items-center justify-center rounded-lg border border-dashed border-zinc-200 px-6 text-center">
+          <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="alert-circle" class="size-4 text-red-600"></i>
+          </span>
+          <p class="mt-3 text-[14px]/5 font-medium">Could not load committed value</p>
+          <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+            The plant ledger did not answer in time. The orders themselves are unaffected — this card is the only thing missing from the page.
+          </p>
+          <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Reference 8f21c4 · 09:12</p>
+          <div class="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+            <button type="button"
+                    hx-get="/dashboard/regions/committed/" hx-target="#dbr-plot" hx-swap="outerHTML"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="rotate-ccw" class="size-3.5 text-zinc-600"></i>Try again<span class="sr-only"> loading committed value by month</span>
+            </button>
+            <a href="/orders/?plant=silvassa"
+               class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the order register</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- arrived -->
+      <section id="dbr-uninspected" aria-labelledby="dbr-uninsp-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbr-uninsp-h" class="text-[14px]/5 font-semibold">Arrived today, not inspected</h2>
+          <a href="/receipts/?qc=pending" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            All <span class="tabular-nums">5</span><span class="sr-only"> receipts awaiting inspection</span>
+          </a>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/receipts/GRN-4821/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers Ltd · 12,000 kg · in at 07:40</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/receipts/GRN-4824/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4824</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · 4.2 MT · in at 08:15</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/receipts/GRN-4826/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4826</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Deccan Fasteners Pvt Ltd · 8,400 nos · in at 08:52</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </main>
+</div>

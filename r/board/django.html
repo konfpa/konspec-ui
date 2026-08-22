@@ -1,0 +1,106 @@
+<!-- The columns come from the stage list and the rows are bucketed into them in
+     the view, because regroup only groups the rows it was given: a stage with
+     nothing in it produces no group, and that column is the one being aimed at.
+
+     # views.py — every slug in STAGES gets a bucket, empty or not.
+     buckets = {slug: [] for slug, _ in STAGES}
+     for o in Order.objects.filter(plant=plant).select_related('vendor', 'owner'):
+         buckets[o.stage].append(o)
+     columns = [{'slug': s, 'name': n, 'orders': buckets[s],
+                 'value': sum(o.value for o in buckets[s])} for s, n in STAGES]
+
+     The move is a real form post, so the board works with htmx switched off.
+     Both columns come back from one response: the source is the target and the
+     destination arrives beside it under hx-swap-oob, because its count and its
+     value changed too, and a board with one of them updated carries a wrong
+     figure until the next full load.
+
+     The stable id on the move control is what puts focus back — htmx restores
+     focus after a swap to the element that had it. There is no hx-disabled-elt
+     on it: disabling the control just pressed drops focus to the body, the
+     defect form-page names on Save. The status region sits outside both columns
+     and survives the swap, and humanize has to be loaded in this same file or
+     intcomma raises. -->
+{% load humanize %}
+<main data-kui="board/django" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+
+  <p id="dj-said" role="status" class="sr-only">{{ move_message|default:"" }}</p>
+
+  <div class="shrink-0 border-b border-zinc-300 bg-white px-4 py-3">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Order approvals</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">{{ plant.name }} · FY 2026–27 · {{ orders|length }} orders</p>
+  </div>
+
+  <div class="flex min-h-0 flex-1 snap-x snap-mandatory gap-3 overflow-x-auto p-3">
+    {% for column in columns %}
+      <section id="dj-col-{{ column.slug }}" aria-labelledby="dj-h-{{ column.slug }}"
+               class="relative flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+        <div class="shrink-0 border-b border-zinc-200 px-3 py-2.5">
+          <div class="flex items-baseline justify-between gap-2">
+            <h2 id="dj-h-{{ column.slug }}" class="truncate text-[13px]/5 font-medium">{{ column.name }}</h2>
+            <p class="shrink-0 text-[13px]/5 font-semibold tabular-nums">₹{{ column.value|intcomma }}</p>
+          </div>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ column.orders|length }} orders</p>
+        </div>
+
+        <ul role="list" class="min-h-0 flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-2">
+          {% for order in column.orders %}
+            <li class="rounded-lg border border-zinc-200 bg-white p-2.5" x-data="{ open: false }">
+
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <a href="{{ order.get_absolute_url }}" class="text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ order.number }}</a>
+                  <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">{{ order.vendor.name }}</p>
+                </div>
+                <button type="button" id="dj-move-{{ order.pk }}" @click="open = !open" :aria-expanded="open"
+                        aria-label="Move {{ order.number }}, now in {{ column.name }}"
+                        class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="arrow-right-left" class="size-4"></i>
+                </button>
+              </div>
+
+              <div class="mt-2 flex items-center justify-between gap-2">
+                <span class="text-[13px]/5 font-medium tabular-nums">₹{{ order.value|intcomma }}</span>
+                <span class="flex shrink-0 items-center gap-1.5">
+                  <span class="text-[12px]/4 tabular-nums text-zinc-500">{{ order.days_at_stage }}d here</span>
+                  <span aria-hidden="true" class="flex size-5 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">{{ order.owner.initials }}</span>
+                  <span class="sr-only">Owner {{ order.owner.get_full_name }}</span>
+                </span>
+              </div>
+
+              {% comment %}
+                One form per card. The buttons inside it are the destinations and
+                the stage travels as the submit button's own value, so no hidden
+                field can get out of step with the label beside it. A multi-line
+                {# #} would render the rest of itself onto the page — tag_re has
+                no DOTALL — so every comment in this file is a comment block.
+              {% endcomment %}
+              <form method="post" action="{% url 'approvals:move' order.pk %}"
+                    hx-post="{% url 'approvals:move' order.pk %}"
+                    hx-target="#dj-col-{{ column.slug }}" hx-swap="outerHTML"
+                    x-show="open" x-cloak class="mt-2.5 border-t border-zinc-100 pt-2.5"
+                    @keydown.escape.stop="open = false; $nextTick(() => document.getElementById('dj-move-{{ order.pk }}').focus())">
+                {% csrf_token %}
+                <p class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Move to</p>
+                <div role="group" aria-label="Move {{ order.number }} to" class="mt-1.5 space-y-1">
+                  {% for stage in stages %}
+                    {% if stage.slug != column.slug %}
+                      <button type="submit" name="stage" value="{{ stage.slug }}"
+                              class="flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 text-left text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                        <span class="truncate">{{ stage.name }}</span>
+                        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">{{ stage.count }}</span>
+                      </button>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </form>
+            </li>
+          {% empty %}
+            <li class="px-2 py-6 text-center text-[12px]/4 text-zinc-500">Nothing at this stage</li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+  </div>
+</main>

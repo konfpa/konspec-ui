@@ -1,0 +1,238 @@
+<!-- Two kinds of correction and the screen has to be honest about which one it
+     offers.
+
+     A value translation is fixable here, and it is the only thing that is. Kgs
+     means KG for this vendor — that is a fact about the vendor rather than
+     about row 418, it repairs all fourteen rows at once, and it is worth
+     storing, because next month the same sheet arrives from the same people
+     with the same word in it. A rule the user teaches once is a rule that stops
+     costing them.
+
+     A cell whose contents are simply mistyped is fixable here too, and only
+     because there are two of them. Past a handful this stops being an edit and
+     starts being data entry into a copy of a file, which is the thing this
+     screen must not turn into.
+
+     Everything structural goes back to the spreadsheet, and the screen says so
+     rather than offering a control that cannot work. Nothing here can decide
+     which of two rates for ITM-4471 is the real one, and nothing here can
+     invent a vendor with a GSTIN and a bank account. Editing those in place
+     would mean the staged copy no longer matches the file the vendor sent, and
+     next month the same file arrives with the same nine duplicates in it.
+
+     The other answer — send them back to Excel for all 37 — is defensible and
+     this is not a criticism of it. It keeps one source of truth and it is
+     simpler to build. It loses on one case: a 1,240-row file with one typo in
+     it costs the user the whole upload and the whole mapping again. What makes
+     both answers work is that a corrected file resumes at the review stage with
+     this mapping already applied, so going back is a re-upload and not a
+     restart.
+
+     Re-validate runs the whole staged file, not the rows that were touched. A
+     fix that repairs fourteen rows and reports the one on screen is a fix
+     nobody believes, and the counts are what the user is actually here for. The
+     new figures are written into a role="status" that was already on the page.
+
+     The mapping selects carry an aria-label naming the value they translate,
+     because a column of five boxes all labelled Unit of measure is five
+     controls nobody can tell apart. -->
+<div data-kui="import-page/fix" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ done: false }">
+
+  <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Master data</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Items</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">Import</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Import items</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">gujarat-polymers-rate-card-aug.xlsx · 1,240 rows · 16 of the 37 problems can be fixed here</p>
+    </div>
+
+    <!-- the count that everything on this screen changes. In the document from
+         first paint with its figures already in it, so re-validating rewrites a
+         region that exists rather than creating one that announces nothing. -->
+    <div role="status" class="mt-5 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <p class="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[13px]/5 font-medium tabular-nums">
+        <span x-text="done ? '1,217 of 1,240 rows will post' : '1,203 of 1,240 rows will post'">1,203 of 1,240 rows will post</span>
+        <span class="text-[12px]/4 font-normal text-zinc-600" x-text="done ? '23 still will not — 21 of them need the sheet' : '37 will not'">37 will not</span>
+      </p>
+      <p x-show="done" x-cloak class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+        Re-validated against all 1,240 rows at 11:41. The unit translation repaired 13 rows and one of the two rate cells. Rolls and &quot;on request&quot; are still out, on purpose.
+      </p>
+    </div>
+
+    <div class="mt-4 space-y-4">
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 tabindex="-1" class="text-[16px]/6 font-semibold focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Translate the units this file uses</h2>
+          <p class="mt-0.5 max-w-[70ch] text-[12px]/4 text-zinc-600">
+            Stored against Gujarat Polymers Ltd, so next month's file converts on its own. It changes what this import reads, never what the file says.
+          </p>
+        </div>
+
+        <table class="w-full text-[13px]/5">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-5 py-2 font-medium">In the file</th>
+              <th scope="col" class="w-52 px-5 py-2 font-medium">Means</th>
+              <th scope="col" class="px-5 py-2 text-right font-medium">Rows</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left align-middle font-medium">&quot;Kgs&quot;</th>
+              <td class="px-5 py-2.5">
+                <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select aria-label="What Kgs means in the item master"
+                          class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                    <option value="">Leave these rows failing</option>
+                    <option value="KG" selected>KG — kilogram</option>
+                    <option value="MT">MT — metric tonne</option>
+                    <option value="NOS">NOS — number</option>
+                    <option value="LTR">LTR — litre</option>
+                    <option value="MTR">MTR — metre</option>
+                  </select>
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600"><i data-lucide="chevron-down" class="size-3.5"></i></span>
+                </div>
+              </td>
+              <td class="px-5 py-2.5 text-right align-middle tabular-nums text-zinc-600">11</td>
+            </tr>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left align-middle font-medium">&quot;kgs&quot;</th>
+              <td class="px-5 py-2.5">
+                <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select aria-label="What kgs means in the item master"
+                          class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                    <option value="">Leave these rows failing</option>
+                    <option value="KG" selected>KG — kilogram</option>
+                    <option value="MT">MT — metric tonne</option>
+                    <option value="NOS">NOS — number</option>
+                    <option value="LTR">LTR — litre</option>
+                    <option value="MTR">MTR — metre</option>
+                  </select>
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600"><i data-lucide="chevron-down" class="size-3.5"></i></span>
+                </div>
+              </td>
+              <td class="px-5 py-2.5 text-right align-middle tabular-nums text-zinc-600">2</td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-5 py-2.5 text-left align-middle font-medium">&quot;Rolls&quot;</th>
+              <td class="px-5 py-2.5">
+                <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select aria-label="What Rolls means in the item master"
+                          class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                    <option value="" selected>Leave these rows failing</option>
+                    <option value="KG">KG — kilogram</option>
+                    <option value="MT">MT — metric tonne</option>
+                    <option value="NOS">NOS — number</option>
+                    <option value="LTR">LTR — litre</option>
+                    <option value="MTR">MTR — metre</option>
+                  </select>
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600"><i data-lucide="chevron-down" class="size-3.5"></i></span>
+                </div>
+              </td>
+              <td class="px-5 py-2.5 text-right align-middle tabular-nums text-zinc-600">1</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="border-t border-zinc-200 bg-zinc-50 px-5 py-2.5">
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">
+            Rolls is left failing on purpose. A roll of tape is not a unit the stock ledger can weigh or count against a purchase order, so the answer is a new unit in the master or a different item — not a translation invented here.
+          </p>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold">Correct the two rate cells</h2>
+          <p class="mt-0.5 max-w-[70ch] text-[12px]/4 text-zinc-600">
+            Typed into this run only. The sheet on the shared drive is unchanged, so anybody who opens it later still sees what the vendor sent.
+          </p>
+        </div>
+        <div class="divide-y divide-zinc-100">
+          <div class="flex flex-wrap items-end gap-x-4 gap-y-2 px-5 py-3">
+            <div class="min-w-0 flex-1">
+              <label for="fx-1187" class="mb-1.5 block text-[13px]/5 font-medium tabular-nums">Row 1,187 · ITM-7701 · rate</label>
+              <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+                <input id="fx-1187" inputmode="decimal" value="118.40" aria-describedby="fx-1187-msg"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+              </div>
+              <p id="fx-1187-msg" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">The file holds &quot;₹118.40/kg&quot;. Digits and one decimal point.</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-end gap-x-4 gap-y-2 px-5 py-3">
+            <div class="min-w-0 flex-1">
+              <label for="fx-1194" class="mb-1.5 block text-[13px]/5 font-medium tabular-nums">Row 1,194 · ITM-7708 · rate</label>
+              <div class="flex items-stretch rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+                <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+                <input id="fx-1194" inputmode="decimal" value="" aria-invalid="true" aria-describedby="fx-1194-msg"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+              </div>
+              <p id="fx-1194-msg" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-red-600">
+                <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+                The file holds &quot;on request&quot;. There is no rate to guess at — leave this blank and the row stays out.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold tabular-nums">21 rows this screen cannot fix</h2>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="flex items-start gap-3 px-5 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="copy" class="size-4 text-zinc-600"></i></span>
+            <p class="text-[13px]/5 tabular-nums text-zinc-700">
+              <span class="font-medium text-zinc-900">9 duplicate item codes.</span>
+              Nothing here can decide whether ITM-4471 is ₹118.40 or ₹121.00. Delete one of the two rows in the sheet.
+            </p>
+          </li>
+          <li class="flex items-start gap-3 px-5 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="calendar" class="size-4 text-zinc-600"></i></span>
+            <p class="text-[13px]/5 tabular-nums text-zinc-700">
+              <span class="font-medium text-zinc-900">7 dates stored as numbers.</span>
+              Format the column as a date and save. Typing seven dates here fixes this file and not the next one.
+            </p>
+          </li>
+          <li class="flex items-start gap-3 px-5 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="building-2" class="size-4 text-zinc-600"></i></span>
+            <p class="text-[13px]/5 tabular-nums text-zinc-700">
+              <span class="font-medium text-zinc-900">5 rows against VEN-0311.</span>
+              An import never creates a vendor. Onboard Deccan Fasteners Pvt Ltd, then run this file again.
+            </p>
+          </li>
+        </ul>
+        <div class="flex flex-wrap items-center gap-3 border-t border-zinc-200 bg-zinc-50 px-5 py-3">
+          <a href="#" class="inline-flex h-8 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="download" class="size-3.5 text-zinc-600"></i>Download the 21 rows as XLSX
+          </a>
+          <p class="min-w-[16rem] flex-1 text-[12px]/4 tabular-nums text-zinc-600">
+            Correct them in the sheet and upload the file again. The mapping you set is remembered against this vendor, so a second upload starts at the review stage.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <p class="min-w-[14rem] flex-1 text-[12px]/4 tabular-nums text-zinc-600">Nothing has been written to the item master. These corrections apply to this run only.</p>
+      <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+        <button type="button" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>Back to the problems
+        </button>
+        <button type="button" @click="done = true"
+                class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-cw" class="size-4"></i>Re-validate all 1,240 rows
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,212 @@
+<!-- The rule made visible on three lines that differ only in how far out they
+     are. It is printed at the top in figures rather than described, because a
+     tolerance nobody can quote is a tolerance every buyer remembers differently.
+
+     The three verdicts wear the locked dots — emerald-600 finished, amber-500
+     waiting on someone, red-600 the alarm state — which is Closed, Approved and
+     Overdue read under different words. There is no fourth colour and no tinted
+     panel behind any of them.
+
+     The blocked line offers no control at all, and that is the decision this
+     variant exists to record. No reason makes a rate above the contract rate
+     postable; what it needs is a credit note from the vendor or an amendment to
+     the order, and neither is done from this screen. A reason box there invites
+     somebody to type a sentence and press a button that then refuses, and the
+     refusal arrives after the work.
+
+     The post button is aria-disabled and never disabled. disabled drops the one
+     control somebody is hunting for out of the tab order with nothing attached
+     to say why, and the browser moves focus off it to the body. It stays
+     focusable, aria-describedby points at the sentence that names what is
+     holding it, and the handler returns early so the press is real.
+
+     The reason field is field's shape and nothing hand-rolled: label, bordered
+     wrapper drawing one outline, one message paragraph whose id never changes,
+     and the free-text box appearing only for the answer that needs it. -->
+<div data-kui="reconcile-page/tolerance" class="bg-zinc-100 text-zinc-900"
+     x-data="{ reason: '', other: '' }">
+
+  <main class="mx-auto max-w-5xl space-y-4 p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Invoice matching</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium tabular-nums text-zinc-900">INV-2026-1184</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Variances against tolerance</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · 3 of 16 lines carry a variance · Silvassa</p>
+    </div>
+
+    <!-- the rule, in figures, before the lines it is applied to -->
+    <div class="rounded-xl border border-zinc-300 bg-white px-4 py-3.5 lg:px-5">
+      <h2 class="text-[13px]/5 font-semibold">The tolerance in force on this vendor</h2>
+      <dl class="mt-2.5 grid gap-x-8 gap-y-2 text-[13px]/5 sm:grid-cols-3">
+        <div class="min-w-0">
+          <dt class="text-zinc-600">Quantity</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">± 0.5% of the ordered quantity</dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-zinc-600">Value</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">± ₹2,000 on a line</dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-zinc-600">Rate</dt>
+          <dd class="mt-0.5 font-medium">None. A rate above the contract cannot post.</dd>
+        </div>
+      </dl>
+      <p class="mt-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+        Set on the rate contract with Sharma Steel &amp; Alloys, effective 01 Apr 2026. Changing it is a master data change, not a decision on this invoice.
+      </p>
+    </div>
+
+    <section aria-labelledby="tl-lines-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <h2 id="tl-lines-h" class="text-[16px]/6 font-semibold">What each line needs</h2>
+      </div>
+
+      <div class="divide-y divide-zinc-100">
+
+        <!-- inside tolerance: nothing to do, and no control offered -->
+        <div class="px-4 py-4 lg:px-5">
+          <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+            <div class="min-w-0">
+              <h3 class="text-[13px]/5 font-medium">M12 hex bolt — 8.8 zinc</h3>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">PO-2026-0418 line 4 · GRN-4821</p>
+            </div>
+            <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>In tolerance
+            </span>
+          </div>
+          <dl class="mt-2.5 flex flex-wrap gap-x-8 gap-y-2 text-[13px]/5">
+            <div>
+              <dt class="text-[12px]/4 text-zinc-600">Received</dt>
+              <dd class="mt-0.5 tabular-nums">3,980 nos</dd>
+            </div>
+            <div>
+              <dt class="text-[12px]/4 text-zinc-600">Invoiced</dt>
+              <dd class="mt-0.5 tabular-nums">4,000 nos</dd>
+            </div>
+            <div>
+              <dt class="text-[12px]/4 text-zinc-600">Difference</dt>
+              <dd class="mt-0.5 font-medium tabular-nums">+20 nos · +₹480</dd>
+            </div>
+          </dl>
+          <p class="mt-2.5 text-[12px]/4 tabular-nums text-zinc-600">
+            0.5% of 4,000 is 20, so this is exactly at the limit and inside it. It posts with the invoice and nothing is written to say it happened.
+          </p>
+        </div>
+
+        <!-- outside tolerance: postable, but only with a reason on the record -->
+        <div class="px-4 py-4 lg:px-5">
+          <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+            <div class="min-w-0">
+              <h3 class="text-[13px]/5 font-medium">Carriage to Silvassa</h3>
+              <p class="mt-0.5 text-[12px]/4 text-zinc-500">No order line behind it</p>
+            </div>
+            <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Needs a reason
+            </span>
+          </div>
+          <dl class="mt-2.5 flex flex-wrap gap-x-8 gap-y-2 text-[13px]/5">
+            <div>
+              <dt class="text-[12px]/4 text-zinc-600">Received</dt>
+              <dd class="mt-0.5 tabular-nums text-zinc-500">—</dd>
+            </div>
+            <div>
+              <dt class="text-[12px]/4 text-zinc-600">Invoiced</dt>
+              <dd class="mt-0.5 tabular-nums">₹4,200</dd>
+            </div>
+            <div>
+              <dt class="text-[12px]/4 text-zinc-600">Difference</dt>
+              <dd class="mt-0.5 font-medium tabular-nums">+₹4,200 against a ₹2,000 limit</dd>
+            </div>
+          </dl>
+
+          <div class="mt-3 max-w-md">
+            <label for="tl-reason" class="mb-1.5 block text-[13px]/5 font-medium">Reason this posts anyway</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select id="tl-reason" name="reason" required x-model="reason" aria-describedby="tl-reason-msg"
+                      class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                <option value="">Choose a reason</option>
+                <option value="agreed">Carriage agreed by phone with the vendor</option>
+                <option value="contract">Carriage is billable under the rate contract</option>
+                <option value="urgent">Urgent despatch arranged by the plant</option>
+                <option value="other">Other — describe it below</option>
+              </select>
+            </div>
+            <p id="tl-reason-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+              Written to the invoice, printed on the working, and read by audit against the ₹4,200.
+            </p>
+          </div>
+
+          <div class="mt-3 max-w-md" x-show="reason === 'other'" x-cloak>
+            <label for="tl-other" class="mb-1.5 block text-[13px]/5 font-medium">Describe it</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <textarea id="tl-other" name="reason_other" rows="2" x-model="other" aria-describedby="tl-other-msg"
+                        class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                        placeholder="Who agreed it, when, and on what authority"></textarea>
+            </div>
+            <p id="tl-other-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">One sentence. It is the whole record of why ₹4,200 was paid.</p>
+          </div>
+        </div>
+
+        <!-- past arguing about: no control, because no reason makes it postable -->
+        <div class="px-4 py-4 lg:px-5">
+          <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+            <div class="min-w-0">
+              <h3 class="text-[13px]/5 font-medium">MS angle 50×50×6</h3>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">PO-2026-0418 line 2 · GRN-4821</p>
+            </div>
+            <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Blocked
+            </span>
+          </div>
+          <dl class="mt-2.5 flex flex-wrap gap-x-8 gap-y-2 text-[13px]/5">
+            <div>
+              <dt class="text-[12px]/4 text-zinc-600">Contract rate</dt>
+              <dd class="mt-0.5 tabular-nums">₹62.40 a kg</dd>
+            </div>
+            <div>
+              <dt class="text-[12px]/4 text-zinc-600">Invoiced rate</dt>
+              <dd class="mt-0.5 tabular-nums">₹64.00 a kg</dd>
+            </div>
+            <div>
+              <dt class="text-[12px]/4 text-zinc-600">Difference</dt>
+              <dd class="mt-0.5 font-medium tabular-nums">+₹1.60 a kg on 11,940 kg · +₹19,104</dd>
+            </div>
+          </dl>
+
+          <!-- alert's shape: neutral body, colour only in the icon, one action -->
+          <div class="mt-3 flex flex-wrap items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 font-medium">There is no reason that makes this postable.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+                Rate carries no tolerance. Either Sharma Steel &amp; Alloys issue a credit note for ₹19,104, or the contract rate on PO-2026-0418 is amended and the invoice is matched again. Neither is done from this screen.
+              </p>
+            </div>
+            <a href="#" class="shrink-0 text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Raise a debit note
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-3 lg:px-5">
+        <p id="tl-guard" class="text-[12px]/4 tabular-nums text-zinc-600"
+           x-text="reason ? '13 lines will post for ₹59,41,636. 1 line posts with a reason. 1 line is held back for ₹19,104.' : 'Carriage to Silvassa needs a reason before this invoice can post.'">
+          Carriage to Silvassa needs a reason before this invoice can post.
+        </p>
+        <button type="button" aria-describedby="tl-guard" :aria-disabled="reason ? 'false' : 'true'"
+                @click="if (!reason) return"
+                class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
+                :class="reason ? '' : 'opacity-60'">
+          <i data-lucide="file-check-2" class="size-4"></i>Review and post
+        </button>
+      </div>
+    </section>
+  </main>
+</div>

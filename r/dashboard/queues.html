@@ -1,0 +1,169 @@
+<!-- The working half on its own, and the half that decides whether anybody
+     comes back to this screen. Three queues, three different questions: what is
+     with you, what is late, and what came in this morning that nobody has
+     looked at.
+
+     A queue is a card with a count in its header, at most five rows, and a link
+     to the register holding the rest. A queue that has grown a sixth row will
+     grow a sort control next, and that is index-page.
+
+     Every row is one stretched anchor, from table/linked-rows: after:absolute
+     after:inset-0 against a relative <li>, so the whole row is the target, the
+     URL is copyable and middle-click opens a tab. Nothing else in the row is
+     focusable, so Tab walks a queue one record at a time rather than three
+     times per row.
+
+     Each row says why it is in this queue, not only what it is. "with you 3
+     days", "21 days late", "in at 07:40" is the fact that makes the row
+     actionable; the vendor and the figure are how it is recognised. A queue of
+     document numbers with no reason attached is a register with its useful
+     column removed. -->
+<div data-kui="dashboard/queues" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Your queues</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Friday 21 Aug 2026 · Silvassa, Vapi and Daman · read at 09:12</p>
+    </div>
+
+    <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+
+      <section aria-labelledby="dbq-appr-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbq-appr-h" class="flex items-center gap-1.5 text-[14px]/5 font-semibold">
+            <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Waiting on your approval
+          </h2>
+          <a href="/orders/?status=approval" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            All <span class="tabular-nums">9</span><span class="sr-only"> orders waiting on your approval</span>
+          </a>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0418/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹18,42,000</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · with you 3 days</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0421/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0421</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹6,04,500</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers Ltd · with you 2 days</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0424/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0424</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,18,400</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Deccan Fasteners Pvt Ltd · with you 1 day</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0426/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0426</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹94,200</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Konkan Fabricators · raised this morning</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0427/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0427</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹2,76,000</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Nashik Steel Traders · raised this morning</p>
+            </div>
+          </li>
+        </ul>
+        <div class="border-t border-zinc-200 px-4 py-2.5">
+          <p class="text-[12px]/4 tabular-nums text-zinc-500">5 of 9 shown · oldest raised 18 Aug</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="dbq-late-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbq-late-h" class="flex items-center gap-1.5 text-[14px]/5 font-semibold">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Past the promised date
+          </h2>
+          <a href="/orders/?status=overdue" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            All <span class="tabular-nums">12</span><span class="sr-only"> orders past the promised date</span>
+          </a>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0311/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0311</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">21 days</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Nashik Steel Traders · ₹9,04,000 · promised 31 Jul</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0348/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0348</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">14 days</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · ₹4,82,000 · promised 07 Aug</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0362/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0362</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">9 days</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers Ltd · ₹1,18,400 · promised 12 Aug</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0370/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0370</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">6 days</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Deccan Fasteners Pvt Ltd · ₹62,900 · promised 15 Aug</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/orders/PO-2026-0384/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0384</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">2 days</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Konkan Fabricators · ₹3,41,600 · promised 19 Aug</p>
+            </div>
+          </li>
+        </ul>
+        <div class="border-t border-zinc-200 px-4 py-2.5">
+          <p class="text-[12px]/4 tabular-nums text-zinc-500">5 of 12 shown · ₹27,10,000 overdue in total</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="dbq-uninsp-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white lg:col-span-2 xl:col-span-1">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbq-uninsp-h" class="text-[14px]/5 font-semibold">Arrived today, not inspected</h2>
+          <a href="/receipts/?qc=pending&amp;on=today" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            All <span class="tabular-nums">5</span><span class="sr-only"> receipts awaiting inspection</span>
+          </a>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/receipts/GRN-4821/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">12,000 kg</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers Ltd · HDPE granules · in at 07:40</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/receipts/GRN-4824/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4824</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">4.2 MT</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · MS plate 8mm · in at 08:15</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/receipts/GRN-4826/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4826</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">8,400 nos</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Deccan Fasteners Pvt Ltd · M12 hex bolts · in at 08:52</p>
+            </div>
+          </li>
+        </ul>
+        <div class="border-t border-zinc-200 px-4 py-2.5">
+          <p class="text-[12px]/4 tabular-nums text-zinc-500">3 of 5 shown · 2 more at the Vapi gate</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,119 @@
+<!-- max-w-[1600px] is the register cap and it is an arbitrary value on purpose:
+     Tailwind's own scale stops at max-w-7xl, 1280px, which is narrower than a
+     fourteen-column ledger wants and would leave 300px of empty page beside a
+     table that is already truncating vendor names. 1600px is where the registry
+     settled, and it is the value app-shell's own main column writes.
+
+     The gutter does not shrink to make room. There are two gutter values in
+     this library, 16px and 24px, and a register gets the same ones a form does;
+     what gives on a narrow screen is the number of columns, at md, and not the
+     space beside them. A register that clawed back eight pixels a side by
+     dropping to px-2 would have bought a third of one column and put the first
+     figure hard against the panel edge.
+
+     The table is table/responsive as that entry writes it: two renderings of
+     the same records, the table hidden below md and the cards hidden above it.
+     Not a table in a horizontal scroller, and not a table with three columns
+     hidden on a phone — the first is unusable with a thumb and the second takes
+     data away from the person least able to go and look it up.
+
+     Both renderings are in the DOM at once. Give either of them a form control
+     with a name and it posts even while display:none, so the same record is
+     submitted twice. -->
+<div data-kui="container/wide" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <main>
+
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto flex max-w-[1600px] flex-wrap items-start justify-between gap-x-6 gap-y-3 px-4 py-4 lg:px-6">
+        <div class="min-w-0">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight">Goods receipts</h1>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Silvassa · FY 2026–27 · 412 receipts</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+        <table class="hidden w-full text-[13px]/5 md:table">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-4 py-2.5 font-medium">GRN</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Against</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Quantity</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Value</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5 font-medium tabular-nums">GRN-4821</td>
+              <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
+              <td class="px-4 py-2.5 tabular-nums text-zinc-600">PO-2026-0418</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">18.400 MT</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹12,45,000</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">04 Sep 2026</td>
+            </tr>
+            <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+              <td class="px-4 py-2.5 font-medium tabular-nums">GRN-4824</td>
+              <td class="px-4 py-2.5">Sharma Steel &amp; Alloys</td>
+              <td class="px-4 py-2.5 tabular-nums text-zinc-600">PO-2026-0421</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">6.250 MT</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹4,86,200</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">06 Sep 2026</td>
+            </tr>
+            <tr class="hover:bg-zinc-100">
+              <td class="px-4 py-2.5 font-medium tabular-nums">GRN-4829</td>
+              <td class="px-4 py-2.5">Deccan Fasteners Pvt Ltd</td>
+              <td class="px-4 py-2.5 tabular-nums text-zinc-600">PO-2026-0427</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">4,800 nos</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹96,750</td>
+              <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">09 Sep 2026</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <ul class="divide-y divide-zinc-100 md:hidden">
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="font-medium tabular-nums">GRN-4821</span>
+              <span class="text-[13px]/5 tabular-nums whitespace-nowrap">₹12,45,000</span>
+            </div>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · PO-2026-0418</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">18.400 MT · received 04 Sep 2026</p>
+          </li>
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="font-medium tabular-nums">GRN-4824</span>
+              <span class="text-[13px]/5 tabular-nums whitespace-nowrap">₹4,86,200</span>
+            </div>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Sharma Steel &amp; Alloys · PO-2026-0421</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6.250 MT · received 06 Sep 2026</p>
+          </li>
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="font-medium tabular-nums">GRN-4829</span>
+              <span class="text-[13px]/5 tabular-nums whitespace-nowrap">₹96,750</span>
+            </div>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Deccan Fasteners Pvt Ltd · PO-2026-0427</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4,800 nos · received 09 Sep 2026</p>
+          </li>
+        </ul>
+
+      </div>
+
+      <p class="text-[12px]/4 text-zinc-500">
+        <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">max-w-[1600px]</code>
+        because Tailwind's scale stops at 1280px. The gutter stays 16px and 24px whatever the table does.
+      </p>
+
+    </div>
+  </main>
+</div>

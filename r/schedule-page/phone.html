@@ -1,0 +1,191 @@
+<!-- A month grid of blocks at 390px is fifty-six cells forty pixels wide, and
+     the honest answer is not a narrower block but a different arrangement: one
+     day, in order, as a list. The geometry is abandoned rather than shrunk,
+     which is the same call board makes when its columns become a select.
+
+     Once the time axis is gone the facts it carried have to be written out. The
+     start time is a gutter down the left so the column of them is scannable,
+     the duration is on the row, and the gaps are sentences — "2 h 30 free" is
+     what the empty space was saying on the desktop lane, and empty space says
+     nothing on a list.
+
+     The day is a select with the counts in the option labels, written out
+     rather than looped: x-model runs on the select before an x-for inside it
+     has filled it, so the binding would set a value with no option behind it.
+     board hit that and this is the same control.
+
+     Everything is 44px or more under a thumb. This is read on the gate office
+     phone by somebody with one hand on a clipboard.
+
+     The rail from the day view comes last rather than being dropped. Four
+     orders promised today with no slot booked is the fact that decides whether
+     the morning is quiet, and it is the first thing that gets cut for width. -->
+<main data-kui="schedule-page/phone" class="mx-auto flex h-[640px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+      x-data="{ day: 'tue' }">
+
+  <div class="shrink-0 border-b border-zinc-300 bg-white px-3 py-3">
+    <h1 class="text-[16px]/6 font-semibold">Gate bookings</h1>
+    <p role="status" class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Silvassa · 5 booked · 4 with no slot</p>
+
+    <div class="mt-2.5 flex items-stretch gap-2">
+      <button type="button" aria-label="Previous day"
+              class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+      <div class="min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <label for="sph-day" class="sr-only">Day</label>
+        <select id="sph-day" x-model="day" class="h-11 w-full bg-transparent px-3 text-[14px]/5 font-medium tabular-nums outline-none">
+          <option value="mon">Mon 17 Aug (2)</option>
+          <option value="tue">Tue 18 Aug (5)</option>
+          <option value="wed">Wed 19 Aug (3)</option>
+          <option value="thu">Thu 20 Aug (1)</option>
+          <option value="fri">Fri 21 Aug — plant shut</option>
+          <option value="sat">Sat 22 Aug (1)</option>
+          <option value="sun">Sun 23 Aug — weekly off</option>
+        </select>
+      </div>
+      <button type="button" aria-label="Next day"
+              class="flex size-11 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-y-auto p-3">
+    <section aria-labelledby="sph-h1" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-3 py-2.5">
+        <h2 id="sph-h1" class="text-[14px]/5 font-semibold tabular-nums">Tuesday 18 August</h2>
+      </div>
+
+      <ul role="list" class="divide-y divide-zinc-100">
+        <li>
+          <a href="#" class="flex min-h-16 items-start gap-3 px-3 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="w-12 shrink-0 pt-0.5 text-[13px]/5 font-medium tabular-nums text-zinc-600">06:30</span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+                <span class="truncate text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2">GRN-4826</span>
+              </span>
+              <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · gate 1 · 20 MT</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">1 h 30 · ends 08:00 · received</span>
+            </span>
+          </a>
+        </li>
+
+        <li class="bg-zinc-50 px-3 py-2 text-[12px]/4 tabular-nums text-zinc-500">1 h free · 08:00 – 09:00</li>
+
+        <li>
+          <a href="#" class="flex min-h-16 items-start gap-3 px-3 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="w-12 shrink-0 pt-0.5 text-[13px]/5 font-medium tabular-nums text-zinc-600">09:00</span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2">GRN-4829</span>
+              </span>
+              <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Deccan Fasteners Pvt Ltd · gate 1</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">2 h · ends 11:00 · at the same time as GRN-4830</span>
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#" class="flex min-h-16 items-start gap-3 px-3 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="w-12 shrink-0 pt-0.5 text-[13px]/5 font-medium tabular-nums text-zinc-600">09:00</span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2">GRN-4830</span>
+              </span>
+              <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Qureshi Metals · gate 2</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">2 h · ends 11:00 · both gates taken</span>
+            </span>
+          </a>
+        </li>
+
+        <!-- On a lane this was three hours of empty space and that was the
+             whole message. A list has no empty space, so the gap is written
+             out and it takes a row of its own. -->
+        <li class="bg-zinc-50 px-3 py-2 text-[12px]/4 tabular-nums text-zinc-500">3 h free · 11:00 – 14:00</li>
+
+        <li>
+          <a href="#" class="flex min-h-16 items-start gap-3 px-3 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="w-12 shrink-0 pt-0.5 text-[13px]/5 font-medium tabular-nums text-zinc-600">14:00</span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+                <span class="truncate text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2">GRN-4833</span>
+              </span>
+              <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Baroda Fasteners Pvt Ltd · gate 1</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">2 h · ends 16:00 · awaiting approval</span>
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#" class="flex min-h-16 items-start gap-3 px-3 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="w-12 shrink-0 pt-0.5 text-[13px]/5 font-medium tabular-nums text-zinc-600">17:00</span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2">GRN-4835</span>
+              </span>
+              <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Konkan Packaging Co · gate 2</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">1 h 30 · ends 18:30</span>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="sph-h2" class="mt-3 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-3 py-2.5">
+        <h2 id="sph-h2" class="text-[14px]/5 font-semibold">Promised today, no slot booked</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 orders · 31 MT</p>
+      </div>
+      <ul role="list" class="divide-y divide-zinc-100">
+        <li>
+          <a href="#" class="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0">
+              <span class="block truncate text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2">PO-2026-0427</span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-600">Sharma Steel &amp; Alloys</span>
+            </span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">24 MT</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0">
+              <span class="block truncate text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2">PO-2026-0430</span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-600">Deccan Fasteners Pvt Ltd</span>
+            </span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">8,000 nos</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0">
+              <span class="block truncate text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2">PO-2026-0433</span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-600">Gujarat Polymers Ltd</span>
+            </span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">10 MT</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0">
+              <span class="block truncate text-[14px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2">PO-2026-0436</span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-600">Konkan Packaging Co</span>
+            </span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">1,200 nos</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="shrink-0 border-t border-zinc-300 bg-white px-3 py-2.5">
+    <button type="button" class="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 text-[14px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="plus" class="size-4"></i>Book a slot
+    </button>
+  </div>
+</main>

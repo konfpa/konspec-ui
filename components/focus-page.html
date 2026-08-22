@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Focus page — Konspec UI</title>
+<meta name="description" content="One task on the whole screen with the application chrome removed: a bag scanned into a GRN at the gate, a bin counted at a rack, a sample passed or failed at the QC bench. Large targets, type one step up, and a scan field that never gives up the keyboard. Copy-paste HTML for internal data applications.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2318181b'/%3E%3Ctext x='16' y='22' font-family='Inter,sans-serif' font-size='17' font-weight='700' fill='white' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/fonts.css">
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+  @theme {
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  [x-cloak] { display: none !important; }
+
+  button:not(:disabled), summary, select:not(:disabled), [role="button"], [role="tab"],
+  input[type="checkbox"]:not(:disabled), input[type="radio"]:not(:disabled),
+  label:has(> input[type="checkbox"]:not(:disabled)),
+  label:has(> input[type="radio"]:not(:disabled)),
+  [\@click]:not(body), [x-on\:click]:not(body) { cursor: pointer; }
+  button:disabled, input:disabled, select:disabled, textarea:disabled,
+  label:has(> input:disabled) { cursor: not-allowed; }
+
+  html { scroll-behavior: smooth; }
+  [id] { scroll-margin-top: 88px; }
+  ::selection { background: #18181b; color: #fff; }
+</style>
+<script>window.COMPONENT_ID = 'focus-page';</script>
+<script src="../assets/spec.js"></script>
+<script src="../assets/counts.js"></script>
+<script src="../assets/registry.js"></script>
+<script src="../assets/reg/actions.js"></script>
+<script src="../assets/reg/forms.js"></script>
+<script src="../assets/reg/data.js"></script>
+<script src="../assets/reg/feedback.js"></script>
+<script src="../assets/reg/navigation.js"></script>
+<script src="../assets/reg/layout.js"></script>
+<script src="../assets/component-page.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+
+<body class="min-h-screen bg-white font-sans text-[14px]/5 text-zinc-900 antialiased" x-data="componentPage()">
+
+<!-- ── header ─────────────────────────────────────────────────────────────── -->
+<header class="sticky top-0 z-50 border-b border-zinc-200/80 bg-white/85 backdrop-blur">
+  <div class="mx-auto flex h-16 max-w-6xl items-center gap-4 px-5 lg:px-8">
+    <a href="../index.html" class="flex shrink-0 items-center gap-2.5">
+      <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-900 text-[13px]/5 font-semibold text-white">K</span>
+      <span class="text-[16px]/6 font-semibold">Konspec UI</span>
+    </a>
+    <nav class="ml-auto flex items-center gap-1 text-[13px]/5">
+      <a href="../index.html#rules" class="hidden rounded-lg px-3 py-2 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 sm:block">Rules</a>
+      <a href="../llms.txt" class="rounded-lg px-3 py-2 font-mono text-[12px]/4 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900">llms.txt</a>
+      <a href="../registry.json" class="hidden rounded-lg px-3 py-2 font-mono text-[12px]/4 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 sm:block">registry.json</a>
+      <button @click="copy(forAgent(), 'nav')"
+              class="ml-2 flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-zinc-900 px-3.5 py-2 text-[13px]/5 font-medium text-white transition hover:bg-zinc-700">
+        <i :data-lucide="copied === 'nav' ? 'check' : 'clipboard'" class="size-3.5 shrink-0"></i>
+        <span class="sm:hidden" x-text="copied === 'nav' ? 'Copied' : 'Copy'"></span>
+        <span class="hidden sm:inline" x-text="copied === 'nav' ? 'Copied' : 'Copy for agent'"></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<div class="mx-auto max-w-6xl px-5 lg:px-8">
+
+  <!-- ── title ────────────────────────────────────────────────────────────── -->
+  <div class="border-b border-zinc-200 py-10 lg:py-14">
+    <!-- the breadcrumbs component, applied to the docs themselves -->
+    <nav aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+        <li><a href="../index.html" class="text-zinc-600 transition hover:text-zinc-900">Konspec UI</a></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><span class="text-zinc-600" x-text="category.label"></span></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><span aria-current="page" class="font-medium text-zinc-900" x-text="c.name"></span></li>
+      </ol>
+    </nav>
+
+    <div class="mt-5 flex flex-wrap items-start justify-between gap-6">
+      <div class="min-w-0 max-w-[62ch]">
+        <div class="flex flex-wrap items-center gap-3">
+          <h1 class="text-[clamp(2rem,4vw,2.8rem)]/[1.05] font-extrabold tracking-tight" x-text="c.name"></h1>
+          <code class="rounded-lg bg-zinc-100 px-2.5 py-1 font-mono text-[13px]/5 text-zinc-600" x-text="c.id"></code>
+        </div>
+        <p class="mt-4 text-[16px]/7 text-zinc-600" x-text="c.description"></p>
+      </div>
+
+      <dl class="grid shrink-0 grid-cols-3 gap-x-8 gap-y-1 rounded-xl border border-zinc-200 px-5 py-4">
+        <dt class="text-[11px]/4 uppercase tracking-wider text-zinc-500">Variants</dt>
+        <dt class="text-[11px]/4 uppercase tracking-wider text-zinc-500">Alpine</dt>
+        <dt class="text-[11px]/4 uppercase tracking-wider text-zinc-500">Deps</dt>
+        <dd class="text-[20px]/7 font-semibold tracking-tight tabular-nums" x-text="c.variants.length"></dd>
+        <dd class="text-[20px]/7 font-semibold tracking-tight">Yes</dd>
+        <dd class="text-[20px]/7 font-semibold tracking-tight tabular-nums">0</dd>
+      </dl>
+    </div>
+
+    <!-- when to use -->
+    <div class="mt-7 flex max-w-[80ch] items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-4">
+      <i data-lucide="compass" class="mt-0.5 size-[18px] shrink-0 text-zinc-600"></i>
+      <p class="text-[14px]/6">
+        <span class="font-semibold">When to use.</span>
+        <span class="text-zinc-600" x-text="c.when"></span>
+      </p>
+    </div>
+  </div>
+
+  <!-- ── variants ─────────────────────────────────────────────────────────── -->
+  <section id="variants" class="py-12 lg:py-16">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h2 class="text-[24px]/7 font-bold tracking-tight">Variants</h2>
+        <p class="mt-2 max-w-[62ch] text-[14px]/5 text-zinc-600">Each preview is rendered from the exact string shown under Code. They cannot drift. The background starts on the surface this component actually lives on; flip it to check the other.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex items-center gap-1 rounded-xl border border-zinc-200 p-1"
+             role="group" aria-label="Preview background">
+          <button @click="surfaceChoice = 'white'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
+                  :class="surface === 'white' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
+            Surface
+          </button>
+          <button @click="surfaceChoice = 'page'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
+                  :class="surface === 'page' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
+            Page
+          </button>
+        </div>
+        <div class="flex items-center gap-1 rounded-xl border border-zinc-200 p-1"
+             role="group" aria-label="Preview width">
+          <button @click="width = 'full'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
+                  :class="width === 'full' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
+            Full width
+          </button>
+          <button @click="width = 'mobile'" class="rounded-lg px-3 py-1.5 text-[12px]/4 font-medium transition"
+                  :class="width === 'mobile' ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:text-zinc-900'">
+            390px
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-7 space-y-6">
+      <template x-for="v in c.variants" :key="v.id">
+        <div class="rounded-2xl border border-zinc-200">
+          <div class="flex flex-wrap items-center gap-3 rounded-t-2xl border-b border-zinc-200 bg-white px-4 py-3">
+            <span class="text-[14px]/5 font-semibold" x-text="v.name"></span>
+            <!-- NEW-TAG start · temporary. To retire the tag: delete the block between
+                 the NEW-TAG markers from every components/*.html, drop every
+                 `tagNew: true,` from assets/reg/*.js, and run node tools/build.js.
+                 The flag is tagNew rather than isNew because combobox already has an
+                 Alpine local called isNew inside its markup that a blunt regex would
+                 eat. Nothing else reads tagNew: build.js copies only id, name and code,
+                 so it never reaches registry.json, llms.txt or the /r endpoints, and
+                 removing it changes no generated file. -->
+            <template x-if="v.tagNew">
+              <span class="rounded-full bg-zinc-900 px-2 py-0.5 text-[11px]/4 font-medium uppercase tracking-wide text-white">New</span>
+            </template>
+            <!-- NEW-TAG end -->
+            <code class="rounded-md bg-zinc-100 px-2 py-0.5 font-mono text-[11px]/4 text-zinc-600" x-text="v.id"></code>
+            <div class="ml-auto flex items-center gap-1.5">
+              <div class="flex rounded-lg bg-zinc-100 p-0.5">
+                <button @click="setMode(v, 'preview')" class="rounded-md px-2.5 py-1 text-[12px]/4 font-medium transition"
+                        :class="mode(v) === 'preview' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">Preview</button>
+                <button @click="setMode(v, 'code')" class="rounded-md px-2.5 py-1 text-[12px]/4 font-medium transition"
+                        :class="mode(v) === 'code' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">Code</button>
+              </div>
+              <button @click="copy(v.code, v.id)" :title="'Copy ' + v.name"
+                      class="flex size-8 items-center justify-center rounded-lg border border-zinc-200 transition hover:bg-zinc-100">
+                <i :data-lucide="copied === v.id ? 'check' : 'copy'" class="size-3.5"
+                   :class="copied === v.id ? 'text-emerald-600' : 'text-zinc-600'"></i>
+              </button>
+            </div>
+          </div>
+
+          <div x-show="mode(v) === 'preview'" class="rounded-b-2xl p-6 lg:p-10" :class="previewBg">
+            <div class="mx-auto transition-all" :class="width === 'mobile' ? 'w-[390px] max-w-full' : 'max-w-full'">
+              <template x-if="width === 'full'">
+                <div x-html="mode(v) === 'preview' ? v.code : ''"></div>
+              </template>
+              <!-- the mode check is not redundant with the x-show above: x-show only
+                   sets display:none, so without it a variant parked on the Code tab
+                   still builds a frame and still runs its script -->
+              <template x-if="width === 'mobile' && mode(v) === 'preview'">
+                <iframe x-init="frame($el, v.code)" title="Preview at 390px" class="block w-full" scrolling="no"></iframe>
+              </template>
+            </div>
+          </div>
+
+          <div x-show="mode(v) === 'code'" x-cloak class="overflow-x-auto rounded-b-2xl bg-white">
+            <pre class="px-5 py-5 font-mono text-[12px]/5 text-zinc-800"><code x-text="v.code"></code></pre>
+          </div>
+        </div>
+      </template>
+    </div>
+  </section>
+
+  <!-- ── anatomy + behaviour ──────────────────────────────────────────────── -->
+  <section id="anatomy" class="grid gap-10 border-t border-zinc-200 py-12 lg:grid-cols-2 lg:py-16">
+    <div>
+      <h2 class="text-[24px]/7 font-bold tracking-tight">Anatomy</h2>
+      <p class="mt-2 text-[14px]/5 text-zinc-600">The parts, and what each is responsible for.</p>
+      <dl class="mt-6 space-y-px overflow-hidden rounded-2xl border border-zinc-200">
+        <template x-for="(a, i) in c.anatomy" :key="a[0]">
+          <div class="flex gap-4 border-b border-zinc-100 bg-white px-5 py-4 last:border-0">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-md bg-zinc-100 font-mono text-[11px]/4 font-semibold text-zinc-600" x-text="i + 1"></span>
+            <div class="min-w-0">
+              <dt class="text-[14px]/5 font-semibold" x-text="a[0]"></dt>
+              <dd class="mt-1 text-[13px]/5 text-zinc-600" x-text="a[1]"></dd>
+            </div>
+          </div>
+        </template>
+      </dl>
+    </div>
+
+    <div>
+      <h2 class="text-[24px]/7 font-bold tracking-tight">Behaviour</h2>
+      <p class="mt-2 text-[14px]/5 text-zinc-600">How it responds, and what must stay true while it does.</p>
+      <ul class="mt-6 space-y-3">
+        <template x-for="b in c.behaviour" :key="b">
+          <li class="flex gap-3 rounded-xl border border-zinc-200 bg-white px-5 py-4">
+            <i data-lucide="corner-down-right" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+            <span class="text-[13px]/5" x-text="b"></span>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── rules + a11y ─────────────────────────────────────────────────────── -->
+  <section id="rules" class="grid gap-10 border-t border-zinc-200 py-12 lg:grid-cols-2 lg:py-16">
+    <div>
+      <div class="flex items-center gap-2.5">
+        <h2 class="text-[24px]/7 font-bold tracking-tight">Rules</h2>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[11px]/4 font-semibold uppercase tracking-wider text-zinc-700 ring-1 ring-inset ring-zinc-300"><span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Breaks if ignored</span>
+      </div>
+      <p class="mt-2 text-[14px]/5 text-zinc-600">Each of these produced a real defect before it was written down.</p>
+      <ul class="mt-6 space-y-3">
+        <template x-for="n in c.notes" :key="n">
+          <li class="flex gap-3 rounded-xl border border-zinc-200 bg-white px-5 py-4">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            <span class="text-[13px]/5" x-text="n"></span>
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="text-[24px]/7 font-bold tracking-tight">Accessibility</h2>
+      <p class="mt-2 text-[14px]/5 text-zinc-600">Non-optional. The markup above already satisfies all of it.</p>
+      <ul class="mt-6 space-y-3">
+        <template x-for="a in c.a11y" :key="a">
+          <li class="flex gap-3 rounded-xl border border-zinc-200 bg-white px-5 py-4">
+            <i data-lucide="check" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
+            <span class="text-[13px]/5" x-text="a"></span>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── agent handoff ────────────────────────────────────────────────────── -->
+  <section class="border-t border-zinc-200 py-12 lg:py-16">
+    <div class="overflow-hidden rounded-2xl bg-zinc-900">
+      <div class="grid items-center gap-8 p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:p-10">
+        <div>
+          <h2 class="text-[24px]/7 font-bold tracking-tight text-white">Hand this component to an agent</h2>
+          <p class="mt-3 max-w-[58ch] text-[14px]/6 text-zinc-400">
+            Copies the description, the rules, the behaviour, the accessibility requirements and every
+            variant's markup as one markdown block. The same content is in
+            <code class="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-300">registry.json</code>
+            under <code class="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-300" x-text="'components[id=' + c.id + ']'"></code>.
+          </p>
+        </div>
+        <button @click="copy(forAgent(), 'foot')"
+                class="flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[14px]/5 font-medium text-zinc-900 transition hover:bg-zinc-200">
+          <i :data-lucide="copied === 'foot' ? 'check' : 'clipboard'" class="size-4"></i>
+          <span x-text="copied === 'foot' ? 'Copied to clipboard' : 'Copy for agent'"></span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── related ──────────────────────────────────────────────────────────── -->
+  <section class="border-t border-zinc-200 py-12 lg:py-16">
+    <h2 class="text-[24px]/7 font-bold tracking-tight">Related</h2>
+    <p class="mt-2 text-[14px]/5 text-zinc-600"
+       x-text="'Reach for one of these instead when the ' + c.name.toLowerCase() + ' is the wrong shape.'"></p>
+    <div class="mt-6 grid gap-3 sm:grid-cols-3">
+      <template x-for="r in relatedComponents" :key="r.id">
+        <a :href="r.href" class="block rounded-xl border border-zinc-200 bg-white p-5 transition"
+           :class="r.href && 'hover:border-zinc-300 hover:bg-zinc-50'">
+          <div class="flex items-center gap-2">
+            <span class="text-[14px]/5 font-semibold" x-text="r.name"></span>
+            <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px]/4 text-zinc-600" x-text="r.id"></code>
+          </div>
+          <p class="mt-2 text-[13px]/5 text-zinc-600" x-text="r.description"></p>
+          <p class="mt-3 flex items-center gap-1.5 font-mono text-[11px]/4"
+             :class="r.href ? 'text-zinc-900' : 'text-zinc-500'">
+            <span x-text="r.href ? 'open the page' : 'page not built yet'"></span>
+            <i x-show="r.href" data-lucide="arrow-right" class="size-3"></i>
+          </p>
+        </a>
+      </template>
+    </div>
+  </section>
+</div>
+
+<footer class="border-t border-zinc-200 bg-zinc-50">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-7 text-[12px]/4 text-zinc-600 lg:px-8">
+    <span>Konspec UI — Tailwind CSS v4 · Alpine.js · htmx · Lucide</span>
+    <a href="../index.html" class="font-medium text-zinc-900 underline underline-offset-2">Back to overview</a>
+  </div>
+</footer>
+
+</body>
+</html>

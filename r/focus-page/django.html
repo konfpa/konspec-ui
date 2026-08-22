@@ -1,0 +1,167 @@
+<!-- grn/templates/grn/station.html — and the one template in the project that
+     does not extend base.html, because base.html renders app-shell. Alongside
+     the auth and error templates, this is the whole list; any other screen
+     starting from a bare document is a bug.
+
+     The swap target is the result panel and never the form. hx-swap on the form
+     replaces the focused input, focus falls to <body>, and the next scan goes
+     nowhere at all — with no visible symptom until the operator notices the
+     count has stopped moving. Everything the server wants to redraw lives in
+     #dj-result and #dj-recent, and the field itself is never in a swap.
+
+     hx-on::after-request clears the box and puts the keyboard back. The clear
+     is on after-request rather than in the response, so a request that fails
+     leaves the code on screen for the operator to see.
+
+     The recent list is redrawn out of band: the scan response carries a second
+     <ul id="dj-recent" hx-swap-oob="true"> alongside the result panel, so one
+     request updates two regions without either of them being the form.
+
+     hx-sync="this:queue all", not replace. Two bags scanned in the same second
+     are two records, and replace would drop the first — which is precisely what
+     working fast causes. And no hx-disabled-elt on the input: disabling it for
+     the length of the request is a browser moving focus to <body>, which is the
+     defect this whole variant is about.
+
+     Two traps this repo has hit. A multi-line {# #} is not a comment — Django's
+     tag_re has no DOTALL, so the rest of it renders on the page; use
+     a comment/endcomment block. And |intcomma raises without {% load humanize %} in this
+     same file, which is why the load line is here and not only in the base. -->
+{% extends "focus/bare.html" %}
+{% load humanize %}
+
+{% block station %}
+<div data-kui="focus-page/django" class="flex h-dvh flex-col overflow-hidden bg-zinc-100 text-zinc-900">
+
+  <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
+    <p class="min-w-0 text-[16px]/6 font-medium">
+      {{ station.name }}
+      <span class="block text-[14px]/5 font-normal tabular-nums text-zinc-600">
+        {{ request.user.get_full_name }} · {{ station.plant }} · {% now "H:i" %}
+      </span>
+    </p>
+    <div class="flex shrink-0 items-center gap-3">
+      <span class="inline-flex items-center gap-2 rounded-full bg-zinc-200 px-3 py-1 text-[13px]/5 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Online
+      </span>
+      <a href="{% url 'grn:stations' %}"
+         class="inline-flex h-12 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="log-out" aria-hidden="true" class="size-5 text-zinc-600"></i>Exit
+      </a>
+    </div>
+  </header>
+
+  <main class="flex min-h-0 flex-1 flex-col">
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+      <div class="mx-auto max-w-3xl">
+
+        <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">Receiving into {{ grn.number }}</h1>
+        <p class="mt-1 text-[16px]/6 tabular-nums text-zinc-600">
+          {{ grn.item.name }} · lot {{ grn.lot }} · {{ grn.pack_kg }} kg a bag · {{ grn.vendor.name }}
+        </p>
+
+        {% comment %}
+          The form posts one code and swaps one panel. autofocus wins the first
+          paint before any script runs; the hx-on handler holds it after every
+          request. Both are needed — autofocus alone loses the field on the
+          first swap, and the handler alone leaves the field cold until the
+          operator scans once into nothing.
+        {% endcomment %}
+        <form class="mt-5"
+              hx-post="{% url 'grn:scan' grn.pk %}"
+              hx-target="#dj-result" hx-swap="innerHTML"
+              hx-sync="this:queue all"
+              hx-indicator="#dj-busy"
+              hx-on::after-request="this.reset(); this.querySelector('#dj-scan').focus()">
+          {% csrf_token %}
+          <label for="dj-scan" class="block text-[16px]/6 font-medium">Scan the next bag label</label>
+          <div class="mt-2 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="scan-barcode" aria-hidden="true" class="ml-4 size-6 shrink-0 text-zinc-600"></i>
+            <input id="dj-scan" name="barcode" autofocus
+                   inputmode="none" autocomplete="off" spellcheck="false" autocapitalize="off"
+                   aria-describedby="dj-scan-help" placeholder="Waiting for a scan"
+                   class="h-16 w-full min-w-0 bg-transparent px-3 text-[24px]/7 tabular-nums outline-none placeholder:text-zinc-500">
+            <span id="dj-busy" class="mr-4 shrink-0 opacity-0 transition-opacity [&.htmx-request]:opacity-100">
+              <i data-lucide="loader-circle" aria-hidden="true" class="size-6 animate-spin text-zinc-600"></i>
+            </span>
+          </div>
+          <p id="dj-scan-help" class="mt-2 text-[14px]/5 text-zinc-600">
+            The gun types the code and presses Enter. The spinner sits beside the field, never on it.
+          </p>
+        </form>
+
+        {% comment %}
+          Permanently in the document and never removed, so replacing its text
+          is what announces. A live region inserted by the swap that creates it
+          announces nothing at all in most screen readers.
+        {% endcomment %}
+        <div id="dj-result" role="alert" class="mt-4">
+          {% if last_scan.accepted %}
+            <div class="flex items-start gap-4 rounded-xl border border-zinc-300 bg-white px-5 py-5">
+              <i data-lucide="check-circle-2" aria-hidden="true" class="mt-0.5 size-8 shrink-0 text-emerald-600"></i>
+              <div class="min-w-0">
+                <p class="text-[24px]/7 font-semibold tracking-tight">Accepted</p>
+                <p class="mt-2 text-[16px]/6 tabular-nums text-zinc-700">
+                  Bag {{ last_scan.code }} added. {{ grn.bags_received|intcomma }} of {{ grn.bags_expected|intcomma }} bags.
+                </p>
+              </div>
+            </div>
+          {% else %}
+            <div class="flex items-start gap-4 rounded-xl border border-zinc-300 bg-white px-5 py-5">
+              <i data-lucide="alert-circle" aria-hidden="true" class="mt-0.5 size-8 shrink-0 text-red-600"></i>
+              <div class="min-w-0">
+                <p class="text-[24px]/7 font-semibold tracking-tight">{{ last_scan.headline }}</p>
+                <p class="mt-2 text-[16px]/6 tabular-nums text-zinc-700">{{ last_scan.detail }}</p>
+                <p class="mt-3 text-[16px]/6 text-zinc-700">
+                  Nothing was recorded. Scan the next bag — this message clears itself.
+                </p>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <h2 class="mt-6 text-[16px]/6 font-semibold">Last reads</h2>
+        <ul id="dj-recent" class="mt-2 divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+          {% for s in recent_scans %}
+            <li class="flex items-center gap-3 px-4 py-3.5">
+              <span aria-hidden="true" class="size-2 shrink-0 rounded-full {% if s.accepted %}bg-emerald-600{% else %}bg-red-600{% endif %}"></span>
+              <span class="min-w-0 flex-1 truncate text-[16px]/6 font-medium tabular-nums">{{ s.code }}</span>
+              <span class="shrink-0 text-[14px]/5 tabular-nums text-zinc-600">{{ s.at|time:"H:i:s" }}</span>
+            </li>
+          {% empty %}
+            <li class="px-4 py-5 text-[16px]/6 text-zinc-600">
+              Nothing scanned into {{ grn.number }} yet. The first read appears here.
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="shrink-0 border-t border-zinc-300 bg-white px-4 py-4 sm:px-6">
+      <div class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-5 gap-y-3">
+        <div class="min-w-[13rem] flex-1">
+          <p id="dj-count" class="text-[24px]/7 font-semibold tracking-tight tabular-nums">
+            {{ grn.bags_received|intcomma }} of {{ grn.bags_expected|intcomma }} bags
+          </p>
+          {% comment %}
+            The width is an inline style and has to be. Tailwind compiles its
+            stylesheet out of the literal strings in the source, so a class of
+            w-[{{ pct }}%] scans as the token w-[{{ and emits no rule at all —
+            the rail comes back empty, which renders as a bug rather than as an
+            error and is why it ships.
+          {% endcomment %}
+          <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
+               role="progressbar" aria-labelledby="dj-count"
+               aria-valuenow="{{ grn.pct_received }}" aria-valuemin="0" aria-valuemax="100">
+            <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: {{ grn.pct_received }}%"></div>
+          </div>
+        </div>
+        <a href="{% url 'grn:confirm' grn.pk %}"
+           class="inline-flex h-16 shrink-0 items-center gap-2.5 rounded-lg border border-transparent bg-zinc-700 px-6 text-[20px]/7 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="check" aria-hidden="true" class="size-6"></i>Finish and post
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

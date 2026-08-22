@@ -1,0 +1,212 @@
+<!-- Three columns become one, and the arrangement is different rather than
+     reflowed. The queue is the screen; opening a record replaces it; the rail
+     stops being a column at all and becomes a bar pinned to the bottom edge of
+     the record.
+
+     Pinned is the whole point. The rail on a wide screen never scrolls away, so
+     the phone version must not either — a decision that is reached by scrolling
+     past nine order lines is a decision taken from memory of what was at the
+     top, and on a 390px screen there is a lot of record between the heading and
+     the end of it. The bar is shrink-0 under a min-h-0 scroller and it is the
+     only thing that is always visible besides the heading.
+
+     What is in the bar is the value and the limit, not the whole rail. The
+     approval trail, the budget line and the where-it-goes-next block are inside
+     the scrolling record on this width, because they are read once, while the
+     value against the limit is what the decision is being made against and it
+     has to be beside the button.
+
+     44px targets, not 36. Approve takes the full width on its own row because
+     it is the one that is pressed forty times a day, and the two refusals share
+     the row under it. Both refusals open the reason dialog, which is a
+     full-screen sheet at this width; it is not drawn here because it belongs to
+     the reject variant, and it would be the same markup with inset-0.
+
+     No responsive prefixes anywhere in this variant. The frame is fixed at
+     390px so it previews as a phone, and md: classes inside it would fire off
+     the viewport rather than off the box.
+
+     Escape has no meaning here and Back is the only way out, so it is first in
+     the record header, it is a real button with words on it, and it returns
+     focus to the option that was opened — leave that out and the user is at the
+     top of the document with the queue somewhere below them. -->
+<main data-kui="inbox-page/phone" class="mx-auto flex h-[640px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, said: '', done: 6,
+        queue: [
+          { no: 'PO-2026-0418', party: 'Gujarat Polymers Ltd', value: '₹4,10,500', age: '4 days', status: 'Overdue', why: 'Above the ₹2,00,000 buying limit held by Meera Joshi', cc: 'Compounding — Silvassa' },
+          { no: 'GRN-4821', party: 'Sharma Steel & Alloys', value: '₹10,14,000', age: '2 days', status: 'Approved', why: 'Short by 400 kg against the challan', cc: 'Stores — Silvassa' },
+          { no: 'PO-2026-0424', party: 'Nashik Steel Traders', value: '₹96,750', age: '1 day', status: 'Approved', why: 'Single quote against a three-quote policy', cc: 'Tooling — Silvassa' },
+          { no: 'CN-2026-0114', party: 'Konkan Packaging Co', value: '₹1,86,300', age: 'today', status: 'Approved', why: 'A credit note against a posted GRN always needs approval', cc: 'Dispatch — Silvassa' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.queue[this.sel] },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.queue.length - 1)) },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) },
+        approve() {
+          const gone = this.rec.no;
+          this.queue.splice(this.sel, 1);
+          this.done++;
+          if (!this.queue.length) { this.said = gone + ' approved. Your inbox is clear.'; this.detail = false; return }
+          this.sel = Math.min(this.sel, this.queue.length - 1);
+          this.said = gone + ' approved. ' + this.queue.length + ' left in your inbox.';
+          this.$nextTick(() => { this.$refs.detail.focus(); if (this.$refs.body) this.$refs.body.scrollTop = 0 });
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3" :class="detail && 'hidden'">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Waiting on you</h1>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-text="queue.length + ' documents · ' + done + ' decided today'"></p>
+  </div>
+
+  <!-- the queue is the screen -->
+  <section :aria-labelledby="$id('q')" class="flex min-h-0 flex-1 flex-col"
+           :class="{ 'hidden': detail, 'flex': !detail }">
+    <h2 :id="$id('q')" class="sr-only">Your inbox</h2>
+    <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')" x-show="queue.length"
+        @keydown.arrow-down.prevent="move(1)"
+        @keydown.arrow-up.prevent="move(-1)"
+        @keydown.home.prevent="go(0)"
+        @keydown.end.prevent="go(queue.length - 1)"
+        @keydown.enter.prevent="open()"
+        class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+      <template x-for="(o, i) in queue" :key="o.no">
+        <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+            @click="go(i); open()"
+            class="flex gap-2.5 px-4 py-3.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+            :class="sel === i && 'bg-zinc-100'">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+            <span class="size-1.5 rounded-full" :class="dot[o.status]"></span>
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="truncate text-[14px]/5 font-medium tabular-nums" x-text="o.no"></span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-900" x-text="o.value"></span>
+            </span>
+            <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+              <span x-text="o.status"></span> · <span x-text="o.party"></span>
+            </span>
+            <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500">With you <span x-text="o.age"></span></span>
+          </span>
+          <span class="flex h-5 shrink-0 items-center text-zinc-400" aria-hidden="true">
+            <i data-lucide="chevron-right" class="size-4"></i>
+          </span>
+        </li>
+      </template>
+    </ul>
+    <div x-show="!queue.length" x-cloak class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+      <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+      </span>
+      <h3 class="mt-3 text-[16px]/6 font-semibold">You are through your inbox</h3>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-text="done + ' documents decided today. Nothing is filtered.'"></p>
+    </div>
+  </section>
+
+  <!-- the record is the screen, and the bar is pinned under it -->
+  <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+           class="hidden min-h-0 flex-1 flex-col focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+           :class="{ 'hidden': !(detail && queue.length), 'flex': detail && queue.length }">
+    <div class="shrink-0 border-b border-zinc-200 px-4 py-3">
+      <button type="button" @click="back()"
+              class="-ml-2 mb-1.5 inline-flex h-11 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>Back to the inbox
+      </button>
+      <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+        <span class="tabular-nums" x-text="rec.no"></span>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+        </span>
+      </h2>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.party + ' · with you ' + rec.age"></p>
+    </div>
+
+    <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+      <div class="rounded-xl border border-zinc-200 p-3.5">
+        <div class="flex items-start gap-2.5">
+          <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+          <div class="min-w-0">
+            <p class="text-[13px]/5 font-medium">Why this is with you</p>
+            <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600" x-text="rec.why"></p>
+          </div>
+        </div>
+      </div>
+
+      <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
+        <div class="min-w-0">
+          <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Value</dt>
+          <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.value"></dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Cost centre</dt>
+          <dd class="mt-1 text-[13px]/5 font-semibold" x-text="rec.cc"></dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Vendor</dt>
+          <dd class="mt-1 text-[13px]/5 font-semibold" x-text="rec.party"></dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">With you</dt>
+          <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.age"></dd>
+        </div>
+      </dl>
+
+      <!-- read once, so it scrolls; the value and the limit do not -->
+      <h3 class="mt-5 text-[13px]/5 font-medium">How it reached you</h3>
+      <ol class="mt-2 space-y-2.5">
+        <li class="flex items-start gap-2.5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+          <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-600"><span class="font-medium text-zinc-900">Raised by Meera Joshi</span> — 17 Aug 2026, 11:20</p>
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+          <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-600"><span class="font-medium text-zinc-900">Checked against RC-2026-0071</span> — 17 Aug 2026, 11:20</p>
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+          <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-600"><span class="font-medium text-zinc-900">With you</span> — since 18 Aug 2026</p>
+        </li>
+      </ol>
+
+      <p class="mt-4 text-[13px]/5 tabular-nums text-zinc-600">
+        Approving commits the value against the cost centre budget and emails the vendor a copy of the order.
+      </p>
+    </div>
+
+    <!-- pinned. shrink-0 under a min-h-0 scroller, so it is on screen at line
+         40 of a long order. -->
+    <div class="shrink-0 border-t border-zinc-200 px-4 py-3">
+      <p class="text-[12px]/4 tabular-nums text-zinc-600">
+        <span class="font-medium text-zinc-900" x-text="rec.value"></span> · within your ₹5,00,000 limit
+      </p>
+      <div class="mt-2 space-y-2">
+        <button type="button" @click="approve()"
+                class="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[14px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="check" class="size-4"></i>Approve
+        </button>
+        <div class="flex gap-2">
+          <button type="button"
+                  class="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back
+          </button>
+          <button type="button"
+                  class="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="alert-circle" class="size-4 text-red-600"></i>Reject
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

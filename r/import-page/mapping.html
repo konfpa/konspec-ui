@@ -1,0 +1,239 @@
+<!-- The stage with no analogue in a form. One row per column in the file — the
+     header they wrote, a value from the first row, and a select of your fields
+     with the system's guess already chosen.
+
+     How the guess was made is on every row, and that is the point of the third
+     column. Matched on the header name and Guessed from Rate/Kg are different
+     levels of confidence, and a grid of eight identically confident selects is
+     one the user presses Continue past without reading. Only the guessed rows
+     need checking, so only the guessed rows say so.
+
+     A column you do not want gets a real answer — Do not import — rather than
+     an empty select. Blank and deliberate look the same and mean the opposite,
+     and Remarks (internal) silently landing in the description field is the
+     kind of thing nobody finds until a purchase order prints it.
+
+     The block is a required field with nothing pointing at it: Effective from
+     is in no column of this file. The primary carries a real disabled
+     attribute, because the reason is a fact rather than a policy the user can
+     argue with, and it points at the sentence naming the field. Both come off
+     together — an aria-describedby left pointing at a display:none paragraph
+     describes the button to nobody.
+
+     Every select carries an aria-label naming its source column rather than a
+     <label for>. The same grid is rendered twice, a table above md and cards
+     below it, and one for/id pair cannot serve two copies of a control; a
+     <th scope="col"> names the column for a reader walking the table and
+     contributes nothing to the name of a control that has been tabbed to.
+
+     The rows take no hover fill. Nothing happens when the row is clicked — the
+     select in it is what responds — and a band that lights up under a cursor
+     that can do nothing with it is a promise the row does not keep. -->
+<div data-kui="import-page/mapping" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       fields: [
+         { key: 'code', label: 'Item code', req: true },
+         { key: 'name', label: 'Description', req: true },
+         { key: 'uom', label: 'Unit of measure', req: true },
+         { key: 'rate', label: 'Rate', req: true },
+         { key: 'from', label: 'Effective from', req: true },
+         { key: 'hsn', label: 'HSN', req: false },
+         { key: 'gst', label: 'GST rate', req: false },
+         { key: 'vendor', label: 'Vendor code', req: false }
+       ],
+       cols: [
+         { id: 'c1', head: 'Item Code', sample: 'ITM-1042', field: 'code', how: 'Matched on the header name' },
+         { id: 'c2', head: 'Description', sample: 'HDPE granules — natural, grade M60075', field: 'name', how: 'Matched on the header name' },
+         { id: 'c3', head: 'UOM', sample: 'Kgs', field: 'uom', how: 'Matched on the header name' },
+         { id: 'c4', head: 'HSN Code', sample: '3901 2000', field: 'hsn', how: 'Matched on the header name' },
+         { id: 'c5', head: 'Rate/Kg', sample: '118.40', field: 'rate', how: 'Guessed from Rate/Kg — check it' },
+         { id: 'c6', head: 'GST', sample: '18', field: 'gst', how: 'Guessed from GST — check it' },
+         { id: 'c7', head: 'Vendor Ref', sample: 'GP/RC/2026/44', field: '', how: 'Nothing matched — not imported' },
+         { id: 'c8', head: 'Remarks (internal)', sample: 'confirmed on call 18 Aug', field: '', how: 'Nothing matched — not imported' }
+       ],
+       get used() { return this.cols.map(c => c.field).filter(Boolean) },
+       get missing() { return this.fields.filter(f => f.req && !this.used.includes(f.key)) },
+       twice(f) { return f !== '' && this.used.filter(x => x === f).length > 1 },
+       name(k) { const f = this.fields.find(x => x.key === k); return f ? f.label : '' }
+     }">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Master data</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Items</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">Import</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Import items</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">gujarat-polymers-rate-card-aug.xlsx · 1,240 rows · 8 columns · uploaded 11:02</p>
+    </div>
+
+    <nav aria-label="Import stages" class="mt-5">
+      <ol class="hidden items-center gap-2 sm:flex">
+        <li class="flex min-w-0 flex-1 items-center gap-2">
+          <button type="button"
+                  class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left enabled:hover:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[11px]/4 font-semibold tabular-nums text-white ring-1 ring-inset ring-zinc-700">1</span>
+            <span class="min-w-0 truncate text-[13px]/5">The file</span>
+          </button>
+          <span class="h-px w-4 shrink-0 bg-zinc-200" aria-hidden="true"></span>
+        </li>
+        <li class="flex min-w-0 flex-1 items-center gap-2">
+          <button type="button" aria-current="step"
+                  class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left enabled:hover:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold tabular-nums text-zinc-900 ring-1 ring-inset ring-zinc-300">2</span>
+            <span class="min-w-0 truncate text-[13px]/5 font-semibold text-zinc-900">Map columns</span>
+          </button>
+          <span class="h-px w-4 shrink-0 bg-zinc-200" aria-hidden="true"></span>
+        </li>
+        <li class="flex min-w-0 flex-1 items-center gap-2">
+          <button type="button" disabled
+                  class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left enabled:hover:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-[11px]/4 font-semibold tabular-nums text-zinc-500 ring-1 ring-inset ring-zinc-200">3</span>
+            <span class="min-w-0 truncate text-[13px]/5">Review</span>
+          </button>
+          <span class="h-px w-4 shrink-0 bg-zinc-200" aria-hidden="true"></span>
+        </li>
+        <li class="flex min-w-0 flex-1 items-center gap-2">
+          <button type="button" disabled
+                  class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left enabled:hover:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-[11px]/4 font-semibold tabular-nums text-zinc-500 ring-1 ring-inset ring-zinc-200">4</span>
+            <span class="min-w-0 truncate text-[13px]/5">Commit</span>
+          </button>
+        </li>
+      </ol>
+      <div class="sm:hidden">
+        <p class="text-[13px]/5 font-medium tabular-nums">Step 2 of 4 · Map columns</p>
+        <div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-zinc-200">
+          <div class="h-full rounded-full bg-zinc-700" style="width: 50%"></div>
+        </div>
+      </div>
+    </nav>
+
+    <div x-show="missing.length" class="mt-5 flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+      <div class="min-w-0">
+        <p class="text-[13px]/5 font-medium tabular-nums"
+           x-text="missing.length + (missing.length === 1 ? ' required field has' : ' required fields have') + ' nothing mapped to them'">1 required field has nothing mapped to it</p>
+        <p class="mt-1 text-[12px]/4 text-zinc-600">
+          <span x-text="missing.map(f => f.label).join(', ')">Effective from</span> — no column in this file matched. Add the column to the sheet and upload again, or map one of the columns below to it.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+        <h2 tabindex="-1" class="text-[16px]/6 font-semibold focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Map columns</h2>
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">
+          <span x-text="fields.filter(f => f.req && used.includes(f.key)).length">4</span> of 5 required fields mapped
+        </p>
+      </div>
+
+      <table class="hidden w-full text-[13px]/5 md:table">
+        <thead>
+          <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+            <th scope="col" class="px-4 py-2.5 font-medium">Column in the file</th>
+            <th scope="col" class="w-64 px-4 py-2.5 font-medium">Field in the item master</th>
+            <th scope="col" class="px-4 py-2.5 font-medium">How this was decided</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="c in cols" :key="c.id">
+            <tr class="border-b border-zinc-100 last:border-0">
+              <th scope="row" class="px-4 py-2.5 text-left align-top font-medium">
+                <span x-text="c.head"></span>
+                <span class="mt-0.5 block max-w-[22rem] truncate text-[12px]/4 font-normal tabular-nums text-zinc-500" x-text="'Row 2: ' + c.sample"></span>
+              </th>
+              <td class="px-4 py-2.5 align-top">
+                <div class="relative rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+                     :class="twice(c.field) ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+                  <select x-model="c.field" :aria-label="'Field for the column ' + c.head"
+                          :aria-invalid="twice(c.field) ? 'true' : 'false'"
+                          class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                    <option value="">Do not import this column</option>
+                    <option value="code">Item code — required</option>
+                    <option value="name">Description — required</option>
+                    <option value="uom">Unit of measure — required</option>
+                    <option value="rate">Rate — required</option>
+                    <option value="from">Effective from — required</option>
+                    <option value="hsn">HSN</option>
+                    <option value="gst">GST rate</option>
+                    <option value="vendor">Vendor code</option>
+                  </select>
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                    <i data-lucide="chevron-down" class="size-3.5"></i>
+                  </span>
+                </div>
+                <p x-show="twice(c.field)" x-cloak class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+                  <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+                  <span x-text="'Two columns are mapped to ' + name(c.field) + '. Only one can be.'"></span>
+                </p>
+              </td>
+              <td class="px-4 py-2.5 align-top">
+                <!-- the icon is on a wrapping span, never on the <i>:
+                     createIcons() replaces the <i> with an <svg> and takes any
+                     binding written on it. -->
+                <span class="flex items-start gap-1.5 text-[12px]/4 text-zinc-500">
+                  <span x-show="c.how.startsWith('Guessed')" class="mt-px shrink-0 text-amber-700"><i data-lucide="alert-triangle" class="size-3.5"></i></span>
+                  <span x-text="c.how"></span>
+                </span>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+      <!-- the same eight columns at 390px: a card each, the select full width
+           under the header it belongs to. A two-column matrix does not reflow
+           into a phone, it restacks. -->
+      <div class="divide-y divide-zinc-100 md:hidden">
+        <template x-for="c in cols" :key="c.id">
+          <div class="px-4 py-3">
+            <p class="text-[13px]/5 font-medium" x-text="c.head"></p>
+            <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-500" x-text="'Row 2: ' + c.sample"></p>
+            <div class="relative mt-2 rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+                 :class="twice(c.field) ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+              <select x-model="c.field" :aria-label="'Field for the column ' + c.head"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-8 pl-2.5 text-[14px]/5 outline-none">
+                <option value="">Do not import this column</option>
+                <option value="code">Item code — required</option>
+                <option value="name">Description — required</option>
+                <option value="uom">Unit of measure — required</option>
+                <option value="rate">Rate — required</option>
+                <option value="from">Effective from — required</option>
+                <option value="hsn">HSN</option>
+                <option value="gst">GST rate</option>
+                <option value="vendor">Vendor code</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-4"></i>
+              </span>
+            </div>
+            <p class="mt-1.5 text-[12px]/4 text-zinc-500" x-text="c.how"></p>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <div class="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <div class="min-w-[14rem] flex-1">
+        <p class="text-[12px]/4 tabular-nums text-zinc-600">Every row posts together. Nothing reaches the item master until all of them have.</p>
+        <p id="mp-block" x-show="missing.length" class="mt-0.5 text-[12px]/4 font-medium text-zinc-900">
+          Map <span x-text="missing.map(f => f.label).join(' and ')">Effective from</span> before you can continue.
+        </p>
+      </div>
+      <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+        <button type="button" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>Back
+        </button>
+        <button type="button" :disabled="missing.length > 0" :aria-describedby="missing.length ? 'mp-block' : false"
+                class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white enabled:hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Continue to review<i data-lucide="chevron-right" class="size-4"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

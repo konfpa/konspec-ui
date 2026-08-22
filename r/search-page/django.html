@@ -1,0 +1,340 @@
+<!-- search/templates/search/results.html — a page template, so it extends the
+     base that renders app-shell and fills one block. Every signed-in screen is
+     the shell; a search page that starts its own document loses the skip link,
+     the nav landmark, the command palette and the keyboard shortcuts, and
+     reviews as fine because everything it dropped is invisible until somebody
+     uses a keyboard.
+
+     This preamble is an HTML comment and carries no template tags at all,
+     which is deliberate twice over. Django requires the extends tag to be the
+     first tag in the template and checks it against the first non-text node, so
+     a comment tag written above extends raises "extends must be the first tag
+     in the template" — raw text does not, which is why an HTML comment is the
+     only thing that may sit here. And an HTML comment is not a Django comment:
+     everything inside it is still tokenised, so a comment tag written here as
+     prose opens a real comment block and swallows the template down to the next
+     endcomment. Name the tags in words above the extends line; use real comment
+     tags everywhere below it, because a multi-line hash comment is not a
+     comment either — Django's tag_re has no DOTALL, so everything after its
+     first line renders on the page.
+
+     Searching is a GET and stays one. The query, the type scope and every facet
+     are parameters on the URL, so Back works, the result is a link somebody can
+     send to the buyer who asked, and reloading it warns about nothing. The one
+     POST on this page is saving the search, because that is the only thing here
+     that changes anything.
+
+     The view builds the groups and the template draws them. Working out which
+     register matched, how many, and which querystring scopes to it inside the
+     template means writing the same comparison five times and getting the count
+     and the link out of step. One list of dicts, each with a label, a true
+     count, the rows to draw, the row template to draw them with and the scope
+     URL.
+
+     The row template per group is how "a result is a record, not a document"
+     survives contact with Django. Five record types have five sets of facts
+     worth showing, so there are five row partials and the group names its own,
+     rather than one generic row that fits every register and helps with none.
+
+     The humanize library is loaded in this file and not only in base.html,
+     because intcomma raises without it in the same template it is used in. -->
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block main %}
+<div data-kui="search-page/django" class="text-zinc-900">
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+      <form method="get" action="{% url 'search:results' %}" role="search" class="max-w-2xl">
+        <label for="dj-sp-q" class="sr-only">Search orders, receipts, invoices, items and vendors</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+          <input id="dj-sp-q" type="search" name="q" value="{{ query }}" enterkeyhint="search"
+                 autocomplete="off" spellcheck="false" autocapitalize="none"
+                 placeholder="Order number, item code, GRN, vendor"
+                 class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500 [&amp;::-webkit-search-cancel-button]:appearance-none">
+        </div>
+        {% comment %}
+          The facets already in force ride with the query, or pressing Enter on
+          a corrected spelling throws away the four things the user narrowed to.
+          Page does not ride along: a new query on page 6 shows nothing.
+        {% endcomment %}
+        {% for name, value in carried_params %}
+          <input type="hidden" name="{{ name }}" value="{{ value }}">
+        {% endfor %}
+      </form>
+
+      {% if scope %}
+        <a href="?{{ unscoped_query }}"
+           class="mt-4 inline-flex items-center gap-1.5 text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="arrow-left" class="size-3.5" aria-hidden="true"></i>All {{ total|intcomma }} results for “{{ query }}”
+        </a>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">{{ scope.label }} matching “{{ query }}”</h1>
+      {% else %}
+        <h1 class="mt-4 text-[24px]/7 font-semibold tracking-tight">Results for “{{ query }}”</h1>
+      {% endif %}
+
+      {% comment %}
+        Rendered with the page and not inside a branch, so a facet, a scope or a
+        new query writes into a region that was already there. A role="status"
+        that arrives with its message in it has not changed and announces
+        nothing.
+      {% endcomment %}
+      <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+        {% if total %}
+          {{ total|intcomma }} result{{ total|pluralize }} in {{ searched_registers|length }} register{{ searched_registers|length|pluralize }}
+        {% else %}
+          No results in {{ searched_registers|length }} register{{ searched_registers|length|pluralize }}
+        {% endif %}
+      </p>
+
+      {% if active_facets %}
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          {% for f in active_facets %}
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              {{ f.label }}
+              <a href="?{{ f.without_query }}" aria-label="Remove the filter {{ f.label }}"
+                 class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-3"></i>
+              </a>
+            </span>
+          {% endfor %}
+          <a href="?q={{ query|urlencode }}" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</a>
+        </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="mx-auto flex max-w-[1600px] flex-col gap-4 px-4 py-5 lg:flex-row lg:px-6">
+
+    <aside aria-labelledby="dj-sp-rail" class="w-full shrink-0 lg:w-64">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <h2 id="dj-sp-rail" class="px-4 py-3 text-[13px]/5 font-medium">Narrow these results</h2>
+
+        {% comment %}
+          Every facet value is a link carrying the whole querystring with that
+          one parameter set and page dropped, built in the view. A facet is a
+          URL: state that lives only in the browser gives a narrowed result
+          nobody can send to the person who asked about it.
+
+          A value at zero is rendered as text rather than as a dead link, and it
+          keeps its place. Dropping it makes the list a different shape on every
+          query, and a value that vanished is indistinguishable from one the
+          register never had.
+        {% endcomment %}
+        {% for facet in facets %}
+          <fieldset class="border-t border-zinc-100 px-4 py-3">
+            <legend class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">{{ facet.label }}</legend>
+            <div>
+              {% for v in facet.values %}
+                {% if v.count %}
+                  <a href="?{{ v.query }}" {% if v.selected %}aria-current="true"{% endif %}
+                     class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <span class="flex size-4 shrink-0 items-center justify-center text-zinc-600" aria-hidden="true">
+                      {% if v.selected %}<i data-lucide="check" class="size-4"></i>{% endif %}
+                    </span>
+                    <span class="min-w-0 flex-1 truncate {% if v.selected %}font-medium{% endif %}">{{ v.label }}</span>
+                    <span class="shrink-0 tabular-nums text-zinc-500">{{ v.count|intcomma }}</span>
+                  </a>
+                {% else %}
+                  <p class="-mx-2 flex items-center gap-2.5 px-2 py-1 text-[13px]/5 text-zinc-500">
+                    <span class="size-4 shrink-0" aria-hidden="true"></span>
+                    <span class="min-w-0 flex-1 truncate">{{ v.label }}</span>
+                    <span class="shrink-0 tabular-nums">0</span>
+                  </p>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </fieldset>
+        {% endfor %}
+
+        {% comment %}
+          Searching is a GET; saving a search changes something, so it is a POST
+          with a token. A GET that mutates is fired by anything that follows
+          links — a prefetcher, a link preview, a browser restoring tabs.
+        {% endcomment %}
+        {% if total %}
+          <form method="post" action="{% url 'search:save' %}" class="border-t border-zinc-100 px-4 py-3">
+            {% csrf_token %}
+            <input type="hidden" name="query" value="{{ request.GET.urlencode }}">
+            <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="bookmark" class="size-4 text-zinc-600" aria-hidden="true"></i>Save this search
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </aside>
+
+    <div class="min-w-0 flex-1 space-y-4">
+
+      {% for g in groups %}
+        <section aria-labelledby="dj-sp-h-{{ g.slug }}" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+            <h2 id="dj-sp-h-{{ g.slug }}" class="text-[16px]/6 font-semibold">{{ g.label }}</h2>
+            {% if g.truncated %}
+              <a href="?{{ g.scope_query }}" class="text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all {{ g.count|intcomma }} {{ g.label|lower }}</a>
+            {% else %}
+              <p class="text-[12px]/4 tabular-nums text-zinc-600">{{ g.count|intcomma }} result{{ g.count|pluralize }}</p>
+            {% endif %}
+          </div>
+          <ul role="list" class="divide-y divide-zinc-100">
+            {% for r in g.results %}
+              {% comment %}
+                One partial per record type — search/_row_order.html,
+                _row_grn.html, _row_invoice.html, _row_item.html, _row_vendor.html
+                — because five registers have five sets of facts worth showing,
+                and a row somebody recognises the record from is the whole job.
+              {% endcomment %}
+              {% include g.row_template %}
+            {% empty %}
+              <li class="px-4 py-3 text-[13px]/5 text-zinc-500">This register answered with nothing.</li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% empty %}
+        {% comment %}
+          The no-results state, and there is no create action in it or anywhere
+          else on this page. The whole premise of a search is that the record
+          might exist, so a New order button under "nothing matched" is the
+          shortest route to raising the same order twice.
+
+          loose_query and loose_count come from the view, which ran the loosened
+          query only because the strict one returned zero. It is offered and
+          never substituted: a search that quietly widens gives a count nobody
+          can reproduce.
+        {% endcomment %}
+        <div class="rounded-xl border border-zinc-300 bg-white">
+          <div class="flex min-h-72 flex-col items-center justify-center px-6 py-12 text-center">
+            <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+              <i data-lucide="search-x" aria-hidden="true" class="size-5 text-zinc-600"></i>
+            </span>
+            <h2 class="mt-3 text-[16px]/6 font-semibold">Nothing matches “{{ query }}”</h2>
+            <p class="mt-1 max-w-md text-[13px]/5 tabular-nums text-zinc-600">
+              {% for reg in searched_registers %}{{ reg.label }}{% if not forloop.last %}, {% endif %}{% endfor %}
+              were searched by document number, item code, vendor name and GSTIN. Line descriptions, notes and attachments are not searched.
+            </p>
+            {% if loose_count %}
+              <p class="mt-4 max-w-md text-[13px]/5 tabular-nums text-zinc-600">
+                Ignoring punctuation, <span class="font-medium text-zinc-900">{{ loose_query }}</span> matches <span class="font-medium text-zinc-900">{{ loose_count|intcomma }}</span> record{{ loose_count|pluralize }}.
+              </p>
+              <a href="?q={{ loose_query|urlencode }}"
+                 class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="corner-down-left" class="size-4 text-zinc-600" aria-hidden="true"></i>Search for “{{ loose_query }}” instead
+              </a>
+            {% endif %}
+          </div>
+          <ul role="list" class="divide-y divide-zinc-100 border-t border-zinc-200">
+            <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="box" class="size-4"></i></span>
+              <div class="min-w-0 flex-1">
+                <a href="{% url 'items:index' %}?q={{ query|urlencode }}" class="text-[13px]/5 font-medium underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Search the item master for “{{ query }}”</a>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ item_count|intcomma }} items by description, HSN code and specification — the fields this search does not read.</p>
+              </div>
+              <span class="mt-0.5 flex h-5 shrink-0 items-center text-zinc-500" aria-hidden="true"><i data-lucide="arrow-right" class="size-4"></i></span>
+            </li>
+            <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="list-filter" class="size-4"></i></span>
+              <div class="min-w-0 flex-1">
+                <a href="{% url 'orders:index' %}?q={{ query|urlencode }}" class="text-[13px]/5 font-medium underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Filter the purchase order register for “{{ query }}”</a>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ order_count|intcomma }} orders including their line items, terms and internal notes.</p>
+              </div>
+              <span class="mt-0.5 flex h-5 shrink-0 items-center text-zinc-500" aria-hidden="true"><i data-lucide="arrow-right" class="size-4"></i></span>
+            </li>
+          </ul>
+        </div>
+      {% endfor %}
+
+      {% comment %}
+        True of every query this account runs rather than of this one string, so
+        it is outside the {% empty %} branch and shows on every state.
+
+        It names the registers and the person who grants them, and it never
+        prints how many hidden records matched. Naming a closed register is a
+        fact about the account; naming the number of rows inside it is a fact
+        about the data, and a search box that answers "matched 3 records you may
+        not see" is an oracle anybody can query one string at a time.
+      {% endcomment %}
+      {% if unsearched_registers %}
+        <div class="rounded-xl border border-zinc-300 bg-white">
+          <div class="flex items-start gap-3 rounded-xl bg-zinc-50 px-4 py-3.5">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+              <i data-lucide="lock" aria-hidden="true" class="size-4 text-zinc-600"></i>
+            </span>
+            <div class="min-w-0 flex-1">
+              <h2 class="text-[13px]/5 font-medium">{{ unsearched_registers|length }} register{{ unsearched_registers|length|pluralize }} {{ unsearched_registers|length|pluralize:"was,were" }} not searched</h2>
+              <p class="mt-0.5 text-[13px]/5 text-zinc-600">
+                {% for reg in unsearched_registers %}{{ reg.label }}{% if not forloop.last %} and {% endif %}{% endfor %}
+                {{ unsearched_registers|length|pluralize:"is,are" }} outside what your account reads, so nothing in {{ unsearched_registers|length|pluralize:"it,them" }} is searched and nothing about {{ unsearched_registers|length|pluralize:"it,them" }} is counted. Access is granted by {{ access_owner.get_full_name }}, {{ access_owner.title }}.
+              </p>
+              <p class="mt-2 text-[11px]/4 tabular-nums text-zinc-500">Signed in as {{ request.user.email }} · {{ request.user.role }}, {{ request.user.plant.name }}</p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% comment %}
+search/views.py — the shape the template reads, built once
+
+    ORDER = ['item', 'order', 'grn', 'invoice', 'vendor']   # the tiebreak
+
+    def results(request):
+        q = request.GET.get('q', '').strip()
+        scope = request.GET.get('type') or None
+        registers = [r for r in REGISTERS if r.visible_to(request.user)]
+        closed = [r for r in REGISTERS if r not in registers]
+
+        groups = []
+        for r in registers:
+            if scope and r.slug != scope:
+                continue
+            hits = r.search(q, request.user, request.GET)     # already permission-filtered
+            if not hits.count:
+                continue                                       # an empty group leaves
+            groups.append({
+                'slug': r.slug, 'label': r.label,
+                'count': hits.count,
+                'results': hits.rows[:3] if not scope else hits.page,
+                'truncated': not scope and hits.count > 3,
+                'row_template': 'search/_row_%s.html' % r.slug,
+                'scope_query': with_params(request.GET, type=r.slug, page=None),
+                'best': hits.best_score,
+            })
+        # ordered by the best match inside the group, tiebroken by register
+        groups.sort(key=lambda g: (-g['best'], ORDER.index(g['slug'])))
+
+        loose = loosen(q)                                      # MS 4821 -> MS-4821
+        return render(request, 'search/results.html', {
+            'query': q,
+            'scope': next((r for r in registers if r.slug == scope), None),
+            'groups': groups,
+            'total': sum(g['count'] for g in groups),
+            'searched_registers': registers,
+            'unsearched_registers': closed,
+            'facets': facets(q, request.GET, registers, scope),
+            'active_facets': chips(request.GET),
+            'carried_params': [(k, v) for k, v in request.GET.items()
+                               if k not in ('q', 'page')],
+            'unscoped_query': with_params(request.GET, type=None, page=None),
+            'loose_query': loose if loose != q else None,
+            'loose_count': count_all(loose, request.user) if not groups and loose != q else 0,
+        })
+
+Three things live in the view because getting them wrong in a template is
+silent. r.search() is permission-filtered before it counts, or a zero that has
+lost its reason arrives at the template and reads as "no such record".
+facets() computes each value's count with that facet's own predicate removed
+and every other one in force, or ticking Silvassa leaves Vapi at 0 and the
+facet you just used is the one you can no longer use. And the loosened query is
+only counted when the strict one returned nothing, because running it every
+time doubles the work on the ninety-nine per cent of searches that found what
+they were looking for.
+
+with_params() drops page whenever anything else changes. Following a facet from
+page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
+{% endcomment %}

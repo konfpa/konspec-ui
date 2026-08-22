@@ -1,0 +1,150 @@
+<!-- The board, and the move that makes it one.
+
+     Keyboard first, drag second. The primary interaction is: reach a card,
+     press its move control, choose a stage. Drag is an accelerant over
+     something that already works — it has no keyboard gesture and never fires
+     on a touch screen, and this board is read on a tablet with gloves on.
+
+     The stage list is a disclosure inside the card and not a menu anchored to
+     it. Each column is its own scroller and overflow-y-auto clips both axes, so
+     an anchored panel is cut off by the column it opens in; dropdown answers
+     that with a fixed panel that must close on scroll, and a board scrolls in
+     two axes while somebody is reading it.
+
+     The column is a plain list, never a listbox: cards carry a link and a
+     button, and a listbox is one Tab stop inside which neither is reachable.
+
+     commit() captures $refs.board before it moves the card, because the
+     mutation tears down the x-for iteration the handler was called from, and it
+     restores focus a frame after the tick, when the destination column has
+     actually been painted. Both are silent failures. -->
+<main data-kui="board/default" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+      x-data="{
+        said: '', open: null,
+        stages: [
+          { id: 'raised', name: 'Raised' },
+          { id: 'buyer', name: 'With buyer' },
+          { id: 'finance', name: 'With finance' },
+          { id: 'approved', name: 'Approved' }
+        ],
+        cards: [
+          { no: 'PO-2026-0418', stage: 'raised', vendor: 'Sharma Steel &amp; Alloys', value: 1842000, age: 2, ini: 'AP', who: 'Akshay Prabhu' },
+          { no: 'PO-2026-0421', stage: 'raised', vendor: 'Gujarat Polymers Ltd', value: 715600, age: 1, ini: 'MJ', who: 'Meera Joshi' },
+          { no: 'PO-2026-0409', stage: 'buyer', vendor: 'Deccan Fasteners Pvt Ltd', value: 284300, age: 6, ini: 'NP', who: 'Nilesh Patil' },
+          { no: 'PO-2026-0412', stage: 'buyer', vendor: 'Konkan Packaging Co', value: 109750, age: 4, ini: 'AP', who: 'Akshay Prabhu' },
+          { no: 'PO-2026-0416', stage: 'buyer', vendor: 'Nashik Steel Traders', value: 96750, age: 3, ini: 'MJ', who: 'Meera Joshi' },
+          { no: 'PO-2026-0402', stage: 'finance', vendor: 'Qureshi Metals', value: 546000, age: 9, ini: 'NP', who: 'Nilesh Patil' },
+          { no: 'PO-2026-0407', stage: 'finance', vendor: 'Baroda Fasteners Pvt Ltd', value: 318400, age: 7, ini: 'AP', who: 'Akshay Prabhu' },
+          { no: 'PO-2026-0398', stage: 'approved', vendor: 'Deshpande Traders', value: 214300, age: 12, ini: 'MJ', who: 'Meera Joshi' },
+          { no: 'PO-2026-0395', stage: 'approved', vendor: 'Silvassa Hydraulics', value: 1160000, age: 14, ini: 'NP', who: 'Nilesh Patil' }
+        ],
+        at(s) { return this.cards.filter(c => c.stage === s) },
+        label(s) { return this.stages.find(x => x.id === s).name },
+        money(n) { return '₹' + n.toLocaleString('en-IN') },
+        toggle(no) {
+          this.open = this.open === no ? null : no;
+          if (this.open) this.$nextTick(() => this.$refs.board.querySelector('[data-move=' + no + ']').closest('li').scrollIntoView({ block: 'nearest' }));
+        },
+        shut(no) {
+          this.open = null;
+          this.$nextTick(() => this.$refs.board.querySelector('[data-move=' + no + ']').focus());
+        },
+        commit(no, to) {
+          const board = this.$refs.board;
+          const c = this.cards.find(x => x.no === no);
+          const from = this.label(c.stage);
+          c.stage = to;
+          this.open = null;
+          this.said = no + ' moved from ' + from + ' to ' + this.label(to) + '. ' + this.label(to) + ' now holds ' + this.at(to).length + ' orders.';
+          this.$nextTick(() => requestAnimationFrame(() => {
+            const el = board.querySelector('[data-move=' + no + ']');
+            if (!el) return;
+            el.focus();
+            el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+          }));
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <!-- page-header, unchanged -->
+  <div class="flex shrink-0 flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 lg:px-5">
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">Approvals</span>
+      </nav>
+      <h1 class="mt-1 text-[20px]/7 font-semibold tracking-tight">Order approvals</h1>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Silvassa · FY 2026–27 · 9 orders in the pipeline</p>
+    </div>
+    <button type="button" class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Filters
+    </button>
+  </div>
+
+  <!-- The one horizontal scroller in the system, and it is this box rather than
+       the page. snap-start on the column lands a whole stage under the thumb. -->
+  <div x-ref="board" class="flex min-h-0 flex-1 snap-x snap-mandatory gap-3 overflow-x-auto p-3 lg:p-4">
+    <template x-for="s in stages" :key="s.id">
+      <section :aria-labelledby="'bd-h-' + s.id"
+               class="relative flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+        <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+          <h2 :id="'bd-h-' + s.id" class="truncate text-[13px]/5 font-medium" x-text="s.name"></h2>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="at(s.id).length"></p>
+        </div>
+
+        <ul role="list" class="min-h-0 flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-2">
+          <template x-for="c in at(s.id)" :key="c.no">
+            <li class="rounded-lg border border-zinc-200 bg-white p-2.5">
+
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="c.no"></a>
+                  <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600" x-text="c.vendor"></p>
+                </div>
+                <button type="button" :data-move="c.no" @click="toggle(c.no)"
+                        :aria-expanded="open === c.no"
+                        :aria-label="'Move ' + c.no + ', now in ' + label(c.stage)"
+                        class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="arrow-right-left" class="size-4"></i>
+                </button>
+              </div>
+
+              <div class="mt-2 flex items-center justify-between gap-2">
+                <span class="text-[13px]/5 font-medium tabular-nums" x-text="money(c.value)"></span>
+                <span class="flex shrink-0 items-center gap-1.5">
+                  <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="c.age + 'd here'"></span>
+                  <span aria-hidden="true" class="flex size-5 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" x-text="c.ini"></span>
+                  <span class="sr-only" x-text="'Owner ' + c.who"></span>
+                </span>
+              </div>
+
+              <!-- In normal flow inside the card, so no scroller can clip it.
+                   The stage the card is already in is not a destination and is
+                   not in the list. -->
+              <div x-show="open === c.no" x-cloak class="mt-2.5 border-t border-zinc-100 pt-2.5"
+                   @keydown.escape.stop="shut(c.no)">
+                <p class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Move to</p>
+                <div role="group" :aria-label="'Move ' + c.no + ' to'" class="mt-1.5 space-y-1">
+                  <template x-for="d in stages.filter(x => x.id !== c.stage)" :key="d.id">
+                    <button type="button" @click="commit(c.no, d.id)"
+                            class="flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 text-left text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                      <span class="truncate" x-text="d.name"></span>
+                      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="at(d.id).length"></span>
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </li>
+          </template>
+
+          <li x-show="!at(s.id).length" x-cloak class="px-2 py-6 text-center text-[12px]/4 text-zinc-500">
+            Nothing at this stage
+          </li>
+        </ul>
+      </section>
+    </template>
+  </div>
+</main>

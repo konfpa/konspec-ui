@@ -1,0 +1,260 @@
+<!-- orders/templates/orders/index.html — the register as a page template
+     rather than a fragment, so it extends the base that renders app-shell and
+     fills one block. Every signed-in screen is the shell; a register that starts
+     its own document loses the skip link, the nav landmark, the command palette
+     and the keyboard shortcuts, and reviews as fine because everything it
+     dropped is invisible until somebody uses a keyboard.
+
+     The whole query is in the querystring and nothing about the list is client
+     state. The filters are a GET form, the sortable headers are links carrying
+     the next sort, the chips are links that drop one parameter, and the pager is
+     the paginator's own page numbers. Back works, a filtered register is a URL
+     somebody can send to the buyer who asked about it, and the export link
+     carries request.GET so the file and the screen cannot disagree.
+
+     The view hands the template one entry per sortable column — its aria value
+     and the query string that would sort by it next — and one entry per active
+     filter with the query string that drops just that one. Working either out in
+     the template means writing the same comparison three times and getting
+     aria-sort and the chevron out of step.
+
+     The empty clause is the no-results state and it offers to clear the query and
+     nothing else; the create button stays up in the band where it is on every
+     state of this page. The register that has never had a row is a different
+     branch entirely, chosen on unfiltered_count rather than on the page being
+     empty, because a filter that hides everything and a plant that has nothing
+     are different screens.
+
+     Two traps this repo has hit. A multi-line {# #} is not a comment — Django's
+     tag_re has no DOTALL, so everything after the first line renders on the
+     page; use a comment/endcomment block. And |intcomma raises without {% load humanize %}
+     in this same file, which is why the load line is here and not only in
+     base.html. -->
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block main %}
+<div data-kui="index-page/django" class="text-zinc-900">
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="{% url 'procurement:home' %}" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium text-zinc-900">Purchase orders</span></li>
+        </ol>
+      </nav>
+
+      <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div class="min-w-0">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight">Purchase orders</h1>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+            {{ page_obj.paginator.count|intcomma }} of {{ unfiltered_count|intcomma }} orders · ₹{{ committed|intcomma }} committed · FY 2026–27
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <a href="{% url 'orders:export' %}?{{ request.GET.urlencode }}"
+             class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="download" class="size-4"></i>Export
+          </a>
+          <a href="{% url 'orders:create' %}"
+             class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="plus" class="size-4"></i>New order
+          </a>
+        </div>
+      </div>
+
+      <form method="get" action="{% url 'orders:index' %}" role="search" class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <div class="md:max-w-sm md:flex-1">
+          <label for="dj-q" class="sr-only">Filter the purchase order register</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+            <input id="dj-q" type="search" name="q" value="{{ request.GET.q|default:'' }}" enterkeyhint="search"
+                   autocomplete="off" spellcheck="false" placeholder="Filter {{ unfiltered_count|intcomma }} orders"
+                   class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 md:flex md:shrink-0">
+          <div class="min-w-0">
+            <label for="dj-status" class="sr-only">Status</label>
+            <select id="dj-status" name="status"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 md:w-auto">
+              <option value="">Status: all</option>
+              {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>Status: {{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="min-w-0">
+            <label for="dj-plant" class="sr-only">Plant</label>
+            <select id="dj-plant" name="plant"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 md:w-auto">
+              <option value="">Plant: all</option>
+              {% for p in plants %}
+                <option value="{{ p.code }}" {% if request.GET.plant == p.code %}selected{% endif %}>Plant: {{ p.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <button type="submit" class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:shrink-0">Apply</button>
+      </form>
+
+      {% if active_filters %}
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          {% for f in active_filters %}
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              {{ f.label }}
+              <a href="?{{ f.without_query }}" aria-label="Remove the filter {{ f.label }}"
+                 class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-3"></i>
+              </a>
+            </span>
+          {% endfor %}
+          <a href="{% url 'orders:index' %}" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</a>
+        </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+    {% if unfiltered_count %}
+      <div class="rounded-xl border border-zinc-300 bg-white">
+        <table class="w-full text-[13px]/5">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              {% for c in columns %}
+                <th scope="col" aria-sort="{{ c.aria }}" class="px-4 py-2.5 {% if c.numeric %}text-right{% endif %}">
+                  <a href="?{{ c.query }}"
+                     class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 {% if c.numeric %}justify-end{% endif %} {% if c.aria != 'none' %}text-zinc-900{% endif %}">
+                    {{ c.label }}
+                    {% if c.aria != 'none' %}
+                      <span class="{% if c.aria == 'descending' %}rotate-180{% endif %}"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+                    {% endif %}
+                  </a>
+                </th>
+              {% endfor %}
+              <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in page_obj %}
+              <tr class="relative border-b border-zinc-100 last:border-0 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums">
+                  <a href="{{ o.get_absolute_url }}" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ o.number }}</a>
+                </td>
+                <td class="px-4 py-2.5">
+                  <a href="{{ o.vendor.get_absolute_url }}" class="relative z-10 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ o.vendor.name }}</a>
+                </td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums">₹{{ o.amount|intcomma }}</td>
+                <td class="hidden px-4 py-2.5 sm:table-cell">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full {{ o.status_dot_class }}" aria-hidden="true"></span>{{ o.get_status_display }}
+                  </span>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4" class="px-6 py-12 text-center">
+                  <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                    <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+                  </span>
+                  <h2 class="mt-3 text-[16px]/6 font-semibold">No orders match this query</h2>
+                  <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+                    There are {{ unfiltered_count|intcomma }} orders in the register. Drop a chip above and the list widens.
+                  </p>
+                  <a href="{% url 'orders:index' %}"
+                     class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    Clear the query
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <p class="text-[13px]/5 text-zinc-600 tabular-nums">
+            {% if page_obj.paginator.count %}
+              {{ page_obj.start_index|intcomma }}–{{ page_obj.end_index|intcomma }} of {{ page_obj.paginator.count|intcomma }} orders
+            {% else %}
+              No orders to show
+            {% endif %}
+          </p>
+          <div class="flex items-center gap-2">
+            <span class="text-[13px]/5 text-zinc-600 tabular-nums">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_previous %}
+              <a href="?{{ prev_query }}" class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="chevron-left" class="size-4"></i>Previous
+              </a>
+            {% else %}
+              <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+                <i data-lucide="chevron-left" class="size-4"></i>Previous
+              </button>
+            {% endif %}
+            {% if page_obj.has_next %}
+              <a href="?{{ next_query }}" class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                Next<i data-lucide="chevron-right" class="size-4"></i>
+              </a>
+            {% else %}
+              <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+                Next<i data-lucide="chevron-right" class="size-4"></i>
+              </button>
+            {% endif %}
+          </div>
+        </nav>
+      </div>
+    {% else %}
+      <div class="rounded-xl border border-zinc-300 bg-white px-6 py-12 text-center">
+        <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="clipboard-list" class="size-5 text-zinc-600"></i>
+        </span>
+        <h2 class="mt-3 text-[16px]/6 font-semibold">No purchase orders yet</h2>
+        <p class="mx-auto mt-1 max-w-md text-[13px]/5 text-zinc-600 tabular-nums">
+          {{ plant.name }} was commissioned on {{ plant.commissioned_on|date:"d M Y" }} and nothing has been raised against it. The first order appears here the moment it is saved, draft or not.
+        </p>
+        <a href="{% url 'orders:import' %}"
+           class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="upload" class="size-4"></i>Import open orders
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% comment %}
+orders/views.py — everything the template reads, built once in the view
+
+    def index(request):
+        qs = Order.objects.for_user(request.user).select_related('vendor')
+        unfiltered_count = qs.count()
+        qs = apply_filters(qs, request.GET)
+        sort = request.GET.get('sort', 'number')
+        page_obj = Paginator(qs.order_by(sort), 50).get_page(request.GET.get('page'))
+        return render(request, 'orders/index.html', {
+            'page_obj': page_obj,
+            'unfiltered_count': unfiltered_count,
+            'committed': qs.aggregate(t=Sum('amount'))['t'] or 0,
+            'columns': [column('number', 'PO number', sort, request.GET),
+                        column('vendor__name', 'Vendor', sort, request.GET),
+                        column('amount', 'Value', sort, request.GET, numeric=True)],
+            'active_filters': chips(request.GET),
+            'prev_query': page_query(request.GET, page_obj.number - 1),
+            'next_query': page_query(request.GET, page_obj.number + 1),
+        })
+
+column() returns {'label', 'query', 'aria', 'numeric'}, where query is the whole
+querystring with sort flipped to '-field' when the column is already ascending,
+and aria is 'ascending', 'descending' or 'none'. chips() returns one entry per
+parameter in force with the label to print and without_query, the querystring
+with that one parameter removed and page dropped — dropping a filter has to
+return to page one, or clearing a chip on page 6 of a 3-page result shows
+nothing and reads as a broken filter.
+
+status_dot_class comes off the model and is one of the five locked values —
+bg-zinc-500, bg-amber-500, bg-red-600, bg-emerald-600, bg-zinc-400 — so the pill
+shape is written once here and only the dot changes.
+{% endcomment %}

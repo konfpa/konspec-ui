@@ -1,0 +1,147 @@
+<!-- The screen states what is true rather than what is comforting. Seventeen
+     scans are held on this tablet, none of them is in GRN-4821, and closing the
+     tab loses all seventeen. An offline banner that says "we will sync when
+     you are back" and nothing else is how a shift of counting disappears, and
+     the operator only finds out because the GRN is empty on Monday.
+
+     It also says what stopped working, not only that something did. The item
+     lookup is server-side, so a bag from the wrong lot is now accepted into the
+     queue and may be refused when the queue goes up — the operator has to know
+     that the screen has stopped checking, or they trust a quiet accept.
+
+     Posting is genuinely unavailable, so the button is disabled and the reason
+     is written beside it. A dead button on a screen with no menu, no sidebar
+     and no other route tells the operator nothing at all about what to do next,
+     and this is the one screen where there is nowhere else to look it up.
+
+     Scanning keeps working. Blocking the field until the network returns turns
+     a network problem into a stopped unloading bay, and the bags are on the
+     floor either way.
+
+     The queue here is in memory and the sentence on screen says so. Where a
+     deployment persists it — IndexedDB, a service worker — that one sentence
+     changes and nothing else about this screen does. -->
+<div data-kui="focus-page/offline" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       code: '', queued: 17,
+       keep(e) {
+         if (e.relatedTarget && e.relatedTarget.closest('[data-hands-off]')) return;
+         requestAnimationFrame(() => this.$refs.scan.focus());
+       },
+       accept() { if (!this.code.trim()) return; this.queued++; this.code = '' }
+     }"
+     x-init="$nextTick(() => $refs.scan.focus())">
+
+  <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
+    <p class="min-w-0 text-[16px]/6 font-medium">
+      Goods inward · Gate 2
+      <span class="block text-[14px]/5 font-normal tabular-nums text-zinc-600">Vikram Rathod · Silvassa · 11:58</span>
+    </p>
+    <div class="flex shrink-0 items-center gap-3">
+      <span class="inline-flex items-center gap-2 rounded-full bg-zinc-200 px-3 py-1 text-[13px]/5 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Offline
+      </span>
+      <button type="button" data-hands-off
+              class="inline-flex h-12 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="log-out" aria-hidden="true" class="size-5 text-zinc-600"></i>Exit
+      </button>
+    </div>
+  </header>
+
+  <main class="flex min-h-0 flex-1 flex-col">
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+      <div class="mx-auto max-w-3xl">
+
+        <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">Receiving into GRN-4821</h1>
+        <p class="mt-1 text-[16px]/6 tabular-nums text-zinc-600">
+          HDPE granules M60075 · lot 24-HD-118 · Gujarat Polymers Ltd
+        </p>
+
+        <!-- alert's shape, unchanged: white card, zinc edge, colour in the icon
+             alone. The loudness is the 24px sentence, not a red field. -->
+        <div class="mt-4 flex items-start gap-4 rounded-xl border border-zinc-300 bg-white px-5 py-5">
+          <i data-lucide="alert-circle" aria-hidden="true" class="mt-0.5 size-8 shrink-0 text-red-600"></i>
+          <div class="min-w-0">
+            <p class="text-[24px]/7 font-semibold tracking-tight tabular-nums">
+              <span x-text="queued">17</span> scans are on this tablet only
+            </p>
+            <p class="mt-2 text-[16px]/6 tabular-nums text-zinc-700">
+              None of them is in GRN-4821. Nothing is saved. Closing this screen or this tab loses every one of them, and they are held in this page rather than on the device.
+            </p>
+            <p class="mt-2 text-[16px]/6 tabular-nums text-zinc-700">
+              The gate network has been down since 11:52. Keep scanning — the queue goes up on its own the moment it comes back.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-start gap-3.5 rounded-xl border border-zinc-300 bg-white px-5 py-4">
+          <i data-lucide="alert-triangle" aria-hidden="true" class="mt-0.5 size-6 shrink-0 text-amber-700"></i>
+          <p class="text-[16px]/6 tabular-nums text-zinc-700">
+            <span class="font-medium">The lot check has stopped.</span>
+            Bag codes are not being checked against PO-2026-0418 while the tablet is offline, so a bag from the wrong lot will be taken now and refused when the queue is sent.
+          </p>
+        </div>
+
+        <div class="mt-5">
+          <label for="fo-scan" class="block text-[16px]/6 font-medium">Scan the next bag label</label>
+          <div class="mt-2 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="scan-barcode" aria-hidden="true" class="ml-4 size-6 shrink-0 text-zinc-600"></i>
+            <input id="fo-scan" x-ref="scan" x-model="code" name="barcode"
+                   inputmode="none" autocomplete="off" spellcheck="false" autocapitalize="off"
+                   aria-describedby="fo-scan-help" placeholder="Waiting for a scan"
+                   @blur="keep($event)" @keydown.enter.prevent="accept()"
+                   class="h-16 w-full min-w-0 bg-transparent px-3 text-[24px]/7 tabular-nums outline-none placeholder:text-zinc-500">
+          </div>
+          <p id="fo-scan-help" class="mt-2 text-[14px]/5 text-zinc-600">
+            Scanning still works. Every read is added to the queue below instead of to the GRN.
+          </p>
+        </div>
+
+        <h2 class="mt-6 text-[16px]/6 font-semibold">Held on this tablet</h2>
+        <ul class="mt-2 divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+          <li class="flex items-center gap-3 px-4 py-3.5">
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-amber-500"></span>
+            <span class="min-w-0 flex-1 truncate text-[16px]/6 font-medium tabular-nums">24-HD-118-0044</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums text-zinc-600">11:57:48 · queued</span>
+          </li>
+          <li class="flex items-center gap-3 px-4 py-3.5">
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-amber-500"></span>
+            <span class="min-w-0 flex-1 truncate text-[16px]/6 font-medium tabular-nums">24-HD-118-0043</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums text-zinc-600">11:57:11 · queued</span>
+          </li>
+          <li class="flex items-center gap-3 px-4 py-3.5">
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-emerald-600"></span>
+            <span class="min-w-0 flex-1 truncate text-[16px]/6 font-medium tabular-nums">24-HD-118-0027</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums text-zinc-600">11:51:52 · in the GRN</span>
+          </li>
+        </ul>
+        <p class="mt-2 text-[14px]/5 tabular-nums text-zinc-600">
+          Oldest queued read 11:52:04. 27 bags were already in the GRN before the network went.
+        </p>
+      </div>
+    </div>
+
+    <div class="shrink-0 border-t border-zinc-300 bg-white px-4 py-4 sm:px-6">
+      <div class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-5 gap-y-3">
+        <div class="min-w-[15rem] flex-1">
+          <p class="text-[24px]/7 font-semibold tracking-tight tabular-nums">
+            27 posted · <span x-text="queued">17</span> queued
+          </p>
+          <p class="mt-1 text-[16px]/6 text-zinc-700">
+            Finish and post needs the network. Last retry 11:58:02, retrying every 15 seconds.
+          </p>
+        </div>
+        <div class="flex shrink-0 flex-wrap items-center gap-3">
+          <button type="button" data-hands-off
+                  class="inline-flex h-16 items-center gap-2.5 rounded-lg border border-zinc-200 bg-white px-5 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="refresh-cw" aria-hidden="true" class="size-5 text-zinc-600"></i>Retry now
+          </button>
+          <button type="button" disabled
+                  class="inline-flex h-16 items-center gap-2.5 rounded-lg border border-zinc-300 bg-zinc-200 px-6 text-[20px]/7 font-medium text-zinc-400">
+            <i data-lucide="check" aria-hidden="true" class="size-6"></i>Finish and post
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

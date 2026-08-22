@@ -1,0 +1,208 @@
+<!-- views.py
+     from django.shortcuts import get_object_or_404, render
+
+     def order_document(request, number):
+         order = get_object_or_404(
+             PurchaseOrder.objects.select_related('vendor', 'ship_to')
+                                  .prefetch_related('lines__item'),
+             number=number, plant=request.user.plant,
+         )
+         # the tax rows are computed here and nowhere else. Whether a supply is
+         # IGST or a CGST and SGST pair depends on the supplier state against
+         # the place of supply, and a template that decides that with an if block
+         # is a tax rule living in the presentation layer — invisible to every
+         # test, and duplicated the moment a second document needs it.
+         return render(request, 'orders/document.html', {
+             'order': order,
+             'tax_rows': order.tax_rows(),       # [('CGST at 9%', Decimal), ...]
+             'words': rupees_in_words(order.total),
+             'copy': request.GET.get('copy', 'Original for recipient'),
+         })
+
+     templatetags/money.py — the same rupees filter table/django defines. Indian
+     grouping is 2,2,3 above the last three digits, and a document keeps the
+     paise: intcomma returns 1,157,750 where the sheet has to read 11,57,750.00,
+     and a figure wrong by a factor of ten is read straight past.
+
+     {% load humanize %} is here for intcomma on the line count, which is an
+     ordinary count and groups in threes correctly. Money does not go through
+     it. Loading it in this file matters — humanize loaded in base.html does
+     nothing for a template that includes it, and intcomma without the load
+     raises TemplateSyntaxError at render rather than at startup.
+
+     Do not extend base.html here. base.html is the app shell, and the shell
+     is chrome that has to come off the paper; a document that inherits it
+     prints the sidebar down the left of the sheet. The document extends a
+     print base that carries the @page rule and nothing else.
+
+     A comment/endcomment block, never a multi-line {# #}. Django's tag_re has no DOTALL, so
+     a {# #} that wraps onto a second line stops being a comment and the rest of
+     it renders on the vendor's copy.
+
+     Page numbers come from the view's pagination, not from CSS: counter(page)
+     in an @page margin box is not implemented in Chrome. -->
+{% extends "print_base.html" %}
+{% load humanize money %}
+
+{% block document %}
+<div data-kui="document-page/django" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm]">
+    <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-300 pb-2">
+        <p class="text-[11px]/4 font-medium uppercase tracking-wider">Purchase order</p>
+        <p class="border border-zinc-300 px-2 py-0.5 text-[11px]/4 font-medium uppercase tracking-wider">{{ copy }}</p>
+      </div>
+
+      <header class="mt-3 flex flex-wrap items-start justify-between gap-x-6 gap-y-4 border-b-2 border-zinc-300 pb-4">
+        <div class="flex min-w-0 flex-1 items-start gap-3 sm:min-w-[15rem]">
+          <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-[14px]/5 font-semibold">K</span>
+          <div class="min-w-0">
+            <p class="text-[16px]/6 font-semibold">{{ order.plant.legal_name }}</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">{{ order.plant.address }}</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">GSTIN {{ order.plant.gstin }} · State code {{ order.plant.state_code }}</p>
+          </div>
+        </div>
+        <div class="min-w-0 sm:shrink-0 sm:text-right">
+          <h1 class="text-[20px]/7 font-semibold tracking-tight">Purchase order</h1>
+          <p class="mt-1 text-[13px]/5 font-medium tabular-nums">{{ order.number }}</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Dated {{ order.raised_on|date:"d M Y" }} · Revision {{ order.revision }}</p>
+        </div>
+      </header>
+
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <section aria-labelledby="dj-vendor-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="dj-vendor-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Vendor</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">{{ order.vendor.name }}</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">{{ order.vendor.address|linebreaksbr }}</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">GSTIN {{ order.vendor.gstin }} · State code {{ order.vendor.state_code }}</p>
+        </section>
+        <section aria-labelledby="dj-ship-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="dj-ship-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Deliver to</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">{{ order.ship_to.name }}</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">{{ order.ship_to.address|linebreaksbr }}</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">Required by {{ order.required_by|date:"d M Y" }} · {{ order.get_freight_display }}</p>
+        </section>
+      </div>
+
+      <section aria-labelledby="dj-lines-h" class="mt-4">
+        <h2 id="dj-lines-h" class="sr-only">Order lines</h2>
+        {% comment %}
+          overflow-x-auto is the 390px answer and md:overflow-visible
+          print:overflow-visible takes it away again. An element with overflow
+          other than visible is monolithic in paged media, so a long order left
+          inside a live scroller is clipped at the first page break instead of
+          splitting across sheets — and the <thead> that repeats itself on every
+          sheet stops repeating with it.
+        {% endcomment %}
+        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+          <table class="w-full min-w-[34rem] text-[12px]/4">
+            <caption class="sr-only">{{ order.lines.count|intcomma }} lines ordered from {{ order.vendor.name }} against {{ order.number }}</caption>
+            <thead class="bg-zinc-50 print:bg-white">
+              <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+                <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+                <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Quantity</th>
+                <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Rate</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for line in order.lines.all %}
+                <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                  <td class="px-2 py-2 text-right tabular-nums">{{ forloop.counter }}</td>
+                  <td class="px-2 py-2">{{ line.item.description }}
+                    <span class="block text-[11px]/4 tabular-nums text-zinc-600">{{ line.item.code }}{% if line.specification %} · {{ line.specification }}{% endif %}</span>
+                  </td>
+                  <td class="px-2 py-2 tabular-nums">{{ line.item.hsn }}</td>
+                  <td class="px-2 py-2 text-right tabular-nums">{{ line.quantity|floatformat:3 }} {{ line.item.uom }}</td>
+                  <td class="px-2 py-2 text-right tabular-nums">{{ line.rate|floatformat:2 }}</td>
+                  <td class="px-2 py-2 text-right tabular-nums">{{ line.amount|rupees }}</td>
+                </tr>
+              {% empty %}
+                {% comment %}
+                  A document with no lines is not an empty state to design — it
+                  is a record that should never have reached a printer. Say so
+                  on the sheet rather than printing a headed form with a blank
+                  middle, which is a form somebody will fill in by hand.
+                {% endcomment %}
+                <tr>
+                  <td colspan="6" class="px-2 py-8 text-center text-[12px]/4">
+                    This order has no lines and cannot be issued. Add at least one line before printing it.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+            {% if order.lines.exists %}
+              <tfoot>
+                <tr class="break-inside-avoid border-t-2 border-zinc-300">
+                  <th scope="row" colspan="5" class="px-2 py-2 text-right font-medium">
+                    Taxable value — {{ order.lines.count|intcomma }} line{{ order.lines.count|pluralize }}
+                  </th>
+                  <td class="px-2 py-2 text-right font-semibold tabular-nums">{{ order.taxable|rupees }}</td>
+                </tr>
+                {% for label, amount in tax_rows %}
+                  <tr class="break-inside-avoid">
+                    <th scope="row" colspan="5" class="px-2 py-1 text-right font-normal text-zinc-600">{{ label }}</th>
+                    <td class="px-2 py-1 text-right tabular-nums">{{ amount|rupees }}</td>
+                  </tr>
+                {% endfor %}
+                <tr class="break-inside-avoid border-t border-zinc-300">
+                  <th scope="row" colspan="5" class="px-2 py-2 text-right text-[13px]/5 font-semibold">Order total</th>
+                  <td class="px-2 py-2 text-right text-[13px]/5 font-semibold tabular-nums">{{ order.total|rupees }}</td>
+                </tr>
+              </tfoot>
+            {% endif %}
+          </table>
+        </div>
+      </section>
+
+      {% if order.lines.exists %}
+        <div class="mt-4 break-inside-avoid border border-zinc-300 p-3">
+          <h2 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Amount chargeable, in words</h2>
+          <p class="mt-1 text-[13px]/5 font-medium">{{ words }}</p>
+        </div>
+
+        <section aria-labelledby="dj-terms-h" class="mt-4 break-inside-avoid">
+          <h2 id="dj-terms-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Terms and conditions</h2>
+          <ol class="mt-1.5 list-decimal space-y-1 pl-4 text-[11px]/4 text-zinc-600">
+            {% for clause in order.terms.all %}
+              <li>{{ clause.text }}</li>
+            {% empty %}
+              <li>Quote {{ order.number }} on the invoice, the delivery challan and the packing list.</li>
+            {% endfor %}
+          </ol>
+        </section>
+
+        <div class="mt-8 grid gap-6 sm:grid-cols-2">
+          <div class="break-inside-avoid">
+            <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">Prepared by</p>
+            <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">{{ order.raised_by.get_full_name }} · {{ order.raised_by.department }}</p>
+          </div>
+          {% if order.approved_on %}
+            <div class="break-inside-avoid sm:text-right">
+              <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">For {{ order.plant.legal_name }}</p>
+              <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Authorised signatory</p>
+            </div>
+          {% else %}
+            {% comment %}
+              No signature block on an unapproved order. An empty rule over the
+              words Authorised signatory is an invitation, and somebody signs it.
+              The draft variant is the whole sheet in this state.
+            {% endcomment %}
+            <div class="break-inside-avoid border border-zinc-300 p-3">
+              <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">Not yet approved</p>
+              <p class="mt-1 text-[12px]/4 text-zinc-600">A signature block is added when this order is approved and emailed to the vendor. This sheet commits nothing.</p>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} · {{ order.number }} · issued {{ order.raised_on|date:"d M Y" }}
+      </footer>
+    </article>
+  </main>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+<!-- Sheet stock is expensive and gets part-used, so the sheet in the drawer
+     starts at position nine and the print has to start there too.
+
+     The skipped positions are rendered. They are empty <li> elements holding
+     their place in the grid, and dropping them instead is the entire defect
+     this screen exists to prevent — remove eight cells and every label moves up
+     eight positions, the sheet prints onto backing paper, and it is not found
+     until somebody looks at the sheet.
+
+     On screen they carry bg-zinc-50 and their position number, because the
+     operator is checking the count against a real sheet in their hand and eight
+     identical blanks are hard to count. That fill is meaning carried in a
+     background, which the print rules forbid — so it is print:bg-transparent
+     and on paper the same information is carried by the cell being blank, which
+     is what an already-peeled position looks like anyway. bg-zinc-50 rather
+     than bg-zinc-100: the sheet is a white surface and the page fill inside a
+     white surface reads as a hole in it.
+
+     The skipped cells are aria-hidden. They exist to occupy grid tracks, and a
+     reader that announced eight blank list items before the first label would
+     be reading the stock rather than the job.
+
+     The start position is a number, not a click target on the sheet. Picking
+     the first free position by clicking it is the obvious design and it is
+     wrong on a phone in a store with one hand free, and it is unreachable from
+     a keyboard without twenty-one tab stops.
+
+     The grid is sliced to what the sheet holds. Starting at fifteen leaves room
+     for seven of the thirteen, and the six that are left are reported rather
+     than drawn — a preview that grows a ninth row is a preview of a sheet of
+     stock nobody sells, and it is exactly the arrangement the operator is here
+     to check against the sheet in their hand. -->
+<div data-kui="label-sheet/start-position" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+     x-data="{
+       start: 9,
+       labels: [
+         { loc: 'C-01-01', code: 'ITM-2001', desc: 'HDPE granules — natural, M60075' },
+         { loc: 'C-01-02', code: 'ITM-2014', desc: 'HDPE granules — black, M65' },
+         { loc: 'C-01-03', code: 'ITM-2030', desc: 'LDPE granules 24FS040' },
+         { loc: 'C-01-04', code: 'ITM-2088', desc: 'PP copolymer 3120MA' },
+         { loc: 'C-01-05', code: 'ITM-1091', desc: 'Masterbatch — white 60%' },
+         { loc: 'C-01-06', code: 'ITM-1097', desc: 'Masterbatch — black 40%' },
+         { loc: 'C-01-07', code: 'ITM-5140', desc: 'Stretch film — 23 micron' },
+         { loc: 'C-02-01', code: 'ITM-5188', desc: 'Strapping roll — PP 12 mm' },
+         { loc: 'C-02-02', code: 'ITM-5210', desc: 'Adhesive tape — 48 mm' },
+         { loc: 'C-02-03', code: 'ITM-5244', desc: 'Corner board — paper' },
+         { loc: 'C-02-04', code: 'ITM-5290', desc: 'Silica gel sachet — 50 g' },
+         { loc: 'C-02-05', code: 'ITM-5311', desc: 'Shrink hood — LDPE' },
+         { loc: 'C-02-06', code: 'ITM-5340', desc: 'Pallet — wooden 1200 × 1000' }
+       ],
+       set(n) { const v = Math.round(Number(n));
+                this.start = Number.isFinite(v) ? Math.min(21, Math.max(1, v)) : 1 },
+       get blanks() { return this.start - 1 },
+       get onSheet() { return this.labels.slice(0, Math.max(0, 21 - this.blanks)) },
+       get spill() { return this.labels.length - this.onSheet.length }
+     }">
+  <main class="mx-auto w-full max-w-[210mm]">
+
+    <div class="mb-4 print:hidden">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Bin labels — rack C-01 and C-02</h1>
+
+      <div class="mt-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+        <div class="flex flex-wrap items-end gap-x-6 gap-y-3">
+          <div>
+            <label for="sp-start" class="mb-1.5 block text-[13px]/5 font-medium">Start at position</label>
+            <div class="w-24 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="sp-start" name="start" inputmode="numeric" value="9" :value="start"
+                     @change="set($el.value); $el.value = start"
+                     @keydown.arrow-up.prevent="set(start + 1)" @keydown.arrow-down.prevent="set(start - 1)"
+                     aria-describedby="sp-count"
+                     class="w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+          </div>
+          <p class="text-[12px]/4 text-zinc-600">Positions run left to right and then down, 1 at the top left and 21 at the bottom right. Count the labels already off the sheet and add one.</p>
+        </div>
+        <p id="sp-count" role="status" class="mt-2 border-t border-zinc-200 pt-2 text-[12px]/4 tabular-nums text-zinc-600">
+          <span x-text="blanks">8</span> positions skipped · <span x-text="onSheet.length">13</span> of <span x-text="labels.length">13</span> labels fit on this sheet, at positions <span x-text="start">9</span> to <span x-text="blanks + onSheet.length">21</span>
+          <span x-show="spill &gt; 0" x-cloak> · <span x-text="spill">0</span> roll onto a second sheet from position 1</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto print:overflow-visible">
+      <ol role="list" class="mx-auto grid w-[210mm] grid-cols-3 gap-x-[2.5mm] gap-y-0 rounded-xl border border-zinc-300 bg-white px-[7.25mm] py-[15.15mm] print:rounded-none print:border-0">
+
+        <template x-for="n in blanks" :key="'blank-' + n">
+          <li aria-hidden="true" class="flex h-[38.1mm] items-center justify-center overflow-hidden border border-zinc-300 bg-zinc-50 print:border-0 print:bg-transparent">
+            <span class="text-[12px]/4 tabular-nums text-zinc-600 print:hidden" x-text="'Position ' + n + ' — already used'">Position 1 — already used</span>
+          </li>
+        </template>
+
+        <template x-for="l in onSheet" :key="l.loc">
+          <li class="flex h-[38.1mm] break-inside-avoid flex-col overflow-hidden border border-zinc-300 p-[2.5mm] print:border-0">
+            <p class="text-[20px]/7 font-semibold tabular-nums tracking-tight" x-text="l.loc">C-01-01</p>
+            <p class="text-[12px]/4 font-medium tabular-nums" x-text="l.code">ITM-2001</p>
+            <p class="truncate text-[11px]/4" x-text="l.desc">HDPE granules — natural, M60075</p>
+            <div class="mt-auto">
+              <!-- SUBSTITUTE. Code 128 of the location at 53.5 × 9 mm. -->
+              <div aria-hidden="true" class="flex h-[9mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+              <p class="mt-[0.6mm] text-center text-[12px]/4 font-medium tabular-nums" x-text="l.loc">C-01-01</p>
+            </div>
+          </li>
+        </template>
+      </ol>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,124 @@
+<!-- The whole chrome of the portal is this header, and that is the decision the
+     entry turns on. No app-shell: no command palette, no keyboard shortcuts, no
+     collapsing rail, no counts. All of it is right for a buyer who lives in the
+     console and was trained on it, and all of it is furniture for a supplier
+     with four destinations who signs in four times a month.
+
+     Two names, one job each. Konspec on the left is the system of record — it
+     says whose numbering and whose terms these are. Gujarat Polymers on the
+     right is the account, and it is the check a person makes when three
+     customers' portals are open in three tabs. Neither is a logo slot: nothing
+     in this system uploads a picture, an organisation takes rounded-lg where a
+     person takes rounded-full, and a logo arrives at whatever size the vendor
+     emailed it and takes the header height with it.
+
+     Four destinations is the budget, not a starting point. A fifth is a screen
+     that should have been merged into one of the four.
+
+     Sign out is a form POST with a CSRF token and not a link. Django's
+     LogoutView has refused GET since 4.1, and a GET sign-out is fired by link
+     prefetchers and by the mail scanners that follow every URL in a
+     notification — the supplier is then signed out by an email nobody opened.
+
+     The skip link and the <main> landmark are drawn here because app-shell
+     normally provides them and this page does not have it. They are the two
+     parts of the shell a portal still needs. -->
+<div data-kui="portal-page/shell" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <a href="#pp-sh-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
+      <a href="/portal/" class="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-semibold">Konspec Industries</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Supplier portal</span>
+        </span>
+      </a>
+
+      <div class="ml-auto flex min-w-0 items-center gap-2.5">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">GP</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-medium">Gujarat Polymers Ltd</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Mehul Trivedi</span>
+        </span>
+        <form method="post" action="/portal/sign-out/" class="shrink-0">
+          <button type="submit" class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sign out</button>
+        </form>
+      </div>
+    </div>
+
+    <nav aria-label="Supplier portal" class="mx-auto max-w-5xl px-2 pb-2">
+      <ul class="flex flex-wrap items-center gap-1">
+        <li><a href="/portal/orders/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Orders</a></li>
+        <li><a href="/portal/invoices/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Invoices</a></li>
+        <li><a href="/portal/payments/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Payments</a></li>
+        <li><a href="/portal/details/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Your details</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="pp-sh-main" tabindex="-1" class="mx-auto max-w-5xl px-4 py-5">
+    <h1 class="text-[24px]/7 font-semibold tracking-tight">Gujarat Polymers Ltd</h1>
+    <!-- the boundary, said in a sentence. Not a filter chip: a chip implies
+         something that can be taken off, and this cannot be. It is also what
+         stops a supplier who sees four rows deciding the fifth order was lost. -->
+    <p class="mt-1.5 max-w-2xl text-[14px]/5 tabular-nums text-zinc-600">
+      This portal holds the orders between Konspec Industries and Gujarat Polymers Ltd, and nothing else. You are signed in as Mehul Trivedi. Four orders are open.
+    </p>
+
+    <h2 class="mt-6 text-[16px]/6 font-semibold">What we are waiting for</h2>
+    <ul class="mt-2 divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <li class="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3.5">
+        <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-check" class="size-4 text-zinc-600"></i>
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[14px]/5 font-medium tabular-nums">Accept the delivery date on PO-2026-0418</p>
+          <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">18.000 MT HDPE granules M60075 · your reference GP/SO/2026/1184 · we asked for 04 Sep 2026</p>
+        </div>
+        <a href="/portal/orders/PO-2026-0418/acknowledge/"
+           class="shrink-0 rounded-lg border border-transparent bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          Acknowledge
+        </a>
+      </li>
+      <li class="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3.5">
+        <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="truck" class="size-4 text-zinc-600"></i>
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[14px]/5 font-medium tabular-nums">PO-2026-0357 was due on 18 Aug 2026</p>
+          <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">12.000 MT PP copolymer 3120MA · your reference GP/SO/2026/1102 · nothing received against it yet</p>
+        </div>
+        <a href="/portal/orders/PO-2026-0357/acknowledge/"
+           class="shrink-0 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Tell us the new date
+        </a>
+      </li>
+      <li class="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3.5">
+        <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="receipt" class="size-4 text-zinc-600"></i>
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[14px]/5 font-medium tabular-nums">Delivery receipt 4821 has no invoice against it</p>
+          <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">9.000 MT accepted on 09 Aug 2026 · ₹10,65,600 · payment starts from the date we receive the invoice</p>
+        </div>
+        <a href="/portal/invoices/new/?receipt=4821"
+           class="shrink-0 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Send your invoice
+        </a>
+      </li>
+    </ul>
+  </main>
+
+  <!-- the escape hatch for everything the four screens do not do, and it is a
+       named person rather than a mailbox. A portal nobody was trained on needs
+       one route to somebody who can answer, printed on every page. -->
+  <footer class="mx-auto max-w-5xl px-4 pb-6">
+    <p class="border-t border-zinc-200 pt-4 text-[12px]/4 tabular-nums text-zinc-600">
+      Your buyer at Konspec is <span class="font-medium text-zinc-900">Ritu Deshpande</span> —
+      <a href="mailto:ritu.deshpande@konspec.com" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">ritu.deshpande@konspec.com</a>
+      · +91 260 264 0102 extension 4118. Anything this portal cannot do, she can.
+    </p>
+  </footer>
+</div>

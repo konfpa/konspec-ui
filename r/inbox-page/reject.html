@@ -1,0 +1,250 @@
+<!-- Approving is a decision the record already carries the argument for.
+     Refusing is not: the buyer gets the order back and has nothing to change
+     unless the refusal says what was wrong with it. So the reason is part of
+     the write and not a note attached to it afterwards, and that is the whole
+     reason a refusal cannot be optimistic in any form. Splice the row out on
+     the click and the queue has already told the user the order is gone while
+     the reason field is still empty and the POST has not been written.
+
+     The question and the field are one interruption rather than two screens,
+     which is alert-dialog's reason shape, composed here and not redrawn. The
+     select is first in the DOM so the focus trap opens on the thing that has to
+     be answered rather than on Cancel, the confirm is genuinely disabled until
+     it is, and the note is required only for Other because Other carries no
+     information by itself.
+
+     Send back and Reject are two different acts and the screen must not blur
+     them. Sending back returns the order to the raiser, who can amend it and
+     send it again; rejecting ends it and the number is spent. Both need a
+     reason, so both open this dialog — what differs is the verb, the list of
+     reasons and the sentence under the heading, and the dialog is told which
+     one it is rather than working it out from the button that opened it.
+
+     Escape cancels and the backdrop does nothing. A dialog dismisses on a stray
+     backdrop click; this one must not, because the user is being asked a
+     question and a misplaced click is not an answer.
+
+     Cancel returns focus to the button that opened the dialog, which x-trap
+     does on its own — but the confirm does not, because the row it belonged to
+     is gone. That path lands focus on the record region the same way an
+     approval does, and the live region carries the outcome.
+
+     The overlay is absolute inset-0 against this bounded frame so it previews
+     in the box. On a real page it is fixed inset-0. -->
+<main data-kui="inbox-page/reject" class="relative flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, said: '', ask: '', reason: '', note: '',
+        queue: [
+          { no: 'PO-2026-0418', party: 'Gujarat Polymers Ltd', value: '₹4,10,500', age: '4 days', status: 'Overdue', raiser: 'Meera Joshi', why: 'Rate is ₹1.60 a kg above RC-2026-0071' },
+          { no: 'PO-2026-0421', party: 'Sharma Steel & Alloys', value: '₹2,18,400', age: '2 days', status: 'Approved', raiser: 'Akshay Prabhu', why: 'No rate contract covers structural steel this quarter' },
+          { no: 'PO-2026-0424', party: 'Nashik Steel Traders', value: '₹96,750', age: '1 day', status: 'Approved', raiser: 'Meera Joshi', why: 'Single quote against a three-quote policy' },
+          { no: 'PO-2026-0427', party: 'Qureshi Metals', value: '₹5,46,000', age: 'today', status: 'Approved', raiser: 'Nilesh Patil', why: 'Above the ₹5,00,000 second-approver threshold' }
+        ],
+        reasons: {
+          reject: [['rate', 'Rate above the running contract'], ['qty', 'Quantity exceeds the indent'], ['vendor', 'Vendor documents expired'], ['budget', 'No budget left on this cost centre'], ['other', 'Other']],
+          back: [['quotes', 'Comparative quotes not attached'], ['spec', 'Material specification incomplete'], ['address', 'Delivery address is not a registered plant'], ['split', 'Split this across two cost centres'], ['other', 'Other']]
+        },
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.queue[this.sel] },
+        get verb() { return this.ask === 'reject' ? 'Reject' : 'Send back' },
+        get ready() { return this.reason !== '' && (this.reason !== 'other' || this.note.trim() !== '') },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.queue.length - 1)) },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) },
+        raise(kind) { this.ask = kind; this.reason = ''; this.note = '' },
+        send() {
+          if (!this.ready) return;
+          const gone = this.rec.no, word = this.ask === 'reject' ? 'rejected' : 'sent back to ' + this.rec.raiser;
+          this.ask = '';
+          this.queue.splice(this.sel, 1);
+          if (!this.queue.length) { this.said = gone + ' ' + word + '. Your inbox is clear.'; this.detail = false; return }
+          this.sel = Math.min(this.sel, this.queue.length - 1);
+          this.said = gone + ' ' + word + ' with a reason. ' + this.queue.length + ' left in your inbox.';
+          this.$nextTick(() => { this.$refs.detail.focus(); if (this.$refs.body) this.$refs.body.scrollTop = 0 });
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Waiting on you</h1>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-text="queue.length + ' purchase orders · Silvassa and Vapi · FY 2026–27'"></p>
+  </div>
+
+  <div class="flex min-h-0 flex-1" @keydown.escape="back()">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">The queue</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="queue.length ? (sel + 1) + ' of ' + queue.length : 'none left'"></p>
+      </div>
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')" x-show="queue.length"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(queue.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(o, i) in queue" :key="o.no">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[o.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="o.no"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="o.value"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="o.status"></span> · <span x-text="o.party"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500">
+                Raised by <span x-text="o.raiser"></span> · with you <span x-text="o.age"></span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+      <div x-show="!queue.length" x-cloak class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+        </span>
+        <h3 class="mt-3 text-[14px]/5 font-semibold">Nothing left waiting</h3>
+      </div>
+    </section>
+
+    <div class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex lg:flex-row"
+         :class="{ 'hidden': !detail, 'flex': detail }">
+      <template x-if="queue.length">
+        <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+                 class="flex min-h-0 min-w-0 flex-1 flex-col focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <button type="button" @click="back()"
+                    class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+              <i data-lucide="chevron-left" class="size-4"></i>Back to the inbox
+            </button>
+            <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+              <span class="tabular-nums" x-text="rec.no"></span>
+              <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+              </span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.party + ' · raised by ' + rec.raiser + ' · with you ' + rec.age"></p>
+          </div>
+          <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+            <div class="rounded-xl border border-zinc-200 p-4">
+              <div class="flex items-start gap-2.5">
+                <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                <div class="min-w-0">
+                  <p class="text-[13px]/5 font-medium">Why this is with you</p>
+                  <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600" x-text="rec.why"></p>
+                </div>
+              </div>
+            </div>
+            <p class="mt-4 text-[13px]/5 tabular-nums text-zinc-600">
+              The reason you give is emailed to the raiser and written onto the order history, where it is the only record of why this number was refused. It is read by somebody who cannot see this screen.
+            </p>
+          </div>
+        </section>
+      </template>
+
+      <aside aria-label="Your decision" x-show="queue.length"
+             class="flex shrink-0 flex-col border-t border-zinc-200 lg:w-72 lg:border-t-0 lg:border-l">
+        <div class="hidden min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:block">
+          <p class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">This order</p>
+          <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="rec.value"></p>
+          <div class="mt-4 rounded-xl border border-zinc-200 p-3">
+            <p class="text-[12px]/4 font-medium">Two ways to refuse</p>
+            <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+              Sending it back returns the order to <span x-text="rec.raiser"></span>, who can amend it and send it again. Rejecting ends it and the number is spent.
+            </p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 border-zinc-200 px-4 py-3 lg:flex-col lg:items-stretch lg:border-t">
+          <button type="button"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="check" class="size-4"></i>Approve
+          </button>
+          <button type="button" x-ref="backBtn" @click="raise('back')"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back
+          </button>
+          <button type="button" x-ref="rejBtn" @click="raise('reject')"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="alert-circle" class="size-4 text-red-600"></i>Reject
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- alert-dialog/reason, composed. No backdrop click handler at all. -->
+  <div x-show="ask" x-cloak x-trap.noscroll="ask !== ''" @keydown.escape.window="ask = ''"
+       class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" :aria-labelledby="$id('rec') + '-ask'" :aria-describedby="$id('rec') + '-askbody'"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <h2 :id="$id('rec') + '-ask'" class="text-[16px]/6 font-semibold tabular-nums" x-text="verb + ' ' + (rec ? rec.no : '')"></h2>
+      <p :id="$id('rec') + '-askbody'" class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+        <span x-text="rec ? rec.party + ' · ' + rec.value + '. ' : ''"></span>
+        <span x-show="ask === 'reject'">The order ends here and the number cannot be reused. The reason is emailed to the raiser and written onto the order history.</span>
+        <span x-show="ask === 'back'" x-cloak>The order returns to the raiser as a draft they can amend and send again. The reason is emailed to them and written onto the order history.</span>
+      </p>
+
+      <div class="mt-4">
+        <label :for="$id('rec') + '-reason'" class="mb-1.5 block text-[13px]/5 font-medium">
+          Reason <span aria-hidden="true" class="text-red-600">*</span>
+        </label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select :id="$id('rec') + '-reason'" name="reason" x-model="reason" required
+                  class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+            <option value="" selected disabled hidden>Choose a reason</option>
+            <template x-for="r in (ask === 'reject' ? reasons.reject : reasons.back)" :key="r[0]">
+              <option :value="r[0]" x-text="r[1]"></option>
+            </template>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-4"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <label :for="$id('rec') + '-note'" class="mb-1.5 block text-[13px]/5 font-medium">
+          Note to the raiser
+          <span x-show="reason === 'other'" x-cloak aria-hidden="true" class="text-red-600">*</span>
+        </label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <textarea :id="$id('rec') + '-note'" name="note" rows="3" x-model="note" :aria-describedby="$id('rec') + '-notehelp'"
+                    :required="reason === 'other'"
+                    class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                    placeholder="Quote the contract rate, or the indent line that does not match."></textarea>
+        </div>
+        <p :id="$id('rec') + '-notehelp'" class="mt-1.5 text-[12px]/4 text-zinc-500">
+          Goes into the email and onto the order history. Required when the reason is Other.
+        </p>
+      </div>
+
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <button type="button" @click="ask = ''"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="send()" :disabled="!ready"
+                class="rounded-lg border border-transparent bg-red-600 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-300 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200"
+                x-text="verb === 'Reject' ? 'Reject the order' : 'Send the order back'">Reject the order</button>
+      </div>
+    </div>
+  </div>
+</main>

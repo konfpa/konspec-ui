@@ -1,0 +1,177 @@
+<!-- One screen type, two empties, and they must not look the same. The switch
+     between them here is a real control the page already has: the plant scope.
+
+     Daman was commissioned on 04 Aug 2026 and no order has ever been raised
+     against it. That register has no toolbar, no header row and no pager,
+     because all three are chrome describing an absence — a search box offering
+     to filter nothing, sortable headers offering to reorder nothing, and a
+     footer reading 0–0 of 0. It says the commissioning date, because "No
+     purchase orders yet" on its own leaves somebody wondering whether the
+     register is empty or broken.
+
+     Silvassa has 1,438 orders and the status filter excludes every one of them.
+     That register keeps the filter band and the chips, because the query is the
+     thing that has to be undone, and it names what is in force and offers to
+     drop it. The count line under the h1 says how many exist outside the query,
+     which is the fact that distinguishes the two screens in one sentence.
+
+     Neither empty block carries a create button, and the reason is worth
+     writing down because it looks like a contradiction. The page's own New
+     order stays in the band on both states, where it always is — it is the
+     page's action, not an answer to what the list shows. What the block in the
+     middle never does is draw a second filled button as the answer to an empty
+     result: under a filter that is hiding a record, that is how the same order
+     gets raised twice, and two graphite buttons 300px apart make somebody
+     choose before they have read why.
+
+     On the never-used register the block's own answers are a bordered import
+     and a link, so the one fill on the page is still the one in the band.
+
+     The scope control is button-group's segmented radiogroup copied rather than
+     reinvented: one Tab stop, a roving tabindex and aria-checked, so which
+     plant is showing is announced and not only tinted. -->
+<div data-kui="index-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       plant: 'daman', status: 'Overdue',
+       book: {
+         silvassa: [
+           { po: 'PO-2026-0414', vendor: 'Gujarat Polymers Ltd', amount: 468500, status: 'Approved' },
+           { po: 'PO-2026-0424', vendor: 'Konkan Chemicals Pvt Ltd', amount: 96750, status: 'Closed' },
+           { po: 'PO-2026-0427', vendor: 'Gujarat Polymers Ltd', amount: 5460000, status: 'Approved' },
+           { po: 'PO-2026-0433', vendor: 'Sharma Steel &amp; Alloys', amount: 78900, status: 'Draft' }
+         ],
+         daman: []
+       },
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get all() { return this.book[this.plant] },
+       get virgin() { return this.all.length === 0 },
+       get rows() { return this.all.filter(r => !this.status || r.status === this.status) },
+       get label() { return this.plant === 'daman' ? 'Daman' : 'Silvassa' }
+     }">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Purchase orders</h1>
+            <p role="status" x-ref="count" tabindex="-1"
+               class="mt-1 text-[13px]/5 tabular-nums text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+               x-text="virgin ? 'No orders have ever been raised against ' + label
+                              : rows.length + ' of ' + all.length + ' orders match · ' + label"></p>
+          </div>
+          <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="plus" class="size-4"></i>New order
+          </button>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <div role="radiogroup" aria-label="Plant" x-ref="grp"
+               @keydown.arrow-right.prevent="plant = plant === 'daman' ? 'silvassa' : 'daman'; $nextTick(() => $refs.grp.querySelector('[aria-checked=true]').focus())"
+               @keydown.arrow-left.prevent="plant = plant === 'daman' ? 'silvassa' : 'daman'; $nextTick(() => $refs.grp.querySelector('[aria-checked=true]').focus())"
+               class="inline-flex rounded-lg bg-zinc-200 p-0.5">
+            <button type="button" role="radio" @click="plant = 'silvassa'"
+                    :aria-checked="plant === 'silvassa'" :tabindex="plant === 'silvassa' ? 0 : -1"
+                    class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="plant === 'silvassa' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">Silvassa</button>
+            <button type="button" role="radio" @click="plant = 'daman'"
+                    :aria-checked="plant === 'daman'" :tabindex="plant === 'daman' ? 0 : -1"
+                    class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="plant === 'daman' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">Daman</button>
+          </div>
+
+          <div x-show="!virgin" x-cloak class="min-w-0">
+            <label for="ix-em-status" class="sr-only">Status</label>
+            <select id="ix-em-status" x-model="status"
+                    class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+              <option value="">Status: all</option>
+              <option value="Approved">Status: approved</option>
+              <option value="Overdue">Status: overdue</option>
+              <option value="Closed">Status: closed</option>
+            </select>
+          </div>
+        </div>
+
+        <div x-show="!virgin &amp;&amp; status" x-cloak class="mt-3 flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span x-text="'Status: ' + status"></span>
+            <button type="button" @click="status = ''" :aria-label="'Remove the filter Status: ' + status"
+                    class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-3"></i>
+            </button>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+
+      <div x-show="virgin" x-cloak class="rounded-xl border border-zinc-300 bg-white px-6 py-12 text-center">
+        <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="clipboard-list" class="size-5 text-zinc-600"></i>
+        </span>
+        <h2 class="mt-3 text-[16px]/6 font-semibold">No purchase orders yet</h2>
+        <p class="mx-auto mt-1 max-w-md text-[13px]/5 text-zinc-600 tabular-nums">
+          The Daman plant was commissioned on 04 Aug 2026 and nothing has been raised against it. The first order appears here the moment it is saved, draft or not.
+        </p>
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="upload" class="size-4"></i>Import open orders from Silvassa
+          </button>
+          <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            How a new plant is set up
+          </a>
+        </div>
+      </div>
+
+      <div x-show="!virgin" x-cloak class="rounded-xl border border-zinc-300 bg-white">
+        <table x-show="rows.length" x-cloak class="w-full text-[13px]/5">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+              <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="r in rows" :key="r.po">
+              <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+                <td class="px-4 py-2.5">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+                  </span>
+                </td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums" x-text="money(r.amount)"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+
+        <div x-show="!rows.length" x-cloak class="px-6 py-12 text-center">
+          <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+          </span>
+          <h2 class="mt-3 text-[16px]/6 font-semibold">No orders match this filter</h2>
+          <p class="mx-auto mt-1 max-w-md text-[13px]/5 text-zinc-600">
+            Silvassa has <span class="font-medium text-zinc-900 tabular-nums" x-text="all.length"></span> orders in the register and the chip above excludes every one of them.
+          </p>
+          <button type="button" @click="status = ''; $nextTick(() => $refs.count.focus())"
+                  class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Drop the status filter
+          </button>
+        </div>
+
+        <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <p class="text-[13px]/5 text-zinc-600 tabular-nums"
+             x-text="rows.length ? '1–' + rows.length + ' of ' + rows.length + ' orders' : 'No orders to show'"></p>
+          <span class="text-[13px]/5 text-zinc-600 tabular-nums">Page 1 of 1</span>
+        </nav>
+      </div>
+    </div>
+  </main>
+</div>

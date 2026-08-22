@@ -1,0 +1,113 @@
+<!-- Half of a real trail changed nothing. Somebody signed in, printed a
+     challan, took the vendor list away as a spreadsheet, or asked for a screen
+     the server refused them. These entries have no old value because no field
+     moved, and the mistake is to draw them with an empty diff band — a well
+     with nothing in it reads as a rendering failure and sends somebody looking
+     for the change that is not there.
+
+     What they carry instead is the context that makes the event auditable, and
+     it is different per kind. A sign-in is an address, a client and a session.
+     An export is a count, a format and whether it carried tax registrations. A
+     print is which document and how many copies. A refused permission check is
+     the object, the permission that was missing and the fact that the request
+     never ran. None of that is a diff and all of it is one line.
+
+     The refusal is the only entry on this page that takes red. It is the one an
+     auditor is scanning for, it is genuinely an alarm state, and rationing the
+     colour to it is what makes it findable. Colour the sign-ins amber for
+     "security" and the column is a barcode.
+
+     A refusal names the permission, not just the screen. "Access denied" sends
+     the reader to the administrator with nothing to act on; procurement.view_rate
+     is a row in a group somebody can look up. The reason for the refusal being
+     an entry at all is that a run of them by one account in one afternoon is
+     the pattern, and a single one is noise. -->
+<div data-kui="audit-page/events" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+  <main class="mx-auto max-w-3xl">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Events</h1>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Entries that changed no field · 03 Sep 2026 · 6 of 71</p>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <h2 id="ad-ev-day" class="border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Yesterday · Thursday, 03 Sep 2026</h2>
+      <ul role="list" aria-labelledby="ad-ev-day" class="divide-y divide-zinc-100">
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><i data-lucide="alert-circle" class="size-4 text-red-600"></i></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T16:41">16:41</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5 tabular-nums">
+                <span class="font-medium">Sanjay Rane</span> was refused the rates on
+                <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Permission check · procurement.view_rate · the page rendered without the Rate and Value columns and no query ran</p>
+              <p class="mt-1.5 text-[13px]/5 text-zinc-600">Fourth refusal for this account today, all on orders for the Fabrication cost centre.</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T15:58">15:58</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5"><span class="font-medium">Meena Iyer</span> exported the vendor list.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Export · 412 vendors · CSV · PAN and GSTIN included · 106.51.28.4</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T14:12">14:12</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5 tabular-nums">
+                <span class="font-medium">Anil Kulkarni</span> approved
+                <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0427</a>
+                at ₹54,60,000.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Approval · level 2 of 2 · plant head · Gujarat Polymers Ltd</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T11:26">11:26</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5 tabular-nums">
+                <span class="font-medium">Suresh Kadam</span> printed the delivery challan for
+                <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">DC-2026-0288</a>.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Print · 3 copies · original, duplicate and triplicate · Silvassa gate 2</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T09:02">09:02</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5"><span class="font-medium">Akshay Prabhu</span> signed in.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Sign-in · 106.51.28.4 · Chrome on Windows · session s-8f31c2 · single sign-on</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><i data-lucide="alert-circle" class="size-4 text-red-600"></i></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T08:47">08:47</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5"><span class="font-medium">Sanjay Rane</span> failed to sign in three times.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Sign-in · 49.36.180.221 · wrong password · the account locked for 15 minutes on the third attempt</p>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </main>
+</div>

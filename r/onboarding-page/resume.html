@@ -1,0 +1,154 @@
+<!-- The state this layout exists for. Setup is abandoned on a Tuesday and
+     picked up on a Friday, by which time four other people have done things to
+     it, and the person coming back needs to know what changed before they know
+     what to do. A checklist that shows nine ticks and no history makes them
+     open every group to work out which ones are new.
+
+     The list is measured from this user's last acknowledged visit, and that
+     marker moves when Mark as read is pressed and at no other time. Moved on
+     render, a three-second look at the page on a phone in a car park erases the
+     record of four days somebody needed to read, and there is no way to get it
+     back.
+
+     The rail is marker's timeline, unchanged: a flex child of the mark column
+     rather than an absolutely positioned line, per-item so it stops under the
+     last dot, and the whole mark column aria-hidden because the dates say the
+     sequence in words.
+
+     Entries are facts with a person and a time on each, not a feed. "Vendor
+     masters — done" with nobody's name against it is an event nobody can ask a
+     question about, and the questions are the point: 3 of 214 vendors were
+     rejected and somebody has to decide whether that matters.
+
+     The progress line at the top of the card is the reading that actually
+     answers "how far did they get" — two figures, then and now, not a
+     percentage that has moved. -->
+<div data-kui="onboarding-page/resume" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Set up Konspec</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · FY 2026–27 · go live 01 Oct 2026</p>
+    </div>
+
+    <div class="mt-5 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3.5">
+        <div class="min-w-0">
+          <h2 class="text-[16px]/6 font-semibold">What changed while you were away</h2>
+          <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">You were last here on 17 Aug 2026. Five things happened since.</p>
+        </div>
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">7 of 16 → 9 of 15 done</p>
+      </div>
+
+      <div class="px-5 py-4">
+        <ol role="list">
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 tabular-nums">
+                <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendor masters</a> is done — 214 vendors imported, 3 rejected for a missing GSTIN.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">18 Aug 2026, 10:12 · Sanjay More</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 tabular-nums">
+                <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Tax defaults</a> is done — 18% GST, HSN required on every line.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">18 Aug 2026, 15:40 · Meera Iyer</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 tabular-nums">
+                <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Item masters</a> was moved off you and onto Sanjay More.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">19 Aug 2026, 09:05 · Meera Iyer</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 tabular-nums">
+                <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Customer masters</a> was skipped — &ldquo;we are not raising sales orders from this system yet&rdquo;. That took the count from 16 to 15, and left Opening customer balances waiting on a task that will never finish.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">19 Aug 2026, 16:48 · Akshay Prabhu</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 tabular-nums">
+                <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approval limits</a> is now waiting on Nilesh Patil, who is taking the ₹7,50,000 figure to the board on 22 Aug.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">20 Aug 2026, 11:26 · Meera Iyer</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <p class="text-[12px]/4 tabular-nums text-zinc-600">
+          Measured from your last visit. It only moves forward when you press this.
+        </p>
+        <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="check" class="size-4" aria-hidden="true"></i>Mark as read
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+        <div class="min-w-0">
+          <h2 class="text-[16px]/6 font-semibold">Next for you</h2>
+          <p class="mt-0.5 text-[13px]/5 text-zinc-600">One task is yours. The other four left are on Meera and Sanjay.</p>
+        </div>
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">15 min</p>
+      </div>
+      <ul role="list" class="divide-y divide-zinc-100">
+        <li>
+          <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[13px]/5 font-medium"><span class="sr-only">Not started — </span>Invite users</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">41 people on the list HR sent · nothing is waiting on it</span>
+            </span>
+            <span class="mt-0.5 shrink-0 text-[12px]/4 tabular-nums text-zinc-500">15 min</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-start gap-3 px-4 pt-3 pb-1.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[13px]/5 font-medium"><span class="sr-only">Blocked — </span>Opening customer balances</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Nobody owns this one · it arrived here while you were away</span>
+            </span>
+            <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          </a>
+          <p class="px-4 pb-3 pl-11 text-[12px]/4 text-zinc-600">
+            Waiting for <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Customer masters</a>, which was skipped. Somebody has to decide whether it is needed at all.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </main>
+</div>

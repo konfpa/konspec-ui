@@ -1,0 +1,250 @@
+<!-- The rail carries what stays true about the record while the reader scrolls
+     through what happened to it: who the vendor is, what the money is doing,
+     the dates, and where the approval stands.
+
+     It is first in the DOM and placed second by the grid, which is the reverse
+     of form-page/side-rail. That entry puts its rail last so the tab order is
+     the form and then its context, and it is right to. This rail is different
+     on both counts: it is the record's identity rather than a running total of
+     something being typed, and it holds nothing focusable at all — so there is
+     no tab order to get wrong, and putting it first is what makes the phone
+     arrangement work without a second copy of the same figures. Put one control
+     in this rail and both halves of that stop being true; move the control into
+     the page.
+
+     Below lg it is a two-column block of small cards above the lines, not a
+     strip folded sideways and not four full-width cards pushing the first line
+     item off the screen. At lg it becomes a 320px column and sticks.
+
+     lg:sticky needs lg:self-start. Without it the aside stretches to the row
+     height and sticky has nothing to travel inside, which measures as correct
+     and never moves. -->
+<div data-kui="record-page/rail" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main>
+
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-6xl px-4 py-4 lg:px-6">
+        <nav aria-label="Breadcrumb">
+          <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">GRN-4821</span></li>
+          </ol>
+        </nav>
+
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <h1 class="text-[24px]/7 font-semibold tracking-tight tabular-nums">GRN-4821</h1>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Awaiting QC
+              </span>
+              <span class="text-[13px]/5 tabular-nums text-zinc-600">2 of 5 lines sampled</span>
+            </div>
+            <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Against PO-2026-0418 · received 12 Aug 2026 at Silvassa gate 2 · vehicle GJ-15-AT-4482</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="printer" class="size-4"></i>Print
+            </button>
+            <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="flask-conical" class="size-4"></i>Record QC result
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto grid max-w-6xl gap-4 px-4 py-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-6">
+
+      <aside aria-labelledby="rl-rail-h" class="grid gap-3 sm:grid-cols-2 lg:col-start-2 lg:row-start-1 lg:sticky lg:top-5 lg:block lg:space-y-3 lg:self-start">
+        <h2 id="rl-rail-h" class="sr-only">Where this receipt stands</h2>
+
+        <div class="rounded-xl border border-zinc-300 bg-white px-4 py-4">
+          <h3 class="text-[13px]/5 font-semibold">Sharma Steel &amp; Alloys</h3>
+          <dl class="mt-3 space-y-2 text-[13px]/5">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Vendor code</dt><dd class="font-medium tabular-nums">VEN-0288</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">GSTIN</dt><dd class="font-medium tabular-nums">24AAKCS8821P1ZM</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">On-time last 90 days</dt><dd class="font-medium tabular-nums">88%</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">QC rejection rate</dt><dd class="font-medium tabular-nums">2.1%</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="rounded-xl border border-zinc-300 bg-white px-4 py-4">
+          <h3 class="text-[13px]/5 font-semibold">Value received</h3>
+          <dl class="mt-3 space-y-2 text-[13px]/5">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Taxable</dt><dd class="font-medium tabular-nums">₹6,91,864</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">IGST at 18%</dt><dd class="font-medium tabular-nums">₹1,24,536</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-2">
+              <dt class="font-medium">Receipt value</dt><dd class="text-[16px]/6 font-semibold tabular-nums">₹8,16,400</dd>
+            </div>
+          </dl>
+          <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Nothing posts to the ledger until QC releases the lot.</p>
+        </div>
+
+        <div class="rounded-xl border border-zinc-300 bg-white px-4 py-4">
+          <h3 class="text-[13px]/5 font-semibold">Dates</h3>
+          <dl class="mt-3 space-y-2 text-[13px]/5">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Promised</dt><dd class="font-medium tabular-nums">22 Aug 2026</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Received</dt><dd class="font-medium tabular-nums">12 Aug 2026</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">QC due</dt><dd class="font-medium tabular-nums">14 Aug 2026</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Payment due</dt><dd class="font-medium tabular-nums">11 Sep 2026</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="rounded-xl border border-zinc-300 bg-white px-4 py-4">
+          <h3 class="text-[13px]/5 font-semibold">Standing</h3>
+          <ol class="mt-3 space-y-2.5 text-[13px]/5">
+            <li class="flex items-start gap-2.5">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i></span>
+              <span class="min-w-0 flex-1">Gate entry passed<span class="block text-[12px]/4 tabular-nums text-zinc-500">12 Aug 2026 · Suresh Kadam</span></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+              <span class="min-w-0 flex-1">With the Vapi lab<span class="block text-[12px]/4 tabular-nums text-zinc-500">since 12 Aug 2026 · 2 of 5 sampled</span></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+              <span class="min-w-0 flex-1 text-zinc-600">Stores posting<span class="block text-[12px]/4 text-zinc-500">not reached</span></span>
+            </li>
+          </ol>
+        </div>
+      </aside>
+
+      <div class="min-w-0 space-y-4 lg:col-start-1 lg:row-start-1">
+
+        <section aria-labelledby="rl-lines-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="rl-lines-h" class="text-[16px]/6 font-semibold">Received lines</h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">5 lines · 1,880 kg against 4,290 kg ordered</p>
+          </div>
+
+          <table class="hidden w-full text-[13px]/5 md:table">
+            <thead>
+              <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                <th scope="col" class="px-5 py-2.5 font-medium">Item</th>
+                <th scope="col" class="px-5 py-2.5 text-right font-medium">Received</th>
+                <th scope="col" class="px-5 py-2.5 text-right font-medium">Value</th>
+                <th scope="col" class="px-5 py-2.5 font-medium">QC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-5 py-2.5 text-left font-normal">
+                  <span class="block font-medium">MS angle 50×50×6</span>
+                  <span class="block text-[12px]/4 tabular-nums text-zinc-500">ITM-2041 · batch B-26-0914</span>
+                </th>
+                <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">1,200 kg</td>
+                <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹6,84,000</td>
+                <td class="px-5 py-2.5">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Passed
+                  </span>
+                </td>
+              </tr>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-5 py-2.5 text-left font-normal">
+                  <span class="block font-medium">MS plate 8 mm</span>
+                  <span class="block text-[12px]/4 tabular-nums text-zinc-500">ITM-2088 · batch B-26-0918</span>
+                </th>
+                <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">680 kg</td>
+                <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹4,08,000</td>
+                <td class="px-5 py-2.5">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Sampled
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row" class="px-5 py-2.5 text-left font-normal">
+                  <span class="block font-medium">Flat 40×6</span>
+                  <span class="block text-[12px]/4 tabular-nums text-zinc-500">ITM-2130 · batch B-26-0919</span>
+                </th>
+                <td class="px-5 py-2.5 text-right text-zinc-500 tabular-nums whitespace-nowrap">—</td>
+                <td class="px-5 py-2.5 text-right text-zinc-500 tabular-nums whitespace-nowrap">—</td>
+                <td class="px-5 py-2.5">
+                  <span class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-600 ring-1 ring-inset ring-zinc-300">Not sampled</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <ul class="divide-y divide-zinc-100 md:hidden">
+            <li class="px-5 py-3">
+              <div class="flex items-baseline justify-between gap-3">
+                <span class="text-[13px]/5 font-medium">MS angle 50×50×6</span>
+                <span class="shrink-0 text-[13px]/5 tabular-nums">₹6,84,000</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">QC passed — </span>1,200 kg · batch B-26-0914</p>
+            </li>
+            <li class="px-5 py-3">
+              <div class="flex items-baseline justify-between gap-3">
+                <span class="text-[13px]/5 font-medium">MS plate 8 mm</span>
+                <span class="shrink-0 text-[13px]/5 tabular-nums">₹4,08,000</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">QC sampled — </span>680 kg · batch B-26-0918</p>
+            </li>
+            <li class="px-5 py-3">
+              <div class="flex items-baseline justify-between gap-3">
+                <span class="text-[13px]/5 font-medium">Flat 40×6</span>
+                <span class="shrink-0 text-[13px]/5 text-zinc-500 tabular-nums">—</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Not sampled · batch B-26-0919</p>
+            </li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="rl-act-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="rl-act-h" class="text-[16px]/6 font-semibold">Activity</h2>
+          </div>
+          <ol class="px-5 py-4">
+            <li class="group flex gap-3 pb-4 last:pb-0">
+              <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+                <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+                <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[13px]/5 tabular-nums">Sample drawn from batch B-26-0918 and sent to the Vapi lab.</p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">12 Aug 2026, 14:35 · Meena Rane</p>
+              </div>
+            </li>
+            <li class="group flex gap-3 pb-4 last:pb-0">
+              <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+                <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+                <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[13px]/5 tabular-nums">Receipt raised at gate 2 against PO-2026-0418.</p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">12 Aug 2026, 09:18 · Suresh Kadam</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+      </div>
+    </div>
+  </main>
+</div>

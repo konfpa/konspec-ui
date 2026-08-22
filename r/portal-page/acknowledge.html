@@ -1,0 +1,194 @@
+<!-- The most valuable screen in a supplier portal, and it earns that by being
+     a screen rather than a button on a record page. Its whole content is one
+     question, the facts needed to answer it, and the answer. Put this control
+     fourth on a record page and the acknowledgement rate falls to whatever
+     fraction of suppliers scroll.
+
+     The legend is the question in full — quantity, material, date — so it is
+     read once on entry rather than once per arrow key, and so somebody who
+     arrived from an email knows what they are agreeing to without reading the
+     card above.
+
+     A proposed date is a proposal and the copy says so. It does not change the
+     order, and telling the supplier that here is what stops the second call
+     asking whether the change went through.
+
+     The follow-up fields sit under the option that opens them and are bound
+     :disabled to the inverse of it. x-show alone leaves them in the POST —
+     display:none does not take an input out of a form — so a date typed, then
+     abandoned in favour of accepting, is submitted alongside the acceptance.
+     Disabling also drops them from constraint validation, which is what lets
+     the required attribute beside them stay static instead of being bound.
+
+     Nothing takes focus when the panel appears and nothing animates. The arrow
+     keys answer as they move, so a keyboard user passing over the second option
+     opens and closes this in transit; moving focus into it would strand them
+     mid-group.
+
+     The header keeps both names and drops the four destinations, and this is the
+     one place in the portal where it does. The four are on the four destination
+     screens; this is a task reached from one of them, so it carries a back link
+     and nothing else. A destination bar over a half-answered form is four ways
+     to lose what was typed, offered to somebody who has not finished the one
+     thing the screen exists for. -->
+<div data-kui="portal-page/acknowledge" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ answer: 'accept' }">
+  <a href="#pp-ak-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
+      <a href="/portal/" class="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-semibold">Konspec Industries</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Supplier portal</span>
+        </span>
+      </a>
+      <div class="ml-auto flex min-w-0 items-center gap-2.5">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">GP</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-medium">Gujarat Polymers Ltd</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Mehul Trivedi</span>
+        </span>
+        <form method="post" action="/portal/sign-out/" class="shrink-0">
+          <button type="submit" class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sign out</button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <main id="pp-ak-main" tabindex="-1" class="mx-auto max-w-3xl px-4 py-5">
+
+    <a href="/portal/orders/" class="inline-flex items-center gap-1.5 rounded text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>All your orders
+    </a>
+
+    <h1 class="mt-2 text-[24px]/7 font-semibold tracking-tight tabular-nums">Purchase order PO-2026-0418</h1>
+    <p class="mt-1.5 text-[14px]/5 tabular-nums text-zinc-600">
+      Your reference GP/SO/2026/1184 · raised 19 Aug 2026 by Ritu Deshpande
+    </p>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 class="text-[16px]/6 font-semibold">What we have ordered</h2>
+      </div>
+      <dl class="divide-y divide-zinc-100 text-[13px]/5">
+        <div class="flex items-baseline justify-between gap-4 px-5 py-2.5">
+          <dt class="text-zinc-600">Material</dt>
+          <dd class="text-right font-medium">HDPE granules, natural, grade M60075</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-4 px-5 py-2.5">
+          <dt class="text-zinc-600">Quantity</dt>
+          <dd class="text-right font-medium tabular-nums">18.000 MT</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-4 px-5 py-2.5">
+          <dt class="text-zinc-600">Rate</dt>
+          <dd class="text-right font-medium tabular-nums">₹118.40 per kg, ex GST</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-4 px-5 py-2.5">
+          <dt class="text-zinc-600">Order value</dt>
+          <dd class="text-right font-medium tabular-nums">₹21,31,200</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-4 px-5 py-2.5">
+          <dt class="text-zinc-600">Deliver to</dt>
+          <dd class="text-right font-medium">Konspec Industries, Plot 214, Silvassa Industrial Estate</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-4 px-5 py-2.5">
+          <dt class="text-zinc-600">Payment</dt>
+          <dd class="text-right font-medium tabular-nums">45 days from our delivery receipt</dd>
+        </div>
+      </dl>
+      <div class="border-t border-zinc-200 bg-zinc-50 px-5 py-3">
+        <a href="/portal/orders/PO-2026-0418/order.pdf"
+           class="inline-flex items-center gap-2 text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-4 text-zinc-600"></i>Download the order as a PDF
+        </a>
+      </div>
+    </div>
+
+    <form method="post" action="/portal/orders/PO-2026-0418/acknowledge/" class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 class="text-[16px]/6 font-semibold">Confirm the delivery date</h2>
+      </div>
+      <div class="px-5 py-4">
+        <!-- the h2 names the region for anyone skimming the headings; the legend
+             is the question in full and is what is read before each radio. One
+             of the two would have to do both jobs badly. -->
+        <fieldset aria-describedby="pp-ak-note">
+          <legend class="text-[14px]/5 font-medium tabular-nums">Can you deliver 18.000 MT to Silvassa by 04 September 2026?</legend>
+
+          <div class="mt-3 space-y-2">
+            <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&amp;:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+              <input type="radio" name="answer" value="accept" checked x-model="answer" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+              <span class="min-w-0">
+                <span class="block text-[14px]/5 font-medium tabular-nums">Yes — we will deliver by 04 Sep 2026</span>
+                <span class="mt-0.5 block text-[13px]/5 text-zinc-600">The order is confirmed as it stands and nothing further is needed from you until dispatch.</span>
+              </span>
+            </label>
+
+            <div>
+              <label class="flex items-start gap-2.5 rounded-xl border border-zinc-200 bg-white p-3 [&amp;:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+                <input type="radio" name="answer" value="propose" x-model="answer" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                <span class="min-w-0">
+                  <span class="block text-[14px]/5 font-medium">No — we can deliver on a different date</span>
+                  <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Tell us the date you can hold to. It is a proposal until Ritu Deshpande accepts it.</span>
+                </span>
+              </label>
+
+              <div x-show="answer === 'propose'" x-cloak class="mt-3 ml-[26px] space-y-4 border-l-2 border-zinc-200 pl-4">
+                <div class="max-w-xs">
+                  <label for="pp-ak-date" class="mb-1.5 block text-[13px]/5 font-medium">The date you can deliver by</label>
+                  <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                    <i data-lucide="calendar" aria-hidden="true" class="ml-3 size-4 shrink-0 self-center text-zinc-500"></i>
+                    <input id="pp-ak-date" name="proposed_date" type="date" value="2026-09-11" required min="2026-08-22"
+                           :disabled="answer !== 'propose'" aria-describedby="pp-ak-date-msg"
+                           class="min-w-0 flex-1 bg-transparent px-2 py-2 text-[14px]/5 tabular-nums outline-none">
+                  </div>
+                  <p id="pp-ak-date-msg" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">The date the material reaches Silvassa, not the date it leaves your works.</p>
+                </div>
+
+                <div class="max-w-sm">
+                  <label for="pp-ak-reason" class="mb-1.5 block text-[13px]/5 font-medium">Why the date is moving</label>
+                  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                    <select id="pp-ak-reason" name="reason" required :disabled="answer !== 'propose'"
+                            class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                      <option value="">Choose the closest one</option>
+                      <option value="stock">The grade is not in stock</option>
+                      <option value="raw">We are waiting on our own raw material</option>
+                      <option value="transport">Transport is not arranged for that week</option>
+                      <option value="shutdown">Plant shutdown or a holiday</option>
+                      <option value="other">Something else — described below</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="pp-ak-detail" class="mb-1.5 flex items-baseline gap-2 text-[13px]/5 font-medium">
+                    Anything Ritu should know
+                    <span aria-hidden="true" class="font-normal text-zinc-500">Optional</span>
+                  </label>
+                  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                    <textarea id="pp-ak-detail" name="detail" rows="3" :disabled="answer !== 'propose'"
+                              class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                              placeholder="Part quantity available earlier, a different grade you can offer, the transporter you are waiting on"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p id="pp-ak-note" class="mt-3 text-[12px]/4 text-zinc-500">
+            Ritu Deshpande sees your answer the moment you send it. A different date does not change the order until she accepts it, and the order stands as written until then.
+          </p>
+        </fieldset>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 bg-zinc-50 px-5 py-3">
+        <a href="/portal/orders/" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Not now</a>
+        <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+          <span x-text="answer === 'accept' ? 'Confirm 04 Sep 2026' : 'Send the new date'">Confirm 04 Sep 2026</span>
+        </button>
+      </div>
+    </form>
+  </main>
+</div>

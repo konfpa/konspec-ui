@@ -1,0 +1,106 @@
+<!-- Four label types on the same 100 × 50 mm stock, and the point is that they
+     are four different documents rather than one template with different words
+     in it. Each one has a field that must never be squeezed out, and it is a
+     different field every time:
+
+       Bin       — the location. A bin label whose code will not read is a bin
+                   nobody can put away into.
+       Batch     — the expiry. A drum with a batch number and no expiry gets
+                   issued to production in 2029 and the deviation is written
+                   after the part has shipped.
+       Pallet    — the count and which pallet of how many. A shipment that
+                   leaves three of four on the dock is found by the consignee.
+       QC hold   — the reason. document-page/grn says it about a rejected line
+                   and it is truer on a sticker: a rejection with no reason is
+                   material nobody can act on, and it sits in quarantine for a
+                   week while somebody finds out why.
+
+     The QC label says QUARANTINE in a word. Coloured stock is the real answer
+     on a shop floor and it is a stores decision about what is loaded in the
+     printer, not something markup can reach — and the printer this prints on is
+     one bit deep, so a red fill would come out as a grey dither over black
+     type. This is document-page's rule that a document says Approved in a word,
+     with the stakes raised: the label goes onto the drum.
+
+     Every one of these is one page on the roll, so every one takes
+     break-after-page except the last. -->
+<div data-kui="label-sheet/content" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm]">
+
+    <div class="mb-4 print:hidden">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Label types — 100 × 50 mm roll</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">4 labels · bin location, batch and heat, pallet tag, QC hold · Silvassa works</p>
+    </div>
+
+    <div class="overflow-x-auto print:overflow-visible">
+      <ol role="list" class="mx-auto w-[100mm] space-y-4 print:space-y-0">
+
+        <li class="break-inside-avoid break-after-page">
+          <h2 class="mb-[2mm] text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600 print:hidden">Bin location</h2>
+          <div class="flex h-[50mm] w-[100mm] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white p-[3mm] print:rounded-none print:border-0">
+            <div class="flex items-start justify-between gap-[3mm]">
+              <p class="text-[24px]/7 font-semibold tabular-nums tracking-tight">B-04-01</p>
+              <p class="text-[13px]/5 font-medium tabular-nums">ITM-1042</p>
+            </div>
+            <p class="mt-[1mm] truncate text-[13px]/5">MS angle 50 × 50 × 6 mm</p>
+            <p class="truncate text-[11px]/4">IS 2062 grade E250 · issued in kg</p>
+            <div class="mt-auto">
+              <div aria-hidden="true" class="flex h-[13mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+              <p class="mt-[0.8mm] text-center text-[13px]/5 font-medium tabular-nums">B-04-01</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="break-inside-avoid break-after-page">
+          <h2 class="mb-[2mm] text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600 print:hidden">Batch and heat number</h2>
+          <div class="flex h-[50mm] w-[100mm] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white p-[3mm] print:rounded-none print:border-0">
+            <p class="truncate text-[13px]/5 font-semibold">HDPE granules — natural</p>
+            <p class="text-[11px]/4 tabular-nums">Grade M60075 · ITM-2001 · Gujarat Polymers Ltd</p>
+            <div class="mt-[1mm] flex items-baseline justify-between gap-[3mm]">
+              <p class="text-[16px]/6 font-semibold tabular-nums">B-26-0914</p>
+              <p class="text-[13px]/5 font-medium tabular-nums">Heat 26-A-4471</p>
+            </div>
+            <p class="mt-[0.5mm] text-[12px]/4 font-medium tabular-nums">Mfd 12 Aug 2026 · Expires 11 Aug 2028</p>
+            <p class="text-[11px]/4 tabular-nums">Net 25.000 kg · bag 18 of 480 · MTC SSA/MTC/26-1188</p>
+            <div class="mt-auto">
+              <div aria-hidden="true" class="flex h-[10mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+              <p class="mt-[0.6mm] text-center text-[13px]/5 font-medium tabular-nums">B-26-0914</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="break-inside-avoid break-after-page">
+          <h2 class="mb-[2mm] text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600 print:hidden">Pallet tag</h2>
+          <div class="flex h-[50mm] w-[100mm] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white p-[3mm] print:rounded-none print:border-0">
+            <div class="flex items-start justify-between gap-[3mm]">
+              <p class="text-[24px]/7 font-semibold tabular-nums tracking-tight">PLT-26-1188</p>
+              <p class="text-[16px]/6 font-semibold tabular-nums">3 of 4</p>
+            </div>
+            <p class="mt-[1mm] truncate text-[13px]/5">Deccan Fasteners Pvt Ltd — Ranjangaon store</p>
+            <p class="text-[12px]/4 font-medium tabular-nums">24 cartons · gross 612.500 kg</p>
+            <p class="text-[11px]/4 tabular-nums">Challan DC-2026-0917 · 08 Sep 2026 · vehicle GJ-15-AT-4471</p>
+            <div class="mt-auto">
+              <div aria-hidden="true" class="flex h-[10mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+              <p class="mt-[0.6mm] text-center text-[13px]/5 font-medium tabular-nums">PLT-26-1188</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="break-inside-avoid">
+          <h2 class="mb-[2mm] text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600 print:hidden">QC hold</h2>
+          <div class="flex h-[50mm] w-[100mm] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white p-[3mm] print:rounded-none print:border-0">
+            <p class="text-[24px]/7 font-semibold uppercase tracking-tight">Quarantine</p>
+            <p class="text-[13px]/5 font-medium">Do not issue to production</p>
+            <p class="mt-[1mm] text-[12px]/4 tabular-nums">MS plate 10 mm · ITM-1088 · heat 26-P-1180</p>
+            <p class="text-[12px]/4 tabular-nums">60.000 kg · GRN-4821 line 2 · bay Q-2</p>
+            <p class="truncate text-[11px]/4">Lamination on two sheets · Prakash Mehta, QC · 06 Sep 2026</p>
+            <div class="mt-auto">
+              <div aria-hidden="true" class="flex h-[9mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+              <p class="mt-[0.6mm] text-center text-[13px]/5 font-medium tabular-nums">QC-26-3341</p>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,238 @@
+<!-- enquiries/compare.html — the content block of a template that extends the
+     shell's base. The wrapper below stands in for <main>.
+
+     views.py
+
+       def compare(request, number):
+           enq = get_object_or_404(Enquiry, number=number, plant__in=request.user.plants.all())
+           vendors = list(enq.quotations.select_related('vendor').order_by('received_on'))
+           quoted = {(q.quotation_id, q.line_id): q for q in
+                     QuotedLine.objects.filter(quotation__enquiry=enq)}
+           rows = []
+           for line in enq.lines.select_related('item'):
+               cells = [quoted.get((q.id, line.id)) for q in vendors]
+               priced = [c for c in cells if c and not c.alternative]
+               low = min((c.rate for c in priced), default=None)
+               rows.append({'line': line, 'cells': cells, 'low': low})
+           return render(request, 'enquiries/compare.html', {
+               'enq': enq, 'vendors': vendors, 'rows': rows,
+               'totals': [q.landed_total for q in vendors],
+           })
+
+     The view builds a dense grid and the template only draws it, and that is
+     the whole Django lesson here. A quotation's lines are a sparse set: loop
+     over the lines a vendor actually quoted and a row comes out with three
+     cells where the header has four, so every column to the right of the gap
+     shifts one vendor left and the page silently attributes each rate to the
+     wrong company. regroup does not fix it either — it groups what exists and
+     cannot invent the cell that does not. Fill the gaps with None in Python,
+     where the vendor list is in hand, and let an if block draw the em dash.
+
+     The lowest rate per line is computed in the view for the same reason: a
+     template cannot take a minimum across a row, and an if c.rate == row.low test
+     against a number the view worked out is the only version of this that
+     cannot drift from the figures beside it.
+
+     Four traps in this file.
+
+     A multi-line {# #} is not a comment — Django's tag_re has no DOTALL, so
+     the first line vanishes and the rest renders on the page. Everything that
+     runs past one line is a comment/endcomment block.
+
+     |intcomma groups in threes, so ₹15,65,600 comes out as ₹1,565,600 and a
+     figure wrong by a factor of ten is read straight past. Money goes through
+     the project's rupees filter, defined in table/django; intcomma stays for
+     counts that genuinely group in threes. Both need {% load humanize %} in
+     this same file or the template raises at render.
+
+     The award is a POST with {% csrf_token %}, and the reason field is
+     required by the view rather than by the template — the template hiding a
+     control is a courtesy and the view is what refuses.
+
+     forloop.counter0 is what indexes the totals against the vendors, and it is
+     the one place a mismatch between the two lists shows up as plausible
+     figures rather than as an error. -->
+{% load humanize ui %}
+
+<div data-kui="compare-page/django" class="min-h-[560px] bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-7xl px-4 py-5 lg:px-6">
+
+    <nav aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+        <li><a href="{% url 'enquiries:index' %}" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><a href="{% url 'enquiries:list' %}" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Enquiries</a></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">{{ enq.number }}</span></li>
+      </ol>
+    </nav>
+
+    <h1 class="mt-2 text-[24px]/7 font-semibold tracking-tight">Comparative statement</h1>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+      {{ enq.number }} · {{ enq.title }} · {{ enq.lines.count|intcomma }} line{{ enq.lines.count|pluralize }} ·
+      {{ vendors|length|intcomma }} quotation{{ vendors|length|pluralize }} · {{ enq.plant.name }}
+    </p>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="dj-rates-h" class="text-[16px]/6 font-semibold">Rates quoted</h2>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-600">Rate per unit, with the line value under it. Exclusive of GST and freight.</p>
+      </div>
+
+      <div role="region" aria-labelledby="dj-rates-h" tabindex="0"
+           class="relative overflow-x-auto overscroll-x-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <table class="w-full min-w-[60rem] table-fixed text-[13px]/5">
+          <caption class="sr-only">Rates quoted against enquiry {{ enq.number }}. Line items down the rows, vendors across the columns.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="w-64 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Line item</th>
+              {% for q in vendors %}
+                <th scope="col" class="w-44 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right align-bottom">
+                  <span class="block text-[13px]/5 font-semibold text-zinc-900">{{ q.vendor.name }}</span>
+                  <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">{{ q.number }} · {{ q.received_on|date:"d M Y" }}</span>
+                </th>
+              {% endfor %}
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for row in rows %}
+              <tr class="hover:bg-zinc-100">
+                <th scope="row" class="border-b border-zinc-100 px-4 py-2.5 text-left align-top font-normal">
+                  <span class="block font-medium">{{ row.line.item.name }}</span>
+                  <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">{{ row.line.item.code }} · {{ row.line.qty|intcomma }} {{ row.line.uom }}</span>
+                </th>
+
+                {% comment %}
+                  cells is dense — one entry per vendor, None where that vendor
+                  did not quote — so this loop can never fall out of step with
+                  the header above it. Looping the vendor's own quoted lines is
+                  what shifts every column right of a gap one vendor to the left.
+                {% endcomment %}
+                {% for c in row.cells %}
+                  <td class="border-b border-zinc-100 px-4 py-2.5 text-right align-top">
+                    {% if c %}
+                      <span class="flex items-baseline justify-end gap-1.5">
+                        {% if c.rate == row.low and not c.alternative %}
+                          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                        {% endif %}
+                        <span class="tabular-nums whitespace-nowrap {% if c.rate == row.low and not c.alternative %}font-semibold text-zinc-900{% else %}text-zinc-600{% endif %}">{{ c.rate|rupees }}</span>
+                      </span>
+                      <span class="mt-0.5 block text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-500">{{ c.value|rupees }}</span>
+                      {% if c.alternative %}
+                        <span class="mt-1 block text-left text-[12px]/4 text-zinc-600">
+                          <span class="font-medium text-zinc-900">Alternative</span>
+                          <span class="block">{{ c.alternative }}</span>
+                          <span class="block text-zinc-500">Not compared until the substitution is cleared</span>
+                        </span>
+                      {% endif %}
+                    {% else %}
+                      <span class="block text-zinc-500">—<span class="sr-only">Not quoted</span></span>
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="{{ vendors|length|add:1 }}" class="px-6 py-12 text-center">
+                  <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                    <i data-lucide="file-question" class="size-5 text-zinc-600"></i>
+                  </span>
+                  <h3 class="mt-3 text-[16px]/6 font-semibold">Nothing to compare yet</h3>
+                  <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+                    {{ enq.number }} has no lines on it, so there is nothing for a vendor to quote against.
+                  </p>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+
+          {% if rows %}
+            <tfoot class="bg-zinc-50">
+              <tr>
+                <th scope="row" class="border-t border-zinc-200 px-4 pt-2.5 text-left text-[12px]/4 font-medium text-zinc-600">
+                  Landed cost of {{ rows|length|intcomma }} line{{ rows|length|pluralize }}
+                </th>
+                {% for q in vendors %}
+                  <td class="border-t border-zinc-200 px-4 pt-2.5 text-right align-top">
+                    <span class="flex items-baseline justify-end gap-1.5">
+                      {% if q.is_lowest_landed %}
+                        <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                      {% endif %}
+                      <span class="text-[14px]/5 font-semibold tabular-nums whitespace-nowrap {% if q.is_lowest_landed %}text-zinc-900{% else %}text-zinc-600{% endif %}">{{ q.landed_total|rupees }}</span>
+                    </span>
+                  </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <th scope="row" class="px-4 pb-2.5 text-left text-[12px]/4 font-normal text-zinc-500">Covers</th>
+                {% for q in vendors %}
+                  <td class="px-4 pb-2.5 text-right align-top text-[12px]/4 tabular-nums text-zinc-500">
+                    <span class="block">{{ q.lines_quoted|intcomma }} of {{ rows|length|intcomma }} line{{ rows|length|pluralize }}</span>
+                    {% if q.lines_quoted != rows|length %}
+                      <span class="mt-0.5 block text-zinc-600">Not comparable on the total</span>
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            </tfoot>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+
+    {% if perms.purchasing.add_purchaseorder and enq.is_awardable %}
+      <form method="post" action="{% url 'enquiries:award' enq.number %}" class="mt-4">
+        {% csrf_token %}
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 class="text-[16px]/6 font-semibold">Award every line to</h2>
+          </div>
+          <ul class="divide-y divide-zinc-100">
+            {% for q in vendors %}
+              <li>
+                <label class="flex items-start gap-3 px-5 py-3 hover:bg-zinc-100 has-[:focus-visible]:outline-3 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+                  <input type="radio" name="award_to" value="{{ q.id }}" required class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                  <span class="min-w-0 flex-1">
+                    <span class="block text-[13px]/5 font-medium">{{ q.vendor.name }}</span>
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">
+                      {{ q.terms }} · promised {{ q.promised_on|date:"d M Y" }} · valid to {{ q.valid_to|date:"d M Y" }}
+                    </span>
+                  </span>
+                  <span class="shrink-0 text-[13px]/5 font-medium tabular-nums whitespace-nowrap">{{ q.landed_total|rupees }}</span>
+                </label>
+              </li>
+            {% endfor %}
+          </ul>
+
+          <div class="border-t border-zinc-200 px-5 py-4">
+            <label for="dj-reason" class="block text-[13px]/5 font-medium">Why the lowest offer is not being accepted</label>
+            <p id="dj-reason-help" class="mt-1 text-[12px]/4 text-zinc-600">
+              Required whenever the award is not the lowest landed cost. Filed with the requisition and read with it.
+            </p>
+            <div class="mt-2 rounded-lg border {% if form.reason.errors %}border-red-600{% else %}border-zinc-200{% endif %} bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <textarea id="dj-reason" name="reason" rows="3"
+                        aria-describedby="dj-reason-help{% if form.reason.errors %} dj-reason-err{% endif %}"
+                        {% if form.reason.errors %}aria-invalid="true"{% endif %}
+                        class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none">{{ form.reason.value|default:"" }}</textarea>
+            </div>
+            {% if form.reason.errors %}
+              <p id="dj-reason-err" class="mt-1.5 text-[12px]/4 text-red-600">{{ form.reason.errors|first }}</p>
+            {% endif %}
+          </div>
+
+          <div class="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 bg-zinc-50 px-5 py-3">
+            <a href="{% url 'enquiries:detail' enq.number %}"
+               class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</a>
+            <button type="submit"
+                    class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+              Award and raise the order
+            </button>
+          </div>
+        </div>
+      </form>
+    {% endif %}
+  </main>
+</div>

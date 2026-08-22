@@ -1,0 +1,170 @@
+<!-- A change here is submitted, not applied. The value in force stays on
+     screen and does not move; what was asked for sits under it in a recessed
+     band saying what, when, and what has to happen next. Applying it
+     optimistically and reverting on rejection is the version that ships fraud.
+
+     The bank row is the one that gets attacked. A vendor bank change arriving
+     by email, on convincing letterhead, from a lookalike domain, is the single
+     commonest fraud in procurement, so this screen states the verification —
+     a call to the number already on the account, not to any number in the
+     request — and states plainly that nobody from Konspec will ever ask for
+     that confirmation by email. Written on the screen the supplier reads, it
+     also arms them against the same mail sent in our name.
+
+     The pending band is bg-zinc-50 inside a white card, which is the recessed
+     band this system already has. It is not an alert and not a coloured field:
+     nothing is wrong, something is waiting, and the waiting is carried by the
+     pill's amber dot exactly as it is on every other screen here.
+
+     MSME and GSTIN are on this page because they are not decoration. The MSME
+     registration is what caps the payment terms at 45 days by statute, and the
+     GSTIN is what our tax return has to match; a supplier whose registration
+     lapses finds out here rather than in a rejected return, so each row says
+     what it is for rather than only what it is. -->
+<div data-kui="portal-page/profile" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <a href="#pp-pr-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
+      <a href="/portal/" class="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-semibold">Konspec Industries</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Supplier portal</span>
+        </span>
+      </a>
+      <div class="ml-auto flex min-w-0 items-center gap-2.5">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">GP</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-medium">Gujarat Polymers Ltd</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Mehul Trivedi</span>
+        </span>
+        <form method="post" action="/portal/sign-out/" class="shrink-0">
+          <button type="submit" class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sign out</button>
+        </form>
+      </div>
+    </div>
+    <nav aria-label="Supplier portal" class="mx-auto max-w-3xl px-2 pb-2">
+      <ul class="flex flex-wrap items-center gap-1">
+        <li><a href="/portal/orders/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Orders</a></li>
+        <li><a href="/portal/invoices/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Invoices</a></li>
+        <li><a href="/portal/payments/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Payments</a></li>
+        <li><a href="/portal/details/" aria-current="page" class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Your details</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="pp-pr-main" tabindex="-1" class="mx-auto max-w-3xl px-4 py-5">
+    <h1 class="text-[24px]/7 font-semibold tracking-tight">Your details</h1>
+    <p class="mt-1.5 max-w-2xl text-[14px]/5 text-zinc-600">
+      What Konspec Industries holds about Gujarat Polymers Ltd. Changes are checked by us before they take effect — until then the value on this page is the one we use.
+    </p>
+
+    <div class="mt-4 space-y-4">
+
+      <section aria-labelledby="pp-pr-bank-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="pp-pr-bank-h" class="text-[16px]/6 font-semibold">Bank account</h2>
+          <a href="/portal/details/bank/"
+             class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Request a change
+          </a>
+        </div>
+        <div class="px-5 py-4">
+          <dl class="text-[13px]/5">
+            <div class="flex items-baseline justify-between gap-4 py-1">
+              <dt class="text-zinc-600">Account number</dt>
+              <dd class="text-right font-medium tabular-nums">5020 0041 1882 07</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 py-1">
+              <dt class="text-zinc-600">Bank and branch</dt>
+              <dd class="text-right font-medium">HDFC Bank, GIDC Vapi</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 py-1">
+              <dt class="text-zinc-600">IFSC</dt>
+              <dd class="text-right font-medium tabular-nums">HDFC0001842</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 py-1">
+              <dt class="text-zinc-600">In use since</dt>
+              <dd class="text-right font-medium tabular-nums">14 Jun 2024</dd>
+            </div>
+          </dl>
+
+          <!-- the requested change, held. The value above has not moved. -->
+          <div class="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Waiting on Konspec
+            </span>
+            <p class="mt-2 text-[13px]/5 tabular-nums">
+              You asked on <span class="font-medium">19 Aug 2026</span> to move payments to
+              <span class="font-medium">5045 8102 4471</span>, ICICI Bank, Vapi, IFSC ICIC0000384.
+            </p>
+            <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-600">
+              We verify a bank change by calling Mehul Trivedi on +91 98250 41187, the number already on this account. Until that call is made, payment continues to the HDFC account above. Nobody at Konspec will ever ask you to confirm a bank change by email.
+            </p>
+            <button type="button" class="mt-2 rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Withdraw this request
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="pp-pr-tax-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="pp-pr-tax-h" class="text-[16px]/6 font-semibold">Tax and registration</h2>
+          <a href="/portal/details/tax/"
+             class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Request a change
+          </a>
+        </div>
+        <dl class="divide-y divide-zinc-100 text-[13px]/5">
+          <div class="px-5 py-3">
+            <dt class="text-zinc-600">GSTIN</dt>
+            <dd class="mt-0.5 font-medium tabular-nums">24AABCG7421L1ZP</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Checked against the GST portal on 12 Apr 2026. Our returns are filed against this number, so it has to match your invoices exactly.</dd>
+          </div>
+          <div class="px-5 py-3">
+            <dt class="text-zinc-600">PAN</dt>
+            <dd class="mt-0.5 font-medium tabular-nums">AABCG7421L</dd>
+          </div>
+          <div class="px-5 py-3">
+            <dt class="text-zinc-600">MSME registration</dt>
+            <dd class="mt-0.5 font-medium tabular-nums">UDYAM-GJ-24-0038174 · Small</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Declared 01 Apr 2026. This is what caps your payment terms at 45 days by statute — if it lapses, the terms on new orders go back to 60 days.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="pp-pr-people-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="pp-pr-people-h" class="text-[16px]/6 font-semibold">Who we contact</h2>
+          <a href="/portal/details/contacts/"
+             class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Request a change
+          </a>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
+            <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">MT</span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 font-medium">Mehul Trivedi</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums break-all text-zinc-600">mehul.trivedi@gujpolymers.in · +91 98250 41187</p>
+            </div>
+            <p class="text-[12px]/4 text-zinc-600">Orders and deliveries · signs in here</p>
+          </li>
+          <li class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
+            <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">KS</span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 font-medium">Kirti Shah</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums break-all text-zinc-600">accounts@gujpolymers.in · +91 98795 20214</p>
+            </div>
+            <p class="text-[12px]/4 text-zinc-600">Invoices and payment advice</p>
+          </li>
+        </ul>
+        <p class="border-t border-zinc-200 bg-zinc-50 px-5 py-3 text-[12px]/4 text-zinc-600">
+          Every purchase order and payment advice is emailed to both of these addresses. Adding or removing a person is a change we check, the same as the rest of this page.
+        </p>
+      </section>
+    </div>
+  </main>
+</div>

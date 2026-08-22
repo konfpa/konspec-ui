@@ -1,0 +1,213 @@
+<!-- The stores dashboard, and the point is that it is not the buyer's page
+     with four regions hidden.
+
+     Different figures, different queues, different links, and the
+     committed-value plot is absent rather than empty. A storekeeper has no
+     spend trend to read and never will; rendering the buyer's page and hiding
+     half of it leaves every hidden region in the DOM, in the tab order the day
+     somebody gets a class wrong, and it makes this screen a worse version of
+     somebody else's instead of its own. Two dashboards, two views, one shell.
+
+     The shell is what is shared: the same page head, the same strip geometry,
+     the same queue card, the same five-row cap, the same as-of line. Somebody
+     who moves between the two desks recognises the arrangement without having
+     to re-learn where anything is.
+
+     Two of these figures carry no delta at all, and that is the second point.
+     Vehicles at the gate is a count of what is standing outside right now, and
+     a delta printed because the other tiles have one is a number invented to
+     fill a slot. Where there is no comparable previous period the slot takes
+     the qualifying fact: how long the oldest one has been waiting. -->
+<div data-kui="dashboard/role" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
+
+    <div class="min-w-0">
+      <p class="text-[13px]/5 text-zinc-600">Good morning, Ramesh</p>
+      <h1 class="mt-0.5 text-[24px]/7 font-semibold tracking-tight">Stores · Silvassa</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Friday 21 Aug 2026 · shift A · gate and main store · read at 09:12</p>
+    </div>
+
+    <section aria-labelledby="dbo-fig-h">
+      <h2 id="dbo-fig-h" class="sr-only">Figures</h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
+        <!-- no delta: a count of what is standing outside right now has no
+             comparable previous period, so the slot takes the fact that makes
+             it actionable -->
+        <a href="/gate/?state=waiting" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>Vehicles at the gate</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">4</dd>
+            <dd class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Longest waiting 1 h 22 m</dd>
+          </dl>
+        </a>
+
+        <a href="/receipts/?state=draft" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>GRNs to post</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">5</dd>
+            <dd class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Oldest weighed 20 Aug at 16:40</dd>
+          </dl>
+        </a>
+
+        <a href="/stores/?state=putaway" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>Lines awaiting put-away</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">38</dd>
+            <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+              <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+                <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+14
+              </span>
+              <span class="text-zinc-500">vs. same time yesterday</span>
+            </dd>
+          </dl>
+        </a>
+
+        <a href="/qc/?state=hold&amp;plant=silvassa" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>Held by QC</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">3</dd>
+            <dd class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Occupying bays Q1, Q2 and Q4</dd>
+          </dl>
+        </a>
+      </div>
+    </section>
+
+    <div class="grid gap-4 xl:grid-cols-3">
+
+      <section aria-labelledby="dbo-gate-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white xl:col-span-2">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h2 id="dbo-gate-h" class="text-[14px]/5 font-semibold">At the gate now</h2>
+            <a href="/gate/" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              All <span class="tabular-nums">4</span><span class="sr-only"> vehicles at the gate</span>
+            </a>
+          </div>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-500">Longest waiting first</p>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/gate/GP-2026-1184/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GJ 05 BT 4471</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">1 h 22 m</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers Ltd · against PO-2026-0311 · HDPE granules, 12,000 kg · not yet weighed</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/gate/GP-2026-1185/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MH 04 JQ 8802</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">54 m</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · against PO-2026-0348 · MS plate 8mm, 4.2 MT · weighed 08:31</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/gate/GP-2026-1186/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">DD 01 K 2290</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">31 m</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Deccan Fasteners Pvt Ltd · against PO-2026-0362 · M12 hex bolts, 8,400 nos · weighed 08:52</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+              <a href="/gate/GP-2026-1187/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GJ 15 CX 1043</a>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">12 m</span>
+              <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Konkan Fabricators · no purchase order quoted · gate to confirm before unloading</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="dbo-qc-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbo-qc-h" class="flex items-center gap-1.5 text-[14px]/5 font-semibold">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Held by QC
+          </h2>
+          <a href="/qc/?state=hold&amp;plant=silvassa" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            All <span class="tabular-nums">3</span><span class="sr-only"> batches held by QC</span>
+          </a>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/receipts/GRN-4812/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4812</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Bay Q1 · melt flow out of spec · held 2 days</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/receipts/GRN-4815/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4815</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Bay Q2 · no test certificate · held 1 day</p>
+            </div>
+          </li>
+          <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <div class="px-4 py-2.5">
+              <a href="/receipts/GRN-4818/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4818</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Bay Q4 · thread gauge failed · held since 07:20</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </div>
+
+    <section aria-labelledby="dbo-put-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+        <h2 id="dbo-put-h" class="text-[14px]/5 font-semibold">Received, not yet put away</h2>
+        <a href="/stores/?state=putaway" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          All <span class="tabular-nums">38</span><span class="sr-only"> lines awaiting put-away</span>
+        </a>
+      </div>
+      <ul class="divide-y divide-zinc-100">
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+            <a href="/receipts/GRN-4821/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821 · line 1</a>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">12,000 kg</span>
+            <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">HDPE granules M60075 · suggested bin A-04-2 · staged at the dock since 07:55</p>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+            <a href="/receipts/GRN-4824/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4824 · line 3</a>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">860 kg</span>
+            <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">MS plate 8mm · suggested bin C-11-1 · staged at the dock since 08:40</p>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+            <a href="/receipts/GRN-4826/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4826 · line 2</a>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">8,400 nos</span>
+            <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">M12 hex bolts, HSN 73181500 · no bin suggested, item is new to Silvassa</p>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+            <a href="/receipts/GRN-4819/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4819 · line 5</a>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">440 kg</span>
+            <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Channel 100×50 · suggested bin C-08-3 · staged at the dock since yesterday 17:10</p>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+            <a href="/receipts/GRN-4817/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4817 · line 1</a>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">1,200 kg</span>
+            <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">MS angle 50×50×6 · suggested bin C-02-4 · staged at the dock since yesterday 15:25</p>
+          </div>
+        </li>
+      </ul>
+      <div class="border-t border-zinc-200 px-4 py-2.5">
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">5 of 38 lines shown · 9 staged since yesterday</p>
+      </div>
+    </section>
+  </main>
+</div>

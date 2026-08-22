@@ -1,0 +1,313 @@
+<!-- Five facets over one query, and the chips are what they add up to. The
+     rail says which facets exist; the chips say which ones are doing something,
+     and the usual reason a result set looks wrong is one value ticked last
+     Tuesday that nobody has looked at since.
+
+     Every value carries its own count, and on a real page those counts are
+     computed with that facet's own predicate removed and every other predicate
+     in force. Compute them naively and ticking Silvassa leaves Vapi reading 0,
+     so the one facet you just used is the one facet you can no longer use. They
+     arrive with the results; the browser does not work them out, and this
+     snippet only re-adds the type totals so the count line moves.
+
+     The value band is the point of the variant. It applies to orders and
+     invoices and to nothing else, so drawing it over a mixed result silently
+     drops every vendor and every item from the answer and the count under the
+     h1 falls by a hundred for a reason nothing on screen explains. It appears
+     when the type narrows to types that have a value and goes again when the
+     type widens — and the x-effect clears it on the way out, because a chip for
+     a facet that is no longer drawn is a filter nobody can remove.
+
+     Status: draft is at zero, and it keeps its place as text rather than
+     disappearing or becoming a disabled checkbox. Disappearing makes the list a
+     different shape on every query, so nobody can find the value they set last
+     week and a value that vanished is indistinguishable from one the register
+     never had. A disabled checkbox is a dead tab stop that explains nothing;
+     the 0 beside the word is the whole explanation.
+
+     Chips live in the band with the count line and not in the rail, because
+     they are the answer to what is applied rather than one more control. Each
+     remove button is named for the value it drops — six buttons called Remove
+     is what gets read out otherwise — and Clear all is a link, because it is
+     the blunt answer and it throws away the three filters that were right along
+     with the one that was not.
+
+     On a real page every one of these is a link carrying the querystring, or a
+     GET form; the django variant is the one to copy. What must not ship either
+     way is facet state that lives only in the browser — a narrowed result
+     nobody can send to the person who asked about it is the defect. -->
+<div data-kui="search-page/facets" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       type: ['order'], plant: 'silvassa', status: '', raised: '', band: '',
+       types: [
+         { k: 'order',   label: 'Purchase orders', n: 186 },
+         { k: 'grn',     label: 'Goods receipts',  n: 74 },
+         { k: 'invoice', label: 'Vendor invoices', n: 41 },
+         { k: 'item',    label: 'Items',           n: 1 },
+         { k: 'vendor',  label: 'Vendors',         n: 1 }
+       ],
+       names: { order: 'Purchase orders', grn: 'Goods receipts', invoice: 'Vendor invoices', item: 'Items', vendor: 'Vendors', silvassa: 'Silvassa', vapi: 'Vapi' },
+       get valued() { return this.type.length &amp;&amp; this.type.every(k => k === 'order' || k === 'invoice'); },
+       get total() {
+         const ks = this.type.length ? this.type : this.types.map(t => t.k);
+         return this.types.filter(t => ks.includes(t.k)).reduce((a, t) => a + t.n, 0);
+       },
+       get chips() {
+         const out = this.type.map(k => ({ key: 'type:' + k, label: this.names[k] }));
+         if (this.plant) out.push({ key: 'plant', label: 'Plant: ' + this.names[this.plant] });
+         if (this.status) out.push({ key: 'status', label: 'Status: ' + this.status });
+         if (this.raised) out.push({ key: 'raised', label: this.raised });
+         if (this.band &amp;&amp; this.valued) out.push({ key: 'band', label: this.band });
+         return out;
+       },
+       shows(k) { return !this.type.length || this.type.includes(k); },
+       drop(c) {
+         if (c.key.indexOf('type:') === 0) { this.type = this.type.filter(k => k !== c.key.slice(5)); return; }
+         this[c.key] = '';
+       },
+       clear() { this.type = []; this.plant = ''; this.status = ''; this.raised = ''; this.band = ''; }
+     }"
+     x-effect="if (!valued &amp;&amp; band) band = ''">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <form role="search" @submit.prevent class="max-w-2xl">
+          <label for="sp-fa-q" class="sr-only">Search orders, receipts, invoices, items and vendors</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+            <input id="sp-fa-q" value="MS-4821" type="search" enterkeyhint="search"
+                   autocomplete="off" spellcheck="false" autocapitalize="none"
+                   class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500 [&amp;::-webkit-search-cancel-button]:appearance-none">
+          </div>
+        </form>
+
+        <h1 class="mt-4 text-[24px]/7 font-semibold tracking-tight">Results for “MS-4821”</h1>
+        <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600"
+           x-text="chips.length ? total.toLocaleString('en-IN') + ' results · ' + chips.length + ' filters in force' : '303 results in 5 registers'"></p>
+
+        <div x-show="chips.length" x-cloak class="mt-3 flex flex-wrap items-center gap-2">
+          <template x-for="c in chips" :key="c.key">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span x-text="c.label"></span>
+              <button type="button" @click="drop(c)" :aria-label="'Remove the filter ' + c.label"
+                      class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-3"></i>
+              </button>
+            </span>
+          </template>
+          <button type="button" @click="clear()" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto flex max-w-[1600px] flex-col gap-4 px-4 py-5 lg:flex-row lg:px-6">
+
+      <aside aria-labelledby="sp-fa-rail" class="w-full shrink-0 lg:w-64">
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="flex items-baseline justify-between gap-3 px-4 py-3">
+            <h2 id="sp-fa-rail" class="text-[13px]/5 font-medium">Narrow these results</h2>
+          </div>
+
+          <fieldset class="border-t border-zinc-100 px-4 py-3">
+            <legend class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Record type</legend>
+            <div>
+              <template x-for="t in types" :key="t.k">
+                <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                  <input type="checkbox" :value="t.k" x-model="type"
+                         class="size-4 shrink-0 rounded accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <span class="min-w-0 flex-1 truncate" x-text="t.label"></span>
+                  <span class="shrink-0 tabular-nums text-zinc-500" x-text="t.n.toLocaleString('en-IN')"></span>
+                </label>
+              </template>
+            </div>
+          </fieldset>
+
+          <fieldset class="border-t border-zinc-100 px-4 py-3">
+            <legend class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Plant</legend>
+            <div>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-plant" value="silvassa" x-model="plant"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Silvassa</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">214</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-plant" value="vapi" x-model="plant"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Vapi</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">89</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="border-t border-zinc-100 px-4 py-3">
+            <legend class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Status</legend>
+            <div>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-status" value="Open" x-model="status"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Open</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">61</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-status" value="Approved" x-model="status"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Approved</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">34</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-status" value="Overdue" x-model="status"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Overdue</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">12</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-status" value="Closed" x-model="status"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Closed</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">196</span>
+              </label>
+              <!-- zero keeps its place and stops being a control. The count is
+                   the explanation, so no reason line is needed and none is red -->
+              <p class="-mx-2 flex items-center gap-2.5 px-2 py-1 text-[13px]/5 text-zinc-500">
+                <span class="size-4 shrink-0" aria-hidden="true"></span>
+                <span class="min-w-0 flex-1 truncate">Draft</span>
+                <span class="shrink-0 tabular-nums">0</span>
+              </p>
+            </div>
+          </fieldset>
+
+          <fieldset class="border-t border-zinc-100 px-4 py-3">
+            <legend class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Raised</legend>
+            <div>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-raised" value="Raised in the last 30 days" x-model="raised"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Last 30 days</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">27</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-raised" value="Raised in FY 2026–27" x-model="raised"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">FY 2026–27</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">148</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-raised" value="Raised before 1 Apr 2026" x-model="raised"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Earlier</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">155</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- only while every selected type has a value. Over a mixed result
+               this band would quietly drop the item and the vendor from the
+               answer, and nothing on screen would say why -->
+          <fieldset x-show="valued" x-cloak class="border-t border-zinc-100 px-4 py-3">
+            <legend class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Value</legend>
+            <div>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-band" value="Under ₹1,00,000" x-model="band"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate tabular-nums">Under ₹1,00,000</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">44</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-band" value="₹1,00,000 to ₹10,00,000" x-model="band"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate tabular-nums">₹1 to ₹10 lakh</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">119</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-fa-band" value="Above ₹10,00,000" x-model="band"
+                       class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate tabular-nums">Above ₹10 lakh</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">64</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <p class="border-t border-zinc-100 px-4 py-3 text-[12px]/4 text-zinc-500">Counts are for this query with every other filter in force.</p>
+        </div>
+      </aside>
+
+      <div class="min-w-0 flex-1 space-y-4">
+
+        <section x-show="shows('order')" x-cloak aria-labelledby="sp-fa-h-po" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+            <h2 id="sp-fa-h-po" class="text-[16px]/6 font-semibold">Purchase orders</h2>
+            <a href="#" class="text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all 186 purchase orders</a>
+          </div>
+          <ul role="list" class="divide-y divide-zinc-100">
+            <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-red-600"></span></span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+                  <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹27,10,400</span>
+                </div>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Overdue — </span>Sharma Steel &amp; Alloys · raised 12 Aug 2026 · due 04 Sep 2026 · Silvassa</p>
+              </div>
+            </li>
+            <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0402</a>
+                  <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹12,45,000</span>
+                </div>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Closed — </span>Sharma Steel &amp; Alloys · closed 09 Sep 2026 · fully received · Silvassa</p>
+              </div>
+            </li>
+            <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0455</a>
+                  <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹4,68,500</span>
+                </div>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Konkan Metals Pvt Ltd · raised 09 Sep 2026 · due 30 Sep 2026 · Silvassa</p>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <section x-show="shows('grn')" x-cloak aria-labelledby="sp-fa-h-grn" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+            <h2 id="sp-fa-h-grn" class="text-[16px]/6 font-semibold">Goods receipts</h2>
+            <a href="#" class="text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all 74 goods receipts</a>
+          </div>
+          <ul role="list" class="divide-y divide-zinc-100">
+            <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a>
+                  <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">12.400 MT</span>
+                </div>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Closed — </span>Against PO-2026-0402 · posted 04 Sep 2026 · Silvassa · QC passed</p>
+              </div>
+            </li>
+            <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-5106</a>
+                  <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">4.180 MT</span>
+                </div>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Approved — </span>Against PO-2026-0418 · posted 06 Sep 2026 · Silvassa · on QC hold</p>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">
+          Looking for one register rather than all of them? <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Filter the purchase order register</a> instead — it keeps the columns, the sort and the saved views.
+        </p>
+      </div>
+    </div>
+  </main>
+</div>

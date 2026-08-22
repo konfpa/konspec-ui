@@ -1,0 +1,248 @@
+<!-- Reached by following a group heading, and the whole page changes shape
+     rather than filtering in place, because scoping to one type buys something
+     grouping cannot: one column set. Five kinds of record share no columns, so
+     a mixed result is a list of rows that each explain themselves; 186 purchase
+     orders and nothing else is a register, and a register gets the register's
+     table, its sortable headers and its pager.
+
+     The h1 changes with it. Results for “MS-4821” is no longer true of this
+     page — it shows 186 of the 303 — so the heading says which 186, and the way
+     back to everything sits above it as a real link rather than as a chip in
+     the band. A chip would put the way out among the things you remove one at a
+     time; this is not a filter that was applied, it is a different page.
+
+     The facets change too, and that is the point of scoping as much as the
+     columns are. Record type is gone — it has been answered — and the value
+     band is now unconditional, because every record on this page has a value.
+     The facets that only orders have arrive with it: the approver, the receipt
+     state. A rail that stays the same on the scoped page is a rail that was
+     never really about the records.
+
+     Sorting appears here and nowhere else on this component. Across five kinds
+     there is nothing to sort by that all five have, and sorting a grouped page
+     by value would reorder three groups against a fourth that has no values at
+     all. Inside one type the register's own sort is meaningful, so the header
+     is table's sortable header, aria-sort on the th and the chevron as
+     decoration.
+
+     The last line hands the user to index-page, which is the better screen the
+     moment they know the answer is an order: it keeps the saved views, the
+     column chooser and the density they set. This page is where somebody lands
+     when they did not know; it is not where they should stay. -->
+<div data-kui="search-page/scoped" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <form role="search" @submit.prevent class="max-w-2xl">
+          <label for="sp-sc-q" class="sr-only">Search orders, receipts, invoices, items and vendors</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+            <input id="sp-sc-q" value="MS-4821" type="search" enterkeyhint="search"
+                   autocomplete="off" spellcheck="false" autocapitalize="none"
+                   class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500 [&amp;::-webkit-search-cancel-button]:appearance-none">
+          </div>
+        </form>
+
+        <!-- a real link out, not a chip. This is a different page, not a filter
+             somebody applied to this one -->
+        <a href="#" class="mt-4 inline-flex items-center gap-1.5 text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="arrow-left" class="size-3.5" aria-hidden="true"></i>All 303 results for “MS-4821”
+        </a>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Purchase orders matching “MS-4821”</h1>
+        <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">186 of 303 results · ₹9,84,26,700 committed · Silvassa and Vapi</p>
+      </div>
+    </header>
+
+    <div class="mx-auto flex max-w-[1600px] flex-col gap-4 px-4 py-5 lg:flex-row lg:px-6">
+
+      <aside aria-labelledby="sp-sc-rail" class="w-full shrink-0 lg:w-64">
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <h2 id="sp-sc-rail" class="px-4 py-3 text-[13px]/5 font-medium">Narrow these orders</h2>
+
+          <fieldset class="border-t border-zinc-100 px-4 py-3">
+            <legend class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Status</legend>
+            <div>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-status" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Open</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">61</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-status" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Approved</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">34</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-status" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Overdue</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">12</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-status" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Closed</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">79</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- unconditional here, because every record on this page has a value
+               to be in a band -->
+          <fieldset class="border-t border-zinc-100 px-4 py-3">
+            <legend class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Value</legend>
+            <div>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-band" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate tabular-nums">Under ₹1,00,000</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">31</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-band" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate tabular-nums">₹1 to ₹10 lakh</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">98</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-band" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate tabular-nums">Above ₹10 lakh</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">57</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- facets only an order has. They arrive with the scope, and a rail
+               that does not change on the scoped page was never about the
+               records in the first place -->
+          <fieldset class="border-t border-zinc-100 px-4 py-3">
+            <legend class="mb-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Receipt</legend>
+            <div>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-recv" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Nothing received</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">22</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-recv" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Part received</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">51</span>
+              </label>
+              <label class="-mx-2 flex items-center gap-2.5 rounded px-2 py-1 text-[13px]/5 hover:bg-zinc-100">
+                <input type="radio" name="sp-sc-recv" class="size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1 truncate">Fully received</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">113</span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+      </aside>
+
+      <div class="min-w-0 flex-1">
+        <div class="rounded-xl border border-zinc-300 bg-white">
+          <table class="w-full text-[13px]/5">
+            <thead>
+              <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                <th scope="col" aria-sort="none" class="px-4 py-2.5">
+                  <button type="button" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO number</button>
+                </th>
+                <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+                <th scope="col" aria-sort="descending" class="px-4 py-2.5">
+                  <button type="button" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider text-zinc-900 uppercase focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    Raised<span class="rotate-180"><i data-lucide="chevron-up" class="size-3.5" aria-hidden="true"></i></span>
+                  </button>
+                </th>
+                <th scope="col" aria-sort="none" class="px-4 py-2.5 text-right">
+                  <button type="button" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Value</button>
+                </th>
+                <th scope="col" class="hidden px-4 py-2.5 font-medium md:table-cell">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="relative border-b border-zinc-100 last:border-0 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums">
+                  <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0455</a>
+                </td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">Konkan Metals Pvt Ltd</td>
+                <td class="px-4 py-2.5 whitespace-nowrap tabular-nums text-zinc-600">09 Sep 2026</td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums">₹4,68,500</td>
+                <td class="hidden px-4 py-2.5 md:table-cell">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+                  </span>
+                </td>
+              </tr>
+              <tr class="relative border-b border-zinc-100 last:border-0 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums">
+                  <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0431</a>
+                </td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">Deccan Fasteners Pvt Ltd</td>
+                <td class="px-4 py-2.5 whitespace-nowrap tabular-nums text-zinc-600">27 Aug 2026</td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums">₹8,64,000</td>
+                <td class="hidden px-4 py-2.5 md:table-cell">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+                  </span>
+                </td>
+              </tr>
+              <tr class="relative border-b border-zinc-100 last:border-0 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums">
+                  <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+                </td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">Sharma Steel &amp; Alloys</td>
+                <td class="px-4 py-2.5 whitespace-nowrap tabular-nums text-zinc-600">12 Aug 2026</td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums">₹27,10,400</td>
+                <td class="hidden px-4 py-2.5 md:table-cell">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+                  </span>
+                </td>
+              </tr>
+              <tr class="relative border-b border-zinc-100 last:border-0 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums">
+                  <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0402</a>
+                </td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">Sharma Steel &amp; Alloys</td>
+                <td class="px-4 py-2.5 whitespace-nowrap tabular-nums text-zinc-600">31 Jul 2026</td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums">₹12,45,000</td>
+                <td class="hidden px-4 py-2.5 md:table-cell">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>Closed
+                  </span>
+                </td>
+              </tr>
+              <tr class="relative border-b border-zinc-100 last:border-0 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums">
+                  <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0377</a>
+                </td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">Gujarat Polymers Ltd</td>
+                <td class="px-4 py-2.5 whitespace-nowrap tabular-nums text-zinc-600">18 Jul 2026</td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums">₹1,32,900</td>
+                <td class="hidden px-4 py-2.5 md:table-cell">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>Closed
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <nav aria-label="Result pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+            <p class="text-[13px]/5 tabular-nums text-zinc-600">1–5 of 186 purchase orders</p>
+            <div class="flex items-center gap-2">
+              <span class="text-[13px]/5 tabular-nums text-zinc-600">Page 1 of 38</span>
+              <button type="button" aria-disabled="true" class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="chevron-left" class="size-4" aria-hidden="true"></i>Previous
+              </button>
+              <a href="#" class="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                Next<i data-lucide="chevron-right" class="size-4" aria-hidden="true"></i>
+              </a>
+            </div>
+          </nav>
+        </div>
+
+        <p class="mt-3 text-[12px]/4 tabular-nums text-zinc-500">
+          Working in this register rather than searching it? <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the purchase order register</a> — it keeps your saved views, your columns and your density.
+        </p>
+      </div>
+    </div>
+  </main>
+</div>

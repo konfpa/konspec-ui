@@ -1,0 +1,138 @@
+<!-- The refusal is loud by being large, not by being red. A 24px sentence in
+     black on white with one red-600 circle beside it reads from further away
+     than a red panel does, says more, and survives forced-colours mode, which
+     repaints a fill and leaves the words. This is alert's rule at bench scale
+     rather than a new one.
+
+     It recovers with no touch at all. The field is already empty and still
+     holds the keyboard, so the next scan replaces the message; nothing has to
+     be dismissed and nothing times out. A refusal with an OK button costs the
+     operator a hand they do not have, and by the third one they are resting a
+     finger on it and no longer reading.
+
+     The panel is a permanent role="alert" whose text is replaced, not a panel
+     inserted on failure. A live region that arrives with the page announces
+     nothing at all, and one created and destroyed on each scan announces
+     unreliably; replacing the string inside a region that was already in the
+     document is what actually reads out.
+
+     The scanned code is echoed at 24px directly above what was expected,
+     because the operator is holding the label and comparing two strings of
+     digits. Naming the fault without printing both leaves them to work out
+     which of fourteen characters was wrong. -->
+<div data-kui="focus-page/unknown" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       code: '', rejected: true, done: 27, target: 40,
+       head: 'Not on this order',
+       body: 'That bag is lot 24-LD-092. GRN-4821 is receiving lot 24-HD-118 only.',
+       keep(e) {
+         if (e.relatedTarget && e.relatedTarget.closest('[data-hands-off]')) return;
+         requestAnimationFrame(() => this.$refs.scan.focus());
+       },
+       accept() {
+         if (!this.code.trim()) return;
+         this.rejected = false;
+         this.head = 'Accepted';
+         this.body = 'Bag ' + this.code.trim() + ' added to GRN-4821.';
+         this.done++;
+         this.code = '';
+       }
+     }"
+     x-init="$nextTick(() => $refs.scan.focus())">
+
+  <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
+    <p class="min-w-0 text-[16px]/6 font-medium">
+      Goods inward · Gate 2
+      <span class="block text-[14px]/5 font-normal tabular-nums text-zinc-600">Vikram Rathod · Silvassa · 11:43</span>
+    </p>
+    <div class="flex shrink-0 items-center gap-3">
+      <span class="inline-flex items-center gap-2 rounded-full bg-zinc-200 px-3 py-1 text-[13px]/5 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Online
+      </span>
+      <button type="button" data-hands-off
+              class="inline-flex h-12 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="log-out" aria-hidden="true" class="size-5 text-zinc-600"></i>Exit
+      </button>
+    </div>
+  </header>
+
+  <main class="flex min-h-0 flex-1 flex-col">
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+      <div class="mx-auto max-w-3xl">
+
+        <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">Receiving into GRN-4821</h1>
+        <p class="mt-1 text-[16px]/6 tabular-nums text-zinc-600">
+          HDPE granules M60075 · lot 24-HD-118 · Gujarat Polymers Ltd
+        </p>
+
+        <div role="alert" class="mt-5 flex items-start gap-4 rounded-xl border border-zinc-300 bg-white px-5 py-5">
+          <span x-show="rejected" class="shrink-0"><i data-lucide="alert-circle" aria-hidden="true" class="size-8 text-red-600"></i></span>
+          <span x-show="!rejected" x-cloak class="shrink-0"><i data-lucide="check-circle-2" aria-hidden="true" class="size-8 text-emerald-600"></i></span>
+          <div class="min-w-0">
+            <p class="text-[24px]/7 font-semibold tracking-tight" x-text="head">Not on this order</p>
+            <p class="mt-2 text-[16px]/6 tabular-nums text-zinc-700" x-text="body">That bag is lot 24-LD-092. GRN-4821 is receiving lot 24-HD-118 only.</p>
+            <p class="mt-3 text-[16px]/6 tabular-nums text-zinc-700">
+              Nothing was recorded. Put the bag back on the pallet and scan the next one — this message clears itself.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <div class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
+            <p class="text-[14px]/5 text-zinc-600">Scanned</p>
+            <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums">24-LD-092-0003</p>
+          </div>
+          <div class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
+            <p class="text-[14px]/5 text-zinc-600">Expected</p>
+            <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums">24-HD-118-<span class="text-zinc-500">nnnn</span></p>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <label for="fu-scan" class="block text-[16px]/6 font-medium">Scan the next bag label</label>
+          <div class="mt-2 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="scan-barcode" aria-hidden="true" class="ml-4 size-6 shrink-0 text-zinc-600"></i>
+            <input id="fu-scan" x-ref="scan" x-model="code" name="barcode"
+                   inputmode="none" autocomplete="off" spellcheck="false" autocapitalize="off"
+                   aria-describedby="fu-scan-help" placeholder="Waiting for a scan"
+                   @blur="keep($event)" @keydown.enter.prevent="accept()"
+                   class="h-16 w-full min-w-0 bg-transparent px-3 text-[24px]/7 tabular-nums outline-none placeholder:text-zinc-500">
+          </div>
+          <p id="fu-scan-help" class="mt-2 text-[14px]/5 tabular-nums text-zinc-600">
+            Field cleared and still holding the keyboard. Last accepted 24-HD-118-0027 at 11:42:07.
+          </p>
+        </div>
+
+        <!-- the two escapes, and neither of them is required to carry on. Both
+             carry data-hands-off, so pressing one is allowed to take the
+             keyboard off the scan field; a scan while either is open goes where
+             the operator is looking rather than into the gate log. -->
+        <div class="mt-4 flex flex-wrap gap-3">
+          <button type="button" data-hands-off
+                  class="inline-flex h-14 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 text-[16px]/6 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="keyboard" aria-hidden="true" class="size-5 text-zinc-600"></i>Key the code in by hand
+          </button>
+          <button type="button" data-hands-off
+                  class="inline-flex h-14 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-5 text-[16px]/6 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="flag" aria-hidden="true" class="size-5 text-zinc-600"></i>Flag this bag for the store officer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="shrink-0 border-t border-zinc-300 bg-white px-4 py-4 sm:px-6">
+      <div class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-5 gap-y-3">
+        <div class="min-w-[13rem] flex-1">
+          <p class="text-[24px]/7 font-semibold tracking-tight tabular-nums">
+            <span x-text="done">27</span> of 40 bags
+          </p>
+          <p class="mt-1 text-[14px]/5 text-zinc-600">Unchanged by the refusal.</p>
+        </div>
+        <button type="button" data-hands-off
+                class="inline-flex h-16 shrink-0 items-center gap-2.5 rounded-lg border border-transparent bg-zinc-700 px-6 text-[20px]/7 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="check" aria-hidden="true" class="size-6"></i>Finish and post
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

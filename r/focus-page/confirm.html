@@ -1,0 +1,113 @@
+<!-- The last screen before anything reaches the ledger, and it exists because
+     the operator has been scanning for twenty minutes with no chrome, no
+     breadcrumb and no record page to check against. Everything that is about to
+     be posted is stated at 20px, in the units it will be posted in, above the
+     one target that posts it.
+
+     The short receipt is called out where it happens rather than after. 1,000
+     of 1,200 kg is a fact the buyer has to be told about, and an operator who
+     finds out from a report on Monday cannot say whether the missing eight bags
+     were short-shipped or never scanned.
+
+     The commit target is the full width of the column at the bottom edge, where
+     the hand already is, and nothing that discards anything is within reach of
+     it — Back is at the top of the card and Exit is up in the strip. Two 64px
+     targets 8px apart on a trolley being pushed is one mis-tap, and one of them
+     writes to a ledger.
+
+     The button is disabled while it posts, which is the opposite of what
+     form-page does and right here for a different reason: a second tap on a
+     touch screen posts a second GRN, and there is no keyboard focus to lose. It
+     keeps its width with button/states' grid overlay, because a label that
+     grows under a thumb moves the target mid-press. -->
+<div data-kui="focus-page/confirm" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ posting: false }">
+
+  <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
+    <p class="min-w-0 text-[16px]/6 font-medium">
+      Goods inward · Gate 2
+      <span class="block text-[14px]/5 font-normal tabular-nums text-zinc-600">Vikram Rathod · Silvassa · 12:04</span>
+    </p>
+    <button type="button"
+            class="inline-flex h-12 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="log-out" aria-hidden="true" class="size-5 text-zinc-600"></i>Exit
+    </button>
+  </header>
+
+  <main class="flex min-h-0 flex-1 flex-col">
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+      <div class="mx-auto max-w-2xl">
+
+        <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">Post GRN-4821</h1>
+        <p class="mt-1 text-[16px]/6 text-zinc-600">This writes to the stock ledger. It cannot be undone from this screen.</p>
+
+        <div class="mt-4 rounded-xl border border-zinc-300 bg-white">
+          <div class="flex items-center justify-between gap-4 border-b border-zinc-200 px-5 py-3.5">
+            <h2 class="text-[16px]/6 font-semibold">What is about to be written</h2>
+            <button type="button"
+                    class="inline-flex h-12 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="arrow-left" aria-hidden="true" class="size-5 text-zinc-600"></i>Keep counting
+            </button>
+          </div>
+
+          <dl class="divide-y divide-zinc-100">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-5 py-3.5">
+              <dt class="text-[16px]/6 text-zinc-600">Against</dt>
+              <dd class="text-[20px]/7 font-medium tabular-nums">PO-2026-0418</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-5 py-3.5">
+              <dt class="text-[16px]/6 text-zinc-600">Vendor</dt>
+              <dd class="text-[20px]/7 font-medium">Gujarat Polymers Ltd</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-5 py-3.5">
+              <dt class="text-[16px]/6 text-zinc-600">Item and lot</dt>
+              <dd class="text-[20px]/7 font-medium tabular-nums">HDPE M60075 · 24-HD-118</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-5 py-3.5">
+              <dt class="text-[16px]/6 text-zinc-600">Bags scanned</dt>
+              <dd class="text-[24px]/7 font-semibold tracking-tight tabular-nums">40</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-5 py-3.5">
+              <dt class="text-[16px]/6 text-zinc-600">Quantity received</dt>
+              <dd class="text-[24px]/7 font-semibold tracking-tight tabular-nums">1,000.0 kg</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-5 py-3.5">
+              <dt class="text-[16px]/6 text-zinc-600">Stored at</dt>
+              <dd class="text-[20px]/7 font-medium tabular-nums">Silvassa · store 2 · bay A-04</dd>
+            </div>
+          </dl>
+
+          <!-- alert's shape at bench scale: white card, zinc edge, colour only
+               in the icon. The consequence gets the sentence, not the row. -->
+          <div class="flex items-start gap-3.5 border-t border-zinc-200 bg-white px-5 py-4">
+            <i data-lucide="alert-triangle" aria-hidden="true" class="mt-0.5 size-6 shrink-0 text-amber-700"></i>
+            <p class="text-[16px]/6 tabular-nums text-zinc-700">
+              <span class="font-medium">Short by 200.0 kg.</span>
+              PO-2026-0418 ordered 1,200.0 kg. Posting this closes the receipt at 1,000.0 kg and raises a shortage against the vendor.
+            </p>
+          </div>
+        </div>
+
+        <p class="mt-4 text-[14px]/5 tabular-nums text-zinc-600">
+          Stamped as posted by Vikram Rathod, 22 Aug 2026 at 12:04, from gate 2.
+        </p>
+      </div>
+    </div>
+
+    <div class="shrink-0 border-t border-zinc-300 bg-white px-4 py-4 sm:px-6">
+      <div class="mx-auto max-w-2xl">
+        <button type="button" @click="posting = true"
+                :disabled="posting" :aria-busy="posting"
+                class="inline-flex h-16 w-full items-center justify-center gap-2.5 rounded-lg border border-transparent bg-zinc-700 px-6 text-[20px]/7 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:hover:bg-zinc-700">
+          <span x-show="!posting"><i data-lucide="check" aria-hidden="true" class="size-6"></i></span>
+          <span x-show="posting" x-cloak><i data-lucide="loader-circle" aria-hidden="true" class="size-6 animate-spin"></i></span>
+          <span class="grid">
+            <span class="col-start-1 row-start-1" :class="posting && 'invisible'">Post 40 bags to GRN-4821</span>
+            <span class="col-start-1 row-start-1" :class="!posting && 'invisible'">Posting to the ledger…</span>
+          </span>
+        </button>
+        <p class="mt-2 text-center text-[14px]/5 text-zinc-600">One tap. The button stops responding while it writes.</p>
+      </div>
+    </div>
+  </main>
+</div>

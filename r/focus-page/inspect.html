@@ -1,0 +1,138 @@
+<!-- questionnaire's three-tile answer, at bench scale. Equal columns, a real
+     radio inside each label, the tint painted from the radio with
+     has-[:checked] so there is no second copy of the state to keep in step —
+     the markup is that entry's, only bigger. What changes is the reach: 96px
+     tiles at 20px because the inspector is standing at a bench with a sample in
+     one hand, where the desk version runs eighteen of these down a sheet at
+     13px and is read as a column.
+
+     Position carries the verdict. Fail is always the middle target, so a hand
+     going to it does not have to read three words first, and a bench that runs
+     forty samples a shift stops reading them after the fourth.
+
+     A fail needs a reason and the reason is a code, not a note. An N/A or a
+     fail with free text behind it is the one answer on a sheet that cannot be
+     counted six months later, and counting is what finds the parameter that has
+     failed on forty of the last fifty lots. Other stays on the list, or the
+     nearest wrong code gets picked instead.
+
+     The follow-up carries :disabled as well as x-show. x-show is display:none
+     and a display:none input is still in the form and still posts, so a reason
+     typed and then hidden by a change of verdict would travel with a POST that
+     says the sample passed. -->
+<div data-kui="focus-page/inspect" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ verdict: '' }">
+
+  <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
+    <p class="min-w-0 text-[16px]/6 font-medium">
+      QC bench · Silvassa lab
+      <span class="block text-[14px]/5 font-normal tabular-nums text-zinc-600">Priya Nair · 22 Aug 2026 · 14:18</span>
+    </p>
+    <button type="button"
+            class="inline-flex h-12 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="log-out" aria-hidden="true" class="size-5 text-zinc-600"></i>Exit
+    </button>
+  </header>
+
+  <main class="flex min-h-0 flex-1 flex-col">
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+      <div class="mx-auto max-w-3xl">
+
+        <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">Sample MS-4821</h1>
+        <p class="mt-1 text-[16px]/6 tabular-nums text-zinc-600">
+          HDPE granules M60075 · lot 24-HD-118 · drawn from GRN-4821 at 12:06
+        </p>
+
+        <div class="mt-4 rounded-xl border border-zinc-300 bg-white px-5 py-4">
+          <h2 class="text-[16px]/6 font-semibold">Specification</h2>
+          <dl class="mt-3 divide-y divide-zinc-100">
+            <div class="flex items-baseline justify-between gap-4 pb-2.5">
+              <dt class="text-[16px]/6 text-zinc-600">Melt flow index</dt>
+              <dd class="text-[16px]/6 font-medium tabular-nums">0.70 – 0.80 g/10 min</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 py-2.5">
+              <dt class="text-[16px]/6 text-zinc-600">Moisture</dt>
+              <dd class="text-[16px]/6 font-medium tabular-nums">0.05% maximum</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 pt-2.5">
+              <dt class="text-[16px]/6 text-zinc-600">Colour against retained standard</dt>
+              <dd class="text-[16px]/6 font-medium">Natural, no yellowing</dd>
+            </div>
+          </dl>
+        </div>
+
+        <form class="mt-5">
+          <fieldset>
+            <legend class="text-[20px]/7 font-semibold tracking-tight">Verdict on this sample</legend>
+            <p id="fi-crit" class="mt-1.5 text-[16px]/6 tabular-nums text-zinc-600">
+              Judged against specification SPEC-HDPE-M60075 rev 4, dated 11 Jan 2026.
+            </p>
+
+            <div class="mt-3 grid grid-cols-3 gap-3">
+              <label class="flex min-h-24 flex-col items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-3 text-[20px]/7 font-medium [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+                <input type="radio" name="qc_verdict" value="pass" x-model="verdict" required aria-describedby="fi-crit" class="size-6 shrink-0 accent-zinc-700">
+                <span>Pass</span>
+              </label>
+              <label class="flex min-h-24 flex-col items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-3 text-[20px]/7 font-medium [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+                <input type="radio" name="qc_verdict" value="fail" x-model="verdict" required aria-describedby="fi-crit" class="size-6 shrink-0 accent-zinc-700">
+                <span>Fail</span>
+              </label>
+              <label class="flex min-h-24 flex-col items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-2 py-3 text-[20px]/7 font-medium [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+                <input type="radio" name="qc_verdict" value="hold" x-model="verdict" required aria-describedby="fi-crit" class="size-6 shrink-0 accent-zinc-700">
+                <span>Hold</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div x-show="verdict === 'fail'" x-cloak class="mt-4 border-l-2 border-zinc-200 pl-4">
+            <label for="fi-reason" class="block text-[16px]/6 font-medium">Why it failed</label>
+            <div class="mt-2 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select id="fi-reason" name="qc_fail_reason"
+                      :disabled="verdict !== 'fail'" aria-describedby="fi-reason-help"
+                      class="h-14 w-full bg-transparent px-4 text-[16px]/6 outline-none">
+                <option value="">Choose a reason</option>
+                <option value="mfi">Melt flow index outside 0.70 – 0.80</option>
+                <option value="moist">Moisture above 0.05%</option>
+                <option value="colour">Colour off the retained standard</option>
+                <option value="contam">Visible contamination</option>
+                <option value="other">Other — described below</option>
+              </select>
+            </div>
+            <p id="fi-reason-help" class="mt-2 text-[16px]/6 text-zinc-700">
+              A coded reason is what can be counted later. Free text cannot, and the parameter that fails forty times a year is the one nobody notices.
+            </p>
+
+            <label for="fi-remark" class="mt-4 block text-[16px]/6 font-medium">Reading or remark</label>
+            <div class="mt-2 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="fi-remark" name="qc_remark" :disabled="verdict !== 'fail'" inputmode="text"
+                     placeholder="MFI 0.86 on the second run"
+                     class="h-14 w-full min-w-0 bg-transparent px-4 text-[16px]/6 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <!-- the consequence gets the colour, not the row. A hold is not a
+               failure, so nothing here is red; it is the sentence that says
+               what a hold does to the lot. -->
+          <div x-show="verdict === 'hold'" x-cloak class="mt-4 flex items-start gap-3.5 rounded-xl border border-zinc-300 bg-white px-5 py-4">
+            <i data-lucide="alert-triangle" aria-hidden="true" class="mt-0.5 size-6 shrink-0 text-amber-700"></i>
+            <p class="text-[16px]/6 tabular-nums text-zinc-700">
+              Lot 24-HD-118 is blocked for issue the moment this is saved. Nothing may be drawn from it until the lab releases it, and the store officer is told.
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="shrink-0 border-t border-zinc-300 bg-white px-4 py-4 sm:px-6">
+      <div class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-5 gap-y-3">
+        <p class="min-w-[13rem] flex-1 text-[16px]/6 tabular-nums text-zinc-600">
+          Sample 3 of 6 drawn today. Nothing is saved until this is recorded.
+        </p>
+        <button type="button"
+                class="inline-flex h-16 shrink-0 items-center gap-2.5 rounded-lg border border-transparent bg-zinc-700 px-6 text-[20px]/7 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="check" aria-hidden="true" class="size-6"></i>Record and take the next sample
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

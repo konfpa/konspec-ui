@@ -1,0 +1,155 @@
+<!-- Last in the nav, below a rule, and an ordinary white card. A red panel is
+     the thing this system rejects by name: a field of colour behind text shouts
+     louder than the overdue orders it is describing, and by the third visit it
+     is wallpaper. What stops the click is the sentence with the figures in it —
+     34 open orders, 61 invoices, ₹27,10,400 committed — and the figures are
+     read out of the record rather than written into the template, or the day
+     they are wrong is the day somebody trusts them.
+
+     Colour appears exactly twice: the alert-circle in the row and the fill on
+     the confirming button inside the dialog. The row's own button is bordered
+     with red text, which is button's middle weight — the same act from a place
+     where it is not the point of the screen.
+
+     Each act is its own row with its own consequence. One card of two
+     destructive buttons under one heading called Danger zone makes them read as
+     one thing with one blast radius, and they have nothing in common except
+     that neither can be undone.
+
+     The typed confirmation is alert-dialog's typed variant, unchanged. It is
+     for the small number of acts that cannot be undone at all — reach for it
+     every time something is deleted and people learn to type without reading,
+     and the friction has bought a slower way to make the same mistake. The
+     input is first in the DOM so the trap opens on it, which is the one case
+     where focus does not land on the safe answer and is safe because the field
+     is not an answer. The confirm carries a real disabled attribute: a button
+     whose handler quietly returns reads as a broken screen.
+
+     Deactivating is not deleting, and the row says which one it is. A plant
+     with ledger history against it can never be removed, and offering a Delete
+     that will always fail is worse than not offering one. -->
+<div data-kui="settings-page/danger" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ open: false, typed: '', target: 'VAPI-02' }">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Settings</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · Silvassa and Vapi · FY 2026–27</p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:items-start lg:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+
+      <nav aria-label="Settings sections" class="lg:sticky lg:top-6 lg:self-start">
+        <ul role="list" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Company profile</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Plants and warehouses</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Numbering series</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Users and roles</a></li>
+        </ul>
+        <!-- last, and separated from the rest rather than tinted -->
+        <ul role="list" class="mt-3 space-y-0.5 border-l border-zinc-200 pt-3 text-[13px]/5">
+          <li><a href="#" aria-current="page" class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Deactivate and reset</a></li>
+        </ul>
+      </nav>
+
+      <section id="dg-pane" tabindex="-1" aria-labelledby="dg-h"
+               class="mt-4 min-w-0 rounded-xl focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 lg:mt-0">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="dg-h" class="text-[16px]/6 font-semibold">Deactivate and reset</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Three acts that cannot be reversed from this screen. Each one is separate and each one is guarded on its own.</p>
+          </div>
+
+          <div class="divide-y divide-zinc-100">
+
+            <div class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+              <div class="min-w-0">
+                <h3 class="flex items-center gap-2 text-[13px]/5 font-semibold">
+                  <i data-lucide="alert-circle" class="size-4 shrink-0 text-red-600"></i>Deactivate Vapi plant
+                </h3>
+                <p class="mt-1 max-w-prose text-[13px]/5 tabular-nums text-zinc-600">
+                  Stops new orders, GRNs and issues being raised against VAPI-02. The 34 open orders, 61 unpaid invoices and ₹27,10,400 of committed value stay in the ledgers and stay readable. The plant is never deleted — a plant with ledger history against it cannot be.
+                </p>
+              </div>
+              <button type="button" @click="open = true; typed = ''"
+                      class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">
+                <i data-lucide="power-off" class="size-4"></i>Deactivate plant
+              </button>
+            </div>
+
+            <div class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+              <div class="min-w-0">
+                <h3 class="flex items-center gap-2 text-[13px]/5 font-semibold">
+                  <i data-lucide="alert-circle" class="size-4 shrink-0 text-red-600"></i>Reset the GRN series
+                </h3>
+                <p class="mt-1 max-w-prose text-[13px]/5 tabular-nums text-zinc-600">
+                  Sets the running number back to 1 for FY 2026–27. GRN-4821 and everything before it keeps its number, so the register will hold two receipts numbered GRN-0001 once the first new one is posted.
+                </p>
+              </div>
+              <button type="button"
+                      class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">
+                <i data-lucide="rotate-ccw" class="size-4"></i>Reset series
+              </button>
+            </div>
+
+            <div class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+              <div class="min-w-0">
+                <h3 class="flex items-center gap-2 text-[13px]/5 font-semibold">
+                  <i data-lucide="alert-circle" class="size-4 shrink-0 text-red-600"></i>Revoke every API key
+                </h3>
+                <p class="mt-1 max-w-prose text-[13px]/5 tabular-nums text-zinc-600">
+                  4 keys are in use, the oldest issued 11 Feb 2025. The weighbridge feed and the Tally export both authenticate with one of them and stop within the minute.
+                </p>
+              </div>
+              <button type="button"
+                      class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-100">
+                <i data-lucide="key-round" class="size-4"></i>Revoke keys
+              </button>
+            </div>
+
+          </div>
+
+          <div class="border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <p class="text-[12px]/4 tabular-nums text-zinc-600">Every act on this page is written to the audit trail with your name against it.</p>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- alert-dialog/typed, unchanged. absolute inset-0 against the preview
+       frame; fixed inset-0 as a real page. -->
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
+       class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="dg-wipe-t" aria-describedby="dg-wipe-b"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <h2 id="dg-wipe-t" class="text-[16px]/6 font-semibold">Deactivate Vapi plant</h2>
+      <p id="dg-wipe-b" class="mt-1.5 text-[13px]/5 text-zinc-600">
+        <span class="font-medium tabular-nums text-red-600">9 users work only at this plant</span>
+        and lose the ability to raise anything from tomorrow morning. Reactivating is a support request, not a button.
+      </p>
+
+      <div class="mt-4">
+        <label for="dg-code" class="mb-1.5 block text-[13px]/5 font-medium">
+          Type <code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[12px]/4" x-text="target">VAPI-02</code> to confirm
+        </label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="dg-code" x-model="typed" :placeholder="target" autocomplete="off" spellcheck="false"
+                 class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 outline-none placeholder:text-zinc-500">
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <button type="button" @click="open = false"
+                class="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+        <button type="button" @click="open = false" :disabled="typed !== target"
+                class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-red-600 px-4 text-[13px]/5 font-medium text-white hover:bg-red-700 disabled:border-zinc-300 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
+          Deactivate plant
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

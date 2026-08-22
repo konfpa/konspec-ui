@@ -2758,6 +2758,58 @@
       "detail": "r/questionnaire.json"
     },
     {
+      "id": "container",
+      "name": "Container",
+      "category": "layout",
+      "description": "The measurements every screen in this library is already making: how wide a page is, how far its content sits from the edge of the column, the three vertical spacings, the responsive column grid, and the rules for what may scroll and in which direction. A reference for the box the other layouts sit in, not a screen of its own.",
+      "related": [
+        "app-shell",
+        "page-header",
+        "card",
+        "separator",
+        "form-page"
+      ],
+      "variants": [
+        {
+          "id": "page",
+          "name": "The box every page starts from"
+        },
+        {
+          "id": "narrow",
+          "name": "The width a form is read at"
+        },
+        {
+          "id": "wide",
+          "name": "The width a register is worked at"
+        },
+        {
+          "id": "stack",
+          "name": "Four vertical spacings, not one"
+        },
+        {
+          "id": "grid",
+          "name": "Columns step at sm and at xl"
+        },
+        {
+          "id": "regions",
+          "name": "A header that stays and a body that scrolls"
+        },
+        {
+          "id": "sticky",
+          "name": "Bands that stay while the page scrolls"
+        },
+        {
+          "id": "overflow",
+          "name": "What may scroll sideways"
+        },
+        {
+          "id": "phone",
+          "name": "At 390px"
+        }
+      ],
+      "detail": "r/container.json"
+    },
+    {
       "id": "app-shell",
       "name": "App shell",
       "category": "layout",
@@ -3144,6 +3196,1005 @@
         }
       ],
       "detail": "r/error-page.json"
+    },
+    {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "category": "layout",
+      "description": "The screen a user lands on after signing in: a strip of figures, one plot, and the queues that are actually waiting for them. Every part of it already exists — this entry is the composition and the rules that govern it.",
+      "related": [
+        "stat-card",
+        "chart",
+        "table",
+        "empty-state",
+        "skeleton",
+        "card",
+        "index-page",
+        "app-shell",
+        "page-header"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "The whole screen"
+        },
+        {
+          "id": "queues",
+          "name": "The half that is actually waiting"
+        },
+        {
+          "id": "alerts",
+          "name": "An exceptions band over the figures"
+        },
+        {
+          "id": "period",
+          "name": "A period over the figures and the plot"
+        },
+        {
+          "id": "regions",
+          "name": "Five regions arriving separately"
+        },
+        {
+          "id": "role",
+          "name": "The same shell, a storekeeper's screen"
+        },
+        {
+          "id": "empty",
+          "name": "The first week of a deployment"
+        },
+        {
+          "id": "phone",
+          "name": "The whole arrangement at 390px"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from the view"
+        }
+      ],
+      "detail": "r/dashboard.json"
+    },
+    {
+      "id": "index-page",
+      "name": "Index page",
+      "category": "layout",
+      "description": "The register screen as a whole page: the breadcrumb and the one h1, the saved views, the filter band, the toolbar that becomes a selection toolbar, the table, the pager, and the states the page as a whole can be in.",
+      "related": [
+        "data-table",
+        "page-header",
+        "table",
+        "pagination",
+        "empty-state",
+        "app-shell",
+        "list-detail"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "The register as a whole page"
+        },
+        {
+          "id": "saved-views",
+          "name": "Views a buyer comes back to"
+        },
+        {
+          "id": "filters",
+          "name": "Filters in force, and a drawer on a phone"
+        },
+        {
+          "id": "tabs",
+          "name": "Status tabs over the register"
+        },
+        {
+          "id": "bulk",
+          "name": "A selection that takes the header over"
+        },
+        {
+          "id": "dense",
+          "name": "Density and a column chooser"
+        },
+        {
+          "id": "empty",
+          "name": "Two different nothings"
+        },
+        {
+          "id": "loading",
+          "name": "First paint, columns already known"
+        },
+        {
+          "id": "django",
+          "name": "The server-rendered register"
+        }
+      ],
+      "detail": "r/index-page.json"
+    },
+    {
+      "id": "record-page",
+      "name": "Record page",
+      "category": "layout",
+      "description": "The screen for one record: the band that identifies it and says what state it is in, a strip of the figures that matter, and the sections of detail below it — line items, approvals, documents, activity — carrying only the actions the record's current state allows.",
+      "related": [
+        "page-header",
+        "form-page",
+        "tabs",
+        "table",
+        "badge",
+        "marker",
+        "list-detail",
+        "card"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Header, summary and stacked sections"
+        },
+        {
+          "id": "rail",
+          "name": "A standing rail beside the record"
+        },
+        {
+          "id": "tabs",
+          "name": "Sections as tabs, with a deep link"
+        },
+        {
+          "id": "approvals",
+          "name": "When the record is with you"
+        },
+        {
+          "id": "activity",
+          "name": "The audit trail, grouped by day"
+        },
+        {
+          "id": "states",
+          "name": "Cancelled, on hold and closed"
+        },
+        {
+          "id": "permissions",
+          "name": "A reader who may not see the rates"
+        },
+        {
+          "id": "phone",
+          "name": "The whole record at 390px"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from the record"
+        }
+      ],
+      "detail": "r/record-page.json"
+    },
+    {
+      "id": "inbox-page",
+      "name": "Approval inbox",
+      "category": "layout",
+      "description": "The screen an approver lives in: everything waiting on their signature in one queue, the record beside it, and the decision on a rail where the hand already is. Deciding removes the record from the queue and lands the user on the next one without a reload.",
+      "related": [
+        "list-detail",
+        "index-page",
+        "alert-dialog",
+        "toast",
+        "empty-state",
+        "badge",
+        "button"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "The queue, the record and the rail"
+        },
+        {
+          "id": "advance",
+          "name": "Approve, and land on the next one"
+        },
+        {
+          "id": "reject",
+          "name": "A refusal, and the reason it needs first"
+        },
+        {
+          "id": "pending",
+          "name": "In flight, and the two ways it comes back refused"
+        },
+        {
+          "id": "bulk",
+          "name": "Several alike, approved together"
+        },
+        {
+          "id": "limits",
+          "name": "Above your limit, so there is nothing to press"
+        },
+        {
+          "id": "delegated",
+          "name": "Signing on somebody else's behalf"
+        },
+        {
+          "id": "empty",
+          "name": "The inbox cleared"
+        },
+        {
+          "id": "phone",
+          "name": "One column at 390px"
+        },
+        {
+          "id": "django",
+          "name": "The server-rendered inbox"
+        }
+      ],
+      "detail": "r/inbox-page.json"
+    },
+    {
+      "id": "board",
+      "name": "Board",
+      "category": "layout",
+      "description": "Records in columns by the stage they are at, where each column is one stage and moving a card between two of them is a state change on the server. The column header carries the count, and every move can be made from the keyboard.",
+      "related": [
+        "index-page",
+        "list-detail",
+        "table",
+        "card",
+        "badge",
+        "empty-state"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Columns, cards and the move"
+        },
+        {
+          "id": "card",
+          "name": "What a card carries at each stage"
+        },
+        {
+          "id": "totals",
+          "name": "A count and a value on every stage"
+        },
+        {
+          "id": "wip",
+          "name": "Over the limit, and a stage that refuses"
+        },
+        {
+          "id": "pending",
+          "name": "A move in flight, and one the server refused"
+        },
+        {
+          "id": "drag",
+          "name": "Drag on top of a move that already works"
+        },
+        {
+          "id": "empty",
+          "name": "Nothing at a stage, and nothing on the board"
+        },
+        {
+          "id": "filters",
+          "name": "Scoped, and saying what is off the board"
+        },
+        {
+          "id": "phone",
+          "name": "One stage at a time at 390px"
+        },
+        {
+          "id": "django",
+          "name": "Server-rendered columns and a posted move"
+        }
+      ],
+      "detail": "r/board.json"
+    },
+    {
+      "id": "schedule-page",
+      "name": "Schedule page",
+      "category": "layout",
+      "description": "What is planned and when, drawn with time as the axis: promised deliveries across a month, production against each line, a shift roster. Position carries meaning — further right is later, and a block twice as wide takes twice as long.",
+      "related": [
+        "calendar",
+        "index-page",
+        "board",
+        "page-header",
+        "badge",
+        "empty-state",
+        "table",
+        "hovercard",
+        "app-shell"
+      ],
+      "variants": [
+        {
+          "id": "month",
+          "name": "A month of promised dates"
+        },
+        {
+          "id": "week",
+          "name": "The week, where the hour matters"
+        },
+        {
+          "id": "resource",
+          "name": "A lane per line, time across"
+        },
+        {
+          "id": "day",
+          "name": "One day, and what has no time on it"
+        },
+        {
+          "id": "block",
+          "name": "What a block shows at four widths"
+        },
+        {
+          "id": "conflict",
+          "name": "Two at once, and one on a shut day"
+        },
+        {
+          "id": "empty",
+          "name": "Three different nothings"
+        },
+        {
+          "id": "filters",
+          "name": "Scoped, and saying what is hidden"
+        },
+        {
+          "id": "phone",
+          "name": "An agenda at 390px"
+        },
+        {
+          "id": "django",
+          "name": "The month built in the view"
+        }
+      ],
+      "detail": "r/schedule-page.json"
+    },
+    {
+      "id": "compare-page",
+      "name": "Compare page",
+      "category": "layout",
+      "description": "Several vendors' quotations against one enquiry, side by side, so a buyer can award the order. Line items down, vendors across, rates in the cells and the totals along the bottom — the comparative statement that is attached to the requisition and shown to whoever signs it.",
+      "related": [
+        "table",
+        "data-table",
+        "reconcile-page",
+        "record-page",
+        "badge",
+        "card"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "The matrix"
+        },
+        {
+          "id": "sticky",
+          "name": "Both axes pinned at once"
+        },
+        {
+          "id": "lowest",
+          "name": "L1 marked, and what it does not settle"
+        },
+        {
+          "id": "landed",
+          "name": "Landed cost changes who wins"
+        },
+        {
+          "id": "terms",
+          "name": "The rows that are not numbers"
+        },
+        {
+          "id": "partial",
+          "name": "Lines nobody quoted, and an alternative make"
+        },
+        {
+          "id": "award",
+          "name": "Choosing, and saying so before committing"
+        },
+        {
+          "id": "phone",
+          "name": "One vendor at a time at 390px"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from the quotations"
+        }
+      ],
+      "detail": "r/compare-page.json"
+    },
+    {
+      "id": "reconcile-page",
+      "name": "Reconcile page",
+      "category": "layout",
+      "description": "Two sets of records that ought to agree, with the difference between them written out as a figure and the controls that make them agree — pairing, explaining and posting. The variance is the content; the rows that already agree are a count.",
+      "related": [
+        "compare-page",
+        "table",
+        "data-table",
+        "index-page",
+        "record-page",
+        "alert",
+        "alert-dialog",
+        "badge",
+        "empty-state"
+      ],
+      "variants": [
+        {
+          "id": "three-way",
+          "name": "The variance, and the arithmetic under it"
+        },
+        {
+          "id": "tolerance",
+          "name": "Inside the limit, outside it, and past arguing about"
+        },
+        {
+          "id": "unmatched",
+          "name": "What is on one side with no partner on the other"
+        },
+        {
+          "id": "match",
+          "name": "Making a pair, from the keyboard"
+        },
+        {
+          "id": "partial",
+          "name": "One invoice against three receipts, one receipt across two invoices"
+        },
+        {
+          "id": "ledger",
+          "name": "The bank statement against the books"
+        },
+        {
+          "id": "phone",
+          "name": "The whole match at 390px"
+        },
+        {
+          "id": "post",
+          "name": "Committing it, and what that writes"
+        },
+        {
+          "id": "clean",
+          "name": "Nothing left to reconcile"
+        },
+        {
+          "id": "django",
+          "name": "The server-rendered reconciliation"
+        }
+      ],
+      "detail": "r/reconcile-page.json"
+    },
+    {
+      "id": "import-page",
+      "name": "Import page",
+      "category": "layout",
+      "description": "The screen that takes a spreadsheet into the system: the file and the rules stated before it is picked, the column mapping, the review of what the system understood, the failures grouped by kind, and the write itself with a report at the end.",
+      "related": [
+        "form-page",
+        "attachment",
+        "index-page",
+        "table",
+        "progress",
+        "alert"
+      ],
+      "variants": [
+        {
+          "id": "upload",
+          "name": "The file, and the rules before it is picked"
+        },
+        {
+          "id": "mapping",
+          "name": "Their columns against your fields"
+        },
+        {
+          "id": "preview",
+          "name": "What the system understood"
+        },
+        {
+          "id": "errors",
+          "name": "37 bad rows out of 1,240"
+        },
+        {
+          "id": "fix",
+          "name": "Fixing here, and fixing in the sheet"
+        },
+        {
+          "id": "committing",
+          "name": "The write in flight"
+        },
+        {
+          "id": "result",
+          "name": "What actually happened"
+        },
+        {
+          "id": "phone",
+          "name": "The mapping grid at 390px"
+        },
+        {
+          "id": "django",
+          "name": "The server-rendered import"
+        }
+      ],
+      "detail": "r/import-page.json"
+    },
+    {
+      "id": "search-page",
+      "name": "Search page",
+      "category": "layout",
+      "description": "The whole-page answer to a query typed into the global search: the query echoed as the one h1, the results grouped by record type with a count on every group, the facets that narrow them, and the states the page is in when there is nothing to show yet or nothing to show at all.",
+      "related": [
+        "command-palette",
+        "index-page",
+        "empty-state",
+        "input",
+        "skeleton",
+        "page-header"
+      ],
+      "variants": [
+        {
+          "id": "results",
+          "name": "Grouped by record type"
+        },
+        {
+          "id": "exact",
+          "name": "One document number, and everything that mentions it"
+        },
+        {
+          "id": "facets",
+          "name": "Narrowing, and the facet that is not always there"
+        },
+        {
+          "id": "scoped",
+          "name": "Scoped to one record type"
+        },
+        {
+          "id": "empty",
+          "name": "Nothing matched, and the two reasons why"
+        },
+        {
+          "id": "loading",
+          "name": "The query in flight, the shape not yet known"
+        },
+        {
+          "id": "recent",
+          "name": "What a bare /search shows"
+        },
+        {
+          "id": "syntax",
+          "name": "A field prefix in the query, and a key nobody recognises"
+        },
+        {
+          "id": "phone",
+          "name": "At 390px, where a rail cannot be a rail"
+        },
+        {
+          "id": "django",
+          "name": "The server-rendered search"
+        }
+      ],
+      "detail": "r/search-page.json"
+    },
+    {
+      "id": "focus-page",
+      "name": "Focus page",
+      "category": "layout",
+      "description": "One task on the whole screen with the application chrome removed: a bag scanned into a GRN at the gate, a bin counted at a rack, a sample passed or failed at the QC bench. Large targets, type one step up, and a scan field that never gives up the keyboard.",
+      "related": [
+        "app-shell",
+        "form-page",
+        "questionnaire",
+        "progress",
+        "alert-dialog",
+        "input"
+      ],
+      "variants": [
+        {
+          "id": "scan",
+          "name": "One field, and it never loses the keyboard"
+        },
+        {
+          "id": "unknown",
+          "name": "The scan that matched nothing"
+        },
+        {
+          "id": "confirm",
+          "name": "What is about to be written"
+        },
+        {
+          "id": "count",
+          "name": "A count with the system figure hidden"
+        },
+        {
+          "id": "inspect",
+          "name": "Pass, fail or hold at the bench"
+        },
+        {
+          "id": "progress",
+          "name": "Part way through a run, and going back one"
+        },
+        {
+          "id": "offline",
+          "name": "The network dropped mid-shift"
+        },
+        {
+          "id": "exit",
+          "name": "Leaving with work in hand"
+        },
+        {
+          "id": "django",
+          "name": "Server-rendered, with htmx keeping the focus"
+        }
+      ],
+      "detail": "r/focus-page.json"
+    },
+    {
+      "id": "settings-page",
+      "name": "Settings page",
+      "category": "layout",
+      "description": "The configuration screen: a permanent nav of sections down one side and the section being changed beside it. One h1 for the whole screen, an h2 per section, and a Save that belongs to the section rather than to the page.",
+      "related": [
+        "form-page",
+        "toggle",
+        "tabs",
+        "sidebar",
+        "card",
+        "alert-dialog"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "One section open beside its nav"
+        },
+        {
+          "id": "dirty",
+          "name": "A section edited and not yet saved"
+        },
+        {
+          "id": "immediate",
+          "name": "Settings that write themselves beside settings that wait"
+        },
+        {
+          "id": "grouped",
+          "name": "Forty sections, grouped and filtered"
+        },
+        {
+          "id": "series",
+          "name": "A numbering series with a live preview"
+        },
+        {
+          "id": "roles",
+          "name": "A permission matrix per module"
+        },
+        {
+          "id": "danger",
+          "name": "The section that takes things away"
+        },
+        {
+          "id": "phone",
+          "name": "Two screens at 390px"
+        },
+        {
+          "id": "django",
+          "name": "One Django form per section"
+        }
+      ],
+      "detail": "r/settings-page.json"
+    },
+    {
+      "id": "onboarding-page",
+      "name": "Onboarding page",
+      "category": "layout",
+      "description": "The screen that tracks a deployment being configured: every task that has to be finished before a document can be raised, grouped, with what is done, what is blocked and on what, who owns each one, and what the page becomes once it is finished.",
+      "related": [
+        "settings-page",
+        "import-page",
+        "form-page",
+        "progress",
+        "marker",
+        "empty-state"
+      ],
+      "variants": [
+        {
+          "id": "checklist",
+          "name": "Every task, grouped, with what is next"
+        },
+        {
+          "id": "task",
+          "name": "One task opened"
+        },
+        {
+          "id": "blocked",
+          "name": "Waiting on a task, and waiting on a person"
+        },
+        {
+          "id": "resume",
+          "name": "Coming back after four days"
+        },
+        {
+          "id": "assigned",
+          "name": "Split across finance, stores and IT"
+        },
+        {
+          "id": "optional",
+          "name": "Skipping a task, and what it does to the count"
+        },
+        {
+          "id": "complete",
+          "name": "Setup finished, and getting out of the way"
+        },
+        {
+          "id": "phone",
+          "name": "The list at 390px"
+        },
+        {
+          "id": "django",
+          "name": "Task state from the server"
+        }
+      ],
+      "detail": "r/onboarding-page.json"
+    },
+    {
+      "id": "audit-page",
+      "name": "Audit page",
+      "category": "layout",
+      "description": "The whole system's audit trail as a page: who changed what, when, and what the value was before. Queried across records, actors, fields and dates, grouped by day, newest first, and append-only — nothing on this screen edits anything.",
+      "related": [
+        "record-page",
+        "index-page",
+        "table",
+        "marker",
+        "empty-state",
+        "pagination",
+        "badge",
+        "page-header",
+        "avatar"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "The whole system's trail, newest first"
+        },
+        {
+          "id": "diff",
+          "name": "One field, nine fields, and the two empties"
+        },
+        {
+          "id": "events",
+          "name": "The entries that are not field changes"
+        },
+        {
+          "id": "filters",
+          "name": "Who changed a rate after approval"
+        },
+        {
+          "id": "record",
+          "name": "The same query, scoped to one record"
+        },
+        {
+          "id": "more",
+          "name": "Extending a long trail as it is read"
+        },
+        {
+          "id": "export",
+          "name": "Handing the trail to an auditor"
+        },
+        {
+          "id": "empty",
+          "name": "Three different nothings"
+        },
+        {
+          "id": "phone",
+          "name": "The trail at 390px"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from the log table"
+        }
+      ],
+      "detail": "r/audit-page.json"
+    },
+    {
+      "id": "docs-page",
+      "name": "Docs page",
+      "category": "layout",
+      "description": "The manual inside the application: the standard operating procedures, the approval limits, the definitions a screen assumes you already know. The only screen in this library that is mostly prose, so the measure, the heading rhythm and what a link looks like inside a sentence are the component.",
+      "related": [
+        "record-page",
+        "settings-page",
+        "accordion",
+        "marker",
+        "alert",
+        "document-page"
+      ],
+      "variants": [
+        {
+          "id": "article",
+          "name": "A page of the manual, read"
+        },
+        {
+          "id": "prose",
+          "name": "Every element the body is made of"
+        },
+        {
+          "id": "procedure",
+          "name": "Nine steps somebody is following one-handed"
+        },
+        {
+          "id": "controlled",
+          "name": "A revision that has been superseded"
+        },
+        {
+          "id": "callouts",
+          "name": "Note, caution, and what is different at Vapi"
+        },
+        {
+          "id": "nav",
+          "name": "The tree when the manual is 204 pages"
+        },
+        {
+          "id": "search",
+          "name": "Searching the manual"
+        },
+        {
+          "id": "phone",
+          "name": "At 390px, where both rails have to go somewhere"
+        },
+        {
+          "id": "print",
+          "name": "The SOP that goes on the noticeboard"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from the manual"
+        }
+      ],
+      "detail": "r/docs-page.json"
+    },
+    {
+      "id": "document-page",
+      "name": "Document page",
+      "category": "layout",
+      "description": "The record as a sheet of paper: a purchase order, a GST tax invoice, a delivery challan, a goods receipt note. Laid out on A4, printed from the browser, and built so that what comes out of the printer is the same document that was on screen.",
+      "related": [
+        "record-page",
+        "table",
+        "card",
+        "page-header",
+        "button"
+      ],
+      "variants": [
+        {
+          "id": "purchase-order",
+          "name": "A purchase order as issued"
+        },
+        {
+          "id": "invoice",
+          "name": "A GST tax invoice"
+        },
+        {
+          "id": "challan",
+          "name": "A delivery challan with no rates on it"
+        },
+        {
+          "id": "grn",
+          "name": "A goods receipt note against an order"
+        },
+        {
+          "id": "draft",
+          "name": "Produced from a record that is not approved"
+        },
+        {
+          "id": "copies",
+          "name": "Original, duplicate and triplicate"
+        },
+        {
+          "id": "multi-page",
+          "name": "Fifteen lines across three sheets"
+        },
+        {
+          "id": "preview",
+          "name": "The toolbar that prints itself away"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from a real order"
+        }
+      ],
+      "detail": "r/document-page.json"
+    },
+    {
+      "id": "label-sheet",
+      "name": "Label sheet",
+      "category": "layout",
+      "description": "Labels that come off a printer and get stuck onto things: a bin label on a rack, a batch label on a drum, a pallet tag, a QC hold sticker. Either a grid of them on an A4 sheet of die-cut stock or one at a time on a continuous roll, sized in millimetres because the stock in the printer is.",
+      "related": [
+        "document-page",
+        "focus-page",
+        "record-page",
+        "index-page",
+        "input"
+      ],
+      "variants": [
+        {
+          "id": "sheet",
+          "name": "A full A4 sheet of die-cut stock"
+        },
+        {
+          "id": "roll",
+          "name": "Continuous stock, where the page is the label"
+        },
+        {
+          "id": "sizes",
+          "name": "The same label at three real sizes"
+        },
+        {
+          "id": "content",
+          "name": "The four labels the plant actually prints"
+        },
+        {
+          "id": "start-position",
+          "name": "A sheet that already has eight labels off it"
+        },
+        {
+          "id": "align",
+          "name": "The calibration print"
+        },
+        {
+          "id": "preview",
+          "name": "The toolbar above the stock"
+        },
+        {
+          "id": "phone",
+          "name": "Reprinting one label at the rack"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from a real print job"
+        }
+      ],
+      "detail": "r/label-sheet.json"
+    },
+    {
+      "id": "portal-page",
+      "name": "Portal page",
+      "category": "layout",
+      "description": "The screens a supplier signs in to: the orders you have placed with them, the acknowledgement, an invoice against a receipt, what has been paid, and their own details. One vendor is the whole application, and the layout is built to make that visible.",
+      "related": [
+        "auth-page",
+        "error-page",
+        "index-page",
+        "record-page",
+        "app-shell",
+        "attachment",
+        "table",
+        "badge",
+        "avatar"
+      ],
+      "variants": [
+        {
+          "id": "shell",
+          "name": "The portal frame"
+        },
+        {
+          "id": "orders",
+          "name": "The orders open with them"
+        },
+        {
+          "id": "acknowledge",
+          "name": "Accepting the date, or proposing another"
+        },
+        {
+          "id": "upload",
+          "name": "An invoice against a receipt"
+        },
+        {
+          "id": "payments",
+          "name": "When they get paid"
+        },
+        {
+          "id": "profile",
+          "name": "Their own details, pending our check"
+        },
+        {
+          "id": "restricted",
+          "name": "A record that is not theirs"
+        },
+        {
+          "id": "phone",
+          "name": "At 390px"
+        },
+        {
+          "id": "django",
+          "name": "Server-rendered and scoped in the view"
+        }
+      ],
+      "detail": "r/portal-page.json"
     },
     {
       "id": "tabs",

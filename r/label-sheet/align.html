@@ -1,0 +1,126 @@
+<!-- Nobody's printer agrees with anybody's stock on the first try. The feed is
+     out by a millimetre or two, it is out in the same direction every time, and
+     the only way to find out which way is to print one sheet and look at it.
+
+     This is that sheet. Every position carries a plus sign near each of its
+     four corners, and the operator holds the print up to the light against the
+     die-cut stock and reads off how far each cross has moved from the corner it
+     should be sitting in, and in which direction. The offset goes in, one more
+     sheet comes out, and the second one is right.
+
+     The marks are type. A registration mark has to be black to be lined up
+     against anything, the border tokens stop at border-zinc-300 — about 16%
+     grey, which a thermal printer dithers into a texture — and this library has
+     no ink-weight border token. document-page hit the same wall and took weight
+     rather than inventing a colour; a glyph needs neither, because type is ink
+     at full strength. The rules around each position are still zinc-300 and are
+     the secondary aid.
+
+     The offset is a margin on the grid, not a transform. A transformed element
+     is monolithic in paged media exactly as an overflowing one is, so a
+     translated grid would take its whole sheet with it and a two-sheet job
+     would break at the first page. A negative top margin moves a block up
+     without fragmenting anything.
+
+     Half a millimetre a press and three millimetres of travel. Three is as far
+     as the 7.25 mm side margin will absorb: shift the grid further and the
+     outer column of labels lands inside the four millimetres at the edge of the
+     page that a laser physically cannot print, and a correction that puts the
+     labels somewhere the printer cannot reach is not a correction.
+
+     The current offset is printed on the sheet, and it is absolutely positioned
+     into the stock's own bottom margin rather than set above the grid. Three
+     calibration sheets in a drawer with nothing on them to say which is which is
+     how this gets done twice — but a line of type above the grid would push the
+     grid down by its own height, and a registration sheet that has moved the
+     thing it is registering is testing nothing. The bottom 15.15 mm is backing
+     paper with no label on it, which is the one place on the sheet where a
+     caption costs nothing. -->
+<div data-kui="label-sheet/align" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+     x-data="{
+       dx: 0, dy: 0,
+       nudge(axis, d) { const v = Math.round((this[axis] + d) * 2) / 2;
+                        this[axis] = Math.min(3, Math.max(-3, v)) },
+       set(axis, n) { const v = Math.round(Number(n) * 2) / 2;
+                      this[axis] = Number.isFinite(v) ? Math.min(3, Math.max(-3, v)) : 0 },
+       get shift() { return this.dy + ' mm down, ' + this.dx + ' mm across' }
+     }">
+  <main class="mx-auto w-full max-w-[210mm]">
+
+    <div class="mb-4 print:hidden">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Align the printer to the stock</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">Print this sheet on the die-cut stock, hold it up to the light, and read off how far each cross has moved from the corner of the cut it should be sitting in, and in which direction. Enter that here and print it again.</p>
+
+      <div class="mt-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+        <fieldset>
+          <legend class="text-[13px]/5 font-medium">Offset</legend>
+          <div class="mt-2 flex flex-wrap items-end gap-x-6 gap-y-3">
+
+            <div>
+              <label for="al-dx" class="mb-1.5 block text-[12px]/4 text-zinc-600">Across, millimetres</label>
+              <div class="flex w-32 items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <button type="button" @click="nudge('dx', -0.5)" aria-label="Move half a millimetre left"
+                        class="flex w-8 shrink-0 items-center justify-center rounded-l-[7px] border-r border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+                  <i data-lucide="minus" class="size-4"></i>
+                </button>
+                <input id="al-dx" name="offset_x" inputmode="decimal" value="0" :value="dx"
+                       @change="set('dx', $el.value); $el.value = dx"
+                       @keydown.arrow-up.prevent="nudge('dx', 0.5)" @keydown.arrow-down.prevent="nudge('dx', -0.5)"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-2 text-center text-[14px]/5 tabular-nums outline-none">
+                <button type="button" @click="nudge('dx', 0.5)" aria-label="Move half a millimetre right"
+                        class="flex w-8 shrink-0 items-center justify-center rounded-r-[7px] border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+                  <i data-lucide="plus" class="size-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label for="al-dy" class="mb-1.5 block text-[12px]/4 text-zinc-600">Down, millimetres</label>
+              <div class="flex w-32 items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <button type="button" @click="nudge('dy', -0.5)" aria-label="Move half a millimetre up"
+                        class="flex w-8 shrink-0 items-center justify-center rounded-l-[7px] border-r border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+                  <i data-lucide="minus" class="size-4"></i>
+                </button>
+                <input id="al-dy" name="offset_y" inputmode="decimal" value="0" :value="dy"
+                       @change="set('dy', $el.value); $el.value = dy"
+                       @keydown.arrow-up.prevent="nudge('dy', 0.5)" @keydown.arrow-down.prevent="nudge('dy', -0.5)"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-2 text-center text-[14px]/5 tabular-nums outline-none">
+                <button type="button" @click="nudge('dy', 0.5)" aria-label="Move half a millimetre down"
+                        class="flex w-8 shrink-0 items-center justify-center rounded-r-[7px] border-l border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+                  <i data-lucide="plus" class="size-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" @click="window.print()"
+                    class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+              <i data-lucide="printer" class="size-4"></i>Print a test sheet
+            </button>
+          </div>
+        </fieldset>
+
+        <p role="status" class="mt-2 border-t border-zinc-200 pt-2 text-[12px]/4 tabular-nums text-zinc-600">
+          Grid moves <span x-text="shift">0 mm down, 0 mm across</span> · saved against this printer and used for every label job from it · scale must be 100% with Fit to page off, or no offset will make it land
+        </p>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto print:overflow-visible">
+      <div class="relative mx-auto w-[210mm] rounded-xl border border-zinc-300 bg-white px-[7.25mm] py-[15.15mm] print:rounded-none print:border-0">
+        <ol role="list" class="grid grid-cols-3 gap-x-[2.5mm] gap-y-0" :style="'margin: ' + dy + 'mm 0 0 ' + dx + 'mm'">
+          <template x-for="n in 21" :key="'reg-' + n">
+            <li class="relative flex h-[38.1mm] items-center justify-center overflow-hidden border border-zinc-300">
+              <span aria-hidden="true" class="absolute left-[0.5mm] top-0 text-[11px]/4 font-semibold">+</span>
+              <span aria-hidden="true" class="absolute right-[0.5mm] top-0 text-[11px]/4 font-semibold">+</span>
+              <span aria-hidden="true" class="absolute bottom-0 left-[0.5mm] text-[11px]/4 font-semibold">+</span>
+              <span aria-hidden="true" class="absolute bottom-0 right-[0.5mm] text-[11px]/4 font-semibold">+</span>
+              <span class="text-[16px]/6 font-semibold tabular-nums" x-text="n">1</span>
+            </li>
+          </template>
+        </ol>
+
+        <p class="absolute inset-x-[7.25mm] bottom-[5mm] text-[12px]/4 font-medium tabular-nums">Alignment test · Silvassa stores · 63.5 × 38.1 mm, 3 × 7 · offset <span x-text="shift">0 mm down, 0 mm across</span> · printed 04 Sep 2026</p>
+      </div>
+    </div>
+  </main>
+</div>

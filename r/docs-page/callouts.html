@@ -1,0 +1,99 @@
+<!-- Three callouts and the rule that governs all of them: this is alert's
+     markup, unchanged, and the colour lives in the icon. A tinted body was
+     tried in that entry and reverted — three amber panels down a page read as
+     an outage, and the one red panel underneath them stopped being the thing
+     anybody looked at first. A manual is where that failure happens fastest,
+     because a page of prose has nothing else competing for attention.
+
+     The icon is decorative and unlabelled, so each sentence has to carry the
+     severity itself. "Do not release the hold until the result is on the
+     record" says what the amber triangle says, and reads the same to somebody
+     who cannot tell amber from red.
+
+     A plant difference is not a severity. It takes the info icon in zinc-500
+     and says which plant in its first four words, because the reader at Vapi is
+     scanning for exactly that and the reader at Silvassa needs to skip it.
+     Painting it amber would spend a status colour on a fact that is nobody's
+     alarm.
+
+     What a callout is not: a paragraph somebody put in a box for emphasis. Four
+     boxes on a page is a page with no prose in it, and the reader learns to
+     read the boxes and skip the text — at which point the sentence that was
+     never boxed is the one that gets missed. One or two on a page, and each of
+     them is a sentence that has a consequence.
+
+     They sit at the measure with the paragraphs, mt-4 above and mt-4 on the
+     paragraph after, so a callout reads as a block in the flow rather than as
+     furniture the text has to get around. -->
+<div data-kui="docs-page/callouts" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+  <main class="mx-auto max-w-3xl">
+    <article class="rounded-xl border border-zinc-300 bg-white px-5 py-5 sm:px-6">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Closing an order short</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">SOP-PUR-009 · Revision 2 · Effective 01 Apr 2026</p>
+
+      <div class="mt-5 max-w-xl text-[14px]/6">
+
+        <p class="text-zinc-600">
+          An order is closed short when the balance quantity will never be received — the vendor cannot supply
+          it, the requirement has gone, or the material has been bought elsewhere.
+        </p>
+
+        <h2 class="mt-10 text-[20px]/7 font-semibold tracking-tight">Before you close it</h2>
+
+        <p class="mt-3">
+          Closing short releases the committed value back to the budget and stops the order appearing in the
+          pending-receipt register. It does not cancel anything already received and it does not touch an
+          invoice that has been booked.
+        </p>
+
+        <div class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+          <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+          <div class="min-w-0">
+            <p class="text-[13px]/5 font-medium">A short close is reversible for seven days.</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">After that the order is archived and reopening it is a request to Materials.</p>
+          </div>
+        </div>
+
+        <p class="mt-4">
+          Tell the vendor before you close, not after. The order is what they are producing against, and a
+          closure they hear about from the accounts department two weeks later is a claim.
+        </p>
+
+        <div class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+          <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+          <div class="min-w-0">
+            <p class="text-[13px]/5 font-medium">Do not close an order short to make the pending register look clean at month end.</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">The commitment is what the plant is planning cash against. A closed order that is still coming is a payment nobody has provided for.</p>
+          </div>
+        </div>
+
+        <p class="mt-4">
+          Where the balance is genuinely still expected but late, the answer is a revised delivery date on the
+          order, which keeps the commitment and moves it out of the overdue count.
+        </p>
+
+        <h2 class="mt-10 text-[20px]/7 font-semibold tracking-tight">Who may close</h2>
+
+        <p class="mt-3">
+          The buyer who raised the order, up to a released value of <span class="tabular-nums">₹1,00,000</span>.
+          Above that it is the plant head, on the same screen, and the released figure is shown before the
+          confirmation.
+        </p>
+
+        <div class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+          <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+          <div class="min-w-0">
+            <p class="text-[13px]/5 font-medium">At Vapi a short close above <span class="tabular-nums">₹50,000</span> also needs the Finance controller.</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Silvassa has no second approval on a short close. Everything else on this page is the same at both plants.</p>
+          </div>
+        </div>
+
+        <p class="mt-4">
+          Both routes record who closed it and why, and the reason is printed on the order's own document. It is
+          read by the vendor, so write it as something a vendor can read.
+        </p>
+
+      </div>
+    </article>
+  </main>
+</div>

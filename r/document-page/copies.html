@@ -1,0 +1,171 @@
+<!-- One template, three sheets, and the only difference between them is a word.
+     That is exactly why the word cannot be carried by a tint, a border colour
+     or an icon: the tint prints as nothing, and three identical sheets go out
+     of the building where three distinguishable ones were meant to.
+
+     The copies are an array and the sheet is written once inside x-for, because
+     three hand-copied blocks drift the first time somebody edits one of them
+     and only then does the transporter copy start showing a different address.
+
+     No ids anywhere inside the loop. A repeated id is three of the same id on
+     one page, and every label, every fragment and every focus call on the page
+     then points at whichever one the browser saw first — so the party blocks
+     are named with aria-label rather than aria-labelledby.
+
+     break-after-page on every copy except the last. On the last one it prints a
+     blank sheet at the end of every job, which is the sort of defect nobody
+     reports and everybody works around by throwing the sheet away.
+
+     The h1 is in the toolbar, not in the copies. Three h1s is three documents
+     in one page and the outline stops saying which is which; each copy is a
+     <section> with its marking as its accessible name, and its headings start
+     at h2.
+
+     The selector is chrome and carries print:hidden. It adds hidden to a copy
+     rather than filtering the array, so the count in the toolbar and the sheets
+     under it are reading the same state and cannot disagree. -->
+<div data-kui="document-page/copies" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+     x-data="{
+       copies: [
+         { id: 'original',   mark: 'Original for recipient',   note: 'Goes to Deccan Fasteners with the invoice.', on: true },
+         { id: 'duplicate',  mark: 'Duplicate for transporter', note: 'Travels in the cab with the driver.', on: true },
+         { id: 'triplicate', mark: 'Triplicate for supplier',  note: 'Filed at Silvassa accounts.', on: true }
+       ],
+       get shown() { return this.copies.filter(c => c.on) }
+     }">
+
+  <div class="mx-auto mb-4 flex w-full max-w-[210mm] flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-xl border border-zinc-300 bg-white px-4 py-3 print:hidden">
+    <div class="min-w-0">
+      <h1 class="text-[16px]/6 font-semibold tabular-nums">Tax invoice INV-2026-0774</h1>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+        <span x-text="shown.length">3</span> of 3 copies will print · one A4 sheet each
+      </p>
+    </div>
+    <fieldset class="min-w-0">
+      <legend class="sr-only">Copies to print</legend>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <template x-for="c in copies" :key="c.id">
+          <label class="flex items-center gap-2 text-[13px]/5">
+            <input type="checkbox" x-model="c.on" class="size-4 shrink-0 rounded accent-zinc-700">
+            <span x-text="c.mark">Original for recipient</span>
+          </label>
+        </template>
+      </div>
+    </fieldset>
+  </div>
+
+  <main class="mx-auto w-full max-w-[210mm] space-y-4 print:space-y-0">
+    <template x-for="(c, i) in copies" :key="c.id">
+      <section :aria-label="'Tax invoice INV-2026-0774 — ' + c.mark"
+               :class="[!c.on &amp;&amp; 'hidden', i < copies.length - 1 &amp;&amp; 'break-after-page']"
+               class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-300 pb-2">
+          <p class="text-[11px]/4 font-medium uppercase tracking-wider">Tax invoice · rule 46 CGST Rules 2017</p>
+          <p class="border border-zinc-300 px-2 py-0.5 text-[11px]/4 font-medium uppercase tracking-wider" x-text="c.mark">Original for recipient</p>
+        </div>
+
+        <header class="mt-3 flex flex-wrap items-start justify-between gap-x-6 gap-y-4 border-b-2 border-zinc-300 pb-4">
+          <div class="flex min-w-0 flex-1 items-start gap-3 sm:min-w-[15rem]">
+            <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-[14px]/5 font-semibold">K</span>
+            <div class="min-w-0">
+              <p class="text-[16px]/6 font-semibold">Konspec Industries Pvt Ltd</p>
+              <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">GSTIN 26AABCK9021M1Z4 · State code 26</p>
+            </div>
+          </div>
+          <div class="min-w-0 sm:shrink-0 sm:text-right">
+            <h2 class="text-[20px]/7 font-semibold tracking-tight">Tax invoice</h2>
+            <p class="mt-1 text-[13px]/5 font-medium tabular-nums">INV-2026-0774</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Dated 09 Sep 2026 · FY 2026–27</p>
+          </div>
+        </header>
+
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <section aria-label="Bill to" class="break-inside-avoid border border-zinc-300 p-3">
+            <h3 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Bill to</h3>
+            <p class="mt-1.5 text-[13px]/5 font-semibold">Deccan Fasteners Pvt Ltd</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Gat 412, Chakan MIDC Phase II, Pune, Maharashtra 410501</p>
+            <p class="mt-1 text-[12px]/4 tabular-nums">GSTIN 27AAECD8812P1ZK · State code 27</p>
+          </section>
+          <section aria-label="This copy" class="break-inside-avoid border border-zinc-300 p-3">
+            <h3 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">This copy</h3>
+            <p class="mt-1.5 text-[13px]/5 font-semibold" x-text="c.mark">Original for recipient</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600" x-text="c.note">Goes to Deccan Fasteners with the invoice.</p>
+            <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Place of supply: Maharashtra (27) · e-Way bill 2716 4488 1902</p>
+          </section>
+        </div>
+
+        <div class="mt-4 overflow-x-auto md:overflow-visible print:overflow-visible">
+          <table class="w-full min-w-[32rem] text-[12px]/4">
+            <caption class="sr-only">Three lines invoiced against INV-2026-0774</caption>
+            <thead class="bg-zinc-50 print:bg-white">
+              <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+                <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+                <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Quantity</th>
+                <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Rate</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Taxable value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">1</td>
+                <td class="px-2 py-2">HDPE granules — natural, M60075</td>
+                <td class="px-2 py-2 tabular-nums">3901</td>
+                <td class="px-2 py-2 text-right tabular-nums">12,000.000 kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">87.00</td>
+                <td class="px-2 py-2 text-right tabular-nums">10,44,000.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">2</td>
+                <td class="px-2 py-2">Masterbatch — white 60%</td>
+                <td class="px-2 py-2 tabular-nums">3206</td>
+                <td class="px-2 py-2 text-right tabular-nums">250.000 kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">245.00</td>
+                <td class="px-2 py-2 text-right tabular-nums">61,250.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">3</td>
+                <td class="px-2 py-2">Stretch film — 23 micron</td>
+                <td class="px-2 py-2 tabular-nums">3920</td>
+                <td class="px-2 py-2 text-right tabular-nums">300.000 kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">175.00</td>
+                <td class="px-2 py-2 text-right tabular-nums">52,500.00</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="break-inside-avoid border-t-2 border-zinc-300">
+                <th scope="row" colspan="5" class="px-2 py-2 text-right font-medium">Taxable value</th>
+                <td class="px-2 py-2 text-right font-medium tabular-nums">11,57,750.00</td>
+              </tr>
+              <tr class="break-inside-avoid">
+                <th scope="row" colspan="5" class="px-2 py-1 text-right font-normal text-zinc-600">IGST at 18%</th>
+                <td class="px-2 py-1 text-right tabular-nums">2,08,395.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-t border-zinc-300">
+                <th scope="row" colspan="5" class="px-2 py-2 text-right text-[13px]/5 font-semibold">Invoice total</th>
+                <td class="px-2 py-2 text-right text-[13px]/5 font-semibold tabular-nums">₹13,66,145.00</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="mt-4 break-inside-avoid border border-zinc-300 p-3">
+          <h3 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Amount chargeable, in words</h3>
+          <p class="mt-1 text-[13px]/5 font-medium">Rupees Thirteen Lakh Sixty Six Thousand One Hundred Forty Five Only</p>
+        </div>
+
+        <div class="mt-8 break-inside-avoid sm:text-right">
+          <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">For Konspec Industries Pvt Ltd</p>
+          <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Authorised signatory</p>
+        </div>
+
+        <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+          Page 1 of 1 · INV-2026-0774 · <span x-text="c.mark">Original for recipient</span>
+        </footer>
+      </section>
+    </template>
+  </main>
+</div>

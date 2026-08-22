@@ -1,0 +1,244 @@
+<!-- An approval is a server write with legal weight, so nothing here is
+     optimistic. The row does not leave the queue and the pill does not change
+     until the write has committed. Drawing Approved on the click and
+     reconciling afterwards means a screen that has told a plant head they
+     signed something they did not, and there is no toast that unsays it.
+
+     While it is in flight the record stays exactly where it was and the rail
+     goes aria-busy. The pressed button keeps focus, keeps its width and says
+     what it is doing rather than going grey — a greyed-out button says you
+     cannot do this when the truth is that you already have, and disabling the
+     control that was just pressed drops focus to the body. The other decisions
+     on that record are disabled, because both answers have already been given.
+     The queue stays live: taking the arrow keys away for the length of a slow
+     request takes the session away, and a decision that arrives for a record
+     that is no longer selected still lands on the record it belongs to.
+
+     Two refusals, and they are drawn in two different places because the record
+     is in two different states.
+
+     PO-2026-0418 is stale — it was amended while it was on screen. The order is
+     still yours, still in the queue, and the refusal belongs on it: above the
+     rail, in a region that was in the DOM and empty from first paint. Nothing
+     was written, the primary becomes Reload rather than a second Approve, and
+     the queue does not move.
+
+     PO-2026-0421 was taken — somebody else approved it before this write
+     reached the server. It has left the inbox, so there is no record left to
+     hang the refusal on, and putting it on whatever record the selection landed
+     on next would attach it to an order it has nothing to do with. It goes into
+     a strip under the page header and stays until it is dismissed, because it
+     is the only place the user will ever be told they did not approve something
+     they thought they had.
+
+     Both refusals say whether anything was written. It failed and it failed and
+     nothing was written are different facts, and only one of them is safe to
+     press again.
+
+     Both regions carry role=alert and are present and empty at first paint. A
+     region created in the same frame as its first message counts as content
+     that was always there and is announced to nobody, which is the failure that
+     costs most in exactly this case. -->
+<main data-kui="inbox-page/pending" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, said: '', busy: '', refusal: null, dropped: '',
+        queue: [
+          { no: 'PO-2026-0418', party: 'Gujarat Polymers Ltd', value: '₹4,10,500', age: '4 days', status: 'Overdue', end: 'stale', why: 'Above the ₹2,00,000 buying limit held by Meera Joshi' },
+          { no: 'PO-2026-0421', party: 'Sharma Steel & Alloys', value: '₹2,18,400', age: '2 days', status: 'Approved', end: 'taken', why: 'No rate contract covers structural steel this quarter' },
+          { no: 'PO-2026-0424', party: 'Nashik Steel Traders', value: '₹96,750', age: '1 day', status: 'Approved', end: 'ok', why: 'Single quote against a three-quote policy' },
+          { no: 'PO-2026-0427', party: 'Qureshi Metals', value: '₹5,46,000', age: 'today', status: 'Approved', end: 'ok', why: 'Above the ₹5,00,000 second-approver threshold' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.queue[this.sel] },
+        get onRec() { return this.refusal && this.rec && this.refusal.no === this.rec.no ? this.refusal : null },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.queue.length - 1)) },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) },
+        approve() {
+          if (this.busy) return;
+          const o = this.rec;
+          this.busy = o.no;
+          this.refusal = null;
+          this.said = 'Approving ' + o.no + '. Nothing is written until the server answers.';
+          setTimeout(() => this.answer(o.no, o.end), 1600);
+        },
+        answer(no, end) {
+          this.busy = '';
+          const i = this.queue.findIndex(o => o.no === no);
+          if (i < 0) return;
+          if (end === 'stale') {
+            this.refusal = { no: no, text: 'Approval refused. ' + no + ' was amended 4 minutes ago by Meera Joshi — line 2 quantity changed from 400 kg to 520 kg, and the value from ₹4,10,500 to ₹4,44,300. Nothing was written and the order is still with you. Reload it before deciding.' };
+            this.said = 'Approval refused. ' + no + ' changed while it was on screen and nothing was written.';
+            return;
+          }
+          this.queue.splice(i, 1);
+          if (end === 'taken') {
+            this.dropped = no + ' was approved by Nilesh Patil at 11:04, before your approval reached the server. You did not approve it and nothing was written by you. It has left your inbox.';
+            this.said = no + ' had already been approved by somebody else. It has left your inbox and ' + this.queue.length + ' are left.';
+          } else {
+            this.said = no + ' approved. ' + this.queue.length + ' left in your inbox.';
+          }
+          if (!this.queue.length) { this.detail = false; return }
+          this.sel = Math.min(this.sel, this.queue.length - 1);
+          this.$nextTick(() => { this.$refs.detail.focus(); if (this.$refs.body) this.$refs.body.scrollTop = 0 });
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Waiting on you</h1>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-text="queue.length + ' purchase orders · Silvassa and Vapi · FY 2026–27'"></p>
+  </div>
+
+  <!-- Present and empty from first paint. This is the only place a user is
+       ever told they did not approve something they thought they had, so it
+       does not expire and it is not a toast. -->
+  <div role="alert" class="shrink-0">
+    <div x-show="dropped" x-cloak class="flex items-start gap-2.5 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 lg:px-5">
+      <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+      <p class="min-w-0 flex-1 text-[13px]/5 tabular-nums text-zinc-900" x-text="dropped"></p>
+      <button type="button" aria-label="Dismiss this notice" @click="dropped = ''"
+              class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="x" class="size-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex min-h-0 flex-1" @keydown.escape="back()">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">The queue</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="queue.length ? (sel + 1) + ' of ' + queue.length : 'none left'"></p>
+      </div>
+      <!-- Live through the write. The arrows keep moving and nothing is
+           disabled; the answer lands on the record it belongs to by number. -->
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')" x-show="queue.length"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(queue.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(o, i) in queue" :key="o.no">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1" :aria-busy="busy === o.no"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[o.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="o.no"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="o.value"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="o.status"></span> · <span x-text="o.party"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500">
+                <span x-show="busy !== o.no && !(refusal && refusal.no === o.no)">With you <span x-text="o.age"></span></span>
+                <span x-show="busy === o.no" x-cloak>Approving — nothing written yet</span>
+                <span x-show="busy !== o.no && refusal && refusal.no === o.no" x-cloak>Refused — still with you</span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+      <div x-show="!queue.length" x-cloak class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+        </span>
+        <h3 class="mt-3 text-[14px]/5 font-semibold">Nothing left waiting</h3>
+      </div>
+    </section>
+
+    <div class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex lg:flex-row"
+         :class="{ 'hidden': !detail, 'flex': detail }">
+      <template x-if="queue.length">
+        <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+                 class="flex min-h-0 min-w-0 flex-1 flex-col focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <button type="button" @click="back()"
+                    class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+              <i data-lucide="chevron-left" class="size-4"></i>Back to the inbox
+            </button>
+            <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+              <span class="tabular-nums" x-text="rec.no"></span>
+              <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+              </span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.party + ' · with you ' + rec.age"></p>
+          </div>
+          <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+            <div class="rounded-xl border border-zinc-200 p-4">
+              <div class="flex items-start gap-2.5">
+                <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                <div class="min-w-0">
+                  <p class="text-[13px]/5 font-medium">Why this is with you</p>
+                  <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600" x-text="rec.why"></p>
+                </div>
+              </div>
+            </div>
+            <p class="mt-4 text-[13px]/5 tabular-nums text-zinc-600">
+              Approving writes the commitment against the cost centre budget and emails the vendor. The order is not approved until that write has committed, which is why this screen does not draw the outcome until the server has sent one.
+            </p>
+          </div>
+        </section>
+      </template>
+
+      <aside aria-label="Your decision" x-show="queue.length" :aria-busy="busy !== ''"
+             class="flex shrink-0 flex-col border-t border-zinc-200 lg:w-72 lg:border-t-0 lg:border-l">
+        <div class="hidden min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:block">
+          <p class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">This order</p>
+          <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="rec.value"></p>
+          <p role="status" class="mt-3 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4 tabular-nums text-zinc-600">
+            <span x-show="busy === ''">Nothing is written until you press Approve.</span>
+            <span x-show="busy !== ''" x-cloak class="flex items-start gap-2">
+              <span class="mt-px shrink-0 text-zinc-500"><i data-lucide="loader-circle" class="size-3.5 animate-spin"></i></span>
+              <span>Writing to the ledger. Leave this open until it answers.</span>
+            </span>
+          </p>
+        </div>
+
+        <!-- empty and present at first paint -->
+        <div role="alert" class="shrink-0 px-4 lg:px-4">
+          <div x-show="onRec" x-cloak class="mt-3 flex items-start gap-2.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 lg:mt-0 lg:mb-1">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-900" x-text="onRec ? onRec.text : ''"></p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 border-zinc-200 px-4 py-3 lg:flex-col lg:items-stretch lg:border-t">
+          <button type="button" @click="onRec ? (refusal = null) : approve()"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span x-show="busy === '' && !onRec" class="flex size-4 shrink-0"><i data-lucide="check" class="size-4"></i></span>
+            <span x-show="busy !== ''" x-cloak class="flex size-4 shrink-0"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+            <span x-show="busy === '' && onRec" x-cloak class="flex size-4 shrink-0"><i data-lucide="refresh-cw" class="size-4"></i></span>
+            <span class="grid">
+              <span class="col-start-1 row-start-1" :class="busy !== '' && 'invisible'" x-text="onRec ? 'Reload the order' : 'Approve'">Approve</span>
+              <span class="invisible col-start-1 row-start-1" :class="busy !== '' && 'visible'">Approving…</span>
+            </span>
+          </button>
+          <button type="button" :disabled="busy !== ''"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-300 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
+            <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>

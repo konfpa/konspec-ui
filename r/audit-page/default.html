@@ -1,0 +1,228 @@
+<!-- The reference. The band, the scope line stated in figures, one panel, and
+     the days inside it as full-bleed recessed headings rather than one card
+     each.
+
+     A card per day is what record-page/activity does, and it is right there
+     because a record draws three or four days. This page can draw forty, and
+     forty bordered boxes holding two lines each is a screen of edges; worse,
+     the column of marks restarts at every box, and the one thing that column is
+     for is that it does not restart. marker/grouped is the shape: a bg-zinc-50
+     band, one ul under it, aria-labelledby back to the heading.
+
+     There is no selection column, no row menu and no create button, and that is
+     the unusual thing about this screen rather than an omission. An entry
+     happened. Nothing can be done to it. Drawing the controls disabled to keep
+     the layout familiar would add three dead tab stops that explain nothing.
+
+     No hover fill on the entry either. A row that lights up is a row that opens
+     something, and this one does not — the record inside the sentence is the
+     link, and it is the only target in the row.
+
+     Today and Yesterday carry their dates. A heading that reads differently
+     depending on when the page was loaded is not evidence, and this page is
+     printed into findings.
+
+     Paged rather than appended. A numbered page is a URL an auditor can cite;
+     the appending arrangement is in the more variant, and it gives that up. -->
+<div data-kui="audit-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main>
+
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-5xl px-4 py-4 lg:px-6">
+        <nav aria-label="Breadcrumb">
+          <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Administration</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><span aria-current="page" class="font-medium text-zinc-900">Audit trail</span></li>
+          </ol>
+        </nav>
+
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Audit trail</h1>
+            <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+              1,284 entries between 01 Apr 2026 and 04 Sep 2026 · orders, receipts, vendors and rate contracts · newest first
+            </p>
+          </div>
+          <button type="button" class="flex shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="download" class="size-4"></i>Export
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-5xl px-4 py-5 lg:px-6">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+        <h2 id="ad-df-d0904" class="border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Today · Friday, 04 Sep 2026</h2>
+        <ul role="list" aria-labelledby="ad-df-d0904" class="divide-y divide-zinc-100">
+
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><i data-lucide="alert-triangle" class="size-4 text-amber-700"></i></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14">
+                <time datetime="2026-09-04T14:22">14:22</time>
+              </p>
+              <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+                <p class="text-[13px]/5 tabular-nums">
+                  <span class="font-medium">Akshay Prabhu</span> changed the rate on line 3 of
+                  <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>.
+                </p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Purchase order · Deccan Fasteners Pvt Ltd · Vapi</p>
+
+                <dl class="mt-2 space-y-1 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                  <div class="hidden gap-x-3 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase sm:grid sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]" aria-hidden="true">
+                    <span>Field</span><span>Was</span><span class="pl-4.5">Now</span>
+                  </div>
+                  <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                    <dt class="text-zinc-600">Rate · MS plate 8 mm</dt>
+                    <dd class="tabular-nums text-zinc-500 line-through">₹58,400 / MT<span class="sr-only"> changed to</span></dd>
+                    <dd class="flex items-baseline gap-1.5 font-medium tabular-nums">
+                      <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>₹61,200 / MT
+                    </dd>
+                  </div>
+                  <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                    <dt class="text-zinc-600">Line 3 value</dt>
+                    <dd class="tabular-nums text-zinc-500 line-through">₹11,68,000<span class="sr-only"> changed to</span></dd>
+                    <dd class="flex items-baseline gap-1.5 font-medium tabular-nums">
+                      <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>₹12,24,000
+                    </dd>
+                  </div>
+                  <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                    <dt class="text-zinc-600">Order value</dt>
+                    <dd class="tabular-nums text-zinc-500 line-through">₹27,10,400<span class="sr-only"> changed to</span></dd>
+                    <dd class="flex items-baseline gap-1.5 font-medium tabular-nums">
+                      <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>₹27,66,400
+                    </dd>
+                  </div>
+                </dl>
+
+                <p class="mt-1.5 text-[13px]/5 text-zinc-600">
+                  Changed after approval. The 2.1% rise cleared the 5% tolerance, so the order kept its approval and did not go back to Nilesh Patil.
+                </p>
+              </div>
+            </div>
+          </li>
+
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14">
+                <time datetime="2026-09-04T11:47">11:47</time>
+              </p>
+              <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+                <p class="text-[13px]/5 tabular-nums">
+                  <span class="font-medium">Farida Qureshi</span> released the QC hold on
+                  <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a>.
+                </p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Goods receipt · Silvassa stores · reason recorded: retest passed at 04 Sep 2026, 11:20</p>
+                <dl class="mt-2 space-y-1 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                  <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                    <dt class="text-zinc-600">QC status</dt>
+                    <dd class="text-zinc-500 line-through">Held<span class="sr-only"> changed to</span></dd>
+                    <dd class="flex items-baseline gap-1.5 font-medium">
+                      <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>Released
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </li>
+
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14">
+                <time datetime="2026-09-04T09:12">09:12</time>
+              </p>
+              <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+                <p class="text-[13px]/5"><span class="font-medium">Meena Iyer</span> exported the vendor list.</p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">412 vendors · CSV · included PAN and GSTIN · 106.51.28.4</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <h2 id="ad-df-d0903" class="border-y border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Yesterday · Thursday, 03 Sep 2026</h2>
+        <ul role="list" aria-labelledby="ad-df-d0903" class="divide-y divide-zinc-100">
+
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14">
+                <time datetime="2026-09-03T17:05">17:05</time>
+              </p>
+              <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+                <p class="text-[13px]/5 tabular-nums">
+                  <span class="font-medium">Nilesh Patil</span> approved
+                  <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+                  at ₹27,10,400, level 2 of 2.
+                </p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Purchase order · above the buyer's own limit of ₹10,00,000</p>
+                <dl class="mt-2 space-y-1 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                  <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                    <dt class="text-zinc-600">Status</dt>
+                    <dd class="text-zinc-500 line-through">Open<span class="sr-only"> changed to</span></dd>
+                    <dd class="flex items-baseline gap-1.5 font-medium">
+                      <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>Approved
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </li>
+
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14">
+                <time datetime="2026-09-03T08:55">08:55</time>
+              </p>
+              <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+                <p class="text-[13px]/5 tabular-nums">
+                  <span class="font-medium">Suresh Kadam</span> posted
+                  <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a>
+                  against lines 1 and 3 of PO-2026-0418.
+                </p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Goods receipt · gate 2, Silvassa · vehicle GJ-15-AT-4482</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <h2 id="ad-df-d0902" class="border-y border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Wednesday, 02 Sep 2026</h2>
+        <ul role="list" aria-labelledby="ad-df-d0902" class="divide-y divide-zinc-100">
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14">
+                <time datetime="2026-09-02T10:31">10:31</time>
+              </p>
+              <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+                <p class="text-[13px]/5 tabular-nums">
+                  <span class="font-medium">Akshay Prabhu</span> raised
+                  <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+                  against rate contract RC-2026-0042.
+                </p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Purchase order · 12 lines · ₹27,10,400 · FY 2026–27</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <nav aria-label="Trail pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600">1–6 of 1,284 entries</p>
+          <div class="flex items-center gap-2">
+            <span class="text-[13px]/5 tabular-nums text-zinc-600">Page 1 of 215</span>
+            <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-left" class="size-4"></i>Newer
+            </button>
+            <button type="button" class="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Older<i data-lucide="chevron-right" class="size-4"></i>
+            </button>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,187 @@
+<!-- Four tasks cannot be started and they have two different problems, so the
+     screen is split by the problem and not by the group. A dependency clears
+     itself and needs nobody; a person who has not answered needs a phone call.
+     Sorted together under one word — Blocked — the screen cannot tell you which
+     two of the four a phone call would fix, which is the only question anybody
+     opens this view to ask.
+
+     Nothing here is a disabled row. Disabled takes the task out of the tab
+     order, gives no reason, and is the one control on the page a keyboard
+     cannot reach to be told why — while the reason is the entire content. So
+     every blocked task stays a link, and what it is waiting for is named beside
+     it as another link.
+
+     The third card is the state that only exists because skipping exists.
+     Customer masters was skipped, so Opening customer balances is waiting for
+     something that will never happen. That is the one place where skipping is
+     not free, and it needs two real answers — bring the skipped task back, or
+     skip this one too — rather than a row that sits stalled until go-live.
+
+     The waiting cards carry the date it was asked and how long ago in words,
+     because "waiting on Nilesh" without a date is a state nobody can judge. Six
+     days is a nudge; six weeks is somebody else's job now. -->
+<div data-kui="onboarding-page/blocked" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Set up Konspec</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · FY 2026–27 · go live 01 Oct 2026</p>
+    </div>
+
+    <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <p class="min-w-0 flex-1 text-[13px]/5 tabular-nums text-zinc-700">
+        Four of the six tasks left cannot be started. Two are waiting on another task and two on a person, and those are not the same problem.
+      </p>
+      <a href="#" class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4" aria-hidden="true"></i>All 17 tasks
+      </a>
+    </div>
+
+    <h2 class="mt-5 text-[13px]/5 font-medium tracking-wider text-zinc-600 uppercase">Waiting on another task</h2>
+
+    <div class="mt-2 space-y-4">
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex items-start gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <i data-lucide="lock" class="mt-1 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-[16px]/6 font-semibold"><span class="sr-only">Blocked — </span>Opening stock</h3>
+            <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">Sanjay More, Stores · about 1 hour once it clears</p>
+          </div>
+        </div>
+        <div class="px-5 py-4">
+          <h4 class="text-[13px]/5 font-medium">Waiting for</h4>
+          <ul role="list" class="mt-2 space-y-2 text-[13px]/5">
+            <li class="flex items-start gap-2.5">
+              <i data-lucide="circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+              <span class="min-w-0 tabular-nums">
+                <span class="sr-only">Not started — </span>
+                <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Item masters</a>
+                <span class="block text-[12px]/4 text-zinc-500">Not started · Sanjay More · 1,240 rows to import</span>
+              </span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+              <span class="min-w-0 tabular-nums">
+                <span class="sr-only">Done — </span>
+                <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Plants and stores</a>
+                <span class="block text-[12px]/4 text-zinc-500">Done 12 Aug 2026 · Akshay Prabhu</span>
+              </span>
+            </li>
+          </ul>
+          <p class="mt-3 border-t border-zinc-100 pt-3 text-[13px]/5 text-zinc-700">
+            Stock is counted against item codes and there are none yet. This clears itself the moment the item import posts — nobody has to come back and tick it.
+          </p>
+        </div>
+        <div class="border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+          <a href="#" class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+            Open Item masters<i data-lucide="arrow-up-right" class="size-4" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex items-start gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <i data-lucide="lock" class="mt-1 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-[16px]/6 font-semibold"><span class="sr-only">Blocked — </span>Opening customer balances</h3>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Nobody owns this one</p>
+          </div>
+        </div>
+        <div class="px-5 py-4">
+          <h4 class="text-[13px]/5 font-medium">Waiting for</h4>
+          <ul role="list" class="mt-2 space-y-2 text-[13px]/5">
+            <li class="flex items-start gap-2.5">
+              <i data-lucide="minus-circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+              <span class="min-w-0 tabular-nums">
+                <span class="sr-only">Skipped — </span>
+                <a href="#" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Customer masters</a>
+                <span class="block text-[12px]/4 text-zinc-500">Skipped 19 Aug 2026 by Akshay Prabhu — &ldquo;we are not raising sales orders from this system yet&rdquo;</span>
+              </span>
+            </li>
+          </ul>
+          <div class="mt-3 flex items-start gap-3 border-t border-zinc-100 pt-3">
+            <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+            <p class="text-[13px]/5 text-zinc-700">
+              A skipped task never finishes, so this one will not clear on its own. It has two honest answers and no third one: bring Customer masters back into the setup, or skip this task as well and record why.
+            </p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+          <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Bring back Customer masters
+          </button>
+          <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Skip Opening customer balances too
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="mt-6 text-[13px]/5 font-medium tracking-wider text-zinc-600 uppercase">Waiting on a person</h2>
+
+    <div class="mt-2 space-y-4">
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex items-start gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <i data-lucide="alert-triangle" class="mt-1 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-[16px]/6 font-semibold"><span class="sr-only">Waiting on somebody — </span>Approval limits</h3>
+            <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">Meera Iyer, Finance · 15 minutes once the figure is agreed</p>
+          </div>
+        </div>
+        <div class="px-5 py-4">
+          <div class="flex items-center gap-3">
+            <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">NP</span>
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">Nilesh Patil</p>
+              <p class="truncate text-[12px]/4 tabular-nums text-zinc-600">Head of Procurement · asked 15 Aug 2026, six days ago</p>
+            </div>
+          </div>
+          <p class="mt-3 text-[13px]/5 tabular-nums text-zinc-700">
+            He is confirming the ₹7,50,000 second-approver limit with the board on 22 Aug. Nothing is waiting on this task — orders can be raised at the ₹5,00,000 default until the figure is set, and the default is what the first week will run on if it is not.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+          <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="bell" class="size-4" aria-hidden="true"></i>Send Nilesh Patil a reminder
+          </button>
+          <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Take Approval limits over
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex items-start gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <i data-lucide="alert-triangle" class="mt-1 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-[16px]/6 font-semibold"><span class="sr-only">Waiting on somebody — </span>Opening vendor balances</h3>
+            <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">Meera Iyer, Finance · about 40 minutes once the file arrives</p>
+          </div>
+        </div>
+        <div class="px-5 py-4">
+          <div class="flex items-center gap-3">
+            <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">MI</span>
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">Meera Iyer</p>
+              <p class="truncate text-[12px]/4 tabular-nums text-zinc-600">Finance · waiting since 19 Aug 2026, two days ago</p>
+            </div>
+          </div>
+          <p class="mt-3 text-[13px]/5 tabular-nums text-zinc-700">
+            She is waiting for the vendor closing balances as at 30 Sep from the outgoing system, and there is no date on them. Go live on 01 Oct is waiting on this one, which is the only task on the screen where that is true.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+          <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="bell" class="size-4" aria-hidden="true"></i>Send Meera Iyer a reminder
+          </button>
+          <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Put a date on it
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

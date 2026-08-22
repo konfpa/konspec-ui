@@ -1,0 +1,182 @@
+<!-- Where the application has a query language, this is the shape of it: a
+     handful of field prefixes over the ordinary text search, so somebody who
+     lives in this box can write vendor:sharma status:open and skip the rail
+     entirely.
+
+     The keys are the labels on screen and never the column names underneath.
+     vendor:, not vendor_name__icontains. The moment a query language leaks the
+     schema it becomes a thing only the person who wrote it can use, and it
+     stops being changeable, because somebody has that string in a bookmark.
+
+     The box is the only source of truth for the query. The chips are derived
+     from it and removing one edits the string, which is the same call the
+     palette makes about its prefix characters: lift the parsed query into its
+     own state and there are two things describing one query, and they go out of
+     step the first time somebody edits the middle of the box. Here it means
+     mode and term are both computed from q and there is nothing to keep in
+     step.
+
+     An unrecognised key is text and never an error. valu:high, typed by
+     somebody who read half the help, is searched as the literal string; the
+     page says so, names the fields that do exist, and the results still arrive.
+     A search box that answers a typo with a parse error is a search box people
+     stop using, and the one thing worse than a wrong result here is no result
+     and no way to tell why.
+
+     The note is drawn the way an alert is — a recessed band, colour only in the
+     glyph, and the glyph is info in zinc-500 because nothing has failed. Red
+     would say a record is overdue or a request broke, and a mistyped key is
+     neither.
+
+     The help is a disclosure under the box rather than a dialog, because it is
+     read while the query is being written and a modal takes the query off the
+     screen at exactly that moment. The placeholder carries no syntax at all: a
+     placeholder disappears the moment somebody types, which is the moment they
+     need it. -->
+<div data-kui="search-page/syntax" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       q: 'vendor:sharma status:open valu:high ms angle',
+       help: false,
+       fields: ['vendor', 'status', 'plant', 'item', 'raised'],
+       labels: { vendor: 'Vendor', status: 'Status', plant: 'Plant', item: 'Item', raised: 'Raised' },
+       get parts() { return this.q.trim().split(/\s+/).filter(Boolean); },
+       key(p) { return p.slice(0, p.indexOf(':')); },
+       get known() { return this.parts.filter(p => p.includes(':') &amp;&amp; this.fields.includes(this.key(p))); },
+       get unknown() { return this.parts.filter(p => p.includes(':') &amp;&amp; !this.fields.includes(this.key(p))); },
+       get text() { return this.parts.filter(p => !this.known.includes(p)).join(' '); },
+       drop(p) { this.q = this.parts.filter(x => x !== p).join(' '); }
+     }">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <form role="search" @submit.prevent class="max-w-2xl">
+          <label for="sp-sy-q" class="sr-only">Search orders, receipts, invoices, items and vendors</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+            <input id="sp-sy-q" x-ref="q" x-model="q" type="search" enterkeyhint="search"
+                   autocomplete="off" spellcheck="false" autocapitalize="none"
+                   aria-describedby="sp-sy-hint"
+                   placeholder="Order number, item code, GRN, vendor"
+                   class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500 [&amp;::-webkit-search-cancel-button]:appearance-none">
+          </div>
+        </form>
+
+        <p id="sp-sy-hint" class="mt-1.5 text-[12px]/4 text-zinc-500">
+          Narrow with a field prefix — vendor:, status:, plant:, item:, raised: — or type anything and every field is searched.
+          <button type="button" @click="help = !help" :aria-expanded="help" aria-controls="sp-sy-help"
+                  class="rounded font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  x-text="help ? 'Hide the fields' : 'Show the fields'">Show the fields</button>
+        </p>
+
+        <!-- a disclosure and not a dialog: this is read while the query is being
+             written, and a modal takes the query off the screen to explain it -->
+        <div id="sp-sy-help" x-show="help" x-cloak class="mt-3 max-w-2xl rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3">
+          <dl class="grid gap-x-6 gap-y-1.5 text-[12px]/4 sm:grid-cols-2">
+            <div class="flex items-baseline gap-2">
+              <dt class="w-20 shrink-0 font-medium tabular-nums">vendor:</dt>
+              <dd class="min-w-0 flex-1 tabular-nums text-zinc-600">vendor:sharma — name or vendor code</dd>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <dt class="w-20 shrink-0 font-medium tabular-nums">status:</dt>
+              <dd class="min-w-0 flex-1 text-zinc-600">status:open, approved, overdue, closed, draft</dd>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <dt class="w-20 shrink-0 font-medium tabular-nums">plant:</dt>
+              <dd class="min-w-0 flex-1 text-zinc-600">plant:silvassa or plant:vapi</dd>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <dt class="w-20 shrink-0 font-medium tabular-nums">item:</dt>
+              <dd class="min-w-0 flex-1 tabular-nums text-zinc-600">item:MS-4821 — an item code on any line</dd>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <dt class="w-20 shrink-0 font-medium tabular-nums">raised:</dt>
+              <dd class="min-w-0 flex-1 tabular-nums text-zinc-600">raised:2026-08 or raised:fy2026</dd>
+            </div>
+          </dl>
+          <p class="mt-2 text-[12px]/4 text-zinc-500">Anything that is not one of these five is searched as ordinary text, prefix and all.</p>
+        </div>
+
+        <h1 class="mt-4 text-[24px]/7 font-semibold tracking-tight">Results for “<span x-text="q"></span>”</h1>
+        <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600"
+           x-text="'23 results · ' + known.length + (known.length === 1 ? ' field' : ' fields') + ' and the text “' + text + '”'"></p>
+
+        <!-- derived from the box, so removing one edits the string. Two copies
+             of one query drift the first time somebody edits the middle of it -->
+        <div x-show="known.length" x-cloak class="mt-3 flex flex-wrap items-center gap-2">
+          <template x-for="p in known" :key="p">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span x-text="labels[key(p)] + ': ' + p.slice(p.indexOf(':') + 1)"></span>
+              <button type="button" @click="drop(p); $refs.q.focus()" :aria-label="'Remove the filter ' + p"
+                      class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-3"></i>
+              </button>
+            </span>
+          </template>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] space-y-4 px-4 py-5 lg:px-6">
+
+      <!-- not an error, and not red. The query ran, the token was searched as
+           text, and the page says which fields do exist -->
+      <div x-show="unknown.length" x-cloak class="rounded-xl border border-zinc-300 bg-white">
+        <div class="flex items-start gap-3 rounded-xl bg-zinc-50 px-4 py-3.5">
+          <span class="flex h-5 shrink-0 items-center text-zinc-500" aria-hidden="true"><i data-lucide="info" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <h2 class="text-[13px]/5 font-medium"><span x-text="unknown.map(p => key(p) + ':').join(', ')"></span> is not a field</h2>
+            <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">
+              It was searched as ordinary text, prefix and all, so these results contain it as a phrase. The five fields are vendor:, status:, plant:, item: and raised:. There is no value field — a value range is a facet in the rail, because a band is a choice out of four and not something anybody should have to spell.
+            </p>
+            <button type="button" @click="q = parts.filter(p => !unknown.includes(p)).join(' '); $refs.q.focus()"
+                    class="mt-2 rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Drop it from the query
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <section aria-labelledby="sp-sy-h-po" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="sp-sy-h-po" class="text-[16px]/6 font-semibold">Purchase orders</h2>
+          <a href="#" class="text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all 23 purchase orders</a>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0463</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹6,18,400</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Sharma Steel &amp; Alloys · MS angle 50×50×6 · raised 14 Sep 2026 · Silvassa</p>
+            </div>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0455</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹4,68,500</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Sharma Steel &amp; Alloys · MS angle 65×65×6 · raised 09 Sep 2026 · Vapi</p>
+            </div>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0448</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹1,32,900</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Sharma Steel &amp; Alloys · MS angle 40×40×5 · raised 02 Sep 2026 · Silvassa</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+  </main>
+</div>

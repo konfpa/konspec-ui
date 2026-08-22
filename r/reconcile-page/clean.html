@@ -1,0 +1,100 @@
+<!-- The end state, and empty-state/all-clear's rule applies here hardest:
+     print the evidence, not the mood. "All reconciled" is exactly what a filter
+     hiding eleven unmatched invoices would also produce, so the claim is made
+     falsifiable — how many were matched, what they came to, who closed it and
+     when, and the scope line saying what this covers and that nothing is
+     filtered. The view may only choose this branch when no predicate is in
+     force and the unscoped unmatched count is zero.
+
+     check-circle-2 in emerald-600 on the same bg-zinc-200 well every other
+     empty state uses. No green panel and no -50 tint: the tone belongs to the
+     mark, not to a field of colour behind the text.
+
+     The carried-forward strip is the part that keeps this honest and it is not
+     a footnote. A period closing does not mean nothing is open — two receipts
+     still have no invoice against them and they move into October — and a clean
+     screen that does not say so teaches people that closing a period clears the
+     backlog.
+
+     One action, and it is the next period rather than a repair. all-clear
+     refuses actions that widen, clear or create, because they turn a finished
+     queue back into a problem; October is none of those. It is the only thing
+     anybody does from this screen, and hiding it behind the breadcrumb costs a
+     navigation every month. -->
+<div data-kui="reconcile-page/clean" class="bg-zinc-100 text-zinc-900">
+  <main class="mx-auto max-w-4xl space-y-4 p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Invoice matching</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">September 2026</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Invoice matching</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Silvassa · September 2026 · FY 2026–27</p>
+    </div>
+
+    <section aria-labelledby="cl-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <h2 id="cl-h" class="text-[14px]/5 font-semibold">Waiting to be matched</h2>
+        <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500">0 unmatched · 47 matched this month</p>
+      </div>
+
+      <div class="flex min-h-72 flex-col items-center justify-center px-6 py-12 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+        </span>
+        <h3 class="mt-3 text-[16px]/6 font-semibold">September is reconciled</h3>
+        <p class="mt-1 max-w-sm text-[13px]/5 tabular-nums text-zinc-600">
+          47 vendor invoices matched against 51 goods receipts, ₹4,18,62,940 in all. Three debit notes were raised for ₹1,24,600. Closed by Ritu Deshpande on 03 Oct 2026 at 16:20.
+        </p>
+        <p class="mt-2 max-w-sm text-[12px]/4 tabular-nums text-zinc-500">
+          All vendors · Silvassa · nothing filtered
+        </p>
+        <a href="#" class="mt-4 text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          See the September working
+        </a>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5 lg:px-5">
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Debit notes go to Ritu Deshpande · tolerance set on each rate contract</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Read at 09:12 on 04 Oct 2026</p>
+      </div>
+    </section>
+
+    <!-- closing a period is not the same as having nothing open, and saying so
+         is the difference between a true screen and a comfortable one -->
+    <section aria-labelledby="cl-cf-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <h2 id="cl-cf-h" class="text-[13px]/5 font-semibold">Carried into October</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-600">2 receipts · ₹9,42,180</p>
+      </div>
+      <ul role="list" class="divide-y divide-zinc-100">
+        <li class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 px-4 py-2.5 lg:px-5">
+          <span class="min-w-0">
+            <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4836</a>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Gujarat Polymers Ltd · received 29 Sep 2026 · invoice not yet received</span>
+          </span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹8,12,400</span>
+        </li>
+        <li class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 px-4 py-2.5 lg:px-5">
+          <span class="min-w-0">
+            <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4841</a>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Deccan Fasteners Pvt Ltd · received 30 Sep 2026 · invoice not yet received</span>
+          </span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,29,780</span>
+        </li>
+      </ul>
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-3 lg:px-5">
+        <p class="text-[12px]/4 tabular-nums text-zinc-600">
+          Both sit in goods received, not invoiced, and neither is overdue yet.
+        </p>
+        <a href="#" class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <i data-lucide="arrow-right" class="size-4"></i>Open October
+        </a>
+      </div>
+    </section>
+  </main>
+</div>

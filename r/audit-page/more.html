@@ -1,0 +1,109 @@
+<!-- pagination/load-more, on a list that is grouped. Two things about the
+     grouping make this harder than appending to a flat list, and both are the
+     variant.
+
+     The batch that lands may start on a day already drawn. Appending a fresh
+     day heading for it splits Thursday into two blocks with a band between
+     them, so the reader believes something happened at midnight that did not.
+     The server is asked for the entries and the client appends into the last
+     list when the day matches, and opens a new group only when it does not.
+
+     Nothing is ever inserted above what is on screen. A trail that pulls in
+     newer entries while somebody reads pushes the entry they were mid-way
+     through down the page, and on this screen that entry is evidence. Newer
+     entries arrive on the next reload and the header says how many are waiting.
+
+     The count is a role="status", so each batch is announced rather than
+     arriving silently below the fold with the button as the only sign. And it
+     is tabindex="-1" because when the last batch lands the button is replaced
+     by a sentence — a removed element drops focus to the body, and the keyboard
+     user who pressed Load more is back at the top of the document. The handler
+     moves focus to the count, which is both somewhere to stand and the sentence
+     saying what just happened.
+
+     Appending gives up the citable URL, and this page is read by people who
+     write findings. That is why the default variant is paged and this one is
+     the alternative rather than the reference: reach for it when the trail is
+     being skimmed, and for the pager when it is being quoted. -->
+<div data-kui="audit-page/more" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       shown: 3, step: 3, total: 9, busy: false,
+       entries: [
+         { id: 'm1', day: 'Today · Friday, 04 Sep 2026', at: '14:22', who: 'Akshay Prabhu', what: 'changed the rate on line 3 of PO-2026-0418.' },
+         { id: 'm2', day: 'Today · Friday, 04 Sep 2026', at: '11:47', who: 'Farida Qureshi', what: 'released the QC hold on GRN-4821.' },
+         { id: 'm3', day: 'Today · Friday, 04 Sep 2026', at: '09:12', who: 'Meena Iyer', what: 'exported the vendor list — 412 vendors, CSV.' },
+         { id: 'm4', day: 'Yesterday · Thursday, 03 Sep 2026', at: '17:05', who: 'Nilesh Patil', what: 'approved PO-2026-0418 at ₹27,10,400, level 2 of 2.' },
+         { id: 'm5', day: 'Yesterday · Thursday, 03 Sep 2026', at: '15:58', who: 'Meena Iyer', what: 'revised the payment terms on Sharma Steel &amp; Alloys from 30 days to 45 days.' },
+         { id: 'm6', day: 'Yesterday · Thursday, 03 Sep 2026', at: '08:55', who: 'Suresh Kadam', what: 'posted GRN-4821 against lines 1 and 3 of PO-2026-0418.' },
+         { id: 'm7', day: 'Wednesday, 02 Sep 2026', at: '16:20', who: 'Ritu Deshpande', what: 'emailed PO-2026-0411 to Sharma Steel &amp; Alloys with the annexure.' },
+         { id: 'm8', day: 'Wednesday, 02 Sep 2026', at: '10:31', who: 'Akshay Prabhu', what: 'raised PO-2026-0418 against rate contract RC-2026-0042.' },
+         { id: 'm9', day: 'Wednesday, 02 Sep 2026', at: '09:04', who: 'Sanjay Rane', what: 'was refused the rates on PO-2026-0411 — procurement.view_rate.' }
+       ],
+       get visible() { return this.entries.slice(0, this.shown) },
+       get days() {
+         const out = [];
+         for (const e of this.visible) {
+           const last = out[out.length - 1];
+           if (last &amp;&amp; last.day === e.day) last.items.push(e);
+           else out.push({ day: e.day, id: 'ad-mo-' + out.length, first: out.length === 0, items: [e] });
+         }
+         return out;
+       },
+       more() {
+         const finishes = this.shown + this.step >= this.total;
+         this.busy = true;
+         this.shown = Math.min(this.shown + this.step, this.total);
+         this.busy = false;
+         if (finishes) this.$nextTick(() => this.$refs.count.focus());
+       }
+     }">
+  <main>
+
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-5xl px-4 py-4 lg:px-6">
+        <h1 class="text-[24px]/7 font-semibold tracking-tight">Audit trail</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Newest first · nothing is inserted above what is already on screen</p>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-5xl px-4 py-5 lg:px-6">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+        <template x-for="g in days" :key="g.id">
+          <div>
+            <h2 :id="g.id" x-text="g.day" :class="!g.first &amp;&amp; 'border-t'"
+                class="border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums"></h2>
+            <ul role="list" :aria-labelledby="g.id" class="divide-y divide-zinc-100">
+              <template x-for="e in g.items" :key="e.id">
+                <li class="flex gap-3 px-4 py-3">
+                  <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+                  <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+                    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14" x-text="e.at"></p>
+                    <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+                      <span class="font-medium" x-text="e.who"></span><span x-text="' ' + e.what"></span>
+                    </p>
+                  </div>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </template>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <p role="status" x-ref="count" tabindex="-1"
+             class="text-[13px]/5 tabular-nums text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+             x-text="shown >= total ? 'All ' + total + ' entries in this range are shown' : 'Showing ' + shown + ' of ' + total + ' entries'">Showing 3 of 9 entries</p>
+          <button type="button" x-show="shown &lt; total" x-cloak @click="more()" :aria-busy="busy"
+                  class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="chevron-down" class="size-4"></i>
+            <span x-text="'Load ' + Math.min(step, total - shown) + ' older entries'">Load 3 older entries</span>
+          </button>
+        </div>
+      </div>
+
+      <p class="mt-3 text-[12px]/4 tabular-nums text-zinc-600">
+        A batch that begins on a day already drawn joins that day’s list. Opening a second Thursday band would say something happened at midnight that did not.
+      </p>
+    </div>
+  </main>
+</div>

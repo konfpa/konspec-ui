@@ -1,0 +1,222 @@
+<!-- One form class per section and one view that routes on the section slug,
+     which is what makes per-section saving cheap: the POST carries only the
+     fields of the section it came from, so a section nobody opened cannot be
+     written by a save somebody made somewhere else. The action is that
+     section's own URL, so a failed submit re-renders the page the user is
+     already on with the errors in place and the address bar still correct.
+
+     An if perms guard around a section is the second lock and never the first. The
+     section still has a URL somebody can type, so the view has to check it too
+     — the template guard only stops the nav item being drawn. The nav loops
+     over sections the view already filtered, and the danger section carries its
+     own explicit check on top, because that one is worth reading in the
+     template rather than inferring from a queryset.
+
+     A section the user may not open is absent, not disabled. A greyed row
+     advertises a section, refuses it, gives no reason, and is the one control
+     on the page a keyboard cannot reach to be told why.
+
+     {{ form.field }} renders Django's own widget, so the Tailwind classes for
+     the control belong on the widget in the form class — attrs={"class": "w-
+     full bg-transparent px-3 py-2 text-[14px]/5 outline-none"} — and the
+     wrapper here keeps the border and the focus outline. That is rule 11's
+     carve-out: outline-none is allowed on a control whose wrapper draws the
+     outline for it.
+
+     The error replaces the help text in one paragraph with one stable id, so
+     aria-describedby never has to be rewritten and never dangles. The
+     aria-describedby itself cannot be written in this file — the control is
+     {{ form.field }} — so it goes into the widget attrs beside the class,
+     pointing at the id the paragraph below is given here. errors.0 is
+     the first message; the whole list only ever matters on a field with several
+     validators, and then it is a <ul> in the same paragraph.
+
+     A comment/endcomment block rather than {# #} for anything over one line. Django's tag_re
+     has no DOTALL, so a multi-line {# #} is not a comment — the first line
+     disappears and the rest renders onto the page.
+
+     {% load humanize %} is in this file because |intcomma is used in this file.
+     A load in the base template does not carry into the include. -->
+{% load humanize %}
+<div data-kui="settings-page/django" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Settings</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+        {{ company.registered_name }} · {{ company.plant_names|join:" and " }} · FY {{ company.financial_year }}
+      </p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:items-start lg:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+
+      <nav aria-label="Settings sections" class="lg:sticky lg:top-6 lg:self-start">
+        <ul role="list" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          {% for s in sections %}
+            <li>
+              {% if s.slug == section %}
+                <a href="{% url 'settings:section' s.slug %}" aria-current="page"
+                   class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ s.label }}</a>
+              {% else %}
+                <a href="{% url 'settings:section' s.slug %}"
+                   class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ s.label }}</a>
+              {% endif %}
+            </li>
+          {% empty %}
+            <li class="py-1.5 pl-3 text-zinc-500">No settings section is open to this account.</li>
+          {% endfor %}
+        </ul>
+
+        {% comment %}
+          The destructive section is checked here as well as in the view. It is
+          the one nav item worth reading in the template, because the reviewer
+          looking for "who can deactivate a plant" reads templates.
+        {% endcomment %}
+        {% if perms.core.deactivate_plant %}
+          <ul role="list" class="mt-3 space-y-0.5 border-l border-zinc-200 pt-3 text-[13px]/5">
+            <li>
+              <a href="{% url 'settings:section' 'danger' %}"
+                 class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Deactivate and reset</a>
+            </li>
+          </ul>
+        {% endif %}
+      </nav>
+
+      <section id="dj-pane" tabindex="-1" aria-labelledby="dj-h"
+               class="mt-4 min-w-0 rounded-xl focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 lg:mt-0">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="dj-h" class="text-[16px]/6 font-semibold">Approval limits</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Who has to sign off before an order is released to the vendor.</p>
+          </div>
+
+          <form method="post" action="{% url 'settings:section' 'approvals' %}" novalidate class="px-5 py-4">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div role="alert" tabindex="-1"
+                   class="mb-4 flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+                <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+                <div class="min-w-0">
+                  <p class="text-[13px]/5 font-medium">This section was not saved.</p>
+                  <ul class="mt-1 space-y-1 text-[12px]/4 text-zinc-600">
+                    {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
+                  </ul>
+                </div>
+              </div>
+            {% endif %}
+
+            <div class="grid gap-4 sm:grid-cols-2">
+
+              <div class="min-w-0">
+                <label for="{{ form.second_approver_above.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+                  {{ form.second_approver_above.label }}
+                </label>
+                <div class="flex items-stretch rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2
+                            {% if form.second_approver_above.errors %}border-red-600 focus-within:outline-red-600/15{% else %}border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15{% endif %}">
+                  <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+                  {{ form.second_approver_above }}
+                </div>
+                <p id="{{ form.second_approver_above.auto_id }}-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums">
+                  {% if form.second_approver_above.errors %}
+                    <span class="flex items-start gap-1.5 font-medium text-red-600">
+                      <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+                      <span>{{ form.second_approver_above.errors.0 }}</span>
+                    </span>
+                  {% else %}
+                    <span class="block text-zinc-500">
+                      Currently ₹{{ settings.second_approver_above|intcomma }} · {{ open_between|intcomma }} open orders sit above it.
+                    </span>
+                  {% endif %}
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="{{ form.second_approver.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">
+                  {{ form.second_approver.label }}
+                </label>
+                <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2
+                            {% if form.second_approver.errors %}border-red-600 focus-within:outline-red-600/15{% else %}border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15{% endif %}">
+                  {{ form.second_approver }}
+                </div>
+                <p id="{{ form.second_approver.auto_id }}-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+                  {% if form.second_approver.errors %}
+                    <span class="flex items-start gap-1.5 font-medium text-red-600">
+                      <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+                      <span>{{ form.second_approver.errors.0 }}</span>
+                    </span>
+                  {% else %}
+                    <span class="block text-zinc-500">{{ form.second_approver.help_text }}</span>
+                  {% endif %}
+                </p>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="flex items-start gap-2.5 text-[14px]/5">
+                  {{ form.block_without_contract }}
+                  <span>{{ form.block_without_contract.label }}
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">
+                      {{ vendors_without_contract|intcomma }} vendors would be affected today.
+                    </span>
+                  </span>
+                </label>
+              </div>
+
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4">
+              <p role="status" class="text-[12px]/4 tabular-nums text-zinc-600">
+                {% if audit %}
+                  Last changed {{ audit.changed_at|date:"d M Y, H:i" }} by {{ audit.changed_by.get_full_name }}
+                {% else %}
+                  Never changed since this plant was set up.
+                {% endif %}
+              </p>
+              <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                <a href="{% url 'settings:section' 'approvals' %}"
+                   class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Discard</a>
+                <button type="submit"
+                        class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save approval limits</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {% if perms.core.view_auditlog %}
+          <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+            <div class="border-b border-zinc-200 px-5 py-3.5">
+              <h2 class="text-[16px]/6 font-semibold">Recent changes to this section</h2>
+            </div>
+            <table class="w-full text-left text-[13px]/5">
+              <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 uppercase tracking-wider text-zinc-600">
+                <tr>
+                  <th scope="col" class="px-5 py-2 font-medium">When</th>
+                  <th scope="col" class="px-5 py-2 font-medium">Who</th>
+                  <th scope="col" class="px-5 py-2 text-right font-medium">Limit set to</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in history %}
+                  <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+                    <td class="px-5 py-2.5 tabular-nums">{{ row.changed_at|date:"d M Y, H:i" }}</td>
+                    <td class="px-5 py-2.5">{{ row.changed_by.get_full_name }}</td>
+                    <td class="px-5 py-2.5 text-right tabular-nums">₹{{ row.value|intcomma }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="3" class="px-5 py-8 text-center text-zinc-600">
+                      Nothing has changed here since the plant was set up.
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+
+      </section>
+    </div>
+  </main>
+</div>

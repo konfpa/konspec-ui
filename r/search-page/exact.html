@@ -1,0 +1,178 @@
+<!-- The query is exactly one order number, so there is one obvious answer and
+     it goes at the top — as the record's own identifying band rather than as
+     the first row of a group, because it is not one of a set.
+
+     The page does not redirect to it, and that is the decision this variant
+     exists to record. Sending somebody straight into the record costs the two
+     commonest reasons anybody types a number into a search box: to find out
+     whether the record exists at all, and to see what refers to it. Redirect
+     and they land inside a record they did not choose to open, Back becomes
+     part of the workflow, and the eleven receipts, invoices and indents that
+     quote the number — usually the actual question — are never seen. The
+     palette may navigate on Enter because a person picked a row; this page may
+     not, because nobody picked anything.
+
+     The order does not appear again in the Purchase orders group underneath.
+     A record drawn twice on one page is a record somebody opens twice, and the
+     count on the group is stated as what it is: other orders, not all orders.
+
+     The band is record-page's identifying block, cut to what fits above a set
+     of results — number, vendor, value, state, the two dates that decide
+     whether anybody has to do anything today. It carries one action and no
+     more: this is a search result, not the record screen, and the second
+     action belongs on the page the first one opens.
+
+     Below it the mentions are one flat list and not five groups, because they
+     are a set of references to one thing rather than an answer to a question
+     about a kind. The kind rides on each row as a word, which is exactly what
+     the palette does for the same reason: a 16px document glyph is the same
+     glyph for a receipt and an invoice, and it is not an accessible name. -->
+<div data-kui="search-page/exact" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ q: 'PO-2026-0418' }">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <form role="search" @submit.prevent class="max-w-2xl">
+          <label for="sp-ex-q" class="sr-only">Search orders, receipts, invoices, items and vendors</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+            <input id="sp-ex-q" x-ref="q" x-model="q" type="search" enterkeyhint="search"
+                   autocomplete="off" spellcheck="false" autocapitalize="none"
+                   @keydown.escape="if (q) { $event.stopPropagation(); q = '' }"
+                   placeholder="Order number, item code, GRN, vendor"
+                   class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500 [&amp;::-webkit-search-cancel-button]:appearance-none">
+            <button type="button" x-show="q" x-cloak @click="q = ''; $refs.q.focus()" aria-label="Clear the search"
+                    class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              <i data-lucide="x" aria-hidden="true" class="size-4"></i>
+            </button>
+          </div>
+        </form>
+
+        <h1 class="mt-4 text-[24px]/7 font-semibold tracking-tight">Results for “PO-2026-0418”</h1>
+        <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">One order carries this number, and 11 other records mention it</p>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] space-y-4 px-4 py-5 lg:px-6">
+
+      <section aria-labelledby="sp-ex-h-hit" class="rounded-xl border border-zinc-300 bg-white">
+        <h2 id="sp-ex-h-hit" class="border-b border-zinc-200 px-4 py-2.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">This order</h2>
+        <div class="px-4 py-4">
+          <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                <a href="#" class="text-[20px]/7 font-semibold tracking-tight tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+                <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                  <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+                </span>
+              </div>
+              <p class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+                <a href="#" class="underline underline-offset-2 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sharma Steel &amp; Alloys</a>
+                · VEN-0288 · Silvassa · raised by Akshay Prabhu on 12 Aug 2026
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">MS angles and plates — August lot · 9 lines · 6 received · due 04 Sep 2026, 18 days late</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-4">
+              <p class="text-[24px]/7 font-semibold tracking-tight tabular-nums">₹27,10,400</p>
+              <a href="#" class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+                <i data-lucide="file-text" class="size-4"></i>Open the order
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="sp-ex-h-ref" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="sp-ex-h-ref" class="text-[16px]/6 font-semibold">Records that mention it</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">11 results · showing 4</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-5106</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">4.180 MT</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Approved — </span>Posted 06 Sep 2026 · Silvassa · on QC hold, batch B-MS-4821/03</p>
+            </div>
+            <!-- the kind as a word inside the row, because there is no heading
+                 over it to say so and an icon is not an accessible name -->
+            <span class="mt-0.5 shrink-0 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">Goods receipt</span>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4966</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">7.820 MT</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Closed — </span>Posted 26 Aug 2026 · Silvassa · QC passed</p>
+            </div>
+            <span class="mt-0.5 shrink-0 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">Goods receipt</span>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">INV-SSA-2026-0801</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹1,18,400</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Sharma Steel &amp; Alloys · booked 18 Sep 2026 · quotes this order on line 1</p>
+            </div>
+            <span class="mt-0.5 shrink-0 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">Vendor invoice</span>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">REQ-0318</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹84,600</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Closed — </span>Maintenance, Silvassa · converted to this order on 12 Aug 2026</p>
+            </div>
+            <span class="mt-0.5 shrink-0 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">Indent</span>
+          </li>
+        </ul>
+        <div class="border-t border-zinc-200 px-4 py-2.5">
+          <a href="#" class="text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all 11 records that mention PO-2026-0418</a>
+        </div>
+      </section>
+
+      <!-- other orders, and the word other is doing work: the exact hit above
+           is deliberately not counted here or drawn again -->
+      <section aria-labelledby="sp-ex-h-po" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="sp-ex-h-po" class="text-[16px]/6 font-semibold">Other purchase orders</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">2 results</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418-A1</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹2,84,000</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Draft — </span>Amendment 1 · Sharma Steel &amp; Alloys · not sent to the vendor</p>
+            </div>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2025-0418</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹6,18,400</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Closed — </span>Konkan Chemicals Pvt Ltd · closed 30 Nov 2025 · FY 2025–26 · same serial, previous year</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+  </main>
+</div>

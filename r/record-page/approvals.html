@@ -1,0 +1,217 @@
+<!-- The same record seen by the person it is waiting on, and two things change
+     because of it.
+
+     The approval section moves to the top, above the lines. Every other reader
+     gets it in its ordinary place; the approver gets it first, because it is
+     what they opened the record for.
+
+     And the decision lives inside that section rather than in the band. An
+     Approve button in the band is the first thing the eye lands on and is one
+     press from done before anything has been read — put it beside the trail and
+     it is one press from done after the reader has scrolled past who has
+     already signed, what they said, and what the value is. The band keeps Print
+     and the route back to the requester.
+
+     The trail is an <ol> because a route is ordered and the order is the
+     record, not the layout. The rail stays zinc-200 the whole way down:
+     colouring the part above the current step turns it into a progress bar
+     whose total is written nowhere, and two of five approvals is not 40% of
+     anything anyone can act on. The state is in the mark; "with you, level 2 of
+     3" is in words.
+
+     Send back is not destructive and does not take red. It returns the record
+     to the buyer with a reason, which is an ordinary outcome of reading it, and
+     red here would make refusing look like deleting.
+
+     The reason box is required on Send back and optional on Approve, which is
+     why it sits under both rather than inside either — one control, one id, and
+     the requirement stated in its help line rather than switched under the
+     reader as they choose. -->
+<div data-kui="record-page/approvals" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main>
+
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-5xl px-4 py-4 lg:px-6">
+        <a href="#" class="inline-flex items-center gap-1.5 rounded text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>Approvals waiting on you
+        </a>
+
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <h1 class="text-[24px]/7 font-semibold tracking-tight tabular-nums">IND-2026-0233</h1>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>With you since 18 Aug 2026
+              </span>
+            </div>
+            <dl class="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-1.5 text-[13px]/5">
+              <div class="flex items-baseline gap-1.5">
+                <dt class="text-zinc-500">Raised by</dt>
+                <dd class="font-medium text-zinc-900">Nilesh Patil · Silvassa maintenance</dd>
+              </div>
+              <div class="flex items-baseline gap-1.5">
+                <dt class="text-zinc-500">Lines</dt>
+                <dd class="font-medium tabular-nums text-zinc-900">24</dd>
+              </div>
+              <div class="flex items-baseline gap-1.5">
+                <dt class="text-zinc-500">Estimated value</dt>
+                <dd class="font-semibold tabular-nums text-zinc-900">₹6,84,200</dd>
+              </div>
+              <div class="flex items-baseline gap-1.5">
+                <dt class="text-zinc-500">Needed by</dt>
+                <dd class="font-medium tabular-nums text-zinc-900">04 Sep 2026</dd>
+              </div>
+            </dl>
+          </div>
+          <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="printer" class="size-4"></i>Print
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-5xl space-y-4 px-4 py-5 lg:px-6">
+
+      <section aria-labelledby="ap-appr-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="ap-appr-h" class="text-[16px]/6 font-semibold">Approval route</h2>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Level 2 of 3 · with you · ₹6,84,200 is above the buyer limit of ₹5,00,000</p>
+        </div>
+
+        <ol class="px-5 pt-4">
+          <li class="group flex gap-3 pb-4">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i></span>
+              <span class="w-px flex-1 bg-zinc-200"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5"><span class="font-medium">Ritu Deshpande</span> approved as buyer.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">18 Aug 2026, 10:26 · level 1</p>
+              <p class="mt-1.5 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4 text-zinc-600">Bearings and belts are the shutdown list agreed on 12 Aug. The hose is not on it and I have left it in — check it.</p>
+            </div>
+          </li>
+
+          <li class="group flex gap-3 pb-4">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+              <span class="w-px flex-1 bg-zinc-200"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5"><span class="font-medium">You</span> — Anil Kulkarni, plant head.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Waiting since 18 Aug 2026, 10:26 · 4 days</p>
+
+              <div class="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3.5">
+                <label for="ap-reason" class="mb-1.5 block text-[13px]/5 font-medium">Your note</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <textarea id="ap-reason" name="reason" rows="2" aria-describedby="ap-reason-msg"
+                            class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                            placeholder="What the requester should know"></textarea>
+                </div>
+                <p id="ap-reason-msg" class="mt-1.5 text-[12px]/4 text-zinc-500">
+                  Required when you send the indent back. Optional when you approve it, and kept on the record either way.
+                </p>
+
+                <div class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                  <button type="button" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back to Nilesh Patil
+                  </button>
+                  <button type="button" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <i data-lucide="check" class="size-4"></i>Approve ₹6,84,200
+                  </button>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 text-zinc-600"><span class="font-medium text-zinc-900">Kavita Menon</span>, finance — not reached.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Required above ₹5,00,000 · asked only after you sign</p>
+            </div>
+          </li>
+        </ol>
+
+        <p class="border-t border-zinc-200 bg-zinc-50 px-5 py-2 text-[12px]/4 text-zinc-600">
+          Approving does not raise an order. It sends the indent to finance, and purchase raises the order after that.
+        </p>
+      </section>
+
+      <section aria-labelledby="ap-lines-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="ap-lines-h" class="text-[16px]/6 font-semibold">What is being asked for</h2>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">24 lines · 4 shown · sorted by value</p>
+        </div>
+        <table class="hidden w-full text-[13px]/5 md:table">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-5 py-2.5 font-medium">Item</th>
+              <th scope="col" class="px-5 py-2.5 text-right font-medium">Quantity</th>
+              <th scope="col" class="px-5 py-2.5 text-right font-medium">Estimated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left font-medium">SS 304 sheet 2 mm</th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">1,200 kg</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,88,000</td>
+            </tr>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left font-medium">Gearbox oil EP-320</th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">8 drums</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,04,000</td>
+            </tr>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left font-medium">Hydraulic hose 1/2 in</th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">60 m</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹42,600</td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-5 py-2.5 text-left font-medium">Bearing 6205-2RS</th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">40 nos</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹18,400</td>
+            </tr>
+          </tbody>
+          <tfoot class="bg-zinc-50">
+            <tr class="border-t border-zinc-200">
+              <th scope="row" class="px-5 py-2 text-left text-[12px]/4 font-medium text-zinc-600">Total of all 24 lines</th>
+              <td class="px-5 py-2 text-right text-zinc-500 tabular-nums">—</td>
+              <td class="px-5 py-2 text-right font-medium tabular-nums whitespace-nowrap">₹6,84,200</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <ul class="divide-y divide-zinc-100 md:hidden">
+          <li class="flex items-baseline justify-between gap-3 px-5 py-3">
+            <span class="min-w-0 text-[13px]/5 font-medium">SS 304 sheet 2 mm <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">1,200 kg</span></span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹2,88,000</span>
+          </li>
+          <li class="flex items-baseline justify-between gap-3 px-5 py-3">
+            <span class="min-w-0 text-[13px]/5 font-medium">Gearbox oil EP-320 <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">8 drums</span></span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,04,000</span>
+          </li>
+          <li class="flex items-baseline justify-between gap-3 px-5 py-3">
+            <span class="min-w-0 text-[13px]/5 font-medium">Hydraulic hose 1/2 in <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">60 m</span></span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹42,600</span>
+          </li>
+          <li class="flex items-baseline justify-between gap-3 px-5 py-3">
+            <span class="min-w-0 text-[13px]/5 font-medium">Bearing 6205-2RS <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">40 nos</span></span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹18,400</span>
+          </li>
+        </ul>
+        <div class="flex items-baseline justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-5 py-3 md:hidden">
+          <span class="text-[12px]/4 font-medium text-zinc-600">Total of all 24 lines</span>
+          <span class="text-[14px]/5 font-semibold tabular-nums">₹6,84,200</span>
+        </div>
+
+        <p class="border-t border-zinc-200 px-5 py-2 text-[12px]/4 text-zinc-500">
+          Quantity is not totalled — these lines are in kg, drums, metres and nos.
+        </p>
+      </section>
+
+    </div>
+  </main>
+</div>

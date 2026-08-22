@@ -1,0 +1,108 @@
+<!-- The half-second the happy path never draws, and the reason a board is not a
+     drag toy: the drop is a request and the column is not the record.
+
+     While the request is in flight the card sits in the destination, because a
+     card that stays put until the server answers reads as a move that did not
+     take and gets pressed again. It goes aria-busy, its control goes
+     aria-disabled so it cannot be moved twice, and the mark in the corner is
+     spinner's loader-circle in zinc-500.
+
+     A refusal puts the card back where it came from and attaches the reason in
+     the server's words. Silently reverting is the worst of the three options:
+     the card jumps back, nothing says why, and what the user learns is that the
+     board is unreliable rather than that the move was not allowed. The reason
+     lives on the card and not in a toast — a toast is gone in four seconds and
+     this card still has to be dealt with.
+
+     Dismissing it is a real button — a card wearing a rejection from an hour
+     ago is worse than one wearing nothing — and focus does not move on the
+     rejection itself, because the user is on another card by then. -->
+<main data-kui="board/pending" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+      x-data="{
+        said: 'PO-2026-0402 was refused by finance and is back in With buyer.',
+        stages: [
+          { id: 'buyer', name: 'With buyer' },
+          { id: 'finance', name: 'With finance' },
+          { id: 'approved', name: 'Approved' }
+        ],
+        cards: [
+          { no: 'PO-2026-0402', stage: 'buyer', vendor: 'Qureshi Metals', value: 546000, state: 'refused',
+            why: 'Finance refused the move: cost centre 1200 is frozen for FY 2026–27. Reassign the cost centre and send it again.' },
+          { no: 'PO-2026-0412', stage: 'buyer', vendor: 'Konkan Packaging Co', value: 109750, state: 'idle', why: '' },
+          { no: 'PO-2026-0407', stage: 'finance', vendor: 'Baroda Fasteners Pvt Ltd', value: 318400, state: 'moving', why: '' },
+          { no: 'PO-2026-0398', stage: 'approved', vendor: 'Deshpande Traders', value: 214300, state: 'idle', why: '' }
+        ],
+        at(s) { return this.cards.filter(c => c.stage === s) },
+        money(n) { return '₹' + n.toLocaleString('en-IN') },
+        clear(no) {
+          const c = this.cards.find(x => x.no === no);
+          c.state = 'idle'; c.why = '';
+          this.said = 'Dismissed the refusal on ' + no + '.';
+          this.$nextTick(() => this.$refs.board.querySelector('[data-move=' + no + ']').focus());
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="shrink-0 border-b border-zinc-300 bg-white px-4 py-3">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Order approvals</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Silvassa · 1 move in flight · 1 refused</p>
+  </div>
+
+  <div x-ref="board" class="flex min-h-0 flex-1 snap-x snap-mandatory gap-3 overflow-x-auto p-3">
+    <template x-for="s in stages" :key="s.id">
+      <section :aria-labelledby="'pd-h-' + s.id"
+               class="relative flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+        <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+          <h2 :id="'pd-h-' + s.id" class="truncate text-[13px]/5 font-medium" x-text="s.name"></h2>
+          <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="at(s.id).length"></p>
+        </div>
+
+        <ul role="list" class="min-h-0 flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-2">
+          <template x-for="c in at(s.id)" :key="c.no">
+            <li class="rounded-lg border border-zinc-200 bg-white p-2.5" :aria-busy="c.state === 'moving'">
+
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="c.no"></a>
+                  <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600" x-text="c.vendor"></p>
+                </div>
+                <button type="button" :data-move="c.no" :aria-disabled="c.state === 'moving'"
+                        :aria-label="'Move ' + c.no + ', now in ' + stages.find(x => x.id === c.stage).name"
+                        class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <span x-show="c.state !== 'moving'" class="flex"><i data-lucide="arrow-right-left" class="size-4"></i></span>
+                  <span x-show="c.state === 'moving'" x-cloak class="flex text-zinc-500"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+                </button>
+              </div>
+
+              <div class="mt-2 flex items-center justify-between gap-2">
+                <span class="text-[13px]/5 font-medium tabular-nums" x-text="money(c.value)"></span>
+                <span x-show="c.state === 'moving'" x-cloak class="text-[12px]/4 text-zinc-500">Sending to finance…</span>
+              </div>
+
+              <!-- The server's words, on the card, until somebody deals with it. -->
+              <div x-show="c.state === 'refused'" x-cloak class="mt-2 border-t border-zinc-100 pt-2">
+                <p class="flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+                  <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0 text-red-600"></i>
+                  <span class="tabular-nums" x-text="c.why"></span>
+                </p>
+                <button type="button" @click="clear(c.no)"
+                        class="mt-1.5 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  Dismiss
+                </button>
+              </div>
+            </li>
+          </template>
+        </ul>
+      </section>
+    </template>
+  </div>
+
+  <div class="flex shrink-0 items-start gap-3 border-t border-zinc-300 bg-white px-4 py-2.5">
+    <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+    <p class="text-[12px]/4 text-zinc-600">
+      A card sits in the column it was sent to while the move is being decided. Nothing here is committed until the server says so, and a refusal puts the card back with the reason on it.
+    </p>
+  </div>
+</main>

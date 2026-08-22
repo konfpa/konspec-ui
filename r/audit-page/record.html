@@ -1,0 +1,165 @@
+<!-- What the "See the full trail" link at the foot of record-page/activity
+     opens, and the reason both entries exist.
+
+     record-page/activity is one record’s history read in the context of that
+     record: the reader has the order open, the trail is bounded by it, and
+     there is no query because there is nothing to query. This is the same
+     events with the whole apparatus over them — the actor filter, the field
+     filter, the date range, the export — and the record is one more predicate
+     rather than the frame. That is what an auditor needs and it is not what
+     somebody deciding about the order needs, which is why the region on the
+     record page is not this page shrunk down.
+
+     The record chip cannot be removed and the difference is visible: it has no
+     X on it and it sits before the others. Drawing it removable would be a
+     button that navigates the reader off the record they arrived on and into
+     the whole-system trail, which is a different page and a surprise.
+
+     The back link says which record and goes to the record, not to the
+     register. Somebody who came here from PO-2026-0418 wants the order back,
+     and a breadcrumb that only offers Purchase orders makes them find it again.
+
+     The count line counts inside the scope. "11 of 1,284" would be a figure
+     about a trail this reader is not looking at; the denominator is the
+     record’s own 34 entries. -->
+<div data-kui="audit-page/record" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main>
+
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-5xl px-4 py-4 lg:px-6">
+        <nav aria-label="Breadcrumb">
+          <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><span aria-current="page" class="font-medium text-zinc-900">Audit trail</span></li>
+          </ol>
+        </nav>
+
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight tabular-nums">PO-2026-0418 · audit trail</h1>
+            <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+              34 entries between 02 Sep 2026 and 04 Sep 2026 · Deccan Fasteners Pvt Ltd · Vapi · newest first
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <a href="#" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="arrow-left" class="size-4"></i>Back to the order
+            </a>
+            <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>Export
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+          <div class="min-w-0">
+            <label for="ad-rc-actor" class="sr-only">Actor</label>
+            <select id="ad-rc-actor" class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:w-auto">
+              <option>Actor: anyone</option>
+              <option selected>Actor: Akshay Prabhu</option>
+              <option>Actor: Nilesh Patil</option>
+              <option>Actor: Suresh Kadam</option>
+            </select>
+          </div>
+          <div class="min-w-0">
+            <label for="ad-rc-field" class="sr-only">Field changed</label>
+            <select id="ad-rc-field" class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:w-auto">
+              <option>Field: any</option>
+              <option selected>Field: rate</option>
+              <option>Field: quantity</option>
+              <option>Field: status</option>
+            </select>
+          </div>
+          <div class="min-w-0">
+            <label for="ad-rc-range" class="sr-only">Date range</label>
+            <select id="ad-rc-range" class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 sm:w-auto">
+              <option selected>Since the order was raised</option>
+              <option>Since it was approved</option>
+              <option>Last 7 days</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-3 py-1 text-[12px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="lock" class="size-3 text-zinc-600" aria-hidden="true"></i>PO-2026-0418
+          </span>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            Actor: Akshay Prabhu
+            <button type="button" aria-label="Remove the filter Actor: Akshay Prabhu"
+                    class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-3"></i>
+            </button>
+          </span>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            Field: rate
+            <button type="button" aria-label="Remove the filter Field: rate"
+                    class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-3"></i>
+            </button>
+          </span>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">The record is the scope of this page and cannot be dropped.</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-5xl px-4 py-5 lg:px-6">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-2.5">
+          <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600">2 of this order’s 34 entries match</p>
+        </div>
+
+        <h2 id="ad-rc-d0904" class="border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Today · Friday, 04 Sep 2026</h2>
+        <ul role="list" aria-labelledby="ad-rc-d0904" class="divide-y divide-zinc-100">
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><i data-lucide="alert-triangle" class="size-4 text-amber-700"></i></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T14:22">14:22</time></p>
+              <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+                <p class="text-[13px]/5"><span class="font-medium">Akshay Prabhu</span> changed the rate on line 3, after the order was approved.</p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">MS plate 8 mm · 20 MT · line 3 of 12</p>
+                <dl class="mt-2 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                  <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                    <dt class="text-zinc-600">Rate</dt>
+                    <dd class="tabular-nums text-zinc-500 line-through">₹58,400 / MT<span class="sr-only"> changed to</span></dd>
+                    <dd class="flex items-baseline gap-1.5 font-medium tabular-nums"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>₹61,200 / MT</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <h2 id="ad-rc-d0902" class="border-y border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Wednesday, 02 Sep 2026</h2>
+        <ul role="list" aria-labelledby="ad-rc-d0902" class="divide-y divide-zinc-100">
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-02T10:31">10:31</time></p>
+              <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+                <p class="text-[13px]/5"><span class="font-medium">Akshay Prabhu</span> set the rate on line 3 when the order was raised.</p>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Taken from rate contract RC-2026-0042, revised 11 Aug 2026</p>
+                <dl class="mt-2 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                  <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                    <dt class="text-zinc-600">Rate</dt>
+                    <dd class="text-zinc-500">Not set<span class="sr-only"> changed to</span></dd>
+                    <dd class="flex items-baseline gap-1.5 font-medium tabular-nums"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>₹58,400 / MT</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 text-zinc-600">
+          Reading this order rather than auditing it? The
+          <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">order’s own activity region</a>
+          shows the same events in the order’s context, unfiltered.
+        </p>
+      </div>
+    </div>
+  </main>
+</div>

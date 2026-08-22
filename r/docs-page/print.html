@@ -1,0 +1,204 @@
+<!-- These are document-page's print rules, followed rather than reinvented.
+     Everything that is not the sheet carries print:hidden; the ground drops to
+     white with print:bg-white print:p-0; the sheet is max-w-[210mm] with
+     min-h-[297mm] on screen and print:min-h-0 on paper, because a 297mm minimum
+     against a printable area of 297mm less the margin pushes a blank second
+     sheet out of every one-page document; corners go square with
+     print:rounded-none; and the @page rule — @page { size: A4; margin: 14mm
+     12mm } — lives once in the project stylesheet, because @page is an at-rule
+     and there is no utility that sets a page box.
+
+     Backgrounds do not print. Chrome and Firefox drop every fill unless
+     somebody ticks Background graphics, and nobody ticks it, so nothing on the
+     sheet may carry meaning in one: the callout keeps its border and its icon
+     and loses nothing, and the numbered wells are ring-zinc-300 rings rather
+     than tinted discs so a step number is still in a circle on paper.
+
+     break-inside-avoid on every step. A step split across the fold is two half
+     instructions, and the reader at the noticeboard does not have the other
+     sheet.
+
+     What an SOP adds to document-page's list is one line in the footer: this
+     copy is uncontrolled. That is the whole point of a revision number — the
+     paper on the wall may be older than the screen — and it is why the revision
+     and the print date are on the sheet rather than only in the browser's own
+     margin, which the print dialog can switch off.
+
+     Cross references print as document numbers. A link is gone on paper, so
+     "see SOP-QA-011" survives the photocopier and "see this page" does not. -->
+<div data-kui="docs-page/print" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+
+  <div class="sticky top-0 z-10 mx-auto mb-4 w-full max-w-[210mm] print:hidden">
+    <div class="rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <a href="/manual/stores/goods-receipt/"
+           class="inline-flex items-center gap-1.5 rounded text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>Back to the page
+        </a>
+        <button type="button" onclick="window.print()"
+                class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <i data-lucide="printer" class="size-4"></i>Print this procedure
+        </button>
+      </div>
+      <p class="mt-2 border-t border-zinc-200 pt-2 text-[12px]/4 tabular-nums text-zinc-600">
+        2 sheets · A4 portrait · SOP-STO-002 Revision 7 · a printed copy is uncontrolled from the moment it leaves this screen
+      </p>
+    </div>
+  </div>
+
+  <main class="mx-auto w-full max-w-[210mm]">
+    <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+
+      <header class="flex flex-wrap items-start justify-between gap-x-6 gap-y-4 border-b-2 border-zinc-300 pb-4">
+        <div class="flex min-w-[15rem] flex-1 items-start gap-3">
+          <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-[14px]/5 font-semibold">K</span>
+          <div class="min-w-0">
+            <p class="text-[16px]/6 font-semibold">Konspec Industries Pvt Ltd</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Silvassa works · Standard operating procedure</p>
+          </div>
+        </div>
+        <div class="shrink-0 sm:text-right">
+          <h1 class="text-[20px]/7 font-semibold tracking-tight">Booking a goods receipt</h1>
+          <p class="mt-1 text-[13px]/5 font-medium tabular-nums">SOP-STO-002 · Revision 7</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Effective 01 Jul 2026</p>
+        </div>
+      </header>
+
+      <section aria-labelledby="dp-pr-control" class="mt-4 break-inside-avoid border border-zinc-300 p-3">
+        <h2 id="dp-pr-control" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Document control</h2>
+        <dl class="mt-2 grid gap-x-6 gap-y-2 text-[12px]/4 sm:grid-cols-3">
+          <div class="min-w-0">
+            <dt class="text-zinc-600">Owner</dt>
+            <dd class="mt-0.5">Stores, Silvassa</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-zinc-600">Approved by</dt>
+            <dd class="mt-0.5">Anil Kulkarni, Plant Head</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-zinc-600">Next review</dt>
+            <dd class="mt-0.5 tabular-nums">01 Jul 2027</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-zinc-600">Supersedes</dt>
+            <dd class="mt-0.5 tabular-nums">Revision 6, 01 Apr 2025</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-zinc-600">Applies at</dt>
+            <dd class="mt-0.5">Silvassa and Vapi</dd>
+          </div>
+          <div class="min-w-0">
+            <dt class="text-zinc-600">Printed</dt>
+            <dd class="mt-0.5 tabular-nums">21 Aug 2026</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="dp-pr-purpose" class="mt-4 break-inside-avoid">
+        <h2 id="dp-pr-purpose" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Purpose and scope</h2>
+        <p class="mt-1.5 max-w-xl text-[13px]/5">
+          Booking a receipt of purchased material at the gate, against an approved purchase order, at either
+          plant. It does not cover receipts against a subcontracting challan, which is SOP-STO-005.
+        </p>
+      </section>
+
+      <section aria-labelledby="dp-pr-steps" class="mt-5">
+        <h2 id="dp-pr-steps" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Procedure</h2>
+
+        <ol role="list" class="mt-2 max-w-xl">
+
+          <li class="flex break-inside-avoid items-start gap-3">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[12px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">1</span>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-[13px]/5 font-semibold">Check the challan against the order</h3>
+              <p class="mt-1 text-[13px]/5">
+                The challan carries the order number. If it does not, or it carries one that is closed, the
+                vehicle does not come off the weighbridge until the buyer confirms the order.
+              </p>
+            </div>
+          </li>
+
+          <li class="mt-4 flex break-inside-avoid items-start gap-3">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[12px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">2</span>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-[13px]/5 font-semibold">Open the order in Receipts</h3>
+              <p class="mt-1 text-[13px]/5">Stores → Receipts → Against an order, or scan the order barcode on the challan.</p>
+            </div>
+          </li>
+
+          <li class="mt-4 flex break-inside-avoid items-start gap-3">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[12px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">3</span>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-[13px]/5 font-semibold">Enter the vehicle and the challan</h3>
+              <p class="mt-1 text-[13px]/5">
+                Vehicle number, challan number and date, and the e-way bill where the taxable value is above
+                ₹50,000.
+              </p>
+            </div>
+          </li>
+
+          <li class="mt-4 flex break-inside-avoid items-start gap-3">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[12px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4</span>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-[13px]/5 font-semibold">Weigh in and record the tare</h3>
+              <p class="mt-1 text-[13px]/5">
+                The net is gross less tare and is computed. Do not type a net weight over it.
+              </p>
+              <div class="mt-2 flex items-start gap-2.5 border border-zinc-300 px-3 py-2">
+                <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                <p class="min-w-0 text-[12px]/4">
+                  A difference over 0.5% against the challan needs a shortage note before the GRN posts. Do not
+                  adjust the weights to make the difference go away.
+                </p>
+              </div>
+            </div>
+          </li>
+
+          <li class="mt-4 flex break-inside-avoid items-start gap-3">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[12px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">5</span>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-[13px]/5 font-semibold">Enter the received quantity per line</h3>
+              <p class="mt-1 text-[13px]/5">Count what is on the vehicle, not what the challan says.</p>
+            </div>
+          </li>
+
+          <li class="mt-4 flex break-inside-avoid items-start gap-3">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[12px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">6</span>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-[13px]/5 font-semibold">Post the GRN</h3>
+              <p class="mt-1 text-[13px]/5">
+                The number is allotted on posting and cannot be reused. A GRN posted in error is reversed, not
+                deleted.
+              </p>
+            </div>
+          </li>
+
+        </ol>
+      </section>
+
+      <section aria-labelledby="dp-pr-refs" class="mt-5 break-inside-avoid">
+        <h2 id="dp-pr-refs" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Referenced documents</h2>
+        <ul role="list" class="mt-1.5 max-w-xl list-disc space-y-1 pl-5 text-[13px]/5 marker:text-zinc-400">
+          <li>SOP-QA-011, QC hold and release — material against an inspection plan.</li>
+          <li>SOP-STO-004, Short and excess receipts — differences against the challan.</li>
+          <li>SOP-STO-005, Receipts against a subcontracting challan.</li>
+        </ul>
+      </section>
+
+      <div class="mt-8 grid break-inside-avoid gap-6 sm:grid-cols-2">
+        <div>
+          <p class="text-[11px]/4 tracking-wider text-zinc-600 uppercase">Prepared by</p>
+          <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Sunita Rane · Stores in-charge</p>
+        </div>
+        <div>
+          <p class="text-[11px]/4 tracking-wider text-zinc-600 uppercase">Approved by</p>
+          <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Anil Kulkarni · Plant Head</p>
+        </div>
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+        Page 1 of 2 · SOP-STO-002 Revision 7 · effective 01 Jul 2026 · printed 21 Aug 2026 · uncontrolled copy
+      </footer>
+    </article>
+  </main>
+</div>

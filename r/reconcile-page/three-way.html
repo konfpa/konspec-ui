@@ -1,0 +1,238 @@
+<!-- The canonical reconciliation in this domain: what the order said, what
+     arrived, what the vendor billed, and the difference between the last two.
+
+     The exceptions render first at full size and the twelve lines that agree
+     collapse to one strip. The rejected alternative is a single table of all
+     sixteen with the four that matter scattered through it, which turns a
+     screen that is scanned into a screen that has to be read, and the cost of
+     missing one of them is a payment.
+
+     The difference is a column, not something the reader subtracts. Two people
+     doing that arithmetic in their heads get two answers often enough that the
+     whole working is worth nothing, and the one who is wrong is the one who
+     signs. The direction is written into the header — invoiced less received —
+     because a signed figure with no stated direction is read both ways, and the
+     two readings are the same number and the opposite dispute.
+
+     No stretched row link, which is the one place this page does not copy
+     table/linked-rows. A row here is not a record; it is two records and the
+     gap between them, so one anchor over the row has to pick a side and lies
+     about the other. The identifiers are separate anchors in the first cell.
+
+     Received is not totalled. MT, kg and nos do not add up, so the foot carries
+     an em dash and the reason sits under the table — table/totals settles this,
+     and here a plausible wrong figure in the foot would be read as the finding.
+
+     Nothing on this page posts. The verdict column says what each line is;
+     committing is reconcile-page/post and it is a separate act. -->
+<div data-kui="reconcile-page/three-way" class="bg-zinc-100 text-zinc-900"
+     x-data="{
+       lines: [
+         { item: 'HDPE granules — natural', po: 'PO-2026-0418', grn: 'GRN-4821', line: 'line 1',
+           ord: '40.000 MT', rec: '38.600 MT', inv: '40.000 MT', dq: '+1.400 MT',
+           recVal: 2254240, invVal: 2336000, verdict: 'Blocked', flag: true,
+           why: 'Invoiced 1.400 MT more than was received. Quantity tolerance is 0.5% of the order, which is 0.200 MT.' },
+         { item: 'MS angle 50×50×6', po: 'PO-2026-0418', grn: 'GRN-4821', line: 'line 2',
+           ord: '12,000 kg', rec: '11,940 kg', inv: '11,940 kg', dq: '—',
+           recVal: 745056, invVal: 764160, verdict: 'Blocked', flag: true,
+           why: 'Billed at ₹64.00 a kg against a contract rate of ₹62.40. Rate carries no tolerance at all.' },
+         { item: 'Carriage to Silvassa', po: '', grn: '', line: 'no order line',
+           ord: '—', rec: '—', inv: '—', dq: '—',
+           recVal: 0, invVal: 4200, verdict: 'Needs a reason', flag: true,
+           why: 'A charge with nothing ordered and nothing received behind it.' },
+         { item: 'M12 hex bolt — 8.8 zinc', po: 'PO-2026-0418', grn: 'GRN-4821', line: 'line 4',
+           ord: '4,000 nos', rec: '3,980 nos', inv: '4,000 nos', dq: '+20 nos',
+           recVal: 95520, invVal: 96000, verdict: 'In tolerance', flag: false,
+           why: '' }
+       ],
+       dot: { 'In tolerance': 'bg-emerald-600', 'Needs a reason': 'bg-amber-500', 'Blocked': 'bg-red-600' },
+       fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       sgn(n) { return (n > 0 ? '+' : n < 0 ? '−' : '') + '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN') },
+       d(l) { return l.invVal - l.recVal },
+       get recTotal() { return this.lines.reduce((s, l) => s + l.recVal, 0) },
+       get invTotal() { return this.lines.reduce((s, l) => s + l.invVal, 0) }
+     }">
+
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
+
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <a href="#" class="hover:text-zinc-900">Procurement</a>
+          <span class="text-zinc-500">/</span>
+          <a href="#" class="hover:text-zinc-900">Invoice matching</a>
+          <span class="text-zinc-500">/</span>
+          <span class="font-medium tabular-nums text-zinc-900">INV-2026-1184</span>
+        </nav>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Three-way match</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+          Sharma Steel &amp; Alloys · INV-2026-1184 against PO-2026-0418 and GRN-4821 · Silvassa · FY 2026–27
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print the working
+        </button>
+        <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-check-2" class="size-4"></i>Review and post
+        </button>
+      </div>
+    </div>
+
+    <!-- the answer to the question the page was opened with, before any row is
+         drawn. The sentence saying which way the subtraction runs sits with the
+         figure, not in a heading three lines above it. -->
+    <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-3 rounded-xl border border-zinc-300 bg-white px-4 py-3.5 lg:px-5">
+      <dl class="flex flex-wrap items-baseline gap-x-8 gap-y-3">
+        <div>
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Invoiced</dt>
+          <dd class="mt-1 text-[20px]/7 font-semibold tracking-tight tabular-nums">₹60,42,500</dd>
+        </div>
+        <div>
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Received</dt>
+          <dd class="mt-1 text-[20px]/7 font-semibold tracking-tight tabular-nums">₹59,36,956</dd>
+        </div>
+        <div>
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Difference</dt>
+          <dd class="mt-1 flex flex-wrap items-baseline gap-x-2 text-[20px]/7 font-semibold tracking-tight tabular-nums">
+            +₹1,05,544
+            <span class="text-[12px]/4 font-normal tracking-normal text-zinc-500">invoiced less received</span>
+          </dd>
+        </div>
+      </dl>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">
+        16 lines · 12 agree · 1 inside tolerance · 1 needs a reason · 2 blocked
+      </p>
+    </div>
+
+    <section aria-labelledby="tw-exc-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <h2 id="tw-exc-h" class="text-[16px]/6 font-semibold">The four lines that disagree</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">
+          Received <span x-text="fmt(recTotal)"></span> · invoiced <span x-text="fmt(invTotal)"></span> · ₹1,00,864 of the difference cannot be posted
+        </p>
+      </div>
+
+      <table class="hidden w-full text-[13px]/5 md:table">
+        <thead>
+          <tr class="border-b border-zinc-200 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+            <th scope="col" class="px-4 py-2.5 font-medium">Line</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Ordered</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Invoiced</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">
+              Quantity
+              <span class="block font-normal tracking-normal normal-case text-zinc-500">invoiced less received</span>
+            </th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">
+              Value
+              <span class="block font-normal tracking-normal normal-case text-zinc-500">invoiced less received</span>
+            </th>
+            <th scope="col" class="px-4 py-2.5 font-medium">Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="l in lines" :key="l.item">
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-4 py-3 text-left font-normal">
+                <span class="block font-medium" x-text="l.item"></span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">
+                  <template x-if="l.po">
+                    <span>
+                      <a href="#" class="text-zinc-600 underline underline-offset-2 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="l.po"></a>
+                      <span x-text="' ' + l.line + ' · '"></span>
+                      <a href="#" class="text-zinc-600 underline underline-offset-2 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="l.grn"></a>
+                    </span>
+                  </template>
+                  <template x-if="!l.po"><span x-text="l.line"></span></template>
+                </span>
+                <template x-if="l.why">
+                  <span class="mt-1.5 flex items-start gap-1.5">
+                    <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600"></i>
+                    <span class="text-[12px]/4 tabular-nums text-zinc-600" x-text="l.why"></span>
+                  </span>
+                </template>
+              </th>
+              <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap text-zinc-600" x-text="l.ord"></td>
+              <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap text-zinc-600" x-text="l.rec"></td>
+              <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap" x-text="l.inv"></td>
+              <td class="px-4 py-3 text-right font-medium tabular-nums whitespace-nowrap" x-text="l.dq"></td>
+              <td class="px-4 py-3 text-right font-medium tabular-nums whitespace-nowrap" x-text="sgn(d(l))"></td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                  <span class="size-1.5 shrink-0 rounded-full" :class="dot[l.verdict]" aria-hidden="true"></span><span x-text="l.verdict"></span>
+                </span>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+        <tfoot class="bg-zinc-50">
+          <tr class="border-t border-zinc-200">
+            <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium text-zinc-600">Total of these 4 lines</th>
+            <td class="px-4 py-2 text-right tabular-nums text-zinc-500">—</td>
+            <td class="px-4 py-2 text-right tabular-nums text-zinc-500">—</td>
+            <td class="px-4 py-2 text-right tabular-nums text-zinc-500">—</td>
+            <td class="px-4 py-2 text-right tabular-nums text-zinc-500">—</td>
+            <td class="px-4 py-2 text-right text-[14px]/5 font-semibold tabular-nums whitespace-nowrap" x-text="sgn(invTotal - recTotal)"></td>
+            <td class="px-4 py-2"></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- below md each line is a card whose arithmetic reads top to bottom
+           with the difference ruled off under it. The verdict leaves the column
+           and becomes a line, because there is no column left to read down. -->
+      <div class="divide-y divide-zinc-100 md:hidden">
+        <template x-for="l in lines" :key="l.item">
+          <div class="px-4 py-3.5">
+            <p class="text-[13px]/5 font-medium" x-text="l.item"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+              <span x-text="l.po ? l.po + ' ' + l.line + ' · ' + l.grn : l.line"></span>
+            </p>
+            <dl class="mt-2.5 space-y-1 text-[13px]/5">
+              <div class="flex items-baseline justify-between gap-3">
+                <dt class="text-zinc-600">Ordered</dt><dd class="tabular-nums" x-text="l.ord"></dd>
+              </div>
+              <div class="flex items-baseline justify-between gap-3">
+                <dt class="text-zinc-600">Received</dt><dd class="tabular-nums" x-text="l.rec"></dd>
+              </div>
+              <div class="flex items-baseline justify-between gap-3">
+                <dt class="text-zinc-600">Invoiced</dt><dd class="tabular-nums" x-text="l.inv"></dd>
+              </div>
+              <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-1">
+                <dt class="font-medium">Difference</dt>
+                <dd class="font-semibold tabular-nums"><span x-text="l.dq"></span> · <span x-text="sgn(d(l))"></span></dd>
+              </div>
+            </dl>
+            <p class="mt-2.5 flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[l.verdict]" aria-hidden="true"></span><span x-text="l.verdict"></span>
+              </span>
+            </p>
+            <template x-if="l.why">
+              <p class="mt-1.5 flex items-start gap-1.5">
+                <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600"></i>
+                <span class="text-[12px]/4 tabular-nums text-zinc-600" x-text="l.why"></span>
+              </p>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <p class="border-t border-zinc-200 px-4 py-2 text-[12px]/4 text-zinc-500 lg:px-5">
+        The four quantity columns are not totalled — these lines are in MT, in kg and in nos, and one of them has no quantity at all. Only the value difference adds up, and the two value subtotals are in the heading above.
+      </p>
+    </section>
+
+    <!-- the agreement, deliberately the smallest thing on the page -->
+    <section aria-labelledby="tw-agr-h" class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 lg:px-5">
+      <div class="min-w-0">
+        <h2 id="tw-agr-h" class="text-[13px]/5 font-medium">12 lines agree exactly</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">₹28,42,140 ordered, received and invoiced. Nothing to decide on any of them.</p>
+      </div>
+      <a href="#" class="shrink-0 text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Show the 12 lines
+      </a>
+    </section>
+  </main>
+</div>

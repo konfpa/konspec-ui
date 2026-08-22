@@ -1,0 +1,95 @@
+<!-- The most common layout bug in this library, written correctly. Three things
+     have to be true at once and each of them is one utility.
+
+     min-h-0 on the item that scrolls. A flex item's min-height defaults to auto,
+     which means it refuses to shrink below its own content, so without it the
+     body grows to its forty rows, the frame grows past the h-[560px] it was
+     given, and the page scrolls instead of the pane — with no scrollbar on the
+     pane the user was looking at. It is the fix repeated more than 150 times
+     across this registry and it is invisible until the content is long enough.
+
+     shrink-0 on the items that must not. flex-shrink defaults to 1, so once the
+     body does start scrolling the flex algorithm takes the space back out of
+     the header and the footer first: the totals bar flattens to a couple of
+     pixels and the Post button goes with it.
+
+     overflow-hidden on the frame, or the rounded corners are drawn over by the
+     scroller inside them and the panel ends in two square edges.
+
+     This shape is for a frame with a height of its own — a bounded pane, a
+     dialog body, list-detail's two panes. A page inside app-shell has no height
+     of its own and must not add one: the shell is already a flex frame whose
+     <main> is min-h-0 flex-1 overflow-auto, and a second scroller inside it
+     traps the wheel in a box whose edges nobody can see. That page is the
+     sticky variant, not this one. -->
+<main data-kui="container/regions" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+
+  <header class="shrink-0 border-b border-zinc-200 px-4 py-3">
+    <h1 class="text-[16px]/6 font-semibold">GRN-4821 · Gujarat Polymers Ltd</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Against PO-2026-0418 · Silvassa · 9 lines</p>
+  </header>
+
+  <div class="min-h-0 flex-1 overflow-y-auto">
+    <ul class="divide-y divide-zinc-100">
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 39074000</span><span class="text-zinc-600"> · PET resin, bottle grade</span></span>
+        <span class="tabular-nums whitespace-nowrap">4.000 MT</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 39076100</span><span class="text-zinc-600"> · PET resin, film grade</span></span>
+        <span class="tabular-nums whitespace-nowrap">2.400 MT</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 39095000</span><span class="text-zinc-600"> · Polyurethane binder</span></span>
+        <span class="tabular-nums whitespace-nowrap">1.200 MT</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 32041790</span><span class="text-zinc-600"> · Masterbatch, blue</span></span>
+        <span class="tabular-nums whitespace-nowrap">0.400 MT</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 32041720</span><span class="text-zinc-600"> · Masterbatch, white</span></span>
+        <span class="tabular-nums whitespace-nowrap">0.600 MT</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 38122010</span><span class="text-zinc-600"> · Plasticiser</span></span>
+        <span class="tabular-nums whitespace-nowrap">0.900 MT</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 39199090</span><span class="text-zinc-600"> · Adhesive tape, 48mm</span></span>
+        <span class="tabular-nums whitespace-nowrap">1,200 nos</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 48191010</span><span class="text-zinc-600"> · Corrugated carton, 5-ply</span></span>
+        <span class="tabular-nums whitespace-nowrap">3,600 nos</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 39232990</span><span class="text-zinc-600"> · LDPE liner bag</span></span>
+        <span class="tabular-nums whitespace-nowrap">4,800 nos</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 73181500</span><span class="text-zinc-600"> · Hex bolt M12 × 60</span></span>
+        <span class="tabular-nums whitespace-nowrap">2,000 nos</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 73181600</span><span class="text-zinc-600"> · Hex nut M12</span></span>
+        <span class="tabular-nums whitespace-nowrap">2,000 nos</span>
+      </li>
+      <li class="flex items-baseline justify-between gap-4 px-4 py-2.5 hover:bg-zinc-100">
+        <span class="min-w-0"><span class="font-medium tabular-nums">HSN 84819090</span><span class="text-zinc-600"> · Valve seat kit</span></span>
+        <span class="tabular-nums whitespace-nowrap">40 nos</span>
+      </li>
+    </ul>
+  </div>
+
+  <footer class="shrink-0 border-t border-zinc-200 bg-zinc-50 px-4 py-3">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">12 lines · ₹12,45,000 receivable value</p>
+      <div class="flex items-center gap-2">
+        <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save draft</button>
+        <button type="button" class="rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Post receipt</button>
+      </div>
+    </div>
+  </footer>
+
+</main>

@@ -1,0 +1,165 @@
+<!-- The page before a query, which is where a search page spends more of its
+     life than anybody expects — every ⌘K that turned into "see everything" and
+     every bookmark of /search lands here.
+
+     What it is not is a page of tips. It is two lists somebody can act on: the
+     searches this account ran, and the records this account opened. Both are
+     server-held rather than kept in the browser, so they follow the user to the
+     plant machine they use on Thursdays, and both are the palette's own recents
+     made browsable — the same data, longer, at a URL, with real links in it
+     rather than listbox options that cannot be middle-clicked.
+
+     No recent search carries a result count. "MS-4821 — 303 results" recorded
+     last Tuesday is a number that has changed since, that nobody can check, and
+     that is read as current; the query and when it was run are the only two
+     facts that stay true. This is the same rule that stops the palette printing
+     a timestamp beside a record nobody opened.
+
+     The recently opened records use the result rows' own shapes, because they
+     are the same records and a second row design for the same object is a
+     second thing to keep in step. They carry when they were opened, which the
+     result rows do not, because here that is the only reason the row is on the
+     page at all.
+
+     The box is autofocused, and this is the one variant where that is correct:
+     the page has one job, nothing above the box to read past, and the caret
+     landing in it saves a click. On the states that carry results it is not,
+     because focus would be taken away from the answer somebody came to read.
+
+     Forgetting a search is a per-row control and not only a Clear all, because
+     the thing people want gone is usually one query with a customer's name in
+     it rather than the whole list. -->
+<div data-kui="search-page/recent" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <h1 class="text-[24px]/7 font-semibold tracking-tight">Search</h1>
+        <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Purchase orders, goods receipts, vendor invoices, items and vendors · Silvassa and Vapi</p>
+
+        <form role="search" @submit.prevent class="mt-3 max-w-2xl">
+          <label for="sp-rc-q" class="sr-only">Search orders, receipts, invoices, items and vendors</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+            <input id="sp-rc-q" type="search" enterkeyhint="search" autofocus
+                   autocomplete="off" spellcheck="false" autocapitalize="none"
+                   placeholder="Order number, item code, GRN, vendor or GSTIN"
+                   class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500 [&amp;::-webkit-search-cancel-button]:appearance-none">
+          </div>
+        </form>
+        <p class="mt-1.5 text-[12px]/4 text-zinc-500">Searched by document number, item code, vendor name and GSTIN. Line descriptions and attachments are not searched.</p>
+      </div>
+    </header>
+
+    <div class="mx-auto grid max-w-[1600px] gap-4 px-4 py-5 lg:grid-cols-2 lg:px-6">
+
+      <section aria-labelledby="sp-rc-h-q" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="sp-rc-h-q" class="text-[16px]/6 font-semibold">Your recent searches</h2>
+          <button type="button" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li class="relative flex items-center gap-2.5 px-4 py-2.5 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="clock" class="size-4"></i></span>
+            <a href="#" class="min-w-0 flex-1 truncate text-[13px]/5 tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4821</a>
+            <!-- when, and nothing else. A count recorded last Tuesday is read as
+                 current and cannot be checked -->
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">11:20 today</span>
+            <button type="button" aria-label="Forget the search MS-4821"
+                    class="relative z-10 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-4" aria-hidden="true"></i>
+            </button>
+          </li>
+          <li class="relative flex items-center gap-2.5 px-4 py-2.5 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="clock" class="size-4"></i></span>
+            <a href="#" class="min-w-0 flex-1 truncate text-[13px]/5 tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">vendor:sharma status:open</a>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">09:48 today</span>
+            <button type="button" aria-label="Forget the search vendor:sharma status:open"
+                    class="relative z-10 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-4" aria-hidden="true"></i>
+            </button>
+          </li>
+          <li class="relative flex items-center gap-2.5 px-4 py-2.5 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="clock" class="size-4"></i></span>
+            <a href="#" class="min-w-0 flex-1 truncate text-[13px]/5 tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">24AACCS4821K1ZP</a>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">Yesterday</span>
+            <button type="button" aria-label="Forget the search 24AACCS4821K1ZP"
+                    class="relative z-10 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-4" aria-hidden="true"></i>
+            </button>
+          </li>
+          <li class="relative flex items-center gap-2.5 px-4 py-2.5 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="clock" class="size-4"></i></span>
+            <a href="#" class="min-w-0 flex-1 truncate text-[13px]/5 tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">19 Sep 2026</span>
+            <button type="button" aria-label="Forget the search GRN-4821"
+                    class="relative z-10 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-4" aria-hidden="true"></i>
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="sp-rc-h-rec" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="sp-rc-h-rec" class="text-[16px]/6 font-semibold">Recently opened</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">Last 5</p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-red-600"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">11:22 today</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Overdue — </span>Sharma Steel &amp; Alloys · ₹27,10,400 · due 04 Sep 2026 · Silvassa</p>
+            </div>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-5106</a>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">10:52 today</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Approved — </span>Against PO-2026-0418 · 4.180 MT · on QC hold, batch B-MS-4821/03</p>
+            </div>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="box" class="size-4"></i></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4821 · MS angle 50×50×6</a>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">10:04 today</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">HSN 72169100 · 14.280 MT on hand · Silvassa stores</p>
+            </div>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="building-2" class="size-4"></i></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sharma Steel &amp; Alloys</a>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">Yesterday</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">VEN-0288 · Vapi, Gujarat · rate contract to 31 Mar 2027</p>
+            </div>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0402</a>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">19 Sep 2026</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Closed — </span>Sharma Steel &amp; Alloys · ₹12,45,000 · fully received · Silvassa</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+  </main>
+</div>

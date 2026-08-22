@@ -1,0 +1,158 @@
+<!-- The block is the unit this whole layout is made of and it has to survive
+     being an hour wide and a fortnight wide without lying at either end. This
+     is the reference for what it drops as it narrows and what it does when the
+     lane cuts it off, drawn at one scale so the four can be compared.
+
+     What survives is decided, not left to the browser. The record number is
+     always first and always fits; the times go next, the vendor after that, and
+     the quantity last. Letting overflow decide produces "PO-2026-04…" beside
+     "Gujarat Poly…" and neither of them is an answer. The order is the same on
+     every view in this entry, so a planner learns it once.
+
+     Below about forty pixels a block shows the dot and nothing else. Half a
+     record number is worse than a bare bar, because a bar does not look like it
+     is telling you something; the whole fact is in the accessible name, and the
+     hovercard entry is what shows it to a pointer.
+
+     No minimum width, ever. A block widened to fit its label is a two-hour job
+     drawn as four, and the one thing this layout sells is that the width is the
+     duration.
+
+     The edges are the other truncation and they are not the same problem. A
+     block clipped by the lane says so in words and squares the corners on the
+     side that was cut, because a rounded end reads as a real end. -->
+<main data-kui="schedule-page/block" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <div class="mx-auto max-w-4xl px-4 py-5 lg:px-6">
+    <h1 class="text-[24px]/7 font-semibold tracking-tight">The scheduled block</h1>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+      One lane, 06:00 to 22:00. Every block below is the same record at a different duration.
+    </p>
+
+    <section aria-labelledby="sbk-h1" class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3">
+        <h2 id="sbk-h1" class="text-[16px]/6 font-semibold">What the text does</h2>
+      </div>
+      <ul role="list" class="divide-y divide-zinc-100">
+
+        <li class="px-4 py-3">
+          <p class="text-[12px]/4 font-medium tabular-nums text-zinc-600">A fortnight, or the whole lane</p>
+          <div class="relative mt-1.5 h-16 rounded-lg bg-zinc-50 px-1.5">
+            <a href="#" class="absolute inset-y-2 overflow-hidden rounded-lg bg-zinc-200 px-2.5 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="left: 1%; width: 98%">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[13px]/5 font-medium tabular-nums text-zinc-700">MS-4838</span>
+                <span class="truncate text-[12px]/4 tabular-nums text-zinc-600">06:00 – 22:00 · 16.0 h</span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-600">Injection 120T · 9,500 crates · Meera Joshi</span>
+            </a>
+          </div>
+          <p class="mt-1.5 text-[12px]/4 text-zinc-500">Number, times, duration, resource, quantity, owner. Everything the record has that a planner reads at a glance.</p>
+        </li>
+
+        <li class="px-4 py-3">
+          <p class="text-[12px]/4 font-medium tabular-nums text-zinc-600">Half the lane — eight hours</p>
+          <div class="relative mt-1.5 h-16 rounded-lg bg-zinc-50 px-1.5">
+            <a href="#" class="absolute inset-y-2 overflow-hidden rounded-lg bg-zinc-200 px-2.5 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="left: 1%; width: 49%">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[13px]/5 font-medium tabular-nums text-zinc-700">MS-4838</span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-600">06:00 – 14:00 · 9,500 crates</span>
+              <span class="sr-only">Injection 120T, Meera Joshi</span>
+            </a>
+          </div>
+          <p class="mt-1.5 text-[12px]/4 text-zinc-500">The owner and the resource drop out of the block; the lane already names the resource and the record page holds the rest.</p>
+        </li>
+
+        <li class="px-4 py-3">
+          <p class="text-[12px]/4 font-medium tabular-nums text-zinc-600">Two hours</p>
+          <div class="relative mt-1.5 h-16 rounded-lg bg-zinc-50 px-1.5">
+            <a href="#" class="absolute inset-y-2 overflow-hidden rounded-lg bg-zinc-200 px-2 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="left: 1%; width: 12.5%">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[12px]/4 font-medium tabular-nums text-zinc-700">4838</span>
+              </span>
+              <span class="sr-only">MS-4838, Injection 120T, 06:00 to 08:00, 9,500 crates, Meera Joshi</span>
+            </a>
+          </div>
+          <p class="mt-1.5 text-[12px]/4 text-zinc-500">The prefix goes before the digits do. MS- is the same on every block on the screen; 4838 is the one part that identifies this one.</p>
+        </li>
+
+        <li class="px-4 py-3">
+          <p class="text-[12px]/4 font-medium tabular-nums text-zinc-600">Forty minutes</p>
+          <div class="relative mt-1.5 h-16 rounded-lg bg-zinc-50 px-1.5">
+            <a href="#" aria-label="MS-4838, Injection 120T, 06:00 to 06:40, 9,500 crates, Meera Joshi"
+               class="absolute inset-y-2 flex items-center justify-center overflow-hidden rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="left: 1%; width: 4.2%">
+              <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+            </a>
+          </div>
+          <p class="mt-1.5 text-[12px]/4 text-zinc-500">The dot and nothing else, with the whole record in the accessible name. Widening it to fit the number would draw forty minutes as two hours, which is the one thing this layout may not do.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="sbk-h2" class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3">
+        <h2 id="sbk-h2" class="text-[16px]/6 font-semibold">What the edges do</h2>
+      </div>
+      <ul role="list" class="divide-y divide-zinc-100">
+
+        <li class="px-4 py-3">
+          <p class="text-[12px]/4 font-medium tabular-nums text-zinc-600">Started before this lane began</p>
+          <div class="relative mt-1.5 h-16 rounded-lg bg-zinc-50 px-1.5">
+            <a href="#" class="absolute inset-y-2 left-0 overflow-hidden rounded-r-lg bg-zinc-200 px-2.5 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="width: 34%">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[13px]/5 font-medium tabular-nums text-zinc-700">MS-4835</span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-600">Started 21:00 yesterday · ends 11:30</span>
+            </a>
+          </div>
+          <p class="mt-1.5 text-[12px]/4 text-zinc-500">Square on the left, rounded on the right, and the start date written in. A rounded left edge at 06:00 says the job started at 06:00.</p>
+        </li>
+
+        <li class="px-4 py-3">
+          <p class="text-[12px]/4 font-medium tabular-nums text-zinc-600">Runs past the end of the shift</p>
+          <div class="relative mt-1.5 h-16 rounded-lg bg-zinc-50 px-1.5">
+            <a href="#" class="absolute inset-y-2 right-0 overflow-hidden rounded-l-lg bg-zinc-200 px-2.5 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="width: 44%">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[13px]/5 font-medium tabular-nums text-zinc-700">MS-4838</span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-600">14:00 – 23:30 · runs 1.5 h past shift end</span>
+            </a>
+          </div>
+          <p class="mt-1.5 text-[12px]/4 text-zinc-500">The overrun is in the text as well as in the clip, and the lane it sits on carries the amber mark on its booked-of-available figure.</p>
+        </li>
+
+        <li class="px-4 py-3">
+          <p class="text-[12px]/4 font-medium tabular-nums text-zinc-600">Two on one lane at one time</p>
+          <div class="relative mt-1.5 h-16 rounded-lg bg-zinc-50 px-1.5">
+            <a href="#" class="absolute inset-x-1.5 overflow-hidden rounded-lg bg-zinc-200 px-2.5 py-0.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 0.375rem; height: 1.5rem; left: 1%; width: 42%">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+                <span class="truncate text-[12px]/4 font-medium tabular-nums text-zinc-700">MS-4835 · 06:00 – 14:00</span>
+              </span>
+            </a>
+            <a href="#" class="absolute overflow-hidden rounded-lg bg-zinc-200 px-2.5 py-0.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 2.125rem; height: 1.5rem; left: 26%; width: 42%">
+              <span class="flex items-center gap-1.5">
+                <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+                <span class="truncate text-[12px]/4 font-medium tabular-nums text-zinc-700">MS-4841 · 12:00 – 20:00</span>
+              </span>
+            </a>
+          </div>
+          <p class="mt-1.5 text-[12px]/4 text-zinc-500">The lane grows and the two blocks keep their true left and width, so the overlap is a shape. Squeezing both into one row hides the two hours that are the whole problem.</p>
+        </li>
+      </ul>
+    </section>
+  </div>
+</main>

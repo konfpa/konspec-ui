@@ -1,0 +1,225 @@
+<!-- The order is in this inbox because somebody has to look at it, and it is
+     above what this approver may sign. It stays fully readable — every figure,
+     every line, the whole trail — because reading it is the job that is still
+     theirs. What changes is the rail.
+
+     There is no Approve button at all, disabled or otherwise. A greyed-out
+     control with no explanation is the most-reported fault in every internal
+     application there has ever been, and aria-disabled with a described reason
+     is only right where the user could plausibly clear the condition. Nobody
+     clears their own approval limit. So the rail states the two figures that
+     decide it, names the approver it goes to instead, and puts the action that
+     actually exists — escalation — where the primary would have been. A rail
+     whose only filled button is one that cannot be pressed teaches people to
+     press it anyway.
+
+     The queue says which ones these are before they are opened. An approver
+     with four orders and one they cannot sign needs that on the row, or they
+     open it, read four screens of it and find out at the end.
+
+     Escalating is still a write and still needs a note, because the next
+     approver gets an order with no context otherwise — but the note is optional
+     rather than required, which is the honest difference from a refusal: a
+     refusal without a reason is worthless, an escalation without one is merely
+     less useful.
+
+     After it goes, it leaves this inbox the same way an approval does and the
+     live region says where it went. An item that stays in the queue after being
+     escalated is an item the approver will open again tomorrow. -->
+<main data-kui="inbox-page/limits" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, said: '', note: '',
+        limit: 500000,
+        queue: [
+          { no: 'PO-2026-0441', party: 'Gujarat Polymers Ltd', value: '₹9,84,000', raw: 984000, age: '3 days', status: 'Overdue', cc: 'Compounding — Silvassa', why: 'Annual resin call-off against RC-2026-0071' },
+          { no: 'RC-2026-0071', party: 'Deccan Fasteners Pvt Ltd', value: '₹62,40,000', raw: 6240000, age: '1 day', status: 'Approved', cc: 'Procurement — all plants', why: 'A new annual contract needs a director signature' },
+          { no: 'PO-2026-0424', party: 'Nashik Steel Traders', value: '₹96,750', raw: 96750, age: '1 day', status: 'Approved', cc: 'Tooling — Silvassa', why: 'Single quote against a three-quote policy' },
+          { no: 'PO-2026-0427', party: 'Qureshi Metals', value: '₹4,46,000', raw: 446000, age: 'today', status: 'Approved', cc: 'Fabrication — Vapi', why: 'No rate contract covers this material' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.queue[this.sel] },
+        get over() { return this.rec && this.rec.raw > this.limit },
+        next(o) { return o.raw > 5000000 ? 'S. Deshpande, director' : 'Nilesh Patil, general manager' },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.queue.length - 1)) },
+        go(i) {
+          this.sel = i; this.note = '';
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) },
+        escalate() {
+          const gone = this.rec.no, to = this.next(this.rec);
+          this.queue.splice(this.sel, 1);
+          if (!this.queue.length) { this.said = gone + ' sent to ' + to + '. Your inbox is clear.'; this.detail = false; return }
+          this.sel = Math.min(this.sel, this.queue.length - 1);
+          this.said = gone + ' sent to ' + to + '. ' + this.queue.length + ' left in your inbox.';
+          this.$nextTick(() => { this.$refs.detail.focus(); if (this.$refs.body) this.$refs.body.scrollTop = 0 });
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Waiting on you</h1>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+      <span x-text="queue.length"></span> documents · your limit is ₹5,00,000 a document · Silvassa and Vapi
+    </p>
+  </div>
+
+  <div class="flex min-h-0 flex-1" @keydown.escape="back()">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">The queue</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="queue.length ? (sel + 1) + ' of ' + queue.length : 'none left'"></p>
+      </div>
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')" x-show="queue.length"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(queue.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(o, i) in queue" :key="o.no">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[o.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="o.no"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="o.value"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="o.status"></span> · <span x-text="o.party"></span>
+              </span>
+              <!-- said on the row, or it is found after four screens of reading -->
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500">
+                <span x-show="o.raw > limit">Above your limit · you can read and forward it</span>
+                <span x-show="o.raw <= limit">With you <span x-text="o.age"></span></span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+      <div x-show="!queue.length" x-cloak class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+        </span>
+        <h3 class="mt-3 text-[14px]/5 font-semibold">Nothing left waiting</h3>
+      </div>
+    </section>
+
+    <div class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex lg:flex-row"
+         :class="{ 'hidden': !detail, 'flex': detail }">
+      <template x-if="queue.length">
+        <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+                 class="flex min-h-0 min-w-0 flex-1 flex-col focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <button type="button" @click="back()"
+                    class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+              <i data-lucide="chevron-left" class="size-4"></i>Back to the inbox
+            </button>
+            <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+              <span class="tabular-nums" x-text="rec.no"></span>
+              <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+              </span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.party + ' · ' + rec.cc + ' · with you ' + rec.age"></p>
+          </div>
+          <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+            <div class="rounded-xl border border-zinc-200 p-4">
+              <div class="flex items-start gap-2.5">
+                <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                <div class="min-w-0">
+                  <p class="text-[13px]/5 font-medium">Why this is with you</p>
+                  <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600" x-text="rec.why"></p>
+                </div>
+              </div>
+            </div>
+            <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Value</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.value"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Your limit</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums">₹5,00,000</dd>
+              </div>
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Cost centre</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold" x-text="rec.cc"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Goes to</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold" x-text="over ? next(rec) : 'You'"></dd>
+              </div>
+            </dl>
+            <p class="mt-4 text-[13px]/5 tabular-nums text-zinc-600">
+              Everything on this record is readable whether or not you may sign it. Reading it is still your job — the next approver acts on what you send them, and an escalation with nothing attached is a document they have to work out from the beginning.
+            </p>
+          </div>
+        </section>
+      </template>
+
+      <aside aria-label="Your decision" x-show="queue.length"
+             class="flex shrink-0 flex-col border-t border-zinc-200 lg:w-72 lg:border-t-0 lg:border-l">
+        <div class="hidden min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:block">
+          <p class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">This document</p>
+          <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="rec.value"></p>
+
+          <!-- The reason is ordinary text on the rail, not a description hung
+               off a disabled control nobody can reach to hear it. -->
+          <div x-show="over" class="mt-3 flex items-start gap-2.5 rounded-lg bg-zinc-50 px-3 py-2.5">
+            <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+            <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-900">
+              This is above your ₹5,00,000 limit, so approving it is not yours to do. It goes to <span class="font-medium" x-text="next(rec)"></span>, whose limit covers it.
+            </p>
+          </div>
+          <p x-show="!over" x-cloak class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Within your ₹5,00,000 limit.</p>
+
+          <div x-show="over" class="mt-4">
+            <label :for="$id('rec') + '-esc'" class="mb-1.5 flex items-baseline gap-2 text-[13px]/5 font-medium">
+              Note for the approver
+              <span aria-hidden="true" class="font-normal text-zinc-500">Optional</span>
+            </label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <textarea :id="$id('rec') + '-esc'" rows="3" x-model="note" :aria-describedby="$id('rec') + '-eschelp'"
+                        class="block w-full resize-none bg-transparent px-3 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500"
+                        placeholder="What you checked, and anything they should look at."></textarea>
+            </div>
+            <p :id="$id('rec') + '-eschelp'" class="mt-1.5 text-[12px]/4 text-zinc-500">Goes onto the document history with your name.</p>
+          </div>
+        </div>
+
+        <!-- No approve control at all when it is out of reach: the primary is
+             the action that exists. -->
+        <div class="flex flex-wrap items-center gap-2 border-zinc-200 px-4 py-3 lg:flex-col lg:items-stretch lg:border-t">
+          <button type="button" x-show="over" @click="escalate()"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="corner-up-right" class="size-4"></i><span x-text="over ? 'Send to ' + next(rec).split(',')[0] : ''"></span>
+          </button>
+          <button type="button" x-show="!over" x-cloak
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="check" class="size-4"></i>Approve
+          </button>
+          <button type="button"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>

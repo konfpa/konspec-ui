@@ -1,0 +1,159 @@
+<!-- views.py
+     from django.shortcuts import get_object_or_404, render
+
+     def bin_labels(request, rack_code):
+         rack = get_object_or_404(Rack, code=rack_code, plant=request.user.plant)
+         form = LabelJobForm(request.GET or None)
+         job = form.job() if form.is_valid() else LabelJob.default_for(rack)
+         return render(request, 'stores/bin_labels.html', {
+             'rack': rack, 'form': form, 'job': job,
+             'bins': rack.bins.select_related('item').order_by('code'),
+             # the skipped leading positions. A template cannot build a range,
+             # and it must not: the count is arithmetic over the start position
+             # and the stock, and arithmetic in a template is arithmetic no test
+             # ever sees.
+             'blanks': range(job.start - 1),
+         })
+
+     forms.py — offset_x and offset_y are DecimalFields with MinValue and
+     MaxValue of -5 and 5 and a 0.5 step. They are written straight into a style
+     attribute below, so what reaches it has to be a number the form has already
+     bounded, and never a string off the query string.
+
+     Do not extend base.html here. base.html is the app shell, and a sheet
+     that inherits it prints the sidebar across the first column of labels.
+     Labels extend a label print base carrying one rule and nothing else:
+
+         @page { size: A4; margin: 0; }
+
+     That is a second @page rule and it cannot share a stylesheet with
+     document-page's @page { size: A4; margin: 14mm 12mm } — the later one wins
+     for every printed page in the application. One print base per medium: an A4
+     document base, a label sheet base, and a roll base at 100mm 50mm. Which one
+     a route extends is the decision, and it is made once per route.
+
+     A comment/endcomment block, never a multi-line {# #}. Django's tag_re has no DOTALL, so
+     a {# #} that wraps stops being a comment and the rest of it prints on the
+     stock.
+
+     {% load humanize %} is in this file for intcomma on the label count, which
+     is an ordinary count and groups in threes correctly. It does nothing when
+     it is loaded in base.html instead, and intcomma without it raises at render
+     rather than at startup. -->
+{% extends "print_base_labels.html" %}
+{% load humanize %}
+
+{% block sheet %}
+<div data-kui="label-sheet/django" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm]">
+
+    <div class="mb-4 print:hidden">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Bin labels — {{ rack.name }}</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+        {{ bins.count|intcomma }} label{{ bins.count|pluralize }} from position {{ job.start }} · {{ job.stock.label }} · {{ job.sheets|intcomma }} sheet{{ job.sheets|pluralize }}
+      </p>
+      <p class="mt-1 text-[12px]/4 text-zinc-600">Print at scale 100% with Fit to page off and margins set to None.</p>
+
+      <form method="get" class="mt-3 flex flex-wrap items-end gap-x-6 gap-y-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+        <div>
+          <label for="{{ form.start.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">Start at position</label>
+          <div class="w-24 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            {{ form.start }}
+          </div>
+          {{ form.start.errors }}
+        </div>
+        <div>
+          <label for="{{ form.offset_x.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">Across, mm</label>
+          <div class="w-24 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            {{ form.offset_x }}
+          </div>
+          {{ form.offset_x.errors }}
+        </div>
+        <div>
+          <label for="{{ form.offset_y.id_for_label }}" class="mb-1.5 block text-[13px]/5 font-medium">Down, mm</label>
+          <div class="w-24 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            {{ form.offset_y }}
+          </div>
+          {{ form.offset_y.errors }}
+        </div>
+        <button type="submit"
+                class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Redraw the sheet
+        </button>
+      </form>
+    </div>
+
+    {% comment %}
+      overflow-x-auto is the 390px answer — 210 mm is 794 px and the stock does
+      not reflow — and print:overflow-visible takes it away again. An element
+      with overflow other than visible is monolithic in paged media, so a job of
+      five sheets left inside a live scroller prints the first one and stops.
+    {% endcomment %}
+    <div class="overflow-x-auto print:overflow-visible">
+      <ol role="list" class="mx-auto grid w-[210mm] grid-cols-3 gap-x-[2.5mm] gap-y-0 rounded-xl border border-zinc-300 bg-white px-[7.25mm] py-[15.15mm] print:rounded-none print:border-0"
+          style="margin-top: {{ job.offset_y }}mm; margin-left: {{ job.offset_x }}mm">
+
+        {% for n in blanks %}
+          {% comment %}
+            The already-peeled positions are rendered as empty cells and never
+            skipped. Drop them and every label moves up one position and the
+            sheet prints onto backing paper. aria-hidden because they exist to
+            hold grid tracks; the fill is screen-only, and on paper a used
+            position is blank, which says the same thing.
+          {% endcomment %}
+          <li aria-hidden="true" class="flex h-[38.1mm] items-center justify-center overflow-hidden border border-zinc-300 bg-zinc-50 print:border-0 print:bg-transparent">
+            <span class="text-[12px]/4 tabular-nums text-zinc-600 print:hidden">Position {{ forloop.counter }} — already used</span>
+          </li>
+        {% endfor %}
+
+        {% for bin in bins %}
+          <li class="flex h-[38.1mm] break-inside-avoid flex-col overflow-hidden border border-zinc-300 p-[2.5mm] print:border-0">
+            <p class="text-[20px]/7 font-semibold tabular-nums tracking-tight">{{ bin.code }}</p>
+            <p class="text-[12px]/4 font-medium tabular-nums">{{ bin.item.code }}</p>
+            <p class="truncate text-[11px]/4">{{ bin.item.description }}</p>
+
+            <div class="mt-auto">
+              {% if bin.barcode_url %}
+                {% comment %}
+                  The symbol is rendered by the server and served as an SVG at
+                  the size the label reserves for it. It is not drawn in the
+                  browser: a symbol that is generated after paint is a symbol
+                  that is not there when print() fires, and the sheet comes out
+                  blank where every barcode should be. Whether this library
+                  takes a barcode dependency at all, and whether it lives in the
+                  view or in a JS layer, is a decision for a person — this
+                  template is written for the view answer because it is the only
+                  one that survives window.print().
+                {% endcomment %}
+                <img src="{{ bin.barcode_url }}" alt="" class="h-[9mm] w-full">
+              {% else %}
+                {% comment %}
+                  No code on the record, so no symbol. A Code 128 generated from
+                  an empty string is a valid symbol that scans as nothing, and
+                  that failure surfaces at a rack rather than here. Print the
+                  gap and say what it is.
+                {% endcomment %}
+                <div aria-hidden="true" class="flex h-[9mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">No code on record</div>
+              {% endif %}
+              <p class="mt-[0.6mm] text-center text-[12px]/4 font-medium tabular-nums">{{ bin.code }}</p>
+            </div>
+          </li>
+        {% empty %}
+          {% comment %}
+            A sheet with nothing on it is not an empty state to design, it is a
+            job that should not have reached a printer. Say so on the screen
+            rather than sending blank stock through the machine.
+          {% endcomment %}
+          <li class="col-span-3 px-2 py-8 text-center text-[13px]/5">
+            {{ rack.name }} has no bins with a location code, so there is nothing to print. Add the bins to the rack first.
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+
+    <p class="mt-3 text-[12px]/4 tabular-nums text-zinc-600 print:hidden">
+      Sheet 1 of {{ job.sheets|intcomma }} · offset {{ job.offset_y }} mm down and {{ job.offset_x }} mm across, saved against {{ job.printer.name }}.
+    </p>
+  </main>
+</div>
+{% endblock %}

@@ -1,0 +1,151 @@
+<!-- The scope is stated in figures before the file is written, and the figures
+     are the filters that are in force. "Export" over an unnamed scope produces
+     a spreadsheet nobody can say anything about a fortnight later, and the
+     commonest defect is a date range left over from a previous question — which
+     is exactly what reading "01 Aug 2026 to 04 Sep 2026, 1,284 entries" out
+     loud catches.
+
+     Both figures matter and they are different. 1,284 is what the range holds;
+     47 is what the filters leave, and that is what goes in the file. Print one
+     of them and somebody reconciles the wrong number against the finding.
+
+     The format choice is a real one rather than a courtesy. CSV is what gets
+     reconciled in a spreadsheet; PDF is what gets attached to a finding and
+     carries the scope on its first page. Both are offered because the same
+     auditor wants both, at different points.
+
+     The export is itself an entry and the dialog says so, with the entry it
+     will write shown in the same shape the trail draws. Not a footnote in
+     small print — a person who is about to take 412 vendor records including
+     GSTIN off the system should read the sentence recording that they did.
+
+     The dialog is dialog/form’s panel unchanged, and it is the only control on
+     this whole page that causes a write. Everything else is a GET. -->
+<div data-kui="audit-page/export" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ open: false, format: 'csv' }">
+  <main>
+
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-5xl px-4 py-4 lg:px-6">
+        <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Audit trail</h1>
+            <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">47 of 1,284 entries match 3 filters · 01 Aug 2026 to 04 Sep 2026</p>
+          </div>
+          <button type="button" @click="open = true"
+                  class="flex shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="download" class="size-4"></i>Export
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-5xl px-4 py-5 lg:px-6">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <h2 id="ad-ex-day" class="border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Today · Friday, 04 Sep 2026</h2>
+        <ul role="list" aria-labelledby="ad-ex-day" class="divide-y divide-zinc-100">
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T14:22">14:22</time></p>
+              <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0"><span class="font-medium">Akshay Prabhu</span> changed the rate on line 3 of PO-2026-0418.</p>
+            </div>
+          </li>
+          <li class="flex gap-3 px-4 py-3">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+              <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T09:12">09:12</time></p>
+              <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0"><span class="font-medium">Meena Iyer</span> exported the vendor list — 412 vendors, CSV.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="ad-ex-title"
+         class="flex max-h-full w-full max-w-lg flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+        <div class="min-w-0">
+          <h2 id="ad-ex-title" class="text-[16px]/6 font-semibold">Export the audit trail</h2>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Signed in as akshay.prabhu@konspec.com</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <form action="/audit/export/" method="post" @submit.prevent="open = false" class="flex min-h-0 flex-1 flex-col">
+        <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+
+          <h3 class="text-[13px]/5 font-medium">What this file will hold</h3>
+          <dl class="mt-2 space-y-1 rounded-lg bg-zinc-50 px-3 py-2.5 text-[12px]/4">
+            <div class="flex flex-wrap items-baseline gap-x-3">
+              <dt class="w-32 shrink-0 text-zinc-600">Entries</dt>
+              <dd class="font-medium tabular-nums">47 of the 1,284 in range</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline gap-x-3">
+              <dt class="w-32 shrink-0 text-zinc-600">Date range</dt>
+              <dd class="font-medium tabular-nums">01 Aug 2026 to 04 Sep 2026</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline gap-x-3">
+              <dt class="w-32 shrink-0 text-zinc-600">Filters</dt>
+              <dd class="font-medium">Actor: Akshay Prabhu · Field: rate · Changed after approval</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline gap-x-3">
+              <dt class="w-32 shrink-0 text-zinc-600">Record types</dt>
+              <dd class="font-medium tabular-nums">Purchase orders and rate contracts · 19 records</dd>
+            </div>
+            <div class="flex flex-wrap items-baseline gap-x-3">
+              <dt class="w-32 shrink-0 text-zinc-600">Columns</dt>
+              <dd class="font-medium">Timestamp, actor, record, field, old value, new value, reason</dd>
+            </div>
+          </dl>
+
+          <fieldset class="mt-4">
+            <legend class="text-[13px]/5 font-medium">Format</legend>
+            <div class="mt-2 space-y-2">
+              <label class="flex items-start gap-2.5 text-[13px]/5">
+                <input type="radio" name="format" value="csv" x-model="format"
+                       class="mt-0.5 size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0">
+                  <span class="block font-medium">CSV</span>
+                  <span class="block text-[12px]/4 tabular-nums text-zinc-600">One row per changed field. 47 entries become 112 rows, because a nine-field amendment is nine rows.</span>
+                </span>
+              </label>
+              <label class="flex items-start gap-2.5 text-[13px]/5">
+                <input type="radio" name="format" value="pdf" x-model="format"
+                       class="mt-0.5 size-4 shrink-0 accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0">
+                  <span class="block font-medium">PDF</span>
+                  <span class="block text-[12px]/4 tabular-nums text-zinc-600">The trail as it reads on this page, with the scope above printed on the first page. 11 pages.</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <h3 class="mt-4 text-[13px]/5 font-medium">The export is itself audited</h3>
+          <div class="mt-2 flex gap-3 rounded-lg border border-zinc-200 px-3 py-2.5">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Akshay Prabhu</span> exported 47 audit entries.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">04 Sep 2026, 15:06 · CSV · filters recorded with the entry · 106.51.28.4</p>
+            </div>
+          </div>
+          <p class="mt-2 text-[12px]/4 text-zinc-600">This entry is written whether the download completes or not, and it cannot be removed.</p>
+        </div>
+
+        <div class="flex shrink-0 flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+          <button type="button" @click="open = false"
+                  class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+          <button type="submit"
+                  class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export 47 entries</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

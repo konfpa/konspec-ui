@@ -1,0 +1,233 @@
+<!-- The whole page server-rendered, and three things in it are the reason the
+     variant exists.
+
+     The delta tone is chosen in the template out of literal class names. The
+     view knows whether the movement was wanted — f.wanted, computed from the
+     metric's own direction of good — but it must not hand back the class
+     string: Tailwind's scanner reads class attributes and never sees a name
+     built in Python. Returned as f.tone_class, text-emerald-600 is never
+     generated and the delta renders in the inherited colour.
+
+     Money is not intcomma. Indian grouping is 2,2,3 above the last three
+     digits, so intcomma returns 1,245,000 where the register reads 12,45,000 —
+     wrong by a factor of ten and read straight past. table/django defines the
+     rupees filter for that; intcomma is right for the counts, and humanize is
+     loaded here rather than assumed.
+
+     json_script escapes the chart payload into a script tag the browser will
+     not execute. Never interpolate JSON into an attribute: one apostrophe in a
+     vendor name ends the attribute and takes the page with it. -->
+{% load humanize %}
+{% comment %}
+  A multi-line {# #} is not a comment. Django's tag_re has no DOTALL, so it
+  matches to the end of the first line only and the rest of the block renders
+  on the page. Use {% comment %} for anything longer than one line.
+{% endcomment %}
+{{ committed_by_month|json_script:"dbj-committed" }}
+
+<div data-kui="dashboard/django" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
+
+    <div class="min-w-0">
+      <p class="text-[13px]/5 text-zinc-600">{{ greeting }}, {{ request.user.first_name }}</p>
+      <h1 class="mt-0.5 text-[24px]/7 font-semibold tracking-tight">{{ desk.name }}</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+        {{ today|date:"l d M Y" }} · {{ desk.scope }} · figures read at {{ read_at|time:"H:i" }}
+      </p>
+    </div>
+
+    <section aria-labelledby="dbj-fig-h">
+      <h2 id="dbj-fig-h" class="sr-only">Figures</h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {% for f in figures %}
+          <a href="{{ f.url }}" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <dl>
+              <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                <span>{{ f.label }}</span>
+                <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+              </dt>
+
+              {% if f.value is None %}
+                {# "is None" and not "if not f.value": a real zero is falsy, so the shorter test draws the em dash over a genuine count of nought. #}
+                <dd class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight text-zinc-400">
+                  <span aria-hidden="true">—</span><span class="sr-only">No data</span>
+                </dd>
+                <dd class="mt-2 flex h-4 items-center text-[12px]/4 text-zinc-600">{{ f.absence }}</dd>
+              {% else %}
+                <dd class="mt-1.5 flex h-7 items-baseline gap-1">
+                  {% if f.is_money %}<span class="text-[13px]/5 font-medium text-zinc-500">₹</span>{% endif %}
+                  <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">{{ f.display }}</span>
+                </dd>
+                <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+                  {% if f.delta %}
+                    {% comment %}
+                      the classes are written out in the template, not returned
+                      from the view: Tailwind scans class attributes and never
+                      sees a name assembled in Python.
+                    {% endcomment %}
+                    <span class="inline-flex items-center gap-1 font-medium tabular-nums {% if f.flat %}text-zinc-600{% elif f.wanted %}text-emerald-600{% else %}text-red-600{% endif %}">
+                      {% if f.flat %}
+                        <i data-lucide="minus" class="size-3.5" aria-hidden="true"></i>
+                      {% elif f.rising %}
+                        <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>
+                      {% else %}
+                        <i data-lucide="trending-down" class="size-3.5" aria-hidden="true"></i>
+                      {% endif %}
+                      {{ f.delta }}
+                    </span>
+                    <span class="text-zinc-500">{{ f.versus }}</span>
+                  {% else %}
+                    <span class="tabular-nums text-zinc-500">{{ f.note }}</span>
+                  {% endif %}
+                </dd>
+              {% endif %}
+            </dl>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <div class="grid gap-4 xl:grid-cols-3">
+
+      <section aria-labelledby="dbj-appr-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white xl:col-span-2">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbj-appr-h" class="text-[14px]/5 font-semibold">Waiting on your approval</h2>
+          <a href="{% url 'orders:list' %}?status=approval" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            All <span class="tabular-nums">{{ approvals_total|intcomma }}</span><span class="sr-only"> orders waiting on your approval</span>
+          </a>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          {% for o in approvals %}
+            <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+                <a href="{{ o.get_absolute_url }}" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ o.number }}</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums">{{ o.amount|rupees }}</span>
+                <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">
+                  {{ o.vendor.name }} · with you {{ o.waiting_days }} day{{ o.waiting_days|pluralize }}
+                </p>
+              </div>
+            </li>
+          {% empty %}
+            <li class="px-6 py-10 text-center">
+              <span class="mx-auto flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i>
+              </span>
+              <p class="mt-2 text-[13px]/5 font-medium">You are through the approval queue</p>
+              <p class="mx-auto mt-0.5 max-w-sm text-[12px]/4 tabular-nums text-zinc-500">
+                {{ approved_today|intcomma }} cleared today · all cost centres · nothing filtered
+              </p>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section aria-labelledby="dbj-late-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbj-late-h" class="flex items-center gap-1.5 text-[14px]/5 font-semibold">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Past the promised date
+          </h2>
+          <a href="{% url 'orders:list' %}?status=overdue" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            All <span class="tabular-nums">{{ overdue_total|intcomma }}</span><span class="sr-only"> orders past the promised date</span>
+          </a>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          {% for o in overdue %}
+            <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <div class="px-4 py-2.5">
+                <a href="{{ o.get_absolute_url }}" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ o.number }}</a>
+                <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+                  {{ o.vendor.name }} · {{ o.days_late }} day{{ o.days_late|pluralize }} late · {{ o.amount|rupees }}
+                </p>
+              </div>
+            </li>
+          {% empty %}
+            <li class="px-6 py-10 text-center">
+              <span class="mx-auto flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                <i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i>
+              </span>
+              <p class="mt-2 text-[13px]/5 font-medium">Nothing is past its promised date</p>
+              <p class="mx-auto mt-0.5 max-w-sm text-[12px]/4 tabular-nums text-zinc-500">
+                {{ open_total|intcomma }} open orders, every one of them inside its window
+              </p>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+
+    <section aria-labelledby="dbj-plot-h" class="rounded-xl border border-zinc-300 bg-white p-5"
+             x-data="{
+               chart: null, gone: false,
+               init() { this.wait(() => this.draw()); },
+               /* the swatch is the palette and it has to be a real class
+                  attribute; a colour named inside x-init is a string the
+                  scanner never reads. */
+               wait(fn) {
+                 if (this.gone) return;
+                 const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+                 probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+                   ? fn()
+                   : requestAnimationFrame(() => this.wait(fn));
+               },
+               draw() {
+                 Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+                 const rows = JSON.parse(document.getElementById('dbj-committed').textContent);
+                 const grid = getComputedStyle(this.$root).borderTopColor;
+                 const ink  = getComputedStyle(this.$refs.legend).color;
+                 const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                                   .map(el => getComputedStyle(el).backgroundColor);
+                 this.chart = new Chart(this.$refs.canvas, {
+                   type: 'line',
+                   data: {
+                     labels: rows.map(r => r.month),
+                     datasets: [{
+                       label: 'Committed value', data: rows.map(r => r.value),
+                       borderColor: tone[0], backgroundColor: tone[0],
+                       borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.3
+                     }]
+                   },
+                   options: {
+                     responsive: true, maintainAspectRatio: false,
+                     interaction: { mode: 'index', intersect: false },
+                     scales: {
+                       x: { grid: { display: false }, border: { color: grid }, ticks: { color: ink, maxRotation: 0, autoSkipPadding: 12 } },
+                       y: { beginAtZero: true, grid: { color: grid }, border: { display: false },
+                            ticks: { color: ink, padding: 8, callback: v => (v / 100000).toFixed(1).replace('.0', '') + 'L' } }
+                     },
+                     plugins: { tooltip: { callbacks: { label: c => '₹' + c.parsed.y.toLocaleString('en-IN') } } }
+                   }
+                 });
+               },
+               destroy() { this.gone = true; this.chart && this.chart.destroy(); }
+             }">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 id="dbj-plot-h" class="text-[14px]/5 font-semibold">Committed value by month</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">{{ desk.scope }} · {{ financial_year }}</p>
+      </div>
+
+      <ul x-ref="legend" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+        <li class="flex items-center gap-1.5">
+          <span data-series class="size-2 rounded-full bg-zinc-800" aria-hidden="true"></span>Committed value
+        </li>
+      </ul>
+
+      <div class="mt-4 h-64">
+        <canvas x-ref="canvas" role="img" aria-label="{{ committed_summary }}"></canvas>
+      </div>
+
+      <div class="sr-only">
+        <table>
+          <caption>Committed value by month, {{ desk.scope }}, {{ financial_year }}</caption>
+          <thead><tr><th scope="col">Month</th><th scope="col">Committed value</th></tr></thead>
+          <tbody>
+            {% for row in committed_by_month %}
+              <tr><th scope="row">{{ row.month }}</th><td>{{ row.value|rupees }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="mt-3 text-[12px]/4 tabular-nums text-zinc-500">Approved orders only, at order value. Drafts are not counted.</p>
+    </section>
+  </main>
+</div>

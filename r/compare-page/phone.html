@@ -1,0 +1,134 @@
+<!-- A matrix cannot be a matrix at 390px, and this is not a reflow: the
+     arrangement is different, not narrower.
+
+     One vendor at a time, chosen from a select, with that vendor's rate
+     against every line and the lowest quoted rate beside it as the reference.
+     The other arrangement — one line at a time across four vendors — was
+     rejected, and the reason is what the buyer opened the phone for. A
+     line-at-a-time screen answers "who is cheapest on line 6", which is a
+     question the L1 mark has already answered and which nobody needed a phone
+     for. The question a buyer has standing in a plant is "should this order go
+     to Deccan", and that is answered by reading one vendor down all six lines
+     and seeing that it is above L1 on four of them by rupees rather than by
+     tens of rupees. Twelve screens of four figures answers it too, eventually,
+     if the reader can hold forty-eight numbers in their head.
+
+     Keeping a fixed reference column is what makes the single column a
+     comparison rather than a quotation. Without it this is one vendor's offer
+     re-typed, which is a document the buyer already has.
+
+     The totals and the award action are on the phone in full. A phone user is
+     not given a reduced version of the thing the screen exists for. Nothing
+     scrolls sideways. -->
+<div data-kui="compare-page/phone" class="mx-auto h-[720px] max-w-[390px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       pick: 'v-0219',
+       vendors: [
+         { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', landed: 1608370, on: '12 Oct 2026' },
+         { id: 'v-0219', name: 'Deccan Fasteners Pvt Ltd', landed: 1565600, on: '28 Sep 2026' },
+         { id: 'v-0361', name: 'Nashik Steel Traders', landed: 1626190, on: '05 Oct 2026' },
+         { id: 'v-0407', name: 'Qureshi Metals', landed: 1608890, on: '02 Nov 2026' }
+       ],
+       lines: [
+         { code: 'ITM-7702', name: 'MS angle — 50×50×5', qty: 12000, uom: 'kg', rates: { 'v-0288': 62.40, 'v-0219': 63.10, 'v-0361': 61.80, 'v-0407': 64.00 } },
+         { code: 'ITM-7715', name: 'MS plate — 6 mm', qty: 4500, uom: 'kg', rates: { 'v-0288': 68.50, 'v-0219': 69.20, 'v-0361': 70.10, 'v-0407': 67.90 } },
+         { code: 'ITM-3310', name: 'M12×60 hex bolt — 8.8 zinc', qty: 8000, uom: 'nos', rates: { 'v-0288': 24.60, 'v-0219': 23.80, 'v-0361': 25.10, 'v-0407': 24.20 } },
+         { code: 'ITM-3318', name: 'M12 hex nut — 8.8 zinc', qty: 8000, uom: 'nos', rates: { 'v-0288': 9.40, 'v-0219': 8.95, 'v-0361': 9.60, 'v-0407': 9.10 } },
+         { code: 'ITM-4120', name: 'Welding electrode — 3.15 mm', qty: 400, uom: 'kg', rates: { 'v-0288': 148.00, 'v-0219': 152.00, 'v-0361': 145.50, 'v-0407': 149.00 } },
+         { code: 'ITM-7728', name: 'MS flat — 40×6', qty: 2600, uom: 'kg', rates: { 'v-0288': 66.20, 'v-0219': 67.00, 'v-0361': 65.90, 'v-0407': 68.40 } }
+       ],
+       money(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       rate(n) { return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+       qty(l) { return l.qty.toLocaleString('en-IN') + ' ' + l.uom },
+       low(l) { return Math.min(...Object.values(l.rates)) },
+       lowName(l) {
+         const id = Object.keys(l.rates).find(k => l.rates[k] === this.low(l));
+         return this.vendors.find(v => v.id === id).name;
+       },
+       mine(l) { return l.rates[this.pick] },
+       isLow(l) { return this.mine(l) === this.low(l) },
+       gap(l) { return (this.mine(l) - this.low(l)) * l.qty },
+       chosen() { return this.vendors.find(v => v.id === this.pick) },
+       total() { return this.lines.reduce((s, l) => s + l.qty * this.mine(l), 0) },
+       above() { return this.lines.filter(l => !this.isLow(l)).length }
+     }">
+
+  <main class="space-y-3 p-4 pb-16">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Enquiries</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium tabular-nums text-zinc-900">ENQ-2026-0117</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Comparative statement</h1>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">6 lines · 4 quotations · Silvassa</p>
+    </div>
+
+    <div>
+      <label for="cf-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Reading the offer from</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="cf-vendor" x-model="pick" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          <template x-for="v in vendors" :key="v.id">
+            <option :value="v.id" x-text="v.name"></option>
+          </template>
+        </select>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-600">Each line shows this vendor's rate and the lowest rate quoted against it.</p>
+    </div>
+
+    <section aria-labelledby="cf-lines-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3">
+        <h2 id="cf-lines-h" class="text-[14px]/5 font-semibold" x-text="chosen().name">Deccan Fasteners Pvt Ltd</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+          <span x-text="'Above L1 on ' + above() + ' of 6 lines'">Above L1 on 4 of 6 lines</span> · promised <span x-text="chosen().on">28 Sep 2026</span>
+        </p>
+      </div>
+      <ul class="divide-y divide-zinc-100">
+        <template x-for="l in lines" :key="l.code">
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 text-[13px]/5 font-medium" x-text="l.name"></span>
+              <span class="flex shrink-0 items-baseline gap-1.5">
+                <span x-show="isLow(l)" x-cloak
+                      class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                <span class="text-[14px]/5 font-medium tabular-nums whitespace-nowrap" x-text="rate(mine(l))"></span>
+              </span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code + ' · ' + qty(l) + ' · ' + money(l.qty * mine(l))"></p>
+            <p x-show="!isLow(l)" x-cloak class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+              <span x-text="'L1 is ' + rate(low(l)) + ' — ' + lowName(l)"></span>
+              <span class="block text-zinc-500" x-text="money(gap(l)) + ' more on this line'"></span>
+            </p>
+          </li>
+        </template>
+      </ul>
+      <dl class="space-y-1 border-t border-zinc-200 bg-zinc-50 px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[12px]/4 text-zinc-600">Basic value of 6 lines</dt>
+          <dd class="text-[13px]/5 font-medium tabular-nums" x-text="money(total())"></dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-[13px]/5 font-semibold">Landed cost</dt>
+          <dd class="text-[14px]/5 font-semibold tabular-nums" x-text="money(chosen().landed)"></dd>
+        </div>
+      </dl>
+    </section>
+
+    <div class="flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+      <p class="text-[12px]/4 text-zinc-600">
+        Terms, validity and past delivery are not on this screen and they decide the award. Open the statement on a desktop before signing it.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <button type="button" class="inline-flex h-11 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <span x-text="'Award all 6 lines to ' + chosen().name">Award all 6 lines to Deccan Fasteners Pvt Ltd</span>
+      </button>
+      <button type="button" class="inline-flex h-11 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Send the statement for approval
+      </button>
+    </div>
+  </main>
+</div>

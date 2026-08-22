@@ -1,0 +1,147 @@
+<!-- Four days after go-live. There is no history to plot and no queue to work,
+     and none of that is a fault — but every region has to say which kind of
+     nothing it is holding, or somebody reads the screen as broken and stops
+     using it before it has any data in it.
+
+     Three different nothings are on this page at once. Zero GRNs posted today
+     is a fact and renders as 0 with its own line. QC holds is an em dash,
+     because the module is not live yet and there is no number to have. And the
+     two figures that exist have no delta, because there is no previous period —
+     a delta invented against a four-day-old baseline is a made-up denominator
+     that gets quoted back in a review.
+
+     None of the queues draws empty-state/all-clear. Nothing has been cleared;
+     nothing has happened. Printed over a queue that has never held a record it
+     is the one empty state that reads as a lie. These are nothing-yet: what will land here, and what
+     has to happen upstream before it does.
+
+     The plot keeps its box and its legend and draws no axes. Chart.js given an
+     empty dataset renders a real scale from 0 to 1, which is a picture of
+     figures nobody has read and looks answered rather than pending. -->
+<div data-kui="dashboard/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
+
+    <div class="min-w-0">
+      <p class="text-[13px]/5 text-zinc-600">Good morning, Akshay</p>
+      <h1 class="mt-0.5 text-[24px]/7 font-semibold tracking-tight">Procurement</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Friday 21 Aug 2026 · Silvassa · live since 17 Aug · read at 09:12</p>
+    </div>
+
+    <section aria-labelledby="dbe-fig-h">
+      <h2 id="dbe-fig-h" class="sr-only">Figures</h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
+        <!-- a real figure with no comparison: the slot says why rather than
+             inventing a baseline out of four days -->
+        <a href="/orders/" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>Orders raised</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">4</dd>
+            <dd class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Since 17 Aug · no previous period to compare</dd>
+          </dl>
+        </a>
+
+        <a href="/orders/?status=open" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>Open order value</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 flex items-baseline gap-1">
+              <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+              <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">6,42,000</span>
+            </dd>
+            <dd class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Since 17 Aug · no previous period to compare</dd>
+          </dl>
+        </a>
+
+        <!-- zero is an answer, and it renders as a number -->
+        <div class="rounded-xl border border-zinc-300 bg-white p-4">
+          <dl>
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">GRNs posted today</dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">0</dd>
+            <dd class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Nothing has come through the gate since 07:00</dd>
+          </dl>
+        </div>
+
+        <!-- no answer to have yet, and it must never be a zero -->
+        <div class="rounded-xl border border-zinc-300 bg-white p-4">
+          <dl>
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">QC holds open</dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight text-zinc-400">
+              <span aria-hidden="true">—</span><span class="sr-only">No data</span>
+            </dd>
+          </dl>
+          <p class="mt-2 flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+            <i data-lucide="info" class="mt-0.5 size-3.5 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            <span class="tabular-nums">Inspection goes live at Silvassa on 01 Sep 2026.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid gap-4 xl:grid-cols-3">
+
+      <section aria-labelledby="dbe-appr-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white xl:col-span-2">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbe-appr-h" class="text-[14px]/5 font-semibold">Waiting on your approval</h2>
+        </div>
+        <div class="flex flex-col items-center px-6 py-10 text-center">
+          <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="inbox" class="size-4 text-zinc-600"></i>
+          </span>
+          <p class="mt-2 text-[13px]/5 font-medium">Nothing has reached you yet</p>
+          <p class="mt-0.5 max-w-sm text-[12px]/4 text-zinc-500">
+            Orders appear here when a buyer sends one for approval. The four raised so far are still drafts.
+          </p>
+          <a href="/orders/?status=draft" class="mt-3 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            See the four drafts
+          </a>
+        </div>
+      </section>
+
+      <section aria-labelledby="dbe-grn-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="dbe-grn-h" class="text-[14px]/5 font-semibold">Arrived today, not inspected</h2>
+        </div>
+        <div class="flex flex-col items-center px-6 py-10 text-center">
+          <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="truck" class="size-4 text-zinc-600"></i>
+          </span>
+          <p class="mt-2 text-[13px]/5 font-medium">No receipts yet</p>
+          <p class="mt-0.5 max-w-sm text-[12px]/4 text-zinc-500">
+            The first delivery against an order raised here is due on 04 Sep 2026.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- chart/empty: the box and the legend stay, the axes do not. An empty
+         grid reads as a chart that failed to load. -->
+    <section aria-labelledby="dbe-plot-h" class="rounded-xl border border-zinc-300 bg-white p-5">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 id="dbe-plot-h" class="text-[14px]/5 font-semibold">Committed value by month</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa · FY 2026–27</p>
+      </div>
+
+      <ul class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+        <li class="flex items-center gap-1.5">
+          <span class="size-2 rounded-full bg-zinc-800" aria-hidden="true"></span>Committed value
+        </li>
+      </ul>
+
+      <div class="mt-4 flex h-64 flex-col items-center justify-center rounded-lg border border-dashed border-zinc-200 px-6 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="chart-line" class="size-4 text-zinc-600"></i>
+        </span>
+        <p class="mt-3 text-[14px]/5 font-medium">Not enough history to plot</p>
+        <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+          This card needs two closed months. The first line lands after 30 Sep 2026; nothing is missing before then.
+        </p>
+      </div>
+    </section>
+  </main>
+</div>

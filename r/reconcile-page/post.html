@@ -1,0 +1,187 @@
+<!-- Posting is a separate act from matching, and this screen exists so that it
+     is. Everything up to here is reversible; from here it is a ledger entry,
+     and the gap between the two has to be a page somebody read rather than a
+     button somebody was already hovering over.
+
+     What is being written is printed as a journal with both sides and both
+     totals, not as a sentence saying the reconciliation will be posted. A
+     confirmation that describes an action in words is a confirmation nobody can
+     check; one that prints ₹59,41,636 against ₹59,41,636 is one somebody can.
+
+     What is held back is stated with the same weight as what goes. The two
+     blocked lines are ₹1,00,864 that stays on the invoice as a disputed
+     balance, and leaving that off this page is how an invoice gets marked
+     matched with a sixth of it unexplained.
+
+     The dialog is an alertdialog and not a plain dialog: it does not dismiss on
+     a backdrop click, because the question has to be answered. It restates the
+     three figures and carries the amount on the confirm button, so the last
+     thing under the pointer says how much.
+
+     Submit is guarded, not disabled. The control that was just pressed is the
+     one that would go dead, and a browser moves focus off a disabled element to
+     the body, so the keyboard user who pressed Post is at the top of the
+     document. The handler returns early instead, the bar goes aria-busy, and
+     the button keeps focus and its width.
+
+     The frame is bounded — h-[680px] — so the sticky bar and the dialog preview
+     in a box. As a real page, drop the height and the border, let the bar stick
+     to the shell's scrolling column, and make the dialog fixed inset-0. -->
+<div data-kui="reconcile-page/post" class="relative h-[680px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ asking: false, posting: false, said: '',
+       run() { if (this.posting) return; this.posting = true; this.asking = false; this.said = 'Posting 14 matched lines for ₹59,41,636.' } }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <main class="mx-auto max-w-4xl space-y-4 p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Invoice matching</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium tabular-nums text-zinc-900">INV-2026-1184</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Review and post</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+        Sharma Steel &amp; Alloys · INV-2026-1184 · matched by Akshay Prabhu on 11 Sep 2026 at 09:41
+      </p>
+    </div>
+
+    <section aria-labelledby="po-what-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <h2 id="po-what-h" class="text-[16px]/6 font-semibold">What is being matched</h2>
+      </div>
+      <dl class="divide-y divide-zinc-100 text-[13px]/5">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-2.5 lg:px-5">
+          <dt class="min-w-0">12 lines that agree exactly<span class="mt-0.5 block text-[12px]/4 text-zinc-500">No accounting entry beyond clearing the receipt.</span></dt>
+          <dd class="shrink-0 tabular-nums">₹28,42,140</dd>
+        </div>
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-2.5 lg:px-5">
+          <dt class="min-w-0">1 line inside tolerance<span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">M12 hex bolt, +20 nos. The ₹480 goes to purchase price variance.</span></dt>
+          <dd class="shrink-0 tabular-nums">₹96,000</dd>
+        </div>
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-2.5 lg:px-5">
+          <dt class="min-w-0">1 line with a reason<span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Carriage to Silvassa, agreed by phone. Reason written to the invoice.</span></dt>
+          <dd class="shrink-0 tabular-nums">₹4,200</dd>
+        </div>
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 bg-zinc-50 px-4 py-2.5 lg:px-5">
+          <dt class="min-w-0 font-medium">Posting for payment<span class="mt-0.5 block text-[12px]/4 tabular-nums font-normal text-zinc-500">14 of 16 lines, due 02 Oct 2026 under 30 days from GRN.</span></dt>
+          <dd class="shrink-0 text-[14px]/5 font-semibold tabular-nums">₹59,41,636</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="po-jl-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <h2 id="po-jl-h" class="text-[16px]/6 font-semibold">What it does to the ledger</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">One journal, dated 11 Sep 2026, in the Silvassa books.</p>
+      </div>
+      <table class="w-full text-[13px]/5">
+        <thead>
+          <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+            <th scope="col" class="px-4 py-2.5 font-medium lg:px-5">Account</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Debit</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium lg:px-5">Credit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-zinc-100">
+            <th scope="row" class="px-4 py-2.5 text-left font-normal lg:px-5">Goods received, not invoiced — clearing</th>
+            <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹59,36,956</td>
+            <td class="px-4 py-2.5 text-right tabular-nums text-zinc-500 lg:px-5">—</td>
+          </tr>
+          <tr class="border-b border-zinc-100">
+            <th scope="row" class="px-4 py-2.5 text-left font-normal lg:px-5">Purchase price variance</th>
+            <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹480</td>
+            <td class="px-4 py-2.5 text-right tabular-nums text-zinc-500 lg:px-5">—</td>
+          </tr>
+          <tr class="border-b border-zinc-100">
+            <th scope="row" class="px-4 py-2.5 text-left font-normal lg:px-5">Carriage inward</th>
+            <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹4,200</td>
+            <td class="px-4 py-2.5 text-right tabular-nums text-zinc-500 lg:px-5">—</td>
+          </tr>
+          <tr class="border-b border-zinc-100">
+            <th scope="row" class="px-4 py-2.5 text-left font-normal lg:px-5">Sharma Steel &amp; Alloys — accounts payable</th>
+            <td class="px-4 py-2.5 text-right tabular-nums text-zinc-500">—</td>
+            <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap lg:px-5">₹59,41,636</td>
+          </tr>
+        </tbody>
+        <tfoot class="bg-zinc-50">
+          <tr class="border-t border-zinc-200">
+            <th scope="row" class="px-4 py-2.5 text-left text-[12px]/4 font-medium text-zinc-600 lg:px-5">Journal totals</th>
+            <td class="px-4 py-2.5 text-right font-semibold tabular-nums whitespace-nowrap">₹59,41,636</td>
+            <td class="px-4 py-2.5 text-right font-semibold tabular-nums whitespace-nowrap lg:px-5">₹59,41,636</td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <section aria-labelledby="po-held-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <h2 id="po-held-h" class="text-[16px]/6 font-semibold">What is held back</h2>
+      </div>
+      <div class="flex items-start gap-3 px-4 py-3.5 lg:px-5">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+        <div class="min-w-0">
+          <p class="text-[13px]/5 font-medium tabular-nums">₹1,00,864 on 2 lines stays on the invoice as a disputed balance.</p>
+          <ul role="list" class="mt-2 space-y-1 text-[12px]/4 tabular-nums text-zinc-600">
+            <li>HDPE granules — invoiced 1.400 MT more than was received · ₹81,760</li>
+            <li>MS angle 50×50×6 — billed ₹1.60 a kg above the contract rate · ₹19,104</li>
+          </ul>
+          <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-600">
+            Neither is paid, and neither closes. A debit note for ₹1,00,864 goes to Ritu Deshpande when this posts.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3" :aria-busy="posting ? 'true' : 'false'">
+      <p class="text-[12px]/4 tabular-nums text-zinc-600">
+        14 lines · ₹59,41,636 posting · ₹1,00,864 held · nothing written yet
+      </p>
+      <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+        <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Back to the match</button>
+        <button type="button" x-ref="post" @click="asking = true"
+                class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <i data-lucide="file-check-2" class="size-4"></i>Post the reconciliation
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- alert-dialog's consequences shape: it does not dismiss on the backdrop,
+       it restates the figures, and the amount is on the confirm button. -->
+  <div x-show="asking" x-cloak x-trap.noscroll="asking" @keydown.escape.window="asking = false"
+       class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="po-dlg-t" aria-describedby="po-dlg-b"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <h2 id="po-dlg-t" class="text-[16px]/6 font-semibold">Post this reconciliation?</h2>
+      <div id="po-dlg-b" class="mt-2 text-[13px]/5 text-zinc-600">
+        <dl class="space-y-1.5 tabular-nums">
+          <div class="flex items-baseline justify-between gap-3">
+            <dt>Lines matched</dt><dd class="font-medium text-zinc-900">14 of 16</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-3">
+            <dt>Released for payment</dt><dd class="font-medium text-zinc-900">₹59,41,636</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-3">
+            <dt>Held as disputed</dt><dd class="font-medium text-zinc-900">₹1,00,864</dd>
+          </div>
+        </dl>
+        <p class="mt-3">
+          A posted match is not undone from this screen. Reversing it is a journal, and a journal needs its own approval.
+        </p>
+      </div>
+      <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="asking = false"
+                class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Keep reviewing</button>
+        <button type="button" @click="run()"
+                class="inline-flex h-9 items-center rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium tabular-nums text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          Post ₹59,41,636
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

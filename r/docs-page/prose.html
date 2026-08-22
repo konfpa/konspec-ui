@@ -1,0 +1,166 @@
+<!-- The specimen. Every other variant here is made of these, and the entry's
+     real contribution is the four numbers in the rhythm rather than any of the
+     screens.
+
+     The measure is max-w-xl, 576px, which is the reading measure container
+     derived by counting the registry. The leading is 24px — text-[14px]/6 —
+     which rule 19 permits prose and nothing else.
+
+     The rhythm is asymmetric, and that is the whole of it: the space above a
+     heading is larger than the space below it, so the heading belongs to what
+     follows rather than floating between two blocks. mt-10 above an h2, mt-8
+     above an h3, mt-6 above an h4, mt-3 on the first block after any heading,
+     mt-4 between two paragraphs, and mt-3 on a list that is the object of the
+     sentence above it. Four numbers read as three pairs.
+
+     The scale runs out below h3 and this says so rather than inventing a step.
+     h4 is the body size at font-semibold with the tighter leading — the next
+     size down from 16 is 14 and there is nothing between them.
+
+     Prose is zinc-900 here and zinc-600 everywhere else in this library. On
+     every other screen the prose describes a control or a record; on this one
+     it is the content, so the secondary colour is left for the lead, the
+     captions and the source line under a quotation.
+
+     No italic type exists in this system, so the quotation earns its shape from
+     a 2px rule and the secondary colour, and its source is a line underneath
+     rather than a <cite>, which browsers italicise by default. -->
+<div data-kui="docs-page/prose" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+  <main class="mx-auto max-w-3xl">
+    <article class="rounded-xl border border-zinc-300 bg-white px-5 py-5 sm:px-6">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">QC hold and release</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">SOP-QA-011 · Revision 5 · Effective 01 Jul 2026</p>
+
+      <div class="mt-5 max-w-xl text-[14px]/6">
+
+        <p class="text-zinc-600">
+          A hold stops material moving. It is not a rejection and it is not a note on the record — while a lot is
+          on hold nobody may issue it, and the store cannot override that from the issue screen.
+        </p>
+
+        <h2 class="mt-10 text-[20px]/7 font-semibold tracking-tight">What a hold does</h2>
+
+        <p class="mt-3">
+          Placing a hold writes a block against the lot in the batch ledger. The lot keeps its quantity and its
+          location, so it is still counted in stock and still valued, and every issue against it fails with the
+          hold reference rather than with a generic error.
+        </p>
+
+        <p class="mt-4">
+          A hold is placed by Quality and by nobody else. A buyer who believes material is wrong raises a
+          <a href="/manual/quality/inspection-request/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">re-inspection request</a>
+          against the lot, which is what puts it in front of Quality.
+        </p>
+
+        <h3 class="mt-8 text-[16px]/6 font-semibold">Three kinds of hold</h3>
+
+        <p class="mt-3">The kind is chosen when the hold is placed and decides who may release it:</p>
+
+        <dl class="mt-3">
+          <dt class="text-[14px]/5 font-semibold">Inward hold</dt>
+          <dd class="mt-1">
+            Placed automatically on every lot received against a material with an inspection plan. Released by
+            the inspector who passes the lot.
+          </dd>
+          <dt class="mt-4 text-[14px]/5 font-semibold">Quality hold</dt>
+          <dd class="mt-1">
+            Placed by an inspector on a lot already in stock, usually after a complaint from the line. Released
+            by the QA head.
+          </dd>
+          <dt class="mt-4 text-[14px]/5 font-semibold">Customer hold</dt>
+          <dd class="mt-1">
+            Placed against finished goods when a customer has raised a claim. Released by the QA head with the
+            claim reference on the record.
+          </dd>
+        </dl>
+
+        <h2 class="mt-10 text-[20px]/7 font-semibold tracking-tight">Releasing a hold</h2>
+
+        <p class="mt-3">
+          A release needs a result on the record. Not a phone call, not an email to the store — the lab result or
+          the inspection has to be entered against the lot first, because the release records which result it was
+          made on and that link is what an audit follows.
+        </p>
+
+        <ol class="mt-3 list-decimal space-y-1 pl-6 marker:tabular-nums marker:text-zinc-500">
+          <li>Open the lot in <span class="font-medium">Quality → Holds</span>.</li>
+          <li>Check that the result you are releasing against is listed under the hold.</li>
+          <li>Choose <span class="font-medium">Release</span> and enter the reason.</li>
+          <li>The block clears on the next issue attempt, which is immediate.</li>
+        </ol>
+
+        <p class="mt-4">
+          A hold that has to stay while part of the lot is used is not a partial release. Split the lot first —
+          <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">Quality → Holds → Split</code>
+          — and release the child lot. Releasing and re-holding leaves a gap in the ledger during which the whole
+          lot was issuable.
+        </p>
+
+        <div class="mt-4 overflow-hidden rounded-xl border border-zinc-200">
+          <table class="w-full text-[13px]/5">
+            <caption class="sr-only">Who may release each kind of hold, and what the release needs</caption>
+            <thead>
+              <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                <th scope="col" class="px-4 py-2.5 font-medium">Hold</th>
+                <th scope="col" class="px-4 py-2.5 font-medium">Released by</th>
+                <th scope="col" class="px-4 py-2.5 font-medium">Needs</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-4 py-2.5 text-left font-normal">Inward</th>
+                <td class="px-4 py-2.5">Inspector</td>
+                <td class="px-4 py-2.5 text-zinc-600">Inspection result</td>
+              </tr>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-4 py-2.5 text-left font-normal">Quality</th>
+                <td class="px-4 py-2.5">QA head</td>
+                <td class="px-4 py-2.5 text-zinc-600">Lab result</td>
+              </tr>
+              <tr>
+                <th scope="row" class="px-4 py-2.5 text-left font-normal">Customer</th>
+                <td class="px-4 py-2.5">QA head</td>
+                <td class="px-4 py-2.5 text-zinc-600">Claim reference</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 class="mt-6 text-[14px]/5 font-semibold">If the material has already moved</h4>
+
+        <p class="mt-3">
+          Material issued before a hold was placed is traced through the batch ledger and recalled by the QA
+          head. That is a different procedure and it is
+          <a href="/manual/quality/recall/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">SOP-QA-014, Recall of issued material</a>.
+        </p>
+
+        <blockquote class="mt-4 border-l-2 border-zinc-300 pl-4 text-zinc-600">
+          <p>
+            Material that does not conform to specified requirements shall be identified and controlled to
+            prevent its unintended use or delivery.
+          </p>
+        </blockquote>
+        <p class="mt-2 text-[12px]/4 text-zinc-500">IATF 16949:2016, clause 8.7.1 — the requirement this procedure exists to meet.</p>
+
+        <figure class="mt-4">
+          <div class="overflow-hidden rounded-xl border border-zinc-200">
+            <!-- the zinc-100 well stands in for <img class="w-full">, the way carousel/photo writes it -->
+            <div class="flex aspect-video items-center justify-center bg-zinc-100">
+              <i data-lucide="image" class="size-6 text-zinc-500"></i>
+            </div>
+          </div>
+          <figcaption class="mt-2 text-[12px]/4 text-zinc-600">
+            Figure 1 — A held lot in the batch ledger. The hold reference is on the row, not on the material.
+          </figcaption>
+        </figure>
+
+        <p class="mt-4">
+          The caption is numbered because the sentence above refers to it by number. A caption that only
+          describes the picture cannot be referred to from anywhere else in the document, and a printed copy has
+          no other way of pointing at it.
+        </p>
+
+      </div>
+    </article>
+  </main>
+</div>

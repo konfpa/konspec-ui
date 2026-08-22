@@ -1,0 +1,133 @@
+<!-- The counter is derived from the answers and never incremented. Going back
+     to amend rack 11 must not decrement it, because rack 11 still holds a
+     figure — the total moves only when a rack gains or loses one. A counter
+     that steps down on Back and up again on Record drifts by one every time
+     somebody checks their own work, and the drift is invisible until the sheet
+     is reconciled at the end of the shift, by which point nobody can say which
+     rack it came from.
+
+     Amending says so, in the field and in words. The recorded figure is loaded
+     into the box rather than left blank, so the operator can see what they are
+     replacing, and the line under it says replaces rather than adds — a run
+     that silently adds the second entry to the first is how a rack of 98 turns
+     into 196.
+
+     Back is at the top of the screen and Record is at the bottom, because they
+     are the two 64px targets on this screen and one of them undoes the other.
+     Nothing on a moving trolley should have to distinguish between adjacent
+     ones by reading them. -->
+<div data-kui="focus-page/progress" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       total: 40, at: 11, qty: '',
+       racks: Array.from({ length: 40 }, (_, n) => n > 10 ? null : 88 + n),
+       get done() { return this.racks.filter(v => v !== null).length },
+       get amending() { return this.racks[this.at] !== null },
+       record() {
+         const v = parseInt(this.qty, 10);
+         if (!isFinite(v)) return;
+         this.racks[this.at] = v;
+         this.qty = '';
+         this.at = Math.min(this.at + 1, this.total - 1);
+       },
+       back() {
+         this.at = Math.max(this.at - 1, 0);
+         this.qty = this.racks[this.at] === null ? '' : String(this.racks[this.at]);
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs.qty.focus()));
+       },
+       keep(e) {
+         if (e.relatedTarget && e.relatedTarget.closest('[data-hands-off]')) return;
+         requestAnimationFrame(() => this.$refs.qty.focus());
+       }
+     }"
+     x-init="$nextTick(() => $refs.qty.focus())">
+
+  <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
+    <div class="flex min-w-0 items-center gap-3">
+      <button type="button" data-hands-off @click="back()"
+              class="inline-flex h-12 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="arrow-left" aria-hidden="true" class="size-5 text-zinc-600"></i>Back one rack
+      </button>
+      <p class="min-w-0 text-[16px]/6 font-medium tabular-nums">
+        Rack <span x-text="at + 1">12</span> of 40
+        <span class="block text-[14px]/5 font-normal text-zinc-600">Sheet SC-2026-0071 · Sunita Pawar</span>
+      </p>
+    </div>
+    <button type="button" data-hands-off
+            class="inline-flex h-12 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="log-out" aria-hidden="true" class="size-5 text-zinc-600"></i>Exit
+    </button>
+  </header>
+
+  <main class="flex min-h-0 flex-1 flex-col">
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+      <div class="mx-auto max-w-2xl">
+
+        <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">
+          Rack <span x-text="'B-14-' + String(at + 1).padStart(2, '0')">B-14-12</span>
+        </h1>
+        <p class="mt-1 text-[16px]/6 tabular-nums text-zinc-600">
+          MS angle 50 × 50 × 6 · ITEM-0912 · counted in nos
+        </p>
+
+        <!-- shown only when the operator has come back to a rack that already
+             holds a figure, which is the one state this variant exists for -->
+        <div x-show="amending" x-cloak role="status" class="mt-4 flex items-start gap-3.5 rounded-xl border border-zinc-300 bg-white px-5 py-4">
+          <i data-lucide="alert-triangle" aria-hidden="true" class="mt-0.5 size-6 shrink-0 text-amber-700"></i>
+          <p class="text-[16px]/6 tabular-nums text-zinc-700">
+            <span class="font-medium">This rack already has a figure.</span>
+            Recording again replaces it. It does not add to it, and the racks-counted total does not move.
+          </p>
+        </div>
+
+        <label for="fp-qty" class="mt-5 block text-[16px]/6 font-medium">How many are on this rack</label>
+        <div class="mt-2 flex items-center rounded-lg border border-zinc-200 bg-white pr-4 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="fp-qty" x-ref="qty" x-model="qty" name="counted"
+                 inputmode="numeric" autocomplete="off" placeholder="0"
+                 aria-describedby="fp-qty-help" @blur="keep($event)" @keydown.enter.prevent="record()"
+                 class="h-16 w-full min-w-0 bg-transparent px-4 text-right text-[24px]/7 font-semibold tabular-nums outline-none placeholder:text-zinc-500">
+          <span aria-hidden="true" class="shrink-0 text-[16px]/6 text-zinc-600">nos</span>
+        </div>
+        <p id="fp-qty-help" class="mt-2 text-[14px]/5 text-zinc-600">
+          An empty rack is a count of 0. Skipping it and counting 0 are different answers and the sheet keeps them apart.
+        </p>
+
+        <h2 class="mt-6 text-[16px]/6 font-semibold">Recorded so far</h2>
+        <ul class="mt-2 divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+          <li class="flex items-center justify-between gap-4 px-4 py-3.5">
+            <span class="text-[16px]/6 tabular-nums">Rack B-14-11</span>
+            <span class="text-[16px]/6 font-medium tabular-nums">98 nos · 11:31</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 px-4 py-3.5">
+            <span class="text-[16px]/6 tabular-nums">Rack B-14-10</span>
+            <span class="text-[16px]/6 font-medium tabular-nums">97 nos · 11:27</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 px-4 py-3.5">
+            <span class="text-[16px]/6 tabular-nums">Rack B-14-09</span>
+            <span class="text-[16px]/6 font-medium tabular-nums">96 nos · 11:24</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="shrink-0 border-t border-zinc-300 bg-white px-4 py-4 sm:px-6">
+      <div class="mx-auto flex max-w-2xl flex-wrap items-center gap-x-5 gap-y-3">
+        <div class="min-w-[13rem] flex-1">
+          <p id="fp-count" class="text-[24px]/7 font-semibold tracking-tight tabular-nums">
+            <span x-text="done">11</span> of 40 racks counted
+          </p>
+          <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
+               role="progressbar" aria-labelledby="fp-count"
+               aria-valuenow="28" :aria-valuenow="Math.round(done / total * 100)" aria-valuemin="0" aria-valuemax="100">
+            <div class="h-full min-w-[2px] rounded-full bg-zinc-700 transition-[width] duration-300 motion-reduce:transition-none"
+                 style="width: 28%" :style="'width: ' + Math.round(done / total * 100) + '%'"></div>
+          </div>
+        </div>
+        <button type="button" data-hands-off @click="record()"
+                class="inline-flex h-16 shrink-0 items-center gap-2.5 rounded-lg border border-transparent bg-zinc-700 px-6 text-[20px]/7 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="arrow-right" aria-hidden="true" class="size-6"></i>
+          <span x-text="amending ? 'Replace and go on' : 'Record and go on'">Record and go on</span>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

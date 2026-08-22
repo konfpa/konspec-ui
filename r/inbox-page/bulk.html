@@ -1,0 +1,271 @@
+<!-- The offer is made by the screen and never assembled by ticking rows in the
+     queue. Two reasons, and the second is the better one.
+
+     The queue is a listbox and a listbox is one Tab stop, so a checkbox inside
+     an option cannot be reached by anybody using a keyboard. That is
+     list-detail's rule and it holds here.
+
+     And alike is not something the user should have to establish by eye.
+     Same vendor, same rate contract, same cost centre, every one inside the
+     limit, none of them amended since the queue was drawn — that is a query the
+     server can run and a person cannot, and the moment the definition is loose
+     enough to be judged from a list it is loose enough to approve the wrong
+     order. So the offer comes off the record already open, states the predicate
+     in words, and names its count.
+
+     What it refuses to include is the part that earns the variant. Two orders
+     from the same vendor are excluded and both are listed with the reason, not
+     quietly left out: one is above this approver limit, which no bulk action
+     may ever route around, and one has been amended since the queue was drawn,
+     so approving it would be approving a version nobody on this screen has
+     read. Silence there is how a bulk action becomes the thing nobody trusts.
+
+     Anything needing a reason is out of scope by construction. A rejection is
+     never a bulk action, because the reason is per record and a shared reason
+     is a reason for none of them.
+
+     The checkboxes live in the dialog, which is where they are legal — this is
+     alert-dialog's bulk shape with a list in it — and every one can be dropped
+     before the write. Ticking down to one is still allowed; the offer is a
+     starting point, not a package.
+
+     One write, one outcome, one sentence in the live region. Seven approvals
+     that report seven times are seven announcements over each other and a queue
+     that reflows six times under the pointer. -->
+<main data-kui="inbox-page/bulk" class="relative flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, said: '', ask: false,
+        queue: [
+          { no: 'PO-2026-0418', party: 'Gujarat Polymers Ltd', value: '₹4,10,500', age: '4 days', status: 'Overdue', like: true },
+          { no: 'PO-2026-0433', party: 'Gujarat Polymers Ltd', value: '₹1,86,200', age: '2 days', status: 'Approved', like: true },
+          { no: 'PO-2026-0436', party: 'Gujarat Polymers Ltd', value: '₹2,44,800', age: '2 days', status: 'Approved', like: true },
+          { no: 'PO-2026-0439', party: 'Gujarat Polymers Ltd', value: '₹3,12,000', age: '1 day', status: 'Approved', like: true },
+          { no: 'PO-2026-0441', party: 'Gujarat Polymers Ltd', value: '₹9,84,000', age: '1 day', status: 'Approved', like: false, out: 'Above your ₹5,00,000 limit — it goes to Nilesh Patil, not into this batch' },
+          { no: 'PO-2026-0444', party: 'Gujarat Polymers Ltd', value: '₹2,08,400', age: 'today', status: 'Approved', like: false, out: 'Amended 12 minutes ago by Meera Joshi — reload it and read it on its own' },
+          { no: 'GRN-4826', party: 'Sharma Steel & Alloys', value: '₹3,40,800', age: 'today', status: 'Approved', like: false, out: 'A goods receipt, not an order on this contract' }
+        ],
+        picked: ['PO-2026-0418', 'PO-2026-0433', 'PO-2026-0436', 'PO-2026-0439'],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.queue[this.sel] },
+        get batch() { return this.queue.filter(o => o.like) },
+        get excluded() { return this.queue.filter(o => !o.like) },
+        get total() { return this.batch.filter(o => this.picked.includes(o.no)).length },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.queue.length - 1)) },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) },
+        toggle(no) { this.picked = this.picked.includes(no) ? this.picked.filter(x => x !== no) : [...this.picked, no] },
+        send() {
+          const n = this.total;
+          if (!n) return;
+          this.ask = false;
+          this.queue = this.queue.filter(o => !this.picked.includes(o.no));
+          this.sel = 0;
+          this.said = n + ' orders for Gujarat Polymers Ltd approved in one write. ' + this.queue.length + ' left in your inbox.';
+          this.$nextTick(() => { if (this.queue.length) this.$refs.detail.focus() });
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Waiting on you</h1>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-text="queue.length + ' documents · Silvassa · FY 2026–27'"></p>
+  </div>
+
+  <div class="flex min-h-0 flex-1" @keydown.escape="back()">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">The queue</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="queue.length ? (sel + 1) + ' of ' + queue.length : 'none left'"></p>
+      </div>
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')" x-show="queue.length"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(queue.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(o, i) in queue" :key="o.no">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[o.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="o.no"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="o.value"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="o.status"></span> · <span x-text="o.party"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500">With you <span x-text="o.age"></span></span>
+            </span>
+          </li>
+        </template>
+      </ul>
+      <div x-show="!queue.length" x-cloak class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+        </span>
+        <h3 class="mt-3 text-[14px]/5 font-semibold">Nothing left waiting</h3>
+      </div>
+    </section>
+
+    <div class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex lg:flex-row"
+         :class="{ 'hidden': !detail, 'flex': detail }">
+      <template x-if="queue.length">
+        <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+                 class="flex min-h-0 min-w-0 flex-1 flex-col focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <button type="button" @click="back()"
+                    class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+              <i data-lucide="chevron-left" class="size-4"></i>Back to the inbox
+            </button>
+            <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+              <span class="tabular-nums" x-text="rec.no"></span>
+              <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+              </span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.party + ' · with you ' + rec.age"></p>
+          </div>
+
+          <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+
+            <!-- The predicate in words, with its count. Offered from the record
+                 that is open, because that is what defines alike. -->
+            <div x-show="rec.like" class="rounded-xl border border-zinc-200 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+                <div class="min-w-0 flex-1">
+                  <p class="text-[13px]/5 font-medium" x-text="batch.length + ' orders in your inbox are like this one'"></p>
+                  <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">
+                    Gujarat Polymers Ltd · all on RC-2026-0071 · all to Compounding, Silvassa · every one inside your ₹5,00,000 limit and unchanged since this queue was drawn.
+                  </p>
+                </div>
+                <button type="button" x-ref="bulkBtn" @click="ask = true"
+                        class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="check-check" class="size-4 text-zinc-600"></i><span class="tabular-nums" x-text="'Approve all ' + batch.length"></span>
+                </button>
+              </div>
+
+              <!-- Named, not quietly left out. -->
+              <div class="mt-3 border-t border-zinc-100 pt-3">
+                <p class="text-[12px]/4 font-medium" x-text="excluded.length + ' others for this vendor are not in the batch'"></p>
+                <ul role="list" class="mt-1.5 space-y-1.5">
+                  <template x-for="o in excluded" :key="o.no">
+                    <li class="flex items-start gap-2.5">
+                      <span class="flex h-4 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+                      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600">
+                        <span class="font-medium text-zinc-900" x-text="o.no"></span> — <span x-text="o.out"></span>
+                      </p>
+                    </li>
+                  </template>
+                </ul>
+              </div>
+            </div>
+
+            <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Order value</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.value"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Rate contract</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums">RC-2026-0071</dd>
+              </div>
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Cost centre</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold">Compounding — Silvassa</dd>
+              </div>
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Payment terms</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums">45 days</dd>
+              </div>
+            </dl>
+
+            <p class="mt-4 text-[13px]/5 tabular-nums text-zinc-600">
+              Rejecting is never offered here. A refusal needs a reason and a reason is per order, so a shared one is a reason for none of them.
+            </p>
+          </div>
+        </section>
+      </template>
+
+      <aside aria-label="Your decision" x-show="queue.length"
+             class="flex shrink-0 flex-col border-t border-zinc-200 lg:w-72 lg:border-t-0 lg:border-l">
+        <div class="hidden min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:block">
+          <p class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">This order</p>
+          <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="rec.value"></p>
+          <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Within your ₹5,00,000 limit.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 border-zinc-200 px-4 py-3 lg:flex-col lg:items-stretch lg:border-t">
+          <button type="button"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="check" class="size-4"></i>Approve this one
+          </button>
+          <button type="button"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- alert-dialog/bulk with a list in it. Head, scrolling body, fixed footer,
+       so the confirm never scrolls out of reach. -->
+  <div x-show="ask" x-cloak x-trap.noscroll="ask" @keydown.escape.window="ask = false"
+       class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" :aria-labelledby="$id('rec') + '-bt'" :aria-describedby="$id('rec') + '-bb'"
+         class="flex max-h-full w-full max-w-lg flex-col rounded-xl border border-zinc-300 bg-white shadow-lg">
+      <div class="shrink-0 px-5 pt-5">
+        <h2 :id="$id('rec') + '-bt'" class="text-[16px]/6 font-semibold tabular-nums" x-text="'Approve ' + total + ' orders for Gujarat Polymers Ltd'"></h2>
+        <p :id="$id('rec') + '-bb'" class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+          One write, one entry per order on the audit trail, one email to the vendor. Untick anything you want to read on its own — it stays in your inbox.
+        </p>
+      </div>
+
+      <div tabindex="0" aria-label="Orders in this batch"
+           class="mt-4 min-h-0 flex-1 overflow-y-auto border-y border-zinc-200 px-5 py-3 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <ul role="list" class="space-y-2">
+          <template x-for="o in batch" :key="o.no">
+            <li>
+              <label class="flex items-start gap-2.5 text-[13px]/5">
+                <input type="checkbox" :checked="picked.includes(o.no)" @change="toggle(o.no)"
+                       class="mt-0.5 size-4 shrink-0 rounded accent-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 flex-1">
+                  <span class="font-medium tabular-nums" x-text="o.no"></span>
+                  <span class="text-zinc-600"> — </span>
+                  <span class="tabular-nums text-zinc-600" x-text="o.value + ' · with you ' + o.age"></span>
+                </span>
+              </label>
+            </li>
+          </template>
+        </ul>
+      </div>
+
+      <div class="flex shrink-0 flex-col-reverse gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
+        <p class="text-[12px]/4 tabular-nums text-zinc-600 sm:mr-auto" x-text="total + ' of ' + batch.length + ' selected'"></p>
+        <button type="button" @click="ask = false"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="send()" :disabled="!total"
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200"
+                x-text="'Approve ' + total + ' orders'">Approve 4 orders</button>
+      </div>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,232 @@
+<!-- The whole screen and the order the regions come in: the band with the
+     trail, the one h1 and the count line, the primary action, the filter row
+     inside the band, then the register panel on the page ground and the pager
+     inside it.
+
+     The panel is data-table's, with its toolbar deleted. That is the one edit a
+     page makes to the region it composes: the search and the filters have moved
+     up into the band, where they also drive the count under the h1, and leaving
+     data-table's own toolbar in place gives the screen two search boxes over one
+     list. Somebody types a PO number into whichever one they are nearest, gets
+     nothing, and reports the order missing.
+
+     Rows are table's linked rows: one stretched anchor per row in the
+     identifying cell, and the vendor link lifted above it with relative z-10.
+     A click handler on the <tr> is not a link — middle-click opens no tab, the
+     status bar shows no URL, and nothing is copyable.
+
+     The count line is a role="status" and it is in the document from first
+     paint, so a keystroke in the search writes a change into a region that
+     already exists. Render it inside the result block instead and it arrives
+     with its message already in it, which is not a change and is announced to
+     nobody.
+
+     Below md the table is gone and the rows are cards. The sort goes with the
+     header row, so it is offered again as a select in the filter band — without
+     it the register a phone gets is sorted by whatever the server chose last
+     and there is no way to change it. -->
+<div data-kui="index-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       q: '', status: '', col: 'po', dir: 'asc', page: 1, size: 5,
+       rows: [
+         { po: 'PO-2026-0411', vendor: 'Sharma Steel &amp; Alloys', plant: 'Silvassa', amount: 1842000, status: 'Overdue', due: '12 Aug 2026' },
+         { po: 'PO-2026-0414', vendor: 'Gujarat Polymers Ltd', plant: 'Silvassa', amount: 468500, status: 'Approved', due: '19 Aug 2026' },
+         { po: 'PO-2026-0418', vendor: 'Deccan Fasteners Pvt Ltd', plant: 'Vapi', amount: 2710400, status: 'Open', due: '02 Sep 2026' },
+         { po: 'PO-2026-0421', vendor: 'Sharma Steel &amp; Alloys', plant: 'Vapi', amount: 132900, status: 'Open', due: '22 Aug 2026' },
+         { po: 'PO-2026-0424', vendor: 'Konkan Chemicals Pvt Ltd', plant: 'Silvassa', amount: 96750, status: 'Closed', due: '28 Jul 2026' },
+         { po: 'PO-2026-0427', vendor: 'Gujarat Polymers Ltd', plant: 'Silvassa', amount: 5460000, status: 'Approved', due: '30 Aug 2026' },
+         { po: 'PO-2026-0430', vendor: 'Deccan Fasteners Pvt Ltd', plant: 'Vapi', amount: 214300, status: 'Overdue', due: '05 Aug 2026' },
+         { po: 'PO-2026-0433', vendor: 'Sharma Steel &amp; Alloys', plant: 'Silvassa', amount: 78900, status: 'Draft', due: '—' },
+         { po: 'PO-2026-0436', vendor: 'Konkan Chemicals Pvt Ltd', plant: 'Vapi', amount: 1290500, status: 'Open', due: '08 Sep 2026' },
+         { po: 'PO-2026-0439', vendor: 'Gujarat Polymers Ltd', plant: 'Silvassa', amount: 43200, status: 'Closed', due: '31 Jul 2026' }
+       ],
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       sortBy(c) { this.dir = this.col === c &amp;&amp; this.dir === 'asc' ? 'desc' : 'asc'; this.col = c; this.page = 1 },
+       ariaSort(c) { return this.col === c ? (this.dir === 'asc' ? 'ascending' : 'descending') : 'none' },
+       get filtered() {
+         const q = this.q.trim().toLowerCase(), c = this.col, s = this.dir === 'asc' ? 1 : -1;
+         return this.rows
+           .filter(r => (!this.status || r.status === this.status) &amp;&amp;
+                        (!q || (r.po + ' ' + r.vendor + ' ' + r.plant).toLowerCase().includes(q)))
+           .sort((a, b) => s * (typeof a[c] === 'number' ? a[c] - b[c] : String(a[c]).localeCompare(b[c])));
+       },
+       get committed() { return this.filtered.reduce((t, r) => t + r.amount, 0) },
+       get pages() { return Math.max(1, Math.ceil(this.filtered.length / this.size)) },
+       get shown() { return this.filtered.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return this.filtered.length ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.filtered.length) }
+     }">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <nav aria-label="Breadcrumb">
+          <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><span aria-current="page" class="font-medium text-zinc-900">Purchase orders</span></li>
+          </ol>
+        </nav>
+
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Purchase orders</h1>
+            <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600"
+               x-text="filtered.length + ' of ' + rows.length + ' orders · ' + money(committed) + ' committed · FY 2026–27'"></p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>Export
+            </button>
+            <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="plus" class="size-4"></i>New order
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+          <form role="search" @submit.prevent class="md:max-w-sm md:flex-1">
+            <label for="ix-df-q" class="sr-only">Filter the purchase order register</label>
+            <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+              <input id="ix-df-q" x-ref="q" x-model="q" @input="page = 1" type="search" enterkeyhint="search"
+                     autocomplete="off" spellcheck="false"
+                     @keydown.escape="if (q) { $event.stopPropagation(); q = ''; page = 1 }"
+                     placeholder="Filter 1,438 orders"
+                     class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500 [&amp;::-webkit-search-cancel-button]:appearance-none">
+              <button type="button" x-show="q" x-cloak @click="q = ''; page = 1; $refs.q.focus()" aria-label="Clear the order filter"
+                      class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-4"></i>
+              </button>
+            </div>
+          </form>
+
+          <div class="grid grid-cols-2 gap-2 md:flex md:shrink-0">
+            <div class="min-w-0">
+              <label for="ix-df-status" class="sr-only">Status</label>
+              <select id="ix-df-status" x-model="status" @change="page = 1"
+                      class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 md:w-auto">
+                <option value="">Status: all</option>
+                <option value="Draft">Status: draft</option>
+                <option value="Open">Status: open</option>
+                <option value="Approved">Status: approved</option>
+                <option value="Overdue">Status: overdue</option>
+                <option value="Closed">Status: closed</option>
+              </select>
+            </div>
+            <div class="min-w-0 md:hidden">
+              <label for="ix-df-sort" class="sr-only">Sort the register</label>
+              <select id="ix-df-sort" @change="const [c, d] = $event.target.value.split('|'); col = c; dir = d; page = 1"
+                      class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+                <option value="po|asc">Sort: PO number</option>
+                <option value="vendor|asc">Sort: vendor</option>
+                <option value="amount|desc">Sort: highest value</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+      <div class="rounded-xl border border-zinc-300 bg-white">
+
+        <table x-show="filtered.length" class="hidden w-full text-[13px]/5 md:table">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" :aria-sort="ariaSort('po')" class="px-4 py-2.5">
+                <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'po' &amp;&amp; 'text-zinc-900'">
+                  PO number
+                  <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+                </button>
+              </th>
+              <th scope="col" :aria-sort="ariaSort('vendor')" class="px-4 py-2.5">
+                <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'vendor' &amp;&amp; 'text-zinc-900'">
+                  Vendor
+                  <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+                </button>
+              </th>
+              <th scope="col" class="hidden px-4 py-2.5 font-medium lg:table-cell">Plant</th>
+              <th scope="col" :aria-sort="ariaSort('amount')" class="px-4 py-2.5">
+                <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'amount' &amp;&amp; 'text-zinc-900'">
+                  Value
+                  <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+                </button>
+              </th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+              <th scope="col" class="hidden px-4 py-2.5 text-right font-medium lg:table-cell">Promised</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="r in shown" :key="r.po">
+              <tr class="relative border-b border-zinc-100 last:border-0 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums">
+                  <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="r.po"></a>
+                </td>
+                <td class="px-4 py-2.5">
+                  <a href="#" class="relative z-10 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="r.vendor"></a>
+                </td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 lg:table-cell" x-text="r.plant"></td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums" x-text="money(r.amount)"></td>
+                <td class="px-4 py-2.5">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+                  </span>
+                </td>
+                <td class="hidden px-4 py-2.5 text-right text-zinc-600 tabular-nums lg:table-cell" x-text="r.due"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+
+        <ul x-show="filtered.length" class="divide-y divide-zinc-100 md:hidden">
+          <template x-for="r in shown" :key="r.po">
+            <li class="relative px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+              <div class="flex items-baseline justify-between gap-3">
+                <a href="#" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="r.po"></a>
+                <span class="text-[14px]/5 tabular-nums" x-text="money(r.amount)"></span>
+              </div>
+              <p class="mt-0.5 text-[13px]/5 text-zinc-600" x-text="r.vendor + ' · ' + r.plant"></p>
+              <div class="mt-2 flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                  <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+                </span>
+                <span class="text-[12px]/4 text-zinc-500 tabular-nums" x-text="'Promised ' + r.due"></span>
+              </div>
+            </li>
+          </template>
+        </ul>
+
+        <div x-show="!filtered.length" x-cloak class="px-6 py-12 text-center">
+          <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
+          </span>
+          <h2 class="mt-3 text-[16px]/6 font-semibold">No orders match this filter</h2>
+          <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">Nothing in the register matches what is set above. Widen the status or clear the search box.</p>
+          <button type="button" @click="q = ''; status = ''; page = 1"
+                  class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Clear the filter
+          </button>
+        </div>
+
+        <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <p class="text-[13px]/5 text-zinc-600 tabular-nums"
+             x-text="filtered.length ? from + '–' + to + ' of ' + filtered.length + ' orders' : 'No orders to show'"></p>
+          <div class="flex items-center gap-2">
+            <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
+            <button type="button" @click="page--" :disabled="page === 1"
+                    class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-left" class="size-4"></i>Previous
+            </button>
+            <button type="button" @click="page++" :disabled="page === pages"
+                    class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Next<i data-lucide="chevron-right" class="size-4"></i>
+            </button>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </main>
+</div>

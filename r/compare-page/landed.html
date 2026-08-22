@@ -1,0 +1,209 @@
+<!-- The variant that justifies the entry. On basic rate Sharma is lowest; add
+     freight and non-creditable duty and Deccan is, by ₹42,770, while being
+     ₹5,230 dearer on the goods themselves. A comparison ranked on the quoted
+     rate has picked the wrong vendor, and there is nothing on a rate table
+     that shows it.
+
+     GST is on the screen and is not compared. A registered buyer takes it back
+     as input credit, so a ranking that includes it ranks on money nobody
+     spends — and it is a uniform 18% here, so including it would not even
+     change the order, which is exactly why nobody notices the mistake until
+     the day one line is at 12%. Freight and basic customs duty are the two
+     that stick to the cost, so those are what the comparable figure is made
+     of, and the tax row says in the row header that it is recovered.
+
+     The basis control is dashboard/period's segmented track, copied: a
+     radiogroup of role="radio" buttons on a zinc-200 track with a roving
+     tabindex, the chosen one filled white. Its aria-checked is the
+     announcement and there is no live region over the table — the basis
+     rewrites six figures in the foot, and a region announcing all six makes a
+     control nobody presses twice.
+
+     Changing the basis moves the mark and the emphasis and touches no cell in
+     the body. Every rate the vendors actually quoted stays on screen under
+     both bases, because a comparison that hides the quoted rate the moment you
+     ask about landed cost cannot be checked against the quotation itself. -->
+<div data-kui="compare-page/landed" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       basis: 'landed',
+       opts: [{ id: 'basic', label: 'Basic rate' }, { id: 'landed', label: 'Landed cost' }],
+       vendors: [
+         { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', terms: 'Ex works Bhiwandi', freight: 48000, duty: 0 },
+         { id: 'v-0219', name: 'Deccan Fasteners Pvt Ltd', terms: 'FOR Silvassa', freight: 0, duty: 0 },
+         { id: 'v-0361', name: 'Nashik Steel Traders', terms: 'Ex works Nashik', freight: 62000, duty: 0 },
+         { id: 'v-0407', name: 'Qureshi Metals', terms: 'FOR Silvassa', freight: 0, duty: 31500 }
+       ],
+       lines: [
+         { code: 'ITM-7702', name: 'MS angle — 50×50×5', qty: 12000, uom: 'kg', rates: [62.40, 63.10, 61.80, 64.00] },
+         { code: 'ITM-7715', name: 'MS plate — 6 mm', qty: 4500, uom: 'kg', rates: [68.50, 69.20, 70.10, 67.90] },
+         { code: 'ITM-3310', name: 'M12×60 hex bolt — 8.8 zinc', qty: 8000, uom: 'nos', rates: [24.60, 23.80, 25.10, 24.20] },
+         { code: 'ITM-3318', name: 'M12 hex nut — 8.8 zinc', qty: 8000, uom: 'nos', rates: [9.40, 8.95, 9.60, 9.10] },
+         { code: 'ITM-4120', name: 'Welding electrode — 3.15 mm', qty: 400, uom: 'kg', rates: [148.00, 152.00, 145.50, 149.00] },
+         { code: 'ITM-7728', name: 'MS flat — 40×6', qty: 2600, uom: 'kg', rates: [66.20, 67.00, 65.90, 68.40] }
+       ],
+       money(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       rate(n) { return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+       qty(l) { return l.qty.toLocaleString('en-IN') + ' ' + l.uom },
+       basic(i) { return this.lines.reduce((s, l) => s + l.qty * l.rates[i], 0) },
+       landed(i) { return this.basic(i) + this.vendors[i].freight + this.vendors[i].duty },
+       gst(i) { return Math.round(this.landed(i) * 0.18) },
+       outflow(i) { return this.landed(i) + this.gst(i) },
+       ranked(i) { return this.basis === 'basic' ? this.basic(i) : this.landed(i) },
+       isLow(i) { return this.ranked(i) === Math.min(...this.vendors.map((v, j) => this.ranked(j))) },
+       winner(b) {
+         const vals = this.vendors.map((v, j) => b === 'basic' ? this.basic(j) : this.landed(j));
+         return this.vendors[vals.indexOf(Math.min(...vals))].name;
+       },
+       choose(id) { this.basis = id },
+       move(step) {
+         const i = (this.opts.findIndex(o => o.id === this.basis) + step + this.opts.length) % this.opts.length;
+         this.choose(this.opts[i].id);
+         this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());
+       }
+     }">
+
+  <main class="mx-auto max-w-7xl p-4 pb-6 lg:p-6">
+
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <a href="#" class="hover:text-zinc-900">Procurement</a>
+          <span class="text-zinc-500">/</span>
+          <a href="#" class="hover:text-zinc-900">Enquiries</a>
+          <span class="text-zinc-500">/</span>
+          <span class="font-medium tabular-nums text-zinc-900">ENQ-2026-0117</span>
+        </nav>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Comparative statement</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">ENQ-2026-0117 · MS fabrication hardware · 6 lines · 4 quotations · Silvassa</p>
+      </div>
+
+      <div role="radiogroup" aria-label="Basis of the comparison" x-ref="grp"
+           @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+           class="inline-flex shrink-0 rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+        <template x-for="o in opts" :key="o.id">
+          <button type="button" role="radio" :aria-checked="basis === o.id" :tabindex="basis === o.id ? 0 : -1"
+                  @click="choose(o.id)"
+                  class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="basis === o.id ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+            <span x-text="o.label"></span>
+          </button>
+        </template>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+      <p class="text-[13px]/5 tabular-nums text-zinc-700">
+        The lowest basic rate and the lowest landed cost are not the same vendor.
+        <span class="font-medium text-zinc-900" x-text="winner('basic')">Sharma Steel &amp; Alloys</span> is lowest on the goods;
+        <span class="font-medium text-zinc-900" x-text="winner('landed')">Deccan Fasteners Pvt Ltd</span> is lowest once ex-works freight and basic customs duty are added, by ₹42,770.
+      </p>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="cn-rates-h" class="text-[16px]/6 font-semibold">Rates and what lands with them</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">The cells are the quoted rates under either basis. Only the foot changes.</p>
+      </div>
+
+      <div role="region" aria-labelledby="cn-rates-h" tabindex="0"
+           class="relative overflow-x-auto overscroll-x-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <table class="w-full min-w-[56rem] table-fixed text-[13px]/5">
+          <caption class="sr-only">Rates quoted by four vendors against six lines, with freight, duty, GST and the landed cost under each vendor.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="w-64 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Line item</th>
+              <template x-for="v in vendors" :key="v.id">
+                <th scope="col" class="w-40 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right align-bottom">
+                  <span class="block text-[13px]/5 font-semibold text-zinc-900" x-text="v.name"></span>
+                  <span class="mt-0.5 block text-[11px]/4 font-normal text-zinc-500" x-text="v.terms"></span>
+                </th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="l in lines" :key="l.code">
+              <tr class="hover:bg-zinc-100">
+                <th scope="row" class="border-b border-zinc-100 px-4 py-2.5 text-left align-top font-normal">
+                  <span class="block font-medium" x-text="l.name"></span>
+                  <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code + ' · ' + qty(l)"></span>
+                </th>
+                <template x-for="(v, i) in vendors" :key="v.id">
+                  <td class="border-b border-zinc-100 px-4 py-2.5 text-right align-top">
+                    <span class="block tabular-nums whitespace-nowrap text-zinc-600" x-text="rate(l.rates[i])"></span>
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-500" x-text="money(l.qty * l.rates[i])"></span>
+                  </td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+          <tfoot class="bg-zinc-50">
+            <tr>
+              <th scope="row" class="border-t border-zinc-200 px-4 pt-3 text-left text-[12px]/4 font-medium text-zinc-600">Basic value of 6 lines</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="border-t border-zinc-200 px-4 pt-3 text-right align-top">
+                  <span class="flex items-baseline justify-end gap-1.5">
+                    <span x-show="basis === 'basic' &amp;&amp; isLow(i)" x-cloak
+                          class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                    <span class="tabular-nums whitespace-nowrap"
+                          :class="basis === 'basic' ? 'text-[14px]/5 font-semibold text-zinc-900' : 'text-zinc-600'"
+                          x-text="money(basic(i))"></span>
+                  </span>
+                </td>
+              </template>
+            </tr>
+            <tr>
+              <th scope="row" class="px-4 py-1 text-left text-[12px]/4 font-normal text-zinc-600">Inward freight</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="px-4 py-1 text-right text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-600"
+                    x-text="v.freight ? money(v.freight) : 'In vendor scope'"></td>
+              </template>
+            </tr>
+            <tr>
+              <th scope="row" class="px-4 py-1 text-left text-[12px]/4 font-normal text-zinc-600">Basic customs duty</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="px-4 py-1 text-right text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-600">
+                  <span x-show="v.duty" x-cloak x-text="money(v.duty)"></span>
+                  <span x-show="!v.duty" class="text-zinc-500">—<span class="sr-only">Nothing imported on this offer</span></span>
+                </td>
+              </template>
+            </tr>
+            <tr>
+              <th scope="row" class="border-t border-zinc-200 px-4 pt-2.5 text-left text-[12px]/4 font-medium text-zinc-600">Landed cost, compared</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="border-t border-zinc-200 px-4 pt-2.5 text-right align-top">
+                  <span class="flex items-baseline justify-end gap-1.5">
+                    <span x-show="basis === 'landed' &amp;&amp; isLow(i)" x-cloak
+                          class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                    <span class="tabular-nums whitespace-nowrap"
+                          :class="basis === 'landed' ? 'text-[14px]/5 font-semibold text-zinc-900' : 'text-zinc-600'"
+                          x-text="money(landed(i))"></span>
+                  </span>
+                </td>
+              </template>
+            </tr>
+            <tr>
+              <th scope="row" class="px-4 py-1 text-left text-[12px]/4 font-normal text-zinc-500">
+                GST at 18% — recovered, not compared
+              </th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="px-4 py-1 text-right text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-500" x-text="money(gst(i))"></td>
+              </template>
+            </tr>
+            <tr>
+              <th scope="row" class="px-4 pb-3 text-left text-[12px]/4 font-normal text-zinc-500">Cash out on the invoice</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="px-4 pb-3 text-right text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-500" x-text="money(outflow(i))"></td>
+              </template>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p class="border-t border-zinc-200 px-5 py-2.5 text-[12px]/4 text-zinc-600">
+        The ranking is basic value plus inward freight plus non-creditable duty. GST is shown because it is what the invoice will say and excluded because a registered buyer takes it back — ranking on a figure that includes it ranks on money nobody spends.
+      </p>
+    </div>
+  </main>
+</div>

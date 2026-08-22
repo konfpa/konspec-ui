@@ -1,0 +1,194 @@
+<!-- Tick a row and the band becomes the selection toolbar. It does not stack a
+     second strip under the header: a new band appearing above the table pushes
+     every row down by 44px at the moment somebody is aiming at the second
+     checkbox, and the row they hit is not the row they meant.
+
+     The h1 stays, and it is literally the same element — not a second copy
+     behind an x-show, which is two page titles in one document and one of them
+     wrong at all times. Everything else in the band gives way: the trail, the
+     action cluster and the filter row. Swap the h1 out for "5 selected" and the
+     document changes its title while somebody is reading it, and a screen
+     reader user who jumps by heading arrives somewhere that is no longer the
+     page they were on.
+
+     So the count arrives as a tinted pill beside the title rather than in place
+     of it, and the line under the h1 is the one role="status" the page always
+     had — it says what the register is showing when nothing is ticked and what
+     the selection spans when something is, which is the same question either
+     way and belongs in one region rather than two that talk over each other.
+
+     The band is sticky, so a selection made at row 3 is still actionable at row
+     40. Its bottom border is drawn from the first frame rather than added on
+     scroll, or every row below it moves a pixel when it engages.
+
+     The selection is an array of PO numbers on the page root, so it survives
+     paging, sorting and filtering, and the toolbar states the scope as well as
+     the size. "5 selected" over a paged register does not say whether the other
+     pages are in it, and the user finds out from the confirmation dialog or
+     from the audit log.
+
+     Next is guarded rather than disabled. A browser blurs a disabled element to
+     the body, so the keyboard user who pressed it is thrown to the top of the
+     document and their selection is now somewhere they cannot see; guarded, the
+     button keeps focus, the count is still on screen, and the scope line
+     re-announces because it is the same role="status" it always was.
+
+     Ticking every row on the page is not selecting the query — that is the
+     second line, and it is a deliberate act with its own count and its own way
+     back out. -->
+<div data-kui="index-page/bulk" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       page: 1, size: 4, sel: ['PO-2026-0411', 'PO-2026-0418'], all: false,
+       rows: [
+         { po: 'PO-2026-0411', vendor: 'Sharma Steel &amp; Alloys', amount: 1842000, status: 'Approved' },
+         { po: 'PO-2026-0414', vendor: 'Gujarat Polymers Ltd', amount: 468500, status: 'Approved' },
+         { po: 'PO-2026-0418', vendor: 'Deccan Fasteners Pvt Ltd', amount: 2710400, status: 'Approved' },
+         { po: 'PO-2026-0421', vendor: 'Sharma Steel &amp; Alloys', amount: 132900, status: 'Open' },
+         { po: 'PO-2026-0424', vendor: 'Konkan Chemicals Pvt Ltd', amount: 96750, status: 'Open' },
+         { po: 'PO-2026-0427', vendor: 'Gujarat Polymers Ltd', amount: 5460000, status: 'Approved' },
+         { po: 'PO-2026-0430', vendor: 'Deccan Fasteners Pvt Ltd', amount: 214300, status: 'Overdue' },
+         { po: 'PO-2026-0433', vendor: 'Sharma Steel &amp; Alloys', amount: 78900, status: 'Open' },
+         { po: 'PO-2026-0436', vendor: 'Konkan Chemicals Pvt Ltd', amount: 1290500, status: 'Open' },
+         { po: 'PO-2026-0439', vendor: 'Gujarat Polymers Ltd', amount: 43200, status: 'Approved' },
+         { po: 'PO-2026-0442', vendor: 'Sharma Steel &amp; Alloys', amount: 662100, status: 'Open' },
+         { po: 'PO-2026-0445', vendor: 'Deccan Fasteners Pvt Ltd', amount: 384000, status: 'Approved' }
+       ],
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get pages() { return Math.ceil(this.rows.length / this.size) },
+       get shown() { return this.rows.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.rows.length) },
+       get onPage() { return this.shown.filter(r => this.sel.includes(r.po)).length },
+       get worth() { return this.rows.filter(r => this.sel.includes(r.po)).reduce((t, r) => t + r.amount, 0) },
+       get scope() {
+         if (this.all) return 'Every order that matches the current filters · ' + this.money(this.worth);
+         if (this.sel.length === this.onPage) return 'All of them on this page · ' + this.money(this.worth);
+         return this.onPage + ' on this page · ' + (this.sel.length - this.onPage) + ' on other pages · ' + this.money(this.worth);
+       },
+       get every() { return this.shown.length > 0 &amp;&amp; this.shown.every(r => this.sel.includes(r.po)) },
+       get some() { return !this.every &amp;&amp; this.shown.some(r => this.sel.includes(r.po)) },
+       toggleAll(on) {
+         this.all = false;
+         const ids = this.shown.map(r => r.po);
+         this.sel = on ? [...new Set([...this.sel, ...ids])] : this.sel.filter(id => !ids.includes(id));
+       }
+     }">
+
+  <main>
+    <header class="sticky top-0 z-30 border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <nav aria-label="Breadcrumb" x-show="!sel.length" x-cloak>
+          <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><span aria-current="page" class="font-medium text-zinc-900">Purchase orders</span></li>
+          </ol>
+        </nav>
+
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <h1 class="text-[24px]/7 font-semibold tracking-tight">Purchase orders</h1>
+              <span x-show="sel.length" x-cloak
+                    class="inline-flex items-center gap-1 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span x-text="sel.length"></span> selected
+              </span>
+            </div>
+            <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600"
+               x-text="sel.length ? scope : rows.length + ' orders awaiting action · Silvassa · FY 2026–27'"></p>
+          </div>
+
+          <div x-show="!sel.length" x-cloak class="flex flex-wrap items-center gap-2">
+            <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>Export
+            </button>
+            <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="plus" class="size-4"></i>New order
+            </button>
+          </div>
+
+          <div x-show="sel.length" x-cloak class="flex flex-wrap items-center gap-2">
+            <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="check" class="size-4"></i>Approve
+            </button>
+            <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export</button>
+            <button type="button" class="inline-flex h-9 items-center rounded-lg px-3 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel orders</button>
+            <button type="button" @click="sel = []; all = false"
+                    class="text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
+          </div>
+        </div>
+
+        <p x-show="sel.length &amp;&amp; every &amp;&amp; !all" x-cloak class="mt-3 border-t border-zinc-200 pt-2 text-[12px]/4 text-zinc-600 tabular-nums">
+          All <span x-text="shown.length"></span> orders on this page are selected.
+          <button type="button" @click="sel = rows.map(r => r.po); all = true"
+                  class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Select all <span x-text="rows.length"></span> orders that match
+          </button>
+        </p>
+        <p x-show="all" x-cloak class="mt-3 border-t border-zinc-200 pt-2 text-[12px]/4 text-zinc-600 tabular-nums">
+          All <span x-text="rows.length"></span> matching orders are selected.
+          <button type="button" @click="sel = shown.map(r => r.po); all = false"
+                  class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Select only this page
+          </button>
+        </p>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+      <div class="rounded-xl border border-zinc-300 bg-white">
+        <table class="w-full text-[13px]/5">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="w-10 px-4 py-2.5">
+                <input type="checkbox" :aria-label="'Select the ' + shown.length + ' orders on this page'"
+                       :checked="every" x-effect="$el.indeterminate = some" @change="toggleAll($event.target.checked)"
+                       class="size-4 shrink-0 accent-zinc-700">
+              </th>
+              <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+              <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+              <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Status</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="r in shown" :key="r.po">
+              <tr class="border-b border-zinc-100 last:border-0" :class="sel.includes(r.po) ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+                <td class="px-4 py-2.5">
+                  <input type="checkbox" :value="r.po" x-model="sel" @change="all = false" :aria-label="'Select ' + r.po" class="size-4 shrink-0 accent-zinc-700">
+                </td>
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+                <td class="hidden px-4 py-2.5 sm:table-cell">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+                  </span>
+                </td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums" x-text="money(r.amount)"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+
+        <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <p class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="from + '–' + to + ' of ' + rows.length + ' orders'"></p>
+          <div class="flex items-center gap-2">
+            <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
+            <button type="button" @click="if (page > 1) page--" :aria-disabled="page === 1 ? 'true' : 'false'"
+                    class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="page === 1 &amp;&amp; 'text-zinc-400'">
+              <i data-lucide="chevron-left" class="size-4"></i>Previous
+            </button>
+            <button type="button" @click="if (page < pages) page++" :aria-disabled="page === pages ? 'true' : 'false'"
+                    class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="page === pages &amp;&amp; 'text-zinc-400'">
+              Next<i data-lucide="chevron-right" class="size-4"></i>
+            </button>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </main>
+</div>

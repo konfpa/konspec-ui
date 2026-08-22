@@ -1,0 +1,115 @@
+<!-- Four numbers, and they are not interchangeable.
+
+     space-y-4 between page sections and between cards. Sections and cards take
+     the same number because the thing being separated is the same thing: a
+     bordered panel, where the border is already doing the grouping and the gap
+     only has to keep two borders from reading as one thick rule.
+
+     space-y-5 between the fields of a form, which is looser than the page
+     stack, and that is the value people write down wrong. A field is three
+     lines of unbordered text — label, control, message — and the whitespace is
+     the only thing saying where one ends; at space-y-4 a column of five of them
+     reads as one fifteen-line block. Counted, the registry writes the exact
+     string max-w-xl space-y-5 twenty-two times.
+
+     space-y-2 between the options of one question, because a radio set is one
+     answer and its options have to read as a group rather than as four fields.
+
+     space-y-0.5 between the rows of a dense meta line. Two pixels, because the
+     rows are one line each and anything more starts to look like a list of
+     records rather than one record's facts.
+
+     Inside a field the label and the message are mb-1.5 and mt-1.5 written on
+     the parts, not a space-y on the field, because the message paragraph keeps
+     its id and its place whether or not it has anything in it. -->
+<div data-kui="container/stack" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <main class="mx-auto max-w-4xl space-y-4 p-4 pb-6 lg:p-6">
+
+    <h1 class="text-[24px]/7 font-semibold tracking-tight">MS-4821 · Material issue</h1>
+
+    <section aria-labelledby="ct-stack-terms" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="ct-stack-terms" class="text-[16px]/6 font-semibold">Issue terms</h2>
+      </div>
+      <div class="px-5 py-4">
+        <div class="max-w-xl space-y-5">
+
+          <div>
+            <label for="ct-stack-cc" class="mb-1.5 block text-[13px]/5 font-medium">Cost centre</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="ct-stack-cc" name="cc" value="SIL-EXT-02"
+                     aria-describedby="ct-stack-cc-help"
+                     class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums uppercase outline-none">
+            </div>
+            <p id="ct-stack-cc-help" class="mt-1.5 max-w-sm text-[12px]/4 text-zinc-500">Extrusion line 2, Silvassa.</p>
+          </div>
+
+          <fieldset>
+            <legend class="mb-2 text-[13px]/5 font-medium">Issue against</legend>
+            <div class="space-y-2">
+              <label class="flex items-start gap-2.5 text-[14px]/5">
+                <input type="radio" name="ct-stack-against" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                <span>A work order</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-[14px]/5">
+                <input type="radio" name="ct-stack-against" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                <span>A cost centre only</span>
+              </label>
+              <label class="flex items-start gap-2.5 text-[14px]/5">
+                <input type="radio" name="ct-stack-against" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                <span>A rework note</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div>
+            <label for="ct-stack-when" class="mb-1.5 block text-[13px]/5 font-medium">Issue date</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="ct-stack-when" name="when" value="04 Sep 2026"
+                     class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="ct-stack-meta" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="ct-stack-meta" class="text-[16px]/6 font-semibold">Raised</h2>
+      </div>
+      <div class="px-5 py-4">
+        <dl class="space-y-0.5 text-[13px]/5">
+          <div class="flex justify-between gap-4">
+            <dt class="text-zinc-600">Raised by</dt>
+            <dd>Akshay Prabhu</dd>
+          </div>
+          <div class="flex justify-between gap-4">
+            <dt class="text-zinc-600">Raised on</dt>
+            <dd class="tabular-nums">02 Sep 2026, 09:41</dd>
+          </div>
+          <div class="flex justify-between gap-4">
+            <dt class="text-zinc-600">Plant</dt>
+            <dd>Silvassa</dd>
+          </div>
+          <div class="flex justify-between gap-4">
+            <dt class="text-zinc-600">Store</dt>
+            <dd>Raw material — bay 3</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <p class="text-[12px]/4 text-zinc-500">
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">space-y-4</code>
+      between the cards,
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">space-y-5</code>
+      between the fields,
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">space-y-2</code>
+      between the radios,
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">space-y-0.5</code>
+      down the facts.
+    </p>
+
+  </main>
+</div>

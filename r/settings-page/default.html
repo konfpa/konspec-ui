@@ -1,0 +1,171 @@
+<!-- Two levels of navigation on one screen, and the second one has to look
+     like the second one. The application sidebar to the left of this page is a
+     white panel with an icon column and a tinted current row; the section nav
+     is a bare list on the page with a 2px rule marking the open item and no
+     fill at all. Give this one the sidebar's treatment and the screen has two
+     panels both claiming to be the navigation, and the user reads whichever is
+     nearer as the application.
+
+     The nav items are real links with aria-current="page", not tabs. Every
+     section is a URL, which is what lets an error message elsewhere in the
+     application link straight to the rule it broke; a tablist cannot be linked
+     into. Nothing here carries aria-selected and nothing binds an arrow key,
+     because the browser already owns both.
+
+     Save belongs to the section and says so on its face. A single Save over a
+     nav of forty sections promises to write things the user cannot see.
+
+     The footer is always on screen. Reveal it on the first keystroke and the
+     pane grows 52px under the pointer while somebody is typing in the last
+     field.
+
+     lg:sticky lg:top-6 lg:self-start is what makes the nav permanent. Without
+     self-start the column stretches to the row height and sticky has nothing
+     to travel inside. Below lg the nav stacks above the pane in DOM order,
+     which is honest for nine sections; the phone variant carries the answer
+     for a screen where it is not. -->
+<div data-kui="settings-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <!-- page-header, unchanged -->
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Settings</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · Silvassa and Vapi · FY 2026–27</p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:items-start lg:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+
+      <nav aria-label="Settings sections" class="lg:sticky lg:top-6 lg:self-start">
+        <ul role="list" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li>
+            <a href="#" aria-current="page"
+               class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Company profile</a>
+          </li>
+          <li>
+            <a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Plants</a>
+          </li>
+          <li>
+            <a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Financial year</a>
+          </li>
+          <li>
+            <a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Numbering series</a>
+          </li>
+          <li>
+            <a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approval limits</a>
+          </li>
+          <li>
+            <a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Tax defaults</a>
+          </li>
+          <li>
+            <a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Users and roles</a>
+          </li>
+          <li>
+            <a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Master lists</a>
+          </li>
+          <li>
+            <a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Notifications</a>
+          </li>
+        </ul>
+      </nav>
+
+      <section id="sp-pane" tabindex="-1" aria-labelledby="sp-h"
+               class="mt-4 min-w-0 rounded-xl focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 lg:mt-0">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="sp-h" class="text-[16px]/6 font-semibold">Company profile</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">Printed on every purchase order, GRN and tax invoice this company issues.</p>
+          </div>
+
+          <form class="px-5 py-4">
+            <p class="text-[12px]/4 text-zinc-600">
+              Every field is required unless its label says <span class="font-medium text-zinc-900">Optional</span>.
+            </p>
+
+            <div class="mt-3 grid gap-4 sm:grid-cols-2">
+
+              <div class="min-w-0 sm:col-span-2">
+                <label for="sp-name" class="mb-1.5 block text-[13px]/5 font-medium">Registered name</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sp-name" name="registered_name" required value="Konspec Industries Pvt Ltd" aria-describedby="sp-name-msg"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                </div>
+                <p id="sp-name-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+                  Exactly as it appears on the GST certificate. Changing it does not reprint documents already issued.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sp-pan" class="mb-1.5 block text-[13px]/5 font-medium">PAN</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sp-pan" name="pan" required maxlength="10" value="AAECK7719R"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 uppercase tabular-nums outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sp-cin" class="mb-1.5 block text-[13px]/5 font-medium">CIN</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sp-cin" name="cin" required maxlength="21" value="U25200DN2009PTC004417"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 uppercase tabular-nums outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0 sm:col-span-2">
+                <label for="sp-addr" class="mb-1.5 block text-[13px]/5 font-medium">Registered address</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <textarea id="sp-addr" name="registered_address" rows="3" required aria-describedby="sp-addr-msg"
+                            class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</textarea>
+                </div>
+                <p id="sp-addr-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">
+                  The registered office, which is not always the plant a document ships from.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sp-state" class="mb-1.5 block text-[13px]/5 font-medium">Place of supply</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="sp-state" name="place_of_supply" required aria-describedby="sp-state-msg"
+                          class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="26" selected>26 — Dadra and Nagar Haveli</option>
+                    <option value="24">24 — Gujarat</option>
+                    <option value="27">27 — Maharashtra</option>
+                  </select>
+                </div>
+                <p id="sp-state-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">
+                  Decides whether an invoice carries IGST or CGST and SGST.
+                </p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="sp-contact" class="mb-1.5 flex items-baseline gap-2 text-[13px]/5 font-medium">
+                  Contact on documents
+                  <span aria-hidden="true" class="font-normal text-zinc-500">Optional</span>
+                </label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="sp-contact" name="doc_contact" type="email" value="purchase@konspec.com"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+            </div>
+          </form>
+
+          <!-- always here, and the Save names the section it commits -->
+          <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <p role="status" class="text-[12px]/4 tabular-nums text-zinc-600">Last changed 04 Aug 2026, 16:12 by Akshay Prabhu</p>
+            <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Discard</button>
+              <button type="submit" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save company profile</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,175 @@
+<!-- The sheet that travels with the lorry, and the only one of these documents
+     that is read standing up at a gate. Everything a gate clerk checks is in
+     the top third: what is on the vehicle, which vehicle, and the e-way bill
+     number. The acknowledgement the driver brings back is at the foot.
+
+     No rate column and no tax block, because this is not a sale. What replaces
+     them is a single declared value with the reason printed beside it — a
+     challan carrying a rate column is read as a bill by somebody, and then the
+     same consignment gets paid for twice.
+
+     The acknowledgement block is ruled boxes with room to write in, not a row
+     of dotted lines. The height is the whole point: mt-10 above each rule gives
+     a hand enough space, and a box that is too short is signed across the
+     printing under it.
+
+     Shortages are a field on the form rather than something the receiver writes
+     in the margin. A field that exists gets filled in, and the store keying the
+     GRN two days later has something to key from.
+
+     No signature block for Konspec at the foot: the company's signature is at
+     the head, and the foot of a challan belongs to whoever receives it. Two
+     signature blocks facing each other on a challan is a form that has been
+     copied from an invoice without being read. -->
+<div data-kui="document-page/challan" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm]">
+    <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-300 pb-2">
+        <p class="text-[11px]/4 font-medium uppercase tracking-wider">Delivery challan · not a tax invoice</p>
+        <p class="border border-zinc-300 px-2 py-0.5 text-[11px]/4 font-medium uppercase tracking-wider">Duplicate for transporter</p>
+      </div>
+
+      <header class="mt-3 flex flex-wrap items-start justify-between gap-x-6 gap-y-4 border-b-2 border-zinc-300 pb-4">
+        <div class="flex min-w-0 flex-1 items-start gap-3 sm:min-w-[15rem]">
+          <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-[14px]/5 font-semibold">K</span>
+          <div class="min-w-0">
+            <p class="text-[16px]/6 font-semibold">Konspec Industries Pvt Ltd</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">GSTIN 26AABCK9021M1Z4 · State code 26</p>
+          </div>
+        </div>
+        <div class="min-w-0 sm:shrink-0 sm:text-right">
+          <h1 class="text-[20px]/7 font-semibold tracking-tight">Delivery challan</h1>
+          <p class="mt-1 text-[13px]/5 font-medium tabular-nums">DC-2026-0917</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Dispatched 08 Sep 2026 at 06:40</p>
+        </div>
+      </header>
+
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <section aria-labelledby="ch-to-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="ch-to-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Consigned to</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">Deccan Fasteners Pvt Ltd — Ranjangaon store</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot D-18, Ranjangaon MIDC, Pune, Maharashtra 412220</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">GSTIN 27AAECD8812P1ZK · State code 27</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Store gate, 09:00 to 18:00 · Vinayak Joshi, +91 98220 33914</p>
+        </section>
+        <section aria-labelledby="ch-veh-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="ch-veh-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Vehicle and transport</h2>
+          <dl class="mt-1.5 space-y-1 text-[12px]/4">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Vehicle number</dt>
+              <dd class="font-semibold tabular-nums">GJ-15-AT-4471</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Transporter</dt>
+              <dd class="tabular-nums">Konkan Roadlines · LR 44821</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">e-Way bill</dt>
+              <dd class="font-semibold tabular-nums">2716 4488 1902</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Valid to</dt>
+              <dd class="tabular-nums">11 Sep 2026</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Driver</dt>
+              <dd class="tabular-nums">Ramesh Yadav · +91 99794 20118</dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+
+      <section aria-labelledby="ch-lines-h" class="mt-4">
+        <h2 id="ch-lines-h" class="sr-only">Goods sent</h2>
+        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+          <table class="w-full min-w-[32rem] text-[12px]/4">
+            <caption class="sr-only">Three lines sent on challan DC-2026-0917. No rates are shown; this consignment is not a sale.</caption>
+            <thead class="bg-zinc-50 print:bg-white">
+              <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+                <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+                <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+                <th scope="col" class="w-20 px-2 py-2 font-medium">Packing</th>
+                <th scope="col" class="w-12 px-2 py-2 font-medium">UOM</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Quantity sent</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">1</td>
+                <td class="px-2 py-2">HDPE granules — natural<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-2001 · grade M60075 · batch B-26-0914</span></td>
+                <td class="px-2 py-2 tabular-nums">3901</td>
+                <td class="px-2 py-2 tabular-nums">480 bags</td>
+                <td class="px-2 py-2">kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">12,000.000</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">2</td>
+                <td class="px-2 py-2">Masterbatch — white 60%<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-1091 · batch B-26-0902</span></td>
+                <td class="px-2 py-2 tabular-nums">3206</td>
+                <td class="px-2 py-2 tabular-nums">10 bags</td>
+                <td class="px-2 py-2">kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">250.000</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">3</td>
+                <td class="px-2 py-2">Stretch film — 23 micron<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-5140 · 500 mm × 1500 m rolls</span></td>
+                <td class="px-2 py-2 tabular-nums">3920</td>
+                <td class="px-2 py-2 tabular-nums">20 rolls</td>
+                <td class="px-2 py-2">kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">300.000</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="break-inside-avoid border-t-2 border-zinc-300">
+                <th scope="row" colspan="3" class="px-2 py-2 text-left font-medium">Total — 3 lines</th>
+                <td class="px-2 py-2 font-medium tabular-nums">510 packages</td>
+                <td class="px-2 py-2"></td>
+                <td class="px-2 py-2 text-right tabular-nums text-zinc-600">—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p class="mt-1.5 text-[11px]/4 text-zinc-600">Quantity is not totalled — packing differs by line. Gross weight on the vehicle is 12,940 kg as weighed at the Silvassa bridge.</p>
+      </section>
+
+      <div class="mt-4 break-inside-avoid border border-zinc-300 p-3">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <h2 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Declared value for e-way bill purposes</h2>
+          <p class="text-[13px]/5 font-semibold tabular-nums">₹13,66,145.00</p>
+        </div>
+        <p class="mt-1 text-[11px]/4 text-zinc-600">Stated for transport documentation only. This challan is not a demand for payment and no tax is charged on it. The tax invoice for this consignment is INV-2026-0774 dated 09 Sep 2026.</p>
+      </div>
+
+      <section aria-labelledby="ch-ack-h" class="mt-6 break-inside-avoid border border-zinc-300 p-3">
+        <h2 id="ch-ack-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Received by consignee</h2>
+        <p class="mt-1 text-[11px]/4 text-zinc-600">Goods received in the quantity and condition stated above unless a shortage or damage is noted here. Note it before signing — a claim raised after this sheet is signed clean is not entertained.</p>
+        <div class="mt-2 grid gap-x-6 gap-y-4 sm:grid-cols-2">
+          <div>
+            <p class="mt-8 border-t border-zinc-300 pt-1 text-[11px]/4 text-zinc-600">Name in block letters</p>
+          </div>
+          <div>
+            <p class="mt-8 border-t border-zinc-300 pt-1 text-[11px]/4 text-zinc-600">Signature and company seal</p>
+          </div>
+          <div>
+            <p class="mt-8 border-t border-zinc-300 pt-1 text-[11px]/4 text-zinc-600">Date and time of receipt</p>
+          </div>
+          <div>
+            <p class="mt-8 border-t border-zinc-300 pt-1 text-[11px]/4 text-zinc-600">Shortage, damage or remarks</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="mt-6 break-inside-avoid">
+        <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">For Konspec Industries Pvt Ltd</p>
+        <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Sanjay Rane · Stores · dispatched 08 Sep 2026</p>
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+        Page 1 of 1 · DC-2026-0917 · issued under rule 55 of the CGST Rules 2017
+      </footer>
+    </article>
+  </main>
+</div>

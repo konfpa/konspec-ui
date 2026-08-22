@@ -1,0 +1,99 @@
+<!-- 390px, which after the 16px gutter each side leaves 358px of content. That
+     gutter is not decoration: the focus style is outline-3 at outline-offset-2,
+     so a focused control paints five pixels beyond its own box, and at px-2 the
+     outline on a full-width button is clipped by the edge of the screen.
+
+     The same 2rem turns up as max-w-[calc(100vw-2rem)], which is what every
+     floating panel in this library caps itself at, 57 of them, so a menu
+     opened near the right edge of a phone stops at the gutter instead of
+     pushing the document sideways.
+
+     No safe-area padding is written here and none is needed, because nothing in
+     this library is pinned to the bottom edge of the viewport. The action bar
+     is sticky bottom-0 in the flow of the scrolling column, so it sits above
+     the browser's own chrome rather than under the home indicator, and
+     sheet/phone makes the same point about the foot of a panel. The two things
+     that really are viewport-fixed keep clear by hand: a toast strip is fixed
+     inset-x-4 bottom-4, and a dialog backdrop is fixed inset-0 p-4, which is
+     the page gutter again. A screen that genuinely has to pin a bar to the
+     bottom edge needs env(safe-area-inset-bottom), which nothing here writes —
+     that is a new pattern and a question for a person.
+
+     The band's actions take their own line rather than sitting beside the
+     title: side by side at this width the h1 is squeezed to a third of the
+     column and wraps under them. -->
+<div data-kui="container/phone" class="mx-auto h-[560px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <main>
+
+    <header class="sticky top-0 z-30 border-b border-zinc-200 bg-white px-4 py-3">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">GRN-4821</h1>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Gujarat Polymers Ltd · 04 Sep 2026</p>
+    </header>
+
+    <div class="space-y-4 p-4 pb-6">
+
+      <section aria-labelledby="ct-phone-lines" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="ct-phone-lines" class="text-[16px]/6 font-semibold">Lines received</h2>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate font-medium">PET resin, bottle grade</span>
+              <span class="tabular-nums whitespace-nowrap">4.000 MT</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">HSN 39074000 · ₹4,12,000</p>
+          </li>
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate font-medium">PET resin, film grade</span>
+              <span class="tabular-nums whitespace-nowrap">2.400 MT</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">HSN 39076100 · ₹2,64,000</p>
+          </li>
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate font-medium">Polyurethane binder</span>
+              <span class="tabular-nums whitespace-nowrap">1.200 MT</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">HSN 39095000 · ₹3,18,000</p>
+          </li>
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate font-medium">Masterbatch, white</span>
+              <span class="tabular-nums whitespace-nowrap">0.600 MT</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">HSN 32041720 · ₹94,500</p>
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="ct-phone-qc" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="ct-phone-qc" class="text-[16px]/6 font-semibold">QC</h2>
+        </div>
+        <div class="px-4 py-3">
+          <dl class="space-y-0.5 text-[13px]/5">
+            <div class="flex justify-between gap-4"><dt class="text-zinc-600">Sampled by</dt><dd>Meera Joshi</dd></div>
+            <div class="flex justify-between gap-4"><dt class="text-zinc-600">Moisture</dt><dd class="tabular-nums">0.18 %</dd></div>
+            <div class="flex justify-between gap-4"><dt class="text-zinc-600">Result</dt><dd>Within specification</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <p class="text-[12px]/4 text-zinc-500">
+        <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">p-4</code>
+        each side, so the content is 358px wide and a focus outline still has room to paint.
+      </p>
+
+    </div>
+
+    <div class="sticky bottom-0 border-t border-zinc-200 bg-white px-4 py-3">
+      <div class="flex items-center gap-2">
+        <button type="button" class="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Hold</button>
+        <button type="button" class="flex-1 rounded-lg bg-zinc-700 px-3 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Accept</button>
+      </div>
+    </div>
+
+  </main>
+</div>

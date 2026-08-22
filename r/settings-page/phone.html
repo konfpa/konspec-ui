@@ -1,0 +1,157 @@
+<!-- A permanent side nav cannot be permanent at 390px. 390 divided in two is
+     two columns, one of which is too narrow to hold a section and the other too
+     narrow to hold a label, so the split stops being a split: the index is the
+     screen and the section is the screen.
+
+     In production these are two URLs, which is what makes this arrangement free
+     — the index is a page, the section is a page, and Back is the browser's own
+     button. The snippet models the move locally so the arrangement is visible
+     in one block, and the Back control is written as a real link with the
+     handler on it rather than as a bare icon button.
+
+     The switch is one boolean bound with the object form of :class. x-show
+     writes an inline display:none and inline styles beat a media query, so a
+     section closed on a phone would never come back on a wide screen. The
+     static class attribute carries the first-paint state and the object form is
+     what corrects it, because the string form only ever adds classes and the
+     static hidden would survive to beat the flex it added.
+
+     Both moves place focus. Opening moves it to the section heading, which is
+     the region's accessible name, so the swap is announced by the mechanism
+     that already exists. Back returns it to the row that was opened — leave
+     that out and the user is at the top of the document with the index
+     somewhere below and nothing saying anything happened.
+
+     The rows are 44px with the chevron aria-hidden, because the row text is
+     already the whole accessible name and "chevron right" adds nothing to it.
+
+     The section's own Save is a full-width pair at the foot of the card rather
+     than two 36px buttons side by side, which is a thumb-sized problem at this
+     width. -->
+<div data-kui="settings-page/phone" class="mx-auto flex h-[600px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       open: false, name: '',
+       show(n) { this.name = n; this.open = true; this.$nextTick(() => this.$refs.head.focus()) },
+       back() { this.open = false; this.$nextTick(() => { const el = this.$refs.list.querySelector('[data-row=' + this.name + ']'); if (el) el.focus() }) }
+     }">
+
+  <div class="shrink-0 border-b border-zinc-200 bg-white px-4 py-3">
+    <div :class="{ 'hidden': open }">
+      <h1 class="text-[16px]/6 font-semibold">Settings</h1>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Konspec Industries · FY 2026–27</p>
+    </div>
+    <div class="hidden" :class="{ 'hidden': !open, 'flex': open }">
+      <a href="#" @click.prevent="back()"
+         class="-ml-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4" aria-hidden="true"></i>Settings
+      </a>
+    </div>
+  </div>
+
+  <main class="min-h-0 flex-1 overflow-y-auto">
+
+    <!-- screen one: the index -->
+    <nav aria-label="Settings sections" x-ref="list" :class="{ 'hidden': open }">
+      <ul role="list" class="divide-y divide-zinc-200 border-b border-zinc-200 bg-white">
+        <li>
+          <a href="#" data-row="approvals" @click.prevent="show('approvals')"
+             class="flex min-h-11 items-center gap-3 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0 flex-1">Approval limits
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Second approver above ₹7,50,000</span>
+            </span>
+            <i data-lucide="chevron-right" class="size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-row="company" @click.prevent="show('company')"
+             class="flex min-h-11 items-center gap-3 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0 flex-1">Company profile
+              <span class="mt-0.5 block text-[12px]/4 text-zinc-500">Konspec Industries Pvt Ltd</span>
+            </span>
+            <i data-lucide="chevron-right" class="size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-row="numbering" @click.prevent="show('numbering')"
+             class="flex min-h-11 items-center gap-3 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0 flex-1">Numbering series
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">Next order PO-2026-0419</span>
+            </span>
+            <i data-lucide="chevron-right" class="size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-row="tax" @click.prevent="show('tax')"
+             class="flex min-h-11 items-center gap-3 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0 flex-1">Tax defaults
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">18% GST · HSN required on every line</span>
+            </span>
+            <i data-lucide="chevron-right" class="size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-row="users" @click.prevent="show('users')"
+             class="flex min-h-11 items-center gap-3 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="min-w-0 flex-1">Users and roles
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">41 users · 6 roles</span>
+            </span>
+            <i data-lucide="chevron-right" class="size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          </a>
+        </li>
+      </ul>
+      <p class="px-4 py-3 text-[12px]/4 text-zinc-500">
+        Numbering series and Users and roles are read-only from a phone. Change them from a desktop.
+      </p>
+    </nav>
+
+    <!-- screen two: one section -->
+    <section aria-labelledby="mb-h" class="hidden p-3" :class="{ 'hidden': !open, 'block': open }">
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-4 py-3">
+          <h2 id="mb-h" tabindex="-1" x-ref="head"
+              class="text-[16px]/6 font-semibold focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">Approval limits</h2>
+          <p class="mt-0.5 text-[13px]/5 text-zinc-600">Applies to orders raised from tomorrow onward.</p>
+        </div>
+
+        <form class="space-y-4 px-4 py-4">
+          <div class="min-w-0">
+            <label for="mb-first" class="mb-1.5 block text-[13px]/5 font-medium">Second approver above (₹)</label>
+            <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <span aria-hidden="true" class="flex items-center pl-3 text-[14px]/5 text-zinc-600">₹</span>
+              <input id="mb-first" name="second_approver_above" required inputmode="numeric" value="7,50,000" aria-describedby="mb-first-msg"
+                     class="min-w-0 flex-1 bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+            </div>
+            <p id="mb-first-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">18 open orders sit above this figure.</p>
+          </div>
+
+          <div class="min-w-0">
+            <label for="mb-who" class="mb-1.5 block text-[13px]/5 font-medium">Second approver</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select id="mb-who" name="second_approver" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                <option value="np" selected>Nilesh Patil — Head of Procurement</option>
+                <option value="ak">Anil Kulkarni — Plant head, Silvassa</option>
+              </select>
+            </div>
+            <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+          </div>
+
+          <label class="flex items-start gap-2.5 text-[14px]/5">
+            <input type="checkbox" name="block_no_contract" checked class="mt-0.5 size-4 shrink-0 rounded accent-zinc-700">
+            <span>Block release with no live rate contract
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">14 vendors affected today.</span>
+            </span>
+          </label>
+        </form>
+
+        <div class="border-t border-zinc-200 bg-zinc-100 px-4 py-3">
+          <p role="status" class="text-[12px]/4 tabular-nums text-zinc-600">Last changed 12 Jul 2026, 09:41 by Nilesh Patil</p>
+          <div class="mt-2 flex flex-col gap-2">
+            <button type="submit" class="inline-flex h-11 w-full items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save approval limits</button>
+            <button type="button" class="inline-flex h-11 w-full items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Discard</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>

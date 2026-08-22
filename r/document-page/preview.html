@@ -1,0 +1,180 @@
+<!-- The screen half of the component, and the whole of its job is to disappear.
+
+     The @page rule this sheet needs cannot be written as a Tailwind class,
+     because @page is an at-rule and not a property. It goes once in the project
+     stylesheet, next to the x-cloak rule:
+
+         @page { size: A4; margin: 14mm 12mm; }
+
+     That is the only piece of hand-written CSS this component asks for, and it
+     is flagged rather than approximated: there is no utility that sets a page
+     box, and inventing a token for one would be inventing a token.
+
+     Print calls print() on the page that is already on screen. It does not open
+     a second window and it does not re-render into a hidden iframe — the sheet
+     the user just checked has to be the sheet that reaches the printer, and a
+     second render is a second chance for the two to differ by a line.
+
+     Download PDF is a real link to a server route, not print() under another
+     name. The browser's Save as PDF and a server-rendered PDF are different
+     files with different fonts and different breaks, and the vendor who gets
+     one and the auditor who gets the other will find the difference.
+
+     The toolbar is sticky on screen and print:hidden on paper. It is the only
+     part of this page carrying state, and nothing inside the sheet is sticky at
+     all: a sticky element prints on the first sheet and leaves a gap on the
+     rest.
+
+     The strip under the toolbar says what will come out — how many sheets, what
+     size, which copy. It is the answer to the question the user is about to
+     find out the expensive way. -->
+<div data-kui="document-page/preview" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+     x-data="{ copy: 'original' }">
+
+  <div class="sticky top-0 z-10 mx-auto mb-4 w-full max-w-[210mm] print:hidden">
+    <div class="rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <a href="/orders/PO-2026-0418/"
+           class="inline-flex items-center gap-1.5 rounded text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>Back to PO-2026-0418
+        </a>
+        <div class="flex flex-wrap items-center gap-2">
+          <label for="pv-copy" class="text-[12px]/4 text-zinc-600">Copy</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="pv-copy" x-model="copy" class="bg-transparent px-3 py-1.5 text-[13px]/5 outline-none">
+              <option value="original">Original for recipient</option>
+              <option value="duplicate">Duplicate for transporter</option>
+              <option value="triplicate">Triplicate for supplier</option>
+            </select>
+          </div>
+          <a href="/orders/PO-2026-0418/pdf/"
+             class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="download" class="size-4 text-zinc-600"></i>Download PDF
+          </a>
+          <button type="button" @click="window.print()"
+                  class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+            <i data-lucide="printer" class="size-4"></i>Print this order
+          </button>
+        </div>
+      </div>
+      <p class="mt-2 border-t border-zinc-200 pt-2 text-[12px]/4 tabular-nums text-zinc-600">
+        1 sheet · A4 portrait · <span x-text="copy === 'original' ? 'Original for recipient' : (copy === 'duplicate' ? 'Duplicate for transporter' : 'Triplicate for supplier')">Original for recipient</span> · the date and address the browser prints down the margin are switched off in the print dialog, not here
+      </p>
+    </div>
+  </div>
+
+  <main class="mx-auto w-full max-w-[210mm]">
+    <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-300 pb-2">
+        <p class="text-[11px]/4 font-medium uppercase tracking-wider">Purchase order</p>
+        <p class="border border-zinc-300 px-2 py-0.5 text-[11px]/4 font-medium uppercase tracking-wider"
+           x-text="copy === 'original' ? 'Original for recipient' : (copy === 'duplicate' ? 'Duplicate for transporter' : 'Triplicate for supplier')">Original for recipient</p>
+      </div>
+
+      <header class="mt-3 flex flex-wrap items-start justify-between gap-x-6 gap-y-4 border-b-2 border-zinc-300 pb-4">
+        <div class="flex min-w-0 flex-1 items-start gap-3 sm:min-w-[15rem]">
+          <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-[14px]/5 font-semibold">K</span>
+          <div class="min-w-0">
+            <p class="text-[16px]/6 font-semibold">Konspec Industries Pvt Ltd</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">GSTIN 26AABCK9021M1Z4 · +91 260 264 1180</p>
+          </div>
+        </div>
+        <div class="min-w-0 sm:shrink-0 sm:text-right">
+          <h1 class="text-[20px]/7 font-semibold tracking-tight">Purchase order</h1>
+          <p class="mt-1 text-[13px]/5 font-medium tabular-nums">PO-2026-0418</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Dated 04 Sep 2026 · Revision 0</p>
+        </div>
+      </header>
+
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <section aria-labelledby="pv-vendor-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="pv-vendor-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Vendor</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">Sharma Steel &amp; Alloys</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Survey 88/2, Athal Road, Silvassa, Dadra and Nagar Haveli 396230</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">GSTIN 26AACCS4417K1ZB · State code 26</p>
+        </section>
+        <section aria-labelledby="pv-ship-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="pv-ship-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Deliver to</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">Konspec Industries Pvt Ltd — Silvassa works</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">Required by 18 Sep 2026 · FOR Silvassa</p>
+        </section>
+      </div>
+
+      <section aria-labelledby="pv-lines-h" class="mt-4">
+        <h2 id="pv-lines-h" class="sr-only">Order lines</h2>
+        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+          <table class="w-full min-w-[32rem] text-[12px]/4">
+            <caption class="sr-only">Three lines ordered from Sharma Steel and Alloys against PO-2026-0418</caption>
+            <thead class="bg-zinc-50 print:bg-white">
+              <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+                <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+                <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Quantity</th>
+                <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Rate</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="break-inside-avoid border-b border-zinc-200">
+                <td class="px-2 py-2 text-right tabular-nums">1</td>
+                <td class="px-2 py-2">MS angle 50 × 50 × 6 mm</td>
+                <td class="px-2 py-2 tabular-nums">7216</td>
+                <td class="px-2 py-2 text-right tabular-nums">4,200.000 kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">62.40</td>
+                <td class="px-2 py-2 text-right tabular-nums">2,62,080.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200">
+                <td class="px-2 py-2 text-right tabular-nums">2</td>
+                <td class="px-2 py-2">MS plate 10 mm</td>
+                <td class="px-2 py-2 tabular-nums">7208</td>
+                <td class="px-2 py-2 text-right tabular-nums">1,800.000 kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">58.90</td>
+                <td class="px-2 py-2 text-right tabular-nums">1,06,020.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200">
+                <td class="px-2 py-2 text-right tabular-nums">3</td>
+                <td class="px-2 py-2">MS channel 100 × 50 mm</td>
+                <td class="px-2 py-2 tabular-nums">7216</td>
+                <td class="px-2 py-2 text-right tabular-nums">2,400.000 kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">61.20</td>
+                <td class="px-2 py-2 text-right tabular-nums">1,46,880.00</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="break-inside-avoid border-t-2 border-zinc-300">
+                <th scope="row" colspan="5" class="px-2 py-2 text-right font-medium">Taxable value</th>
+                <td class="px-2 py-2 text-right font-medium tabular-nums">5,14,980.00</td>
+              </tr>
+              <tr class="break-inside-avoid">
+                <th scope="row" colspan="5" class="px-2 py-1 text-right font-normal text-zinc-600">CGST 9% and SGST 9%</th>
+                <td class="px-2 py-1 text-right tabular-nums">92,696.40</td>
+              </tr>
+              <tr class="break-inside-avoid border-t border-zinc-300">
+                <th scope="row" colspan="5" class="px-2 py-2 text-right text-[13px]/5 font-semibold">Order total</th>
+                <td class="px-2 py-2 text-right text-[13px]/5 font-semibold tabular-nums">₹6,07,676.40</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <div class="mt-4 break-inside-avoid border border-zinc-300 p-3">
+        <h2 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Amount chargeable, in words</h2>
+        <p class="mt-1 text-[13px]/5 font-medium">Rupees Six Lakh Seven Thousand Six Hundred Seventy Six and Forty Paise Only</p>
+      </div>
+
+      <div class="mt-8 break-inside-avoid sm:text-right">
+        <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">For Konspec Industries Pvt Ltd</p>
+        <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Authorised signatory</p>
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+        Page 1 of 1 · PO-2026-0418 · issued 04 Sep 2026
+      </footer>
+    </article>
+  </main>
+</div>

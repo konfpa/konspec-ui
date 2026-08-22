@@ -1,0 +1,239 @@
+<!-- The mechanic the whole entry is built around: decide, the record leaves,
+     and the next one is already open. Four things have to be decided together
+     and the browser gets none of them right on its own.
+
+     Where focus goes. The button that was pressed survives the swap, because
+     the rail is not part of the record — which makes leaving focus on it the
+     tempting answer and exactly the wrong one: a held Enter approves four
+     orders nobody read, and these are signatures. Sending focus back to the
+     queue is no better, because the keyboard then has to walk the whole record
+     again to reach the decision. It goes to the record region, whose accessible
+     name is the record heading, so the new record announces itself through the
+     mechanism that already exists and there is one deliberate Tab between the
+     user and the next Approve.
+
+     What the live region says. Focus reads out which record is now open, so the
+     region must not repeat it — it carries the other sentence, the one focus
+     cannot deliver: what happened to the record that just left, and how many
+     are behind it. Say both in the region and the screen reader reads the same
+     document number twice and the outcome once.
+
+     What happens to the item. It is spliced out and the selection is clamped to
+     what is left, so the index that used to point at the decided record now
+     points at the one that took its place. Leave the row in with a tick on it
+     and the count in the header stops meaning anything by the fourth decision.
+
+     What the empty queue does. The last approval collapses the screen rather
+     than leaving two empty panes with a rail full of buttons that act on
+     nothing — that state is the empty variant, and it is reached from here.
+
+     The commit is still a request. The row leaves when the write comes back,
+     not when the click lands, which is what the short busy state is standing in
+     for; the in-flight drawing and every way the server can refuse belong to
+     the pending variant. -->
+<main data-kui="inbox-page/advance" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, said: '', done: 6, busy: '',
+        queue: [
+          { no: 'PO-2026-0418', party: 'Gujarat Polymers Ltd', value: '₹4,10,500', age: '4 days', status: 'Overdue', why: 'Above the ₹2,00,000 buying limit held by Meera Joshi', cc: 'Compounding — Silvassa', need: '04 Sep 2026' },
+          { no: 'PO-2026-0421', party: 'Sharma Steel & Alloys', value: '₹2,18,400', age: '2 days', status: 'Approved', why: 'No rate contract covers structural steel this quarter', cc: 'Fabrication — Silvassa', need: '07 Sep 2026' },
+          { no: 'PO-2026-0424', party: 'Nashik Steel Traders', value: '₹96,750', age: '1 day', status: 'Approved', why: 'Single quote against a three-quote policy', cc: 'Tooling — Silvassa', need: '09 Sep 2026' },
+          { no: 'PO-2026-0427', party: 'Qureshi Metals', value: '₹5,46,000', age: 'today', status: 'Approved', why: 'Above the ₹5,00,000 second-approver threshold', cc: 'Fabrication — Vapi', need: '12 Sep 2026' },
+          { no: 'PO-2026-0431', party: 'Deccan Fasteners Pvt Ltd', value: '₹1,42,900', age: 'today', status: 'Approved', why: 'Delivery address is not a registered plant', cc: 'Maintenance — Vapi', need: '15 Sep 2026' }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rec() { return this.queue[this.sel] },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.queue.length - 1)) },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) },
+        decide(word) {
+          if (this.busy) return;
+          const gone = this.rec.no;
+          this.busy = gone;
+          setTimeout(() => this.settle(gone, word), 700);
+        },
+        settle(gone, word) {
+          this.busy = '';
+          this.queue.splice(this.sel, 1);
+          this.done++;
+          if (!this.queue.length) {
+            this.said = gone + ' ' + word + '. Your inbox is clear — ' + this.done + ' decided today.';
+            this.detail = false;
+            return;
+          }
+          this.sel = Math.min(this.sel, this.queue.length - 1);
+          this.said = gone + ' ' + word + '. ' + this.queue.length + ' left in your inbox.';
+          this.$nextTick(() => {
+            this.$refs.detail.focus();
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        }
+      }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3 lg:px-5">
+    <div class="min-w-0">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Purchase orders waiting on you</h1>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-text="queue.length + ' left · ' + done + ' decided today · Silvassa and Vapi'"></p>
+    </div>
+  </div>
+
+  <div class="flex min-h-0 flex-1" @keydown.escape="back()">
+
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 :id="$id('q')" class="text-[13px]/5 font-medium">The queue</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="queue.length ? (sel + 1) + ' of ' + queue.length : 'none left'"></p>
+      </div>
+
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')" x-show="queue.length"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(queue.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(o, i) in queue" :key="o.no">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1" :aria-busy="busy === o.no"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[o.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="o.no"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="o.value"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="o.status"></span> · <span x-text="o.party"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500">
+                <span x-show="busy !== o.no">With you <span x-text="o.age"></span></span>
+                <span x-show="busy === o.no" x-cloak>Approving — not written yet</span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+
+      <div x-show="!queue.length" x-cloak class="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+        </span>
+        <h3 class="mt-3 text-[14px]/5 font-semibold">Nothing left waiting</h3>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-text="done + ' documents decided today.'"></p>
+      </div>
+    </section>
+
+    <div class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex lg:flex-row"
+         :class="{ 'hidden': !detail, 'flex': detail }">
+
+      <template x-if="queue.length">
+        <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+                 class="flex min-h-0 min-w-0 flex-1 flex-col focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <button type="button" @click="back()"
+                    class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+              <i data-lucide="chevron-left" class="size-4"></i>Back to the inbox
+            </button>
+            <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+              <span class="tabular-nums" x-text="rec.no"></span>
+              <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+              </span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.party + ' · ' + rec.cc + ' · with you ' + rec.age"></p>
+          </div>
+
+          <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+            <div class="rounded-xl border border-zinc-200 p-4">
+              <div class="flex items-start gap-2.5">
+                <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                <div class="min-w-0">
+                  <p class="text-[13px]/5 font-medium">Why this is with you</p>
+                  <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600" x-text="rec.why"></p>
+                </div>
+              </div>
+            </div>
+
+            <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Order value</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.value"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Required by</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="rec.need"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Cost centre</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold" x-text="rec.cc"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Vendor</dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold" x-text="rec.party"></dd>
+              </div>
+            </dl>
+
+            <p class="mt-4 text-[13px]/5 tabular-nums text-zinc-600">
+              Budget for this cost centre has ₹12,40,000 uncommitted for the quarter. Approving commits the value against it and emails the vendor a copy of the order.
+            </p>
+          </div>
+        </section>
+      </template>
+
+      <template x-if="!queue.length">
+        <section class="flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center px-6 py-12 text-center">
+          <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+          </span>
+          <h2 :id="$id('rec')" class="mt-3 text-[16px]/6 font-semibold">You are through the queue</h2>
+          <p class="mt-1 max-w-sm text-[13px]/5 tabular-nums text-zinc-600" x-text="'All ' + done + ' purchase orders that reached you today are decided. New ones appear here as buyers release them.'"></p>
+        </section>
+      </template>
+
+      <aside aria-label="Your decision" x-show="queue.length" :aria-busy="busy !== ''"
+             class="flex shrink-0 flex-col border-t border-zinc-200 lg:w-72 lg:border-t-0 lg:border-l">
+        <div class="hidden min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:block">
+          <p class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">This order</p>
+          <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="rec.value"></p>
+          <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Within your ₹5,00,000 limit.</p>
+          <p class="mt-4 text-[12px]/4 tabular-nums text-zinc-600" x-text="'After this one there are ' + (queue.length - 1) + ' left.'"></p>
+        </div>
+
+        <!-- The pressed button keeps focus, keeps its width and says what it is
+             doing. Disabling it would move focus to the body and leave the
+             keyboard user who just approved an order at the top of the page. -->
+        <div class="flex flex-wrap items-center gap-2 border-zinc-200 px-4 py-3 lg:flex-col lg:items-stretch lg:border-t">
+          <button type="button" @click="decide('approved')"
+                  class="group inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span x-show="busy === ''" class="flex size-4 shrink-0"><i data-lucide="check" class="size-4"></i></span>
+            <span x-show="busy !== ''" x-cloak class="flex size-4 shrink-0"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+            <span class="grid">
+              <span class="col-start-1 row-start-1" :class="busy !== '' && 'invisible'">Approve</span>
+              <span class="invisible col-start-1 row-start-1" :class="busy !== '' && 'visible'">Approving…</span>
+            </span>
+          </button>
+          <button type="button" @click="decide('sent back')" :disabled="busy !== ''"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-300 disabled:bg-zinc-200 disabled:text-zinc-400">
+            <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>

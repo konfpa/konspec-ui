@@ -1,0 +1,184 @@
+<!-- The before-and-after arrangement on its own, in the four shapes that come
+     up. Everything else on this page is scaffolding around this band.
+
+     A single-field change gets no column headings. Three tracks with Field, Was
+     and Now written over one row is a table of one, and it takes more vertical
+     space than the fact it labels.
+
+     A change that touched nine fields gets them, and this is the arrangement
+     that earns the variant: field, old, new as three grid tracks means nine
+     changed values read as three columns you can run an eye down, with the
+     arrows in a straight line between them. Written as nine sentences — "the
+     freight terms changed from Ex-works to FOR destination" — the same fact
+     takes nine paragraphs and no two old values sit above each other.
+
+     The headings are hidden below sm and the grid collapses to one column,
+     because three tracks at 390px puts ₹58,400 in a 90px box. The strike and
+     the arrow carry the direction at every width; the headings are a desktop
+     convenience and that is why they can be aria-hidden and dropped.
+
+     An old value that was empty is the words "not set", never an em dash and
+     never a blank cell. A blank on the left is indistinguishable from a field
+     the export dropped, and it is exactly the case somebody is checking when
+     they ask whether the GSTIN was ever there.
+
+     A cleared value is the old value struck through against the word "cleared".
+     Same reason in reverse: an empty right-hand cell reads as a rendering bug,
+     and clearing a field is a thing people do deliberately and get asked about.
+
+     The strike-through is decoration and so is the arrow. The sr-only "changed
+     to" closes the old value, so the pair is announced as one fact with a
+     direction in it rather than as two figures. -->
+<div data-kui="audit-page/diff" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+  <main class="mx-auto max-w-3xl">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Changes</h1>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Four entries · 04 Sep 2026 · the shapes a diff comes in</p>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <h2 id="ad-dd-day" class="border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Today · Friday, 04 Sep 2026</h2>
+      <ul role="list" aria-labelledby="ad-dd-day" class="divide-y divide-zinc-100">
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T14:22">14:22</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5 tabular-nums">
+                <span class="font-medium">Akshay Prabhu</span> changed the rate on line 3 of
+                <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Purchase order · Deccan Fasteners Pvt Ltd</p>
+              <dl class="mt-2 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Rate · MS plate 8 mm</dt>
+                  <dd class="tabular-nums text-zinc-500 line-through">₹58,400 / MT<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium tabular-nums">
+                    <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>₹61,200 / MT
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </li>
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><i data-lucide="alert-triangle" class="size-4 text-amber-700"></i></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T12:08">12:08</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5 tabular-nums">
+                <span class="font-medium">Ritu Deshpande</span> amended
+                <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0411</a>
+                after the vendor asked for two more weeks. 9 fields changed.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Purchase order · Sharma Steel &amp; Alloys · Silvassa · amended after approval</p>
+
+              <dl class="mt-2 space-y-1 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                <div class="hidden gap-x-3 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase sm:grid sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]" aria-hidden="true">
+                  <span>Field</span><span>Was</span><span class="pl-4.5">Now</span>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Promised delivery</dt>
+                  <dd class="tabular-nums text-zinc-500 line-through">08 Sep 2026<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium tabular-nums"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>22 Sep 2026</dd>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Rate · MS angle 50×50</dt>
+                  <dd class="tabular-nums text-zinc-500 line-through">₹57,000 / MT<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium tabular-nums"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>₹60,000 / MT</dd>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Quantity · line 2</dt>
+                  <dd class="tabular-nums text-zinc-500 line-through">18.0 MT<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium tabular-nums"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>16.5 MT</dd>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Order value</dt>
+                  <dd class="tabular-nums text-zinc-500 line-through">₹18,42,000<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium tabular-nums"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>₹17,84,200</dd>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Freight terms</dt>
+                  <dd class="text-zinc-500 line-through">Ex-works Silvassa<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>FOR destination</dd>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Payment terms</dt>
+                  <dd class="tabular-nums text-zinc-500 line-through">30 days<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium tabular-nums"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>45 days</dd>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Inspection clause</dt>
+                  <dd class="text-zinc-500">Not set<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>Third-party at works</dd>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Vehicle number</dt>
+                  <dd class="tabular-nums text-zinc-500 line-through">GJ-15-AT-4482<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 text-zinc-600"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>Cleared</dd>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Delivery instructions</dt>
+                  <dd class="text-zinc-500 line-through">Unload at gate 2 before 16:00<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>Unload at gate 4, weighbridge slip to stores</dd>
+                </div>
+              </dl>
+
+              <p class="mt-1.5 text-[13px]/5 text-zinc-600">
+                The order value fell, so the amendment stayed inside the tolerance and Anil Kulkarni’s approval of 28 Aug 2026 stood.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T10:04">10:04</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5">
+                <span class="font-medium">Meena Iyer</span> filled in the tax registration on
+                <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Gujarat Polymers Ltd</a>.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Vendor · V-1184 · the field had never been set since the vendor was created on 14 Apr 2024</p>
+              <dl class="mt-2 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">GSTIN</dt>
+                  <dd class="text-zinc-500">Not set<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 font-medium tabular-nums"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>24AABCG1429P1ZH</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </li>
+
+        <li class="flex gap-3 px-4 py-3">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+          <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T09:37">09:37</time></p>
+            <div class="mt-0.5 min-w-0 flex-1 sm:mt-0">
+              <p class="text-[13px]/5">
+                <span class="font-medium">Meena Iyer</span> cleared the bank details on
+                <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Deccan Fasteners Pvt Ltd</a>
+                pending a fresh cancelled cheque.
+              </p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Vendor · V-0937 · payments to this vendor are blocked until the account is re-entered</p>
+              <dl class="mt-2 space-y-1 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">Account number</dt>
+                  <dd class="tabular-nums text-zinc-500 line-through">50200041882317<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 text-zinc-600"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>Cleared</dd>
+                </div>
+                <div class="grid gap-x-3 gap-y-0.5 sm:grid-cols-[10rem_minmax(0,15rem)_minmax(0,1fr)]">
+                  <dt class="text-zinc-600">IFSC</dt>
+                  <dd class="tabular-nums text-zinc-500 line-through">HDFC0001284<span class="sr-only"> changed to</span></dd>
+                  <dd class="flex items-baseline gap-1.5 text-zinc-600"><i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>Cleared</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </main>
+</div>

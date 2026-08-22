@@ -1,0 +1,87 @@
+<!-- The other medium, and the whole difference is @page. On a desktop thermal
+     printer there is no sheet to lay out on: the stock is a continuous roll of
+     100 × 50 mm labels, the printer feeds one and cuts, and the browser has to
+     be told that the page itself is 100 × 50 mm:
+
+         @page { size: 100mm 50mm; margin: 0; }
+
+     That rule cannot be written as a Tailwind class — @page is an at-rule, not
+     a property — and it cannot live in the same stylesheet as document-page's
+     @page { size: A4; margin: 14mm 12mm }, because the two would fight and the
+     last one parsed would win for every printed page in the application. Named
+     pages solve it in Chrome and not in Firefox. What actually works is one
+     print base per medium: an A4 base for documents, a roll base for labels,
+     and each route extends the one it needs. Flagged rather than guessed.
+
+     margin: 0 rather than a small margin, because the label has no margin — it
+     has an adhesive edge. The 3 mm of padding inside the label is the safe
+     area, and it is padding rather than a page margin so it belongs to the
+     label and travels with it onto the sheet variant unchanged.
+
+     Every label is its own page, so every one takes break-after-page except the
+     last, which takes none. break-after-page on the final label feeds a blank
+     label off the roll at the end of every job, and on a roll that is a label
+     somebody has to peel and throw away rather than a blank sheet.
+
+     100 × 50 mm is 378 × 189 px at 96dpi and does not fit a 390px viewport once
+     the page gutter is on it, so the roll sits in the same scroller the sheet
+     does. -->
+<div data-kui="label-sheet/roll" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm]">
+
+    <div class="mb-4 print:hidden">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Bin labels on continuous stock</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">3 labels · 100 × 50 mm roll · Zebra ZD421 at the stores desk, Silvassa works</p>
+      <p class="mt-1 text-[12px]/4 text-zinc-600">The printed page is the label. The route this screen prints from extends a roll print base carrying <code class="font-mono">@page { size: 100mm 50mm; margin: 0 }</code>, not the A4 base the documents use.</p>
+    </div>
+
+    <div class="overflow-x-auto print:overflow-visible">
+      <ol role="list" class="mx-auto w-[100mm] space-y-4 print:space-y-0">
+
+        <li class="flex h-[50mm] w-[100mm] break-inside-avoid break-after-page flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white p-[3mm] print:rounded-none print:border-0">
+          <div class="flex items-start justify-between gap-[3mm]">
+            <p class="text-[24px]/7 font-semibold tabular-nums tracking-tight">B-04-01</p>
+            <p class="text-[13px]/5 font-medium tabular-nums">ITM-1042</p>
+          </div>
+          <p class="mt-[1mm] truncate text-[13px]/5">MS angle 50 × 50 × 6 mm</p>
+          <p class="truncate text-[11px]/4">IS 2062 grade E250 · issued in kg</p>
+          <div class="mt-auto">
+            <!-- SUBSTITUTE. Code 128 of B-04-01 at 94 × 13 mm. -->
+            <div aria-hidden="true" class="flex h-[13mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+            <p class="mt-[0.8mm] text-center text-[13px]/5 font-medium tabular-nums">B-04-01</p>
+          </div>
+        </li>
+
+        <li class="flex h-[50mm] w-[100mm] break-inside-avoid break-after-page flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white p-[3mm] print:rounded-none print:border-0">
+          <div class="flex items-start justify-between gap-[3mm]">
+            <p class="text-[24px]/7 font-semibold tabular-nums tracking-tight">B-04-02</p>
+            <p class="text-[13px]/5 font-medium tabular-nums">ITM-1088</p>
+          </div>
+          <p class="mt-[1mm] truncate text-[13px]/5">MS plate 10 mm</p>
+          <p class="truncate text-[11px]/4">IS 2062 grade E250 · issued in kg</p>
+          <div class="mt-auto">
+            <!-- SUBSTITUTE. Code 128 of B-04-02 at 94 × 13 mm. -->
+            <div aria-hidden="true" class="flex h-[13mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+            <p class="mt-[0.8mm] text-center text-[13px]/5 font-medium tabular-nums">B-04-02</p>
+          </div>
+        </li>
+
+        <li class="flex h-[50mm] w-[100mm] break-inside-avoid flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white p-[3mm] print:rounded-none print:border-0">
+          <div class="flex items-start justify-between gap-[3mm]">
+            <p class="text-[24px]/7 font-semibold tabular-nums tracking-tight">B-04-03</p>
+            <p class="text-[13px]/5 font-medium tabular-nums">ITM-1120</p>
+          </div>
+          <p class="mt-[1mm] truncate text-[13px]/5">MS channel 100 × 50 mm</p>
+          <p class="truncate text-[11px]/4">IS 2062 grade E250 · issued in kg</p>
+          <div class="mt-auto">
+            <!-- SUBSTITUTE. Code 128 of B-04-03 at 94 × 13 mm. The last label on
+                 the roll carries no break-after-page: it would feed one more
+                 blank label off the roll at the end of every job. -->
+            <div aria-hidden="true" class="flex h-[13mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+            <p class="mt-[0.8mm] text-center text-[13px]/5 font-medium tabular-nums">B-04-03</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </main>
+</div>

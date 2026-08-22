@@ -1,0 +1,160 @@
+<!-- L1 is a pill and a weight. Not a green cell, and the reasons are not
+     taste: colour in this system says what a record is doing and cheapest is
+     not a state, green already means finished, a field of colour behind a
+     figure is what the colour rule forbids outright, and six marks scattered
+     across four columns read as a pattern in the grid rather than as six
+     separate decisions. A graphite pill reading L1 is a word, and a word
+     survives being read out.
+
+     The mark sits to the left of the figure inside a right-aligned cell, so
+     the digits keep their right edge and the mark appearing or moving does not
+     shift a single number. That only holds because the table is table-fixed
+     with declared widths.
+
+     The figures this page is built on: Sharma is lowest on the total and
+     lowest on none of the six lines, and Nashik is lowest on three lines and
+     second on the total. That is not a contrived case, it is what a spread of
+     four quotations normally looks like, and it is the reason a screen that
+     marks the smallest number and stops is lying to the buyer.
+
+     The line under the foot is the honest arithmetic of the alternative:
+     awarding each line to its own lowest costs less than any single vendor's
+     total, and it costs three purchase orders, three deliveries and three sets
+     of paperwork to do it. Both halves of that sentence belong on the screen.
+
+     Ties are marked on both cells rather than on the first. L1 is a rate, not
+     a rank, and marking whichever quotation arrived first makes the award look
+     decided by the post. -->
+<div data-kui="compare-page/lowest" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       vendors: [
+         { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', quote: 'QT-4417' },
+         { id: 'v-0219', name: 'Deccan Fasteners Pvt Ltd', quote: 'QT-4419' },
+         { id: 'v-0361', name: 'Nashik Steel Traders', quote: 'QT-4421' },
+         { id: 'v-0407', name: 'Qureshi Metals', quote: 'QT-4424' }
+       ],
+       lines: [
+         { code: 'ITM-7702', name: 'MS angle — 50×50×5', qty: 12000, uom: 'kg', rates: [62.40, 63.10, 61.80, 64.00] },
+         { code: 'ITM-7715', name: 'MS plate — 6 mm', qty: 4500, uom: 'kg', rates: [68.50, 69.20, 70.10, 67.90] },
+         { code: 'ITM-3310', name: 'M12×60 hex bolt — 8.8 zinc', qty: 8000, uom: 'nos', rates: [24.60, 23.80, 25.10, 24.20] },
+         { code: 'ITM-3318', name: 'M12 hex nut — 8.8 zinc', qty: 8000, uom: 'nos', rates: [9.40, 8.95, 9.60, 9.10] },
+         { code: 'ITM-4120', name: 'Welding electrode — 3.15 mm', qty: 400, uom: 'kg', rates: [148.00, 152.00, 145.50, 149.00] },
+         { code: 'ITM-7728', name: 'MS flat — 40×6', qty: 2600, uom: 'kg', rates: [66.20, 67.00, 65.90, 68.40] }
+       ],
+       money(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       rate(n) { return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+       qty(l) { return l.qty.toLocaleString('en-IN') + ' ' + l.uom },
+       total(i) { return this.lines.reduce((s, l) => s + l.qty * l.rates[i], 0) },
+       low(l) { return Math.min(...l.rates) },
+       isLow(l, i) { return l.rates[i] === this.low(l) },
+       lowTotal() { return Math.min(...this.vendors.map((v, i) => this.total(i))) },
+       isLowTotal(i) { return this.total(i) === this.lowTotal() },
+       wins(i) { return this.lines.filter(l => this.isLow(l, i)).length },
+       floor() { return this.lines.reduce((s, l) => s + l.qty * this.low(l), 0) }
+     }">
+
+  <main class="mx-auto max-w-7xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Enquiries</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium tabular-nums text-zinc-900">ENQ-2026-0117</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Comparative statement</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">ENQ-2026-0117 · MS fabrication hardware · 6 lines · 4 quotations · Silvassa</p>
+    </div>
+
+    <!-- alert's shape: white body, zinc border, colour only in the icon. The
+         sentence is the point of the variant and it belongs above the table,
+         not under it. -->
+    <div class="mt-4 flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+      <p class="text-[13px]/5 text-zinc-700">
+        <span class="font-medium text-zinc-900">Sharma Steel &amp; Alloys</span> is lowest on the total and lowest on
+        <span class="tabular-nums">none</span> of the six lines. <span class="font-medium text-zinc-900">Nashik Steel Traders</span> is lowest on three lines and second on the total. L1 on a line and L1 on the order are different questions and this enquiry answers them differently.
+      </p>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="cl-rates-h" class="text-[16px]/6 font-semibold">Rates quoted</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Rate per unit, with the line value under it. Exclusive of GST and freight.</p>
+      </div>
+
+      <div role="region" aria-labelledby="cl-rates-h" tabindex="0"
+           class="relative overflow-x-auto overscroll-x-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <table class="w-full min-w-[56rem] table-fixed text-[13px]/5">
+          <caption class="sr-only">Rates quoted by four vendors against the six lines of enquiry ENQ-2026-0117, with the lowest rate on each line marked L1.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="w-64 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Line item</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <th scope="col" class="w-40 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right align-bottom">
+                  <span class="block text-[13px]/5 font-semibold text-zinc-900" x-text="v.name"></span>
+                  <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500" x-text="v.quote + ' · L1 on ' + wins(i) + ' of 6'"></span>
+                </th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="l in lines" :key="l.code">
+              <tr class="hover:bg-zinc-100">
+                <th scope="row" class="border-b border-zinc-100 px-4 py-2.5 text-left align-top font-normal">
+                  <span class="block font-medium" x-text="l.name"></span>
+                  <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code + ' · ' + qty(l)"></span>
+                </th>
+                <template x-for="(v, i) in vendors" :key="v.id">
+                  <td class="border-b border-zinc-100 px-4 py-2.5 text-right align-top">
+                    <span class="flex items-baseline justify-end gap-1.5">
+                      <span x-show="isLow(l, i)" x-cloak
+                            class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                      <span class="tabular-nums whitespace-nowrap"
+                            :class="isLow(l, i) ? 'font-semibold text-zinc-900' : 'text-zinc-600'"
+                            x-text="rate(l.rates[i])"></span>
+                    </span>
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-500" x-text="money(l.qty * l.rates[i])"></span>
+                  </td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+          <tfoot class="bg-zinc-50">
+            <tr>
+              <th scope="row" class="border-t border-zinc-200 px-4 pt-2.5 text-left text-[12px]/4 font-medium text-zinc-600">Total of these 6 lines</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="border-t border-zinc-200 px-4 pt-2.5 text-right align-top">
+                  <span class="flex items-baseline justify-end gap-1.5">
+                    <span x-show="isLowTotal(i)" x-cloak
+                          class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                    <span class="text-[14px]/5 font-semibold tabular-nums whitespace-nowrap"
+                          :class="isLowTotal(i) ? 'text-zinc-900' : 'text-zinc-600'"
+                          x-text="money(total(i))"></span>
+                  </span>
+                </td>
+              </template>
+            </tr>
+            <tr>
+              <th scope="row" class="px-4 pb-2.5 text-left text-[12px]/4 font-normal text-zinc-500">Lines quoted</th>
+              <template x-for="v in vendors" :key="v.id">
+                <td class="px-4 pb-2.5 text-right text-[12px]/4 tabular-nums text-zinc-500">6 of 6</td>
+              </template>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="border-t border-zinc-200 px-5 py-3">
+        <p class="text-[12px]/4 text-zinc-600">
+          <span class="mr-1.5 inline-flex items-center rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+          is the lowest rate quoted on that line, and on the last row the lowest total. It is arithmetic on the rates above it and nothing else.
+        </p>
+        <p class="mt-2 text-[13px]/5 tabular-nums text-zinc-700">
+          Awarding every line to its own L1 comes to <span class="font-semibold" x-text="money(floor())">₹15,38,690</span> — <span class="font-semibold" x-text="money(lowTotal() - floor())">₹21,680</span> below the lowest single total. It is also three purchase orders, three deliveries and three sets of receipt paperwork.
+        </p>
+      </div>
+    </div>
+  </main>
+</div>

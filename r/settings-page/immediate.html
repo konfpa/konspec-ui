@@ -1,0 +1,199 @@
+<!-- Two different promises on one screen. A switch writes when it is touched;
+     a field writes when Save is pressed. Interleave them and there is no way to
+     tell from a row which gesture applies to it, so half the users press Save
+     after flipping a switch and half do not, and the two halves get the same
+     result by different routes until the day one of them does not.
+
+     The separation is structural, not a colour. Two blocks under two h3
+     headings, divided by border-zinc-100, and the block of switches says once
+     in its own subtitle that there is nothing to save.
+
+     The Save is not in the card footer. A button at the bottom of a card whose
+     last block is a run of switches promises to save the switches; it moves up
+     and sits at the end of the block it actually commits, with the switches
+     below it where nothing can be read as belonging to it. The footer keeps
+     only the last-changed stamp.
+
+     Each switch is toggle's markup unchanged — a real checkbox with
+     role="switch", sr-only peer, the track and thumb painted by peer-checked.
+     Nothing writes aria-checked: role="switch" on a native checkbox already
+     maps the checked property onto it, and an attribute written once in markup
+     goes stale the first time the control moves.
+
+     The switches post through htmx with hx-sync="this:replace", because two
+     flips inside a second are one intent and the replies can otherwise land out
+     of order. They report into one role="status" line under the block that
+     names the setting — the revert after a failed write is script setting
+     checked, and a programmatic change is announced by nothing. Real hx-*
+     attributes, not bound ones: htmx never processes attributes Alpine created
+     after load.
+
+     One handler on the block covers every switch in it. $event.detail.elt is
+     the input that fired, so the message can name the setting — "Not saved —
+     Warn 30 days before a rate contract expires is unchanged" — and four rows
+     do not need four status lines. want is captured before the request, so the
+     revert puts back the value the server still holds rather than the one the
+     user just asked for. -->
+<div data-kui="settings-page/immediate" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Settings</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · Silvassa and Vapi · FY 2026–27</p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:items-start lg:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+
+      <nav aria-label="Settings sections" class="lg:sticky lg:top-6 lg:self-start">
+        <ul role="list" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Company profile</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approval limits</a></li>
+          <li><a href="#" aria-current="page" class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Notifications</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Tax defaults</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Master lists</a></li>
+        </ul>
+      </nav>
+
+      <section id="im-pane" tabindex="-1" aria-labelledby="im-h"
+               class="mt-4 min-w-0 rounded-xl focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 lg:mt-0">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="im-h" class="text-[16px]/6 font-semibold">Notifications</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">What the application sends, to whom, and when it gives up waiting.</p>
+          </div>
+
+          <!-- block one: it waits for Save, and the Save is at the end of it -->
+          <form class="px-5 py-4">
+            <h3 class="text-[13px]/5 font-semibold">Escalation</h3>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-500">Changes here apply when you save them.</p>
+
+            <div class="mt-3 grid gap-4 sm:grid-cols-2">
+              <div class="min-w-0">
+                <label for="im-wait" class="mb-1.5 block text-[13px]/5 font-medium">Chase an approver after</label>
+                <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="im-wait" name="chase_after" required inputmode="numeric" value="2" aria-describedby="im-wait-unit im-wait-msg"
+                         class="min-w-0 flex-1 bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+                  <span id="im-wait-unit" class="flex items-center pr-3 text-[14px]/5 text-zinc-600">working days</span>
+                </div>
+                <p id="im-wait-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">9 orders are past this today.</p>
+              </div>
+
+              <div class="min-w-0">
+                <label for="im-to" class="mb-1.5 block text-[13px]/5 font-medium">Escalate to</label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="im-to" name="escalate_to" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                    <option value="ak" selected>Anil Kulkarni — Plant head, Silvassa</option>
+                    <option value="np">Nilesh Patil — Head of Procurement</option>
+                  </select>
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+
+              <div class="min-w-0 sm:col-span-2">
+                <label for="im-cc" class="mb-1.5 flex items-baseline gap-2 text-[13px]/5 font-medium">
+                  Copy every escalation to
+                  <span aria-hidden="true" class="font-normal text-zinc-500">Optional</span>
+                </label>
+                <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input id="im-cc" name="escalation_cc" type="email" value="purchase@konspec.com"
+                         class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+                </div>
+                <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+              </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap items-center justify-end gap-2">
+              <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Discard</button>
+              <button type="submit" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save escalation</button>
+            </div>
+          </form>
+
+          <!-- block two: touching it is the write, and nothing here belongs to
+               the button above -->
+          <div class="border-t border-zinc-100 px-5 py-4"
+               x-data="{
+                 msg: 'Warn 30 days before a rate contract expires — turned off, 21 Aug 2026 11:16.',
+                 el: null, want: false,
+                 name(e) { return e.closest('label').querySelector('span').textContent.trim() }
+               }"
+               @htmx:before-request.camel="el = $event.detail.elt; want = el.checked"
+               @htmx:after-request.camel="
+                 if ($event.detail.successful) { msg = name(el) + ' — ' + (want ? 'turned on' : 'turned off') + ', just now.' }
+                 else { el.checked = !want; msg = 'Not saved — ' + name(el) + ' is unchanged.' }">
+            <h3 class="text-[13px]/5 font-semibold">What gets sent</h3>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-500">Each switch applies as you set it. There is nothing to save.</p>
+
+            <div class="mt-2 divide-y divide-zinc-100">
+
+              <div class="py-2.5">
+                <label class="flex items-start justify-between gap-4 py-1">
+                  <span class="text-[14px]/5">Email the vendor when an order is approved</span>
+                  <input type="checkbox" role="switch" name="notify_approved" value="1" checked
+                         hx-post="/settings/notifications/notify_approved/"
+                         hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                         aria-describedby="im-approved-help" class="peer sr-only">
+                  <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+                    <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+                  </span>
+                </label>
+                <p id="im-approved-help" class="mt-1 pr-13 text-[12px]/4 text-zinc-500">Goes to the contact on the rate contract, with the order PDF attached.</p>
+              </div>
+
+              <div class="py-2.5">
+                <label class="flex items-start justify-between gap-4 py-1">
+                  <span class="text-[14px]/5">Email the buyer when a GRN is posted short</span>
+                  <input type="checkbox" role="switch" name="notify_short_grn" value="1" checked
+                         hx-post="/settings/notifications/notify_short_grn/"
+                         hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                         aria-describedby="im-short-help" class="peer sr-only">
+                  <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+                    <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+                  </span>
+                </label>
+                <p id="im-short-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">Includes the challan quantity and the weighbridge figure side by side.</p>
+              </div>
+
+              <div class="py-2.5">
+                <label class="flex items-start justify-between gap-4 py-1">
+                  <span class="text-[14px]/5 tabular-nums">Warn 30 days before a rate contract expires</span>
+                  <input type="checkbox" role="switch" name="notify_contract" value="1"
+                         hx-post="/settings/notifications/notify_contract/"
+                         hx-trigger="change" hx-swap="none" hx-sync="this:replace"
+                         aria-describedby="im-contract-help" class="peer sr-only">
+                  <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+                    <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+                  </span>
+                </label>
+                <p id="im-contract-help" class="mt-1 pr-13 text-[12px]/4 tabular-nums text-zinc-500">7 contracts expire before 31 Mar 2027.</p>
+              </div>
+
+              <div class="py-2.5">
+                <label class="flex items-start justify-between gap-4 py-1 has-[:disabled]:text-zinc-500">
+                  <span class="text-[14px]/5 tabular-nums">Copy the audit trail on every approval above ₹25,00,000</span>
+                  <input type="checkbox" role="switch" checked disabled
+                         aria-describedby="im-audit-help" class="peer sr-only">
+                  <span class="relative h-5 w-9 shrink-0 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 transition-colors peer-checked:bg-zinc-700 peer-checked:ring-zinc-700 peer-checked:[&>span]:translate-x-4 peer-focus-visible:ring-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15 peer-disabled:opacity-60 motion-reduce:transition-none forced-colors:border">
+                    <span class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none forced-colors:border"></span>
+                  </span>
+                </label>
+                <p id="im-audit-help" class="mt-1 pr-13 text-[12px]/4 text-zinc-500">Required by the statutory audit policy. It changes in the audit settings, not here.</p>
+              </div>
+
+            </div>
+
+            <p role="status" class="mt-3 text-[12px]/4 tabular-nums text-zinc-500" x-text="msg">
+              Warn 30 days before a rate contract expires — turned off, 21 Aug 2026 11:16.
+            </p>
+          </div>
+
+          <div class="border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <p class="text-[12px]/4 tabular-nums text-zinc-600">Escalation last saved 02 Aug 2026, 10:24 by Ritu Deshpande</p>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+</div>

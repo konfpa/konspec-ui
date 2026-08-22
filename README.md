@@ -10,8 +10,8 @@
 **A component library for internal data applications — written for the agents that build them.**
 
 [![CI](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml)
-[![components](https://img.shields.io/badge/components-55-18181b?style=flat-square)](#components)
-[![variants](https://img.shields.io/badge/variants-679-18181b?style=flat-square)](#components)
+[![components](https://img.shields.io/badge/components-74-18181b?style=flat-square)](#components)
+[![variants](https://img.shields.io/badge/variants-857-18181b?style=flat-square)](#components)
 [![build step](https://img.shields.io/badge/build_step-none-18181b?style=flat-square)](#running-it-locally)
 [![licence](https://img.shields.io/badge/licence-MIT-18181b?style=flat-square)](LICENSE)
 
@@ -41,7 +41,7 @@ Arrived without reading llms.txt:         /r/index.json
 Never fetch /registry.json — the whole system in one file, ~725k tokens.
 ```
 
-`llms.txt` is 39 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
+`llms.txt` is 46 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 
@@ -72,7 +72,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**55 components · 679 variants · 55 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
+**74 components · 857 variants · 74 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
 
 ### Actions
 
@@ -149,6 +149,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 
 | Component | id | Variants | Page |
 |---|---|--:|---|
+| Container | `container` | 9 | [open](https://konfpa.github.io/konspec-ui/components/container.html) |
 | App shell | `app-shell` | 1 | [open](https://konfpa.github.io/konspec-ui/components/app-shell.html) |
 | Page header | `page-header` | 8 | [open](https://konfpa.github.io/konspec-ui/components/page-header.html) |
 | Card | `card` | 9 | [open](https://konfpa.github.io/konspec-ui/components/card.html) |
@@ -158,6 +159,24 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Form page | `form-page` | 8 | [open](https://konfpa.github.io/konspec-ui/components/form-page.html) |
 | Auth page | `auth-page` | 8 | [open](https://konfpa.github.io/konspec-ui/components/auth-page.html) |
 | Error page | `error-page` | 7 | [open](https://konfpa.github.io/konspec-ui/components/error-page.html) |
+| Dashboard | `dashboard` | 9 | [open](https://konfpa.github.io/konspec-ui/components/dashboard.html) |
+| Index page | `index-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/index-page.html) |
+| Record page | `record-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/record-page.html) |
+| Approval inbox | `inbox-page` | 10 | [open](https://konfpa.github.io/konspec-ui/components/inbox-page.html) |
+| Board | `board` | 10 | [open](https://konfpa.github.io/konspec-ui/components/board.html) |
+| Schedule page | `schedule-page` | 10 | [open](https://konfpa.github.io/konspec-ui/components/schedule-page.html) |
+| Compare page | `compare-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/compare-page.html) |
+| Reconcile page | `reconcile-page` | 10 | [open](https://konfpa.github.io/konspec-ui/components/reconcile-page.html) |
+| Import page | `import-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/import-page.html) |
+| Search page | `search-page` | 10 | [open](https://konfpa.github.io/konspec-ui/components/search-page.html) |
+| Focus page | `focus-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/focus-page.html) |
+| Settings page | `settings-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/settings-page.html) |
+| Onboarding page | `onboarding-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/onboarding-page.html) |
+| Audit page | `audit-page` | 10 | [open](https://konfpa.github.io/konspec-ui/components/audit-page.html) |
+| Docs page | `docs-page` | 10 | [open](https://konfpa.github.io/konspec-ui/components/docs-page.html) |
+| Document page | `document-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/document-page.html) |
+| Label sheet | `label-sheet` | 9 | [open](https://konfpa.github.io/konspec-ui/components/label-sheet.html) |
+| Portal page | `portal-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/portal-page.html) |
 
 <!-- components:end -->
 

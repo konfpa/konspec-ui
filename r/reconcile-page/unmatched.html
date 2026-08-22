@@ -1,0 +1,139 @@
+<!-- The two-sided view, and the sentence that keeps it honest: nothing here is
+     a variance. A receipt with no invoice against it means the invoice has not
+     arrived, has not been posted, or has not been found, and only the last of
+     those is work for this screen. Drawing the two sides as a variance is the
+     commonest way this page misleads — it makes a filing delay look like money
+     going missing.
+
+     For the same reason the two totals are never subtracted from one another.
+     They are different populations, and a difference between them is a figure
+     with no meaning that somebody will nevertheless quote in a meeting. The
+     figure that has to reach zero belongs to reconcile-page/ledger, where both
+     sides really are the same account.
+
+     Each pane is a section with its own h2, its own count and its own value in
+     its own header, so a pane read on its own still says what it is. Below lg
+     they stack in DOM order and nothing is dropped.
+
+     Age is the only ordering that matters here, and the dot carries it: red-600
+     past thirty days, amber-500 past fourteen, zinc-500 otherwise. The number of
+     days is written beside it, so the column is readable without colour and the
+     one red dot in twelve graphite ones still lands at a glance.
+
+     The alert at the top is alert/compact's shape and it is the hook into
+     reconcile-page/match: two records on opposite sides that look like the same
+     transaction, named, with one route to the screen that pairs them. It is one
+     action, not two — a second button here turns a notice into a decision. -->
+<div data-kui="reconcile-page/unmatched" class="bg-zinc-100 text-zinc-900"
+     x-data="{
+       left: [
+         { id: 'GRN-4821', who: 'Gujarat Polymers Ltd', on: '04 Sep 2026', ref: 'PO-2026-0418', val: 2254240, days: 6 },
+         { id: 'GRN-4818', who: 'Sharma Steel &amp; Alloys', on: '02 Sep 2026', ref: 'PO-2026-0411', val: 745056, days: 8 },
+         { id: 'GRN-4802', who: 'Deccan Fasteners Pvt Ltd', on: '21 Aug 2026', ref: 'PO-2026-0399', val: 95520, days: 20 },
+         { id: 'GRN-4794', who: 'Konkan Packaging Co', on: '14 Aug 2026', ref: 'PO-2026-0391', val: 52500, days: 27 },
+         { id: 'GRN-4771', who: 'Nashik Steel Traders', on: '31 Jul 2026', ref: 'PO-2026-0377', val: 486300, days: 41 }
+       ],
+       right: [
+         { id: 'INV-2026-1184', who: 'Sharma Steel &amp; Alloys', on: '02 Sep 2026', ref: 'PO-2026-0411', val: 764160, days: 6 },
+         { id: 'INV-2026-1179', who: 'Qureshi Metals', on: '26 Aug 2026', ref: 'no order quoted', val: 546000, days: 13 },
+         { id: 'INV-2026-1152', who: 'Nashik Steel Traders', on: '30 Jul 2026', ref: 'PO-2026-0377', val: 486300, days: 42 },
+         { id: 'INV-2026-1141', who: 'Baroda Fasteners Pvt Ltd', on: '18 Jul 2026', ref: 'PO-2026-0362', val: 109750, days: 54 }
+       ],
+       fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       age(d) { return d > 30 ? 'bg-red-600' : d > 14 ? 'bg-amber-500' : 'bg-zinc-500' },
+       sum(rows) { return rows.reduce((s, r) => s + r.val, 0) }
+     }">
+
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
+
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <a href="#" class="hover:text-zinc-900">Procurement</a>
+          <span class="text-zinc-500">/</span>
+          <span class="font-medium text-zinc-900">Invoice matching</span>
+        </nav>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Unmatched</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Silvassa · read at 09:12 on 11 Sep 2026 · FY 2026–27</p>
+      </div>
+      <button type="button" class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="link" class="size-4"></i>Match by hand
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2.5 rounded-lg border border-zinc-300 bg-white px-3 py-2">
+      <i data-lucide="info" class="size-3.5 shrink-0 text-zinc-500"></i>
+      <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums">
+        GRN-4771 and INV-2026-1152 are both Nashik Steel Traders at ₹4,86,300, dated a day apart.
+      </p>
+      <a href="#" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Review the pair</a>
+    </div>
+
+    <div class="grid gap-4 lg:grid-cols-2">
+
+      <section aria-labelledby="um-l-h" class="rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="um-l-h" class="text-[16px]/6 font-semibold">Receipts with no invoice</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">
+            <span x-text="left.length"></span> receipts · <span x-text="fmt(sum(left))"></span>
+          </p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <template x-for="r in left" :key="r.id">
+            <li class="flex gap-2.5 px-4 py-3">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+                <span class="size-1.5 rounded-full" :class="age(r.days)"></span>
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="r.id"></a>
+                  <span class="shrink-0 text-[13px]/5 tabular-nums" x-text="fmt(r.val)"></span>
+                </span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">
+                  <span x-text="r.who"></span> · received <span x-text="r.on"></span> · <span x-text="r.ref"></span> · waiting <span x-text="r.days"></span> days
+                </span>
+              </span>
+            </li>
+          </template>
+        </ul>
+        <p class="border-t border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 tabular-nums text-zinc-600">
+          Goods received, not invoiced: <span class="font-medium text-zinc-900" x-text="fmt(sum(left))"></span> sitting in the clearing account.
+        </p>
+      </section>
+
+      <section aria-labelledby="um-r-h" class="rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="um-r-h" class="text-[16px]/6 font-semibold">Invoices with no receipt</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">
+            <span x-text="right.length"></span> invoices · <span x-text="fmt(sum(right))"></span>
+          </p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <template x-for="r in right" :key="r.id">
+            <li class="flex gap-2.5 px-4 py-3">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+                <span class="size-1.5 rounded-full" :class="age(r.days)"></span>
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <a href="#" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="r.id"></a>
+                  <span class="shrink-0 text-[13px]/5 tabular-nums" x-text="fmt(r.val)"></span>
+                </span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">
+                  <span x-text="r.who"></span> · dated <span x-text="r.on"></span> · <span x-text="r.ref"></span> · waiting <span x-text="r.days"></span> days
+                </span>
+              </span>
+            </li>
+          </template>
+        </ul>
+        <p class="border-t border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 tabular-nums text-zinc-600">
+          Held out of the payment run: <span class="font-medium text-zinc-900" x-text="fmt(sum(right))"></span>, none of it approved.
+        </p>
+      </section>
+    </div>
+
+    <p class="text-[12px]/4 text-zinc-600">
+      Nothing on this page is a variance. A record is unmatched because its partner has not arrived, has not been posted, or has not been found, and only the last of those is work for this screen. The two totals are not subtracted from one another — they are different populations, and the difference between them would be a figure with no meaning.
+    </p>
+  </main>
+</div>

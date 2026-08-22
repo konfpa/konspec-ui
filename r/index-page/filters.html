@@ -1,0 +1,281 @@
+<!-- Four predicates over the register and the chips are what they add up to.
+     The controls tell somebody which filters exist; the chips tell them which
+     ones are doing something, and the usual reason a register looks empty is
+     one filter out of four set last Tuesday and never cleared.
+
+     Below sm the controls go into a drawer and the chips do not. That split is
+     the whole variant. Four selects stacked on a phone is a screen of chrome
+     above the first row, so they fold away — but fold the chips away with them
+     and the phone build of the register is one that looks wrong and cannot be
+     diagnosed, because nothing on screen says a filter is on. The count on the
+     trigger is the second half of the same answer.
+
+     Both copies of every filter are in the DOM, bound to the same state, with
+     the inactive one display:none so it is out of the tab order as well as off
+     the screen. Two independent copies drift the moment somebody rotates a
+     tablet, and the one that loses is whichever was not touched last.
+
+     Each chip's button is named for the filter it drops — "Remove the filter
+     Overdue", never "Remove", because six buttons called Remove is what gets
+     read out otherwise. Clear all is a link beside them rather than a second
+     filled button: it is the blunt answer and it throws away the three filters
+     that were right along with the one that was not.
+
+     The empty result names the filters and offers to drop the last one. It
+     carries no create button — the page's own New order is up in the band where
+     it always is, and a create drawn as the answer to "nothing matched" is how
+     the same order gets raised twice.
+
+     The drawer is absolute inset-0 against this preview frame; as a real page
+     it is fixed inset-0. -->
+<div data-kui="index-page/filters" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       open: false,
+       status: 'Overdue', vendor: 'deccan', plant: 'Silvassa', period: '',
+       rows: [
+         { po: 'PO-2026-0411', vendor: 'sharma', vname: 'Sharma Steel &amp; Alloys', plant: 'Silvassa', amount: 1842000, status: 'Overdue' },
+         { po: 'PO-2026-0414', vendor: 'gujarat', vname: 'Gujarat Polymers Ltd', plant: 'Silvassa', amount: 468500, status: 'Approved' },
+         { po: 'PO-2026-0418', vendor: 'deccan', vname: 'Deccan Fasteners Pvt Ltd', plant: 'Vapi', amount: 2710400, status: 'Open' },
+         { po: 'PO-2026-0421', vendor: 'sharma', vname: 'Sharma Steel &amp; Alloys', plant: 'Vapi', amount: 132900, status: 'Open' },
+         { po: 'PO-2026-0427', vendor: 'gujarat', vname: 'Gujarat Polymers Ltd', plant: 'Silvassa', amount: 5460000, status: 'Approved' },
+         { po: 'PO-2026-0430', vendor: 'deccan', vname: 'Deccan Fasteners Pvt Ltd', plant: 'Silvassa', amount: 214300, status: 'Overdue' }
+       ],
+       names: { vendor: { sharma: 'Sharma Steel &amp; Alloys', gujarat: 'Gujarat Polymers Ltd', deccan: 'Deccan Fasteners Pvt Ltd' } },
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get filtered() {
+         return this.rows.filter(r =>
+           (!this.status || r.status === this.status) &amp;&amp;
+           (!this.vendor || r.vendor === this.vendor) &amp;&amp;
+           (!this.plant || r.plant === this.plant));
+       },
+       get chips() {
+         return [
+           this.status ? { key: 'status', label: 'Status: ' + this.status } : null,
+           this.vendor ? { key: 'vendor', label: this.names.vendor[this.vendor] } : null,
+           this.plant ? { key: 'plant', label: 'Plant: ' + this.plant } : null,
+           this.period ? { key: 'period', label: this.period } : null
+         ].filter(Boolean);
+       },
+       drop(key) { this[key] = '' },
+       clear() { this.status = ''; this.vendor = ''; this.plant = ''; this.period = '' }
+     }">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Purchase orders</h1>
+            <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600"
+               x-text="chips.length ? filtered.length + ' of ' + rows.length + ' orders match ' + chips.length + ' filters' : rows.length + ' orders'"></p>
+          </div>
+          <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="plus" class="size-4"></i>New order
+          </button>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <form role="search" @submit.prevent class="min-w-0 flex-1 sm:max-w-xs">
+            <label for="ix-fl-q" class="sr-only">Filter the purchase order register</label>
+            <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+              <input id="ix-fl-q" type="search" autocomplete="off" spellcheck="false" placeholder="Filter 1,438 orders"
+                     class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500">
+            </div>
+          </form>
+
+          <button type="button" @click="open = true"
+                  class="flex shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:hidden">
+            <i data-lucide="sliders-horizontal" class="size-4"></i>Filters
+            <span x-show="chips.length" x-cloak class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tabular-nums ring-1 ring-inset ring-zinc-300" x-text="chips.length"></span>
+          </button>
+
+          <div class="hidden gap-2 sm:flex sm:flex-wrap">
+            <div class="min-w-0">
+              <label for="ix-fl-status" class="sr-only">Status</label>
+              <select id="ix-fl-status" x-model="status"
+                      class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+                <option value="">Status: all</option>
+                <option value="Open">Status: open</option>
+                <option value="Approved">Status: approved</option>
+                <option value="Overdue">Status: overdue</option>
+              </select>
+            </div>
+            <div class="min-w-0">
+              <label for="ix-fl-vendor" class="sr-only">Vendor</label>
+              <select id="ix-fl-vendor" x-model="vendor"
+                      class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+                <option value="">Vendor: all</option>
+                <option value="sharma">Sharma Steel &amp; Alloys</option>
+                <option value="gujarat">Gujarat Polymers Ltd</option>
+                <option value="deccan">Deccan Fasteners Pvt Ltd</option>
+              </select>
+            </div>
+            <div class="min-w-0">
+              <label for="ix-fl-plant" class="sr-only">Plant</label>
+              <select id="ix-fl-plant" x-model="plant"
+                      class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+                <option value="">Plant: all</option>
+                <option value="Silvassa">Plant: Silvassa</option>
+                <option value="Vapi">Plant: Vapi</option>
+              </select>
+            </div>
+            <div class="min-w-0">
+              <label for="ix-fl-period" class="sr-only">Raised in</label>
+              <select id="ix-fl-period" x-model="period"
+                      class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+                <option value="">Raised: any time</option>
+                <option value="Raised in August 2026">Raised: August 2026</option>
+                <option value="Raised this quarter">Raised: this quarter</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div x-show="chips.length" x-cloak class="mt-3 flex flex-wrap items-center gap-2">
+          <template x-for="c in chips" :key="c.key">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span x-text="c.label"></span>
+              <button type="button" @click="drop(c.key)" :aria-label="'Remove the filter ' + c.label"
+                      class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-3"></i>
+              </button>
+            </span>
+          </template>
+          <button type="button" @click="clear()" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+      <div class="rounded-xl border border-zinc-300 bg-white">
+        <table x-show="filtered.length" class="w-full text-[13px]/5">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+              <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="r in filtered" :key="r.po">
+              <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+                <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+                <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vname"></td>
+                <td class="px-4 py-2.5">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+                  </span>
+                </td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap tabular-nums" x-text="money(r.amount)"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+
+        <div x-show="!filtered.length" x-cloak class="px-6 py-12 text-center">
+          <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+          </span>
+          <h2 class="mt-3 text-[16px]/6 font-semibold">No orders match these filters</h2>
+          <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+            There are <span class="font-medium text-zinc-900 tabular-nums" x-text="rows.length"></span> orders in the register. Every chip above is in force — drop one and the list widens.
+          </p>
+          <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <button type="button" @click="if (chips.length) drop(chips[chips.length - 1].key)"
+                    class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Drop the last filter
+            </button>
+            <button type="button" @click="clear()" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all filters</button>
+          </div>
+        </div>
+
+        <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <p class="text-[13px]/5 text-zinc-600 tabular-nums"
+             x-text="filtered.length ? '1–' + filtered.length + ' of ' + filtered.length + ' orders' : 'No orders to show'"></p>
+          <span class="text-[13px]/5 text-zinc-600 tabular-nums">Page 1 of 1</span>
+        </nav>
+      </div>
+    </div>
+  </main>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="absolute inset-0 z-50 flex items-end justify-center bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="ix-fl-drawer-t"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-y-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-y-full"
+         class="flex max-h-[calc(100%-4rem)] w-full flex-col rounded-t-2xl border-t border-zinc-200 bg-white shadow-lg sm:max-w-md">
+
+      <div class="flex shrink-0 justify-center pt-2.5 pb-1">
+        <div class="h-1 w-9 rounded-full bg-zinc-300" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 px-5 pt-2 pb-3">
+        <h2 id="ix-fl-drawer-t" class="text-[16px]/6 font-semibold">Filter orders</h2>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <div>
+          <label for="ix-dr-status" class="mb-1.5 block text-[13px]/5 font-medium">Status</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="ix-dr-status" x-model="status" class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 outline-none">
+              <option value="">All statuses</option>
+              <option value="Open">Open</option>
+              <option value="Approved">Approved</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4">
+          <label for="ix-dr-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="ix-dr-vendor" x-model="vendor" class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 outline-none">
+              <option value="">All vendors</option>
+              <option value="sharma">Sharma Steel &amp; Alloys</option>
+              <option value="gujarat">Gujarat Polymers Ltd</option>
+              <option value="deccan">Deccan Fasteners Pvt Ltd</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4">
+          <label for="ix-dr-plant" class="mb-1.5 block text-[13px]/5 font-medium">Plant</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="ix-dr-plant" x-model="plant" class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 outline-none">
+              <option value="">All plants</option>
+              <option value="Silvassa">Silvassa</option>
+              <option value="Vapi">Vapi</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4">
+          <label for="ix-dr-period" class="mb-1.5 block text-[13px]/5 font-medium">Raised in</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="ix-dr-period" x-model="period" class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 outline-none">
+              <option value="">Any time</option>
+              <option value="Raised in August 2026">August 2026</option>
+              <option value="Raised this quarter">This quarter</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" @click="clear()"
+                class="rounded-lg px-4 py-2.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reset</button>
+        <button type="button" @click="open = false"
+                class="flex-1 rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                x-text="'Show ' + filtered.length + ' orders'"></button>
+      </div>
+    </div>
+  </div>
+</div>

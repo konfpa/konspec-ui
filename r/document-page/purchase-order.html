@@ -1,0 +1,216 @@
+<!-- The base sheet, and the shape every other variant here is a version of.
+
+     Backgrounds do not print. The browser drops every fill unless somebody
+     ticks Background graphics in the dialog, and nobody does — so no box on
+     this sheet carries meaning in its fill. Every division is a rule:
+     border-b-2 under the letterhead, border-y round the table head,
+     border-t-2 over the totals. bg-zinc-50 on the head is kept for the screen
+     and is allowed to disappear, because the rules above and below it already
+     say what it is.
+
+     The corners are square. rounded-xl is a screen affordance; one rounded box
+     among ruled ones reads as a screenshot pasted into a form.
+
+     The table is a real <table> and it is not inside overflow-hidden. A <thead>
+     repeats itself across sheets by default, and an element with overflow other
+     than visible is monolithic in paged media — inside the card idiom this
+     table would be clipped at the first page break rather than split across it.
+     The scroller it does sit in is for 390px only and is cancelled again with
+     md:overflow-visible print:overflow-visible.
+
+     break-inside-avoid on every row, on the words, on the tax block and on each
+     signature. A total on a sheet with no lines above it reads as a total of
+     that sheet, and nothing on the page tells the reader otherwise.
+
+     min-h-[297mm] is the screen preview of A4. print:min-h-0, or the printable
+     area — 297mm less the @page margin — pushes a blank second sheet out of
+     every one-page order. -->
+<div data-kui="document-page/purchase-order" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm]">
+    <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+
+      <header class="flex flex-wrap items-start justify-between gap-x-6 gap-y-4 border-b-2 border-zinc-300 pb-4">
+        <div class="flex min-w-0 flex-1 items-start gap-3 sm:min-w-[15rem]">
+          <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-[14px]/5 font-semibold">K</span>
+          <div class="min-w-0">
+            <p class="text-[16px]/6 font-semibold">Konspec Industries Pvt Ltd</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">GSTIN 26AABCK9021M1Z4 · CIN U25200DN2004PTC000418 · +91 260 264 1180</p>
+          </div>
+        </div>
+        <div class="min-w-0 sm:shrink-0 sm:text-right">
+          <h1 class="text-[20px]/7 font-semibold tracking-tight">Purchase order</h1>
+          <p class="mt-1 text-[13px]/5 font-medium tabular-nums">PO-2026-0418</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Dated 04 Sep 2026 · Revision 0 · FY 2026–27</p>
+        </div>
+      </header>
+
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <section aria-labelledby="po-vendor-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="po-vendor-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Vendor</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">Sharma Steel &amp; Alloys</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Survey 88/2, Athal Road, Silvassa, Dadra and Nagar Haveli 396230</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">GSTIN 26AACCS4417K1ZB · State code 26</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Mehul Trivedi · +91 98250 41187 · sales@sharmasteel.in</p>
+        </section>
+        <section aria-labelledby="po-ship-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="po-ship-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Deliver to</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">Konspec Industries Pvt Ltd — Silvassa works</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">GSTIN 26AABCK9021M1Z4 · State code 26</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Stores gate 2, 08:00 to 17:00 · Sanjay Rane, stores</p>
+        </section>
+      </div>
+
+      <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border border-zinc-300 p-3 text-[12px]/4 sm:grid-cols-4">
+        <div>
+          <dt class="text-zinc-600">Required by</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">18 Sep 2026</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">Payment terms</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">30 days from GRN</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">Freight</dt>
+          <dd class="mt-0.5 font-medium">FOR Silvassa</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">Your quotation</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">SSA/Q/26-1140 · 28 Aug 2026</dd>
+        </div>
+      </dl>
+
+      <section aria-labelledby="po-lines-h" class="mt-4">
+        <h2 id="po-lines-h" class="sr-only">Order lines</h2>
+        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+          <table class="w-full min-w-[36rem] text-[12px]/4">
+            <caption class="sr-only">Four lines ordered from Sharma Steel and Alloys against PO-2026-0418</caption>
+            <thead class="bg-zinc-50 print:bg-white">
+              <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+                <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+                <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+                <th scope="col" class="w-12 px-2 py-2 font-medium">UOM</th>
+                <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Quantity</th>
+                <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Rate</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">1</td>
+                <td class="px-2 py-2">MS angle 50 × 50 × 6 mm<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-1042 · IS 2062 grade E250 · mill test certificate required</span></td>
+                <td class="px-2 py-2 tabular-nums">7216</td>
+                <td class="px-2 py-2">kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">4,200.000</td>
+                <td class="px-2 py-2 text-right tabular-nums">62.40</td>
+                <td class="px-2 py-2 text-right tabular-nums">2,62,080.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">2</td>
+                <td class="px-2 py-2">MS plate 10 mm<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-1088 · IS 2062 grade E250 · 2500 × 1250 sheets</span></td>
+                <td class="px-2 py-2 tabular-nums">7208</td>
+                <td class="px-2 py-2">kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">1,800.000</td>
+                <td class="px-2 py-2 text-right tabular-nums">58.90</td>
+                <td class="px-2 py-2 text-right tabular-nums">1,06,020.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">3</td>
+                <td class="px-2 py-2">MS channel 100 × 50 mm<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-1120 · IS 2062 grade E250</span></td>
+                <td class="px-2 py-2 tabular-nums">7216</td>
+                <td class="px-2 py-2">kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">2,400.000</td>
+                <td class="px-2 py-2 text-right tabular-nums">61.20</td>
+                <td class="px-2 py-2 text-right tabular-nums">1,46,880.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">4</td>
+                <td class="px-2 py-2">HT bolt M16 × 60<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-3310 · grade 8.8, zinc plated, with nut and washer</span></td>
+                <td class="px-2 py-2 tabular-nums">7318</td>
+                <td class="px-2 py-2">nos</td>
+                <td class="px-2 py-2 text-right tabular-nums">600</td>
+                <td class="px-2 py-2 text-right tabular-nums">18.50</td>
+                <td class="px-2 py-2 text-right tabular-nums">11,100.00</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="break-inside-avoid border-t-2 border-zinc-300">
+                <th scope="row" colspan="4" class="px-2 py-2 text-left font-medium">Total — 4 lines</th>
+                <td class="px-2 py-2 text-right tabular-nums text-zinc-600">—</td>
+                <td class="px-2 py-2"></td>
+                <td class="px-2 py-2 text-right font-semibold tabular-nums">5,26,080.00</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p class="mt-1.5 text-[11px]/4 text-zinc-600">Quantity is not totalled — these lines are in kg and in nos.</p>
+      </section>
+
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <div class="space-y-3">
+          <div class="break-inside-avoid border border-zinc-300 p-3">
+            <h2 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Amount chargeable, in words</h2>
+            <p class="mt-1 text-[13px]/5 font-medium">Rupees Six Lakh Twenty Thousand Seven Hundred Seventy Five Only</p>
+          </div>
+          <section aria-labelledby="po-terms-h" class="break-inside-avoid">
+            <h2 id="po-terms-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Terms and conditions</h2>
+            <ol class="mt-1.5 list-decimal space-y-1 pl-4 text-[11px]/4 text-zinc-600">
+              <li>Quote PO-2026-0418 on the invoice, the delivery challan and the packing list. A consignment that does not quote it is held at the gate.</li>
+              <li>Mill test certificates for every heat number accompany the material. Material without them is received but not accepted.</li>
+              <li>Quantity tolerance is ±2%. Anything beyond it needs a written amendment before dispatch.</li>
+              <li>Rates are firm to 31 Mar 2027 and inclusive of freight to Silvassa. Statutory levies are extra at actuals.</li>
+              <li>Payment runs 30 days from the goods receipt note, not from the invoice date.</li>
+            </ol>
+          </section>
+        </div>
+
+        <section aria-labelledby="po-tax-h" class="break-inside-avoid self-start">
+          <h2 id="po-tax-h" class="sr-only">Tax summary</h2>
+          <table class="w-full border border-zinc-300 text-[12px]/4">
+            <tbody>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">Taxable value</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">5,26,080.00</td>
+              </tr>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">CGST at 9%</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">47,347.20</td>
+              </tr>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">SGST at 9%</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">47,347.20</td>
+              </tr>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">Rounded off</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">0.60</td>
+              </tr>
+              <tr class="border-t-2 border-zinc-300">
+                <th scope="row" class="px-3 py-2 text-left text-[13px]/5 font-semibold">Order total</th>
+                <td class="px-3 py-2 text-right text-[13px]/5 font-semibold tabular-nums">₹6,20,775.00</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="mt-1.5 text-[11px]/4 text-zinc-600">Supplier and place of supply are both Dadra and Nagar Haveli (26), so the tax splits into CGST and SGST.</p>
+        </section>
+      </div>
+
+      <div class="mt-8 grid gap-6 sm:grid-cols-2">
+        <div class="break-inside-avoid">
+          <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">Prepared by</p>
+          <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Ritu Deshpande · Purchase · 04 Sep 2026</p>
+        </div>
+        <div class="break-inside-avoid sm:text-right">
+          <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">For Konspec Industries Pvt Ltd</p>
+          <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Authorised signatory</p>
+        </div>
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 text-zinc-600">
+        <p>This purchase order is computer generated and is valid without a physical signature when transmitted from purchase@konspec.com. Queries to Ritu Deshpande, +91 260 264 1180 extension 214.</p>
+        <p class="mt-1 tabular-nums">Page 1 of 1 · PO-2026-0418 · issued 04 Sep 2026</p>
+      </footer>
+    </article>
+  </main>
+</div>

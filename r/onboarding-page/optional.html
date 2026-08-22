@@ -1,0 +1,190 @@
+<!-- Skipping is the difference between a setup that finishes and one that is
+     still at 88% in March. Four of the seventeen tasks are things this company
+     may not need, and a checklist that will not let them be closed is a
+     checklist people stop opening.
+
+     So a skipped task is a third state and not a quiet kind of done. It keeps
+     its row, its group and its mark, it carries who skipped it and why, and it
+     comes out of the denominator rather than being counted as finished. Both
+     figures are printed — 9 of 15 done, 17 tasks in all — because a bar with a
+     hidden denominator is a number somebody can improve by skipping things.
+
+     The reason is required and the Skip button does not post without it. In
+     November somebody asks why there are no customer masters, and "skipped"
+     with nothing beside it is indistinguishable from an oversight; a sentence
+     is the difference between a decision and a gap.
+
+     Skipping is not free and the panel says where the cost lands: anything
+     waiting on a skipped task waits for ever, because a skipped task never
+     finishes. That is the one consequence people do not predict, and it is
+     printed under the confirm rather than discovered three weeks later.
+
+     A required task carries no Skip control at all. Disabled would advertise an
+     option that does not exist and give no reason for it, and the reason is
+     that a purchase order cannot be numbered without a numbering series.
+
+     Focus after a reveal needs a frame as well as a tick: at $nextTick the
+     panel x-show is about to unhide is still display:none, and .focus() on it
+     is a silent no-op that measures as correct and leaves the keyboard where it
+     was. -->
+<div data-kui="onboarding-page/optional" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       asking: false, reason: '',
+       open() { this.asking = true; this.$nextTick(() => requestAnimationFrame(() => this.$refs.why.focus())) },
+       close() { this.asking = false; this.$nextTick(() => this.$refs.skip.focus()) }
+     }">
+
+  <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Set up Konspec</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · FY 2026–27 · go live 01 Oct 2026</p>
+    </div>
+
+    <div class="mt-5 rounded-xl border border-zinc-300 bg-white p-4">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h2 id="op-progress" class="text-[16px]/6 font-semibold tabular-nums">9 of 15 tasks done</h2>
+        <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600">6 left · 60%</p>
+      </div>
+      <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="op-progress"
+           aria-valuenow="9" aria-valuemin="0" aria-valuemax="15"
+           aria-valuetext="9 of 15 counted tasks done. Two more were skipped and are not counted.">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 60%"></div>
+      </div>
+      <dl class="mt-3 grid gap-2 border-t border-zinc-100 pt-3 text-[13px]/5 tabular-nums sm:grid-cols-3">
+        <div class="flex items-baseline justify-between gap-3 sm:block">
+          <dt class="text-zinc-600">Tasks in the setup</dt><dd class="font-medium sm:mt-0.5">17</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3 sm:block">
+          <dt class="text-zinc-600">Skipped, not counted</dt><dd class="font-medium sm:mt-0.5">2</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3 sm:block">
+          <dt class="text-zinc-600">Counted, and done</dt><dd class="font-medium sm:mt-0.5">15, of which 9</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3">
+        <h2 class="text-[16px]/6 font-semibold">The four tasks that can be skipped</h2>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">The other thirteen cannot. A purchase order cannot be numbered without a numbering series, so that task carries no Skip control at all rather than a greyed one.</p>
+      </div>
+
+      <ul role="list" class="divide-y divide-zinc-100">
+
+        <li class="px-4 py-3">
+          <div class="flex items-start gap-3">
+            <i data-lucide="minus-circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+            <div class="min-w-0 flex-1">
+              <p class="flex flex-wrap items-center gap-2 text-[13px]/5 font-medium text-zinc-600">
+                <span class="sr-only">Skipped — </span>
+                <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Customer masters</a>
+                <span class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">Optional</span>
+              </p>
+              <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Skipped by Akshay Prabhu on 19 Aug 2026 — &ldquo;we are not raising sales orders from this system yet&rdquo;</p>
+              <p class="mt-1 text-[12px]/4 text-zinc-500">One task is stranded behind it: <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Opening customer balances</a>.</p>
+            </div>
+            <button type="button" class="mt-0.5 shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Bring Customer masters back
+            </button>
+          </div>
+        </li>
+
+        <li class="px-4 py-3">
+          <div class="flex items-start gap-3">
+            <i data-lucide="minus-circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+            <div class="min-w-0 flex-1">
+              <p class="flex flex-wrap items-center gap-2 text-[13px]/5 font-medium text-zinc-600">
+                <span class="sr-only">Skipped — </span>
+                <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Roles and permissions</a>
+                <span class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">Optional</span>
+              </p>
+              <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Skipped by Akshay Prabhu on 19 Aug 2026 — &ldquo;the four built-in roles cover everybody at both plants&rdquo;</p>
+              <p class="mt-1 text-[12px]/4 text-zinc-500">Nothing is waiting on it.</p>
+            </div>
+            <button type="button" class="mt-0.5 shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Bring Roles and permissions back
+            </button>
+          </div>
+        </li>
+
+        <li class="px-4 py-3">
+          <div class="flex items-start gap-3">
+            <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            <div class="min-w-0 flex-1">
+              <p class="flex flex-wrap items-center gap-2 text-[13px]/5 font-medium">
+                <span class="sr-only">Blocked — </span>
+                <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Opening customer balances</a>
+                <span class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">Optional</span>
+              </p>
+              <p class="mt-1 text-[12px]/4 text-zinc-600">Counted, unfinished, and waiting on a task that was skipped. Skipping this one takes it out of the count and closes the thread.</p>
+            </div>
+            <button type="button" x-ref="skip" @click="open()" x-show="!asking"
+                    class="mt-0.5 inline-flex h-8 shrink-0 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Skip this task
+            </button>
+          </div>
+
+          <div x-show="asking" x-cloak class="mt-3 rounded-lg bg-zinc-50 px-4 py-3">
+            <label for="op-why" class="block text-[13px]/5 font-medium">Why is Opening customer balances being skipped?</label>
+            <p id="op-why-msg" class="mt-1 text-[12px]/4 text-zinc-600">
+              Required. It is printed against the task for as long as the record exists, and it is what an auditor reads in November instead of guessing.
+            </p>
+            <div class="mt-2 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <textarea id="op-why" x-ref="why" x-model="reason" rows="2" required aria-describedby="op-why-msg"
+                        class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                        placeholder="No customer ledger is being brought across."></textarea>
+            </div>
+            <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <p class="text-[12px]/4 tabular-nums text-zinc-600">The count becomes 9 of 14. Nothing is waiting on this task.</p>
+              <div class="flex items-center gap-2">
+                <button type="button" @click="close()"
+                        class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+                <button type="button" :disabled="!reason.trim()"
+                        class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white enabled:hover:bg-zinc-800 disabled:bg-zinc-400 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">Skip it</button>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="px-4 py-3">
+          <div class="flex items-start gap-3">
+            <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+            <div class="min-w-0 flex-1">
+              <p class="flex flex-wrap items-center gap-2 text-[13px]/5 font-medium">
+                <span class="sr-only">Done — </span>
+                <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Payment terms</a>
+                <span class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">Optional</span>
+              </p>
+              <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Meera Iyer · 15 Aug 2026 · 30 days from GRN, 45 for MSME vendors</p>
+              <p class="mt-1 text-[12px]/4 text-zinc-500">Optional and done, which counts exactly like any other finished task. Optional describes whether it may be skipped, not how it is counted once it is not.</p>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="border-t border-zinc-200 bg-zinc-100 px-4 py-3">
+        <h3 class="text-[13px]/5 font-medium">A skipped task is not an unfinished one</h3>
+        <ul role="list" class="mt-2 space-y-1.5 text-[12px]/4 text-zinc-600">
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="circle" class="mt-0.5 size-3.5 shrink-0 text-zinc-400" aria-hidden="true"></i>
+            <span class="min-w-0 tabular-nums">It leaves the denominator, so 9 of 15 rather than 9 of 17, and both figures stay on the page.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="circle" class="mt-0.5 size-3.5 shrink-0 text-zinc-400" aria-hidden="true"></i>
+            <span class="min-w-0">It never appears in what is next, and it never appears in the work-left estimate.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="alert-triangle" class="mt-0.5 size-3.5 shrink-0 text-amber-700" aria-hidden="true"></i>
+            <span class="min-w-0">Anything waiting on it waits for ever. A skipped task never finishes, so the dependency never clears — that is the one cost, and it is why the screen names what is stranded.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="circle" class="mt-0.5 size-3.5 shrink-0 text-zinc-400" aria-hidden="true"></i>
+            <span class="min-w-0">It can be brought back at any time, which puts it into the denominator again and the count down with it.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</div>

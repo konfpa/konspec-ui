@@ -1,0 +1,239 @@
+<!-- The other reconciliation this layout has to cover, and the one where the
+     two sides really are the same account — so here, and only here, there is a
+     single difference that has to reach zero.
+
+     The statement is printed first, in full, and the working is written against
+     it, because that is the document that is not ours. A reconciliation that
+     starts from the ledger and hunts for the bank entry produces a figure the
+     bank has never seen, and the whole point of the exercise is to agree with
+     somebody else's record.
+
+     Three kinds of row and they must not be drawn as one. A match with a date
+     one day apart is not a variance — a bank posts on value date and a ledger
+     on voucher date — and an unannotated date column sends a clerk chasing a
+     difference that does not exist. A cheque drawn and not presented is carried
+     forward, not a difference, and it is already in the statement above. Only
+     the third kind, an entry on one side that has no counterpart at all, moves
+     the running difference.
+
+     One transfer covering four sales invoices is a list inside the ledger cell
+     rather than four rows of its own. The statement has one line for it, so the
+     working has one line for it; splitting it into four makes the statement and
+     the working disagree about how many transactions there were, which is the
+     first thing anybody checks when the two do not tie.
+
+     The running difference is a column, not a figure at the bottom. The row
+     where it stops being zero is the row that has to be fixed, and a total at
+     the foot says only that something is wrong somewhere above it.
+
+     Closing is guarded on the difference being zero, and the button carries the
+     reason it will not: it is aria-disabled and focusable rather than disabled,
+     so the control somebody is hunting for is still there with an explanation
+     attached to it. -->
+<div data-kui="reconcile-page/ledger" class="bg-zinc-100 text-zinc-900"
+     x-data="{
+       rows: [
+         { on: '01 Sep 2026', narr: 'NEFT to Sharma Steel &amp; Alloys', amt: '−₹18,42,000',
+           led: [ { id: 'BP-2026-0884', on: '31 Aug 2026', amt: '₹18,42,000' } ],
+           note: 'The bank posts on value date, the ledger on voucher date. One day apart is the ordinary case.',
+           diff: 0, state: 'Matched' },
+         { on: '08 Sep 2026', narr: 'RTGS from Konkan Fabricators', amt: '+₹41,05,760',
+           led: [ { id: 'SI-2026-0912', on: '14 Aug 2026', amt: '₹12,40,000' },
+                  { id: 'SI-2026-0918', on: '19 Aug 2026', amt: '₹9,85,760' },
+                  { id: 'SI-2026-0925', on: '26 Aug 2026', amt: '₹11,00,000' },
+                  { id: 'SI-2026-0931', on: '02 Sep 2026', amt: '₹7,80,000' } ],
+           note: 'One transfer settling four sales invoices. The statement has one line for it, so this has one line for it.',
+           diff: 0, state: 'Matched' },
+         { on: '14 Sep 2026', narr: 'Bank charges — RTGS and account maintenance', amt: '−₹2,360',
+           led: [],
+           note: 'Nothing in the ledger answers this. It has to be posted to bank charges, not matched to something.',
+           diff: 2360, state: 'Not in the ledger' },
+         { on: '—', narr: 'Cheque 004182 to Deccan Fasteners Pvt Ltd', amt: '—',
+           led: [ { id: 'BP-2026-0901', on: '27 Sep 2026', amt: '₹12,40,760' } ],
+           note: 'Drawn on 27 Sep and not presented by 30 Sep. Carried forward into October, not a difference.',
+           diff: 0, state: 'Carried forward' },
+         { on: '—', narr: 'Deposit at Silvassa branch, credited 01 Oct 2026', amt: '—',
+           led: [ { id: 'BR-2026-0447', on: '29 Sep 2026', amt: '₹4,86,300' } ],
+           note: 'Banked on 29 Sep, credited on 01 Oct. Carried forward, not a difference.',
+           diff: 0, state: 'Carried forward' }
+       ],
+       dot: { 'Matched': 'bg-emerald-600', 'Carried forward': 'bg-zinc-500', 'Not in the ledger': 'bg-red-600' },
+       fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       run(i) { return this.rows.slice(0, i + 1).reduce((s, r) => s + r.diff, 0) },
+       get gap() { return this.rows.reduce((s, r) => s + r.diff, 0) }
+     }">
+
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
+
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <a href="#" class="hover:text-zinc-900">Finance</a>
+          <span class="text-zinc-500">/</span>
+          <a href="#" class="hover:text-zinc-900">Bank reconciliation</a>
+          <span class="text-zinc-500">/</span>
+          <span class="font-medium text-zinc-900">September 2026</span>
+        </nav>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Bank reconciliation</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+          HDFC current account 50200041188207 · Silvassa · 01 to 30 September 2026 · FY 2026–27
+        </p>
+      </div>
+      <button type="button" class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print the statement
+      </button>
+    </div>
+
+    <section aria-labelledby="lg-sum-h" class="rounded-xl border border-zinc-300 bg-white px-4 py-3.5 lg:px-5">
+      <h2 id="lg-sum-h" class="text-[13px]/5 font-semibold">The reconciliation statement at 30 Sep 2026</h2>
+      <dl class="mt-3 max-w-lg space-y-2 text-[13px]/5">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-zinc-600">Balance per bank statement</dt>
+          <dd class="font-medium tabular-nums">₹1,42,68,500</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-zinc-600">Add — deposits banked, not yet credited</dt>
+          <dd class="tabular-nums">₹4,86,300</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-zinc-600">Less — cheques drawn, not yet presented</dt>
+          <dd class="tabular-nums">−₹12,40,760</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-2">
+          <dt class="font-medium">Adjusted bank balance</dt>
+          <dd class="font-medium tabular-nums">₹1,35,14,040</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-zinc-600">Balance per books</dt>
+          <dd class="tabular-nums">₹1,35,16,400</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-2">
+          <dt class="font-semibold">Unexplained difference</dt>
+          <dd class="inline-flex items-center gap-1.5 text-[16px]/6 font-semibold tabular-nums">
+            <span x-show="gap !== 0"><i data-lucide="alert-circle" class="size-4 text-red-600" aria-hidden="true"></i></span>
+            <span x-show="gap === 0" x-cloak><i data-lucide="check-circle-2" class="size-4 text-emerald-600" aria-hidden="true"></i></span>
+            <span x-text="fmt(gap)">₹2,360</span>
+          </dd>
+        </div>
+      </dl>
+      <p class="mt-3 text-[12px]/4 tabular-nums text-zinc-600">
+        The books are ₹2,360 higher than the bank because the September charges have not been entered. September cannot be closed until this is zero.
+      </p>
+    </section>
+
+    <section aria-labelledby="lg-work-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <h2 id="lg-work-h" class="text-[16px]/6 font-semibold">The working</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">5 items · 2 matched · 2 carried forward · 1 not in the ledger</p>
+      </div>
+
+      <table class="hidden w-full text-[13px]/5 md:table">
+        <thead>
+          <tr class="border-b border-zinc-200 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+            <th scope="col" class="px-4 py-2.5 font-medium lg:px-5">On the statement</th>
+            <th scope="col" class="px-4 py-2.5 font-medium">In the ledger</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Difference</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">
+              Running
+              <span class="block font-normal tracking-normal normal-case text-zinc-500">has to reach zero</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="(r, i) in rows" :key="r.narr">
+            <tr class="border-b border-zinc-100 align-top">
+              <th scope="row" class="px-4 py-3 text-left font-normal lg:px-5">
+                <span class="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <span class="font-medium" x-text="r.narr"></span>
+                  <span class="shrink-0 tabular-nums" x-text="r.amt"></span>
+                </span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">
+                  <span x-text="r.on === '—' ? 'Not on the statement' : 'Statement ' + r.on"></span>
+                </span>
+                <span class="mt-1.5 block text-[12px]/4 tabular-nums text-zinc-600" x-text="r.note"></span>
+              </th>
+              <td class="px-4 py-3">
+                <template x-if="r.led.length">
+                  <ul role="list" class="space-y-1">
+                    <template x-for="e in r.led" :key="e.id">
+                      <li class="flex flex-wrap items-baseline justify-between gap-x-3">
+                        <a href="#" class="tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="e.id"></a>
+                        <span class="shrink-0 tabular-nums text-zinc-600"><span x-text="e.on"></span> · <span x-text="e.amt"></span></span>
+                      </li>
+                    </template>
+                  </ul>
+                </template>
+                <template x-if="!r.led.length">
+                  <span class="text-zinc-500">Nothing</span>
+                </template>
+                <span class="mt-1.5 flex">
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.state]" aria-hidden="true"></span><span x-text="r.state"></span>
+                  </span>
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap" x-text="r.diff === 0 ? '—' : fmt(r.diff)"></td>
+              <td class="px-4 py-3 text-right font-medium tabular-nums whitespace-nowrap" x-text="fmt(run(i))"></td>
+            </tr>
+          </template>
+        </tbody>
+        <tfoot class="bg-zinc-50">
+          <tr class="border-t border-zinc-200">
+            <th scope="row" colspan="3" class="px-4 py-2.5 text-right text-[13px]/5 font-semibold lg:px-5">Unexplained difference</th>
+            <td class="px-4 py-2.5 text-right text-[14px]/5 font-semibold tabular-nums whitespace-nowrap" x-text="fmt(gap)"></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- below md the same five items as cards, in the same order, with the
+           running figure kept on every one of them. It is the column somebody
+           reads down, so it is the last thing a phone may lose. -->
+      <div class="divide-y divide-zinc-100 md:hidden">
+        <template x-for="(r, i) in rows" :key="r.narr">
+          <div class="px-4 py-3.5">
+            <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+              <p class="text-[13px]/5 font-medium" x-text="r.narr"></p>
+              <p class="shrink-0 text-[13px]/5 tabular-nums" x-text="r.amt"></p>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500" x-text="r.on === '—' ? 'Not on the statement' : 'Statement ' + r.on"></p>
+            <template x-if="r.led.length">
+              <ul role="list" class="mt-2 space-y-1 text-[12px]/4">
+                <template x-for="e in r.led" :key="e.id">
+                  <li class="flex flex-wrap items-baseline justify-between gap-x-3 tabular-nums">
+                    <a href="#" class="underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="e.id"></a>
+                    <span class="shrink-0 text-zinc-600"><span x-text="e.on"></span> · <span x-text="e.amt"></span></span>
+                  </li>
+                </template>
+              </ul>
+            </template>
+            <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-600" x-text="r.note"></p>
+            <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.state]" aria-hidden="true"></span><span x-text="r.state"></span>
+              </span>
+              <span class="text-[12px]/4 tabular-nums text-zinc-600">Running <span class="font-medium text-zinc-900" x-text="fmt(run(i))"></span></span>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-3 lg:px-5">
+        <p id="lg-guard" class="text-[12px]/4 tabular-nums text-zinc-600"
+           x-text="gap === 0 ? 'Nothing unexplained. September can be closed.' : fmt(gap) + ' is still unexplained — the bank charges on 14 Sep have no entry in the ledger.'">
+          ₹2,360 is still unexplained — the bank charges on 14 Sep have no entry in the ledger.
+        </p>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="plus" class="size-4 text-zinc-600"></i>Post the bank charges
+          </button>
+          <button type="button" aria-describedby="lg-guard" :aria-disabled="gap === 0 ? 'false' : 'true'"
+                  @click="if (gap !== 0) return"
+                  class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
+                  :class="gap === 0 ? '' : 'opacity-60'">
+            <i data-lucide="lock" class="size-4"></i>Close September
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

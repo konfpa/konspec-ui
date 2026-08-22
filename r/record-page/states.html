@@ -1,0 +1,229 @@
+<!-- One record in the three states the happy path never draws, and the rule is
+     the same in all three: what the state has removed is gone, not disabled.
+
+     A disabled Record GRN on a cancelled order is a dead Tab stop that explains
+     nothing, invites the press it is going to refuse, and puts the burden of
+     saying why on a tooltip nobody can hover on a phone. Draw the banner, drop
+     the button. Disabled is for a control that still exists and is busy — the
+     one whose own request is in flight — and for nothing else.
+
+     The banner is alert's shape unchanged: white card, zinc border, colour only
+     in the icon. A red field across the top of a cancelled order shouts louder
+     than the overdue rows it sits above, and after the third one people stop
+     reading the top of the page altogether. It says who did it, when, and what
+     it means for anything downstream, because those are the three questions the
+     next person asks.
+
+     None of these three states is in the locked five and there is no sixth dot.
+     On hold takes Approved's amber-500 — its meaning is exactly amber's,
+     waiting on someone. Cancelled takes Open's zinc-500, which is the fallback
+     badge/status names and the same one the Django status_dot filter returns
+     for a value it has never seen. Emerald was the other candidate for
+     Cancelled and is wrong: nothing more will happen to the order, but green
+     says that is good news.
+
+     The select at the top of the frame is the preview, not the page. A real
+     record is in one state and the server renders that one; delete the strip
+     and keep whichever branch applies. -->
+<div data-kui="record-page/states" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ state: 'cancelled' }">
+
+  <div class="flex flex-wrap items-center gap-3 border-b border-zinc-300 bg-white px-4 py-2 lg:px-6">
+    <label for="st-pick" class="text-[12px]/4 font-medium text-zinc-700">Preview this record as</label>
+    <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <select id="st-pick" x-model="state"
+              class="block appearance-none bg-transparent py-1.5 pr-9 pl-3 text-[13px]/5 font-medium outline-none">
+        <option value="cancelled">Cancelled</option>
+        <option value="hold">On hold</option>
+        <option value="closed">Closed</option>
+      </select>
+      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </div>
+    <span class="text-[12px]/4 text-zinc-600">This row is the preview. It is not part of the page.</span>
+  </div>
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-5xl px-4 py-4 lg:px-6">
+        <nav aria-label="Breadcrumb">
+          <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">PO-2026-0411</span></li>
+          </ol>
+        </nav>
+
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <h1 class="text-[24px]/7 font-semibold tracking-tight tabular-nums">PO-2026-0411</h1>
+
+              <!-- the dot colour is bound on a wrapping span, never on the pill
+                   text and never on a Lucide <i>. -->
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 rounded-full" aria-hidden="true"
+                      :class="{ 'bg-zinc-500': state === 'cancelled', 'bg-amber-500': state === 'hold', 'bg-emerald-600': state === 'closed' }"></span>
+                <span x-text="state === 'cancelled' ? 'Cancelled' : state === 'hold' ? 'On hold' : 'Closed'">Cancelled</span>
+              </span>
+            </div>
+            <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Deccan Fasteners Pvt Ltd · Vapi · raised 21 Jul 2026 · ₹4,26,500</p>
+          </div>
+
+          <!-- three action sets, and each state gets only its own. Nothing here
+               is rendered disabled and nothing is rendered that the server
+               would refuse. -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="printer" class="size-4"></i>Print
+            </button>
+
+            <template x-if="state === 'cancelled' || state === 'closed'">
+              <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="copy" class="size-4"></i>Duplicate as a new order
+              </button>
+            </template>
+
+            <template x-if="state === 'hold'">
+              <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="play" class="size-4"></i>Release the hold
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-5xl space-y-4 px-4 py-5 lg:px-6">
+
+      <div x-show="state === 'cancelled'" class="flex flex-wrap items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+        <div class="min-w-[16rem] flex-1">
+          <p class="text-[13px]/5 font-medium tabular-nums">Cancelled on 12 Aug 2026 by Anil Kulkarni.</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+            The vendor withdrew the quotation before anything was despatched. Nothing was received and nothing was invoiced, so no ledger entry was reversed. The requirement was re-raised as
+            <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+            against Sharma Steel &amp; Alloys.
+          </p>
+        </div>
+      </div>
+
+      <div x-show="state === 'hold'" x-cloak class="flex flex-wrap items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+        <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+        <div class="min-w-[16rem] flex-1">
+          <p class="text-[13px]/5 font-medium tabular-nums">On hold since 19 Aug 2026, put there by Meena Rane.</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+            <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">QC-2026-0233</a>
+            is open against batch B-26-0871 from this vendor. Receipts cannot be posted and the order cannot be amended until the hold is released or the batch is rejected.
+          </p>
+        </div>
+      </div>
+
+      <div x-show="state === 'closed'" x-cloak class="flex flex-wrap items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+        <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
+        <div class="min-w-[16rem] flex-1">
+          <p class="text-[13px]/5 font-medium tabular-nums">Closed on 04 Sep 2026.</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+            All 6 lines received, 2 invoices posted and ₹4,26,500 settled on 03 Sep 2026. A closed order is read-only; a further supply against the same requirement is a new order.
+          </p>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <dl class="grid grid-cols-2 sm:grid-cols-4">
+          <div class="border-b border-zinc-200 px-4 py-3 sm:border-b-0">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Ordered</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹4,26,500</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 lines</dd>
+          </div>
+          <div class="border-b border-l border-zinc-200 px-4 py-3 sm:border-b-0">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Received</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums"
+                x-text="state === 'closed' ? '₹4,26,500' : state === 'hold' ? '₹1,84,000' : '₹0'">₹0</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"
+                x-text="state === 'closed' ? '6 of 6 lines' : state === 'hold' ? '2 of 6 lines' : 'nothing despatched'">nothing despatched</dd>
+          </div>
+          <div class="border-zinc-200 px-4 py-3 sm:border-l">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Invoiced</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums"
+                x-text="state === 'closed' ? '₹4,26,500' : '₹0'">₹0</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"
+                x-text="state === 'closed' ? '2 invoices · settled 03 Sep 2026' : 'no invoice raised'">no invoice raised</dd>
+          </div>
+          <div class="border-l border-zinc-200 px-4 py-3">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Commitment</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums"
+                x-text="state === 'hold' ? '₹2,42,500' : '₹0'">₹0</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"
+                x-text="state === 'hold' ? 'frozen while the hold stands' : 'released from the budget'">released from the budget</dd>
+          </div>
+        </dl>
+      </div>
+
+      <section aria-labelledby="st-lines-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="st-lines-h" class="text-[16px]/6 font-semibold">Order lines</h2>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">6 lines · 3 shown</p>
+        </div>
+        <table class="hidden w-full text-[13px]/5 md:table">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-5 py-2.5 font-medium">Item</th>
+              <th scope="col" class="px-5 py-2.5 text-right font-medium">Ordered</th>
+              <th scope="col" class="px-5 py-2.5 text-right font-medium">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left font-medium">M12 hex bolt — 8.8 zinc</th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">4,000 nos</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹96,000</td>
+            </tr>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left font-medium">M16 hex nut — 8.8 zinc</th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">6,000 nos</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,44,000</td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-5 py-2.5 text-left font-medium">Spring washer M12</th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">10,000 nos</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹52,000</td>
+            </tr>
+          </tbody>
+          <tfoot class="bg-zinc-50">
+            <tr class="border-t border-zinc-200">
+              <th scope="row" colspan="2" class="px-5 py-2 text-right text-[12px]/4 font-medium text-zinc-600">Total of all 6 lines</th>
+              <td class="px-5 py-2 text-right font-medium tabular-nums whitespace-nowrap">₹4,26,500</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <ul class="divide-y divide-zinc-100 md:hidden">
+          <li class="flex items-baseline justify-between gap-3 px-5 py-3">
+            <span class="min-w-0 text-[13px]/5 font-medium">M12 hex bolt — 8.8 zinc <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">4,000 nos</span></span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹96,000</span>
+          </li>
+          <li class="flex items-baseline justify-between gap-3 px-5 py-3">
+            <span class="min-w-0 text-[13px]/5 font-medium">M16 hex nut — 8.8 zinc <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">6,000 nos</span></span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,44,000</span>
+          </li>
+          <li class="flex items-baseline justify-between gap-3 px-5 py-3">
+            <span class="min-w-0 text-[13px]/5 font-medium">Spring washer M12 <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">10,000 nos</span></span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹52,000</span>
+          </li>
+        </ul>
+        <div class="flex items-baseline justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-5 py-3 md:hidden">
+          <span class="text-[12px]/4 font-medium text-zinc-600">Total of all 6 lines</span>
+          <span class="text-[14px]/5 font-semibold tabular-nums">₹4,26,500</span>
+        </div>
+
+        <p class="border-t border-zinc-200 px-5 py-2 text-[12px]/4 text-zinc-600"
+           x-text="state === 'cancelled' ? 'The lines are kept for the record. No receipt can be posted against a cancelled order.' : state === 'hold' ? 'Two lines were received before the hold. The other four cannot be received until it is released.' : 'All six lines were received in full and the order was closed automatically.'">The lines are kept for the record. No receipt can be posted against a cancelled order.</p>
+      </section>
+
+    </div>
+  </main>
+</div>

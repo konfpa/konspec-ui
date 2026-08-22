@@ -1,0 +1,309 @@
+<!-- approvals/templates/approvals/inbox.html — a page template rather than a
+     fragment, so it extends the base that renders app-shell and fills one
+     block. Every signed-in screen is the shell; an inbox that starts its own
+     document loses the skip link, the nav landmark, the command palette and the
+     keyboard shortcuts, and reviews as fine because everything it dropped is
+     invisible until somebody uses a keyboard.
+
+     The queue is a list of links here, and that is a deliberate departure from
+     the Alpine variants rather than a shortcut. list-detail says the listbox
+     shape is right when nothing changes the address bar and the links shape is
+     right when each record has a URL and clicking one is a navigation. On the
+     server each record does have a URL: ?open=PO-2026-0418 is a real address, it
+     survives a reload, Back works, and it can be pasted to the buyer who asked
+     about it. So the queue is a <ul> of anchors with aria-current on the open
+     one, the browser owns Tab, and the arrow-key contract is not claimed by
+     anything. An anchor wearing role="option" would announce as one thing and
+     behave as another.
+
+     The queue and the record are swapped together, as one fragment with one id.
+     Two targets means two responses, and between them the queue says seven
+     while the record beside it shows one that has already gone. hx-swap
+     outerHTML on #inbox replaces both at once, and the response is the same
+     template rendered again, so the two can never disagree about what is left.
+
+     Three things therefore have to live outside #inbox, and all three are the
+     same mistake if they do not. The live region is in base.html: a region that
+     the swap replaces is a new region whose message was already inside it when
+     it appeared, and a live region that arrives holding its message announces
+     nothing at all. The after-swap handler that moves focus onto the record is
+     on the shell around the fragment, because a handler inside the fragment is
+     removed by the swap it is reacting to. And the decided listener reads the
+     HX-Trigger the view sends, which is where the outcome sentence comes from —
+     the server decides what happened, so the server writes the sentence.
+
+     Approving is a POST with {% csrf_token %} and nothing about it is
+     optimistic: the row is still in the queue in the HTML on screen until the
+     response that removed it arrives. hx-disabled-elt="this" is what stops the
+     second post, because htmx re-enables on every ending a request has — done,
+     failed, timed out, aborted — and a hand-written busy flag only ever
+     remembers the first.
+
+     Rejecting is a link to a page, not a button here. A refusal needs a
+     required reason, and a form with a required field posted out of a dialog is
+     the reject variant; server-rendered it is its own view, its own template
+     and its own POST, and the inbox links to it.
+
+     Two traps this repo has hit. A multi-line {# #} is not a comment — Django
+     tag_re has no DOTALL, so everything after the first line renders on the
+     page; use a comment/endcomment block. And |intcomma raises without {% load humanize %}
+     in this same file, which is why the load line is here and not only in
+     base.html. -->
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block main %}
+<div data-kui="inbox-page/django" class="flex h-full flex-col overflow-hidden bg-white text-[14px]/5 text-zinc-900"
+     hx-on:decided="document.getElementById('kui-live').textContent = event.detail.value"
+     hx-on::after-swap="const r = this.querySelector('[data-record]'); if (r) r.focus()">
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Waiting on you</h1>
+    <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+      {{ queue|length|intcomma }} documents · ₹{{ waiting_value|intcomma }} · your limit is ₹{{ user.approval_limit|intcomma }} a document · FY 2026–27
+    </p>
+  </div>
+
+  {% comment %}
+    Everything below this line is #inbox and the decision POST replaces all of
+    it. The live region, the focus handler and the h1 are above it on purpose.
+  {% endcomment %}
+  <div id="inbox" class="flex min-h-0 flex-1">
+
+    <section aria-labelledby="dj-queue" class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r lg:w-[22rem]">
+      <div class="flex shrink-0 items-baseline justify-between gap-3 border-b border-zinc-200 px-4 py-2.5">
+        <h2 id="dj-queue" class="text-[13px]/5 font-medium">Your inbox</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">{{ queue|length }} left</p>
+      </div>
+
+      <ul class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        {% for d in queue %}
+          <li>
+            <a href="?open={{ d.number }}"
+               hx-get="{% url 'approvals:inbox' %}?open={{ d.number }}"
+               hx-target="#inbox" hx-swap="outerHTML" hx-push-url="true"
+               {% if d.number == current.number %}aria-current="true"{% endif %}
+               class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 {% if d.number == current.number %}bg-zinc-100{% endif %}">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+                <span class="size-1.5 rounded-full {{ d.status_dot_class }}"></span>
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="flex items-baseline justify-between gap-3">
+                  <span class="truncate text-[13px]/5 font-medium tabular-nums">{{ d.number }}</span>
+                  <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">₹{{ d.value|intcomma }}</span>
+                </span>
+                <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                  {{ d.get_status_display }} · {{ d.get_kind_display }}
+                </span>
+                <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500">
+                  {{ d.party.name }} · with you {{ d.with_you_since|timesince }}
+                </span>
+              </span>
+            </a>
+          </li>
+        {% empty %}
+          <li class="flex min-h-72 flex-col items-center justify-center px-6 py-12 text-center">
+            <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+              <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+            </span>
+            <h3 class="mt-3 text-[14px]/5 font-semibold">You are through your inbox</h3>
+            <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+              {{ decided_today|intcomma }} documents decided today. Nothing is filtered.
+            </p>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    {% if current %}
+      <div class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex lg:flex-row">
+
+        <section data-record tabindex="-1" aria-labelledby="dj-record"
+                 class="flex min-h-0 min-w-0 flex-1 flex-col focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+            <a href="{% url 'approvals:inbox' %}"
+               class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+              <i data-lucide="chevron-left" class="size-4"></i>Back to the inbox
+            </a>
+            <h2 id="dj-record" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+              <span class="tabular-nums">{{ current.number }}</span>
+              <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full {{ current.status_dot_class }}" aria-hidden="true"></span>{{ current.get_status_display }}
+              </span>
+            </h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+              {{ current.get_kind_display }} · {{ current.party.name }} · with you {{ current.with_you_since|timesince }}
+            </p>
+          </div>
+
+          <div class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+            <div class="rounded-xl border border-zinc-200 p-4">
+              <div class="flex items-start gap-2.5">
+                <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                <div class="min-w-0">
+                  <p class="text-[13px]/5 font-medium">Why this is with you</p>
+                  <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">{{ current.routing_reason }}</p>
+                </div>
+              </div>
+            </div>
+
+            <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+              {% for f in current.summary_fields %}
+                <div class="min-w-0">
+                  <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">{{ f.label }}</dt>
+                  <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums">{{ f.value }}</dd>
+                </div>
+              {% endfor %}
+            </dl>
+
+            <h3 class="mt-5 text-[13px]/5 font-medium">Lines</h3>
+            <div class="mt-2 overflow-hidden rounded-xl border border-zinc-200">
+              <table class="w-full text-[13px]/5">
+                <thead>
+                  <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">
+                    {% for c in current.line_columns %}
+                      <th scope="col" class="px-3 py-2 font-medium {% if c.numeric %}text-right{% endif %}">{{ c.label }}</th>
+                    {% endfor %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for l in current.lines.all %}
+                    <tr class="border-b border-zinc-100 last:border-0">
+                      <td class="px-3 py-2">{{ l.description }}</td>
+                      <td class="px-3 py-2 text-right tabular-nums text-zinc-600">{{ l.quantity|intcomma }} {{ l.uom }}</td>
+                      <td class="px-3 py-2 text-right tabular-nums text-zinc-600">₹{{ l.rate|intcomma }}</td>
+                      <td class="px-3 py-2 text-right font-medium tabular-nums">₹{{ l.amount|intcomma }}</td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="4" class="px-3 py-6 text-center text-[13px]/5 text-zinc-600">This document has no lines.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="mt-5 text-[13px]/5 font-medium">How it reached you</h3>
+            <ol class="mt-2 space-y-2.5">
+              {% for e in current.approval_trail %}
+                <li class="flex items-start gap-2.5">
+                  <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+                  <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-600">
+                    <span class="font-medium text-zinc-900">{{ e.what }}</span> — {{ e.when|date:"d M Y, H:i" }}
+                  </p>
+                </li>
+              {% endfor %}
+            </ol>
+          </div>
+        </section>
+
+        <aside aria-label="Your decision" class="flex shrink-0 flex-col border-t border-zinc-200 lg:w-72 lg:border-t-0 lg:border-l">
+          <div class="hidden min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:block">
+            <p class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">This document</p>
+            <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums">₹{{ current.value|intcomma }}</p>
+            {% if current.within_limit %}
+              <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Within your ₹{{ user.approval_limit|intcomma }} limit.</p>
+            {% else %}
+              <div class="mt-3 flex items-start gap-2.5 rounded-lg bg-zinc-50 px-3 py-2.5">
+                <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+                <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-900">
+                  Above your ₹{{ user.approval_limit|intcomma }} limit, so approving it is not yours to do. It goes to {{ current.next_approver.get_full_name }}.
+                </p>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 border-zinc-200 px-4 py-3 lg:flex-col lg:items-stretch lg:border-t">
+            {% if current.within_limit %}
+              <form method="post" action="{% url 'approvals:approve' current.pk %}"
+                    hx-post="{% url 'approvals:approve' current.pk %}"
+                    hx-target="#inbox" hx-swap="outerHTML" hx-disabled-elt="find button"
+                    class="contents">
+                {% csrf_token %}
+                <button type="submit"
+                        class="group inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:hover:bg-zinc-700">
+                  <span class="group-[.htmx-request]:hidden"><i data-lucide="check" class="size-4"></i></span>
+                  <span class="hidden group-[.htmx-request]:inline"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+                  <span class="grid">
+                    <span class="col-start-1 row-start-1 group-[.htmx-request]:invisible">Approve</span>
+                    <span class="invisible col-start-1 row-start-1 group-[.htmx-request]:visible">Approving…</span>
+                  </span>
+                </button>
+              </form>
+            {% else %}
+              <form method="post" action="{% url 'approvals:escalate' current.pk %}"
+                    hx-post="{% url 'approvals:escalate' current.pk %}"
+                    hx-target="#inbox" hx-swap="outerHTML" hx-disabled-elt="find button"
+                    class="contents">
+                {% csrf_token %}
+                <button type="submit"
+                        class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="corner-up-right" class="size-4"></i>Send to {{ current.next_approver.first_name }}
+                </button>
+              </form>
+            {% endif %}
+
+            {% comment %}
+              A refusal needs a required reason, so it is a real view with a
+              real form rather than a second button here.
+            {% endcomment %}
+            <a href="{% url 'approvals:send_back' current.pk %}"
+               class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back
+            </a>
+            <a href="{% url 'approvals:reject' current.pk %}"
+               class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="alert-circle" class="size-4 text-red-600"></i>Reject
+            </a>
+          </div>
+        </aside>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% comment %}
+base.html — the live region ships empty, once, outside every hx-target on the
+page. A region the swap replaces is a new region holding a message that was
+already inside it when it appeared, and that is announced to nobody.
+
+    <p id="kui-live" role="status" aria-live="polite" class="sr-only"></p>
+
+approvals/views.py
+
+    @require_POST
+    def approve(request, pk):
+        doc = get_object_or_404(Document.awaiting(request.user), pk=pk)
+        try:
+            doc.approve(by=request.user, on_behalf_of=request.delegation)
+        except AlreadyDecided as e:
+            said = f"{doc.number} was approved by {e.by} at {e.at:%H:%M}, before "
+            said += "your approval reached the server. Nothing was written by you."
+        except Stale:
+            said = f"{doc.number} changed while it was on screen. Nothing was written."
+        else:
+            said = f"{doc.number} approved."
+        queue = list(Document.awaiting(request.user))
+        said += f" {len(queue)} left in your inbox."
+        response = render(request, "approvals/_inbox.html", inbox_context(request, queue))
+        response["HX-Trigger"] = json.dumps({"decided": said})
+        return response
+
+Document.awaiting(user) is the whole routing rule in one place — the user's own
+queue plus anything they hold a live delegation for — and it is re-run on every
+response, so the queue and the record can never disagree about what is left.
+It is also what the POST re-checks: a document that has left the queue between
+the render and the click is not in the queryset, so the 404 is the concurrency
+guard rather than something bolted on beside it.
+
+within_limit and next_approver come off the model against the authority in
+force, which is the delegation limit when one is being used and the user's own
+otherwise. The template never compares two figures itself — a limit worked out
+in a template is a limit that will be worked out differently in the next
+template.
+
+status_dot_class is one of the five locked values — bg-zinc-500, bg-amber-500,
+bg-red-600, bg-emerald-600, bg-zinc-400 — so the pill shape is written once
+here and only the dot changes.
+{% endcomment %}

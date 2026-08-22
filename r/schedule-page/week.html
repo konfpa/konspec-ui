@@ -1,0 +1,272 @@
+<!-- Gate-in bookings at the weighbridge, where a delivery is not a date but a
+     slot: two trucks at 09:00 is two trucks at one gate, and a month grid
+     cannot say that. Seven day columns, the hour down the side, and the block
+     positioned by per cent of the working span rather than snapped into a cell
+     — 06:20 rounded to 06:00 three times in a row is an hour of gate time that
+     does not exist.
+
+     top and height are the whole geometry: 06:00 to 20:00 is fourteen hours, so
+     one hour is 7.143 per cent and a two-hour booking is exactly twice the
+     height of a one-hour one. The lane is relative, the block is absolute, and
+     the style attribute carries the two numbers the same way progress carries
+     its fill.
+
+     Two trucks at once on Wednesday split the column: 0 to 48 per cent and 50
+     to 98. Side by side is the only arrangement that says "at the same time" —
+     stacked in sequence they read as one after the other, which is the fact the
+     planner came to check.
+
+     Saturday is a working column like any other and Sunday is the recessed
+     fill. The gate does not open on a Sunday and it does on a Saturday, which
+     is the working week this software is for.
+
+     Below md the grid is gone: seven columns of forty-pixel blocks is nothing
+     anybody can read, and the honest answer at that width is the agenda in the
+     phone variant. Here it is one line per day with the times written out. -->
+<main data-kui="schedule-page/week" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Planning</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium text-zinc-900">Gate bookings</span></li>
+        </ol>
+      </nav>
+
+      <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div class="min-w-0">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight">Gate bookings</h1>
+          <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+            11 slots booked · 2 gates · 06:00 to 20:00 · Silvassa
+          </p>
+        </div>
+        <button type="button" class="flex shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4"></i>Book a slot
+        </button>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <div class="flex items-center gap-1">
+          <button type="button" aria-label="Previous week"
+                  class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="chevron-left" class="size-4"></i>
+          </button>
+          <span aria-live="polite" class="min-w-44 px-1 text-center text-[13px]/5 font-medium tabular-nums">17 – 23 Aug 2026</span>
+          <button type="button" aria-label="Next week"
+                  class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="chevron-right" class="size-4"></i>
+          </button>
+          <a href="#" class="ml-1 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">This week</a>
+        </div>
+
+        <nav aria-label="Schedule views" class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+          <a href="#" class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Month</a>
+          <a href="#" aria-current="page" class="inline-flex h-8 items-center rounded-md bg-white px-3 text-[13px]/5 font-medium text-zinc-900 shadow-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Week</a>
+          <a href="#" class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Line</a>
+          <a href="#" class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Day</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+    <section aria-labelledby="swk-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <h2 id="swk-h" class="sr-only">Gate bookings, 17 to 23 August 2026</h2>
+
+      <div class="hidden md:block">
+        <div class="flex border-b border-zinc-200 bg-zinc-50">
+          <div class="w-14 shrink-0 border-r border-zinc-200"></div>
+          <div class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Mon 17</div>
+          <div class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Tue 18</div>
+          <div class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Wed 19</div>
+          <div class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Thu 20</div>
+          <div class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Fri 21</div>
+          <div class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Sat 22</div>
+          <div class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Sun 23</div>
+        </div>
+
+        <div class="flex">
+          <!-- The ruler is aria-hidden. Twelve hour labels read out before the
+               first booking is noise, and every block already carries its own
+               start and end in its name. -->
+          <div aria-hidden="true" class="relative h-[28rem] w-14 shrink-0 border-r border-zinc-200 bg-zinc-50">
+            <span class="absolute right-1.5 -translate-y-1/2 text-[11px]/4 tabular-nums text-zinc-500" style="top: 0%">06:00</span>
+            <span class="absolute right-1.5 -translate-y-1/2 text-[11px]/4 tabular-nums text-zinc-500" style="top: 14.29%">08:00</span>
+            <span class="absolute right-1.5 -translate-y-1/2 text-[11px]/4 tabular-nums text-zinc-500" style="top: 28.57%">10:00</span>
+            <span class="absolute right-1.5 -translate-y-1/2 text-[11px]/4 tabular-nums text-zinc-500" style="top: 42.86%">12:00</span>
+            <span class="absolute right-1.5 -translate-y-1/2 text-[11px]/4 tabular-nums text-zinc-500" style="top: 57.14%">14:00</span>
+            <span class="absolute right-1.5 -translate-y-1/2 text-[11px]/4 tabular-nums text-zinc-500" style="top: 71.43%">16:00</span>
+            <span class="absolute right-1.5 -translate-y-1/2 text-[11px]/4 tabular-nums text-zinc-500" style="top: 85.71%">18:00</span>
+            <span class="absolute right-1.5 -translate-y-1/2 text-[11px]/4 tabular-nums text-zinc-500" style="top: 100%">20:00</span>
+          </div>
+
+          <div class="relative h-[28rem] flex-1 border-r border-zinc-200 px-1">
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 14.29%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 28.57%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 42.86%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 57.14%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 71.43%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 85.71%"></span>
+            <a href="#" class="absolute inset-x-1 overflow-hidden rounded-md bg-zinc-200 px-1.5 py-1 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 7.14%; height: 14.29%">
+              <span class="flex items-center gap-1">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[11px]/4 font-medium tabular-nums text-zinc-700">GRN-4821</span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-600">07:00 – 09:00</span>
+              <span class="sr-only">Sharma Steel &amp; Alloys, gate 1, Monday 17 August 2026</span>
+            </a>
+            <a href="#" class="absolute inset-x-1 overflow-hidden rounded-md bg-zinc-200 px-1.5 py-1 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 50%; height: 7.14%">
+              <span class="flex items-center gap-1">
+                <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+                <span class="truncate text-[11px]/4 font-medium tabular-nums text-zinc-700">GRN-4824</span>
+              </span>
+              <span class="sr-only">Konkan Packaging Co, 13:00 to 14:00, gate 2, Monday 17 August 2026, received</span>
+            </a>
+          </div>
+
+          <div class="relative h-[28rem] flex-1 border-r border-zinc-200 px-1">
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 14.29%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 28.57%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 42.86%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 57.14%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 71.43%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 85.71%"></span>
+            <a href="#" class="absolute inset-x-1 overflow-hidden rounded-md bg-zinc-200 px-1.5 py-1 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 21.43%; height: 21.43%">
+              <span class="flex items-center gap-1">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[11px]/4 font-medium tabular-nums text-zinc-700">GRN-4826</span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-600">09:00 – 12:00</span>
+              <span class="mt-0.5 block truncate text-[11px]/4 text-zinc-600">Gujarat Polymers</span>
+              <span class="sr-only">Gujarat Polymers Ltd, gate 1, Tuesday 18 August 2026, 20 MT</span>
+            </a>
+          </div>
+
+          <!-- Two at once, and the only honest drawing of it is side by side.
+               Stacked in sequence they read as one after the other, which is
+               the fact the planner opened the week to check. -->
+          <div class="relative h-[28rem] flex-1 border-r border-zinc-200 px-1">
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 14.29%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 28.57%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 42.86%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 57.14%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 71.43%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 85.71%"></span>
+            <a href="#" class="absolute overflow-hidden rounded-md bg-zinc-200 px-1.5 py-1 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 21.43%; height: 14.29%; left: 4%; width: 46%">
+              <span class="flex items-center gap-1">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[11px]/4 font-medium tabular-nums text-zinc-700">4829</span>
+              </span>
+              <span class="sr-only">GRN-4829, Deccan Fasteners Pvt Ltd, 09:00 to 11:00, gate 1, Wednesday 19 August 2026</span>
+            </a>
+            <a href="#" class="absolute overflow-hidden rounded-md bg-zinc-200 px-1.5 py-1 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 21.43%; height: 14.29%; left: 52%; width: 46%">
+              <span class="flex items-center gap-1">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[11px]/4 font-medium tabular-nums text-zinc-700">4830</span>
+              </span>
+              <span class="sr-only">GRN-4830, Qureshi Metals, 09:00 to 11:00, gate 2, Wednesday 19 August 2026</span>
+            </a>
+            <a href="#" class="absolute inset-x-1 overflow-hidden rounded-md bg-zinc-200 px-1.5 py-1 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 64.29%; height: 14.29%">
+              <span class="flex items-center gap-1">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[11px]/4 font-medium tabular-nums text-zinc-700">GRN-4833</span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-600">15:00 – 17:00</span>
+              <span class="sr-only">Baroda Fasteners Pvt Ltd, gate 1, Wednesday 19 August 2026</span>
+            </a>
+          </div>
+
+          <div class="relative h-[28rem] flex-1 border-r border-zinc-200 px-1">
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 14.29%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 28.57%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 42.86%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 57.14%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 71.43%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 85.71%"></span>
+            <a href="#" class="absolute inset-x-1 overflow-hidden rounded-md bg-zinc-200 px-1.5 py-1 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 0%; height: 28.57%">
+              <span class="flex items-center gap-1">
+                <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                <span class="truncate text-[11px]/4 font-medium tabular-nums text-zinc-700">GRN-4836</span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-600">06:00 – 10:00</span>
+              <span class="mt-0.5 block truncate text-[11px]/4 text-zinc-600">Sharma Steel</span>
+              <span class="sr-only">Sharma Steel &amp; Alloys, gate 1, Thursday 20 August 2026, 24 MT in three trucks</span>
+            </a>
+          </div>
+
+          <!-- The plant is shut on Friday and the column says so rather than
+               being left blank. A blank column is a free day to anybody reading
+               quickly, and a free Friday is exactly what nobody has. -->
+          <div class="relative h-[28rem] flex-1 border-r border-zinc-200 bg-zinc-50 px-1">
+            <p class="px-1.5 pt-2 text-[11px]/4 text-zinc-600">Plant shut — annual maintenance</p>
+          </div>
+
+          <div class="relative h-[28rem] flex-1 border-r border-zinc-200 px-1">
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 14.29%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 28.57%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 42.86%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 57.14%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 71.43%"></span>
+            <span aria-hidden="true" class="absolute inset-x-0 h-px bg-zinc-100" style="top: 85.71%"></span>
+            <a href="#" class="absolute inset-x-1 overflow-hidden rounded-md bg-zinc-200 px-1.5 py-1 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+               style="top: 7.14%; height: 14.29%">
+              <span class="flex items-center gap-1">
+                <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+                <span class="truncate text-[11px]/4 font-medium tabular-nums text-zinc-700">GRN-4841</span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-600">07:00 – 09:00</span>
+              <span class="sr-only">Silvassa Hydraulics, gate 1, Saturday 22 August 2026, awaiting approval</span>
+            </a>
+          </div>
+
+          <div class="relative h-[28rem] flex-1 bg-zinc-50 px-1">
+            <p class="px-1.5 pt-2 text-[11px]/4 text-zinc-500">Weekly off</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Below md the geometry is abandoned rather than shrunk. Seven columns
+           of forty-pixel blocks says nothing; a line per day with the times
+           written out says the same facts in words. -->
+      <ul role="list" class="divide-y divide-zinc-100 md:hidden">
+        <li class="px-4 py-3">
+          <h3 class="text-[13px]/5 font-medium tabular-nums">Mon 17 Aug</h3>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">07:00 – 09:00 GRN-4821 · 13:00 – 14:00 GRN-4824</p>
+        </li>
+        <li class="px-4 py-3">
+          <h3 class="text-[13px]/5 font-medium tabular-nums">Tue 18 Aug</h3>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">09:00 – 12:00 GRN-4826</p>
+        </li>
+        <li class="px-4 py-3">
+          <h3 class="text-[13px]/5 font-medium tabular-nums">Wed 19 Aug</h3>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">09:00 – 11:00 GRN-4829 and GRN-4830, both gates · 15:00 – 17:00 GRN-4833</p>
+        </li>
+        <li class="px-4 py-3">
+          <h3 class="text-[13px]/5 font-medium tabular-nums">Thu 20 Aug</h3>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">06:00 – 10:00 GRN-4836</p>
+        </li>
+        <li class="bg-zinc-50 px-4 py-3">
+          <h3 class="text-[13px]/5 font-medium tabular-nums text-zinc-600">Fri 21 Aug</h3>
+          <p class="mt-1 text-[13px]/5 text-zinc-600">Plant shut — annual maintenance</p>
+        </li>
+        <li class="px-4 py-3">
+          <h3 class="text-[13px]/5 font-medium tabular-nums">Sat 22 Aug</h3>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">07:00 – 09:00 GRN-4841</p>
+        </li>
+        <li class="bg-zinc-50 px-4 py-3">
+          <h3 class="text-[13px]/5 font-medium tabular-nums text-zinc-600">Sun 23 Aug</h3>
+          <p class="mt-1 text-[13px]/5 text-zinc-600">Weekly off</p>
+        </li>
+      </ul>
+    </section>
+  </div>
+</main>

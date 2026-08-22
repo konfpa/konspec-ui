@@ -1,0 +1,339 @@
+<!-- The view paginates, not the browser, and the two figures on this sheet are
+     the reason.
+
+     "Page 2 of 3" cannot be produced in CSS: counter(page) inside an @page
+     margin box is not implemented in Chrome, so a number written that way is
+     right in Firefox and missing everywhere else. And a brought-forward
+     subtotal is arithmetic over the lines that fell on the previous sheet,
+     which no stylesheet can see. Both are the server's to compute, so the
+     server decides where the lines break and hands down one section per sheet.
+
+     Each sheet is a <section> ending in break-after-page, except the last,
+     which ends in nothing — break-after-page on the final section prints a
+     blank sheet at the end of every job.
+
+     Every sheet repeats the table head, because the head is inside each sheet's
+     own table. This is the opposite trade from purchase-order, which lets one
+     table flow and repeat its <thead> natively: that is the right answer when
+     there is nothing to carry forward and no page number to print, and it is
+     the wrong one the moment there is.
+
+     The carried figures are named in full — carried forward from page 1, and
+     brought forward from page 2 — rather than b/f and c/f. Two abbreviations
+     that differ by one letter, in a column of figures, on a sheet somebody is
+     checking against a ledger.
+
+     The totals and the signature ride together on the last sheet, both
+     break-inside-avoid. A totals block orphaned onto a sheet of its own reads
+     as a total of that sheet, and nothing on the page corrects it.
+
+     The h1 is on sheet 1. Sheets 2 and 3 carry a compact continuation head at
+     h2, which is how a paper continuation sheet has always been headed and what
+     stops the outline claiming three documents. -->
+<div data-kui="document-page/multi-page" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm] space-y-4 print:space-y-0">
+
+    <section aria-label="Tax invoice INV-2026-0774, page 1 of 3"
+             class="min-h-[297mm] break-after-page rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+      <header class="flex flex-wrap items-start justify-between gap-x-6 gap-y-4 border-b-2 border-zinc-300 pb-4">
+        <div class="flex min-w-0 flex-1 items-start gap-3 sm:min-w-[15rem]">
+          <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-[14px]/5 font-semibold">K</span>
+          <div class="min-w-0">
+            <p class="text-[16px]/6 font-semibold">Konspec Industries Pvt Ltd</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">GSTIN 26AABCK9021M1Z4 · State code 26</p>
+          </div>
+        </div>
+        <div class="min-w-0 sm:shrink-0 sm:text-right">
+          <h1 class="text-[20px]/7 font-semibold tracking-tight">Tax invoice</h1>
+          <p class="mt-1 text-[13px]/5 font-medium tabular-nums">INV-2026-0774 · 09 Sep 2026</p>
+          <p class="mt-0.5 text-[12px]/4 font-medium tabular-nums">Page 1 of 3</p>
+        </div>
+      </header>
+
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <section aria-labelledby="mp-bill-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="mp-bill-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Bill to</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">Deccan Fasteners Pvt Ltd</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Gat 412, Chakan MIDC Phase II, Pune, Maharashtra 410501</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">GSTIN 27AAECD8812P1ZK · State code 27</p>
+        </section>
+        <section aria-labelledby="mp-disp-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="mp-disp-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Dispatch</h2>
+          <p class="mt-1.5 text-[12px]/4 tabular-nums">Challan DC-2026-0917 · vehicle GJ-15-AT-4471</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">e-Way bill 2716 4488 1902 · place of supply Maharashtra (27)</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">15 lines on this invoice, printed across 3 sheets</p>
+        </section>
+      </div>
+
+      <div class="mt-4 overflow-x-auto md:overflow-visible print:overflow-visible">
+        <table class="w-full min-w-[32rem] text-[12px]/4">
+          <caption class="sr-only">Lines 1 to 6 of 15 on invoice INV-2026-0774</caption>
+          <thead class="bg-zinc-50 print:bg-white">
+            <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+              <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+              <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+              <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+              <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Quantity</th>
+              <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Rate</th>
+              <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Taxable value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">1</td>
+              <td class="px-2 py-1.5">HDPE granules — natural, M60075</td>
+              <td class="px-2 py-1.5 tabular-nums">3901</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">6,000.000 kg</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">87.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">5,22,000.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">2</td>
+              <td class="px-2 py-1.5">HDPE granules — black, M65</td>
+              <td class="px-2 py-1.5 tabular-nums">3901</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">3,000.000 kg</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">89.50</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">2,68,500.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">3</td>
+              <td class="px-2 py-1.5">LDPE granules — 24FS040</td>
+              <td class="px-2 py-1.5 tabular-nums">3901</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">2,000.000 kg</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">92.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">1,84,000.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">4</td>
+              <td class="px-2 py-1.5">PP copolymer — 3120MA</td>
+              <td class="px-2 py-1.5 tabular-nums">3902</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">1,500.000 kg</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">105.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">1,57,500.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">5</td>
+              <td class="px-2 py-1.5">Masterbatch — white 60%</td>
+              <td class="px-2 py-1.5 tabular-nums">3206</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">250.000 kg</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">245.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">61,250.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">6</td>
+              <td class="px-2 py-1.5">Masterbatch — black 40%</td>
+              <td class="px-2 py-1.5 tabular-nums">3206</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">180.000 kg</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">210.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">37,800.00</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="break-inside-avoid border-t-2 border-zinc-300">
+              <th scope="row" colspan="5" class="px-2 py-2 text-right font-medium">Carried forward from page 1</th>
+              <td class="px-2 py-2 text-right font-semibold tabular-nums">12,31,050.00</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+        Page 1 of 3 · INV-2026-0774 · lines 1 to 6 of 15 · continued overleaf
+      </footer>
+    </section>
+
+    <section aria-label="Tax invoice INV-2026-0774, page 2 of 3"
+             class="min-h-[297mm] break-after-page rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+      <header class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b-2 border-zinc-300 pb-3">
+        <h2 class="text-[13px]/5 font-semibold tabular-nums">Tax invoice INV-2026-0774 — continued</h2>
+        <p class="text-[12px]/4 font-medium tabular-nums">Page 2 of 3 · Konspec Industries Pvt Ltd · GSTIN 26AABCK9021M1Z4</p>
+      </header>
+
+      <div class="mt-4 overflow-x-auto md:overflow-visible print:overflow-visible">
+        <table class="w-full min-w-[32rem] text-[12px]/4">
+          <caption class="sr-only">Lines 7 to 12 of 15 on invoice INV-2026-0774, continued from page 1</caption>
+          <thead class="bg-zinc-50 print:bg-white">
+            <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+              <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+              <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+              <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+              <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Quantity</th>
+              <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Rate</th>
+              <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Taxable value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="break-inside-avoid border-b border-zinc-300">
+              <th scope="row" colspan="5" class="px-2 py-1.5 text-right font-medium">Brought forward from page 1</th>
+              <td class="px-2 py-1.5 text-right font-medium tabular-nums">12,31,050.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">7</td>
+              <td class="px-2 py-1.5">Stretch film — 23 micron</td>
+              <td class="px-2 py-1.5 tabular-nums">3920</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">300.000 kg</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">175.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">52,500.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">8</td>
+              <td class="px-2 py-1.5">HDPE woven sack — 50 kg</td>
+              <td class="px-2 py-1.5 tabular-nums">6305</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">4,000 nos</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">18.40</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">73,600.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">9</td>
+              <td class="px-2 py-1.5">Liner — LDPE 100 micron</td>
+              <td class="px-2 py-1.5 tabular-nums">3923</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">1,200 nos</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">9.80</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">11,760.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">10</td>
+              <td class="px-2 py-1.5">Strapping roll — PP 12 mm</td>
+              <td class="px-2 py-1.5 tabular-nums">3920</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">60 nos</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">640.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">38,400.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">11</td>
+              <td class="px-2 py-1.5">Pallet — wooden 1200 × 1000</td>
+              <td class="px-2 py-1.5 tabular-nums">4415</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">40 nos</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">1,150.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">46,000.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">12</td>
+              <td class="px-2 py-1.5">Silica gel sachet — 50 g</td>
+              <td class="px-2 py-1.5 tabular-nums">2811</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">2,000 nos</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">4.20</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">8,400.00</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="break-inside-avoid border-t-2 border-zinc-300">
+              <th scope="row" colspan="5" class="px-2 py-2 text-right font-medium">Carried forward from page 2</th>
+              <td class="px-2 py-2 text-right font-semibold tabular-nums">14,61,710.00</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+        Page 2 of 3 · INV-2026-0774 · lines 7 to 12 of 15 · continued overleaf
+      </footer>
+    </section>
+
+    <section aria-label="Tax invoice INV-2026-0774, page 3 of 3"
+             class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+      <header class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b-2 border-zinc-300 pb-3">
+        <h2 class="text-[13px]/5 font-semibold tabular-nums">Tax invoice INV-2026-0774 — continued</h2>
+        <p class="text-[12px]/4 font-medium tabular-nums">Page 3 of 3 · Konspec Industries Pvt Ltd · GSTIN 26AABCK9021M1Z4</p>
+      </header>
+
+      <div class="mt-4 overflow-x-auto md:overflow-visible print:overflow-visible">
+        <table class="w-full min-w-[32rem] text-[12px]/4">
+          <caption class="sr-only">Lines 13 to 15 of 15 on invoice INV-2026-0774, and the totals</caption>
+          <thead class="bg-zinc-50 print:bg-white">
+            <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+              <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+              <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+              <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+              <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Quantity</th>
+              <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Rate</th>
+              <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Taxable value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="break-inside-avoid border-b border-zinc-300">
+              <th scope="row" colspan="5" class="px-2 py-1.5 text-right font-medium">Brought forward from page 2</th>
+              <td class="px-2 py-1.5 text-right font-medium tabular-nums">14,61,710.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">13</td>
+              <td class="px-2 py-1.5">Adhesive tape — 48 mm</td>
+              <td class="px-2 py-1.5 tabular-nums">3919</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">300 nos</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">42.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">12,600.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">14</td>
+              <td class="px-2 py-1.5">Corner board — paper</td>
+              <td class="px-2 py-1.5 tabular-nums">4823</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">800 nos</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">11.50</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">9,200.00</td>
+            </tr>
+            <tr class="break-inside-avoid border-b border-zinc-200">
+              <td class="px-2 py-1.5 text-right tabular-nums">15</td>
+              <td class="px-2 py-1.5">Shrink hood — LDPE</td>
+              <td class="px-2 py-1.5 tabular-nums">3920</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">120.000 kg</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">168.00</td>
+              <td class="px-2 py-1.5 text-right tabular-nums">20,160.00</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="break-inside-avoid border-t-2 border-zinc-300">
+              <th scope="row" colspan="5" class="px-2 py-2 text-right font-medium">Total taxable value — 15 lines</th>
+              <td class="px-2 py-2 text-right font-semibold tabular-nums">15,03,670.00</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <div class="break-inside-avoid border border-zinc-300 p-3">
+          <h3 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Amount chargeable, in words</h3>
+          <p class="mt-1 text-[13px]/5 font-medium">Rupees Seventeen Lakh Seventy Four Thousand Three Hundred Thirty Only</p>
+        </div>
+        <section aria-labelledby="mp-tax-h" class="break-inside-avoid self-start">
+          <h3 id="mp-tax-h" class="sr-only">Tax summary</h3>
+          <table class="w-full border border-zinc-300 text-[12px]/4">
+            <tbody>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">Taxable value</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">15,03,670.00</td>
+              </tr>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">IGST at 18%</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">2,70,660.60</td>
+              </tr>
+              <tr class="border-b border-zinc-200">
+                <th scope="row" class="px-3 py-1.5 text-left font-normal text-zinc-600">Rounded off</th>
+                <td class="px-3 py-1.5 text-right tabular-nums">−0.60</td>
+              </tr>
+              <tr class="border-t-2 border-zinc-300">
+                <th scope="row" class="px-3 py-2 text-left text-[13px]/5 font-semibold">Invoice total</th>
+                <td class="px-3 py-2 text-right text-[13px]/5 font-semibold tabular-nums">₹17,74,330.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <div class="mt-8 grid gap-6 sm:grid-cols-2">
+        <div class="break-inside-avoid">
+          <h3 class="text-[11px]/4 uppercase tracking-wider text-zinc-600">Declaration</h3>
+          <p class="mt-1 text-[11px]/4 text-zinc-600">We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct. Subject to Silvassa jurisdiction. E &amp; O.E.</p>
+        </div>
+        <div class="break-inside-avoid sm:text-right">
+          <p class="text-[11px]/4 uppercase tracking-wider text-zinc-600">For Konspec Industries Pvt Ltd</p>
+          <p class="mt-10 border-t border-zinc-300 pt-1 text-[12px]/4">Authorised signatory</p>
+        </div>
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+        Page 3 of 3 · INV-2026-0774 · lines 13 to 15 of 15 · last page
+      </footer>
+    </section>
+  </main>
+</div>

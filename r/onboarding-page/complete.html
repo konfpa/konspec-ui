@@ -1,0 +1,167 @@
+<!-- The state most setup screens never draw, and the one that decides whether
+     the thing was worth building. A checklist parked at 100% for three years is
+     clutter with an audit trail attached: it holds a place in the navigation
+     that an operational destination should have, and every new joiner opens it
+     once to find out what it is.
+
+     So the page says out loud what happens to it. It leaves the navigation on a
+     stated date rather than the moment the last task is ticked, because the
+     person who finished at 18:00 will look for it again the next morning. The
+     URL keeps working for ever, and what it holds afterwards is the record of
+     who set what up and when — which is the only reason to keep it at all.
+
+     Every setting is now in settings-page and that is where it is changed. This
+     screen offers no fields, because a second place to edit a setting is how
+     the prefix ends up different in two places.
+
+     The top block is empty-state's all-clear shape: check-circle-2 in
+     emerald-600 on the same bg-zinc-200 well every other state uses, evidence
+     rather than mood. "15 of 15 over 14 days, first order PO-2026-0001 on 27
+     Aug" is a claim somebody can check; "All done!" is what a bug would also
+     print.
+
+     The two skipped tasks are still on the screen and are still not done. Rolled
+     into the total they become fifteen finished tasks, and in November nobody
+     can tell which two were decisions.
+
+     The record is a list and not a table. Three short facts per task, nothing
+     to sort and no column to compare down — a table here is a grid that has to
+     restack at 390px to say what a list says at any width. -->
+<div data-kui="onboarding-page/complete" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Set up Konspec</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · Silvassa and Vapi · FY 2026–27</p>
+    </div>
+
+    <div class="mt-5 rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-col items-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="check-circle-2" class="size-5 text-emerald-600" aria-hidden="true"></i>
+        </span>
+        <h2 class="mt-3 text-[20px]/7 font-semibold tracking-tight">Setup is done</h2>
+        <p class="mt-1 max-w-md text-[13px]/5 tabular-nums text-zinc-600">
+          15 of 15 counted tasks, finished between 12 and 26 Aug 2026 by four people. Two optional tasks were skipped and are listed below.
+        </p>
+        <p class="mt-2 max-w-md text-[12px]/4 tabular-nums text-zinc-500">
+          The first document raised against this configuration was PO-2026-0001, Gujarat Polymers Ltd, ₹12,45,000, on 27 Aug 2026.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Opening stock: 1,240 items across 6 stores</p>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Checked 27 Aug 2026, 09:14</p>
+      </div>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 class="text-[16px]/6 font-semibold">What happens to this page</h2>
+      </div>
+      <ul role="list" class="divide-y divide-zinc-100 px-5 text-[13px]/5">
+        <li class="flex items-start gap-3 py-3">
+          <i data-lucide="calendar" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <p class="min-w-0 tabular-nums text-zinc-700">
+            It leaves the navigation on <span class="font-medium text-zinc-900">09 Sep 2026</span>, two weeks after the last task. Not today — whoever finished at 18:00 will come looking for it in the morning.
+          </p>
+        </li>
+        <li class="flex items-start gap-3 py-3">
+          <i data-lucide="link" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <p class="min-w-0 text-zinc-700">
+            The address keeps working after that. What it holds is the record below — who set what up and when — which is what an auditor asks for and what nothing else in the application stores in one place.
+          </p>
+        </li>
+        <li class="flex items-start gap-3 py-3">
+          <i data-lucide="settings" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <p class="min-w-0 text-zinc-700">
+            Nothing is changed from here again. Every one of these settings lives in Settings and is edited there; this page never held them, it only tracked whether somebody had got to them.
+          </p>
+        </li>
+      </ul>
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Take it out of the navigation now
+        </button>
+        <a href="#" class="inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          Open Settings<i data-lucide="arrow-up-right" class="size-4" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+        <div class="min-w-0">
+          <h2 class="text-[16px]/6 font-semibold">Two tasks were skipped</h2>
+          <p class="mt-0.5 text-[13px]/5 text-zinc-600">They are not done. If either is needed later it is done in Settings, not here.</p>
+        </div>
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">19 Aug 2026</p>
+      </div>
+      <ul role="list" class="divide-y divide-zinc-100">
+        <li class="flex items-start gap-3 px-4 py-3">
+          <i data-lucide="minus-circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium text-zinc-600"><span class="sr-only">Skipped — </span>Customer masters</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Akshay Prabhu, 19 Aug 2026 — &ldquo;we are not raising sales orders from this system yet&rdquo;</p>
+          </div>
+          <a href="#" class="mt-0.5 shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Settings, Master lists</a>
+        </li>
+        <li class="flex items-start gap-3 px-4 py-3">
+          <i data-lucide="minus-circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium text-zinc-600"><span class="sr-only">Skipped — </span>Roles and permissions</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Akshay Prabhu, 19 Aug 2026 — &ldquo;the four built-in roles cover everybody at both plants&rdquo;</p>
+          </div>
+          <a href="#" class="mt-0.5 shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Settings, Users and roles</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+        <div class="min-w-0">
+          <h2 class="text-[16px]/6 font-semibold">Who set what up</h2>
+          <p class="mt-0.5 text-[13px]/5 text-zinc-600">The record this page becomes. Three facts per task, and where the setting lives now.</p>
+        </div>
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">15 tasks</p>
+      </div>
+      <ul role="list" class="divide-y divide-zinc-100">
+        <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-2.5">
+          <span class="min-w-0 flex-1 text-[13px]/5 font-medium">Company profile</span>
+          <span class="text-[12px]/4 tabular-nums text-zinc-600">Akshay Prabhu · 12 Aug 2026</span>
+          <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Settings, Company profile</a>
+        </li>
+        <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-2.5">
+          <span class="min-w-0 flex-1 text-[13px]/5 font-medium">Numbering series</span>
+          <span class="text-[12px]/4 tabular-nums text-zinc-600">Meera Iyer · 13 Aug 2026</span>
+          <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Settings, Numbering series</a>
+        </li>
+        <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-2.5">
+          <span class="min-w-0 flex-1 text-[13px]/5 font-medium">Chart of accounts</span>
+          <span class="text-[12px]/4 tabular-nums text-zinc-600">Meera Iyer · 14 Aug 2026 · 412 ledgers</span>
+          <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Settings, Master lists</a>
+        </li>
+        <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-2.5">
+          <span class="min-w-0 flex-1 text-[13px]/5 font-medium">Vendor masters</span>
+          <span class="text-[12px]/4 tabular-nums text-zinc-600">Sanjay More · 18 Aug 2026 · 214 vendors</span>
+          <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Master data, Vendors</a>
+        </li>
+        <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-2.5">
+          <span class="min-w-0 flex-1 text-[13px]/5 font-medium">Item masters</span>
+          <span class="text-[12px]/4 tabular-nums text-zinc-600">Sanjay More · 22 Aug 2026 · 1,240 items</span>
+          <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Master data, Items</a>
+        </li>
+        <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-2.5">
+          <span class="min-w-0 flex-1 text-[13px]/5 font-medium">Opening stock</span>
+          <span class="text-[12px]/4 tabular-nums text-zinc-600">Sanjay More · 26 Aug 2026 · ₹4,18,62,400</span>
+          <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stock, Opening balances</a>
+        </li>
+      </ul>
+      <div class="border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
+        <p class="text-[12px]/4 tabular-nums text-zinc-600">
+          Showing 6 of 15 · <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">the whole record</a>
+        </p>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,241 @@
+<!-- The case naive matching screens fall over on, drawn twice: the many-to-one
+     and the one-to-many, which are the same table read from opposite ends.
+
+     A match is an allocation with an amount, not a link between two ids. Store
+     it as a link and neither of these can be expressed, and a screen built on
+     one-to-one pairing has to be rewritten the first week it meets a part
+     shipment. The amount is a real input on every row, because the arithmetic
+     is the decision — three receipts that come to the invoice exactly and two
+     invoices that leave ₹18,240 outstanding are different findings, and the
+     screen must not round either of them into the other.
+
+     The remainder is printed, never absorbed. A screen that silently allocates
+     the last ₹18,240 to the nearest row is a screen where the ledger and the
+     vendor statement disagree by ₹18,240 and nobody can say when it started.
+     It is an <output> with aria-live="off" — an output is a live region by
+     default and this one recomputes on every keystroke, so what announces a
+     remainder reaching zero is the status region, once.
+
+     Every allocation box carries its own sr-only label naming both records.
+     Five boxes all labelled Allocated are five boxes nobody using a screen
+     reader can tell apart, which is form-page's line-grid rule and it applies
+     here for the same reason.
+
+     The label carries its whole sentence in one x-text and not as a run of
+     nested spans. sr-only is position:absolute in a 1px box with overflow
+     hidden, so an inline child inside it lays out past the box and reports a
+     rect seventy pixels beyond the right edge of a 390px screen — clipped, so
+     nothing scrolls, but every overflow audit flags it forever. One string is
+     also one label rather than four fragments.
+
+     The progress rail is progress/bar's shape and it says what fraction of the
+     receipt has been invoiced. It is not a decoration on a full panel: the two
+     panels differ by 0.8% and the rail is what makes that visible before the
+     figures are read. -->
+<div data-kui="reconcile-page/partial" class="bg-zinc-100 text-zinc-900"
+     x-id="['pt']"
+     x-data="{
+       said: '',
+       one: { id: 'INV-2026-1184', kind: 'invoice', who: 'Sharma Steel &amp; Alloys', on: '02 Sep 2026', val: 1842000,
+         rows: [
+           { id: 'GRN-4788', on: '12 Aug 2026', val: 745056, alloc: 745056 },
+           { id: 'GRN-4801', on: '19 Aug 2026', val: 612400, alloc: 612400 },
+           { id: 'GRN-4818', on: '02 Sep 2026', val: 484544, alloc: 484544 }
+         ] },
+       two: { id: 'GRN-4821', kind: 'receipt', who: 'Gujarat Polymers Ltd', on: '04 Sep 2026', val: 2254240,
+         rows: [
+           { id: 'INV-2026-1176', on: '05 Sep 2026', val: 1500000, alloc: 1500000 },
+           { id: 'INV-2026-1191', on: '11 Sep 2026', val: 736000, alloc: 736000 }
+         ] },
+       fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       allocated(o) { return o.rows.reduce((s, r) => s + (Number(r.alloc) || 0), 0) },
+       rest(o) { return o.val - this.allocated(o) },
+       pct(o) { return Math.max(0, Math.min(100, (this.allocated(o) / o.val) * 100)) }
+     }">
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <main class="mx-auto max-w-5xl space-y-4 p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Invoice matching</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">Part matches</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Part matches</h1>
+      <p class="mt-1 text-[13px]/5 text-zinc-600">
+        Where one record on one side answers several on the other. The amount allocated is the match; what is left over is the finding.
+      </p>
+    </div>
+
+    <section aria-labelledby="pt-a-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3.5 lg:px-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <h2 id="pt-a-h" class="text-[16px]/6 font-semibold">
+            One invoice against three receipts
+          </h2>
+          <p class="text-[13px]/5 font-semibold tabular-nums" x-text="fmt(one.val)">₹18,42,000</p>
+        </div>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+          <span x-text="one.id"></span> · <span x-text="one.who"></span> · dated <span x-text="one.on"></span> · covers three deliveries against PO-2026-0411
+        </p>
+      </div>
+
+      <table class="w-full text-[13px]/5">
+        <thead>
+          <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+            <th scope="col" class="px-4 py-2.5 font-medium lg:px-5">Receipt</th>
+            <th scope="col" class="hidden px-4 py-2.5 text-right font-medium sm:table-cell">Receipt value</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium lg:px-5">Allocated to this invoice</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="r in one.rows" :key="r.id">
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-4 py-2.5 text-left font-normal lg:px-5">
+                <a href="#" class="font-medium tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="r.id"></a>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">received <span x-text="r.on"></span></span>
+              </th>
+              <td class="hidden px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600 sm:table-cell" x-text="fmt(r.val)"></td>
+              <td class="px-4 py-2.5 lg:px-5">
+                <label class="sr-only" :for="$id('pt', 'a-' + r.id)"
+                       x-text="'Amount of ' + r.id + ' allocated to ' + one.id"></label>
+                <div class="ml-auto flex max-w-[11rem] items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <span aria-hidden="true" class="flex items-center pl-3 text-[13px]/5 text-zinc-600">₹</span>
+                  <input :id="$id('pt', 'a-' + r.id)" type="text" inputmode="decimal" x-model.number="r.alloc"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+                </div>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+        <tfoot class="bg-zinc-50">
+          <tr class="border-t border-zinc-200">
+            <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium text-zinc-600 lg:px-5">Allocated</th>
+            <td class="hidden px-4 py-2 sm:table-cell"></td>
+            <td class="px-4 py-2 text-right font-medium tabular-nums whitespace-nowrap lg:px-5">
+              <output aria-live="off" x-text="fmt(allocated(one))">₹18,42,000</output>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" class="px-4 pb-2.5 text-left text-[12px]/4 font-medium text-zinc-600 lg:px-5">Left unallocated</th>
+            <td class="hidden px-4 pb-2.5 sm:table-cell"></td>
+            <td class="px-4 pb-2.5 text-right lg:px-5">
+              <output aria-live="off" class="inline-flex items-center gap-1.5 text-[14px]/5 font-semibold tabular-nums">
+                <span x-show="rest(one) === 0"><i data-lucide="check-circle-2" class="size-4 text-emerald-600" aria-hidden="true"></i></span>
+                <span x-show="rest(one) !== 0" x-cloak><i data-lucide="alert-circle" class="size-4 text-red-600" aria-hidden="true"></i></span>
+                <span x-text="fmt(rest(one))">₹0</span>
+              </output>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="border-t border-zinc-200 px-4 py-3 lg:px-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-[12px]/4">
+          <span class="tabular-nums text-zinc-600">Three receipts come to the invoice exactly. Nothing is outstanding.</span>
+          <span class="font-medium tabular-nums" x-text="pct(one).toFixed(1) + '% allocated'">100.0% allocated</span>
+        </div>
+        <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200">
+          <div class="h-full rounded-full bg-zinc-700" :style="'width:' + pct(one) + '%'"></div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 px-4 py-3 lg:px-5">
+        <button type="button" :aria-disabled="rest(one) === 0 ? 'false' : 'true'"
+                @click="if (rest(one) !== 0) return; said = one.id + ' matched against three receipts for ' + fmt(allocated(one)) + '. Nothing is posted yet.'"
+                class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <i data-lucide="link" class="size-4"></i>Match these three
+        </button>
+      </div>
+    </section>
+
+    <section aria-labelledby="pt-b-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3.5 lg:px-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <h2 id="pt-b-h" class="text-[16px]/6 font-semibold">One receipt across two invoices</h2>
+          <p class="text-[13px]/5 font-semibold tabular-nums" x-text="fmt(two.val)">₹22,54,240</p>
+        </div>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+          <span x-text="two.id"></span> · <span x-text="two.who"></span> · received <span x-text="two.on"></span> · 38.600 MT of HDPE granules billed in two parts
+        </p>
+      </div>
+
+      <table class="w-full text-[13px]/5">
+        <thead>
+          <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+            <th scope="col" class="px-4 py-2.5 font-medium lg:px-5">Invoice</th>
+            <th scope="col" class="hidden px-4 py-2.5 text-right font-medium sm:table-cell">Invoice value</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium lg:px-5">Allocated to this receipt</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="r in two.rows" :key="r.id">
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-4 py-2.5 text-left font-normal lg:px-5">
+                <a href="#" class="font-medium tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="r.id"></a>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">dated <span x-text="r.on"></span></span>
+              </th>
+              <td class="hidden px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600 sm:table-cell" x-text="fmt(r.val)"></td>
+              <td class="px-4 py-2.5 lg:px-5">
+                <label class="sr-only" :for="$id('pt', 'b-' + r.id)"
+                       x-text="'Amount of ' + r.id + ' allocated to ' + two.id"></label>
+                <div class="ml-auto flex max-w-[11rem] items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <span aria-hidden="true" class="flex items-center pl-3 text-[13px]/5 text-zinc-600">₹</span>
+                  <input :id="$id('pt', 'b-' + r.id)" type="text" inputmode="decimal" x-model.number="r.alloc"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+                </div>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+        <tfoot class="bg-zinc-50">
+          <tr class="border-t border-zinc-200">
+            <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium text-zinc-600 lg:px-5">Allocated</th>
+            <td class="hidden px-4 py-2 sm:table-cell"></td>
+            <td class="px-4 py-2 text-right font-medium tabular-nums whitespace-nowrap lg:px-5">
+              <output aria-live="off" x-text="fmt(allocated(two))">₹22,36,000</output>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" class="px-4 pb-2.5 text-left text-[12px]/4 font-medium text-zinc-600 lg:px-5">Left unallocated</th>
+            <td class="hidden px-4 pb-2.5 sm:table-cell"></td>
+            <td class="px-4 pb-2.5 text-right lg:px-5">
+              <output aria-live="off" class="inline-flex items-center gap-1.5 text-[14px]/5 font-semibold tabular-nums">
+                <span x-show="rest(two) === 0" x-cloak><i data-lucide="check-circle-2" class="size-4 text-emerald-600" aria-hidden="true"></i></span>
+                <span x-show="rest(two) !== 0"><i data-lucide="alert-circle" class="size-4 text-red-600" aria-hidden="true"></i></span>
+                <span x-text="fmt(rest(two))">₹18,240</span>
+              </output>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="border-t border-zinc-200 px-4 py-3 lg:px-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-[12px]/4">
+          <span class="tabular-nums text-zinc-600">Two invoices cover all but ₹18,240 of the receipt. A third invoice is outstanding, or the receipt was over-valued.</span>
+          <span class="font-medium tabular-nums" x-text="pct(two).toFixed(1) + '% allocated'">99.2% allocated</span>
+        </div>
+        <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200">
+          <div class="h-full rounded-full bg-zinc-700" :style="'width:' + pct(two) + '%'"></div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-3 lg:px-5">
+        <p id="pt-b-guard" class="text-[12px]/4 tabular-nums text-zinc-600"
+           x-text="rest(two) === 0 ? 'Fully allocated. This receipt can be matched.' : fmt(rest(two)) + ' of this receipt is not allocated to any invoice. It cannot be matched until it is.'">
+          ₹18,240 of this receipt is not allocated to any invoice. It cannot be matched until it is.
+        </p>
+        <button type="button" aria-describedby="pt-b-guard" :aria-disabled="rest(two) === 0 ? 'false' : 'true'"
+                @click="if (rest(two) !== 0) return; said = two.id + ' matched against two invoices for ' + fmt(allocated(two)) + '. Nothing is posted yet.'"
+                class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
+                :class="rest(two) === 0 ? '' : 'opacity-60'">
+          <i data-lucide="link" class="size-4"></i>Match these two
+        </button>
+      </div>
+    </section>
+  </main>
+</div>

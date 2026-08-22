@@ -1,0 +1,385 @@
+<!-- The reference arrangement, and the one to reach for before any of the
+     others: the band, one strip of figures, then every section on the page at
+     once.
+
+     Stacked rather than tabbed is the decision. Four sections fit down a page
+     and everything about them is better for being there — the record prints in
+     one pass, Ctrl+F finds the GRN number wherever it is, and nobody has to
+     remember which tab the approval was under. Tabs are what you reach for when
+     there are enough sections that scrolling stops being reading, and that is
+     the tabs variant, not a thing to do to this one.
+
+     The line items are table's markup with the total in a tfoot, and they are
+     read-only. A record page whose lines can be typed into has quietly become
+     form-page/line-items with the wrong header on it, and then two screens
+     disagree about what a line is and only one of them validates.
+
+     The summary strip is card/stats' divided footer rather than four
+     stat-cards. These four figures are parts of one total and they add up;
+     four tiles with gaps between them say they do not, and stat-card's delta
+     has no previous period to compare a single record against.
+
+     The rules between the cells are borders on the cells, not divide-x. In a
+     two-column grid divide-x puts a rule down the left edge of the third cell,
+     which is the first cell of the second row and sits against the panel
+     edge. -->
+<div data-kui="record-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main>
+
+    <!-- page-header/record, unchanged. Never overflow-hidden: the action menu
+         opens out of the bottom of this band. -->
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-6xl px-4 py-4 lg:px-6">
+        <nav aria-label="Breadcrumb">
+          <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">PO-2026-0418</span></li>
+          </ol>
+        </nav>
+
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <h1 class="text-[24px]/7 font-semibold tracking-tight tabular-nums">PO-2026-0418</h1>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+              </span>
+              <span class="text-[13px]/5 tabular-nums text-zinc-600">4 of 9 lines received</span>
+            </div>
+
+            <dl class="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-1.5 text-[13px]/5">
+              <div class="flex items-baseline gap-1.5">
+                <dt class="text-zinc-500">Vendor</dt>
+                <dd class="font-medium text-zinc-900">Sharma Steel &amp; Alloys</dd>
+              </div>
+              <div class="flex items-baseline gap-1.5">
+                <dt class="text-zinc-500">Plant</dt>
+                <dd class="font-medium text-zinc-900">Silvassa</dd>
+              </div>
+              <div class="flex items-baseline gap-1.5">
+                <dt class="text-zinc-500">Raised</dt>
+                <dd class="font-medium tabular-nums text-zinc-900">04 Aug 2026</dd>
+              </div>
+              <div class="flex items-baseline gap-1.5">
+                <dt class="text-zinc-500">Promised</dt>
+                <dd class="font-medium tabular-nums text-zinc-900">22 Aug 2026</dd>
+              </div>
+              <div class="flex items-baseline gap-1.5">
+                <dt class="text-zinc-500">Value</dt>
+                <dd class="font-semibold tabular-nums text-zinc-900">₹18,42,000</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="printer" class="size-4"></i>Print
+            </button>
+            <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="pencil" class="size-4"></i>Amend
+            </button>
+            <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="truck" class="size-4"></i>Record GRN
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-6xl space-y-4 px-4 py-5 lg:px-6">
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <dl class="grid grid-cols-2 sm:grid-cols-4">
+          <div class="border-b border-zinc-200 px-4 py-3 sm:border-b-0">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Ordered</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹18,42,000</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">9 lines · 4,290 kg</dd>
+          </div>
+          <div class="border-b border-l border-zinc-200 px-4 py-3 sm:border-b-0">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Received</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹8,16,400</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 lines · 1,880 kg</dd>
+          </div>
+          <div class="border-zinc-200 px-4 py-3 sm:border-l">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Invoiced</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹6,04,000</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">2 invoices · 30 days from GRN</dd>
+          </div>
+          <div class="border-l border-zinc-200 px-4 py-3">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Left to receive</dt>
+            <dd class="mt-1 text-[16px]/6 font-semibold tabular-nums">₹10,25,600</dd>
+            <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">5 lines · 2,410 kg</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- card/table: no body padding, so the table's rules meet the card's
+           edges. The total is a <tfoot>, never one more row in the body. -->
+      <section aria-labelledby="rp-lines-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <div class="min-w-0">
+            <h2 id="rp-lines-h" class="text-[16px]/6 font-semibold">Order lines</h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">9 lines · 4 received in full, 1 short, 4 not started</p>
+          </div>
+          <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="download" class="size-4 text-zinc-600"></i>Export
+          </button>
+        </div>
+
+        <table class="hidden w-full text-[13px]/5 md:table">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-5 py-2.5 font-medium">Item</th>
+              <th scope="col" class="px-5 py-2.5 text-right font-medium">Ordered</th>
+              <th scope="col" class="px-5 py-2.5 text-right font-medium">Received</th>
+              <th scope="col" class="px-5 py-2.5 text-right font-medium">Rate</th>
+              <th scope="col" class="px-5 py-2.5 text-right font-medium">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left font-normal">
+                <span class="block font-medium">MS angle 50×50×6</span>
+                <span class="block text-[12px]/4 tabular-nums text-zinc-500">ITM-2041 · HSN 7216</span>
+              </th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">1,200 kg</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">1,200 kg</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹57.00</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹6,84,000</td>
+            </tr>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left font-normal">
+                <span class="block font-medium">MS plate 8 mm</span>
+                <span class="block text-[12px]/4 tabular-nums text-zinc-500">ITM-2088 · HSN 7208</span>
+              </th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">860 kg</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">680 kg</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹60.00</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹5,16,000</td>
+            </tr>
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-5 py-2.5 text-left font-normal">
+                <span class="block font-medium">Channel 100×50</span>
+                <span class="block text-[12px]/4 tabular-nums text-zinc-500">ITM-2114 · HSN 7216</span>
+              </th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">1,840 kg</td>
+              <td class="px-5 py-2.5 text-right text-zinc-500 tabular-nums whitespace-nowrap">—</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹70.00</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹4,47,000</td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-5 py-2.5 text-left font-normal">
+                <span class="block font-medium">Flat 40×6</span>
+                <span class="block text-[12px]/4 tabular-nums text-zinc-500">ITM-2130 · HSN 7216</span>
+              </th>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">390 kg</td>
+              <td class="px-5 py-2.5 text-right text-zinc-500 tabular-nums whitespace-nowrap">—</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹50.00</td>
+              <td class="px-5 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,95,000</td>
+            </tr>
+          </tbody>
+          <tfoot class="bg-zinc-50">
+            <tr class="border-t border-zinc-200">
+              <th scope="row" class="px-5 py-2 text-left text-[12px]/4 font-medium text-zinc-600">Total of these 4 lines</th>
+              <td class="px-5 py-2 text-right tabular-nums whitespace-nowrap">4,290 kg</td>
+              <td class="px-5 py-2 text-right tabular-nums whitespace-nowrap">1,880 kg</td>
+              <td class="px-5 py-2"></td>
+              <td class="px-5 py-2 text-right font-medium tabular-nums whitespace-nowrap">₹18,42,000</td>
+            </tr>
+            <tr>
+              <th scope="row" colspan="4" class="px-5 pt-1 pb-2.5 text-right text-[13px]/5 font-semibold">Order value including 18% GST</th>
+              <td class="px-5 pt-1 pb-2.5 text-right text-[14px]/5 font-semibold tabular-nums whitespace-nowrap">₹21,73,560</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- the same four lines as cards below md, and the foot repeated as a
+             strip. The total is the reason the screen was opened; a phone is
+             not given a reduced version of it. -->
+        <ul class="divide-y divide-zinc-100 md:hidden">
+          <li class="px-5 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="text-[13px]/5 font-medium">MS angle 50×50×6</span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹6,84,000</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-2041 · 1,200 kg ordered · 1,200 kg received</p>
+          </li>
+          <li class="px-5 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="text-[13px]/5 font-medium">MS plate 8 mm</span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹5,16,000</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-2088 · 860 kg ordered · 680 kg received</p>
+          </li>
+          <li class="px-5 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="text-[13px]/5 font-medium">Channel 100×50</span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹4,47,000</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-2114 · 1,840 kg ordered · nothing received</p>
+          </li>
+          <li class="px-5 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="text-[13px]/5 font-medium">Flat 40×6</span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,95,000</span>
+            </div>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-2130 · 390 kg ordered · nothing received</p>
+          </li>
+        </ul>
+        <dl class="space-y-1 border-t border-zinc-200 bg-zinc-50 px-5 py-3 md:hidden">
+          <div class="flex items-baseline justify-between gap-3">
+            <dt class="text-[12px]/4 text-zinc-600">Total of these 4 lines</dt>
+            <dd class="text-[13px]/5 font-medium tabular-nums">₹18,42,000</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-3">
+            <dt class="text-[13px]/5 font-semibold">Including 18% GST</dt>
+            <dd class="text-[14px]/5 font-semibold tabular-nums">₹21,73,560</dd>
+          </div>
+        </dl>
+
+        <p class="border-t border-zinc-200 px-5 py-2 text-[12px]/4 text-zinc-500">Showing 4 of 9 lines. Export carries all nine with their receipt history.</p>
+      </section>
+
+      <section aria-labelledby="rp-appr-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="rp-appr-h" class="text-[16px]/6 font-semibold">Approvals</h2>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Both levels signed · released to the vendor 05 Aug 2026</p>
+        </div>
+        <ol class="px-5 py-4">
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5"><span class="font-medium">Ritu Deshpande</span> approved as buyer.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">04 Aug 2026, 16:12 · within her limit of ₹10,00,000</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5"><span class="font-medium">Anil Kulkarni</span> approved as plant head.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">05 Aug 2026, 09:40 · required above ₹10,00,000</p>
+              <p class="mt-1.5 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4 text-zinc-600">Rate is ₹3 above the March contract. Accepted for this lot only — renegotiate before the next call-off.</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 text-zinc-600">Released to Sharma Steel &amp; Alloys by email.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">05 Aug 2026, 09:41 · purchase@sharmasteel.in</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="rp-docs-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 id="rp-docs-h" class="text-[16px]/6 font-semibold">Documents</h2>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">3 files · the signed order is generated, the rest were attached</p>
+        </div>
+        <ul class="divide-y divide-zinc-100">
+          <li class="flex items-center gap-3 px-5 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[13px]/5 font-medium">PO-2026-0418-signed.pdf</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">186 KB · generated · 05 Aug 2026</p>
+            </div>
+            <a href="#" aria-label="Download PO-2026-0418-signed.pdf"
+               class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>
+            </a>
+          </li>
+          <li class="flex items-center gap-3 px-5 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="file-text" class="size-4 text-zinc-600"></i></span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[13px]/5 font-medium">quotation-sharma-steel-jul.pdf</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">248 KB · Ritu Deshpande · 28 Jul 2026</p>
+            </div>
+            <a href="#" aria-label="Download quotation-sharma-steel-jul.pdf"
+               class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>
+            </a>
+          </li>
+          <li class="flex items-center gap-3 px-5 py-3">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100"><i data-lucide="sheet" class="size-4 text-zinc-600"></i></span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[13px]/5 font-medium">rate-comparison-aug.xlsx</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">54 KB · Anil Kulkarni · 02 Aug 2026</p>
+            </div>
+            <a href="#" aria-label="Download rate-comparison-aug.xlsx"
+               class="flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="rp-act-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <div class="min-w-0">
+            <h2 id="rp-act-h" class="text-[16px]/6 font-semibold">Activity</h2>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Newest first · 24 entries since 28 Jul 2026</p>
+          </div>
+          <a href="#" class="rounded text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all 24</a>
+        </div>
+        <ol class="px-5 py-4">
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5 tabular-nums">GRN-4830 posted against lines 2 and 4.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">18 Aug 2026, 11:04 · Nilesh Patil</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-400"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5">Promised delivery moved after the vendor asked for two more weeks.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">12 Aug 2026, 15:22 · Ritu Deshpande</p>
+            </div>
+          </li>
+          <li class="group flex gap-3 pb-4 last:pb-0">
+            <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+              <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+              <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px]/5">Approved by the plant head and released to the vendor.</p>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">05 Aug 2026, 09:40 · Anil Kulkarni</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <!-- the region a form does not have, and the commonest reason anybody
+           opens the record: what else is hanging off it. Plain links, not
+           chips — a chip is a filter or a tag, and these are destinations. -->
+      <section aria-labelledby="rp-link-h" class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
+        <h2 id="rp-link-h" class="text-[16px]/6 font-semibold">Linked records</h2>
+        <ul class="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-[13px]/5">
+          <li><a href="#" class="rounded tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">IND-2026-0233</a> <span class="text-[12px]/4 text-zinc-500">indent</span></li>
+          <li><a href="#" class="rounded tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a> <span class="text-[12px]/4 text-zinc-500">receipt · 12 Aug</span></li>
+          <li><a href="#" class="rounded tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4830</a> <span class="text-[12px]/4 text-zinc-500">receipt · 18 Aug</span></li>
+          <li><a href="#" class="rounded tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">RC-2026-0091</a> <span class="text-[12px]/4 text-zinc-500">rate contract</span></li>
+        </ul>
+      </section>
+
+    </div>
+  </main>
+</div>

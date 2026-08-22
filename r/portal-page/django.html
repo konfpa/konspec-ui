@@ -1,0 +1,233 @@
+<!-- portal/templates/portal/orders.html. It extends portal/base.html and not
+     the console's base.html, because the console base renders app-shell — the
+     sidebar, the counts, the palette, the internal nav — and a portal page that
+     inherits it hands a supplier the shape of our whole application and a
+     column of numbers they may not see. Two bases, and the portal one is small.
+
+     The scoping is the security boundary and it belongs in the view. Every
+     queryset in the portal is filtered to request.user.supplier_contact.vendor
+     before anything else touches it, and no template in this directory is
+     allowed to widen it: a template condition is a display rule that somebody
+     will move when the layout changes, and the day it moves the page is still
+     valid HTML and still renders. Write it once, in a mixin, and make the
+     detail view raise Http404 rather than PermissionDenied — a 403 on somebody
+     else's order and a 404 on an order that does not exist is an enumeration
+     oracle, and outside the company that is a leak of who we buy from.
+
+     {% csrf_token %} sits in the sign-out form because sign-out is a POST.
+     Django's LogoutView has refused GET since 4.1, and a GET sign-out is fired
+     by link prefetchers and by the mail scanners that follow every URL in a
+     notification — the supplier is then signed out by an email nobody opened.
+
+     |intcomma is what puts ₹21,31,200 in Indian grouping, and it raises without
+     {% load humanize %} in this same file. That is why the load line is here
+     rather than only in the base.
+
+     The empty clause is a real state on this page and it is not "no results" — there
+     is no query to clear. A supplier with nothing open needs to be told that
+     the portal is working and that new orders arrive here, or the empty screen
+     reads as a broken account.
+
+     A multi-line {# #} is not a comment: Django's tag_re has no DOTALL, so
+     everything after the first line renders on the page. The view notes at the
+     foot are in a comment/endcomment block for exactly that reason. -->
+{% extends "portal/base.html" %}
+{% load humanize %}
+
+{% block main %}
+<div data-kui="portal-page/django" class="min-h-[560px] bg-zinc-100 text-zinc-900">
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
+      <a href="{% url 'portal:home' %}" class="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-semibold">Konspec Industries</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">Supplier portal</span>
+        </span>
+      </a>
+      <div class="ml-auto flex min-w-0 items-center gap-2.5">
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">{{ vendor.initials }}</span>
+        <span class="min-w-0">
+          <span class="block truncate text-[13px]/5 font-medium">{{ vendor.name }}</span>
+          <span class="block truncate text-[11px]/4 text-zinc-500">{{ request.user.get_full_name }}</span>
+        </span>
+        <form method="post" action="{% url 'portal:logout' %}" class="shrink-0">
+          {% csrf_token %}
+          <button type="submit" class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sign out</button>
+        </form>
+      </div>
+    </div>
+
+    <nav aria-label="Supplier portal" class="mx-auto max-w-5xl px-2 pb-2">
+      <ul class="flex flex-wrap items-center gap-1">
+        <li><a href="{% url 'portal:orders' %}" aria-current="page" class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Orders</a></li>
+        <li><a href="{% url 'portal:invoices' %}" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Invoices</a></li>
+        <li><a href="{% url 'portal:payments' %}" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Payments</a></li>
+        <li><a href="{% url 'portal:details' %}" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Your details</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1" class="mx-auto max-w-5xl px-4 py-5">
+    <h1 class="text-[24px]/7 font-semibold tracking-tight">Your orders</h1>
+    <p class="mt-1.5 max-w-2xl text-[14px]/5 tabular-nums text-zinc-600">
+      All {{ orders|length|intcomma }} orders Konspec Industries has open with {{ vendor.name }}. There is nothing else on this portal to find — if an order you expect is missing, it has not been raised yet.
+    </p>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <table class="hidden w-full text-[13px]/5 md:table">
+        <caption class="sr-only">Purchase orders placed by Konspec Industries with {{ vendor.name }}</caption>
+        <thead>
+          <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+            <th scope="col" class="px-4 py-2.5 font-medium">Konspec order</th>
+            <th scope="col" class="px-4 py-2.5 font-medium">Your reference</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Value</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Wanted by</th>
+            <th scope="col" class="px-4 py-2.5 font-medium">What we are waiting for</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+            <tr class="border-b border-zinc-100 align-top last:border-0 hover:bg-zinc-100">
+              <td class="px-4 py-3">
+                <span class="block font-medium tabular-nums">{{ o.number }}</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-600">{{ o.material }} · {{ o.quantity }} {{ o.unit }}</span>
+              </td>
+              <td class="px-4 py-3 tabular-nums text-zinc-600">{{ o.vendor_reference|default:"—" }}</td>
+              <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap">₹{{ o.value|intcomma }}</td>
+              <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap text-zinc-600">{{ o.wanted_by|date:"d M Y" }}</td>
+              <td class="px-4 py-3">
+                {% comment %}
+                  status_dot_class comes off the model and is one of the five
+                  locked values — bg-zinc-500, bg-amber-500, bg-red-600,
+                  bg-emerald-600, bg-zinc-400 — so the pill shape is written
+                  once here and only the dot changes. supplier_status is the
+                  word a supplier reads; get_status_display is the internal one
+                  and never reaches this template.
+                {% endcomment %}
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                  <span class="size-1.5 shrink-0 rounded-full {{ o.status_dot_class }}" aria-hidden="true"></span>{{ o.supplier_status }}
+                </span>
+                {% if o.needs_acknowledgement %}
+                  <a href="{% url 'portal:acknowledge' o.number %}"
+                     class="mt-2 block w-fit rounded-lg border border-transparent bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+                    Accept or change the date
+                  </a>
+                {% elif o.awaiting_invoice %}
+                  <a href="{% url 'portal:invoice-new' %}?receipt={{ o.receipt.number }}"
+                     class="mt-2 block w-fit rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    Send your invoice
+                  </a>
+                {% else %}
+                  <span class="mt-1.5 block text-[12px]/4 tabular-nums text-zinc-600">{{ o.supplier_next_step }}</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="px-6 py-12 text-center">
+                <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                  <i data-lucide="package" class="size-5 text-zinc-600"></i>
+                </span>
+                <h2 class="mt-3 text-[16px]/6 font-semibold">Konspec has no open orders with you</h2>
+                <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+                  Nothing is outstanding between us at the moment. A new order appears here the same day it is raised, and {{ request.user.email }} is emailed when it does.
+                </p>
+                <a href="{% url 'portal:payments' %}"
+                   class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  See your payments
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <ul class="divide-y divide-zinc-100 md:hidden">
+        {% for o in orders %}
+          <li class="px-4 py-3">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="text-[14px]/5 font-medium tabular-nums">{{ o.number }}</span>
+              <span class="shrink-0 text-[14px]/5 tabular-nums">₹{{ o.value|intcomma }}</span>
+            </div>
+            <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">{{ o.material }} · {{ o.quantity }} {{ o.unit }}</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Your reference {{ o.vendor_reference|default:"—" }} · wanted by {{ o.wanted_by|date:"d M Y" }}</p>
+            <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full {{ o.status_dot_class }}" aria-hidden="true"></span>{{ o.supplier_status }}
+            </span>
+            {% if o.needs_acknowledgement %}
+              <a href="{% url 'portal:acknowledge' o.number %}"
+                 class="mt-3 flex h-10 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+                Accept or change the date
+              </a>
+            {% endif %}
+          </li>
+        {% empty %}
+          <li class="px-6 py-10 text-center">
+            <h2 class="text-[16px]/6 font-semibold">Konspec has no open orders with you</h2>
+            <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">A new order appears here the same day it is raised.</p>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </main>
+
+  <footer class="mx-auto max-w-5xl px-4 pb-6">
+    <p class="border-t border-zinc-200 pt-4 text-[12px]/4 tabular-nums text-zinc-600">
+      Your buyer at Konspec is <span class="font-medium text-zinc-900">{{ vendor.buyer.get_full_name }}</span> —
+      <a href="mailto:{{ vendor.buyer.email }}" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ vendor.buyer.email }}</a>
+      · {{ vendor.buyer.phone }}. Anything this portal cannot do, she can.
+    </p>
+  </footer>
+</div>
+{% endblock %}
+
+{% comment %}
+portal/views.py — the scoping, written once and never in a template
+
+    class VendorScopedMixin(LoginRequiredMixin):
+        """The security boundary of the whole portal.
+
+        Every queryset starts here. Nothing in portal/templates may widen it:
+        a template condition is a display rule and somebody will move it, and
+        the page still renders perfectly the day they do.
+        """
+        def get_vendor(self):
+            return self.request.user.supplier_contact.vendor
+
+        def get_queryset(self):
+            return super().get_queryset().filter(vendor=self.get_vendor())
+
+    class OrderList(VendorScopedMixin, ListView):
+        model = PurchaseOrder
+        context_object_name = 'orders'
+        template_name = 'portal/orders.html'
+
+        def get_queryset(self):
+            return (super().get_queryset()
+                    .exclude(status=PurchaseOrder.DRAFT)
+                    .select_related('receipt')
+                    .order_by('-raised_on'))
+
+        def get_context_data(self, **kw):
+            return super().get_context_data(vendor=self.get_vendor(), **kw)
+
+    class OrderDetail(VendorScopedMixin, DetailView):
+        model = PurchaseOrder
+        # 404 and not 403. A 403 on another supplier's order and a 404 on an
+        # order that was never raised is an enumeration oracle: outside the
+        # company it leaks who we buy from and how much we buy. get_object()
+        # on the scoped queryset raises Http404 for both, which is the
+        # restricted variant of this entry.
+
+A draft order is excluded here as well as scoped. Draft is our word for an
+order that has not been signed off internally, and a supplier who is emailed
+about one and then finds it withdrawn has been told something that was not a
+commitment.
+
+supplier_status and supplier_next_step are model properties, not template
+logic. The internal get_status_display() never reaches these templates: it says
+Approved, which does not tell a supplier who approved what or what they now
+owe us.
+{% endcomment %}

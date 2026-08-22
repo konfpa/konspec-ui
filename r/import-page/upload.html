@@ -1,0 +1,202 @@
+<!-- Everything the file has to be is on screen before the picker, not in the
+     error that comes back after it. "XLSX or CSV, up to 20 MB, first row is the
+     header" prevents the failure; "Unsupported file type" only reports it, and
+     by then the user has spent a minute on an upload that was never going to
+     work.
+
+     The three sentences under What this import does are the contract, and they
+     are the reason this screen is not attachment. The file is staged and thrown
+     away; the rows are what survive. Rows are matched on the item code, so a
+     second run updates rather than duplicates. And every row posts together, so
+     nothing appears in the master until all of them have.
+
+     The resume strip is the abandoned half of the job. Somebody uploaded 1,240
+     rows yesterday, got as far as mapping, and was called away. Without this
+     they upload the same file again, map it again, and the staged copy sits on
+     disk for a week with nothing pointing at it.
+
+     Discard is a real POST rather than a client-side hide, because the thing
+     being discarded is a file on the server. A strip that vanishes on click and
+     leaves the staged run behind is a lie the next visit contradicts.
+
+     The drop zone is attachment's, unchanged: a real input hidden with sr-only,
+     the label as its peer carrying the focus outline, both drag handlers
+     prevented, and the depth counted rather than flagged so the highlight does
+     not flicker as the pointer crosses the icon. -->
+<div data-kui="import-page/upload" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ depth: 0 }">
+
+  <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Master data</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Items</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">Import</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Import items</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Silvassa plant · FY 2026–27 · adds and updates the item master</p>
+    </div>
+
+    <!-- four stages, and the shape is form-page/wizard's step list: an <ol>
+         with aria-current="step", passed stages as buttons back, stages ahead
+         disabled. Below sm it is one line and a rail, never a sideways scroll. -->
+    <nav aria-label="Import stages" class="mt-5">
+      <ol class="hidden items-center gap-2 sm:flex">
+        <li class="flex min-w-0 flex-1 items-center gap-2">
+          <button type="button" aria-current="step"
+                  class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left enabled:hover:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold tabular-nums text-zinc-900 ring-1 ring-inset ring-zinc-300">1</span>
+            <span class="min-w-0 truncate text-[13px]/5 font-semibold text-zinc-900">The file</span>
+          </button>
+          <span class="h-px w-4 shrink-0 bg-zinc-200" aria-hidden="true"></span>
+        </li>
+        <li class="flex min-w-0 flex-1 items-center gap-2">
+          <button type="button" disabled
+                  class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left enabled:hover:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-[11px]/4 font-semibold tabular-nums text-zinc-500 ring-1 ring-inset ring-zinc-200">2</span>
+            <span class="min-w-0 truncate text-[13px]/5">Map columns</span>
+          </button>
+          <span class="h-px w-4 shrink-0 bg-zinc-200" aria-hidden="true"></span>
+        </li>
+        <li class="flex min-w-0 flex-1 items-center gap-2">
+          <button type="button" disabled
+                  class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left enabled:hover:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-[11px]/4 font-semibold tabular-nums text-zinc-500 ring-1 ring-inset ring-zinc-200">3</span>
+            <span class="min-w-0 truncate text-[13px]/5">Review</span>
+          </button>
+          <span class="h-px w-4 shrink-0 bg-zinc-200" aria-hidden="true"></span>
+        </li>
+        <li class="flex min-w-0 flex-1 items-center gap-2">
+          <button type="button" disabled
+                  class="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left enabled:hover:bg-zinc-200 disabled:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-[11px]/4 font-semibold tabular-nums text-zinc-500 ring-1 ring-inset ring-zinc-200">4</span>
+            <span class="min-w-0 truncate text-[13px]/5">Commit</span>
+          </button>
+        </li>
+      </ol>
+      <div class="sm:hidden">
+        <p class="text-[13px]/5 font-medium tabular-nums">Step 1 of 4 · The file</p>
+        <div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-zinc-200">
+          <div class="h-full rounded-full bg-zinc-700" style="width: 25%"></div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- alert's shape: white card, zinc border, colour only in the icon -->
+    <div class="mt-5 flex flex-wrap items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+      <div class="min-w-[16rem] flex-1">
+        <p class="text-[13px]/5 font-medium">An import from yesterday is still at the mapping stage</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+          gujarat-polymers-rate-card-aug.xlsx · 1,240 rows · uploaded 20 Aug 2026, 16:12 by Ritu Deshpande. Nothing has been written to the item master. Staged files are deleted after 7 days.
+        </p>
+      </div>
+      <div class="flex shrink-0 items-center gap-2">
+        <button type="button"
+                class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Resume it</button>
+        <button type="button"
+                class="inline-flex h-8 items-center rounded-lg px-3 text-[12px]/4 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Discard</button>
+      </div>
+    </div>
+
+    <div class="mt-4 space-y-4">
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="border-b border-zinc-200 px-5 py-3.5">
+          <h2 tabindex="-1" class="text-[16px]/6 font-semibold focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">The file</h2>
+        </div>
+        <div class="px-5 py-4">
+          <div @dragenter.prevent="depth++" @dragleave.prevent="depth--" @dragover.prevent @drop.prevent="depth = 0"
+               class="rounded-lg border border-dashed px-4 py-6 transition"
+               :class="depth > 0 ? 'border-zinc-700 bg-zinc-100' : 'border-zinc-200 bg-zinc-50'">
+            <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center">
+              <i data-lucide="upload" class="size-5 shrink-0 text-zinc-600"></i>
+              <span class="text-[13px]/5 text-zinc-600">Drag the spreadsheet here or</span>
+              <input type="file" id="up-file" name="file" accept=".xlsx,.csv" aria-describedby="up-file-limit" class="peer sr-only">
+              <label for="up-file"
+                     class="cursor-pointer rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 peer-focus-visible:border-zinc-700 peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-zinc-700/15">
+                Choose a file
+              </label>
+              <span id="up-file-limit" class="text-[12px]/4 tabular-nums text-zinc-500">XLSX or CSV · up to 20 MB · up to 5,000 rows</span>
+            </div>
+          </div>
+
+          <ul class="mt-4 space-y-2">
+            <li class="flex items-start gap-2.5 text-[13px]/5 text-zinc-600">
+              <i data-lucide="table-2" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+              <span>The first row is read as the header. One sheet per file — a workbook with three tabs imports the first and says nothing about the other two, so split it before uploading.</span>
+            </li>
+            <li class="flex items-start gap-2.5 text-[13px]/5 text-zinc-600">
+              <i data-lucide="calendar" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+              <span class="tabular-nums">Format date columns as dates in the sheet. Excel stores 04 Sep 2026 as the number 45,904, and a column left as General arrives here as five digits.</span>
+            </li>
+            <li class="flex items-start gap-2.5 text-[13px]/5 text-zinc-600">
+              <i data-lucide="hash" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+              <span>Rate and quantity columns hold digits only. The currency and the unit are already known, so ₹118.40/kg is not a number this import can read.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3.5">
+          <h2 class="text-[16px]/6 font-semibold">What this import does</h2>
+          <a href="#" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Download the template (XLSX)
+          </a>
+        </div>
+        <div class="px-5 py-4">
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="key-round" class="size-4 text-zinc-600"></i></span>
+              <p class="text-[13px]/5 text-zinc-700">
+                <span class="font-medium text-zinc-900">Rows are matched on the item code.</span>
+                A code that already exists is updated; one that does not is created. Nothing is ever deleted by an import, and an item missing from the file is left alone.
+              </p>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="shield-check" class="size-4 text-zinc-600"></i></span>
+              <p class="text-[13px]/5 text-zinc-700">
+                <span class="font-medium text-zinc-900">Every row posts together.</span>
+                Nothing appears in the item master until all of them have. If you would rather post the good rows and deal with the rest afterwards, that is a choice you make at the review stage against a count.
+              </p>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300"><i data-lucide="trash-2" class="size-4 text-zinc-600"></i></span>
+              <p class="text-[13px]/5 text-zinc-700">
+                <span class="font-medium text-zinc-900">The file is not kept.</span>
+                It is staged while you work through these stages and deleted after 7 days. The records it creates are what survives — to keep the vendor's own document, attach it to the rate contract instead.
+              </p>
+            </li>
+          </ul>
+
+          <h3 class="mt-5 text-[13px]/5 font-medium">Columns this import reads</h3>
+          <ul class="mt-2 grid gap-x-8 sm:grid-cols-2">
+            <li class="flex items-baseline justify-between gap-3 border-b border-zinc-100 py-1.5 text-[13px]/5"><span>Item code</span><span class="shrink-0 text-[12px]/4 font-medium text-zinc-600">Required</span></li>
+            <li class="flex items-baseline justify-between gap-3 border-b border-zinc-100 py-1.5 text-[13px]/5"><span>Description</span><span class="shrink-0 text-[12px]/4 font-medium text-zinc-600">Required</span></li>
+            <li class="flex items-baseline justify-between gap-3 border-b border-zinc-100 py-1.5 text-[13px]/5"><span>Unit of measure</span><span class="shrink-0 text-[12px]/4 font-medium text-zinc-600">Required</span></li>
+            <li class="flex items-baseline justify-between gap-3 border-b border-zinc-100 py-1.5 text-[13px]/5"><span>Rate</span><span class="shrink-0 text-[12px]/4 font-medium text-zinc-600">Required</span></li>
+            <li class="flex items-baseline justify-between gap-3 border-b border-zinc-100 py-1.5 text-[13px]/5"><span>Effective from</span><span class="shrink-0 text-[12px]/4 font-medium text-zinc-600">Required</span></li>
+            <li class="flex items-baseline justify-between gap-3 border-b border-zinc-100 py-1.5 text-[13px]/5"><span>HSN</span><span class="shrink-0 text-[12px]/4 text-zinc-500">Optional</span></li>
+            <li class="flex items-baseline justify-between gap-3 border-b border-zinc-100 py-1.5 text-[13px]/5"><span>GST rate</span><span class="shrink-0 text-[12px]/4 text-zinc-500">Optional</span></li>
+            <li class="flex items-baseline justify-between gap-3 border-b border-zinc-100 py-1.5 text-[13px]/5"><span>Vendor code</span><span class="shrink-0 text-[12px]/4 text-zinc-500">Optional</span></li>
+          </ul>
+          <p class="mt-2 text-[12px]/4 text-zinc-500">Any other column in the file is left alone. You say so explicitly at the mapping stage rather than by leaving it blank.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sticky bottom-0 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <p class="min-w-[14rem] flex-1 text-[12px]/4 tabular-nums text-zinc-600">Every row posts together. Nothing reaches the item master until all of them have.</p>
+      <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+        <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Continue to mapping<i data-lucide="chevron-right" class="size-4"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

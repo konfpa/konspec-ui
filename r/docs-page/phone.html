@@ -1,0 +1,148 @@
+<!-- Three columns become one, and the two that disappear each need an answer
+     rather than a display:none.
+
+     The section nav does not become a <select>. A select of 204 pages is a list
+     nobody can scan, no group survives it, and the current page is the only one
+     you can see. What replaces it is the two things a phone reader actually
+     does: a search field, and a link to the manual's contents. Browsing a tree
+     is a desk activity.
+
+     The on-this-page rail becomes a native <details>, which is collapsible's
+     native variant rather than an Alpine panel, for one reason: find-in-page
+     reaches inside a closed <details> in current Chrome and Firefox and cannot
+     reach an x-show panel at all. On the one screen in this application whose
+     content is words, Ctrl-F and the phone's own Find on page are navigation.
+     It is closed by default because it is a table of contents and not content —
+     and nothing in the article body is ever collapsed, for the same reason
+     stated the other way round.
+
+     The body keeps text-[14px]/6. At 390px the measure is doing nothing —
+     max-w-xl is 576px and the column is 358 — so the leading is the only thing
+     left carrying the readability, which is exactly when it matters most.
+
+     The document line under the h1 wraps to two lines rather than truncating.
+     The revision is the fact that decides whether the reader is looking at the
+     right procedure, and a truncated revision is a wrong answer that looks like
+     a right one.
+
+     The table holds at three columns and 358px, which is why this entry caps a
+     table in prose at three. Anything wider is a register and belongs on an
+     index-page with a link to it from here, not in a sideways scroller nobody
+     can drive with a thumb. -->
+<div data-kui="docs-page/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main class="p-4 pb-6">
+
+    <nav aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+        <li><a href="/manual/" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Manual</a></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><a href="/manual/procurement/" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+      </ol>
+    </nav>
+
+    <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Raising a capital indent</h1>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">SOP-PUR-004 · Revision 3 · Effective 01 Apr 2026</p>
+
+    <form action="/manual/search/" method="get" class="mt-4">
+      <label for="dp-ph-q" class="sr-only">Search the manual</label>
+      <div class="relative">
+        <i data-lucide="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500"></i>
+        <input id="dp-ph-q" name="q" type="search" placeholder="Search the manual"
+               class="h-11 w-full rounded-lg border border-zinc-200 bg-white pr-3 pl-9 text-[14px]/5 text-zinc-900 placeholder:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      </div>
+    </form>
+
+    <article class="mt-4 rounded-xl border border-zinc-300 bg-white px-4 py-4">
+      <div class="text-[14px]/6">
+
+        <p class="text-zinc-600">
+          A capital indent commits money that is not in the plant's operating budget, so it takes a budget code
+          before it takes a vendor.
+        </p>
+
+        <details class="mt-4 rounded-lg border border-zinc-200">
+          <summary class="flex items-center gap-2 px-4 py-2.5 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="list" class="size-4 shrink-0 text-zinc-600"></i>On this page
+          </summary>
+          <ul role="list" class="space-y-1.5 border-t border-zinc-200 px-4 py-3 text-[13px]/5">
+            <li><a href="#dp-ph-when" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">When an indent is capital</a></li>
+            <li><a href="#dp-ph-raise" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Raising it</a></li>
+            <li><a href="#dp-ph-limits" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Who approves it</a></li>
+          </ul>
+        </details>
+
+        <h2 id="dp-ph-when" class="mt-10 text-[20px]/7 font-semibold tracking-tight">When an indent is capital</h2>
+
+        <p class="mt-3">
+          An indent is capital when what is bought is expected to last more than one financial year and is
+          carried on the fixed asset register. The test is the asset register and not the value.
+        </p>
+
+        <ul class="mt-3 list-disc space-y-1 pl-5 marker:text-zinc-400">
+          <li>Plant and machinery, including a rebuild that extends the life of a machine.</li>
+          <li>Moulds, dies and tooling held against a part number.</li>
+          <li>Anything installed in the building.</li>
+        </ul>
+
+        <h2 id="dp-ph-raise" class="mt-10 text-[20px]/7 font-semibold tracking-tight">Raising it</h2>
+
+        <p class="mt-3">
+          Open <span class="font-medium">Materials → Indents → New</span> and choose
+          <span class="font-medium">Capital</span>. The type cannot be changed after the indent is saved.
+        </p>
+
+        <div class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+          <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+          <div class="min-w-0">
+            <p class="text-[13px]/5 font-medium">A capital indent without a budget code will not route to anybody.</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">It saves as a draft and sits there.</p>
+          </div>
+        </div>
+
+        <h2 id="dp-ph-limits" class="mt-10 text-[20px]/7 font-semibold tracking-tight">Who approves it</h2>
+
+        <p class="mt-3">The indent routes on its value, and the value is the whole indent rather than the line.</p>
+
+        <div class="mt-3 overflow-hidden rounded-xl border border-zinc-200">
+          <table class="w-full text-[13px]/5">
+            <caption class="sr-only">Approval limits for a capital indent, by value</caption>
+            <thead>
+              <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                <th scope="col" class="px-3 py-2.5 font-medium">Value</th>
+                <th scope="col" class="px-3 py-2.5 font-medium">Approver</th>
+                <th scope="col" class="px-3 py-2.5 font-medium">Needs</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-3 py-2.5 text-left font-normal tabular-nums">To ₹2,00,000</th>
+                <td class="px-3 py-2.5">Plant head</td>
+                <td class="px-3 py-2.5 text-zinc-600">—</td>
+              </tr>
+              <tr class="border-b border-zinc-100">
+                <th scope="row" class="px-3 py-2.5 text-left font-normal tabular-nums">To ₹10,00,000</th>
+                <td class="px-3 py-2.5">Plant head, Finance</td>
+                <td class="px-3 py-2.5 text-zinc-600">2 quotes</td>
+              </tr>
+              <tr>
+                <th scope="row" class="px-3 py-2.5 text-left font-normal tabular-nums">Above ₹10,00,000</th>
+                <td class="px-3 py-2.5">Director</td>
+                <td class="px-3 py-2.5 text-zinc-600">3 quotes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-200 pt-3">
+        <p class="text-[12px]/4 tabular-nums text-zinc-600">Last reviewed 12 Jun 2026 · Next review 01 Apr 2027</p>
+      </footer>
+    </article>
+
+    <p class="mt-4 text-[13px]/5">
+      <a href="/manual/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All 204 pages of the manual</a>
+    </p>
+
+  </main>
+</div>

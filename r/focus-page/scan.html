@@ -1,0 +1,175 @@
+<!-- No sidebar and no topbar, and that absence is the shape of the screen. An
+     operator at the gate does one thing a few hundred times a shift with a gun
+     in one hand, so every pixel of chrome is a pixel of target taken away from
+     the one field that matters, and every link is a route to losing a count
+     nobody has posted. app-shell is dropped here and almost nowhere else.
+
+     Focus is held by taking it back on blur, and the handler reads
+     relatedTarget first. A barcode scanner is a keyboard: with focus anywhere
+     else the scan lands in the wrong control or in nothing at all, and the
+     operator finds out three racks later. Controls the keyboard is allowed to
+     move into carry data-hands-off; everything else is pulled back on the next
+     frame, which is a frame rather than a tick so it does not fight the click
+     that caused the blur.
+
+     inputmode="none" is deliberate. Focusing a text input on a tablet raises
+     the on-screen keyboard, and a field that always has focus would mean one
+     permanently covering half the screen; the gun types into it regardless.
+
+     The first focus goes through $nextTick. x-init on a component root runs
+     before Alpine has walked the children, so $refs.scan is undefined at that
+     moment and the screen loads with the keyboard on nothing — a field that
+     looks ready and swallows the first scan of the shift.
+
+     Type is one step up over the whole screen and nothing on it is under 13px.
+     The tablet is at arm's length under a work light and the operator is
+     wearing gloves — 11px labels and 36px buttons measure as accessible and
+     cannot be read or hit. -->
+<div data-kui="focus-page/scan" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       code: '', typed: '', manual: false, done: 27, target: 40, fresh: [],
+       keep(e) {
+         if (this.manual) return;
+         if (e.relatedTarget && e.relatedTarget.closest('[data-hands-off]')) return;
+         requestAnimationFrame(() => this.$refs.scan.focus());
+       },
+       open() { this.manual = true; this.$nextTick(() => requestAnimationFrame(() => this.$refs.typed.focus())) },
+       close() { this.manual = false; this.$nextTick(() => requestAnimationFrame(() => this.$refs.scan.focus())) },
+       accept(v) {
+         v = String(v || '').trim();
+         if (!v) return;
+         this.fresh.unshift({ id: this.fresh.length + '-' + v, code: v, at: 'just now' });
+         this.done++;
+         this.code = ''; this.typed = '';
+       }
+     }"
+     x-init="$nextTick(() => $refs.scan.focus())">
+
+  <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
+    <p class="min-w-0 text-[16px]/6 font-medium">
+      Goods inward · Gate 2
+      <span class="block text-[14px]/5 font-normal tabular-nums text-zinc-600">Vikram Rathod · Silvassa · 11:42</span>
+    </p>
+    <div class="flex shrink-0 items-center gap-3">
+      <span class="inline-flex items-center gap-2 rounded-full bg-zinc-200 px-3 py-1 text-[13px]/5 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Online
+      </span>
+      <button type="button" data-hands-off
+              class="inline-flex h-12 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="log-out" aria-hidden="true" class="size-5 text-zinc-600"></i>Exit
+      </button>
+    </div>
+  </header>
+
+  <main class="flex min-h-0 flex-1 flex-col">
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+      <div class="mx-auto max-w-3xl">
+
+        <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">Receiving into GRN-4821</h1>
+        <p class="mt-1 text-[16px]/6 tabular-nums text-zinc-600">
+          HDPE granules M60075 · lot 24-HD-118 · 25.0 kg a bag · Gujarat Polymers Ltd
+        </p>
+
+        <div x-show="!manual" class="mt-5">
+          <label for="fs-scan" class="block text-[16px]/6 font-medium">Scan the next bag label</label>
+          <div class="mt-2 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="scan-barcode" aria-hidden="true" class="ml-4 size-6 shrink-0 text-zinc-600"></i>
+            <input id="fs-scan" x-ref="scan" x-model="code" name="barcode"
+                   inputmode="none" autocomplete="off" spellcheck="false" autocapitalize="off"
+                   aria-describedby="fs-scan-help" placeholder="Waiting for a scan"
+                   @blur="keep($event)" @keydown.enter.prevent="accept(code)"
+                   class="h-16 w-full min-w-0 bg-transparent px-3 text-[24px]/7 tabular-nums outline-none placeholder:text-zinc-500">
+          </div>
+          <p id="fs-scan-help" class="mt-2 text-[14px]/5 text-zinc-600">
+            The gun types the code and presses Enter. Nothing else on this screen takes the keyboard on its own.
+          </p>
+          <button type="button" data-hands-off @click="open()"
+                  class="mt-3 inline-flex h-12 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="keyboard" aria-hidden="true" class="size-5 text-zinc-600"></i>Key the code in by hand
+          </button>
+        </div>
+
+        <!-- the manual route replaces the scan field rather than sitting beside
+             it: one field on screen at a time, so there is never a question of
+             which one the gun is typing into. inputmode goes back to text here
+             because the soft keyboard is the whole point of this branch. -->
+        <div x-show="manual" x-cloak class="mt-5">
+          <label for="fs-typed" class="block text-[16px]/6 font-medium">Type the code printed under the barcode</label>
+          <div class="mt-2 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input id="fs-typed" x-ref="typed" x-model="typed" data-hands-off name="barcode_typed"
+                   inputmode="text" autocomplete="off" spellcheck="false" autocapitalize="characters"
+                   aria-describedby="fs-typed-help" placeholder="24-HD-118-0028"
+                   @keydown.enter.prevent="accept(typed)" @keydown.escape="close()"
+                   class="h-16 w-full min-w-0 bg-transparent px-4 text-[24px]/7 uppercase tabular-nums outline-none placeholder:text-zinc-500">
+          </div>
+          <p id="fs-typed-help" class="mt-2 text-[14px]/5 text-zinc-600">
+            Escape hands the keyboard back to the scan field.
+          </p>
+          <button type="button" data-hands-off @click="close()"
+                  class="mt-3 inline-flex h-12 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[16px]/6 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="scan-barcode" aria-hidden="true" class="size-5 text-zinc-600"></i>Back to scanning
+          </button>
+        </div>
+
+        <h2 class="mt-6 text-[16px]/6 font-semibold">Last reads</h2>
+        <p class="mt-1 text-[14px]/5 text-zinc-600">So the gun can be checked against the label in hand without waiting for the total.</p>
+
+        <!-- rows the server rendered are real markup; scans made since the page
+             loaded are prepended above them. An x-for on its own would leave the
+             panel empty until Alpine boots, which on this tablet is not instant. -->
+        <ul class="mt-2 divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+          <template x-for="r in fresh" :key="r.id">
+            <li class="flex items-center gap-3 px-4 py-3.5">
+              <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-emerald-600"></span>
+              <span class="min-w-0 flex-1 truncate text-[16px]/6 font-medium tabular-nums" x-text="r.code"></span>
+              <span class="shrink-0 text-[14px]/5 tabular-nums text-zinc-600" x-text="r.at"></span>
+            </li>
+          </template>
+          <li class="flex items-center gap-3 px-4 py-3.5">
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-emerald-600"></span>
+            <span class="min-w-0 flex-1 truncate text-[16px]/6 font-medium tabular-nums">24-HD-118-0027</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums text-zinc-600">11:42:07</span>
+          </li>
+          <li class="flex items-center gap-3 px-4 py-3.5">
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-emerald-600"></span>
+            <span class="min-w-0 flex-1 truncate text-[16px]/6 font-medium tabular-nums">24-HD-118-0026</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums text-zinc-600">11:41:31</span>
+          </li>
+          <li class="flex items-center gap-3 px-4 py-3.5">
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-emerald-600"></span>
+            <span class="min-w-0 flex-1 truncate text-[16px]/6 font-medium tabular-nums">24-HD-118-0025</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums text-zinc-600">11:40:58</span>
+          </li>
+          <li class="flex items-center gap-3 px-4 py-3.5">
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-emerald-600"></span>
+            <span class="min-w-0 flex-1 truncate text-[16px]/6 font-medium tabular-nums">24-HD-118-0024</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums text-zinc-600">11:40:12</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- the commit bar is pinned to the bottom edge, so the target is in the
+         same place whether the echo list has two rows or forty. Every bound
+         figure is written into the element underneath it as well. -->
+    <div class="shrink-0 border-t border-zinc-300 bg-white px-4 py-4 sm:px-6">
+      <div class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-5 gap-y-3">
+        <div class="min-w-[13rem] flex-1">
+          <p id="fs-count" class="text-[24px]/7 font-semibold tracking-tight tabular-nums">
+            <span x-text="done">27</span> of 40 bags
+          </p>
+          <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
+               role="progressbar" aria-labelledby="fs-count"
+               aria-valuenow="68" :aria-valuenow="Math.round(done / target * 100)" aria-valuemin="0" aria-valuemax="100">
+            <div class="h-full min-w-[2px] rounded-full bg-zinc-700 transition-[width] duration-300 motion-reduce:transition-none"
+                 style="width: 68%" :style="'width: ' + Math.round(done / target * 100) + '%'"></div>
+          </div>
+        </div>
+        <button type="button" data-hands-off
+                class="inline-flex h-16 shrink-0 items-center gap-2.5 rounded-lg border border-transparent bg-zinc-700 px-6 text-[20px]/7 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="check" aria-hidden="true" class="size-6"></i>Finish and post
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

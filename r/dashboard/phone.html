@@ -1,0 +1,233 @@
+<!-- Not a reflow. Two of the three regions become a different component at
+     this width, and neither of them is invented here.
+
+     The four-across strip becomes stat-card/dense: one card holding four cells
+     two across, rules drawn by gap-px over zinc-200, the figure down to 16px
+     and the comparison clause moved under the whole strip. Four full-width
+     tiles stacked is roughly 480px of chrome before the first queue row, which
+     puts the thing somebody opened the page for two screens down.
+
+     The twelve-month plot keeps its box and drops labels, which is
+     chart/responsive: maxRotation 0 so the axis cannot fan out at fifty degrees
+     and eat a third of the height, autoSkip to drop whichever months do not
+     fit, maxTicksLimit 5 so the value axis is a scale and not a hatch pattern.
+     Shortening is not the alternative — initials turn June, July and January
+     into three identical labels, and the tooltip still names a month the axis
+     dropped.
+
+     Queues before the plot, the same order as every other width, three rows
+     each rather than five. Nothing scrolls sideways. -->
+<div data-kui="dashboard/phone" class="mx-auto h-[720px] max-w-[390px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main class="space-y-3 p-4 pb-16">
+
+    <div class="min-w-0">
+      <p class="text-[13px]/5 text-zinc-600">Good morning, Akshay</p>
+      <h1 class="mt-0.5 text-[24px]/7 font-semibold tracking-tight">Procurement</h1>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Fri 21 Aug · three plants · read 09:12</p>
+    </div>
+
+    <!-- stat-card/dense: one card, four cells, two across -->
+    <section aria-labelledby="dbf-fig-h">
+      <h2 id="dbf-fig-h" class="sr-only">Figures</h2>
+      <div class="overflow-hidden rounded-xl border border-zinc-300">
+        <dl class="grid grid-cols-2 gap-px bg-zinc-200">
+          <div class="bg-white px-3 py-2.5">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open</dt>
+            <dd class="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+              <span class="text-[16px]/6 font-semibold tabular-nums">148</span>
+              <span class="inline-flex items-center gap-0.5 text-[11px]/4 font-medium tabular-nums text-emerald-600">
+                <i data-lucide="trending-up" class="size-3" aria-hidden="true"></i>+11
+              </span>
+            </dd>
+          </div>
+          <div class="bg-white px-3 py-2.5">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue</dt>
+            <dd class="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+              <span class="text-[16px]/6 font-semibold tabular-nums">₹27.10 L</span>
+              <span class="inline-flex items-center gap-0.5 text-[11px]/4 font-medium tabular-nums text-red-600">
+                <i data-lucide="trending-up" class="size-3" aria-hidden="true"></i>+4.10 L
+              </span>
+            </dd>
+          </div>
+          <div class="bg-white px-3 py-2.5">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">GRNs today</dt>
+            <dd class="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+              <span class="text-[16px]/6 font-semibold tabular-nums">12</span>
+              <span class="inline-flex items-center gap-0.5 text-[11px]/4 font-medium tabular-nums text-emerald-600">
+                <i data-lucide="trending-up" class="size-3" aria-hidden="true"></i>+4
+              </span>
+            </dd>
+          </div>
+          <div class="bg-white px-3 py-2.5">
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">QC holds</dt>
+            <dd class="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+              <span class="text-[16px]/6 font-semibold tabular-nums">3</span>
+              <span class="inline-flex items-center gap-0.5 text-[11px]/4 font-medium tabular-nums text-red-600">
+                <i data-lucide="trending-up" class="size-3" aria-hidden="true"></i>+2
+              </span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+      <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">Change against July, except GRNs and holds, which are against yesterday</p>
+    </section>
+
+    <section aria-labelledby="dbf-appr-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+        <h2 id="dbf-appr-h" class="text-[14px]/5 font-semibold">Waiting on you</h2>
+        <a href="/orders/?status=approval" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          All <span class="tabular-nums">9</span><span class="sr-only"> orders waiting on your approval</span>
+        </a>
+      </div>
+      <ul class="divide-y divide-zinc-100">
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex items-baseline justify-between gap-3 px-4 py-3">
+            <div class="min-w-0">
+              <a href="/orders/PO-2026-0418/" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+              <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">Sharma Steel · with you 3 days</p>
+            </div>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</span>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex items-baseline justify-between gap-3 px-4 py-3">
+            <div class="min-w-0">
+              <a href="/orders/PO-2026-0421/" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0421</a>
+              <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers · with you 2 days</p>
+            </div>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹6,04,500</span>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex items-baseline justify-between gap-3 px-4 py-3">
+            <div class="min-w-0">
+              <a href="/orders/PO-2026-0424/" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0424</a>
+              <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">Deccan Fasteners · with you 1 day</p>
+            </div>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹1,18,400</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="dbf-late-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+        <h2 id="dbf-late-h" class="flex items-center gap-1.5 text-[14px]/5 font-semibold">
+          <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Past the promised date
+        </h2>
+        <a href="/orders/?status=overdue" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          All <span class="tabular-nums">12</span><span class="sr-only"> orders past the promised date</span>
+        </a>
+      </div>
+      <ul class="divide-y divide-zinc-100">
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex items-baseline justify-between gap-3 px-4 py-3">
+            <div class="min-w-0">
+              <a href="/orders/PO-2026-0311/" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0311</a>
+              <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">Nashik Steel · ₹9,04,000</p>
+            </div>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">21 days</span>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex items-baseline justify-between gap-3 px-4 py-3">
+            <div class="min-w-0">
+              <a href="/orders/PO-2026-0348/" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0348</a>
+              <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">Sharma Steel · ₹4,82,000</p>
+            </div>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">14 days</span>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex items-baseline justify-between gap-3 px-4 py-3">
+            <div class="min-w-0">
+              <a href="/orders/PO-2026-0362/" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0362</a>
+              <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers · ₹1,18,400</p>
+            </div>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">9 days</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- last, and chart/responsive's options rather than chart/line's -->
+    <section aria-labelledby="dbf-plot-h" class="rounded-xl border border-zinc-300 bg-white p-4"
+             x-data="{
+               chart: null, gone: false,
+               init() { this.wait(() => this.draw()); },
+               wait(fn) {
+                 if (this.gone) return;
+                 const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+                 probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+                   ? fn()
+                   : requestAnimationFrame(() => this.wait(fn));
+               },
+               draw() {
+                 Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+                 const grid = getComputedStyle(this.$root).borderTopColor;
+                 const ink  = getComputedStyle(this.$refs.legend).color;
+                 const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                                   .map(el => getComputedStyle(el).backgroundColor);
+                 this.chart = new Chart(this.$refs.canvas, {
+                   type: 'bar',
+                   data: {
+                     labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                     datasets: [{
+                       label: 'Receipts posted',
+                       data: [38, 41, 34, 46, 39, 44, 52, 47, 49, 55, 51, 58],
+                       backgroundColor: tone[0], borderRadius: 3, maxBarThickness: 22
+                     }]
+                   },
+                   options: {
+                     responsive: true, maintainAspectRatio: false,
+                     interaction: { mode: 'index', intersect: false },
+                     scales: {
+                       x: { grid: { display: false }, border: { color: grid },
+                            ticks: { color: ink, autoSkip: true, maxRotation: 0, autoSkipPadding: 10 } },
+                       y: { beginAtZero: true, grid: { color: grid }, border: { display: false },
+                            ticks: { color: ink, padding: 8, maxTicksLimit: 5 } }
+                     }
+                   }
+                 });
+               },
+               destroy() { this.gone = true; this.chart && this.chart.destroy(); }
+             }">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 id="dbf-plot-h" class="text-[14px]/5 font-semibold">Receipts posted by month</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">Rolling 12 months</p>
+      </div>
+
+      <ul x-ref="legend" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+        <li class="flex items-center gap-1.5">
+          <span data-series class="size-2 rounded-full bg-zinc-600" aria-hidden="true"></span>Receipts posted
+        </li>
+      </ul>
+
+      <div class="mt-4 h-56">
+        <canvas x-ref="canvas" role="img"
+                aria-label="Receipts posted each month over the last twelve months, rising from 38 to 58 with a low of 34 in November."></canvas>
+      </div>
+
+      <div class="sr-only">
+        <table>
+          <caption>Receipts posted by month, rolling twelve months to August 2026</caption>
+          <thead><tr><th scope="col">Month</th><th scope="col">Receipts posted</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">September 2025</th><td>38</td></tr>
+            <tr><th scope="row">October 2025</th><td>41</td></tr>
+            <tr><th scope="row">November 2025</th><td>34</td></tr>
+            <tr><th scope="row">December 2025</th><td>46</td></tr>
+            <tr><th scope="row">January 2026</th><td>39</td></tr>
+            <tr><th scope="row">February 2026</th><td>44</td></tr>
+            <tr><th scope="row">March 2026</th><td>52</td></tr>
+            <tr><th scope="row">April 2026</th><td>47</td></tr>
+            <tr><th scope="row">May 2026</th><td>49</td></tr>
+            <tr><th scope="row">June 2026</th><td>55</td></tr>
+            <tr><th scope="row">July 2026</th><td>51</td></tr>
+            <tr><th scope="row">August 2026</th><td>58</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>

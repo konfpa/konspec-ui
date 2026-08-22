@@ -1,0 +1,268 @@
+<!-- Three regions, and the third one is what makes this a different entry from
+     list-detail: a rail that carries the decision, always in reach, never
+     scrolling away with the record.
+
+     The rail is one element that changes shape, not two copies behind media
+     queries. At lg it is a 288px column beside the record; below lg the same
+     aside is a bar across the foot of the record pane, because a decision that
+     has scrolled off the bottom of a long order is a decision somebody makes
+     from memory. Two copies would mean two sets of button ids, and the POST
+     would come from whichever one the browser happened to render.
+
+     The record pane draws the record's own field list and its own line columns
+     rather than a fixed template. Four document kinds arrive in one inbox — an
+     order, a receipt, a rate contract, a credit note — and they do not share a
+     shape; hard-code the pane to purchase orders and a credit note renders as
+     four empty cells.
+
+     The queue is list-detail's listbox verbatim: one Tab stop, roving tabindex,
+     arrows bound on the listbox and never on the window, ends that clamp. What
+     is added is the age, and it is the age with this approver rather than the
+     age of the document — an order raised three weeks ago and forwarded this
+     morning is one day old here, and writing the document date instead is how
+     a queue acquires a column of alarming numbers nobody can act on.
+
+     The buttons are inert in this variant. The mechanic they drive is the
+     advance variant, and everything before it is the arrangement. -->
+<main data-kui="inbox-page/default" class="flex h-[660px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+      x-id="['q', 'rec']"
+      x-data="{
+        sel: 0, detail: false, kind: 'all',
+        queue: [
+          { no: 'PO-2026-0418', kind: 'Purchase order', party: 'Gujarat Polymers Ltd', value: '₹4,10,500', age: '4 days', status: 'Overdue', why: 'Above the ₹2,00,000 buying limit held by Meera Joshi',
+            facts: [['Order value', '₹4,10,500'], ['Cost centre', 'Compounding — Silvassa'], ['Required by', '04 Sep 2026'], ['Rate contract', 'RC-2026-0071']],
+            cols: ['Material', 'Quantity', 'Rate', 'Amount'],
+            lines: [['HDPE granules, natural', '12,000 kg', '₹28.40', '₹3,40,800'], ['Masterbatch, blue', '420 kg', '₹142.00', '₹59,640'], ['Antioxidant blend', '60 kg', '₹168.50', '₹10,110']],
+            trail: [['Raised by Meera Joshi', '17 Aug 2026, 11:20'], ['Checked against RC-2026-0071', '17 Aug 2026, 11:20'], ['With you', 'since 18 Aug 2026']] },
+          { no: 'GRN-4821', kind: 'Goods receipt', party: 'Sharma Steel & Alloys', value: '₹10,14,000', age: '2 days', status: 'Approved', why: 'Short by 400 kg against the challan',
+            facts: [['Received', '7,800 kg'], ['On the challan', '8,200 kg'], ['Against', 'PO-2026-0391'], ['Gate entry', '19 Aug 2026, 06:40']],
+            cols: ['Material', 'Challan', 'Weighed', 'Amount'],
+            lines: [['MS angle 50x50x6', '4,200 kg', '4,200 kg', '₹5,46,000'], ['MS plate 8 mm', '4,000 kg', '3,600 kg', '₹4,68,000']],
+            trail: [['Logged by Nilesh Patil', '19 Aug 2026, 07:05'], ['Weighbridge slip attached', '19 Aug 2026, 07:12'], ['With you', 'since 20 Aug 2026']] },
+          { no: 'RC-2026-0071', kind: 'Rate contract', party: 'Deccan Fasteners Pvt Ltd', value: '₹62,40,000', age: '1 day', status: 'Approved', why: 'A new annual contract needs a plant head signature',
+            facts: [['Contract value', '₹62,40,000'], ['Period', '01 Sep 2026 – 31 Aug 2027'], ['Payment terms', '45 days'], ['GSTIN', '24AABCD1234E1ZR']],
+            cols: ['Item', 'Annual quantity', 'Rate', 'Value'],
+            lines: [['Hex bolt M12x60', '180,000 nos', '₹11.85', '₹21,33,000'], ['Hex nut M12', '180,000 nos', '₹4.20', '₹7,56,000'], ['Washer, spring M12', '360,000 nos', '₹1.15', '₹4,14,000']],
+            trail: [['Negotiated by Akshay Prabhu', '14 Aug 2026'], ['Legal review cleared', '20 Aug 2026'], ['With you', 'since 21 Aug 2026']] },
+          { no: 'CN-2026-0114', kind: 'Credit note', party: 'Konkan Packaging Co', value: '₹1,86,300', age: '1 day', status: 'Approved', why: 'A credit note against a posted GRN always needs approval',
+            facts: [['Credit value', '₹1,86,300'], ['Against', 'GRN-4776'], ['Reason', 'Rejected on inspection'], ['Raised', '21 Aug 2026']],
+            cols: ['Material', 'Quantity', 'Rate', 'Amount'],
+            lines: [['Stretch film 500 mm', '900 nos', '₹207.00', '₹1,86,300']],
+            trail: [['Raised by Nilesh Patil', '21 Aug 2026, 09:30'], ['Quality rejection recorded', '20 Aug 2026'], ['With you', 'since 21 Aug 2026']] },
+          { no: 'PO-2026-0424', kind: 'Purchase order', party: 'Nashik Steel Traders', value: '₹96,750', age: 'today', status: 'Approved', why: 'No rate contract covers this material',
+            facts: [['Order value', '₹96,750'], ['Cost centre', 'Tooling — Silvassa'], ['Required by', '09 Sep 2026'], ['Rate contract', 'None']],
+            cols: ['Material', 'Quantity', 'Rate', 'Amount'],
+            lines: [['Carbide insert CNMG', '450 nos', '₹152.00', '₹68,400'], ['Tool holder PCLNR', '15 nos', '₹1,890.00', '₹28,350']],
+            trail: [['Raised by Meera Joshi', '22 Aug 2026, 08:15'], ['Three quotes attached', '22 Aug 2026, 08:15'], ['With you', 'since 22 Aug 2026']] },
+          { no: 'PO-2026-0427', kind: 'Purchase order', party: 'Qureshi Metals', value: '₹5,46,000', age: 'today', status: 'Approved', why: 'Above the ₹5,00,000 second-approver threshold',
+            facts: [['Order value', '₹5,46,000'], ['Cost centre', 'Fabrication — Vapi'], ['Required by', '12 Sep 2026'], ['Rate contract', 'RC-2026-0044']],
+            cols: ['Material', 'Quantity', 'Rate', 'Amount'],
+            lines: [['MS plate 10 mm', '9,000 kg', '₹54.60', '₹4,91,400'], ['MS angle 40x40x5', '1,000 kg', '₹54.60', '₹54,600']],
+            trail: [['Raised by Akshay Prabhu', '22 Aug 2026, 09:40'], ['Checked against RC-2026-0044', '22 Aug 2026, 09:40'], ['With you', 'since 22 Aug 2026']] },
+          { no: 'GRN-4826', kind: 'Goods receipt', party: 'Gujarat Polymers Ltd', value: '₹3,40,800', age: 'today', status: 'Approved', why: 'Moisture result outstanding at the time of receipt',
+            facts: [['Received', '12,000 kg'], ['On the challan', '12,000 kg'], ['Against', 'PO-2026-0418'], ['Gate entry', '22 Aug 2026, 06:20']],
+            cols: ['Material', 'Challan', 'Weighed', 'Amount'],
+            lines: [['HDPE granules, natural', '12,000 kg', '12,000 kg', '₹3,40,800']],
+            trail: [['Logged by Nilesh Patil', '22 Aug 2026, 06:44'], ['Sample drawn for the lab', '22 Aug 2026, 07:00'], ['With you', 'since 22 Aug 2026']] }
+        ],
+        dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+        get rows() { return this.kind === 'all' ? this.queue : this.queue.filter(o => o.kind === this.kind) },
+        get rec() { return this.rows[this.sel] || this.rows[0] },
+        move(step) { this.go(Math.min(Math.max(this.sel + step, 0), this.rows.length - 1)) },
+        go(i) {
+          this.sel = i;
+          this.$nextTick(() => {
+            const el = this.$refs.list.querySelector('[aria-selected=true]');
+            if (el) { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'nearest' }) }
+            if (this.$refs.body) this.$refs.body.scrollTop = 0;
+          });
+        },
+        open() { this.detail = true; this.$nextTick(() => this.$refs.detail.focus()) },
+        back() { this.detail = false; this.go(this.sel) }
+      }"
+      x-effect="if (sel > rows.length - 1) sel = Math.max(rows.length - 1, 0)">
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Waiting on you</h1>
+    <p role="status" class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+      7 documents · ₹88,34,350 · oldest with you 4 days · Silvassa and Vapi · FY 2026–27
+    </p>
+  </div>
+
+  <div class="flex min-h-0 flex-1" @keydown.escape="back()">
+
+    <!-- queue -->
+    <section :aria-labelledby="$id('q')"
+             class="flex min-h-0 w-full shrink-0 flex-col border-zinc-200 md:flex md:w-80 md:border-r lg:w-[22rem]"
+             :class="{ 'hidden': detail, 'flex': !detail }">
+      <div class="shrink-0 space-y-2.5 border-b border-zinc-200 px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <h2 :id="$id('q')" class="text-[13px]/5 font-medium">Your inbox</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="rows.length ? (sel + 1) + ' of ' + rows.length : 'none'"></p>
+        </div>
+        <!-- Bound with :class, so the lint never sees a hover here and neither
+             does anybody reading it wonder which of the two fills is resting. -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <template x-for="k in ['all', 'Purchase order', 'Goods receipt', 'Rate contract', 'Credit note']" :key="k">
+            <button type="button" @click="kind = k; sel = 0" :aria-pressed="kind === k"
+                    class="inline-flex h-7 items-center rounded-full px-2.5 text-[12px]/4 font-medium ring-1 ring-inset focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="kind === k ? 'bg-zinc-700 text-white ring-zinc-700' : 'bg-zinc-200 text-zinc-700 ring-zinc-300 hover:bg-zinc-300'"
+                    x-text="k === 'all' ? 'Everything' : k"></button>
+          </template>
+        </div>
+      </div>
+
+      <ul x-ref="list" role="listbox" :aria-labelledby="$id('q')"
+          @keydown.arrow-down.prevent="move(1)"
+          @keydown.arrow-up.prevent="move(-1)"
+          @keydown.home.prevent="go(0)"
+          @keydown.end.prevent="go(rows.length - 1)"
+          @keydown.enter.prevent="open()"
+          class="min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
+        <template x-for="(o, i) in rows" :key="o.no">
+          <li role="option" :aria-selected="sel === i" :tabindex="sel === i ? 0 : -1"
+              @click="go(i); open()"
+              class="flex gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="sel === i && 'bg-zinc-100'">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full" :class="dot[o.status]"></span>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="flex items-baseline justify-between gap-3">
+                <span class="truncate text-[13px]/5 font-medium tabular-nums" x-text="o.no"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="o.value"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[12px]/4 text-zinc-500">
+                <span x-text="o.status"></span> · <span x-text="o.kind"></span>
+              </span>
+              <span class="mt-0.5 block truncate text-[11px]/4 tabular-nums text-zinc-500">
+                <span x-text="o.party"></span> · with you <span x-text="o.age"></span>
+              </span>
+            </span>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- record and rail. One wrapper carries the below-md swap, so Escape and
+         the Back button return from either of them. -->
+    <div class="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex lg:flex-row"
+         :class="{ 'hidden': !detail, 'flex': detail }">
+
+      <section x-ref="detail" tabindex="-1" :aria-labelledby="$id('rec')"
+               class="flex min-h-0 min-w-0 flex-1 flex-col focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+
+        <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+          <button type="button" @click="back()"
+                  class="-ml-2 mb-2 inline-flex h-9 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:hidden">
+            <i data-lucide="chevron-left" class="size-4"></i>Back to the inbox
+          </button>
+          <h2 :id="$id('rec')" class="flex flex-wrap items-center gap-2.5 text-[16px]/6 font-semibold">
+            <span class="tabular-nums" x-text="rec.no"></span>
+            <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[rec.status]" aria-hidden="true"></span><span x-text="rec.status"></span>
+            </span>
+          </h2>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="rec.kind + ' · ' + rec.party + ' · with you ' + rec.age"></p>
+        </div>
+
+        <div x-ref="body" class="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-5">
+
+          <div class="rounded-xl border border-zinc-200 p-4">
+            <div class="flex items-start gap-2.5">
+              <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+              <div class="min-w-0">
+                <p class="text-[13px]/5 font-medium">Why this is with you</p>
+                <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600" x-text="rec.why"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- The record's own field list. Four kinds, four shapes, one pane. -->
+          <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+            <template x-for="f in rec.facts" :key="f[0]">
+              <div class="min-w-0">
+                <dt class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600" x-text="f[0]"></dt>
+                <dd class="mt-1 text-[13px]/5 font-semibold tabular-nums" x-text="f[1]"></dd>
+              </div>
+            </template>
+          </dl>
+
+          <h3 class="mt-5 text-[13px]/5 font-medium">Lines</h3>
+          <div class="mt-2 overflow-hidden rounded-xl border border-zinc-200">
+            <table class="w-full text-[13px]/5">
+              <thead>
+                <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">
+                  <th scope="col" class="px-3 py-2 font-medium" x-text="rec.cols[0]"></th>
+                  <th scope="col" class="px-3 py-2 text-right font-medium" x-text="rec.cols[1]"></th>
+                  <th scope="col" class="px-3 py-2 text-right font-medium" x-text="rec.cols[2]"></th>
+                  <th scope="col" class="px-3 py-2 text-right font-medium" x-text="rec.cols[3]"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="l in rec.lines" :key="l[0]">
+                  <tr class="border-b border-zinc-100 last:border-0">
+                    <td class="px-3 py-2" x-text="l[0]"></td>
+                    <td class="px-3 py-2 text-right tabular-nums text-zinc-600" x-text="l[1]"></td>
+                    <td class="px-3 py-2 text-right tabular-nums text-zinc-600" x-text="l[2]"></td>
+                    <td class="px-3 py-2 text-right font-medium tabular-nums" x-text="l[3]"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="mt-5 text-[13px]/5 font-medium">How it reached you</h3>
+          <ol class="mt-2 space-y-2.5">
+            <template x-for="t in rec.trail" :key="t[0]">
+              <li class="flex items-start gap-2.5">
+                <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+                <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-600">
+                  <span class="font-medium text-zinc-900" x-text="t[0]"></span> — <span x-text="t[1]"></span>
+                </p>
+              </li>
+            </template>
+          </ol>
+        </div>
+      </section>
+
+      <!-- the rail: a column at lg, a bar below it, one element either way -->
+      <aside aria-label="Your decision" class="flex shrink-0 flex-col border-t border-zinc-200 lg:w-72 lg:border-t-0 lg:border-l">
+        <div class="hidden min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:block">
+          <p class="text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">This document</p>
+          <p class="mt-1 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="rec.value"></p>
+          <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Your limit is ₹5,00,000 a document.</p>
+
+          <div class="mt-4 rounded-xl border border-zinc-200 p-3">
+            <p class="text-[12px]/4 font-medium">Where it goes next</p>
+            <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+              Approving posts it and closes the approval. Sending it back returns it to the raiser with your note. Rejecting ends it and cannot be undone.
+            </p>
+          </div>
+
+          <p class="mt-4 text-[11px]/4 font-medium tracking-wider uppercase text-zinc-600">Signing as</p>
+          <p class="mt-1 text-[13px]/5 font-medium">Akshay Prabhu</p>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">Plant head, Silvassa · limit ₹5,00,000</p>
+        </div>
+
+        <!-- Approve first in the DOM in both shapes. It is the action the screen
+             exists for, and the rail is the last Tab stop rather than the first
+             thing on the page, so nothing is armed before the record is read. -->
+        <div class="flex flex-wrap items-center gap-2 border-zinc-200 px-4 py-3 lg:flex-col lg:items-stretch lg:border-t">
+          <button type="button"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="check" class="size-4"></i>Approve
+          </button>
+          <button type="button"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Send back
+          </button>
+          <button type="button"
+                  class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="alert-circle" class="size-4 text-red-600"></i>Reject
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>

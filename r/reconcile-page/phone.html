@@ -1,0 +1,181 @@
+<!-- Three things become different things at this width, and none of them is a
+     reflow of the table.
+
+     The seven-column variance row becomes a card whose arithmetic reads top to
+     bottom as a small ledger — ordered, received, invoiced, and the difference
+     ruled off under them. A variance is a subtraction, and a subtraction reads
+     down a column, not across a row that has been squeezed to 46px a cell.
+
+     The verdict leaves the column and becomes a line under the figures, because
+     there is no column left to read down. It keeps the pill and the locked dot,
+     so a card seen on its own still says what it is.
+
+     The twelve agreeing lines move behind a segmented switch instead of into a
+     second section further down. On a phone a section four cards below the fold
+     is not something anybody finds, and the count in the switch is what says
+     the other twelve exist at all. It is button-group/segmented: a real
+     radiogroup, one Tab stop, roving tabindex, arrows to move, and the track is
+     a tinted shape carrying its ring.
+
+     The actions go to a bar stuck to the foot of the scrolling column, opaque
+     and top-bordered, because on a phone the decision is taken after reading
+     and the header is 900px above by then. Nothing is dropped to get there —
+     Print the working stays as an icon button with a real name up in the header,
+     since an action missing from the phone build is a job the phone cannot do.
+
+     Nothing scrolls sideways. As a real page this is app-shell's main column at
+     the same width; the w-[390px] frame is only so it previews as a phone. -->
+<div data-kui="reconcile-page/phone" class="mx-auto flex h-[680px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       tab: 'work',
+       opts: [ { id: 'work', label: 'Needs work 4' }, { id: 'agree', label: 'Agree 12' } ],
+       lines: [
+         { item: 'HDPE granules — natural', ref: 'PO-2026-0418 line 1',
+           ord: '40.000 MT', rec: '38.600 MT', inv: '40.000 MT', dq: '+1.400 MT', dv: '+₹81,760',
+           verdict: 'Blocked', why: 'Invoiced 1.400 MT more than was received. Tolerance is 0.200 MT.' },
+         { item: 'MS angle 50×50×6', ref: 'PO-2026-0418 line 2',
+           ord: '12,000 kg', rec: '11,940 kg', inv: '11,940 kg', dq: '—', dv: '+₹19,104',
+           verdict: 'Blocked', why: 'Billed at ₹64.00 a kg against a contract rate of ₹62.40.' },
+         { item: 'Carriage to Silvassa', ref: 'No order line',
+           ord: '—', rec: '—', inv: '—', dq: '—', dv: '+₹4,200',
+           verdict: 'Needs a reason', why: 'A charge with nothing ordered behind it.' },
+         { item: 'M12 hex bolt — 8.8 zinc', ref: 'PO-2026-0418 line 4',
+           ord: '4,000 nos', rec: '3,980 nos', inv: '4,000 nos', dq: '+20 nos', dv: '+₹480',
+           verdict: 'In tolerance', why: '' }
+       ],
+       agreed: [
+         { item: 'MS plate 8 mm', ref: 'line 5', val: '₹12,79,800' },
+         { item: 'Stretch film — 23 micron', ref: 'line 6', val: '₹52,500' },
+         { item: 'Welding rod 3.15 mm', ref: 'line 7', val: '₹1,84,400' }
+       ],
+       dot: { 'In tolerance': 'bg-emerald-600', 'Needs a reason': 'bg-amber-500', 'Blocked': 'bg-red-600' },
+       move(step) {
+         const i = this.opts.findIndex(o => o.id === this.tab);
+         const n = Math.min(Math.max(i + step, 0), this.opts.length - 1);
+         this.tab = this.opts[n].id;
+         this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());
+       }
+     }">
+
+  <main class="min-h-0 flex-1 overflow-y-auto">
+
+    <header class="border-b border-zinc-200 bg-white px-4 py-3.5">
+      <div class="flex items-start justify-between gap-3">
+        <a href="#" class="inline-flex items-center gap-1.5 rounded text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>Invoice matching
+        </a>
+        <button type="button" aria-label="Print the working for INV-2026-1184"
+                class="-mt-1 flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="printer" class="size-4"></i>
+        </button>
+      </div>
+
+      <h1 class="mt-2 text-[20px]/7 font-semibold tracking-tight">Three-way match</h1>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+        INV-2026-1184 · Sharma Steel &amp; Alloys · against PO-2026-0418 and GRN-4821
+      </p>
+
+      <dl class="mt-3 space-y-1.5 text-[13px]/5">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-zinc-600">Invoiced</dt><dd class="tabular-nums">₹60,42,500</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-zinc-600">Received</dt><dd class="tabular-nums">₹59,36,956</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-1.5">
+          <dt class="font-medium">Difference<span class="mt-0.5 block text-[12px]/4 font-normal text-zinc-500">invoiced less received</span></dt>
+          <dd class="text-[20px]/7 font-semibold tracking-tight tabular-nums">+₹1,05,544</dd>
+        </div>
+      </dl>
+    </header>
+
+    <div class="px-4 py-3">
+      <div role="radiogroup" aria-label="Which lines to show" x-ref="grp"
+           @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+           @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+           class="flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+        <template x-for="o in opts" :key="o.id">
+          <button type="button" role="radio" :aria-checked="tab === o.id" :tabindex="tab === o.id ? 0 : -1"
+                  @click="tab = o.id"
+                  class="inline-flex h-8 flex-1 items-center justify-center rounded-md px-3 text-[13px]/5 font-medium tabular-nums transition focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="tab === o.id ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+            <span x-text="o.label"></span>
+          </button>
+        </template>
+      </div>
+    </div>
+
+    <section aria-label="Lines that need work" x-show="tab === 'work'" class="space-y-3 px-4 pb-4">
+      <template x-for="l in lines" :key="l.item">
+        <article class="rounded-xl border border-zinc-300 bg-white px-4 py-3.5">
+          <h2 class="text-[13px]/5 font-medium" x-text="l.item"></h2>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500" x-text="l.ref"></p>
+          <dl class="mt-2.5 space-y-1 text-[13px]/5">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Ordered</dt><dd class="tabular-nums" x-text="l.ord"></dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Received</dt><dd class="tabular-nums" x-text="l.rec"></dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt class="text-zinc-600">Invoiced</dt><dd class="tabular-nums" x-text="l.inv"></dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-1.5">
+              <dt class="font-medium">Difference</dt>
+              <dd class="font-semibold tabular-nums"><span x-text="l.dq"></span> · <span x-text="l.dv"></span></dd>
+            </div>
+          </dl>
+          <p class="mt-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[l.verdict]" aria-hidden="true"></span><span x-text="l.verdict"></span>
+            </span>
+          </p>
+          <template x-if="l.why">
+            <p class="mt-1.5 flex items-start gap-1.5">
+              <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600"></i>
+              <span class="text-[12px]/4 tabular-nums text-zinc-600" x-text="l.why"></span>
+            </p>
+          </template>
+        </article>
+      </template>
+    </section>
+
+    <section aria-label="Lines that agree" x-show="tab === 'agree'" x-cloak class="px-4 pb-4">
+      <div class="rounded-xl border border-zinc-300 bg-white">
+        <p class="border-b border-zinc-200 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-600">
+          12 lines ordered, received and invoiced the same. ₹28,42,140 in total.
+        </p>
+        <ul role="list" class="divide-y divide-zinc-100">
+          <template x-for="a in agreed" :key="a.item">
+            <li class="flex items-baseline justify-between gap-3 px-4 py-2.5">
+              <span class="min-w-0">
+                <span class="block truncate text-[13px]/5" x-text="a.item"></span>
+                <span class="block text-[12px]/4 tabular-nums text-zinc-500" x-text="a.ref"></span>
+              </span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums" x-text="a.val"></span>
+            </li>
+          </template>
+        </ul>
+        <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+          9 more, all agreeing exactly.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- opaque and top-bordered. Transparent, the last card scrolls under it and
+       reads as clipped; absent, the decision is nine cards back up the page. -->
+  <div class="shrink-0 border-t border-zinc-200 bg-white px-4 py-3">
+    <p class="text-[12px]/4 tabular-nums text-zinc-600">
+      2 lines blocked for ₹1,00,864. ₹59,41,636 can post.
+    </p>
+    <div class="mt-2 flex gap-2">
+      <button type="button" class="inline-flex h-10 flex-1 items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Send it back
+      </button>
+      <button type="button" class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="file-check-2" class="size-4"></i>Review and post
+      </button>
+    </div>
+  </div>
+</div>

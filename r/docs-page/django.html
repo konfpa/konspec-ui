@@ -1,0 +1,176 @@
+<!-- views.py
+     from django.shortcuts import get_object_or_404, render
+
+     def manual_page(request, section, slug):
+         page = get_object_or_404(
+             ManualPage.objects.select_related('section', 'owner', 'approver'),
+             section__slug=section, slug=slug, plants=request.user.plant,
+         )
+         return render(request, 'manual/page.html', {
+             'page': page,
+             'sections': ManualSection.objects.prefetch_related('pages'),
+             'headings': page.headings(),   # [(id, text), ...] from the renderer
+         })
+
+     The body is Markdown rendered and sanitised in the model, not in the
+     template. |safe on a field somebody edits in a browser is where a manual
+     becomes an XSS vector, and the one place that can be reviewed is the
+     renderer.
+
+     Which leaves the problem this variant exists for: a rendered body emits
+     bare <h2>, <p>, <ul> and <a> with no classes on them, and there is no
+     typography plugin here and no project stylesheet to put a .prose class in —
+     rule 4 forbids both. So the rhythm goes on the wrapper as descendant
+     variants, which is stock Tailwind and the same technique table/django
+     already uses for rows it does not write. Every number in that class list is
+     the one written out by hand in docs-page/prose.
+
+     Two things the wrapper cannot do, and both are honest limits rather than
+     bugs. It cannot give the first block a different top margin, so the wrapper
+     zeroes it with [&amp;>:first-child]:mt-0. And it cannot tell a bullet list
+     from a numbered one when it sets the marker colour, so the numbered value
+     wins — numbers are read and bullets are not.
+
+     {% load humanize %} is in this file and not only in base.html, because a
+     template that includes another does not inherit its loads and naturaltime
+     without the load raises at render rather than at startup. It is used on the
+     review date and nowhere else: a controlled document states its effective
+     date in figures, and "5 months ago" is decoration beside it, never instead
+     of it.
+
+     A comment/endcomment block, never a multi-line {# #}. Django's tag_re has no DOTALL, so
+     a {# #} that wraps onto a second line stops being a comment and the rest of
+     it renders in the middle of the procedure.
+
+     No csrf_token on this page, and that is not an omission: nothing here
+     posts. The search is a GET form, which is what makes a result a link
+     somebody can send. -->
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<div data-kui="docs-page/django" class="text-zinc-900"
+     x-data="{ here: '{{ headings.0.0 }}' }"
+     x-init="const seen = new IntersectionObserver(
+               rows => rows.forEach(r => { if (r.isIntersecting) here = r.target.id }),
+               { rootMargin: '0px 0px -68% 0px' });
+             $el.querySelectorAll('article h2[id]').forEach(h => seen.observe(h))">
+
+  <main class="mx-auto max-w-6xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="{% url 'manual:index' %}" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Manual</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><a href="{% url 'manual:section' page.section.slug %}" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ page.section.name }}</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium text-zinc-900">{{ page.title }}</span></li>
+        </ol>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">{{ page.title }}</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+        {{ page.number }} · Revision {{ page.revision }} · Effective {{ page.effective_on|date:"d M Y" }} · Owner: {{ page.owner.team }}
+      </p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-6 xl:grid-cols-[220px_minmax(0,1fr)_200px]">
+
+      <nav aria-label="Manual sections" class="lg:sticky lg:top-6 lg:self-start">
+        {% for section in sections %}
+          <p class="{% if not forloop.first %}mt-5 {% endif %}text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">{{ section.name }}</p>
+          <ul role="list" class="mt-2 space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+            {% for doc in section.pages.all %}
+              <li>
+                {% if doc.pk == page.pk %}
+                  <a href="{% url 'manual:page' section.slug doc.slug %}" aria-current="page"
+                     class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ doc.title }}</a>
+                {% else %}
+                  <a href="{% url 'manual:page' section.slug doc.slug %}"
+                     class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ doc.title }}</a>
+                {% endif %}
+              </li>
+            {% empty %}
+              <li class="py-1.5 pl-3 text-[13px]/5 text-zinc-500">Nothing published in this section yet.</li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+      </nav>
+
+      <article class="mt-4 min-w-0 rounded-xl border border-zinc-300 bg-white px-5 py-5 sm:px-6 lg:mt-0">
+
+        {% if page.superseded_by %}
+          {% comment %}
+            In the flow, above the lead, inside the article — not a dismissible
+            banner and not a message. It is the first fact about the text under
+            it and it has to survive being printed.
+          {% endcomment %}
+          <div class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            <div class="min-w-0">
+              <p class="text-[13px]/5 font-medium">You are reading revision <span class="tabular-nums">{{ page.revision }}</span>, superseded on {{ page.superseded_on|date:"d M Y" }}.</p>
+              <p class="mt-0.5 text-[12px]/4 text-zinc-600">
+                <a href="{% url 'manual:page' page.section.slug page.superseded_by.slug %}" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Read revision {{ page.superseded_by.revision }}</a>,
+                effective {{ page.superseded_by.effective_on|date:"d M Y" }}.
+              </p>
+            </div>
+          </div>
+        {% endif %}
+
+        {% comment %}
+          The rhythm, on the wrapper, because the body arrives as bare tags. The
+          numbers are the ones docs-page/prose writes out by hand: mt-10 above
+          an h2, mt-8 above an h3, mt-6 above an h4, mt-4 between paragraphs,
+          mt-3 on a list under the sentence that introduces it, 24px of leading
+          on 14px type, and the whole thing capped at the 576px measure.
+        {% endcomment %}
+        <div class="max-w-xl text-[14px]/6 text-zinc-900 marker:tabular-nums marker:text-zinc-500
+                    [&amp;>:first-child]:mt-0
+                    [&amp;_h2]:mt-10 [&amp;_h2]:text-[20px]/7 [&amp;_h2]:font-semibold [&amp;_h2]:tracking-tight
+                    [&amp;_h3]:mt-8 [&amp;_h3]:text-[16px]/6 [&amp;_h3]:font-semibold
+                    [&amp;_h4]:mt-6 [&amp;_h4]:text-[14px]/5 [&amp;_h4]:font-semibold
+                    [&amp;_p]:mt-4 [&amp;_ul]:mt-3 [&amp;_ol]:mt-3 [&amp;_blockquote]:mt-4 [&amp;_figure]:mt-4
+                    [&amp;_ul]:list-disc [&amp;_ul]:space-y-1 [&amp;_ul]:pl-5
+                    [&amp;_ol]:list-decimal [&amp;_ol]:space-y-1 [&amp;_ol]:pl-6
+                    [&amp;_dt]:mt-4 [&amp;_dt]:text-[14px]/5 [&amp;_dt]:font-semibold [&amp;_dd]:mt-1
+                    [&amp;_a]:text-zinc-900 [&amp;_a]:underline [&amp;_a]:underline-offset-2
+                    [&amp;_code]:rounded [&amp;_code]:bg-zinc-200 [&amp;_code]:px-1.5 [&amp;_code]:py-0.5 [&amp;_code]:font-mono [&amp;_code]:text-[12px]/4 [&amp;_code]:text-zinc-600
+                    [&amp;_blockquote]:border-l-2 [&amp;_blockquote]:border-zinc-300 [&amp;_blockquote]:pl-4 [&amp;_blockquote]:text-zinc-600
+                    [&amp;_figcaption]:mt-2 [&amp;_figcaption]:text-[12px]/4 [&amp;_figcaption]:text-zinc-600">
+          {{ page.body_html }}
+        </div>
+
+        <footer class="mt-8 border-t border-zinc-200 pt-3">
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">
+            Last reviewed {{ page.reviewed_on|date:"d M Y" }} ({{ page.reviewed_at|naturaltime }}) by {{ page.approver.get_full_name }} · Next review {{ page.next_review_on|date:"d M Y" }}
+          </p>
+          <p class="mt-1 text-[12px]/4 text-zinc-500">
+            Something on this page wrong or out of date?
+            <a href="{% url 'manual:report' page.section.slug page.slug %}" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Tell {{ page.owner.team }}</a>.
+          </p>
+        </footer>
+      </article>
+
+      <nav aria-label="On this page" class="hidden xl:sticky xl:top-6 xl:block xl:self-start">
+        <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">On this page</p>
+        <ul role="list" class="mt-2 space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          {% for id, text in headings %}
+            <li>
+              <a href="#{{ id }}" aria-current="{% if forloop.first %}location{% else %}false{% endif %}"
+                 :aria-current="here === '{{ id }}' ? 'location' : 'false'"
+                 :class="here === '{{ id }}' ? 'border-zinc-700 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
+                 class="-ml-px block border-l-2 py-1.5 pl-3 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ text }}</a>
+            </li>
+          {% empty %}
+            {% comment %}
+              A page with no h2 in it does not get an empty rail with a heading
+              over it. There is nothing to navigate, so there is no navigation.
+            {% endcomment %}
+          {% endfor %}
+        </ul>
+      </nav>
+
+    </div>
+  </main>
+</div>
+{% endblock %}

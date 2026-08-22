@@ -1,0 +1,80 @@
+<!-- What drops out as the stock shrinks, drawn at the sizes the stock actually
+     comes in rather than described. A 100 × 50 mm label carries the location,
+     the item code, the description, the specification and a symbol wide enough
+     to scan across a bay. A 50 × 25 mm label loses the description and the
+     specification. A 25 × 15 mm label is a symbol and its number, and anything
+     else put on it makes the symbol too small to read.
+
+     The decision this variant exists to force is which field is the one that
+     survives, and it is not always the obvious one. Here it is the location,
+     because a bin label whose code cannot be read is a bin nobody can put away
+     into; on the batch label in the content variant it is the expiry, and on a
+     pallet tag it is the count.
+
+     Nothing here is scaled. The three labels are three different designs at
+     three fixed sizes, because type does not scale with the stock — 11px is
+     11px on all three, and a 25 × 15 mm label at 60% of a 100 × 50 mm one would
+     have 6.6px type on it that no thermal printer will resolve. The type scale
+     bottoms out at 11px and that is the floor this entry designs to; the answer
+     to a label too small for 11px is fewer fields, not smaller type.
+
+     It prints on A4 and it is worth printing: held against a roll it is how the
+     stores clerk works out which of the three boxes in the cupboard is the one
+     the job wants. That is also why these three keep their outlines on paper
+     where every other variant drops them with print:border-0 — here the outline
+     is the thing being compared, not a stand-in for a die-cut. -->
+<div data-kui="label-sheet/sizes" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm]">
+
+    <div class="mb-4 print:hidden">
+      <h1 class="text-[20px]/7 font-semibold tracking-tight">Bin label at three stock sizes</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">100 × 50 mm, 50 × 25 mm and 25 × 15 mm, drawn at size. Print this page at 100% and hold it against the roll.</p>
+    </div>
+
+    <div class="overflow-x-auto print:overflow-visible">
+      <div class="w-[190mm] space-y-[8mm]">
+
+        <section aria-labelledby="sz-100-h">
+          <h2 id="sz-100-h" class="mb-[2mm] text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600 print:hidden">100 × 50 mm — everything</h2>
+          <div class="flex h-[50mm] w-[100mm] break-inside-avoid flex-col overflow-hidden border border-zinc-300 bg-white p-[3mm]">
+            <div class="flex items-start justify-between gap-[3mm]">
+              <p class="text-[24px]/7 font-semibold tabular-nums tracking-tight">B-04-01</p>
+              <p class="text-[13px]/5 font-medium tabular-nums">ITM-1042</p>
+            </div>
+            <p class="mt-[1mm] truncate text-[13px]/5">MS angle 50 × 50 × 6 mm</p>
+            <p class="truncate text-[11px]/4">IS 2062 grade E250 · issued in kg · Silvassa raw material yard</p>
+            <div class="mt-auto">
+              <div aria-hidden="true" class="flex h-[13mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128 · substitute</div>
+              <p class="mt-[0.8mm] text-center text-[13px]/5 font-medium tabular-nums">B-04-01</p>
+            </div>
+          </div>
+          <p class="mt-[2mm] text-[12px]/4 text-zinc-600 print:hidden">Location, item code, description, specification, symbol and the readable line. The symbol is 94 mm wide, which a gun reads from three metres up a rack.</p>
+        </section>
+
+        <section aria-labelledby="sz-50-h">
+          <h2 id="sz-50-h" class="mb-[2mm] text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600 print:hidden">50 × 25 mm — the description goes</h2>
+          <div class="flex h-[25mm] w-[50mm] break-inside-avoid flex-col overflow-hidden border border-zinc-300 bg-white p-[2mm]">
+            <div class="flex items-baseline justify-between gap-[2mm]">
+              <p class="text-[16px]/6 font-semibold tabular-nums tracking-tight">B-04-01</p>
+              <p class="text-[11px]/4 font-medium tabular-nums">ITM-1042</p>
+            </div>
+            <div class="mt-auto">
+              <div aria-hidden="true" class="flex h-[7mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">Code 128</div>
+              <p class="text-center text-[11px]/4 font-medium tabular-nums">B-04-01</p>
+            </div>
+          </div>
+          <p class="mt-[2mm] text-[12px]/4 text-zinc-600 print:hidden">The description and the specification are gone. They were the two fields a person reads and never keys, and the scanner does not need either.</p>
+        </section>
+
+        <section aria-labelledby="sz-25-h">
+          <h2 id="sz-25-h" class="mb-[2mm] text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600 print:hidden">25 × 15 mm — a code and nothing else</h2>
+          <div class="flex h-[15mm] w-[25mm] break-inside-avoid flex-col justify-between overflow-hidden border border-zinc-300 bg-white p-[1mm]">
+            <div aria-hidden="true" class="flex h-[8mm] items-center justify-center border border-zinc-300 text-[11px]/4 uppercase tracking-wider">128</div>
+            <p class="text-center text-[11px]/4 font-medium tabular-nums">B-04-01</p>
+          </div>
+          <p class="mt-[2mm] text-[12px]/4 text-zinc-600 print:hidden">The symbol and the line under it, at the same 11px the other two use. The item code went because the location already resolves to it in the system, and putting both on 23 mm of stock would have narrowed the symbol below what a gun reads at arm's length.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

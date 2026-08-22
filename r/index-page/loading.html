@@ -1,0 +1,200 @@
+<!-- The register in the second before the rows arrive, and the split is what
+     matters: the page is drawn for real and only the panel is grey.
+
+     Everything above the panel came with the document — the trail, the h1, the
+     filter band, the primary action — so none of it waits, and none of it moves
+     when the rows land. The search is live from the first frame: what somebody
+     types in the first half-second goes into the request that replaces these
+     rows. Disable it instead and the one control a person reaches for while a
+     slow screen loads is the one that refuses them.
+
+     The count line is the exception, because the count is genuinely not known
+     until the query answers. It is a grey bar in the exact box the sentence will
+     occupy, and the role="status" that will carry the count is already in the
+     document — a live region that arrives with its message already in it is not
+     a change and is announced to nobody.
+
+     The header row is real, and it does two jobs: somebody can decide which
+     column they are going to read before the figures land, and the browser sets
+     the column widths from the same markup the loaded table uses, so no column
+     moves on arrival.
+
+     Five grey rows because the page size is five. Guess low where it is not
+     known — growth pushes down only what is below the panel, while shrinkage
+     pulls the whole page up under a cursor already moving.
+
+     aria-busy sits on the panel and one sr-only status names what is loading.
+     The grey rows are aria-hidden, or a screen reader walks twenty-five empty
+     cells and is never told why.
+
+     This is the first paint and nothing here is worth keeping. Once rows are up,
+     a later page in flight keeps them and marks them inert; the register never
+     comes back to this state. -->
+<div data-kui="index-page/loading" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <nav aria-label="Breadcrumb">
+          <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+            <li><a href="#" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><span aria-current="page" class="font-medium text-zinc-900">Purchase orders</span></li>
+          </ol>
+        </nav>
+
+        <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+          <div class="min-w-0">
+            <h1 class="text-[24px]/7 font-semibold tracking-tight">Purchase orders</h1>
+            <p role="status" class="mt-1 flex h-5 items-center text-[13px]/5 text-zinc-600">
+              <span class="h-2.5 w-64 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></span>
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="download" class="size-4"></i>Export
+            </button>
+            <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="plus" class="size-4"></i>New order
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+          <form role="search" class="md:max-w-sm md:flex-1">
+            <label for="ix-ld-q" class="sr-only">Filter the purchase order register</label>
+            <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+              <input id="ix-ld-q" type="search" autocomplete="off" spellcheck="false" placeholder="Filter the register"
+                     class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500">
+            </div>
+          </form>
+          <div class="grid grid-cols-2 gap-2 md:flex md:shrink-0">
+            <div class="min-w-0">
+              <label for="ix-ld-status" class="sr-only">Status</label>
+              <select id="ix-ld-status" class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 md:w-auto">
+                <option>Status: all</option>
+                <option>Status: open</option>
+                <option>Status: approved</option>
+                <option>Status: overdue</option>
+              </select>
+            </div>
+            <div class="min-w-0">
+              <label for="ix-ld-plant" class="sr-only">Plant</label>
+              <select id="ix-ld-plant" class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 md:w-auto">
+                <option>Plant: all</option>
+                <option>Plant: Silvassa</option>
+                <option>Plant: Vapi</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+      <div aria-busy="true" class="rounded-xl border border-zinc-300 bg-white">
+        <p role="status" class="sr-only">Loading the purchase order register</p>
+
+        <table class="hidden w-full text-[13px]/5 md:table">
+          <thead>
+            <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Plant</th>
+              <th scope="col" class="px-4 py-2.5 text-right font-medium">Value</th>
+              <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+            <tr class="border-b border-zinc-100">
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-16 rounded-full bg-zinc-200"></div></div></td>
+            </tr>
+            <tr class="border-b border-zinc-100">
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-20 rounded-full bg-zinc-200"></div></div></td>
+            </tr>
+            <tr class="border-b border-zinc-100">
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-32 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-16 rounded-full bg-zinc-200"></div></div></td>
+            </tr>
+            <tr class="border-b border-zinc-100">
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-14 rounded-full bg-zinc-200"></div></div></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+              <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-16 rounded-full bg-zinc-200"></div></div></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <ul class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none md:hidden" aria-hidden="true">
+          <li class="px-4 py-3">
+            <div class="flex h-5 items-center justify-between gap-3">
+              <div class="h-2.5 w-28 rounded bg-zinc-200"></div>
+              <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+            </div>
+            <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div>
+            <div class="mt-2 flex h-5 items-center gap-2">
+              <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
+              <div class="h-2 w-24 rounded bg-zinc-200"></div>
+            </div>
+          </li>
+          <li class="px-4 py-3">
+            <div class="flex h-5 items-center justify-between gap-3">
+              <div class="h-2.5 w-28 rounded bg-zinc-200"></div>
+              <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+            </div>
+            <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div>
+            <div class="mt-2 flex h-5 items-center gap-2">
+              <div class="h-5 w-20 shrink-0 rounded-full bg-zinc-200"></div>
+              <div class="h-2 w-24 rounded bg-zinc-200"></div>
+            </div>
+          </li>
+          <li class="px-4 py-3">
+            <div class="flex h-5 items-center justify-between gap-3">
+              <div class="h-2.5 w-28 rounded bg-zinc-200"></div>
+              <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+            </div>
+            <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+            <div class="mt-2 flex h-5 items-center gap-2">
+              <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
+              <div class="h-2 w-24 rounded bg-zinc-200"></div>
+            </div>
+          </li>
+        </ul>
+
+        <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <div class="flex h-8 items-center">
+            <div class="h-2.5 w-40 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+              <i data-lucide="chevron-left" class="size-4"></i>Previous
+            </button>
+            <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+              Next<i data-lucide="chevron-right" class="size-4"></i>
+            </button>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </main>
+</div>

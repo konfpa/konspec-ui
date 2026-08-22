@@ -1,0 +1,334 @@
+<!-- matching/templates/matching/reconcile.html — a page template, so it
+     extends the base that renders app-shell and fills one block. Every
+     signed-in screen is the shell; a reconciliation that starts its own
+     document loses the skip link, the nav landmark and the command palette, and
+     reviews as fine because everything it dropped is invisible until somebody
+     uses a keyboard.
+
+     |intcomma is for counts and never for money. It groups in threes, so an
+     invoice value comes out ₹1,245,000 where the register has to read
+     ₹12,45,000 — wrong by a factor of ten to anyone reading at speed, and read
+     straight past. Rupees go through the project filter table/django defines in
+     templatetags/money.py, which is why both modules are loaded here. |intcomma
+     also raises without {% load humanize %} in this same file, which is why the
+     load line is here and not only in base.html.
+
+     The htmx target is the wrapper holding both unmatched lists, and it is a
+     real id rather than closest [data-kui]. Two things ride on that. A pair
+     takes a row out of the left list and a row out of the right one, so the two
+     sides have to be replaced in one swap — swap them separately and there is a
+     frame in which the page shows a receipt that is already matched. And a
+     composed page carries exactly one data-kui, so closest [data-kui] would
+     swap the whole screen, variance table and all, out from under the user. The
+     partial the view returns has to carry id="recon-panes" itself, or the swap
+     after this one has nothing to aim at.
+
+     The form is a real POST with an action as well as an hx-post, so it works
+     with htmx switched off and the URL is the same either way. {% csrf_token %}
+     is inside the form, not the page: htmx sends what the form contains.
+
+     The empty clause is the reconciled state, and it is not the same branch as a
+     filter that matched nothing. That choice is made in the view on
+     unfiltered_count, exactly as index-page/django makes it, because a period
+     with nothing left and a query that hid everything are different screens and
+     only one of them is good news.
+
+     A multi-line {# #} is not a comment — Django's tag_re has no DOTALL, so
+     everything after the first line renders on the page. The trailing note uses
+     a comment/endcomment block. -->
+{% extends "base.html" %}
+{% load humanize money %}
+
+{% block main %}
+<div data-kui="reconcile-page/django" class="bg-zinc-100 text-zinc-900">
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
+
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb">
+          <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+            <li><a href="{% url 'procurement:home' %}" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+            <li aria-hidden="true" class="text-zinc-500">/</li>
+            <li><span aria-current="page" class="font-medium text-zinc-900">Invoice matching</span></li>
+          </ol>
+        </nav>
+        <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Invoice matching</h1>
+        <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+          {{ plant.name }} · {{ period.start|date:"d M Y" }} to {{ period.end|date:"d M Y" }} · {{ variances|length|intcomma }} of {{ line_count|intcomma }} lines carry a variance
+        </p>
+      </div>
+      <a href="{% url 'matching:post' invoice.pk %}"
+         class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-3.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="file-check-2" class="size-4"></i>Review and post
+      </a>
+    </div>
+
+    <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-3 rounded-xl border border-zinc-300 bg-white px-4 py-3.5 lg:px-5">
+      <dl class="flex flex-wrap items-baseline gap-x-8 gap-y-3">
+        <div>
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Invoiced</dt>
+          <dd class="mt-1 text-[20px]/7 font-semibold tracking-tight tabular-nums">{{ totals.invoiced|rupees }}</dd>
+        </div>
+        <div>
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Received</dt>
+          <dd class="mt-1 text-[20px]/7 font-semibold tracking-tight tabular-nums">{{ totals.received|rupees }}</dd>
+        </div>
+        <div>
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Difference</dt>
+          <dd class="mt-1 flex flex-wrap items-baseline gap-x-2 text-[20px]/7 font-semibold tracking-tight tabular-nums">
+            {{ totals.difference|rupees }}
+            <span class="text-[12px]/4 font-normal tracking-normal text-zinc-500">invoiced less received</span>
+          </dd>
+        </div>
+      </dl>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">
+        {{ agreed_count|intcomma }} agree · {{ tolerance_count|intcomma }} inside tolerance · {{ reason_count|intcomma }} need a reason · {{ blocked_count|intcomma }} blocked
+      </p>
+    </div>
+
+    <section aria-labelledby="dj-var-h" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3 lg:px-5">
+        <h2 id="dj-var-h" class="text-[16px]/6 font-semibold">Lines that disagree</h2>
+      </div>
+      <table class="hidden w-full text-[13px]/5 md:table">
+        <thead>
+          <tr class="border-b border-zinc-200 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+            <th scope="col" class="px-4 py-2.5 font-medium lg:px-5">Line</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Ordered</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">Invoiced</th>
+            <th scope="col" class="px-4 py-2.5 text-right font-medium">
+              Value
+              <span class="block font-normal tracking-normal normal-case text-zinc-500">invoiced less received</span>
+            </th>
+            <th scope="col" class="px-4 py-2.5 font-medium lg:px-5">Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in variances %}
+            <tr class="border-b border-zinc-100">
+              <th scope="row" class="px-4 py-3 text-left font-normal lg:px-5">
+                <span class="block font-medium">{{ v.item.description }}</span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">
+                  {% if v.order_line %}
+                    <a href="{{ v.order_line.get_absolute_url }}" class="text-zinc-600 underline underline-offset-2 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ v.order_line.order.number }}</a>
+                    line {{ v.order_line.position }} ·
+                    <a href="{{ v.receipt.get_absolute_url }}" class="text-zinc-600 underline underline-offset-2 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ v.receipt.number }}</a>
+                  {% else %}
+                    No order line
+                  {% endif %}
+                </span>
+                {% if v.reason %}
+                  <span class="mt-1.5 flex items-start gap-1.5">
+                    <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600"></i>
+                    <span class="text-[12px]/4 tabular-nums text-zinc-600">{{ v.reason }}</span>
+                  </span>
+                {% endif %}
+              </th>
+              <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap text-zinc-600">{{ v.ordered_display|default:"—" }}</td>
+              <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap text-zinc-600">{{ v.received_display|default:"—" }}</td>
+              <td class="px-4 py-3 text-right tabular-nums whitespace-nowrap">{{ v.invoiced_display|default:"—" }}</td>
+              <td class="px-4 py-3 text-right font-medium tabular-nums whitespace-nowrap">{{ v.value_difference|rupees }}</td>
+              <td class="px-4 py-3 lg:px-5">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                  <span class="size-1.5 shrink-0 rounded-full {{ v.verdict_dot_class }}" aria-hidden="true"></span>{{ v.get_verdict_display }}
+                </span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="px-6 py-12 text-center">
+                <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+                  <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+                </span>
+                <h3 class="mt-3 text-[16px]/6 font-semibold">Every line agrees</h3>
+                <p class="mx-auto mt-1 max-w-sm text-[13px]/5 tabular-nums text-zinc-600">
+                  {{ line_count|intcomma }} lines ordered, received and invoiced the same, {{ totals.invoiced|rupees }} in all. Nothing filtered.
+                </p>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        {% if variances %}
+          <tfoot class="bg-zinc-50">
+            <tr class="border-t border-zinc-200">
+              <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium text-zinc-600 lg:px-5">
+                Total of these {{ variances|length|intcomma }} line{{ variances|length|pluralize }}
+              </th>
+              <td class="px-4 py-2 text-right tabular-nums text-zinc-500">—</td>
+              <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap">{{ totals.exception_received|rupees }}</td>
+              <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap">{{ totals.exception_invoiced|rupees }}</td>
+              <td class="px-4 py-2 text-right text-[14px]/5 font-semibold tabular-nums whitespace-nowrap">{{ totals.exception_difference|rupees }}</td>
+              <td class="px-4 py-2 lg:px-5"></td>
+            </tr>
+          </tfoot>
+        {% endif %}
+      </table>
+
+      <div class="divide-y divide-zinc-100 md:hidden">
+        {% for v in variances %}
+          <div class="px-4 py-3.5">
+            <p class="text-[13px]/5 font-medium">{{ v.item.description }}</p>
+            <dl class="mt-2.5 space-y-1 text-[13px]/5">
+              <div class="flex items-baseline justify-between gap-3">
+                <dt class="text-zinc-600">Ordered</dt><dd class="tabular-nums">{{ v.ordered_display|default:"—" }}</dd>
+              </div>
+              <div class="flex items-baseline justify-between gap-3">
+                <dt class="text-zinc-600">Received</dt><dd class="tabular-nums">{{ v.received_display|default:"—" }}</dd>
+              </div>
+              <div class="flex items-baseline justify-between gap-3">
+                <dt class="text-zinc-600">Invoiced</dt><dd class="tabular-nums">{{ v.invoiced_display|default:"—" }}</dd>
+              </div>
+              <div class="flex items-baseline justify-between gap-3 border-t border-zinc-100 pt-1">
+                <dt class="font-medium">Difference</dt>
+                <dd class="font-semibold tabular-nums">{{ v.value_difference|rupees }}</dd>
+              </div>
+            </dl>
+            <p class="mt-2.5">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full {{ v.verdict_dot_class }}" aria-hidden="true"></span>{{ v.get_verdict_display }}
+              </span>
+            </p>
+          </div>
+        {% empty %}
+          <p class="px-4 py-8 text-center text-[13px]/5 tabular-nums text-zinc-600">
+            Every one of the {{ line_count|intcomma }} lines agrees.
+          </p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <div id="recon-panes" class="grid gap-4 lg:grid-cols-2">
+
+      <section aria-labelledby="dj-l-h" class="rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dj-l-h" class="text-[16px]/6 font-semibold">Receipts with no invoice</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">
+            {{ receipts|length|intcomma }} receipt{{ receipts|length|pluralize }} · {{ receipt_total|rupees }}
+          </p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          {% for r in receipts %}
+            <li class="px-4 py-3">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+                <a href="{{ r.get_absolute_url }}" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ r.number }}</a>
+                <span class="shrink-0 text-[13px]/5 tabular-nums">{{ r.value|rupees }}</span>
+              </div>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+                {{ r.vendor.name }} · received {{ r.received_on|date:"d M Y" }} · waiting {{ r.age_days|intcomma }} days
+              </p>
+
+              <form method="post" action="{% url 'matching:pair' %}"
+                    hx-post="{% url 'matching:pair' %}" hx-target="#recon-panes" hx-swap="outerHTML"
+                    class="mt-2 flex flex-wrap items-center gap-2">
+                {% csrf_token %}
+                <input type="hidden" name="receipt" value="{{ r.pk }}">
+                <label for="dj-pair-{{ r.pk }}" class="sr-only">Invoice to pair with {{ r.number }}</label>
+                <div class="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select id="dj-pair-{{ r.pk }}" name="invoice" required
+                          class="w-full bg-transparent px-3 py-1.5 text-[13px]/5 outline-none">
+                    <option value="">Choose an invoice</option>
+                    {% for c in r.candidates %}
+                      <option value="{{ c.pk }}">{{ c.number }} · {{ c.amount|rupees }} · {{ c.match_note }}</option>
+                    {% empty %}
+                      <option value="" disabled>No candidate on the other side</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <button type="submit"
+                        class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="link" class="size-3.5 text-zinc-600"></i>Pair
+                </button>
+              </form>
+            </li>
+          {% empty %}
+            <li class="px-4 py-8 text-center text-[13px]/5 text-zinc-600">Every receipt has an invoice against it.</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section aria-labelledby="dj-r-h" class="rounded-xl border border-zinc-300 bg-white">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+          <h2 id="dj-r-h" class="text-[16px]/6 font-semibold">Invoices with no receipt</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">
+            {{ invoices|length|intcomma }} invoice{{ invoices|length|pluralize }} · {{ invoice_total|rupees }}
+          </p>
+        </div>
+        <ul role="list" class="divide-y divide-zinc-100">
+          {% for i in invoices %}
+            <li class="flex gap-2.5 px-4 py-3">
+              <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+                <span class="size-1.5 rounded-full {{ i.age_dot_class }}"></span>
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <a href="{{ i.get_absolute_url }}" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ i.number }}</a>
+                  <span class="shrink-0 text-[13px]/5 tabular-nums">{{ i.amount|rupees }}</span>
+                </span>
+                <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">
+                  {{ i.vendor.name }} · dated {{ i.issued_on|date:"d M Y" }} · waiting {{ i.age_days|intcomma }} days
+                </span>
+              </span>
+            </li>
+          {% empty %}
+            <li class="px-4 py-8 text-center text-[13px]/5 text-zinc-600">Every invoice has a receipt behind it.</li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+
+    <p class="text-[12px]/4 text-zinc-600">
+      Nothing on the two lists above is a variance. A record is unmatched because its partner has not arrived, has not been posted, or has not been found, and the two totals are never subtracted from one another.
+    </p>
+  </main>
+</div>
+{% endblock %}
+
+{% comment %}
+matching/views.py — everything the template reads, built once in the view
+
+    def reconcile(request, pk):
+        invoice = get_object_or_404(Invoice.objects.for_user(request.user), pk=pk)
+        lines = invoice.lines.select_related('item', 'order_line', 'receipt')
+        variances = [l for l in lines if l.verdict != Verdict.AGREES]
+        receipts = (GoodsReceipt.objects.unmatched(request.user.plant)
+                    .select_related('vendor').with_candidates())
+        return render(request, 'matching/reconcile.html', {
+            'invoice': invoice,
+            'variances': variances,
+            'line_count': lines.count(),
+            'agreed_count': len(lines) - len(variances),
+            'totals': invoice.reconciliation_totals(),
+            'receipts': receipts,
+            'invoices': Invoice.objects.unmatched(request.user.plant).select_related('vendor'),
+            'receipt_total': receipts.aggregate(v=Sum('value'))['v'] or 0,
+        })
+
+    def pair(request):
+        # returns the #recon-panes fragment for htmx and redirects for a plain
+        # POST, so the same view serves both and the URL is the same either way.
+        allocate(request.POST['receipt'], request.POST['invoice'], request.user)
+        if request.headers.get('HX-Request'):
+            return render(request, 'matching/_panes.html', panes(request.user))
+        return redirect('matching:reconcile', pk=request.POST['invoice'])
+
+matching/_panes.html is the recon-panes block copied out of this template, id
+and all. The fragment has to carry that id itself, or the swap after this one
+has nothing to aim at.
+
+verdict_dot_class and age_dot_class come off the model and return one of the
+locked five — bg-zinc-500, bg-amber-500, bg-red-600, bg-emerald-600,
+bg-zinc-400 — so the pill shape is written once in the template and only the dot
+changes. In tolerance is emerald-600, Needs a reason amber-500, Blocked red-600.
+
+with_candidates() is what stops this page issuing one query per row. It annotates
+each receipt with the invoices from the same vendor within the tolerance window,
+ordered by how close they are, and match_note is the sentence saying why each one
+is a candidate — same vendor, same value, dated two days apart. Working that out
+in the template means a query inside a loop and a page that is fine on the demo
+data and unusable on a month of it.
+
+reconciliation_totals() returns invoiced, received and difference over the whole
+invoice and the same three over the exception lines only, so the band at the top
+and the foot of the table cannot disagree about which population they describe.
+{% endcomment %}

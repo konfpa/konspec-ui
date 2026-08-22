@@ -1,0 +1,96 @@
+<!-- The last decision took the queue to nothing, and the screen collapses to
+     one column rather than leaving two empty panes with a rail of buttons that
+     act on nothing. There is no record to show and no queue to walk, so the
+     three regions have nothing to be.
+
+     This is empty-state all-clear read at page level, and the discipline is the
+     same: print the evidence, not the mood. Fourteen decided, the last one
+     named with its figure and its time, the scope written out. All caught up is
+     exactly what a filter hiding eleven approvals would also produce, and a
+     claim that cannot be checked is a claim nobody should act on.
+
+     Which is the trap this state has to be guarded against. A queue emptied by
+     a predicate has not been cleared. The kind filter above the queue, a saved
+     view, a plant scope — any of them can produce zero rows, and rendering
+     success over one is the create-under-a-filter defect one register worse,
+     because the user believes it and goes home. The view may only choose this
+     state when nothing is filtered and the unscoped count is zero; a filtered
+     nothing is empty-state no-results, with the filter named and a way to clear
+     it, and it keeps the queue pane.
+
+     What it offers next is deliberately not more work. Three routes, all of
+     them ways of checking rather than doing: what was decided today, what is
+     with the people this approver sends things to, and the register for
+     anything older. No filled button, because there is nothing to press that
+     would be an improvement on being finished.
+
+     The count line stays a role=status in the same place it was on the loaded
+     screen, so the sentence that arrives when the queue empties lands in a
+     region that was already there. -->
+<main data-kui="inbox-page/empty" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+
+  <div class="shrink-0 border-b border-zinc-200 px-4 py-3 lg:px-5">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Waiting on you</h1>
+    <p role="status" class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+      0 waiting · 14 decided today · Silvassa and Vapi · nothing filtered
+    </p>
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-y-auto">
+    <div class="flex min-h-full flex-col items-center justify-center px-6 py-12 text-center">
+      <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+      </span>
+      <h2 class="mt-3 text-[20px]/7 font-semibold tracking-tight">You are through your inbox</h2>
+      <p class="mt-1.5 max-w-md text-[13px]/5 tabular-nums text-zinc-600">
+        Fourteen documents reached you today and all fourteen are decided. The last was CN-2026-0114 for Konkan Packaging Co, ₹1,86,300, at 16:20.
+      </p>
+      <p class="mt-2 max-w-md text-[12px]/4 tabular-nums text-zinc-500">
+        Purchase orders, goods receipts, rate contracts and credit notes · Silvassa and Vapi · documents up to your ₹5,00,000 limit · no filter in force
+      </p>
+
+      <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <a href="#" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="history" class="size-4 text-zinc-600"></i>What you decided today
+        </a>
+        <a href="#" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="corner-up-right" class="size-4 text-zinc-600"></i>What you sent on
+        </a>
+        <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Open the purchase order register
+        </a>
+      </div>
+
+      <!-- Where the next one comes from, so the empty screen is not also a
+           mystery about whether anything is still arriving. -->
+      <div class="mt-6 w-full max-w-md rounded-xl border border-zinc-200 p-4 text-left">
+        <p class="text-[13px]/5 font-medium">What is still moving</p>
+        <ul role="list" class="mt-2 space-y-2">
+          <li class="flex items-start gap-2.5">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+            <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600">
+              <span class="font-medium text-zinc-900">3 documents with Nilesh Patil</span> — sent on above your limit, oldest 2 days.
+            </p>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600">
+              <span class="font-medium text-zinc-900">5 orders with buyers</span> — sent back for amendment, they return here once resent.
+            </p>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+            <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600">
+              <span class="font-medium text-zinc-900">New arrivals</span> — anything released after 16:20 appears here without a reload.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5 lg:px-5">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Documents above ₹5,00,000 go to Nilesh Patil</p>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Checked 22 Aug 2026, 16:42</p>
+  </div>
+</main>

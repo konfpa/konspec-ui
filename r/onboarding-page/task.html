@@ -1,0 +1,157 @@
+<!-- A task is its own URL and its own h1, which is the one place this page
+     departs from import-page. There the four stages are one document and the
+     h1 must survive all of them; here the link arrives in an email — "Meera has
+     assigned you Approval limits" — and a page titled Set up Konspec has not
+     told the person who opened it what they are looking at.
+
+     The form is settings-page's numbering-series form, unchanged, posting to
+     the same endpoint. That is the boundary this entry draws in markup: the
+     setting lives in settings-page for the rest of the deployment's life and
+     this screen is a view over it for the first month. Two copies of the fields
+     with two ways to save is how the prefix ends up different in two places.
+
+     What the task page adds is everything around the form: why it has to be
+     right before a document is raised, what is waiting on it, who it is on, and
+     the way back to the list. Drop those and this is the settings section with
+     a different breadcrumb.
+
+     The preview is an <output> with aria-live="off" and never a disabled input.
+     It recomputes on every keystroke and an <output> is a live region by
+     default, so left on it reads the whole document number back one character
+     at a time while somebody is still typing the prefix.
+
+     The second card is the other shape a task takes — a door rather than a
+     form. Item masters is not a set of fields; it is 1,240 rows and it opens
+     the item import. Its completion is detected from the import posting, so
+     there is no Mark done button on it at all: a manual tick over a fact the
+     server can read goes stale the first time somebody empties the table. -->
+<div data-kui="onboarding-page/task" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       prefix: 'PO', width: 4, next: 1,
+       get preview() { return this.prefix + '-2026-' + String(this.next).padStart(Number(this.width) || 1, '0') }
+     }">
+
+  <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Set up Konspec</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Company and plants</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium text-zinc-900">Numbering series</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Numbering series</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Task 4 of 17 · assigned to Meera Iyer · about 20 minutes</p>
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <div class="min-w-0 flex-1">
+        <p id="tk-progress" class="text-[13px]/5 font-medium tabular-nums">9 of 15 tasks done across the setup</p>
+        <div class="mt-1.5 h-1 overflow-hidden rounded-full bg-zinc-200"
+             role="progressbar" aria-labelledby="tk-progress"
+             aria-valuenow="9" aria-valuemin="0" aria-valuemax="15"
+             aria-valuetext="9 of 15 counted tasks done. Two more were skipped and are not counted.">
+          <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 60%"></div>
+        </div>
+      </div>
+      <a href="#" class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4" aria-hidden="true"></i>All 17 tasks
+      </a>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 class="text-[16px]/6 font-semibold">Why this has to be right first</h2>
+      </div>
+      <div class="px-5 py-4">
+        <p class="text-[13px]/5 text-zinc-700">
+          Once a purchase order has been issued the prefix and the width are fixed for the whole financial year — the documents already printed carry them, and the register sorts on them. Changing the series afterwards means two shapes of order number in one year and a reconciliation nobody enjoys.
+        </p>
+        <h3 class="mt-4 text-[13px]/5 font-medium">Two tasks are waiting on this one</h3>
+        <ul role="list" class="mt-2 space-y-2 text-[13px]/5">
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            <span class="min-w-0"><span class="sr-only">Blocked — </span><a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the first purchase order</a> <span class="text-zinc-600">· Ritu Deshpande</span></span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+            <span class="min-w-0"><span class="sr-only">Blocked — </span><a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN and invoice series</a> <span class="text-zinc-600">· Meera Iyer</span></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <form class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 class="text-[16px]/6 font-semibold">Purchase order series</h2>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">The same fields as Settings, Numbering series. Saving here saves there.</p>
+      </div>
+
+      <div class="px-5 py-4">
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div class="min-w-0">
+            <label for="tk-prefix" class="mb-1.5 block text-[13px]/5 font-medium">Prefix</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="tk-prefix" name="prefix" required maxlength="6" x-model="prefix" aria-describedby="tk-prefix-msg"
+                     class="w-full bg-transparent px-3 py-2 text-[14px]/5 uppercase outline-none">
+            </div>
+            <p id="tk-prefix-msg" class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500">Letters only. Printed on the order.</p>
+          </div>
+          <div class="min-w-0">
+            <label for="tk-width" class="mb-1.5 block text-[13px]/5 font-medium">Digits</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select id="tk-width" name="width" required x-model.number="width" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+                <option value="3">3 — up to 999 a year</option>
+                <option value="4">4 — up to 9,999 a year</option>
+                <option value="5">5 — up to 99,999 a year</option>
+              </select>
+            </div>
+            <p class="mt-1.5 min-h-4 text-[12px]/4 text-zinc-500"></p>
+          </div>
+          <div class="min-w-0">
+            <label for="tk-next" class="mb-1.5 block text-[13px]/5 font-medium">Start at</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="tk-next" name="next_number" required inputmode="numeric" x-model.number="next" aria-describedby="tk-next-msg"
+                     class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+            </div>
+            <p id="tk-next-msg" class="mt-1.5 min-h-4 text-[12px]/4 tabular-nums text-zinc-500">1 unless the old system was mid-year.</p>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-lg bg-zinc-50 px-4 py-3">
+          <p class="text-[13px]/5 text-zinc-600">The first order raised will be</p>
+          <output aria-live="off" class="text-[16px]/6 font-semibold tabular-nums" x-text="preview">PO-2026-0001</output>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <p class="flex min-w-0 items-center gap-2 text-[12px]/4 text-zinc-600">
+          <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300" aria-hidden="true">MI</span>
+          Assigned to Meera Iyer, Finance
+        </p>
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <a href="#" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save and come back to it</a>
+          <button type="submit" class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+            <i data-lucide="check" class="size-4" aria-hidden="true"></i>Save and mark done
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 class="text-[16px]/6 font-semibold">Next: Item masters</h2>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">The other shape a task takes — a door, not a form.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-3 px-5 py-4">
+        <p class="min-w-0 flex-1 text-[13px]/5 tabular-nums text-zinc-700">
+          1,240 rows in the sheet Sanjay sent. This one is finished on the import screen, and it marks itself done when the import posts — there is no button here to tick it by hand.
+        </p>
+        <a href="#" class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Open the item import<i data-lucide="arrow-up-right" class="size-4" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>

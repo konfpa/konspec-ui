@@ -1,0 +1,227 @@
+<!-- Lines down, the working week across, and two impossibilities drawn rather
+     than reported. Seven days is 14.29 per cent each, so Monday starts at 0 and
+     Friday at 57.14, and a job that spans Monday to Wednesday is exactly three
+     of those wide.
+
+     Injection 120T has two jobs overlapping from Tuesday noon to Wednesday
+     noon. They keep their true left and width and the lane grows to two rows,
+     because the overlap has to be a shape: written as a sentence under the grid
+     it is a fact somebody has to reconcile against the picture, and the picture
+     is what they came for. Both carry the red dot, the lane header carries the
+     alert-circle, and the exception line under the lane says what the server
+     will do about it.
+
+     Friday is the annual maintenance shutdown and it is drawn as a band down
+     the whole grid, not as a property of one row. A shutdown is a fact about
+     the plant, so it crosses every lane; painting it per row is how one lane
+     gets missed. PO-2026-0455 is promised into it — which is the second
+     conflict, and the layout does not move the block to the next working day.
+     Moved silently, the plant discovers four trucks at the gate on the morning
+     it is shut.
+
+     Colour is in the dot and in the icon and nowhere else. Forty blocks are
+     visible here and a red fill on two of them would be the only thing on the
+     screen; alert's rule holds hardest where the density is highest. -->
+<main data-kui="schedule-page/conflict" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+      <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div class="min-w-0">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight">Line plan</h1>
+          <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+            Week of 17 Aug 2026 · Silvassa · 14 jobs · 2 conflicts
+          </p>
+        </div>
+        <a href="#" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rebalance the week</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1600px] space-y-4 px-4 py-5 lg:px-6">
+
+    <!-- alert's shape: white card, zinc border, colour only in the icon, and
+         one link per record so the conflict is somewhere to go rather than
+         something to be told about. -->
+    <div class="flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+      <div class="min-w-0">
+        <h2 class="text-[13px]/5 font-medium">2 conflicts on this plan</h2>
+        <ul role="list" class="mt-1.5 space-y-1 text-[13px]/5 text-zinc-600">
+          <li>
+            <a href="#" class="font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4835</a>
+            and
+            <a href="#" class="font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4841</a>
+            both hold Injection 120T from Tue 12:00 to Wed 12:00.
+          </li>
+          <li>
+            <a href="#" class="font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0455</a>
+            is promised for Fri 21 Aug, when the plant is shut for annual maintenance.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="hidden overflow-x-auto overscroll-x-contain md:block">
+        <div class="relative min-w-[56rem]">
+
+          <div aria-hidden="true" class="flex border-b border-zinc-200 bg-zinc-50">
+            <div class="sticky left-0 z-10 w-44 shrink-0 border-r border-zinc-200 bg-zinc-50 px-3 py-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Line</div>
+            <div class="relative flex flex-1">
+              <span class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Mon 17</span>
+              <span class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Tue 18</span>
+              <span class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Wed 19</span>
+              <span class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Thu 20</span>
+              <span class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Fri 21<span class="block font-normal normal-case tracking-normal text-zinc-500">Plant shut</span></span>
+              <span class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Sat 22</span>
+              <span class="flex-1 px-2 py-2 text-center text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Sun 23</span>
+            </div>
+          </div>
+
+          <section aria-labelledby="scf-h-ex1" class="flex border-b border-zinc-100">
+            <div class="sticky left-0 z-10 w-44 shrink-0 border-r border-zinc-200 bg-white px-3 py-3">
+              <h2 id="scf-h-ex1" class="text-[13px]/5 font-medium">Extruder 1</h2>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 jobs · 62 h</p>
+            </div>
+            <div class="relative h-20 flex-1 bg-zinc-50">
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 14.29%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 28.57%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 42.86%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 57.14%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 71.43%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 85.71%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 bg-zinc-100" style="left: 57.14%; width: 14.29%"></span>
+              <a href="#" class="absolute inset-y-2 overflow-hidden rounded-lg bg-zinc-200 px-2.5 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                 style="left: 0.5%; width: 41.5%">
+                <span class="flex items-center gap-1.5">
+                  <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                  <span class="truncate text-[12px]/4 font-medium tabular-nums text-zinc-700">MS-4821</span>
+                </span>
+                <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-600">Mon 06:00 – Wed 22:00 · 12.6 MT HDPE pipe</span>
+                <span class="sr-only">Extruder 1, planned</span>
+              </a>
+              <a href="#" class="absolute inset-y-2 overflow-hidden rounded-lg bg-zinc-200 px-2.5 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                 style="left: 71.9%; width: 13.4%">
+                <span class="flex items-center gap-1.5">
+                  <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                  <span class="truncate text-[12px]/4 font-medium tabular-nums text-zinc-700">MS-4829</span>
+                </span>
+                <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-600">Sat · 2.8 MT</span>
+                <span class="sr-only">Extruder 1, Saturday 22 August 2026, planned</span>
+              </a>
+            </div>
+          </section>
+
+          <!-- The lane grows to two rows and both blocks keep their true left
+               and width. The overlap from Tue 12:00 to Wed 12:00 is the shape
+               between them, which is the only drawing of it a planner can act
+               on without re-reading the times. -->
+          <section aria-labelledby="scf-h-in120" class="border-b border-zinc-100">
+           <div class="flex">
+            <div class="sticky left-0 z-10 w-44 shrink-0 border-r border-zinc-200 bg-white px-3 py-3">
+              <h2 id="scf-h-in120" class="flex items-center gap-1 text-[13px]/5 font-medium">
+                <i data-lucide="alert-circle" class="size-3.5 shrink-0 text-red-600"></i>Injection 120T
+              </h2>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">2 jobs · double-booked 24 h</p>
+            </div>
+            <div class="relative h-28 flex-1 bg-zinc-50">
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 14.29%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 28.57%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 42.86%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 57.14%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 71.43%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 85.71%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 bg-zinc-100" style="left: 57.14%; width: 14.29%"></span>
+
+              <a href="#" class="absolute overflow-hidden rounded-lg bg-zinc-200 px-2.5 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                 style="top: 0.5rem; height: 2.75rem; left: 0.5%; width: 27.6%">
+                <span class="flex items-center gap-1.5">
+                  <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+                  <span class="truncate text-[12px]/4 font-medium tabular-nums text-zinc-700">MS-4835</span>
+                </span>
+                <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-600">Mon 06:00 – Wed 12:00</span>
+                <span class="sr-only">Injection 120T, 12,000 crates, conflicts with MS-4841</span>
+              </a>
+
+              <a href="#" class="absolute overflow-hidden rounded-lg bg-zinc-200 px-2.5 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                 style="top: 3.5rem; height: 2.75rem; left: 21.4%; width: 27.6%">
+                <span class="flex items-center gap-1.5">
+                  <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+                  <span class="truncate text-[12px]/4 font-medium tabular-nums text-zinc-700">MS-4841</span>
+                </span>
+                <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-600">Tue 12:00 – Thu 12:00</span>
+                <span class="sr-only">Injection 120T, 9,500 crates, conflicts with MS-4835</span>
+              </a>
+            </div>
+           </div>
+           <p class="flex items-start gap-1.5 bg-white px-3 py-2 text-[12px]/4 text-zinc-600">
+             <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600"></i>
+             One machine, two jobs, 24 hours of overlap. Neither will be released to the shop floor until one of them moves.
+           </p>
+          </section>
+
+          <section aria-labelledby="scf-h-in">
+           <div class="flex">
+            <div class="sticky left-0 z-10 w-44 shrink-0 border-r border-zinc-200 bg-white px-3 py-3">
+              <h2 id="scf-h-in" class="flex items-center gap-1 text-[13px]/5 font-medium">
+                <i data-lucide="alert-circle" class="size-3.5 shrink-0 text-red-600"></i>Inward deliveries
+              </h2>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 promised · 1 on a shut day</p>
+            </div>
+            <div class="relative h-20 flex-1 bg-zinc-50">
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 14.29%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 28.57%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 42.86%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 57.14%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 71.43%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 w-px bg-zinc-200" style="left: 85.71%"></span>
+              <span aria-hidden="true" class="absolute inset-y-0 bg-zinc-100" style="left: 57.14%; width: 14.29%"></span>
+
+              <a href="#" class="absolute inset-y-2 overflow-hidden rounded-lg bg-zinc-200 px-2 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                 style="left: 15%; width: 12.8%">
+                <span class="flex items-center gap-1.5">
+                  <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+                  <span class="truncate text-[12px]/4 font-medium tabular-nums text-zinc-700">0427</span>
+                </span>
+                <span class="sr-only">PO-2026-0427, Sharma Steel &amp; Alloys, promised Tuesday 18 August 2026, open</span>
+              </a>
+
+              <!-- Promised into the shutdown and left where it was promised.
+                   Sliding it to Monday is a fix nobody asked for and a date the
+                   vendor was never told about. -->
+              <a href="#" class="absolute inset-y-2 overflow-hidden rounded-lg bg-zinc-200 px-2 py-1.5 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+                 style="left: 58%; width: 12.8%">
+                <span class="flex items-center gap-1.5">
+                  <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+                  <span class="truncate text-[12px]/4 font-medium tabular-nums text-zinc-700">0455</span>
+                </span>
+                <span class="sr-only">PO-2026-0455, Gujarat Polymers Ltd, 20 MT, promised Friday 21 August 2026, which is a plant shutdown</span>
+              </a>
+            </div>
+           </div>
+           <p class="flex items-start gap-1.5 bg-white px-3 py-2 text-[12px]/4 text-zinc-600">
+             <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600"></i>
+             PO-2026-0455 is promised for Friday and the gate is shut. The date on the order has to change, and Gujarat Polymers Ltd has to be told.
+           </p>
+          </section>
+        </div>
+      </div>
+
+      <ul role="list" class="divide-y divide-zinc-100 md:hidden">
+        <li class="px-4 py-3">
+          <h2 class="flex items-center gap-1 text-[13px]/5 font-medium">
+            <i data-lucide="alert-circle" class="size-3.5 shrink-0 text-red-600"></i>Injection 120T
+          </h2>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">MS-4835 Mon 06:00 – Wed 12:00 and MS-4841 Tue 12:00 – Thu 12:00 overlap by 24 h.</p>
+        </li>
+        <li class="px-4 py-3">
+          <h2 class="flex items-center gap-1 text-[13px]/5 font-medium">
+            <i data-lucide="alert-circle" class="size-3.5 shrink-0 text-red-600"></i>Inward deliveries
+          </h2>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">PO-2026-0455 is promised Fri 21 Aug, when the plant is shut for annual maintenance.</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,115 @@
+<!-- The ladder is sm then xl, and md is not in it. Counted across every
+     responsive grid in the registry: 117 sm:grid-cols-<n>, 25 xl:grid-cols-<n>,
+     6 lg:grid-cols-<n> — and zero md:grid-cols-<n>. Every md: in this library
+     is md:hidden, md:table,
+     md:table-cell, md:border-r or a named track list, which is a change of
+     markup rather than a change of column count.
+
+     That split is the rule and the arithmetic is why. Four tiles at md is 768px
+     less the 32px gutter and three 12px gaps: 175px a tile, and a 24px figure
+     over an 11px uppercase label does not fit in 175px — the label wraps to two
+     lines on three of the four and the strip stops being a strip. At xl the
+     same four tiles get 300px each. So the strip goes one, two, four, and it is
+     never three.
+
+     grid-cols-1 is written even though it is the default, because the class
+     list then reads as the whole ladder rather than as two thirds of it.
+
+     gap-3 on a strip of tiles and gap-4 on a grid of cards: 12px between things
+     that are read as one row of figures, 16px between panels that are each read
+     on their own.
+
+     min-w-0 on every item that holds text. A grid item will not shrink below
+     its intrinsic minimum, so one long vendor name — or a <select> as wide as
+     its longest option — pushes its own track past the card and takes the
+     column beside it along. -->
+<div data-kui="container/grid" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
+
+    <h1 class="text-[24px]/7 font-semibold tracking-tight">Procurement — August 2026</h1>
+
+    <section aria-labelledby="ct-grid-strip">
+      <h2 id="ct-grid-strip" class="sr-only">Figures</h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="min-w-0 rounded-xl border border-zinc-300 bg-white p-4">
+          <dl>
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Orders raised</dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">64</dd>
+          </dl>
+        </div>
+        <div class="min-w-0 rounded-xl border border-zinc-300 bg-white p-4">
+          <dl>
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Value raised</dt>
+            <dd class="mt-1.5 flex items-baseline gap-1">
+              <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+              <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">3,84,20,000</span>
+            </dd>
+          </dl>
+        </div>
+        <div class="min-w-0 rounded-xl border border-zinc-300 bg-white p-4">
+          <dl>
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Receipts booked</dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">412</dd>
+          </dl>
+        </div>
+        <div class="min-w-0 rounded-xl border border-zinc-300 bg-white p-4">
+          <dl>
+            <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Rejected at QC</dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">7</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="ct-grid-fields" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="ct-grid-fields" class="text-[16px]/6 font-semibold">Order header</h2>
+      </div>
+      <div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
+
+        <div class="min-w-0">
+          <label for="ct-grid-vendor" class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+          <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="ct-grid-vendor" name="vendor" class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+              <option value="gujarat-polymers" selected>Gujarat Polymers Ltd</option>
+              <option value="sharma-steel">Sharma Steel &amp; Alloys</option>
+              <option value="deccan-fasteners">Deccan Fasteners Pvt Ltd</option>
+            </select>
+            <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+              <i data-lucide="chevron-down" class="size-4"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="min-w-0">
+          <label for="ct-grid-plant" class="mb-1.5 block text-[13px]/5 font-medium">Plant</label>
+          <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="ct-grid-plant" name="plant" class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+              <option value="silvassa" selected>Silvassa</option>
+              <option value="vapi">Vapi</option>
+            </select>
+            <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+              <i data-lucide="chevron-down" class="size-4"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="min-w-0 sm:col-span-2">
+          <label for="ct-grid-note" class="mb-1.5 block text-[13px]/5 font-medium">Delivery instruction</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input id="ct-grid-note" name="note" value="Gate 2 only, 07:00–15:00. Weighbridge slip with every vehicle."
+                   class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <p class="text-[12px]/4 text-zinc-500">
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">grid-cols-1 sm:grid-cols-2 xl:grid-cols-4</code>
+      for the strip. The long field spans both columns with
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">sm:col-span-2</code>.
+    </p>
+
+  </main>
+</div>

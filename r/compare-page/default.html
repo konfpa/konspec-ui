@@ -1,0 +1,166 @@
+<!-- Line items down, vendors across, and the rate in the cell with the
+     extended line value under it. Rate first because that is what was
+     negotiated and what will be quoted back at the vendor; the value under it
+     because that is what the foot totals, and a total whose parts are not on
+     screen is a number nobody can check.
+
+     No sortable headers anywhere, and that is the decision this variant
+     exists to record. Every other register in this system sorts, so the
+     absence has to be deliberate: sorting a matrix by one vendor's rates
+     reorders the line items under all four of them, and after one click line 7
+     in the Sharma column is not line 7 in the Deccan column. There is nothing
+     to sort here because the row order is the enquiry's own order and it is
+     the only order the four columns agree on.
+
+     table-fixed with declared widths, or the widest vendor name sets its own
+     column width and four columns of identical figures come out four
+     different widths. The digits lining up across the row is the whole point
+     of the screen.
+
+     The totals are in a <tfoot> for the reason table/totals gives: in the body
+     a total is a record, and a reader walking rows is read one more line
+     without being told it is a sum. The line count under each total is not
+     decoration — it is what makes the four figures comparable, and the moment
+     one of them covers fewer lines the count is the only thing that says so.
+
+     No mark on any figure here. This is the matrix before anyone has done
+     arithmetic on it. -->
+<div data-kui="compare-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       vendors: [
+         { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', quote: 'QT-4417', on: '04 Sep 2026' },
+         { id: 'v-0219', name: 'Deccan Fasteners Pvt Ltd', quote: 'QT-4419', on: '05 Sep 2026' },
+         { id: 'v-0361', name: 'Nashik Steel Traders', quote: 'QT-4421', on: '05 Sep 2026' },
+         { id: 'v-0407', name: 'Qureshi Metals', quote: 'QT-4424', on: '06 Sep 2026' }
+       ],
+       lines: [
+         { code: 'ITM-7702', name: 'MS angle — 50×50×5', qty: 12000, uom: 'kg', rates: [62.40, 63.10, 61.80, 64.00] },
+         { code: 'ITM-7715', name: 'MS plate — 6 mm', qty: 4500, uom: 'kg', rates: [68.50, 69.20, 70.10, 67.90] },
+         { code: 'ITM-3310', name: 'M12×60 hex bolt — 8.8 zinc', qty: 8000, uom: 'nos', rates: [24.60, 23.80, 25.10, 24.20] },
+         { code: 'ITM-3318', name: 'M12 hex nut — 8.8 zinc', qty: 8000, uom: 'nos', rates: [9.40, 8.95, 9.60, 9.10] },
+         { code: 'ITM-4120', name: 'Welding electrode — 3.15 mm', qty: 400, uom: 'kg', rates: [148.00, 152.00, 145.50, 149.00] },
+         { code: 'ITM-7728', name: 'MS flat — 40×6', qty: 2600, uom: 'kg', rates: [66.20, 67.00, 65.90, 68.40] }
+       ],
+       money(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       rate(n) { return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+       qty(l) { return l.qty.toLocaleString('en-IN') + ' ' + l.uom },
+       value(l, i) { return l.qty * l.rates[i] },
+       total(i) { return this.lines.reduce((s, l) => s + l.qty * l.rates[i], 0) }
+     }">
+
+  <main class="mx-auto max-w-7xl p-4 pb-6 lg:p-6">
+
+    <!-- page-header, unchanged -->
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="min-w-0">
+        <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <a href="#" class="hover:text-zinc-900">Procurement</a>
+          <span class="text-zinc-500">/</span>
+          <a href="#" class="hover:text-zinc-900">Enquiries</a>
+          <span class="text-zinc-500">/</span>
+          <span class="font-medium tabular-nums text-zinc-900">ENQ-2026-0117</span>
+        </nav>
+        <div class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight">Comparative statement</h1>
+          <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="printer" class="size-4" aria-hidden="true"></i>Print statement
+        </button>
+      </div>
+    </div>
+
+    <!-- the enquiry band. Four prices for nothing in particular is what this
+         page is without it. -->
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <dl class="grid grid-cols-2 sm:grid-cols-4">
+        <div class="border-b border-zinc-200 px-4 py-3 sm:border-b-0">
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Enquiry</dt>
+          <dd class="mt-1 text-[14px]/5 font-medium tabular-nums">ENQ-2026-0117</dd>
+          <dd class="mt-0.5 text-[12px]/4 text-zinc-500">MS fabrication hardware · Silvassa</dd>
+        </div>
+        <div class="border-b border-l border-zinc-200 px-4 py-3 sm:border-b-0">
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Lines</dt>
+          <dd class="mt-1 text-[14px]/5 font-medium tabular-nums">6</dd>
+          <dd class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Against PR-2026-0884</dd>
+        </div>
+        <div class="border-zinc-200 px-4 py-3 sm:border-l">
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Quotations</dt>
+          <dd class="mt-1 text-[14px]/5 font-medium tabular-nums">4 of 5 invited</dd>
+          <dd class="mt-0.5 text-[12px]/4 text-zinc-500">Baroda Fasteners regretted</dd>
+        </div>
+        <div class="border-l border-zinc-200 px-4 py-3">
+          <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Enquiry closed</dt>
+          <dd class="mt-1 text-[14px]/5 font-medium tabular-nums">06 Sep 2026</dd>
+          <dd class="mt-0.5 text-[12px]/4 text-zinc-500">Opened by Akshay Prabhu</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="cd-rates-h" class="text-[16px]/6 font-semibold">Rates quoted</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Rate per unit, with the line value under it. Exclusive of GST and freight.</p>
+      </div>
+
+      <!-- tabindex and a name on the scroller. Without them the arrow keys
+           cannot pan this in Chromium and the right-hand vendors are reachable
+           by pointer only. -->
+      <div role="region" aria-labelledby="cd-rates-h" tabindex="0"
+           class="relative overflow-x-auto overscroll-x-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <table class="w-full min-w-[56rem] table-fixed text-[13px]/5">
+          <caption class="sr-only">Rates quoted by four vendors against the six lines of enquiry ENQ-2026-0117. Line items down the rows, vendors across the columns.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="w-64 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Line item</th>
+              <template x-for="v in vendors" :key="v.id">
+                <th scope="col" class="w-40 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right align-bottom">
+                  <span class="block text-[13px]/5 font-semibold text-zinc-900" x-text="v.name"></span>
+                  <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500" x-text="v.quote + ' · ' + v.on"></span>
+                </th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="l in lines" :key="l.code">
+              <tr class="hover:bg-zinc-100">
+                <th scope="row" class="border-b border-zinc-100 px-4 py-2.5 text-left align-top font-normal">
+                  <span class="block font-medium" x-text="l.name"></span>
+                  <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code + ' · ' + qty(l)"></span>
+                </th>
+                <template x-for="(v, i) in vendors" :key="v.id">
+                  <td class="border-b border-zinc-100 px-4 py-2.5 text-right align-top">
+                    <span class="block tabular-nums whitespace-nowrap" x-text="rate(l.rates[i])"></span>
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-500" x-text="money(value(l, i))"></span>
+                  </td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+          <tfoot class="bg-zinc-50">
+            <tr>
+              <th scope="row" class="border-t border-zinc-200 px-4 pt-2.5 text-left text-[12px]/4 font-medium text-zinc-600">Total of these 6 lines</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="border-t border-zinc-200 px-4 pt-2.5 text-right text-[14px]/5 font-semibold tabular-nums whitespace-nowrap" x-text="money(total(i))"></td>
+              </template>
+            </tr>
+            <tr>
+              <th scope="row" class="px-4 pb-2.5 text-left text-[12px]/4 font-normal text-zinc-500">Lines quoted</th>
+              <template x-for="v in vendors" :key="v.id">
+                <td class="px-4 pb-2.5 text-right text-[12px]/4 tabular-nums text-zinc-500">6 of 6</td>
+              </template>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p class="border-t border-zinc-200 px-5 py-2.5 text-[12px]/4 text-zinc-600">
+        Rates are as quoted, in rupees, exclusive of GST. Freight, duty and the terms of each offer are compared separately — nothing on this table is an award.
+      </p>
+    </div>
+  </main>
+</div>

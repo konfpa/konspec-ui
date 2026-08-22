@@ -1,0 +1,182 @@
+<!-- Absent is not zero, and a total that pretends otherwise is the defect
+     this variant exists to prevent. Deccan quoted three of the six lines. Its
+     total is ₹10,08,400, which is five and a half lakh below every other
+     column, and it is not lower — it is shorter. The line count sits under
+     every total for that reason, the partial total carries no L1 mark however
+     small it is, and the reason is written beside the figure rather than in a
+     footnote below the fold.
+
+     A cell nobody quoted is an em dash for the eye and the words "Not quoted"
+     in an sr-only span. An em dash on its own is announced as nothing at all,
+     which is indistinguishable from a cell the page failed to fill — the same
+     rule badge states for a status that does not apply.
+
+     The second absence is subtler. Qureshi quoted line 1 against IS 2062 Gr.B
+     where the enquiry asked for E250BR, at ₹61.20, which is lower than
+     anything else on that line. It does not get the L1 mark: a rate for a
+     grade nobody asked for is not a lower price for the same thing, and until
+     somebody with the authority to accept the substitution has accepted it,
+     comparing the two is comparing two different purchases. The figure stays
+     on screen, says what was offered, and is excluded from the line mark and
+     from the comparable total — because a buyer who cannot see the alternative
+     cannot ask for it to be cleared.
+
+     Both exclusions are stated in the foot in the units of the decision. A
+     comparison that quietly drops a column is worse than one that draws it
+     with a reason attached. -->
+<div data-kui="compare-page/partial" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       vendors: [
+         { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', quote: 'QT-4417' },
+         { id: 'v-0219', name: 'Deccan Fasteners Pvt Ltd', quote: 'QT-4419' },
+         { id: 'v-0361', name: 'Nashik Steel Traders', quote: 'QT-4421' },
+         { id: 'v-0407', name: 'Qureshi Metals', quote: 'QT-4424' }
+       ],
+       lines: [
+         { code: 'ITM-7702', name: 'MS angle — 50×50×5', qty: 12000, uom: 'kg',
+           cells: [{ r: 62.40 }, { r: 63.10 }, { r: 61.80 }, { r: 61.20, alt: 'IS 2062 Gr.B offered in place of E250BR' }] },
+         { code: 'ITM-7715', name: 'MS plate — 6 mm', qty: 4500, uom: 'kg',
+           cells: [{ r: 68.50 }, null, { r: 70.10 }, { r: 67.90 }] },
+         { code: 'ITM-3310', name: 'M12×60 hex bolt — 8.8 zinc', qty: 8000, uom: 'nos',
+           cells: [{ r: 24.60 }, { r: 23.80 }, { r: 25.10 }, { r: 24.20 }] },
+         { code: 'ITM-3318', name: 'M12 hex nut — 8.8 zinc', qty: 8000, uom: 'nos',
+           cells: [{ r: 9.40 }, null, { r: 9.60 }, { r: 9.10 }] },
+         { code: 'ITM-4120', name: 'Welding electrode — 3.15 mm', qty: 400, uom: 'kg',
+           cells: [{ r: 148.00 }, { r: 152.00 }, { r: 145.50 }, { r: 149.00 }] },
+         { code: 'ITM-7728', name: 'MS flat — 40×6', qty: 2600, uom: 'kg',
+           cells: [{ r: 66.20 }, null, { r: 65.90 }, { r: 68.40 }] }
+       ],
+       money(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       rate(n) { return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+       qty(l) { return l.qty.toLocaleString('en-IN') + ' ' + l.uom },
+       comparable(l) { return l.cells.filter(c => c &amp;&amp; !c.alt).map(c => c.r) },
+       isLow(l, i) {
+         const c = l.cells[i];
+         if (!c || c.alt) return false;
+         return c.r === Math.min(...this.comparable(l));
+       },
+       quoted(i) { return this.lines.filter(l => l.cells[i]).length },
+       total(i) { return this.lines.reduce((s, l) => s + (l.cells[i] ? l.qty * l.cells[i].r : 0), 0) },
+       whole(i) { return this.quoted(i) === this.lines.length &amp;&amp; !this.lines.some(l => l.cells[i].alt) },
+       isLowTotal(i) {
+         if (!this.whole(i)) return false;
+         const full = this.vendors.map((v, j) => j).filter(j => this.whole(j)).map(j => this.total(j));
+         return this.total(i) === Math.min(...full);
+       }
+     }">
+
+  <main class="mx-auto max-w-7xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Enquiries</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium tabular-nums text-zinc-900">ENQ-2026-0117</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Comparative statement</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">ENQ-2026-0117 · MS fabrication hardware · 6 lines · 4 quotations · Silvassa</p>
+    </div>
+
+    <div class="mt-4 flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+      <div class="min-w-[16rem] flex-1">
+        <p class="text-[13px]/5 tabular-nums text-zinc-700">
+          Two columns are not comparable on the total. <span class="font-medium text-zinc-900">Deccan Fasteners Pvt Ltd</span> quoted 3 of the 6 lines, and <span class="font-medium text-zinc-900">Qureshi Metals</span> quoted line 1 against an alternative grade.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-600">
+          Both totals are drawn. Neither carries the mark, because a total over fewer lines is shorter rather than lower.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="cp-rates-h" class="text-[16px]/6 font-semibold">Rates quoted</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Rate per unit, with the line value under it. Exclusive of GST and freight.</p>
+      </div>
+
+      <div role="region" aria-labelledby="cp-rates-h" tabindex="0"
+           class="relative overflow-x-auto overscroll-x-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <table class="w-full min-w-[60rem] table-fixed text-[13px]/5">
+          <caption class="sr-only">Rates quoted by four vendors against six lines. Cells reading an em dash were not quoted; one cell carries an alternative grade and is excluded from the comparison.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="w-64 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Line item</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <th scope="col" class="w-44 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right align-bottom">
+                  <span class="block text-[13px]/5 font-semibold text-zinc-900" x-text="v.name"></span>
+                  <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500" x-text="v.quote + ' · ' + quoted(i) + ' of 6 lines'"></span>
+                </th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="l in lines" :key="l.code">
+              <tr class="hover:bg-zinc-100">
+                <th scope="row" class="border-b border-zinc-100 px-4 py-2.5 text-left align-top font-normal">
+                  <span class="block font-medium" x-text="l.name"></span>
+                  <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code + ' · ' + qty(l)"></span>
+                </th>
+                <template x-for="(v, i) in vendors" :key="v.id">
+                  <td class="border-b border-zinc-100 px-4 py-2.5 text-right align-top">
+                    <template x-if="!l.cells[i]">
+                      <span class="block text-zinc-500">—<span class="sr-only">Not quoted</span></span>
+                    </template>
+                    <template x-if="l.cells[i]">
+                      <span class="block">
+                        <span class="flex items-baseline justify-end gap-1.5">
+                          <span x-show="isLow(l, i)" x-cloak
+                                class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                          <span class="tabular-nums whitespace-nowrap"
+                                :class="isLow(l, i) ? 'font-semibold text-zinc-900' : 'text-zinc-600'"
+                                x-text="rate(l.cells[i].r)"></span>
+                        </span>
+                        <span class="mt-0.5 block text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-500" x-text="money(l.qty * l.cells[i].r)"></span>
+                        <span x-show="l.cells[i].alt" x-cloak class="mt-1 block text-[12px]/4 text-left text-zinc-600">
+                          <span class="font-medium text-zinc-900">Alternative</span>
+                          <span class="block" x-text="l.cells[i].alt"></span>
+                          <span class="block text-zinc-500">Not compared until the substitution is cleared</span>
+                        </span>
+                      </span>
+                    </template>
+                  </td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+          <tfoot class="bg-zinc-50">
+            <tr>
+              <th scope="row" class="border-t border-zinc-200 px-4 pt-2.5 text-left text-[12px]/4 font-medium text-zinc-600">Total of the lines quoted</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="border-t border-zinc-200 px-4 pt-2.5 text-right align-top">
+                  <span class="flex items-baseline justify-end gap-1.5">
+                    <span x-show="isLowTotal(i)" x-cloak
+                          class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">L1</span>
+                    <span class="text-[14px]/5 font-semibold tabular-nums whitespace-nowrap"
+                          :class="isLowTotal(i) ? 'text-zinc-900' : 'text-zinc-600'"
+                          x-text="money(total(i))"></span>
+                  </span>
+                </td>
+              </template>
+            </tr>
+            <tr>
+              <th scope="row" class="px-4 pb-2.5 text-left text-[12px]/4 font-normal text-zinc-500">Covers</th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="px-4 pb-2.5 text-right align-top text-[12px]/4 tabular-nums text-zinc-500">
+                  <span class="block" x-text="quoted(i) + ' of 6 lines'"></span>
+                  <span x-show="!whole(i)" x-cloak class="mt-0.5 block text-zinc-600">Not comparable on the total</span>
+                </td>
+              </template>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p class="border-t border-zinc-200 px-5 py-2.5 text-[12px]/4 text-zinc-600">
+        A blank cell is a line nobody priced, not a line priced at nothing. The three lines Deccan did not quote have to be enquired again or awarded elsewhere before this statement can be signed.
+      </p>
+    </div>
+  </main>
+</div>

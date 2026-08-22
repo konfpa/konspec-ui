@@ -1,0 +1,241 @@
+<!-- planning/templates/planning/schedule.html — a page template, so it extends
+     the base that renders app-shell and fills one block. A signed-in screen is
+     the shell; a schedule that starts its own document loses the skip link, the
+     nav landmark, the command palette and the keyboard shortcuts.
+
+     The weeks are built in the view and not in the template, and the reason is
+     the same one board gives for its columns: a template cannot bucket rows by
+     date, and regroup only groups the rows it was handed — a day with nothing
+     on it produces no group, and an empty day is a cell this layout must draw.
+     Every date in the month gets an entry whether or not anything falls on it.
+
+     # views.py
+     import calendar
+     from collections import defaultdict
+
+     # firstweekday is Monday, which is what calendar.MONDAY is and what the
+     # working week here starts on. monthdatescalendar pads the first and last
+     # rows with dates from the neighbouring months, so each cell carries
+     # in_month and the template draws the padding blank — a muted 27 July is
+     # still a date and it invites a click.
+     cal = calendar.Calendar(firstweekday=calendar.MONDAY)
+
+     promised = defaultdict(list)
+     for o in (Order.objects
+               .filter(plant=plant, promised__year=y, promised__month=m)
+               .select_related('vendor').order_by('promised', 'number')):
+         promised[o.promised].append(o)
+
+     # Plant holidays, not the gazetted list. The shutdown closes this plant
+     # and is on nobody's public calendar; both have to be here or the
+     # schedule promises trucks into a shut gate.
+     closures = dict(PlantClosure.objects
+                     .filter(plant=plant, on__year=y, on__month=m)
+                     .values_list('on', 'reason'))
+
+     weeks = [[{'date': d,
+                'in_month': d.month == m,
+                'sunday': d.weekday() == calendar.SUNDAY,
+                'closure': closures.get(d),
+                'planned': d <= plant.planned_to,
+                'orders': promised[d][:3],
+                'extra': max(len(promised[d]) - 3, 0)}
+               for d in week]
+              for week in cal.monthdatescalendar(y, m)]
+
+     Two traps this repo has hit. A multi-line {# #} is not a comment —
+     Django's tag_re has no DOTALL, so everything after the first line renders
+     on the page; use a comment/endcomment block. And |intcomma raises without
+     {% load humanize %} in this same file, which is why the load is here and
+     not only in base.html.
+
+     The period and the scope are a GET form, so a filtered month is a URL
+     somebody can send. Publishing the plan further out is the one write on this
+     screen and it is a POST with a csrf token — extending the horizon changes
+     what other people are allowed to promise against. -->
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block main %}
+<div data-kui="schedule-page/django" class="text-zinc-900">
+
+  <header class="border-b border-zinc-200 bg-white">
+    <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="{% url 'planning:home' %}" class="text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Planning</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium text-zinc-900">Delivery schedule</span></li>
+        </ol>
+      </nav>
+
+      <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div class="min-w-0">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight">Delivery schedule</h1>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+            {{ promised_count|intcomma }} deliveries promised in {{ month_label }} · {{ overdue_count }} overdue · &#8377;{{ committed|intcomma }} committed · {{ plant.name }}
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <a href="{% url 'planning:schedule_export' %}?{{ request.GET.urlencode }}"
+             class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="download" class="size-4"></i>Export
+          </a>
+          <a href="{% url 'orders:create' %}"
+             class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="plus" class="size-4"></i>Promise a date
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <form method="get" action="{% url 'planning:schedule' %}" class="flex flex-wrap items-center gap-2">
+          <a href="?{{ prev_query }}" aria-label="Previous month"
+             class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="chevron-left" class="size-4"></i>
+          </a>
+          <span aria-live="polite" class="min-w-32 px-1 text-center text-[13px]/5 font-medium tabular-nums">{{ month_label }}</span>
+          <a href="?{{ next_query }}" aria-label="Next month"
+             class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="chevron-right" class="size-4"></i>
+          </a>
+
+          <input type="hidden" name="m" value="{{ request.GET.m }}">
+          <label for="dj-plant" class="sr-only">Plant</label>
+          <select id="dj-plant" name="plant"
+                  class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+            <option value="">Plant: all</option>
+            {% for p in plants %}
+              <option value="{{ p.code }}" {% if request.GET.plant == p.code %}selected{% endif %}>Plant: {{ p.name }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Apply</button>
+        </form>
+
+        <nav aria-label="Schedule views" class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+          <a href="{% url 'planning:schedule' %}?{{ request.GET.urlencode }}" aria-current="page" class="inline-flex h-8 items-center rounded-md bg-white px-3 text-[13px]/5 font-medium text-zinc-900 shadow-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Month</a>
+          <a href="{% url 'planning:schedule_week' %}?{{ request.GET.urlencode }}" class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Week</a>
+          <a href="{% url 'planning:schedule_lines' %}?{{ request.GET.urlencode }}" class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Line</a>
+        </nav>
+      </div>
+
+      {% if active_filters %}
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          {% for f in active_filters %}
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-1 pr-1.5 pl-3 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              {{ f.label }}
+              <a href="?{{ f.without_query }}" aria-label="Remove the filter {{ f.label }}"
+                 class="rounded-full p-0.5 text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-3"></i>
+              </a>
+            </span>
+          {% endfor %}
+          <a href="{% url 'planning:schedule' %}" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</a>
+        </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+    <section aria-labelledby="dj-sch-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <h2 id="dj-sch-h" class="sr-only">Deliveries promised in {{ month_label }}</h2>
+
+      <table class="w-full table-fixed border-collapse text-[13px]/5">
+        <caption class="sr-only">Deliveries promised in {{ month_label }}, one column per weekday from Monday</caption>
+        <thead>
+          <tr>
+            {% for name in weekday_names %}
+              <th scope="col" class="w-[14.28%] border-b border-zinc-200 bg-zinc-50 px-2 py-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">{{ name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for week in weeks %}
+            <tr>
+              {% for day in week %}
+                {% if not day.in_month %}
+                  <td class="border-r border-b border-zinc-200 last:border-r-0"></td>
+                {% elif day.closure or day.sunday %}
+                  <td class="h-24 border-r border-b border-zinc-200 bg-zinc-50 p-1.5 align-top last:border-r-0">
+                    <span class="text-[12px]/4 tabular-nums text-zinc-500">{{ day.date|date:"j" }}</span>
+                    <p class="mt-1 text-[11px]/4 {% if day.closure %}text-zinc-600{% else %}text-zinc-500{% endif %}">{{ day.closure|default:"Weekly off" }}</p>
+                  </td>
+                {% elif not day.planned %}
+                  {% comment %}
+                    Past the planning horizon. This is not an empty day and it
+                    must not be drawn as one: a free Wednesday and a Wednesday
+                    nobody has planned are the difference between a promise the
+                    plant can keep and one it cannot. Only the first such cell
+                    carries the sentence; thirty copies of it is wallpaper.
+                  {% endcomment %}
+                  <td class="h-24 border-r border-b border-zinc-200 bg-zinc-50 p-1.5 align-top last:border-r-0">
+                    <span class="text-[12px]/4 tabular-nums text-zinc-500">{{ day.date|date:"j" }}</span>
+                    {% if day.date == first_unplanned %}
+                      <p class="mt-1 text-[11px]/4 text-zinc-600">Not planned past {{ plant.planned_to|date:"D j M" }}</p>
+                    {% endif %}
+                  </td>
+                {% else %}
+                  <td class="h-24 border-r border-b border-zinc-200 p-1.5 align-top last:border-r-0">
+                    {% if day.date == today %}
+                      <span aria-current="date" class="inline-flex size-5 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium tabular-nums text-zinc-900 ring-1 ring-inset ring-zinc-300">{{ day.date|date:"j" }}</span>
+                    {% else %}
+                      <span class="text-[12px]/4 font-medium tabular-nums text-zinc-600">{{ day.date|date:"j" }}</span>
+                    {% endif %}
+
+                    <ul role="list" class="mt-1 space-y-1">
+                      {% for o in day.orders %}
+                        <li>
+                          <a href="{{ o.get_absolute_url }}"
+                             class="flex items-center gap-1 truncate rounded-md bg-zinc-200 px-1.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                            <span class="size-1.5 shrink-0 rounded-full {{ o.status_dot_class }}" aria-hidden="true"></span>
+                            <span class="truncate tabular-nums">{{ o.number }}</span>
+                            <span class="sr-only">, {{ o.vendor.name }}, {{ o.quantity_display }}, promised {{ o.promised|date:"l j F Y" }}, {{ o.get_status_display|lower }}</span>
+                          </a>
+                        </li>
+                      {% empty %}
+                      {% endfor %}
+                    </ul>
+
+                    {% if day.extra %}
+                      <a href="{% url 'planning:schedule_day' day.date|date:'Y-m-d' %}"
+                         class="mt-1 inline-block rounded text-[11px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                        {{ day.extra }} more on {{ day.date|date:"j M" }}
+                      </a>
+                    {% endif %}
+                  </td>
+                {% endif %}
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <ul role="list" class="flex flex-wrap gap-x-4 gap-y-1 border-t border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 text-zinc-600">
+        <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue</li>
+        <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Awaiting approval</li>
+        <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open</li>
+        <li class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>Received</li>
+      </ul>
+    </section>
+
+    {% comment %}
+      The one write on this screen. Extending the horizon changes what every
+      other buyer is allowed to promise against, so it is a POST with a token
+      and not a link — the month, the filters and the view stay GET, which is
+      why there is no token anywhere above this.
+    {% endcomment %}
+    <form method="post" action="{% url 'planning:publish' %}"
+          class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+      {% csrf_token %}
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">
+        The plan is published to {{ plant.planned_to|date:"l j F Y" }}. {{ unplanned_days }} days of this month are past it.
+      </p>
+      <button type="submit" name="until" value="{{ month_end|date:'Y-m-d' }}"
+              class="inline-flex h-9 shrink-0 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Publish to {{ month_end|date:"j M" }}
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

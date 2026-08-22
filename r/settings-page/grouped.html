@@ -1,0 +1,167 @@
+<!-- The deployment where the nav is the problem. Nine sections read as a list;
+     forty do not, so they go under group headings in the order somebody would
+     look for them, and a filter sits over the whole thing.
+
+     The list is written out in the markup and the filter only hides rows. The
+     obvious version — an x-for over an array of sections — puts the entire
+     primary navigation of the screen inside JavaScript, so a page rendered
+     before Alpine boots has no nav in it, nothing in it is crawlable or
+     findable with the browser's own Find, and the server has to hand the same
+     list down twice.
+
+     x-show="hit($el.textContent)" is what avoids writing every label twice. On
+     a row it reads that row's own link text; on a group it reads the heading
+     plus every label under it, so a group whose name matches shows whole and a
+     group with no surviving row disappears with its heading. There is no second
+     copy of the strings to drift out of step with the first.
+
+     The count is measured off the DOM on input rather than tracked in state,
+     for the same reason: one source, and it cannot disagree with what is on
+     screen. hits is set in x-init as well, because @input never fires on first
+     paint and a count that starts at a guess is wrong for every user whose
+     role has fewer sections than the guess.
+
+     The filter never touches the pane. It is a way to find a section, not a way
+     to filter the settings — filter the pane too and clearing the box has to
+     restore a section the user cannot see any more.
+
+     Escape clears the box and leaves focus in it. Blurring on Escape hands the
+     keyboard back to the top of the document. -->
+<div data-kui="settings-page/grouped" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       q: '', hits: 0,
+       hit(s) { return !this.q.trim() || s.toLowerCase().includes(this.q.trim().toLowerCase()) },
+       count() { this.hits = [...this.$refs.list.querySelectorAll('li')].filter(li => this.hit(li.textContent)).length }
+     }"
+     x-init="count()">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Settings</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · Silvassa and Vapi · FY 2026–27</p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:items-start lg:gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
+
+      <div class="lg:sticky lg:top-6 lg:self-start">
+
+        <label for="gp-filter" class="mb-1.5 block text-[12px]/4 font-medium">Find a section</label>
+        <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 self-center text-zinc-500"></i>
+          <input id="gp-filter" type="search" x-model="q" @input="count()" @keydown.escape.prevent="q = ''; count()"
+                 placeholder="numbering, GST, plant" aria-describedby="gp-count"
+                 class="min-w-0 flex-1 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        </div>
+        <p id="gp-count" role="status" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500"
+           x-text="hits + ' of 18 sections'">18 of 18 sections</p>
+
+        <nav aria-label="Settings sections" x-ref="list" class="mt-3">
+
+          <div x-show="hit($el.textContent)">
+            <p id="gp-g1" class="pb-1 pl-3 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-500">Organisation</p>
+            <ul role="list" aria-labelledby="gp-g1" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Company profile</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Plants and warehouses</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cost centres</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Financial year</a></li>
+            </ul>
+          </div>
+
+          <div x-show="hit($el.textContent)" class="mt-4">
+            <p id="gp-g2" class="pb-1 pl-3 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-500">Documents</p>
+            <ul role="list" aria-labelledby="gp-g2" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+              <li x-show="hit($el.textContent)"><a href="#" aria-current="page" class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Numbering series</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Print templates</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Terms and conditions</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Attachments and retention</a></li>
+            </ul>
+          </div>
+
+          <div x-show="hit($el.textContent)" class="mt-4">
+            <p id="gp-g3" class="pb-1 pl-3 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-500">Procurement</p>
+            <ul role="list" aria-labelledby="gp-g3" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approval limits</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendor onboarding</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rate contract rules</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt tolerance</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Quality hold reasons</a></li>
+            </ul>
+          </div>
+
+          <div x-show="hit($el.textContent)" class="mt-4">
+            <p id="gp-g4" class="pb-1 pl-3 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-500">Tax and finance</p>
+            <ul role="list" aria-labelledby="gp-g4" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GST and HSN defaults</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">TDS sections</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Payment terms</a></li>
+            </ul>
+          </div>
+
+          <div x-show="hit($el.textContent)" class="mt-4">
+            <p id="gp-g5" class="pb-1 pl-3 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-500">Access</p>
+            <ul role="list" aria-labelledby="gp-g5" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Users and roles</a></li>
+              <li x-show="hit($el.textContent)"><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sign-in and sessions</a></li>
+            </ul>
+          </div>
+
+          <p x-show="hits === 0" x-cloak class="mt-4 pl-3 text-[13px]/5 text-zinc-600">
+            No section matches that. Try the word on the document — challan, GRN, HSN.
+          </p>
+        </nav>
+      </div>
+
+      <section id="gp-pane" tabindex="-1" aria-labelledby="gp-h"
+               class="mt-4 min-w-0 rounded-xl focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 lg:mt-0">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="gp-h" class="text-[16px]/6 font-semibold">Numbering series</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">One series per document type per plant. The next number is issued when the document is first saved, not when it is approved.</p>
+          </div>
+
+          <table class="w-full text-left text-[13px]/5">
+            <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 uppercase tracking-wider text-zinc-600">
+              <tr>
+                <th scope="col" class="px-5 py-2 font-medium">Document</th>
+                <th scope="col" class="hidden px-5 py-2 font-medium sm:table-cell">Plant</th>
+                <th scope="col" class="px-5 py-2 text-right font-medium">Next number</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                <th scope="row" class="px-5 py-2.5 text-left font-normal">Purchase order</th>
+                <td class="hidden px-5 py-2.5 sm:table-cell">Silvassa</td>
+                <td class="px-5 py-2.5 text-right font-medium tabular-nums">PO-2026-0419</td>
+              </tr>
+              <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                <th scope="row" class="px-5 py-2.5 text-left font-normal">Goods receipt</th>
+                <td class="hidden px-5 py-2.5 sm:table-cell">Silvassa</td>
+                <td class="px-5 py-2.5 text-right font-medium tabular-nums">GRN-4822</td>
+              </tr>
+              <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                <th scope="row" class="px-5 py-2.5 text-left font-normal">Material issue</th>
+                <td class="hidden px-5 py-2.5 sm:table-cell">Vapi</td>
+                <td class="px-5 py-2.5 text-right font-medium tabular-nums">MS-4821</td>
+              </tr>
+              <tr class="hover:bg-zinc-100">
+                <th scope="row" class="px-5 py-2.5 text-left font-normal">Tax invoice</th>
+                <td class="hidden px-5 py-2.5 sm:table-cell">Silvassa</td>
+                <td class="px-5 py-2.5 text-right font-medium tabular-nums">KI/2026-27/1188</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <p class="text-[12px]/4 tabular-nums text-zinc-600">4 series · last changed 01 Apr 2026, 08:00 by the financial year rollover</p>
+            <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-200">
+              <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Edit a series
+            </button>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+</div>

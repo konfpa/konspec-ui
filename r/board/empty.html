@@ -1,0 +1,88 @@
+<!-- Two empties, and the second one is the interesting one.
+
+     A column with nothing in it keeps its header, its count of zero, its full
+     height and its line saying so, because it is still a destination.
+     Collapsing an empty column to a strip is the worst thing a board can do:
+     the stage a card is about to be moved into is the one that disappeared.
+
+     A board with nothing on it keeps every column too, one step further out.
+     The columns are the process and not the data, so a first-run screen showing
+     four empty stages teaches somebody the pipeline; four stages replaced by
+     one panel teaches nothing and hides the shape of what they are about to use.
+
+     The empty board is therefore the columns plus one band above them, and the
+     band is empty-state's own shape — a size-10 graphite well, a heading, a
+     max-w-sm line and the one control that fills the board. No dashed box.
+
+     The offer to raise an order is only correct because nothing is filtered.
+     Under a filter it is the create-under-a-filter defect and somebody raises
+     the order they raised last week, which is why the filters variant has no
+     such button on it. -->
+<main data-kui="board/empty" class="flex h-[600px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+
+  <div class="shrink-0 border-b border-zinc-300 bg-white px-4 py-3">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Order approvals</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Silvassa · FY 2026–27 · 0 orders · nothing filtered</p>
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-y-auto">
+    <div class="px-3 pt-3">
+      <div class="flex flex-col items-center rounded-xl border border-zinc-300 bg-white px-6 py-8 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="clipboard-list" class="size-5 text-zinc-600"></i>
+        </span>
+        <h2 class="mt-3 text-[16px]/6 font-semibold">Nothing is in the approval pipeline</h2>
+        <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+          An order joins the board at Raised as soon as it is sent for approval, and leaves it when it is approved or cancelled. Drafts stay in your own list until they are sent.
+        </p>
+        <button type="button"
+                class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4"></i>Raise a purchase order
+        </button>
+      </div>
+    </div>
+
+    <!-- Every column still renders. The stages are the process. -->
+    <div class="flex snap-x snap-mandatory gap-3 overflow-x-auto p-3">
+      <section aria-labelledby="ey-h-raised" class="relative flex h-64 w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+          <h2 id="ey-h-raised" class="text-[13px]/5 font-medium">Raised</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-500">0</p>
+        </div>
+        <div class="flex min-h-0 flex-1 items-center justify-center bg-zinc-50 px-3 text-center">
+          <p class="text-[12px]/4 text-zinc-500">Nothing at this stage</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="ey-h-buyer" class="relative flex h-64 w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+          <h2 id="ey-h-buyer" class="text-[13px]/5 font-medium">With buyer</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-500">0</p>
+        </div>
+        <div class="flex min-h-0 flex-1 items-center justify-center bg-zinc-50 px-3 text-center">
+          <p class="text-[12px]/4 text-zinc-500">Nothing at this stage</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="ey-h-finance" class="relative flex h-64 w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+          <h2 id="ey-h-finance" class="text-[13px]/5 font-medium">With finance</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-500">0</p>
+        </div>
+        <div class="flex min-h-0 flex-1 items-center justify-center bg-zinc-50 px-3 text-center">
+          <p class="text-[12px]/4 text-zinc-500">Nothing at this stage</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="ey-h-approved" class="relative flex h-64 w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+        <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+          <h2 id="ey-h-approved" class="text-[13px]/5 font-medium">Approved</h2>
+          <p class="text-[12px]/4 tabular-nums text-zinc-500">0</p>
+        </div>
+        <div class="flex min-h-0 flex-1 items-center justify-center bg-zinc-50 px-3 text-center">
+          <p class="text-[12px]/4 text-zinc-500">Nothing at this stage</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>

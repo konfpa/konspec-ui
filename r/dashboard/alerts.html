@@ -1,0 +1,178 @@
+<!-- Two things went wrong overnight that nobody is going to find by reading a
+     figure. They go above the strip, because a band under it is a band that is
+     read after the numbers it should have qualified.
+
+     Three is the cap, and what earns a place is narrow: actionable by this
+     person today, time-bound, and not already counted in the strip. "12 orders
+     overdue" is a tile, not an exception. Three GRNs that failed inspection
+     last night is one, because nothing else on the screen counts them and the
+     material sits in a quarantine bay until somebody decides.
+
+     A fourth exception is a queue. The moment the band needs a scroller it has
+     become a register drawn without a header. Nothing here dismisses either:
+     dismissing does not fix the record and it is back tomorrow.
+
+     alert's shape, unchanged: white card, zinc border, colour only in the icon.
+     A red field across the top of a dashboard shouts louder than the twelve
+     genuinely overdue orders further down it. No role="alert" either — this is
+     static markup rendered on every load, and a live region that fires whether
+     or not anything just happened announces nothing the second time. -->
+<div data-kui="dashboard/alerts" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
+
+    <div class="min-w-0">
+      <p class="text-[13px]/5 text-zinc-600">Good morning, Akshay</p>
+      <h1 class="mt-0.5 text-[24px]/7 font-semibold tracking-tight">Procurement</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Friday 21 Aug 2026 · Silvassa, Vapi and Daman · figures read at 09:12</p>
+    </div>
+
+    <section aria-labelledby="dba-exc-h" class="space-y-2">
+      <h2 id="dba-exc-h" class="text-[13px]/5 font-semibold">Needs a decision today</h2>
+
+      <!-- alert/records: the count is not enough, so the three are named -->
+      <div class="rounded-lg border border-zinc-300 bg-white px-4 py-3">
+        <div class="flex items-start gap-3">
+          <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+          <div class="min-w-0">
+            <p class="text-[13px]/5 font-medium"><span class="tabular-nums">3</span> goods receipts failed inspection overnight.</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">The material is in quarantine at Silvassa and cannot be issued until each one is rejected or released under concession.</p>
+          </div>
+        </div>
+        <ul class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3 text-[12px]/4">
+          <li class="flex items-center justify-between gap-4">
+            <a href="/receipts/GRN-4812/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4812 · Gujarat Polymers Ltd · melt flow out of spec</a>
+            <span class="shrink-0 tabular-nums text-zinc-600">12,000 kg</span>
+          </li>
+          <li class="flex items-center justify-between gap-4">
+            <a href="/receipts/GRN-4815/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4815 · Sharma Steel &amp; Alloys · no test certificate</a>
+            <span class="shrink-0 tabular-nums text-zinc-600">4.2 MT</span>
+          </li>
+          <li class="flex items-center justify-between gap-4">
+            <a href="/receipts/GRN-4818/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4818 · Deccan Fasteners Pvt Ltd · thread gauge failed</a>
+            <span class="shrink-0 tabular-nums text-zinc-600">8,400 nos</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- time-bound, and the date is what makes it an exception rather than a
+           fact about a vendor -->
+      <div class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+        <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium">The HDPE rate contract with Gujarat Polymers Ltd expires on 31 Aug 2026.</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">
+            Ten days. Four orders totalling ₹12,45,000 are scheduled against it in September and will be blocked at release.
+          </p>
+          <a href="/contracts/RC-2026-0091/" class="mt-1.5 inline-block text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Open the rate contract
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="dba-fig-h">
+      <h2 id="dba-fig-h" class="sr-only">Figures</h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
+        <a href="/orders/?status=open" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>Open orders</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">148</dd>
+            <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+              <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+                <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+11
+              </span>
+              <span class="text-zinc-500">vs. July</span>
+            </dd>
+          </dl>
+        </a>
+
+        <a href="/orders/?status=overdue" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>Overdue value</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 flex items-baseline gap-1">
+              <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+              <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">27.10 L</span>
+            </dd>
+            <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+              <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+                <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+₹4.10 L
+              </span>
+              <span class="text-zinc-500">vs. 12 Aug</span>
+            </dd>
+          </dl>
+        </a>
+
+        <a href="/receipts/?posted=today" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>GRNs posted today</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">12</dd>
+            <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+              <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+                <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+4
+              </span>
+              <span class="text-zinc-500">vs. same time yesterday</span>
+            </dd>
+          </dl>
+        </a>
+
+        <a href="/qc/?state=hold" class="group block rounded-xl border border-zinc-300 bg-white p-4 transition hover:border-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <dl>
+            <dt class="flex items-center justify-between gap-2 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+              <span>QC holds open</span>
+              <i data-lucide="chevron-right" class="size-3.5 shrink-0 text-zinc-400 transition group-hover:text-zinc-700" aria-hidden="true"></i>
+            </dt>
+            <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums">3</dd>
+            <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+              <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+                <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+2
+              </span>
+              <span class="text-zinc-500">since yesterday</span>
+            </dd>
+          </dl>
+        </a>
+      </div>
+    </section>
+
+    <section aria-labelledby="dba-appr-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+        <h2 id="dba-appr-h" class="text-[14px]/5 font-semibold">Waiting on your approval</h2>
+        <a href="/orders/?status=approval" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          All <span class="tabular-nums">9</span><span class="sr-only"> orders waiting on your approval</span>
+        </a>
+      </div>
+      <ul class="divide-y divide-zinc-100">
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+            <a href="/orders/PO-2026-0418/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0418</a>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹18,42,000</span>
+            <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · with you 3 days</p>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+            <a href="/orders/PO-2026-0421/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0421</a>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹6,04,500</span>
+            <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers Ltd · with you 2 days</p>
+          </div>
+        </li>
+        <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+            <a href="/orders/PO-2026-0424/" class="text-[13px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-2026-0424</a>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,18,400</span>
+            <p class="w-full text-[12px]/4 tabular-nums text-zinc-600">Deccan Fasteners Pvt Ltd · with you 1 day</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,96 @@
+<!-- Two caps, one inside the other, and both are needed. The page caps at
+     max-w-4xl, 896px, which is what form-page takes for a create or edit
+     screen; the column of controls inside it caps at max-w-xl, 576px, which
+     the registry writes as the exact string max-w-xl space-y-5 twenty-two
+     times. Drop the inner cap and the fields inherit
+     the card: a 900px-wide text input is a line whose end and whose next
+     beginning are 900px apart, and the eye loses the return sweep somewhere
+     past 75 characters. Drop the outer one and the card grows to the column,
+     which on a 1600px monitor is a form four feet from itself.
+
+     Prose under the h1 caps tighter still, at max-w-md — 448px — and help text
+     under a control at max-w-sm. Those are not one rule with three values; they
+     are three different jobs. A sentence explaining the page is read once and
+     wants to be short. A field label is scanned.
+
+     The cap belongs to the page and not to the section, which is why form-page
+     writes a different one per variant: 3xl for the wizard, 4xl here, 5xl for
+     sections, 6xl once a 320px side rail turned up. Copy the cap from the
+     variant you copied the layout from rather than from this comment.
+
+     space-y-5 between the fields, which is looser than the space-y-4 between
+     the cards on the page outside. A card has a border doing its grouping; a
+     field is three lines of unbordered text and the whitespace is the only
+     thing saying where one ends. -->
+<div data-kui="container/narrow" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
+
+    <h1 class="text-[24px]/7 font-semibold tracking-tight">New vendor</h1>
+    <p class="mt-1 max-w-md text-[14px]/5 text-zinc-600">
+      Registration details are checked against the GST portal before the vendor can be put on an order.
+    </p>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 class="text-[16px]/6 font-semibold">Identity</h2>
+      </div>
+
+      <div class="px-5 py-4">
+        <div class="max-w-xl space-y-5">
+
+          <div>
+            <label for="ct-narrow-name" class="mb-1.5 block text-[13px]/5 font-medium">Registered name</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="ct-narrow-name" name="name" value="Deccan Fasteners Pvt Ltd"
+                     aria-describedby="ct-narrow-name-help"
+                     class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            </div>
+            <p id="ct-narrow-name-help" class="mt-1.5 max-w-sm text-[12px]/4 text-zinc-500">
+              Exactly as it appears on the GST certificate.
+            </p>
+          </div>
+
+          <div>
+            <label for="ct-narrow-gstin" class="mb-1.5 block text-[13px]/5 font-medium">GSTIN</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="ct-narrow-gstin" name="gstin" value="27AABCD1234E1Z5"
+                     class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums uppercase outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label for="ct-narrow-pan" class="mb-1.5 block text-[13px]/5 font-medium">PAN</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="ct-narrow-pan" name="pan" value="AABCD1234E"
+                     class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums uppercase outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label for="ct-narrow-terms" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms</label>
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select id="ct-narrow-terms" name="terms" class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+                <option value="inv30">30 days from invoice</option>
+                <option value="inv45" selected>45 days from invoice</option>
+                <option value="grn60">60 days from GRN</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-4"></i>
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <p class="mt-4 text-[12px]/4 text-zinc-500">
+      The card runs to
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">max-w-4xl</code>
+      and the fields stop at
+      <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">max-w-xl</code>
+      inside it.
+    </p>
+
+  </main>
+</div>

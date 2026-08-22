@@ -1,0 +1,210 @@
+<!-- The screen somebody is on from 09:00 to 18:00. Two settings do most of the
+     work — how many rows fit in the viewport, and which columns are worth the
+     width — and both belong to the person rather than to the visit. Persist
+     them per user; a register that resets to comfortable on every navigation is
+     one somebody sets four times a day and then stops setting.
+
+     Density changes py-2.5 to py-1.5 and px-4 to px-3 and nothing else. The
+     type stays at 13px, because a register read all day is read at the body
+     size and dropping it to 12 to fit one more row is a trade nobody asked for.
+
+     The column control is a popover of checkboxes and not a role="menu", because
+     its items are settings that stay put and not commands that fire and close.
+     It lives in a strip above the table rather than in the header band: it is
+     about the panel, and the band is about the page. Hiding a column drops its
+     header, its cells and the same field from the card layout below md.
+
+     The panel is not overflow-hidden, or the popover is clipped at the panel
+     edge and opens as a sliver that reads as a script that failed to load.
+
+     The header sticks inside the panel's own scroller, which needs
+     border-separate border-spacing-0: preflight collapses borders onto the
+     table, so a collapsed header takes no rule with it when it sticks and the
+     labels float over the rows with nothing between them. sticky goes on each
+     <th>, not on the <thead>, and each one carries bg-zinc-50 or the rows
+     scroll straight through the labels.
+
+     The pager is pagination's numbered row, because somebody who lives here
+     pages by number, and its seven slots hold the same width from page 1 to
+     page 15 so Next never slides out from under the pointer between two
+     clicks. Below md the slot row is display:none and "Page n of m" stands in
+     its place. -->
+<div data-kui="index-page/dense" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       dense: true, page: 4, size: 10, total: 148,
+       cols: { plant: true, buyer: true, status: true, due: true },
+       rows: [
+         { po: 'PO-2026-0411', vendor: 'Sharma Steel &amp; Alloys', plant: 'Silvassa', buyer: 'A Prabhu', amount: 1842000, status: 'Overdue', due: '12 Aug 2026' },
+         { po: 'PO-2026-0414', vendor: 'Gujarat Polymers Ltd', plant: 'Silvassa', buyer: 'A Prabhu', amount: 468500, status: 'Approved', due: '19 Aug 2026' },
+         { po: 'PO-2026-0418', vendor: 'Deccan Fasteners Pvt Ltd', plant: 'Vapi', buyer: 'R Kulkarni', amount: 2710400, status: 'Open', due: '02 Sep 2026' },
+         { po: 'PO-2026-0421', vendor: 'Sharma Steel &amp; Alloys', plant: 'Vapi', buyer: 'R Kulkarni', amount: 132900, status: 'Open', due: '22 Aug 2026' },
+         { po: 'PO-2026-0424', vendor: 'Konkan Chemicals Pvt Ltd', plant: 'Silvassa', buyer: 'S Naik', amount: 96750, status: 'Closed', due: '28 Jul 2026' },
+         { po: 'PO-2026-0427', vendor: 'Gujarat Polymers Ltd', plant: 'Silvassa', buyer: 'S Naik', amount: 5460000, status: 'Approved', due: '30 Aug 2026' },
+         { po: 'PO-2026-0430', vendor: 'Deccan Fasteners Pvt Ltd', plant: 'Silvassa', buyer: 'A Prabhu', amount: 214300, status: 'Overdue', due: '05 Aug 2026' },
+         { po: 'PO-2026-0433', vendor: 'Sharma Steel &amp; Alloys', plant: 'Vapi', buyer: 'R Kulkarni', amount: 78900, status: 'Draft', due: '—' },
+         { po: 'PO-2026-0436', vendor: 'Konkan Chemicals Pvt Ltd', plant: 'Vapi', buyer: 'S Naik', amount: 1290500, status: 'Open', due: '08 Sep 2026' },
+         { po: 'PO-2026-0439', vendor: 'Gujarat Polymers Ltd', plant: 'Silvassa', buyer: 'A Prabhu', amount: 43200, status: 'Closed', due: '31 Jul 2026' }
+       ],
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get cell() { return this.dense ? 'px-3 py-1.5' : 'px-4 py-2.5' },
+       get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get slots() {
+         const n = this.pages, p = this.page;
+         if (n <= 7) return Array.from({ length: n }, (_, i) => i + 1);
+         if (p <= 4) return [1, 2, 3, 4, 5, 'gap-end', n];
+         if (p >= n - 3) return [1, 'gap-start', n - 4, n - 3, n - 2, n - 1, n];
+         return [1, 'gap-start', p - 1, p, p + 1, 'gap-end', n];
+       },
+       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) },
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
+     }">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto flex max-w-[1600px] flex-wrap items-start justify-between gap-x-6 gap-y-3 px-4 py-4 lg:px-6">
+        <div class="min-w-0">
+          <h1 class="text-[24px]/7 font-semibold tracking-tight">Purchase orders</h1>
+          <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600"
+             x-text="total.toLocaleString('en-IN') + ' orders · ₹6,42,80,000 committed · FY 2026–27'"></p>
+        </div>
+        <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3.5 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4"></i>New order
+        </button>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] px-4 py-5 lg:px-6">
+      <div class="rounded-xl border border-zinc-300 bg-white">
+
+        <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-2.5">
+          <div role="radiogroup" aria-label="Row density" x-ref="grp"
+               @keydown.arrow-right.prevent="dense = !dense; $nextTick(() => $refs.grp.querySelector('[aria-checked=true]').focus())"
+               @keydown.arrow-left.prevent="dense = !dense; $nextTick(() => $refs.grp.querySelector('[aria-checked=true]').focus())"
+               class="inline-flex rounded-lg bg-zinc-200 p-0.5">
+            <button type="button" role="radio" @click="dense = false"
+                    :aria-checked="!dense" :tabindex="!dense ? 0 : -1"
+                    class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="!dense ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">Comfortable</button>
+            <button type="button" role="radio" @click="dense = true"
+                    :aria-checked="dense" :tabindex="dense ? 0 : -1"
+                    class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="dense ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">Dense</button>
+          </div>
+
+          <div class="relative ml-auto" x-data="{ open: false }" @click.outside="open = false"
+               @keydown.escape="if (open) { open = false; $refs.colTrigger.focus() }">
+            <button type="button" x-ref="colTrigger" @click="open = !open" :aria-expanded="open" aria-haspopup="true"
+                    class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
+              <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+            </button>
+            <div x-show="open" x-cloak role="group" aria-label="Columns shown"
+                 class="absolute right-0 z-40 mt-1 w-44 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+              <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
+                <input type="checkbox" x-model="cols.plant" class="size-4 shrink-0 accent-zinc-700">Plant
+              </label>
+              <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
+                <input type="checkbox" x-model="cols.buyer" class="size-4 shrink-0 accent-zinc-700">Buyer
+              </label>
+              <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
+                <input type="checkbox" x-model="cols.status" class="size-4 shrink-0 accent-zinc-700">Status
+              </label>
+              <label class="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px]/5 hover:bg-zinc-200">
+                <input type="checkbox" x-model="cols.due" class="size-4 shrink-0 accent-zinc-700">Promised
+              </label>
+            </div>
+          </div>
+
+          <div class="min-w-0">
+            <label for="ix-dn-size" class="sr-only">Rows per page</label>
+            <select id="ix-dn-size" x-model.number="size" @change="page = 1"
+                    class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium tabular-nums focus:border-zinc-700 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+              <option value="10">10 per page</option>
+              <option value="25">25 per page</option>
+              <option value="50">50 per page</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="hidden max-h-72 overflow-y-auto overscroll-contain md:block">
+          <table class="w-full border-separate border-spacing-0 text-[13px]/5">
+            <thead>
+              <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 font-medium whitespace-nowrap" :class="cell">PO number</th>
+                <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 font-medium" :class="cell">Vendor</th>
+                <th x-show="cols.plant" scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 font-medium" :class="cell">Plant</th>
+                <th x-show="cols.buyer" scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 font-medium" :class="cell">Buyer</th>
+                <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 text-right font-medium" :class="cell">Value</th>
+                <th x-show="cols.status" scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 font-medium" :class="cell">Status</th>
+                <th x-show="cols.due" scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 text-right font-medium" :class="cell">Promised</th>
+              </tr>
+            </thead>
+            <tbody class="[&amp;>tr:last-child>td]:border-b-0">
+              <template x-for="r in rows" :key="r.po">
+                <tr class="hover:bg-zinc-100">
+                  <td class="border-b border-zinc-100 font-medium whitespace-nowrap tabular-nums" :class="cell" x-text="r.po"></td>
+                  <td class="border-b border-zinc-100" :class="cell" x-text="r.vendor"></td>
+                  <td x-show="cols.plant" class="border-b border-zinc-100 text-zinc-600" :class="cell" x-text="r.plant"></td>
+                  <td x-show="cols.buyer" class="border-b border-zinc-100 text-zinc-600" :class="cell" x-text="r.buyer"></td>
+                  <td class="border-b border-zinc-100 text-right whitespace-nowrap tabular-nums" :class="cell" x-text="money(r.amount)"></td>
+                  <td x-show="cols.status" class="border-b border-zinc-100" :class="cell">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                      <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+                    </span>
+                  </td>
+                  <td x-show="cols.due" class="border-b border-zinc-100 text-right text-zinc-600 tabular-nums" :class="cell" x-text="r.due"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+
+        <ul class="divide-y divide-zinc-100 md:hidden">
+          <template x-for="r in rows" :key="r.po">
+            <li class="px-4 py-2.5">
+              <div class="flex items-baseline justify-between gap-3">
+                <span class="text-[14px]/5 font-medium tabular-nums" x-text="r.po"></span>
+                <span class="text-[14px]/5 tabular-nums" x-text="money(r.amount)"></span>
+              </div>
+              <p class="mt-0.5 text-[13px]/5 text-zinc-600" x-text="cols.plant ? r.vendor + ' · ' + r.plant : r.vendor"></p>
+            </li>
+          </template>
+        </ul>
+
+        <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+          <p role="status" class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="from + '–' + to + ' of ' + total.toLocaleString('en-IN') + ' orders'"></p>
+          <div class="flex items-center gap-2">
+            <span class="text-[13px]/5 text-zinc-600 tabular-nums md:hidden" x-text="'Page ' + page + ' of ' + pages"></span>
+            <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
+                    class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-left" class="size-4"></i>
+            </button>
+            <ul role="list" class="hidden items-center gap-1 md:flex">
+              <template x-for="s in slots" :key="s">
+                <li>
+                  <template x-if="typeof s === 'number'">
+                    <button type="button" @click="go(s)" :aria-label="'Page ' + s" :aria-current="s === page ? 'page' : false"
+                            class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                            :class="s === page ? 'bg-zinc-700 font-medium text-white' : 'hover:bg-zinc-100'"
+                            x-text="s"></button>
+                  </template>
+                  <template x-if="typeof s !== 'number'">
+                    <span aria-hidden="true" class="flex size-9 items-center justify-center text-[13px]/5 text-zinc-500">…</span>
+                  </template>
+                </li>
+              </template>
+            </ul>
+            <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
+                    class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-right" class="size-4"></i>
+            </button>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,95 @@
+<!-- Nothing found is three answers here and the wrong one costs a day.
+
+     A range that holds no entries is not a claim that nothing happened — it is
+     a claim about this query. So it says what the range was, offers to widen
+     it, and does not offer to clear the record scope, which the reader chose
+     deliberately.
+
+     A record with no history is a different fact and it is usually a true one:
+     the vendor was created by the migration in April 2024 and nobody has
+     touched it since. Saying "no entries match" there sends somebody hunting
+     for a filter that is not set. It names the creation event, because that is
+     the one thing that is known, and it says where the record came from.
+
+     A range the account may not query is the state most often mislabelled,
+     because row-level filtering really does return zero. Rendering it as an
+     empty range tells the auditor the entries do not exist when what is true is
+     that they do and this account cannot read them — and an auditor who
+     concludes the trail is empty writes that in the finding. It names the scope
+     that is closed, the retention boundary it collides with, and the person who
+     opens it, and it gives no count at all: a count is itself a disclosure.
+
+     None of the three offers a create button and none draws a disabled control.
+     There is nothing to create — an audit entry is written by something else
+     happening — and a disabled button is a dead tab stop that explains nothing.
+     empty-state’s shapes, unchanged. -->
+<div data-kui="audit-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+  <main class="mx-auto max-w-3xl space-y-4">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Audit trail · nothing to show</h1>
+
+    <section aria-labelledby="ad-em-a" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3">
+        <h2 id="ad-em-a" class="text-[14px]/5 font-semibold">Nothing in the range</h2>
+      </div>
+      <div class="flex min-h-56 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="calendar-x" class="size-5 text-zinc-600"></i>
+        </span>
+        <h3 class="mt-3 text-[16px]/6 font-semibold">No entries between 01 Jul and 31 Jul 2026</h3>
+        <p class="mt-1 max-w-sm text-[13px]/5 tabular-nums text-zinc-600">
+          PO-2026-0418 was raised on 02 Sep 2026, so nothing on it can fall in July. The trail holds 34 entries for this order, all of them in September.
+        </p>
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Widen to the whole life of the order
+          </button>
+          <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Back to the order</a>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="ad-em-b" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3">
+        <h2 id="ad-em-b" class="text-[14px]/5 font-semibold">A record with no history</h2>
+      </div>
+      <div class="flex min-h-56 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="history" class="size-5 text-zinc-600"></i>
+        </span>
+        <h3 class="mt-3 text-[16px]/6 font-semibold">Nothing has been changed on this vendor</h3>
+        <p class="mt-1 max-w-sm text-[13px]/5 tabular-nums text-zinc-600">
+          Gujarat Polymers Ltd was created on 14 Apr 2024 by the opening-balance migration and no field has been touched since. That is the whole trail — no filter is hiding anything.
+        </p>
+        <p class="mt-2 max-w-sm text-[12px]/4 tabular-nums text-zinc-500">
+          Records loaded by that migration carry no actor, because there was not one.
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="ad-em-c" class="rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-4 py-3">
+        <h2 id="ad-em-c" class="text-[14px]/5 font-semibold">A range this account may not query</h2>
+      </div>
+      <div class="flex min-h-56 flex-col items-center justify-center px-6 py-10 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="lock" class="size-5 text-zinc-600"></i>
+        </span>
+        <h3 class="mt-3 text-[16px]/6 font-semibold">You cannot query the trail before 01 Apr 2026</h3>
+        <p class="mt-1 max-w-sm text-[13px]/5 tabular-nums text-zinc-600">
+          Entries older than the current financial year are held in the archive, and your account reads FY 2026–27 only. There are entries in that period and no count is given for them.
+        </p>
+        <p class="mt-2 max-w-sm text-[13px]/5 text-zinc-600">
+          The archive is opened by Nilesh Patil, Head of Procurement, for a named period and a stated reason.
+        </p>
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <a href="mailto:nilesh.patil@konspec.com?subject=Audit%20archive%20access"
+             class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="mail" class="size-4 text-zinc-600"></i>Request the archive
+          </a>
+          <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Query FY 2026–27 instead</a>
+        </div>
+        <p class="mt-6 text-[11px]/4 text-zinc-500">Signed in as akshay.prabhu@konspec.com</p>
+      </div>
+    </section>
+  </main>
+</div>

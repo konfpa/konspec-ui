@@ -1,0 +1,151 @@
+<!-- Three densities of the same object, because what a card carries is whatever
+     the decision at that stage needs and nothing else.
+
+     On hold is where the decision is taken, so those cards are full: the batch,
+     the material, the quantity, the age of the hold, who raised it and the
+     exception that put it there. Re-inspect is a work list and keeps only the
+     identity and the age. Released is a record of what has been decided, so the
+     number is the whole card — a released batch is looked up, not read.
+
+     No status pill anywhere. The column is the status, and a pill repeating the
+     column header is the first thing to delete from a board card. The red
+     alert-circle is a different axis — a hold whose material is also blocking a
+     dispatch — and it is a mark and a sentence, never a field of colour.
+
+     The exception is written on the card rather than behind the move control,
+     because a reason somebody has to open something to read is a reason nobody
+     reads.
+
+     The Released cards keep the same 36px control even though they are one line
+     tall: a card that is cheap to read is not one that is cheap to move back. -->
+<main data-kui="board/card" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+
+  <div class="shrink-0 border-b border-zinc-300 bg-white px-4 py-3">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">QC holds</h1>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Vapi · 21 Aug 2026 · 6 batches</p>
+  </div>
+
+  <div class="flex min-h-0 flex-1 snap-x snap-mandatory gap-3 overflow-x-auto p-3">
+
+    <section aria-labelledby="cd-h-hold" class="relative flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+        <h2 id="cd-h-hold" class="text-[13px]/5 font-medium">On hold</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">2 · 14.6 MT</p>
+      </div>
+      <ul role="list" class="min-h-0 flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-2">
+        <li class="rounded-lg border border-zinc-200 bg-white p-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <a href="#" class="text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4821</a>
+              <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">HDPE granules, grade M60075</p>
+            </div>
+            <button type="button" aria-label="Move MS-4821, now in On hold"
+                    class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="arrow-right-left" class="size-4"></i>
+            </button>
+          </div>
+          <div class="mt-2 flex items-center justify-between gap-2">
+            <span class="text-[13px]/5 font-medium tabular-nums">9.4 MT</span>
+            <span class="flex shrink-0 items-center gap-1.5">
+              <span class="text-[12px]/4 tabular-nums text-zinc-500">3d here</span>
+              <span aria-hidden="true" class="flex size-5 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">RD</span>
+              <span class="sr-only">Raised by Ritu Deshpande</span>
+            </span>
+          </div>
+          <p class="mt-2 flex items-start gap-1.5 border-t border-zinc-100 pt-2 text-[12px]/4 text-zinc-600">
+            <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0 text-red-600"></i>
+            <span class="tabular-nums">MFI 0.42 against a spec of 0.30–0.38. Blocks dispatch DSP-2026-1180.</span>
+          </p>
+        </li>
+        <li class="rounded-lg border border-zinc-200 bg-white p-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <a href="#" class="text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4827</a>
+              <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">PP copolymer, grade 3120MA</p>
+            </div>
+            <button type="button" aria-label="Move MS-4827, now in On hold"
+                    class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="arrow-right-left" class="size-4"></i>
+            </button>
+          </div>
+          <div class="mt-2 flex items-center justify-between gap-2">
+            <span class="text-[13px]/5 font-medium tabular-nums">5.2 MT</span>
+            <span class="flex shrink-0 items-center gap-1.5">
+              <span class="text-[12px]/4 tabular-nums text-zinc-500">1d here</span>
+              <span aria-hidden="true" class="flex size-5 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">NP</span>
+              <span class="sr-only">Raised by Nilesh Patil</span>
+            </span>
+          </div>
+          <p class="mt-2 flex items-start gap-1.5 border-t border-zinc-100 pt-2 text-[12px]/4 text-zinc-600">
+            <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0 text-red-600"></i>
+            <span>Colour drift against the retained sample. Second opinion asked of the lab.</span>
+          </p>
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="cd-h-re" class="relative flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+        <h2 id="cd-h-re" class="text-[13px]/5 font-medium">Re-inspect</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">2 · 7.8 MT</p>
+      </div>
+      <ul role="list" class="min-h-0 flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-2">
+        <li class="rounded-lg border border-zinc-200 bg-white p-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <a href="#" class="text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4814</a>
+              <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">LDPE granules, grade 24FS040</p>
+            </div>
+            <button type="button" aria-label="Move MS-4814, now in Re-inspect"
+                    class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="arrow-right-left" class="size-4"></i>
+            </button>
+          </div>
+          <div class="mt-2 flex items-center justify-between gap-2">
+            <span class="text-[13px]/5 font-medium tabular-nums">4.1 MT</span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-500">since 06:40</span>
+          </div>
+        </li>
+        <li class="rounded-lg border border-zinc-200 bg-white p-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <a href="#" class="text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4819</a>
+              <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600">HDPE granules, grade M60075</p>
+            </div>
+            <button type="button" aria-label="Move MS-4819, now in Re-inspect"
+                    class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="arrow-right-left" class="size-4"></i>
+            </button>
+          </div>
+          <div class="mt-2 flex items-center justify-between gap-2">
+            <span class="text-[13px]/5 font-medium tabular-nums">3.7 MT</span>
+            <span class="text-[12px]/4 tabular-nums text-zinc-500">since 09:15</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="cd-h-rel" class="relative flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex shrink-0 items-baseline justify-between gap-2 border-b border-zinc-200 px-3 py-2.5">
+        <h2 id="cd-h-rel" class="text-[13px]/5 font-medium">Released today</h2>
+        <p class="text-[12px]/4 tabular-nums text-zinc-500">2 · 21.0 MT</p>
+      </div>
+      <ul role="list" class="min-h-0 flex-1 space-y-2 overflow-y-auto bg-zinc-50 p-2">
+        <li class="flex items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white p-2.5">
+          <a href="#" class="truncate text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4808</a>
+          <button type="button" aria-label="Move MS-4808, now in Released today"
+                  class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="arrow-right-left" class="size-4"></i>
+          </button>
+        </li>
+        <li class="flex items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white p-2.5">
+          <a href="#" class="truncate text-[13px]/5 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MS-4811</a>
+          <button type="button" aria-label="Move MS-4811, now in Released today"
+                  class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="arrow-right-left" class="size-4"></i>
+          </button>
+        </li>
+      </ul>
+    </section>
+  </div>
+</main>

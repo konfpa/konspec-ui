@@ -1,0 +1,144 @@
+<!-- The state the component exists for. Nobody complains about a search that
+     works, and every search that fails fails in one of two ways that must not
+     look the same: there is no such record, or there is a record and this
+     account may not read the register it is in.
+
+     Say what was searched. "No results" leaves somebody retyping the same
+     string; naming the five registers and the four fields makes the second
+     attempt land, and it stops the conscientious ones raising a request to have
+     an item created that was there all along under a description this search
+     never looked at.
+
+     The looser query is offered with its real count and is never run silently.
+     Somebody typed a space where the document number has a hyphen — which
+     happens all day, because half the printed paperwork writes it both ways —
+     so the page ran the loosened query, found 303, and put that on a button
+     naming the query it will run. Substituting it quietly would give a result
+     count nobody can reproduce, and the user could not tell whether the rows in
+     front of them are the ones they asked for.
+
+     There is no create button here and there must never be one, in any state of
+     this page. That is empty-state's rule about a filtered register and it is
+     sharper on a search: the whole premise is that the record might exist, so
+     New order under "nothing matched" is the shortest route to raising the same
+     order twice, and the duplicate surfaces at three-way match a fortnight
+     later.
+
+     The permission half is the recessed band underneath, and it is separate
+     from the empty state on purpose — it is true of this query and of every
+     other one this account runs, so it does not belong inside a block about
+     this particular string. It names the registers and the person who opens
+     them, a name and a role rather than "your administrator".
+
+     It does not say how many hidden records matched, and that is deliberate.
+     Naming a closed register is a fact about the account; naming the number of
+     rows inside it is a fact about the data, and a search box that answers
+     "MS 4821 matched 3 records you may not see" is an oracle anybody can query
+     one string at a time until they have mapped the ledger.
+
+     The two fallback rows are the searches this page cannot run itself — the
+     item master's descriptions and the register's own full-text filter — and
+     they carry the query in their own labels, so each says what it will do with
+     the words already typed. -->
+<div data-kui="search-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ q: 'MS 4821' }">
+
+  <main>
+    <header class="border-b border-zinc-200 bg-white">
+      <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
+
+        <form role="search" @submit.prevent class="max-w-2xl">
+          <label for="sp-em-q" class="sr-only">Search orders, receipts, invoices, items and vendors</label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <i data-lucide="search" aria-hidden="true" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+            <input id="sp-em-q" x-ref="q" x-model="q" type="search" enterkeyhint="search"
+                   autocomplete="off" spellcheck="false" autocapitalize="none"
+                   @keydown.escape="if (q) { $event.stopPropagation(); q = '' }"
+                   placeholder="Order number, item code, GRN, vendor"
+                   class="w-full min-w-0 bg-transparent px-2 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500 [&amp;::-webkit-search-cancel-button]:appearance-none">
+            <button type="button" x-show="q" x-cloak @click="q = ''; $refs.q.focus()" aria-label="Clear the search"
+                    class="mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+              <i data-lucide="x" aria-hidden="true" class="size-4"></i>
+            </button>
+          </div>
+        </form>
+
+        <h1 class="mt-4 text-[24px]/7 font-semibold tracking-tight">Results for “MS 4821”</h1>
+        <p role="status" class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">No results in 5 registers</p>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[1600px] space-y-4 px-4 py-5 lg:px-6">
+
+      <div class="rounded-xl border border-zinc-300 bg-white">
+        <div class="flex min-h-72 flex-col items-center justify-center px-6 py-12 text-center">
+          <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="search-x" aria-hidden="true" class="size-5 text-zinc-600"></i>
+          </span>
+          <h2 class="mt-3 text-[16px]/6 font-semibold">Nothing matches “MS 4821”</h2>
+          <p class="mt-1 max-w-md text-[13px]/5 tabular-nums text-zinc-600">
+            Purchase orders, goods receipts, vendor invoices, items and vendors were searched by document number, item code, vendor name and GSTIN. Line descriptions, notes and attachments are not searched.
+          </p>
+
+          <!-- the looser query, with the count it would actually return. Run it
+               silently instead and nobody can reproduce the number on screen -->
+          <p class="mt-4 max-w-md text-[13px]/5 tabular-nums text-zinc-600">
+            Ignoring the space, <span class="font-medium text-zinc-900">MS-4821</span> matches <span class="font-medium text-zinc-900">303</span> records.
+          </p>
+          <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <button type="button" @click="q = 'MS-4821'; $refs.q.focus()"
+                    class="inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="corner-down-left" class="size-4 text-zinc-600" aria-hidden="true"></i>Search for “MS-4821” instead
+            </button>
+            <button type="button" @click="q = ''; $refs.q.focus()" class="rounded text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Start a different search
+            </button>
+          </div>
+        </div>
+
+        <!-- the searches this page cannot run itself, carrying the query in
+             their own labels so each says what it will do with it -->
+        <ul role="list" class="divide-y divide-zinc-100 border-t border-zinc-200">
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="box" class="size-4"></i></span>
+            <div class="min-w-0 flex-1">
+              <a href="#" class="text-[13px]/5 font-medium underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Search the item master for “MS 4821”</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">9,412 items by description, HSN code and specification — the fields this search does not read.</p>
+            </div>
+            <span class="mt-0.5 flex h-5 shrink-0 items-center text-zinc-500" aria-hidden="true"><i data-lucide="arrow-right" class="size-4"></i></span>
+          </li>
+          <li class="relative flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+            <span class="flex h-5 shrink-0 items-center text-zinc-600" aria-hidden="true"><i data-lucide="list-filter" class="size-4"></i></span>
+            <div class="min-w-0 flex-1">
+              <a href="#" class="text-[13px]/5 font-medium underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Filter the purchase order register for “MS 4821”</a>
+              <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">1,438 orders including their line items, terms and internal notes.</p>
+            </div>
+            <span class="mt-0.5 flex h-5 shrink-0 items-center text-zinc-500" aria-hidden="true"><i data-lucide="arrow-right" class="size-4"></i></span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- true of every query this account runs, not of this string, so it sits
+           outside the block about this string. No count of what is behind it -->
+      <div class="rounded-xl border border-zinc-300 bg-white">
+        <div class="flex items-start gap-3 rounded-xl bg-zinc-50 px-4 py-3.5">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="lock" aria-hidden="true" class="size-4 text-zinc-600"></i>
+          </span>
+          <div class="min-w-0 flex-1">
+            <h2 class="text-[13px]/5 font-medium">Two registers were not searched</h2>
+            <p class="mt-0.5 text-[13px]/5 text-zinc-600">
+              Vendor ledger and Payments are outside what your account reads, so nothing in them is searched and nothing about them is counted. Access is granted by Nilesh Patil, Head of Procurement.
+            </p>
+            <div class="mt-2 flex flex-wrap items-center gap-3">
+              <a href="mailto:nilesh.patil@konspec.com?subject=Access%20to%20Vendor%20ledger%20and%20Payments"
+                 class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Request access</a>
+              <span class="text-[11px]/4 tabular-nums text-zinc-500">Signed in as akshay.prabhu@konspec.com · Buyer, Silvassa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

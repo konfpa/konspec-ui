@@ -1,0 +1,224 @@
+<!-- The state is a queryset, not a browser. A checklist kept in local storage
+     tells the second person that nothing has been done and the first that it
+     has, and neither of them finds out — which is the whole reason this screen
+     exists on a server at all. Every figure on the page is recomputed from the
+     task rows on each render, so two people on two machines are reading the
+     same thing.
+
+     Five branches per row, because there are five states and one of them is
+     not "not done". Done, blocked by another task, waiting on a person,
+     skipped, not started — and the skipped branch prints who and why, since a
+     skip with no sentence beside it is indistinguishable from an oversight
+     three months later.
+
+     The row is a flex container and not one big anchor. A form inside an anchor
+     is invalid and browsers repair it by moving the form out, so the moment a
+     row carries a Mark done button the title becomes the link and the form sits
+     beside it. Rows with no button stay whole anchors elsewhere in this entry.
+
+     Mark done only appears where the server cannot detect completion. Item
+     masters is done when the item table is not empty and its row carries no
+     button at all — a manual tick over a fact the database already holds goes
+     stale the first time somebody empties it.
+
+     The progress width is an inline style and has to be. Tailwind compiles its
+     stylesheet out of the literal strings in the source, so a class built
+     around a template variable scans as a token nobody wrote a rule for and the
+     fill comes back zero wide — an empty rail rather than an error, which is
+     why it ships.
+
+     Use Django's block comment tag rather than the hash form for anything over
+     one line. The hash form is single-line: tag_re has no DOTALL, so the first
+     line disappears and every line after it renders onto the page, tags and
+     all.
+
+     The humanize load is in this file because naturaltime and intcomma are used
+     in this file. A load in the base template does not carry into an include. -->
+{% load humanize %}
+<div data-kui="onboarding-page/django" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Set up {{ company.short_name }}</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+        {{ company.registered_name }} · {{ company.plant_names|join:" and " }} · FY {{ company.financial_year }} · go live {{ setup.go_live_on|date:"d M Y" }}
+      </p>
+    </div>
+
+    <div class="mt-5 rounded-xl border border-zinc-300 bg-white p-4">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h2 id="dj-progress" class="text-[16px]/6 font-semibold tabular-nums">
+          {{ progress.done }} of {{ progress.counted }} tasks done
+        </h2>
+        <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600">
+          {{ progress.left }} left · {{ progress.pct }}%
+        </p>
+      </div>
+
+      <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="dj-progress"
+           aria-valuenow="{{ progress.done }}" aria-valuemin="0" aria-valuemax="{{ progress.counted }}"
+           aria-valuetext="{{ progress.done }} of {{ progress.counted }} counted tasks done. {{ progress.skipped }} more were skipped and are not counted.">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: {{ progress.pct }}%"></div>
+      </div>
+
+      <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">
+        {{ progress.total }} tasks in all · {{ progress.skipped }} skipped and not counted here
+      </p>
+
+      {% comment %}
+        Three readings and never one total. Typing time and waiting time do not
+        add up to anything anybody can plan against, so the view hands over
+        three separate buckets and the template does no arithmetic of its own.
+      {% endcomment %}
+      <dl class="mt-3 grid gap-3 border-t border-zinc-100 pt-3 text-[13px]/5 sm:grid-cols-3">
+        <div>
+          <dt class="text-zinc-600">You can start now</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">{{ buckets.startable|length }} tasks · about {{ buckets.startable_minutes|intcomma }} minutes</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">Waiting on a person</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">{{ buckets.waiting|length }} tasks</dd>
+        </div>
+        <div>
+          <dt class="text-zinc-600">Waiting on another task</dt>
+          <dd class="mt-0.5 font-medium tabular-nums">{{ buckets.blocked|length }} tasks · they clear on their own</dd>
+        </div>
+      </dl>
+
+      {% if next_task %}
+        <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-3">
+          <p class="min-w-0 flex-1 text-[13px]/5 tabular-nums">
+            Next:
+            <a href="{% url 'onboarding:task' next_task.slug %}" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ next_task.label }}</a>
+            — {{ next_task.summary }}
+          </p>
+          <a href="{{ next_task.opens_url }}" class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+            {{ next_task.cta }}<i data-lucide="arrow-up-right" class="size-4" aria-hidden="true"></i>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="mt-4 space-y-4">
+      {% for group in groups %}
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+            <div class="min-w-0">
+              <h2 class="text-[16px]/6 font-semibold">{{ group.label }}</h2>
+              <p class="mt-0.5 text-[13px]/5 text-zinc-600">{{ group.blurb }}</p>
+            </div>
+            <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">
+              {{ group.done_count }} of {{ group.counted_count }} done{% if group.skipped_count %} · {{ group.skipped_count }} skipped{% endif %}
+            </p>
+          </div>
+
+          <ul role="list" class="divide-y divide-zinc-100">
+            {% for task in group.tasks %}
+              <li class="hover:bg-zinc-100">
+                <div class="flex items-start gap-3 px-4 py-3">
+                  {% if task.state == 'done' %}
+                    <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden="true"></i>
+                  {% elif task.state == 'blocked' %}
+                    <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500" aria-hidden="true"></i>
+                  {% elif task.state == 'waiting' %}
+                    <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+                  {% elif task.state == 'skipped' %}
+                    <i data-lucide="minus-circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+                  {% else %}
+                    <i data-lucide="circle" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+                  {% endif %}
+
+                  <div class="min-w-0 flex-1">
+                    <p class="text-[13px]/5 font-medium{% if task.state == 'skipped' %} text-zinc-600{% endif %}">
+                      <span class="sr-only">{{ task.get_state_display }} — </span>
+                      <a href="{% url 'onboarding:task' task.slug %}" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ task.label }}</a>
+                    </p>
+
+                    {% if task.state == 'done' %}
+                      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+                        {{ task.completed_by.get_full_name }} · {{ task.completed_at|naturaltime }}{% if task.result %} · {{ task.result }}{% endif %}
+                      </p>
+                    {% elif task.state == 'waiting' %}
+                      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+                        {{ task.owner.get_full_name }} · asked {{ task.asked_at|naturaltime }}
+                      </p>
+                    {% elif task.state == 'skipped' %}
+                      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+                        Skipped by {{ task.skipped_by.get_full_name }} · {{ task.skipped_at|naturaltime }}
+                      </p>
+                    {% else %}
+                      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+                        {% if task.owner %}{{ task.owner.get_full_name }}{% else %}Nobody owns this one{% endif %}{% if task.row_count %} · {{ task.row_count|intcomma }} rows to import{% endif %}
+                      </p>
+                    {% endif %}
+                  </div>
+
+                  {% if task.state == 'todo' and task.completes_manually %}
+                    {% comment %}
+                      A form cannot live inside an anchor, so the row is a flex
+                      container with the title as the link and this beside it.
+                      Tasks the server can detect — the item import posting, the
+                      first stock entry — carry no button at all, because a
+                      manual tick over a fact in the database goes stale.
+                    {% endcomment %}
+                    <form method="post" action="{% url 'onboarding:complete' task.slug %}" class="shrink-0">
+                      {% csrf_token %}
+                      <button type="submit"
+                              class="inline-flex h-8 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                        <i data-lucide="check" class="size-3.5" aria-hidden="true"></i>Mark {{ task.label }} done
+                      </button>
+                    </form>
+                  {% elif task.estimate_label %}
+                    <p class="mt-0.5 shrink-0 text-[12px]/4 tabular-nums text-zinc-500">{{ task.estimate_label }}</p>
+                  {% endif %}
+                </div>
+
+                {% if task.state == 'blocked' %}
+                  <p class="px-4 pb-3 pl-11 text-[12px]/4 tabular-nums text-zinc-600">
+                    Waiting for
+                    {% for dep in task.blocked_by %}
+                      <a href="{% url 'onboarding:task' dep.slug %}" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ dep.label }}</a>{% if not forloop.last %} and {% endif %}
+                    {% endfor %}
+                    {% if task.stranded %}
+                      — which was skipped {{ task.blocked_by.0.skipped_at|naturaltime }}. A skipped task never finishes, so this one will not clear on its own.
+                    {% else %}
+                      . This clears itself as soon as that is done.
+                    {% endif %}
+                  </p>
+                {% elif task.state == 'waiting' %}
+                  <p class="px-4 pb-3 pl-11 text-[12px]/4 tabular-nums text-zinc-600">
+                    Waiting on {{ task.waiting_on.get_full_name }} — {{ task.waiting_note }}
+                  </p>
+                {% elif task.state == 'skipped' %}
+                  <p class="px-4 pb-3 pl-11 text-[12px]/4 text-zinc-600">
+                    &ldquo;{{ task.skip_reason }}&rdquo;
+                    {% if task.strands %} One task is waiting on this one and will stay waiting.{% endif %}
+                  </p>
+                {% endif %}
+              </li>
+            {% empty %}
+              <li class="px-4 py-8 text-center text-[13px]/5 text-zinc-600">
+                Nothing in this group applies to {{ company.short_name }}.
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% empty %}
+        <div class="rounded-xl border border-zinc-300 bg-white px-6 py-12 text-center">
+          <span class="inline-flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="check-circle-2" class="size-5 text-emerald-600" aria-hidden="true"></i>
+          </span>
+          <h2 class="mt-3 text-[16px]/6 font-semibold">Setup is done</h2>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+            Finished {{ setup.completed_at|naturaltime }}. This page leaves the navigation on {{ setup.retires_on|date:"d M Y" }} and the address keeps working after that.
+          </p>
+          <a href="{% url 'settings:index' %}" class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+            Open Settings<i data-lucide="arrow-up-right" class="size-4" aria-hidden="true"></i>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </main>
+</div>

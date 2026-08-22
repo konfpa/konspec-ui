@@ -1,0 +1,167 @@
+<!-- Three role columns is the ceiling, and that rule belongs to checkbox, not
+     to this page. Every role column costs the width of its heading and the
+     permission column is what pays for it; past three or four the row label
+     wraps to four lines at 390px and the matrix stops being readable exactly
+     where it is hardest to read.
+
+     So six roles is not six columns and it is not a sideways scroll. It is two
+     matrices split by module, stacked down the pane, which is the arrangement
+     the settings page has the room for and a card on a record page does not.
+     That is this layout's contribution here: the shape of the section, not the
+     shape of the table.
+
+     What it is not is a second copy of the matrix restacked into cards below
+     md. Two renderings of one checkbox is two inputs for one permission, and
+     after a save the hidden one is wrong — the same defect toggle warns about
+     for a register of switches. The boxes are rendered once and the table
+     tightens its padding instead.
+
+     Every box carries an aria-label naming both axes. Row and column headers
+     are announced when a screen reader walks a table and not when somebody tabs
+     through the controls inside one, which is exactly how this screen is used,
+     so without it twenty-four boxes announce as "checkbox".
+
+     There is no row tint and no has-[:checked] on the tr. A matrix row holds
+     three separate answers; painting the row from one of them says the whole
+     row is on. The hover band is the only thing tracking the eye across.
+
+     A matrix saves, it does not write on change. Twenty-four boxes each posting
+     on change is twenty-four requests nobody can reconcile and no record of
+     what the state was before. -->
+<div data-kui="settings-page/roles" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+
+  <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <h1 class="text-[24px]/7 font-semibold tracking-tight">Settings</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Konspec Industries Pvt Ltd · Silvassa and Vapi · FY 2026–27</p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:items-start lg:gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+
+      <nav aria-label="Settings sections" class="lg:sticky lg:top-6 lg:self-start">
+        <ul role="list" class="space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Company profile</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approval limits</a></li>
+          <li><a href="#" aria-current="page" class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Users and roles</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sign-in and sessions</a></li>
+          <li><a href="#" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Master lists</a></li>
+        </ul>
+      </nav>
+
+      <section id="rl-pane" tabindex="-1" aria-labelledby="rl-h"
+               class="mt-4 min-w-0 rounded-xl focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15 lg:mt-0">
+
+        <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+          <div class="border-b border-zinc-200 px-5 py-3.5">
+            <h2 id="rl-h" class="text-[16px]/6 font-semibold">Users and roles</h2>
+            <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">6 roles · 41 users. A user carries one role per plant, and the role carries the permissions.</p>
+          </div>
+
+          <form>
+            <div class="px-5 py-4">
+              <h3 class="text-[13px]/5 font-semibold">Purchase orders</h3>
+              <p class="mt-0.5 text-[12px]/4 text-zinc-500">Buyer, Approver and Stores. Finance, Quality and Plant head are the second matrix below.</p>
+            </div>
+
+            <table class="w-full text-[13px]/5">
+              <caption class="sr-only">What each role may do with purchase orders</caption>
+              <thead>
+                <tr class="border-y border-zinc-200 bg-zinc-50 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">
+                  <th scope="col" class="px-3 py-2.5 text-left font-medium sm:px-5">Permission</th>
+                  <th scope="col" class="px-2 py-2.5 font-medium">Buyer</th>
+                  <th scope="col" class="px-2 py-2.5 font-medium">Approver</th>
+                  <th scope="col" class="px-2 py-2.5 font-medium">Stores</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                  <th scope="row" class="px-3 py-2.5 text-left font-normal text-zinc-600 sm:px-5">View the register</th>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Buyer" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Approver" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the register — Stores" class="size-4 accent-zinc-700"></td>
+                </tr>
+                <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                  <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-5">Raise an order</th>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_raise:buyer" checked aria-label="Raise an order — Buyer" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_raise:approver" aria-label="Raise an order — Approver" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_raise:stores" aria-label="Raise an order — Stores" class="size-4 accent-zinc-700"></td>
+                </tr>
+                <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                  <th scope="row" class="px-3 py-2.5 text-left font-normal tabular-nums sm:px-5">Approve to ₹7,50,000</th>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_approve_750:buyer" aria-label="Approve to ₹7,50,000 — Buyer" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_approve_750:approver" checked aria-label="Approve to ₹7,50,000 — Approver" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_approve_750:stores" aria-label="Approve to ₹7,50,000 — Stores" class="size-4 accent-zinc-700"></td>
+                </tr>
+                <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                  <th scope="row" class="px-3 py-2.5 text-left font-normal tabular-nums sm:px-5">Approve over ₹7,50,000</th>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_approve_over:buyer" aria-label="Approve over ₹7,50,000 — Buyer" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_approve_over:approver" aria-label="Approve over ₹7,50,000 — Approver" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_approve_over:stores" aria-label="Approve over ₹7,50,000 — Stores" class="size-4 accent-zinc-700"></td>
+                </tr>
+                <tr class="hover:bg-zinc-100">
+                  <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-5">Amend an approved order</th>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_amend:buyer" checked aria-label="Amend an approved order — Buyer" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_amend:approver" checked aria-label="Amend an approved order — Approver" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po_amend:stores" aria-label="Amend an approved order — Stores" class="size-4 accent-zinc-700"></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="border-t border-zinc-100 px-5 py-4">
+              <h3 class="text-[13px]/5 font-semibold">Goods receipt and quality</h3>
+              <p class="mt-0.5 text-[12px]/4 text-zinc-500">A second matrix rather than three more columns on the first one.</p>
+            </div>
+
+            <table class="w-full text-[13px]/5">
+              <caption class="sr-only">What each role may do with goods receipts</caption>
+              <thead>
+                <tr class="border-y border-zinc-200 bg-zinc-50 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">
+                  <th scope="col" class="px-3 py-2.5 text-left font-medium sm:px-5">Permission</th>
+                  <th scope="col" class="px-2 py-2.5 font-medium">Stores</th>
+                  <th scope="col" class="px-2 py-2.5 font-medium">Quality</th>
+                  <th scope="col" class="px-2 py-2.5 font-medium">Finance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                  <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-5">Post a GRN</th>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn_post:stores" checked aria-label="Post a GRN — Stores" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn_post:quality" aria-label="Post a GRN — Quality" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn_post:finance" aria-label="Post a GRN — Finance" class="size-4 accent-zinc-700"></td>
+                </tr>
+                <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                  <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-5">Accept a short receipt</th>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn_short:stores" aria-label="Accept a short receipt — Stores" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn_short:quality" checked aria-label="Accept a short receipt — Quality" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn_short:finance" checked aria-label="Accept a short receipt — Finance" class="size-4 accent-zinc-700"></td>
+                </tr>
+                <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+                  <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-5">Release a quality hold</th>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc_release:stores" aria-label="Release a quality hold — Stores" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc_release:quality" checked aria-label="Release a quality hold — Quality" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc_release:finance" aria-label="Release a quality hold — Finance" class="size-4 accent-zinc-700"></td>
+                </tr>
+                <tr class="hover:bg-zinc-100">
+                  <th scope="row" class="px-3 py-2.5 text-left font-normal sm:px-5">Pass an invoice for payment</th>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="inv_pass:stores" aria-label="Pass an invoice for payment — Stores" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="inv_pass:quality" aria-label="Pass an invoice for payment — Quality" class="size-4 accent-zinc-700"></td>
+                  <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="inv_pass:finance" checked aria-label="Pass an invoice for payment — Finance" class="size-4 accent-zinc-700"></td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <p role="status" class="text-[12px]/4 tabular-nums text-zinc-600">Last changed 28 Jul 2026, 15:07 by Anil Kulkarni · 41 users affected</p>
+            <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              <button type="button" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200">Discard</button>
+              <button type="submit" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save permissions</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,140 @@
+<!-- Twelve lines and six vendors, which is the size at which a comparison
+     stops fitting on a screen and starts needing this. Three planes stick in
+     one scroller and the cost of that is the whole variant.
+
+     border-separate border-spacing-0 first. Preflight sets border-collapse:
+     collapse, and a collapsed border belongs to the table rather than to the
+     cell, so it stays behind when the cell travels: the head floats over the
+     rows with nothing under it and the frozen column slides across the figures
+     with no edge to stop at. Separated borders fix both, and the price is that
+     every rule moves onto the cells — 72 <td>s carrying border-b instead of 12
+     <tr>s carrying it once.
+
+     Every sticky cell needs an opaque fill or the content scrolls straight
+     through it. Because the fill is opaque it also stops taking the row's
+     hover, so the tint is put back on the frozen cell with group-hover;
+     without that, hovering a row lights up six columns and leaves the seventh
+     white, which reads as the row ending where the label starts.
+
+     Two corners, not none. The top-left cell is sticky on both axes, and once
+     the foot sticks the bottom-left cell is too. Both take z-20 against z-10
+     on the head, the frozen column and the foot, or they are painted over from
+     one side or the other. This is where a two-axis sticky ships broken: a
+     reviewer scrolls one axis at a time and both corners look perfect until
+     somebody scrolls right and down together.
+
+     The scroller is the div, never the table, and it takes tabindex="0" with a
+     name. An overflow container is not focusable in Chromium, so without the
+     tabindex a keyboard user can reach every control on this page and cannot
+     move the matrix one pixel.
+
+     The matrix keeps this box at every width rather than disappearing below
+     md, and it is the one region in this system allowed to scroll sideways.
+     Frozen, the line names stay readable while the vendors are panned, which is
+     the only thing that makes a narrow window usable at all — but a real phone
+     gets a different arrangement rather than a smaller grid, and that is what
+     the phone variant is. -->
+<div data-kui="compare-page/sticky" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{
+       vendors: [
+         { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', quote: 'QT-4417' },
+         { id: 'v-0219', name: 'Deccan Fasteners Pvt Ltd', quote: 'QT-4419' },
+         { id: 'v-0361', name: 'Nashik Steel Traders', quote: 'QT-4421' },
+         { id: 'v-0407', name: 'Qureshi Metals', quote: 'QT-4424' },
+         { id: 'v-0503', name: 'Baroda Fasteners Pvt Ltd', quote: 'QT-4426' },
+         { id: 'v-0466', name: 'Konkan Fabricators', quote: 'QT-4429' }
+       ],
+       lines: [
+         { code: 'ITM-7702', name: 'MS angle — 50×50×5', qty: 12000, uom: 'kg', rates: [62.40, 63.10, 61.80, 64.00, 62.90, 63.40] },
+         { code: 'ITM-7715', name: 'MS plate — 6 mm', qty: 4500, uom: 'kg', rates: [68.50, 69.20, 70.10, 67.90, 68.80, 69.90] },
+         { code: 'ITM-3310', name: 'M12×60 hex bolt — 8.8 zinc', qty: 8000, uom: 'nos', rates: [24.60, 23.80, 25.10, 24.20, 23.95, 24.80] },
+         { code: 'ITM-3318', name: 'M12 hex nut — 8.8 zinc', qty: 8000, uom: 'nos', rates: [9.40, 8.95, 9.60, 9.10, 9.05, 9.35] },
+         { code: 'ITM-4120', name: 'Welding electrode — 3.15 mm', qty: 400, uom: 'kg', rates: [148.00, 152.00, 145.50, 149.00, 150.50, 147.20] },
+         { code: 'ITM-7728', name: 'MS flat — 40×6', qty: 2600, uom: 'kg', rates: [66.20, 67.00, 65.90, 68.40, 66.80, 67.30] },
+         { code: 'ITM-7731', name: 'MS channel — 100×50', qty: 3200, uom: 'kg', rates: [64.80, 65.40, 64.20, 66.10, 65.00, 65.75] },
+         { code: 'ITM-3342', name: 'M16×75 hex bolt — 8.8 zinc', qty: 2400, uom: 'nos', rates: [46.20, 44.90, 47.10, 45.60, 45.10, 46.80] },
+         { code: 'ITM-4128', name: 'Welding electrode — 4.00 mm', qty: 250, uom: 'kg', rates: [151.00, 155.50, 148.90, 152.40, 153.20, 150.10] },
+         { code: 'ITM-7744', name: 'MS round bar — 20 mm', qty: 1800, uom: 'kg', rates: [67.40, 68.10, 66.80, 69.20, 67.90, 68.60] },
+         { code: 'ITM-3355', name: 'Spring washer — M12', qty: 8000, uom: 'nos', rates: [2.85, 2.60, 2.95, 2.75, 2.70, 2.90] },
+         { code: 'ITM-5140', name: 'Stretch film — 23 micron', qty: 300, uom: 'kg', rates: [176.00, 181.00, 174.50, 179.00, 178.20, 175.60] }
+       ],
+       money(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       rate(n) { return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+       qty(l) { return l.qty.toLocaleString('en-IN') + ' ' + l.uom },
+       total(i) { return this.lines.reduce((s, l) => s + l.qty * l.rates[i], 0) }
+     }">
+
+  <main class="mx-auto max-w-7xl p-4 pb-6 lg:p-6">
+
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
+        <a href="#" class="hover:text-zinc-900">Procurement</a>
+        <span class="text-zinc-500">/</span>
+        <a href="#" class="hover:text-zinc-900">Enquiries</a>
+        <span class="text-zinc-500">/</span>
+        <span class="font-medium tabular-nums text-zinc-900">ENQ-2026-0121</span>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Comparative statement</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">ENQ-2026-0121 · structural steel and fasteners · 12 lines · 6 quotations · Silvassa</p>
+    </div>
+
+    <div class="mt-4 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="border-b border-zinc-200 px-5 py-3.5">
+        <h2 id="cs-rates-h" class="text-[16px]/6 font-semibold">Rates quoted</h2>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Six vendors is the width this table is built for. A seventh is a vendor to drop, not a narrower column.</p>
+      </div>
+
+      <div role="region" aria-labelledby="cs-rates-h" tabindex="0"
+           class="relative max-h-[26rem] overflow-auto overscroll-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <table class="w-full min-w-[82rem] table-fixed border-separate border-spacing-0 text-[13px]/5">
+          <caption class="sr-only">Rates quoted by six vendors against the twelve lines of enquiry ENQ-2026-0121. Line items down the rows, vendors across the columns, and the totals in the last two rows.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="sticky top-0 left-0 z-20 w-64 border-r border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Line item</th>
+              <template x-for="v in vendors" :key="v.id">
+                <th scope="col" class="sticky top-0 z-10 w-44 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right align-bottom">
+                  <span class="block text-[13px]/5 font-semibold text-zinc-900" x-text="v.name"></span>
+                  <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500" x-text="v.quote"></span>
+                </th>
+              </template>
+            </tr>
+          </thead>
+          <tbody class="[&>tr:last-child>th]:border-b-0 [&>tr:last-child>td]:border-b-0">
+            <template x-for="l in lines" :key="l.code">
+              <tr class="group hover:bg-zinc-100">
+                <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left align-top font-normal group-hover:bg-zinc-100">
+                  <span class="block font-medium" x-text="l.name"></span>
+                  <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code + ' · ' + qty(l)"></span>
+                </th>
+                <template x-for="(v, i) in vendors" :key="v.id">
+                  <td class="border-b border-zinc-100 px-4 py-2.5 text-right align-top">
+                    <span class="block tabular-nums whitespace-nowrap" x-text="rate(l.rates[i])"></span>
+                    <span class="mt-0.5 block text-[12px]/4 tabular-nums whitespace-nowrap text-zinc-500" x-text="money(l.qty * l.rates[i])"></span>
+                  </td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" class="sticky bottom-0 left-0 z-20 border-t border-r border-zinc-200 bg-zinc-50 px-4 py-3 text-left text-[12px]/4 font-medium text-zinc-600">
+                Total of these 12 lines
+                <span class="mt-0.5 block font-normal text-zinc-500">Exclusive of GST and freight</span>
+              </th>
+              <template x-for="(v, i) in vendors" :key="v.id">
+                <td class="sticky bottom-0 z-10 border-t border-zinc-200 bg-zinc-50 px-4 py-3 text-right align-top">
+                  <span class="block text-[14px]/5 font-semibold tabular-nums whitespace-nowrap" x-text="money(total(i))"></span>
+                  <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">12 of 12 lines</span>
+                </td>
+              </template>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p class="border-t border-zinc-200 px-5 py-2.5 text-[12px]/4 text-zinc-600">
+        The head, the line column and the totals row all stay put. The matrix scrolls in both directions inside this panel; the page behind it does not move at any width.
+      </p>
+    </div>
+  </main>
+</div>

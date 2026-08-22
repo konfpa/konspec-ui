@@ -1,0 +1,290 @@
+<!-- Three columns, and the middle one is the only one that is the page. The
+     section nav and the on-this-page rail are both bare lists on the page
+     ground with a 2px graphite rule on the current item — settings-page's
+     treatment, copied — because the application sidebar to the left of this
+     screen is already a white panel claiming to be the navigation and a second
+     one here means the user reads whichever is nearer as the application.
+
+     max-w-xl on the body, which is the reading measure container derived, and
+     everything sits at it: paragraphs, lists, callouts and the table alike. The
+     white to the right of the text at this width is the measure working. Let
+     the table run wider than the column beside it and the eye has to find the
+     left edge twice.
+
+     text-[14px]/6 rather than the default /5 pairing. Rule 19 allows prose, and
+     only prose, a looser leading, and this is the screen it was written for.
+
+     The rail marks aria-current="location" and not "page". Every entry in it is
+     the page the reader is already on; five of them claiming to be the current
+     page contradicts the nav on the other side of the article.
+
+     No scroll-mt on the headings. The system carries one base rule for the
+     sticky topbar — [id] { scroll-margin-top: 88px } — and this page is the
+     reason it exists rather than a place to work around it.
+
+     Below xl the rail is a second copy of the list rendered inline under the
+     lead, hidden against the sticky one with xl:hidden and hidden xl:block.
+     That is table/responsive's idiom: two renderings, one of them display:none
+     and therefore out of the accessibility tree rather than duplicated in it.
+
+     Nothing the ternary toggles is written in the rail link's class attribute,
+     and that is not tidiness. Alpine removes the classes it added and cannot
+     remove the ones the markup wrote, so a border-zinc-700 rendered by the
+     server survives every change of state and the rail marks two headings at
+     once. The resting state here needs no class: the marker is a 2px span with
+     no background until the ternary paints one, and the resting text colour is
+     inherited from the ul. If Alpine never boots, the rail is a plain list of
+     links with no marker, which is the correct thing for it to fall back to. -->
+
+<div data-kui="docs-page/article" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+     x-data="{ here: 'dp-a-raise' }"
+     x-init="const seen = new IntersectionObserver(
+               rows => rows.forEach(r => { if (r.isIntersecting) here = r.target.id }),
+               { rootMargin: '0px 0px -68% 0px' });
+             $el.querySelectorAll('article h2[id]').forEach(h => seen.observe(h))">
+
+  <main class="mx-auto max-w-6xl p-4 pb-6 lg:p-6">
+
+    <!-- page-header, unchanged -->
+    <div class="min-w-0">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4">
+          <li><a href="/manual/" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Manual</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><a href="/manual/procurement/" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+          <li aria-hidden="true" class="text-zinc-500">/</li>
+          <li><span aria-current="page" class="font-medium text-zinc-900">Raising a capital indent</span></li>
+        </ol>
+      </nav>
+      <h1 class="mt-1.5 text-[24px]/7 font-semibold tracking-tight">Raising a capital indent</h1>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">SOP-PUR-004 · Revision 3 · Effective 01 Apr 2026 · Owner: Materials, Silvassa</p>
+    </div>
+
+    <div class="mt-5 lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start lg:gap-6 xl:grid-cols-[220px_minmax(0,1fr)_200px]">
+
+      <nav aria-label="Manual sections" class="lg:sticky lg:top-6 lg:self-start">
+        <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Procurement</p>
+        <ul role="list" class="mt-2 space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li>
+            <a href="/manual/procurement/vendor-onboarding/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Onboarding a vendor</a>
+          </li>
+          <li>
+            <a href="/manual/procurement/capital-indent/" aria-current="page" class="-ml-px block border-l-2 border-zinc-700 py-1.5 pl-3 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Raising a capital indent</a>
+          </li>
+          <li>
+            <a href="/manual/procurement/approval-limits/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approval limits</a>
+          </li>
+          <li>
+            <a href="/manual/procurement/amending-an-order/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Amending an order</a>
+          </li>
+          <li>
+            <a href="/manual/procurement/closing-short/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Closing an order short</a>
+          </li>
+        </ul>
+
+        <p class="mt-5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Quality</p>
+        <ul role="list" class="mt-2 space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li>
+            <a href="/manual/quality/inward-inspection/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Inward inspection</a>
+          </li>
+          <li>
+            <a href="/manual/quality/qc-hold/" class="-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">QC hold and release</a>
+          </li>
+        </ul>
+
+        <p class="mt-5 border-t border-zinc-200 pt-3 text-[12px]/4 text-zinc-500">
+          <a href="/manual/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All 204 pages</a>
+        </p>
+      </nav>
+
+      <article class="mt-4 min-w-0 rounded-xl border border-zinc-300 bg-white px-5 py-5 sm:px-6 lg:mt-0">
+        <div class="max-w-xl text-[14px]/6">
+
+          <p class="text-zinc-600">
+            A capital indent commits money that is not in the plant's operating budget, so it takes a budget code
+            before it takes a vendor. This page covers indents raised at Silvassa and Vapi. For revenue purchases
+            — consumables, spares, packing material — see
+            <a href="/manual/procurement/purchase-indent/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">SOP-PUR-002, Raising a purchase indent</a>.
+          </p>
+
+          <!-- the rail, inline, below xl. The sticky copy in the third column is
+               hidden xl:block and this one is xl:hidden, so exactly one of the
+               two is ever in the accessibility tree. -->
+          <nav aria-label="On this page" class="mt-4 rounded-lg border border-zinc-200 px-4 py-3 xl:hidden">
+            <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">On this page</p>
+            <ul role="list" class="mt-1.5 space-y-1 text-[13px]/5">
+              <li><a href="#dp-a-when" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">When an indent is capital</a></li>
+              <li><a href="#dp-a-raise" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Raising it</a></li>
+              <li><a href="#dp-a-limits" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Who approves it</a></li>
+              <li><a href="#dp-a-after" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">After approval</a></li>
+            </ul>
+          </nav>
+
+          <h2 id="dp-a-when" class="mt-10 text-[20px]/7 font-semibold tracking-tight">When an indent is capital</h2>
+
+          <p class="mt-3">
+            An indent is capital when what is bought is expected to last more than one financial year and is
+            carried on the fixed asset register. The test is the asset register and not the value: a
+            <span class="tabular-nums">₹40,000</span> die that is capitalised is a capital indent, and
+            <span class="tabular-nums">₹6,00,000</span> of packing film is not.
+          </p>
+
+          <p class="mt-4">Three things make an indent capital regardless of what it costs:</p>
+
+          <ul class="mt-3 list-disc space-y-1 pl-5 marker:text-zinc-400">
+            <li>Plant and machinery, including a rebuild that extends the life of an existing machine.</li>
+            <li>Moulds, dies and tooling held against a part number rather than consumed in a run.</li>
+            <li>Anything installed in the building — a compressor line, a weighbridge, a fire panel.</li>
+          </ul>
+
+          <p class="mt-4">
+            If none of the three applies and the item is still expected to last three years, ask Accounts before
+            raising anything. Getting this wrong is expensive to unwind: the indent has to be cancelled and
+            raised again under the other series, and the budget consumed in between shows against the wrong head
+            until the month is closed.
+          </p>
+
+          <h2 id="dp-a-raise" class="mt-10 text-[20px]/7 font-semibold tracking-tight">Raising it</h2>
+
+          <p class="mt-3">
+            Open <span class="font-medium">Materials → Indents → New</span> and choose
+            <span class="font-medium">Capital</span> as the type. The type cannot be changed after the indent is
+            saved, which is the one field on the form worth reading twice.
+          </p>
+
+          <div class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+            <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+            <div class="min-w-0">
+              <p class="text-[13px]/5 font-medium">A capital indent without a budget code will not route to anybody.</p>
+              <p class="mt-0.5 text-[12px]/4 text-zinc-600">It saves as a draft and sits there. Nothing tells you, because nothing has been submitted.</p>
+            </div>
+          </div>
+
+          <p class="mt-4">
+            The budget code is on the capital budget sheet the plant head circulates in April. It is eight
+            characters — plant, year, head, serial — and it is written
+            <code class="rounded bg-zinc-200 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-600">SIL-27-PM-04</code>
+            on the sheet and typed without the hyphens.
+          </p>
+
+          <h3 class="mt-8 text-[16px]/6 font-semibold">What to attach</h3>
+
+          <p class="mt-3">
+            Two quotations for anything above <span class="tabular-nums">₹2,00,000</span>, and three above
+            <span class="tabular-nums">₹10,00,000</span>. A single-source purchase needs a note saying why, signed
+            by the plant head, attached to the indent and not sent separately.
+          </p>
+
+          <h2 id="dp-a-limits" class="mt-10 text-[20px]/7 font-semibold tracking-tight">Who approves it</h2>
+
+          <p class="mt-3">
+            The indent routes on its value, and the value is the whole indent rather than the line. Splitting one
+            purchase across two indents to stay under a limit is the thing internal audit looks for first.
+          </p>
+
+          <div class="mt-4 overflow-hidden rounded-xl border border-zinc-200">
+            <table class="w-full text-[13px]/5">
+              <caption class="sr-only">Approval limits for a capital indent, by value</caption>
+              <thead>
+                <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+                  <th scope="col" class="px-4 py-2.5 font-medium">Indent value</th>
+                  <th scope="col" class="px-4 py-2.5 font-medium">Approver</th>
+                  <th scope="col" class="px-4 py-2.5 font-medium">Also needs</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-zinc-100">
+                  <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Up to ₹2,00,000</th>
+                  <td class="px-4 py-2.5">Plant head</td>
+                  <td class="px-4 py-2.5 text-zinc-600">—</td>
+                </tr>
+                <tr class="border-b border-zinc-100">
+                  <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">₹2,00,001 to ₹10,00,000</th>
+                  <td class="px-4 py-2.5">Plant head, then Finance</td>
+                  <td class="px-4 py-2.5 text-zinc-600">Two quotations</td>
+                </tr>
+                <tr>
+                  <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Above ₹10,00,000</th>
+                  <td class="px-4 py-2.5">Director</td>
+                  <td class="px-4 py-2.5 text-zinc-600">Three quotations, board note</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-4">
+            Limits are set once a year and are the same at both plants. They are listed again, with the delegation
+            in force while an approver is away, in
+            <a href="/manual/procurement/approval-limits/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">SOP-PUR-006, Approval limits</a>.
+          </p>
+
+          <h2 id="dp-a-after" class="mt-10 text-[20px]/7 font-semibold tracking-tight">After approval</h2>
+
+          <p class="mt-3">
+            An approved capital indent becomes a purchase order raised by the buyer holding that category. The
+            indent stays open until the order is closed, so a partially received machine keeps its indent open and
+            the budget stays committed against it.
+          </p>
+
+          <div class="mt-4 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+            <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+            <div class="min-w-0">
+              <p class="text-[13px]/5 font-medium">At Vapi the budget code is allotted by Accounts, not by the plant head.</p>
+              <p class="mt-0.5 text-[12px]/4 text-zinc-600">Everything else on this page is the same at both plants.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <footer class="mt-8 border-t border-zinc-200 pt-3">
+          <p class="text-[12px]/4 tabular-nums text-zinc-600">
+            Last reviewed 12 Jun 2026 by Anil Kulkarni · Next review 01 Apr 2027
+          </p>
+          <p class="mt-1 text-[12px]/4 text-zinc-500">
+            Something on this page wrong or out of date?
+            <a href="/manual/procurement/capital-indent/report/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Tell the owner</a>.
+          </p>
+        </footer>
+      </article>
+
+      <nav aria-label="On this page" class="hidden xl:sticky xl:top-6 xl:block xl:self-start">
+        <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">On this page</p>
+        <ul role="list" class="mt-2 space-y-0.5 border-l border-zinc-200 text-[13px]/5">
+          <li>
+            <a href="#dp-a-when" aria-current="false" :aria-current="here === 'dp-a-when' ? 'location' : 'false'"
+               :class="here === 'dp-a-when' ? 'font-medium text-zinc-900' : 'text-zinc-600'"
+               class="-ml-px flex gap-2.5 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span aria-hidden="true" class="w-0.5 shrink-0" :class="here === 'dp-a-when' ? 'bg-zinc-700' : 'bg-transparent'"></span>
+              <span class="min-w-0 flex-1 py-1.5">When an indent is capital</span>
+            </a>
+          </li>
+          <li>
+            <a href="#dp-a-raise" aria-current="location" :aria-current="here === 'dp-a-raise' ? 'location' : 'false'"
+               :class="here === 'dp-a-raise' ? 'font-medium text-zinc-900' : 'text-zinc-600'"
+               class="-ml-px flex gap-2.5 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span aria-hidden="true" class="w-0.5 shrink-0" :class="here === 'dp-a-raise' ? 'bg-zinc-700' : 'bg-transparent'"></span>
+              <span class="min-w-0 flex-1 py-1.5">Raising it</span>
+            </a>
+          </li>
+          <li>
+            <a href="#dp-a-limits" aria-current="false" :aria-current="here === 'dp-a-limits' ? 'location' : 'false'"
+               :class="here === 'dp-a-limits' ? 'font-medium text-zinc-900' : 'text-zinc-600'"
+               class="-ml-px flex gap-2.5 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span aria-hidden="true" class="w-0.5 shrink-0" :class="here === 'dp-a-limits' ? 'bg-zinc-700' : 'bg-transparent'"></span>
+              <span class="min-w-0 flex-1 py-1.5">Who approves it</span>
+            </a>
+          </li>
+          <li>
+            <a href="#dp-a-after" aria-current="false" :aria-current="here === 'dp-a-after' ? 'location' : 'false'"
+               :class="here === 'dp-a-after' ? 'font-medium text-zinc-900' : 'text-zinc-600'"
+               class="-ml-px flex gap-2.5 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span aria-hidden="true" class="w-0.5 shrink-0" :class="here === 'dp-a-after' ? 'bg-zinc-700' : 'bg-transparent'"></span>
+              <span class="min-w-0 flex-1 py-1.5">After approval</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+    </div>
+  </main>
+</div>

@@ -1,0 +1,157 @@
+<!-- The state the happy path never draws, and the one that does real damage
+     when it is drawn wrong: an unapproved order printed and handed to a vendor
+     looks exactly like an approved one, and the vendor ships against it.
+
+     A diagonal grey watermark is the usual answer and it is the wrong one
+     twice. It is a background effect, so it does not print at all unless
+     somebody ticked Background graphics; and it is deliberately faint, so on
+     the machines where it does print it is a smudge. The mark here is a ruled
+     band of type above the letterhead — black on white, in the reading order,
+     and impossible for a printer to drop.
+
+     The signature block is gone rather than left blank. An empty rule over the
+     words Authorised signatory is an invitation, and somebody will sign it. In
+     its place is a sentence saying what has to happen before there is one.
+
+     The number is not allotted yet, and the sheet says so where the number
+     would be. Printing a provisional number that the record will not keep is
+     worse than printing none: it gets quoted back on an invoice and matches
+     nothing.
+
+     The tax block still prints in full. A draft is not an estimate — the
+     figures are the ones the order will carry if it is approved unchanged, and
+     hiding them makes the sheet useless for the approval it is asking for. -->
+<div data-kui="document-page/draft" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+  <main class="mx-auto w-full max-w-[210mm]">
+    <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
+
+      <div class="break-inside-avoid border-y-2 border-zinc-300 py-2">
+        <p class="text-[16px]/6 font-semibold uppercase tracking-wider">Draft — not valid for dispatch</p>
+        <p class="mt-1 text-[12px]/4 text-zinc-600">This order has not been approved and has not been sent to the vendor. Do not act on it, do not quote it and do not supply against it. It is printed for approval only.</p>
+      </div>
+
+      <header class="mt-4 flex flex-wrap items-start justify-between gap-x-6 gap-y-4 border-b-2 border-zinc-300 pb-4">
+        <div class="flex min-w-0 flex-1 items-start gap-3 sm:min-w-[15rem]">
+          <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-300 text-[14px]/5 font-semibold">K</span>
+          <div class="min-w-0">
+            <p class="text-[16px]/6 font-semibold">Konspec Industries Pvt Ltd</p>
+            <p class="mt-0.5 text-[12px]/4 text-zinc-600">Plot 214, Silvassa Industrial Estate, Dadra and Nagar Haveli 396230</p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">GSTIN 26AABCK9021M1Z4 · State code 26</p>
+          </div>
+        </div>
+        <div class="min-w-0 sm:shrink-0 sm:text-right">
+          <h1 class="text-[20px]/7 font-semibold tracking-tight">Purchase order — draft</h1>
+          <p class="mt-1 text-[13px]/5 font-medium text-zinc-600">Number not yet allotted</p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Raised 04 Sep 2026 by Ritu Deshpande · FY 2026–27</p>
+        </div>
+      </header>
+
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <section aria-labelledby="dr-vendor-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="dr-vendor-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Proposed vendor</h2>
+          <p class="mt-1.5 text-[13px]/5 font-semibold">Sharma Steel &amp; Alloys</p>
+          <p class="mt-0.5 text-[12px]/4 text-zinc-600">Survey 88/2, Athal Road, Silvassa, Dadra and Nagar Haveli 396230</p>
+          <p class="mt-1 text-[12px]/4 tabular-nums">GSTIN 26AACCS4417K1ZB · VEN-0288</p>
+        </section>
+        <section aria-labelledby="dr-appr-h" class="break-inside-avoid border border-zinc-300 p-3">
+          <h2 id="dr-appr-h" class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Awaiting approval</h2>
+          <ol class="mt-1.5 space-y-1 text-[12px]/4">
+            <li class="flex items-baseline justify-between gap-3">
+              <span class="tabular-nums">1 · Ritu Deshpande — Purchase</span>
+              <span class="font-medium tabular-nums">Raised 04 Sep 2026</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-3">
+              <span class="tabular-nums">2 · Nilesh Patil — Head of Procurement</span>
+              <span class="font-medium">Pending</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-3">
+              <span class="tabular-nums">3 · Anil Kulkarni — Plant head</span>
+              <span class="text-zinc-600">Above ₹5,00,000</span>
+            </li>
+          </ol>
+        </section>
+      </div>
+
+      <section aria-labelledby="dr-lines-h" class="mt-4">
+        <h2 id="dr-lines-h" class="sr-only">Proposed order lines</h2>
+        <div class="overflow-x-auto md:overflow-visible print:overflow-visible">
+          <table class="w-full min-w-[34rem] text-[12px]/4">
+            <caption class="sr-only">Four proposed lines on an unapproved purchase order</caption>
+            <thead class="bg-zinc-50 print:bg-white">
+              <tr class="border-y border-zinc-300 text-left text-[11px]/4 uppercase tracking-wider text-zinc-600">
+                <th scope="col" class="w-8 px-2 py-2 text-right font-medium">Sr</th>
+                <th scope="col" class="px-2 py-2 font-medium">Description of goods</th>
+                <th scope="col" class="w-16 px-2 py-2 font-medium">HSN</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Quantity</th>
+                <th scope="col" class="w-20 px-2 py-2 text-right font-medium">Rate</th>
+                <th scope="col" class="w-24 px-2 py-2 text-right font-medium">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">1</td>
+                <td class="px-2 py-2">MS angle 50 × 50 × 6 mm<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-1042 · IS 2062 grade E250</span></td>
+                <td class="px-2 py-2 tabular-nums">7216</td>
+                <td class="px-2 py-2 text-right tabular-nums">4,200.000 kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">62.40</td>
+                <td class="px-2 py-2 text-right tabular-nums">2,62,080.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">2</td>
+                <td class="px-2 py-2">MS plate 10 mm<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-1088 · IS 2062 grade E250</span></td>
+                <td class="px-2 py-2 tabular-nums">7208</td>
+                <td class="px-2 py-2 text-right tabular-nums">1,800.000 kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">58.90</td>
+                <td class="px-2 py-2 text-right tabular-nums">1,06,020.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">3</td>
+                <td class="px-2 py-2">MS channel 100 × 50 mm<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-1120 · IS 2062 grade E250</span></td>
+                <td class="px-2 py-2 tabular-nums">7216</td>
+                <td class="px-2 py-2 text-right tabular-nums">2,400.000 kg</td>
+                <td class="px-2 py-2 text-right tabular-nums">61.20</td>
+                <td class="px-2 py-2 text-right tabular-nums">1,46,880.00</td>
+              </tr>
+              <tr class="break-inside-avoid border-b border-zinc-200 align-top">
+                <td class="px-2 py-2 text-right tabular-nums">4</td>
+                <td class="px-2 py-2">HT bolt M16 × 60<span class="block text-[11px]/4 tabular-nums text-zinc-600">ITM-3310 · grade 8.8, zinc plated</span></td>
+                <td class="px-2 py-2 tabular-nums">7318</td>
+                <td class="px-2 py-2 text-right tabular-nums">600 nos</td>
+                <td class="px-2 py-2 text-right tabular-nums">18.50</td>
+                <td class="px-2 py-2 text-right tabular-nums">11,100.00</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="break-inside-avoid border-t-2 border-zinc-300">
+                <th scope="row" colspan="5" class="px-2 py-2 text-right font-medium">Taxable value</th>
+                <td class="px-2 py-2 text-right font-semibold tabular-nums">5,26,080.00</td>
+              </tr>
+              <tr class="break-inside-avoid">
+                <th scope="row" colspan="5" class="px-2 py-1 text-right font-normal text-zinc-600">CGST 9% and SGST 9%</th>
+                <td class="px-2 py-1 text-right tabular-nums">94,694.40</td>
+              </tr>
+              <tr class="break-inside-avoid border-t border-zinc-300">
+                <th scope="row" colspan="5" class="px-2 py-2 text-right text-[13px]/5 font-semibold">Proposed order value</th>
+                <td class="px-2 py-2 text-right text-[13px]/5 font-semibold tabular-nums">₹6,20,775.00</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <div class="mt-4 break-inside-avoid border border-zinc-300 p-3">
+        <h2 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Amount in words, if approved unchanged</h2>
+        <p class="mt-1 text-[13px]/5 font-medium">Rupees Six Lakh Twenty Thousand Seven Hundred Seventy Five Only</p>
+      </div>
+
+      <div class="mt-8 break-inside-avoid border border-zinc-300 p-3">
+        <h2 class="text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">No signature block on this sheet</h2>
+        <p class="mt-1 text-[12px]/4 text-zinc-600">A signature block is added when the order is approved. It is allotted a number at that point, it is emailed to the vendor from purchase@konspec.com, and only the sheet carrying that number is an order. Approve it in the console — signing this copy commits nothing and creates nothing.</p>
+      </div>
+
+      <footer class="mt-6 border-t border-zinc-300 pt-2 text-[11px]/4 tabular-nums text-zinc-600">
+        Draft · no number allotted · raised 04 Sep 2026 · printed for approval
+      </footer>
+    </article>
+  </main>
+</div>
