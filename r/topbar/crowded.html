@@ -1,0 +1,105 @@
+<!-- One flexible thing in the row and it is the name. Every control is
+     shrink-0, the h1 is min-w-0 flex-1 truncate, and the header never wraps.
+     Give it flex-wrap as a safety net and a long vendor name turns a 48px bar
+     into a 96px one halfway through an edit, and the document jumps under the
+     cursor at the moment somebody is typing a rate into it.
+
+     truncate hides the tail from the eye and from nothing else: the accessible
+     name is still the whole string, so a screen reader is unaffected. What is
+     lost is a sighted user telling two rate contracts apart, and title only
+     gets that back for a mouse — it never appears on a touch device and cannot
+     be reached by keyboard. So the full name is written once more in the
+     document under the bar, which is where a phone reads it.
+
+     What goes when there is no room goes whole. The saved line disappears below
+     md rather than truncating, because half a timestamp is not a shorter
+     timestamp, it is a wrong one. Preview keeps its label at sm and drops into
+     the overflow menu below it, so the same action is in exactly one place at
+     any given width. The primary keeps its icon everywhere and is the last
+     thing in the bar to give anything up — and its label drops to sr-only
+     rather than to hidden, because display:none takes the text out of the
+     accessible name too and leaves the screen's primary action unnamed at the
+     one width where nothing else on the row explains it.
+
+     A menu item dropped by a breakpoint is still in the DOM and still in the
+     roving list, so the item collector filters on offsetParent. Leave it in and
+     at sm the first arrow press focuses a display:none button, which does
+     nothing at all — no error, no move, and a menu that reads as broken on the
+     one width the developer never tested.
+
+     The overflow menu is why this header must never take overflow-hidden to
+     tidy the corner it sits in — the panel would be clipped to 48px and open as
+     a sliver that reads as a script that failed. -->
+<div data-kui="topbar/crowded" class="mx-auto max-w-2xl rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{
+       open: false,
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')].filter(el => el.offsetParent !== null) },
+       show() { this.open = true; this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus())) },
+       close(toTrigger = true) { if (!this.open) return; this.open = false; if (toTrigger) this.$refs.more.focus() },
+       move(step) { const i = this.items(), at = i.indexOf(document.activeElement); i[(at + step + i.length) % i.length]?.focus() }
+     }"
+     @click.outside="close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <header class="flex h-12 items-center gap-2 border-b border-zinc-200 px-3 sm:px-4">
+    <a href="#" aria-label="Back to rate contracts"
+       class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="arrow-left" class="size-4"></i>
+    </a>
+
+    <h1 title="RC-26-0043 — Gujarat Polymers Ltd, HDPE and LDPE granules, FY 2026-27"
+        class="min-w-0 flex-1 truncate text-[16px]/6 font-semibold tabular-nums">RC-26-0043 — Gujarat Polymers Ltd, HDPE and LDPE granules, FY 2026-27</h1>
+
+    <p class="hidden shrink-0 items-center gap-1.5 text-[12px]/4 tabular-nums text-zinc-500 md:flex">
+      <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Saved 2 min ago
+    </p>
+
+    <button type="button"
+            class="hidden shrink-0 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:block">
+      Preview
+    </button>
+
+    <div class="relative shrink-0">
+      <button type="button" x-ref="more" @click="open ? close(false) : show()" @keydown.arrow-down.prevent="show()"
+              :aria-expanded="open" aria-haspopup="menu" aria-label="More actions for this rate contract"
+              class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open && 'bg-zinc-200 text-zinc-900'">
+        <i data-lucide="more-horizontal" class="size-4"></i>
+      </button>
+
+      <div x-show="open" x-cloak x-ref="menu" role="menu" aria-label="More actions"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.tab="close(false)"
+           class="absolute right-0 z-40 mt-1 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700 sm:hidden">
+          <i data-lucide="eye" class="size-4 text-zinc-600"></i>Preview
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="copy" class="size-4 text-zinc-600"></i>Duplicate for FY 2027-28
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="history" class="size-4 text-zinc-600"></i>Version history
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="download" class="size-4 text-zinc-600"></i>Export as PDF
+        </button>
+      </div>
+    </div>
+
+    <button type="button"
+            class="flex shrink-0 items-center gap-2 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="check" class="size-4"></i><span class="sr-only sm:not-sr-only">Submit for approval</span>
+    </button>
+  </header>
+
+  <div class="space-y-3 p-4">
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">RC-26-0043 — Gujarat Polymers Ltd, HDPE and LDPE granules, FY 2026-27</p>
+    <div class="rounded-xl border border-zinc-200 px-4 py-3">
+      <p class="text-[13px]/5 font-medium tabular-nums">HDPE granules, natural · HSN 39012000</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">₹98,400 per MT · 40 MT committed · Vasai</p>
+    </div>
+  </div>
+</div>

@@ -9,6 +9,12 @@
      Put a pill on every row and the column reads as a traffic light by the
      eighth item and stops meaning anything. One pill in twelve rows is read.
 
+     The pill on the current row steps to zinc-300 and drops its ring. A tinted
+     shape is zinc-200 with a zinc-300 ring everywhere else in the library, but
+     the current row is itself zinc-200, so that pill is the same colour as the
+     surface it sits on with a ring doing all the work — one step deeper is what
+     the rule says a fill does when the thing behind it already took its step.
+
      99+ is a real cap, not a nicety. Invoices on hold runs to four digits at
      month end, and a four-digit pill pushes the label into a truncation that
      makes half the nav read as "Purchase or…".
@@ -36,7 +42,7 @@
         <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="truck" class="size-[18px] shrink-0"></i>
           <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
-          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
+          <span class="shrink-0 rounded-full bg-zinc-300 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700">12</span>
         </a>
       </li>
       <li>

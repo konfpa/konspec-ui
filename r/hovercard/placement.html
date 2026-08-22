@@ -50,7 +50,7 @@
           @hovercard-open.window="if ($event.detail !== $root) shut()"
           @resize.window.debounce="open && place()">
 
-      <a :href="'/orders/' + po.id + '/'" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums" x-text="po.id"></a>
+      <a :href="'/orders/' + po.id + '/'" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" x-text="po.id"></a>
 
       <div x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.150ms
            :class="up ? 'bottom-full pb-2' : 'top-full pt-2'"

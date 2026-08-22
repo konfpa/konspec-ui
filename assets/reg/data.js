@@ -5,30 +5,43 @@ register(
     when: 'More than about five records with more than two attributes each. For two or three fields per record a definition list reads better. This is the table itself; when the screen wants a search box, paging and a selection around it, that assembled register is data-table.',
     notes: [
       'Money and quantity cells get tabular-nums and text-right so digits line up. Text cells stay left.',
-      'Status pills use the locked mapping: Open graphite, Approved amber, Overdue red, Closed emerald, Draft muted zinc. Do not reinterpret it per screen.',
-      'Below md the table must not scroll sideways — render the same rows as stacked cards instead.',
+      'Status pills use the locked mapping: Open zinc-500, Approved amber-500, Overdue red-600, Closed emerald-600, Draft zinc-400. The pill itself is bg-zinc-200 with a zinc-300 ring and zinc-700 text in every case — only the dot changes. Do not reinterpret it per screen.',
+      'Below md the table must not scroll sideways — render the same rows as stacked cards instead. The panel is rounded and clipped, so a table too wide for the phone is not merely awkward there, it is cut off: the last column is behind the panel edge and nothing indicates it exists.',
       'The sort indicator belongs inside the <th> button, not beside the table. Only one column is sorted at a time.',
       'Selection state is an array of PO numbers on the component root. Nothing outside the snippet is read.',
       'The sort chevron is a plain icon inside a span, and the span is what carries the state. createIcons() replaces the <i> with an <svg>, and any binding written on the icon goes with it.',
-      'A panel holding a row menu cannot be overflow-hidden, or the menu on the bottom row is cut off at the panel edge. Once the clipping is gone the hover tint has to move onto the cells, because a tinted <tr> fills the rounded corners back in with a square.'
+      'A panel holding a row menu cannot be overflow-hidden, or the menu on the bottom row is cut off at the panel edge. Once the clipping is gone the hover tint has to move onto the cells, because a tinted <tr> fills the rounded corners back in with a square.',
+      'A column that has to total does it in a <tfoot>, never as one more <tr> at the end of the body. In the body a total is a record: a select-all ticks it, a sort carries it into the middle of the table, and a reader walking rows is read one more line without being told it is a sum.',
+      'Anything sticky — a header that stays, a column that stays — needs border-separate border-spacing-0 on the table. Preflight sets border-collapse: collapse, and in a collapsed table the borders belong to the table rather than to the cell, so the rule under a sticky header does not travel with it and the header floats over the rows with nothing between them. The price is that the row rules move onto the <td>.',
+      'A sticky cell needs an opaque fill of its own or the rows scroll straight through it. Because that fill is opaque it also stops taking the row\'s hover tint, so the tint has to be put back on the sticky cell with group-hover.',
+      'A row that opens its record carries exactly one anchor, stretched over the row with after:absolute after:inset-0. An <a> around a <tr> is deleted by the parser, an <a> in every cell is six tab stops per row, and a click handler on the <tr> loses middle-click, Ctrl-click and the URL in the status bar.',
+      'An identifier is never truncated. A PO number, a batch code or an HSN cut off at the column edge is not a shortened value, it is a different value, and somebody will read it into an email. Identifiers wrap; only prose truncates.',
+      'Indian digit grouping is 2,2,3 above the last three digits — ₹12,45,000, not ₹1,245,000. toLocaleString(\'en-IN\') does it in the browser; on the server it is a project filter, because intcomma groups in threes unless the locale overrides it and the resulting figure is wrong by a factor of ten to anyone reading it quickly.'
     ],
     anatomy: [
       ['Header cell', 'A button inside the <th>. The button carries the label and the sort chevron and is the thing clicked; the <th> carries scope and aria-sort.'],
       ['Row', 'One record. Where rows can be selected the selected tint is zinc-100 and hover a step lighter, so the two states never read as one.'],
-      ['Numeric cell', 'tabular-nums and text-right, so digits stack into a readable column.'],
+      ['Numeric cell', 'tabular-nums and text-right, so digits stack into a readable column. whitespace-nowrap as well, or ₹12,45,000 wraps between the symbol and the digits in a narrow column.'],
       ['Status cell', 'A pill from the locked mapping, and the only colour in the row.'],
       ['Action cell', 'Right-aligned and no wider than it needs to be, holding the row menu trigger.'],
       ['Row menu', 'A real menu on a real button: it opens on click, its items take focus one at a time, and Escape closes it back onto the trigger.'],
+      ['Foot', 'A <tfoot> under the body carrying the totals. Each figure is named by a <th scope="row">, sits in the column it totals, and keeps that column\'s alignment and tabular-nums. A recessed bg-zinc-50 band over a border-zinc-200 rule, because the foot changes what the region is rather than dividing it.'],
+      ['Group heading', 'A <th scope="colgroup"> spanning the row at the top of its own <tbody>, naming the group and carrying its subtotal in the column the subtotal belongs to.'],
+      ['Frozen column', 'The identifying column, sticky left-0 with a fill of its own and a border-r, so the figures scroll under a label that stays readable.'],
       ['Stacked card', 'The same record rendered as a card below md, because a table that scrolls sideways on a phone is unusable.']
     ],
     behaviour: [
-      'Sorting lives in the default variant. Clicking a header sorts by that column ascending, clicking the sorted header reverses it, and the rows are really reordered. The other four variants carry no sort at all: take the state out of the default and put it where the screen needs it.',
+      'Sorting lives in the default variant. Clicking a header sorts by that column ascending, clicking the sorted header reverses it, and the rows are really reordered. The other variants carry no sort at all: take the state out of the default and put it where the screen needs it.',
       'One column is sorted at a time, and the indicator sits in that column\'s header, never floating beside the table.',
       'Selection lives as an array of record ids on the component root, so nothing outside the snippet has to be wired up.',
       'The header checkbox reflects three states — none, some, all — and \'some\' is indeterminate, not unchecked. indeterminate is a property, so it is written with x-effect on the box itself.',
       'The row menu opens on click rather than on hover, moves real focus between its items with the arrow keys, and closes on Escape or on a choice, handing focus back to the trigger.',
       'Below md the table becomes stacked cards showing the same fields in the same order. It does not scroll sideways and columns are not hidden silently.',
-      'Where rows can be selected, hover and selection are different tints, because a user scanning a selection needs to tell them apart.'
+      'Where rows can be selected, hover and selection are different tints, because a user scanning a selection needs to tell them apart.',
+      'A total is computed from the same array the rows are drawn from, so the foot and the body cannot disagree. On a paged register the figure comes from the server over the whole query instead, and the label in the foot says which of the two it is.',
+      'A quantity column in mixed units does not total. kg and nos do not add up, so the cell carries an em dash and the reason sits under the table — a number there would be read as a figure rather than as nonsense.',
+      'A bounded scroller takes overscroll-contain, so reaching the last row does not hand the wheel to the page behind it.',
+      'A wide table scrolls sideways inside its own bounded scroller from md up, and only there. At 390px it is cards, like every other table: a sideways scroll on a phone is indistinguishable from a layout that broke.'
     ],
     a11y: [
       'Header cells are <th scope="col">, so a screen reader can name the column when reading a cell.',
@@ -36,16 +49,29 @@ register(
       'The chevron is decorative: Lucide marks the svg it generates aria-hidden, so the direction is announced from aria-sort and from nowhere else.',
       'Each row checkbox has a label naming its record — twelve checkboxes all labelled "Select" are useless.',
       'The stacked-card layout carries the same information, not a reduced subset, so a phone user is not given less data.',
-      'Row actions are reachable by keyboard: the trigger is a button with aria-haspopup and aria-expanded, the panel is a role="menu" whose items take real focus, and nothing here appears only on hover, which would be invisible to anyone who cannot hover.'
+      'Row actions are reachable by keyboard: the trigger is a button with aria-haspopup and aria-expanded, the panel is a role="menu" whose items take real focus, and nothing here appears only on hover, which would be invisible to anyone who cannot hover.',
+      'A group heading is a <th scope="colgroup"> at the head of its own <tbody>, not a <td>. As a <td> the group name is a data value in an unnamed column, and the rows under it are attached to nothing.',
+      'In a wide table the identifying cell is a <th scope="row">, so a figure eight columns along is announced with the item it belongs to instead of on its own.',
+      'A total in the foot is named by a <th scope="row"> in the same row. A bare figure at the bottom of a table is announced as a number with no word attached to it.',
+      'A stretched row link keeps its accessible name from the text inside the anchor, not from the row. "PO-24-1187" is the name; the rest of the row is read as cells, as it should be.'
     ],
-    related: ['data-table', 'empty-state', 'skeleton'],
+    related: ['data-table', 'empty-state', 'checkbox', 'skeleton'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<!-- The chevron is a static Lucide icon inside a span, and the span is what
      carries the state: createIcons() replaces the <i> with an <svg>, so a
      binding written on the icon itself is thrown away on hydration. It is
      invisible rather than absent on the unsorted columns, so the header labels
-     do not shift when the sort moves. -->
+     do not shift when the sort moves, and it starts invisible in the class
+     attribute rather than only in the binding, so the unsorted chevrons do not
+     show for the frame before Alpine boots.
+
+     The sortable header is a button inside the <th> and the aria-sort is on the
+     <th>. Both halves are needed: the button is what a keyboard reaches, and
+     aria-sort on the cell is the only thing that says which way the column is
+     ordered. Department and Due do not sort, so they are plain cells carrying
+     no aria-sort at all — aria-sort="none" on a column that cannot be sorted
+     announces a control that is not there. -->
 <div data-kui="table/default" x-data="{
        col: 'po', dir: 'asc',
        rows: [
@@ -55,7 +81,7 @@ register(
          { po: 'PO-24-1203', vendor: 'Sharma Extrusions', dept: 'Tooling', amount: 96750, status: 'Closed', due: '28 Jul' },
          { po: 'PO-24-1206', vendor: 'Nashik Steel Traders', dept: 'Maintenance', amount: 132900, status: 'Draft', due: '—' }
        ],
-       dot: { Open: 'bg-zinc-700', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
        sortBy(c) { this.dir = this.col === c && this.dir === 'asc' ? 'desc' : 'asc'; this.col = c },
        ariaSort(c) { return this.col === c ? (this.dir === 'asc' ? 'ascending' : 'descending') : 'none' },
        money(n) { return '₹' + n.toLocaleString('en-IN') },
@@ -69,20 +95,20 @@ register(
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" :aria-sort="ariaSort('po')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'po' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'po' && 'text-zinc-900'">
             PO number
             <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th scope="col" :aria-sort="ariaSort('vendor')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'vendor' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'vendor' && 'text-zinc-900'">
             Vendor
             <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th scope="col" class="px-4 py-2.5 font-medium">Department</th>
         <th scope="col" :aria-sort="ariaSort('amount')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'amount' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'amount' && 'text-zinc-900'">
             Amount
             <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
@@ -97,7 +123,7 @@ register(
           <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.po"></td>
           <td class="px-4 py-2.5" x-text="r.vendor"></td>
           <td class="px-4 py-2.5 text-zinc-600" x-text="r.dept"></td>
-          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="money(r.amount)"></td>
           <td class="px-4 py-2.5">
             <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
               <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
@@ -111,23 +137,44 @@ register(
 </div>` },
 
       { id: 'selection', name: 'With selection', code:
-`<div data-kui="table/selection" x-data="{ all: ['PO-24-1187','PO-24-1191','PO-24-1194'], sel: [] }"
+`<!-- The bulk bar is inside the panel and above the header, so it appears in the
+     place the selection was made rather than at the foot of the page where the
+     user is not looking. It is x-cloak because it is hidden at first paint, and
+     without that it flashes across the top of every register on load.
+
+     Selection and hover are different tints and have to be: a selected row is
+     zinc-100 and a hovered one zinc-50, one step lighter. Give them the same
+     fill and a user dragging down a column of ticks cannot tell which rows are
+     already in the set.
+
+     The row boxes carry no name attribute. Both the table and the cards below
+     are in the DOM at once with one of them display:none, and a display:none
+     checkbox still posts — two renderings of one row with one name post that
+     row twice. The array on the root is the state, and a real form submits it
+     from a hidden field written from that array.
+
+     Select-all means the rows on this page and its label says so. A bulk
+     approve that quietly took every match cannot be undone. checkbox/table
+     carries the shift-click run and the second, deliberate select-all across
+     the whole query. -->
+<div data-kui="table/selection" x-data="{ all: ['PO-24-1187','PO-24-1191','PO-24-1194'], sel: [] }"
      class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <div x-show="sel.length" x-cloak
        class="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-zinc-100 px-4 py-2">
-    <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
+    <span class="text-[13px]/5 font-medium tabular-nums"><span x-text="sel.length"></span> of 3 selected</span>
     <div class="flex flex-wrap items-center gap-2">
-      <button class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">Export</button>
-      <button class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Cancel orders</button>
+      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export</button>
+      <button type="button" class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel orders</button>
     </div>
-    <button @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-600 underline underline-offset-2">Clear</button>
+    <button type="button" @click="sel = []" class="ml-auto shrink-0 text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
   </div>
-  <table class="w-full text-[13px]/5">
+
+  <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" class="w-10 px-4 py-2.5">
-          <input type="checkbox" aria-label="Select all three orders" class="size-4 rounded accent-zinc-700"
+          <input type="checkbox" aria-label="Select all 3 orders on this page" class="size-4 shrink-0 accent-zinc-700"
                  :checked="sel.length === all.length"
                  x-effect="$el.indeterminate = sel.length > 0 && sel.length < all.length"
                  @change="sel = $event.target.checked ? [...all] : []">
@@ -141,45 +188,105 @@ register(
     <tbody>
       <tr class="border-b border-zinc-100" :class="sel.includes('PO-24-1187') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
         <td class="px-4 py-2.5">
-          <input type="checkbox" value="PO-24-1187" x-model="sel" aria-label="Select PO-24-1187" class="size-4 rounded accent-zinc-700">
+          <input type="checkbox" value="PO-24-1187" x-model="sel" aria-label="Select PO-24-1187" class="size-4 shrink-0 accent-zinc-700">
         </td>
         <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
         <td class="px-4 py-2.5">Sharma Extrusions</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹18,42,000</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹18,42,000</td>
         <td class="px-4 py-2.5">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-900">
-            <span class="size-1.5 rounded-full bg-zinc-700"></span>Open
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
           </span>
         </td>
       </tr>
       <tr class="border-b border-zinc-100" :class="sel.includes('PO-24-1191') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
         <td class="px-4 py-2.5">
-          <input type="checkbox" value="PO-24-1191" x-model="sel" aria-label="Select PO-24-1191" class="size-4 rounded accent-zinc-700">
+          <input type="checkbox" value="PO-24-1191" x-model="sel" aria-label="Select PO-24-1191" class="size-4 shrink-0 accent-zinc-700">
         </td>
         <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1191</td>
         <td class="px-4 py-2.5">Nashik Steel Traders</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹4,68,500</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹4,68,500</td>
         <td class="px-4 py-2.5">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-700">
-            <span class="size-1.5 rounded-full bg-amber-500"></span>Approved
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
           </span>
         </td>
       </tr>
       <tr :class="sel.includes('PO-24-1194') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
         <td class="px-4 py-2.5">
-          <input type="checkbox" value="PO-24-1194" x-model="sel" aria-label="Select PO-24-1194" class="size-4 rounded accent-zinc-700">
+          <input type="checkbox" value="PO-24-1194" x-model="sel" aria-label="Select PO-24-1194" class="size-4 shrink-0 accent-zinc-700">
         </td>
         <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194</td>
         <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹27,10,400</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹27,10,400</td>
         <td class="px-4 py-2.5">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-700">
-            <span class="size-1.5 rounded-full bg-red-600"></span>Overdue
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
           </span>
         </td>
       </tr>
     </tbody>
   </table>
+
+  <!-- below md the same three records with the same boxes. Five columns do not
+       fit at 390px, and the panel is clipped rather than scrollable, so without
+       this the Status column is simply behind the rounded edge. -->
+  <div class="border-b border-zinc-200 px-4 py-2.5 md:hidden">
+    <label class="flex items-center gap-2.5 text-[13px]/5 font-medium">
+      <input type="checkbox" class="size-4 shrink-0 accent-zinc-700"
+             :checked="sel.length === all.length"
+             x-effect="$el.indeterminate = sel.length > 0 && sel.length < all.length"
+             @change="sel = $event.target.checked ? [...all] : []">
+      <span class="tabular-nums">All 3 on this page</span>
+    </label>
+  </div>
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li :class="sel.includes('PO-24-1187') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+      <label class="flex items-start gap-3 px-4 py-3">
+        <input type="checkbox" value="PO-24-1187" x-model="sel" aria-label="Select PO-24-1187" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1">
+          <span class="flex items-baseline justify-between gap-3">
+            <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1187</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</span>
+          </span>
+          <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Sharma Extrusions</span>
+          <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+        </span>
+      </label>
+    </li>
+    <li :class="sel.includes('PO-24-1191') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+      <label class="flex items-start gap-3 px-4 py-3">
+        <input type="checkbox" value="PO-24-1191" x-model="sel" aria-label="Select PO-24-1191" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1">
+          <span class="flex items-baseline justify-between gap-3">
+            <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1191</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹4,68,500</span>
+          </span>
+          <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Nashik Steel Traders</span>
+          <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+          </span>
+        </span>
+      </label>
+    </li>
+    <li :class="sel.includes('PO-24-1194') ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+      <label class="flex items-start gap-3 px-4 py-3">
+        <input type="checkbox" value="PO-24-1194" x-model="sel" aria-label="Select PO-24-1194" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+        <span class="min-w-0 flex-1">
+          <span class="flex items-baseline justify-between gap-3">
+            <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1194</span>
+            <span class="shrink-0 text-[14px]/5 tabular-nums">₹27,10,400</span>
+          </span>
+          <span class="mt-0.5 block text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd</span>
+          <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+          </span>
+        </span>
+      </label>
+    </li>
+  </ul>
 </div>` },
 
       { id: 'row-actions', name: 'Row actions', code:
@@ -193,10 +300,14 @@ register(
      items one tabindex="-1" at a time — the same idiom as the dropdown
      component. items() is read out of the DOM on every keystroke, so a row
      whose Approve is hidden by a permission check drops out of the keyboard
-     order with it. -->
+     order with it.
+
+     The trigger is named for its row. Twelve buttons all called "Actions" is a
+     keyboard user reading a list of twelve identical things, so the label
+     carries the PO number the menu will act on. -->
 <div data-kui="table/row-actions" x-data="{
        rows: [
-         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '₹18,42,000', status: 'Open', dot: 'bg-zinc-700' },
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '₹18,42,000', status: 'Open', dot: 'bg-zinc-500' },
          { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: '₹4,68,500', status: 'Approved', dot: 'bg-amber-500' },
          { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: '₹27,10,400', status: 'Overdue', dot: 'bg-red-600' }
        ]
@@ -217,7 +328,7 @@ register(
         <tr class="border-b border-zinc-100 last:border-0 hover:[&>td]:bg-zinc-100 [&:last-child>td:first-child]:rounded-bl-xl [&:last-child>td:last-child]:rounded-br-xl">
           <td class="px-4 py-2 font-medium tabular-nums" x-text="r.po"></td>
           <td class="px-4 py-2" x-text="r.vendor"></td>
-          <td class="px-4 py-2 text-right tabular-nums" x-text="r.amount"></td>
+          <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap" x-text="r.amount"></td>
           <td class="px-4 py-2">
             <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
               <span class="size-1.5 shrink-0 rounded-full" :class="r.dot" aria-hidden="true"></span><span x-text="r.status"></span>
@@ -249,13 +360,13 @@ register(
               <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
                       @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
                       :aria-expanded="open" aria-haspopup="menu" :aria-label="'Actions for ' + r.po"
-                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
                 <i data-lucide="more-horizontal" class="size-4"></i>
               </button>
               <div x-show="open" x-cloak x-ref="menu" role="menu" :aria-label="'Actions for ' + r.po"
                    @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
                    @keydown.tab="close(false)"
-                   class="absolute right-0 z-40 mt-1 w-44 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 text-left shadow-lg">
+                   class="absolute top-full right-0 z-40 mt-1 w-44 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 text-left shadow-lg">
                 <button type="button" role="menuitem" tabindex="-1" @click="close()"
                         class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
                   <i data-lucide="eye" class="size-4 text-zinc-600"></i>Open order
@@ -280,8 +391,477 @@ register(
   </table>
 </div>` },
 
+      { id: 'totals', name: 'A column that totals', tagNew: true, code:
+`<!-- The total is a <tfoot>, not one more <tr> at the end of the body. In the
+     body a total row is a record as far as everything else on the screen is
+     concerned: a select-all ticks it, a sort carries it into the middle of the
+     table, and a reader walking rows is read one more line and never told it is
+     a sum. In the foot it is outside all three, and the browser keeps it at the
+     bottom whatever order the body ends up in.
+
+     Each figure is named by a <th scope="row"> in its own row, so it is
+     announced with a word attached to it rather than as a bare number at the
+     end of the table. The first foot row keeps the columns — the taxable total
+     sits under the taxable column — and the derived rows below it slide right,
+     which is how an invoice foot has always read.
+
+     The totals come from the same array as the rows, so the body and the foot
+     cannot disagree. On a paged register they come from the server over the
+     whole query instead, and the label has to change with them: a foot that
+     quietly sums the twenty rows on screen under a header saying 148 receipts
+     is the defect the wording here exists to prevent.
+
+     Received has no total. 12,000 kg and 4,000 nos do not add up, so the cell
+     carries an em dash and the reason sits under the table — a number there
+     would be read as a figure rather than as nonsense. -->
+<div data-kui="table/totals" x-data="{
+       lines: [
+         { code: 'ITM-1042', name: 'HDPE granules — natural', qty: '12,000 kg', rate: 87, base: 1044000 },
+         { code: 'ITM-1091', name: 'Masterbatch — white 60%', qty: '250 kg', rate: 245, base: 61250 },
+         { code: 'ITM-3310', name: 'M12 hex bolt — 8.8 zinc', qty: '4,000 nos', rate: 24, base: 96000 },
+         { code: 'ITM-5140', name: 'Stretch film — 23 micron', qty: '300 kg', rate: 175, base: 52500 }
+       ],
+       fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       get taxable() { return this.lines.reduce((s, l) => s + l.base, 0) },
+       get tax() { return Math.round(this.taxable * 0.18) },
+       get total() { return this.taxable + this.tax }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">GRN-26-0448 · Gujarat Polymers Ltd</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Received at Silvassa on 04 Sep 2026 against PO-24-1194</p>
+  </div>
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">Item</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Rate</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Taxable value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="l in lines" :key="l.code">
+        <tr class="border-b border-zinc-100">
+          <td class="px-4 py-2.5">
+            <span class="block" x-text="l.name"></span>
+            <span class="block text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code"></span>
+          </td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="l.qty"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="fmt(l.rate)"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="fmt(l.base)"></td>
+        </tr>
+      </template>
+    </tbody>
+    <tfoot class="bg-zinc-50">
+      <tr class="border-t border-zinc-200">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium text-zinc-600">Total of these 4 lines</th>
+        <td class="px-4 py-2 text-right text-zinc-500 tabular-nums">—</td>
+        <td class="px-4 py-2"></td>
+        <td class="px-4 py-2 text-right font-medium tabular-nums whitespace-nowrap" x-text="fmt(taxable)"></td>
+      </tr>
+      <tr>
+        <th scope="row" colspan="3" class="px-4 py-2 text-right text-[12px]/4 font-medium text-zinc-600">IGST at 18%</th>
+        <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap" x-text="fmt(tax)"></td>
+      </tr>
+      <tr>
+        <th scope="row" colspan="3" class="px-4 pt-1 pb-2.5 text-right text-[13px]/5 font-semibold">Receipt value</th>
+        <td class="px-4 pt-1 pb-2.5 text-right text-[14px]/5 font-semibold tabular-nums whitespace-nowrap" x-text="fmt(total)"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- below md the four lines are cards and the foot is a strip that repeats
+       every figure. The total is the reason this screen was opened; it is not
+       something a phone is given a reduced version of. -->
+  <div class="divide-y divide-zinc-100 md:hidden">
+    <template x-for="l in lines" :key="l.code">
+      <div class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <span class="text-[13px]/5 font-medium" x-text="l.name"></span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums" x-text="fmt(l.base)"></span>
+        </div>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <span x-text="l.code"></span> · <span x-text="l.qty"></span> at <span x-text="fmt(l.rate)"></span>
+        </p>
+      </div>
+    </template>
+  </div>
+  <dl class="space-y-1 border-t border-zinc-200 bg-zinc-50 px-4 py-3 md:hidden">
+    <div class="flex items-baseline justify-between gap-3">
+      <dt class="text-[12px]/4 text-zinc-600">Total of these 4 lines</dt>
+      <dd class="text-[13px]/5 font-medium tabular-nums" x-text="fmt(taxable)"></dd>
+    </div>
+    <div class="flex items-baseline justify-between gap-3">
+      <dt class="text-[12px]/4 text-zinc-600">IGST at 18%</dt>
+      <dd class="text-[13px]/5 tabular-nums" x-text="fmt(tax)"></dd>
+    </div>
+    <div class="flex items-baseline justify-between gap-3">
+      <dt class="text-[13px]/5 font-semibold">Receipt value</dt>
+      <dd class="text-[14px]/5 font-semibold tabular-nums" x-text="fmt(total)"></dd>
+    </div>
+  </dl>
+
+  <p class="border-t border-zinc-200 px-4 py-2 text-[12px]/4 text-zinc-500">Received quantity is not totalled — these lines are in kg and in nos.</p>
+</div>` },
+
+      { id: 'grouped', name: 'Rows under subheadings', tagNew: true, code:
+`<!-- One <tbody> per group, not a flat body with heading rows scattered through
+     it. The grouping then lives in the structure of the table rather than in
+     the styling of some of its rows, which is what lets scope="colgroup" work:
+     every cell under the heading is named by it.
+
+     The heading is a <th>, never a <td>. As a <td> the vendor name is a data
+     value in a column that has no header, and the rows below it are attached to
+     nothing at all.
+
+     The subtotal sits in the amount column, in the heading row. A separate
+     subtotal row under each group doubles the number of rows the eye has to
+     skip and puts the figure a long way from the name it belongs to; in the
+     heading it lands in the same column as the amounts it sums, so one vertical
+     scan reads group, group, group.
+
+     The heading band is bg-zinc-50 — a recessed band inside a white panel.
+     zinc-100 is the page fill and would read as a gap in the panel rather than
+     as part of it.
+
+     The groups do not collapse. A register is scanned, not navigated, and a
+     collapsed group hides the rows its subtotal is made of while leaving the
+     subtotal on screen. -->
+<div data-kui="table/grouped" x-data="{
+       groups: [
+         { vendor: 'Gujarat Polymers Ltd', rows: [
+           { po: 'PO-24-1194', dept: 'Compounding', due: '02 Aug', amount: 2710400 },
+           { po: 'PO-24-1210', dept: 'Compounding', due: '21 Aug', amount: 342500 },
+           { po: 'PO-24-1218', dept: 'Compounding', due: '04 Sep', amount: 132000 }
+         ] },
+         { vendor: 'Sharma Extrusions', rows: [
+           { po: 'PO-24-1187', dept: 'Fabrication', due: '12 Aug', amount: 1842000 },
+           { po: 'PO-24-1203', dept: 'Tooling', due: '28 Jul', amount: 96750 }
+         ] },
+         { vendor: 'Nashik Steel Traders', rows: [
+           { po: 'PO-24-1191', dept: 'Dispatch', due: '19 Aug', amount: 468500 },
+           { po: 'PO-24-1206', dept: 'Maintenance', due: '22 Aug', amount: 132900 }
+         ] }
+       ],
+       fmt(n) { return '₹' + n.toLocaleString('en-IN') },
+       sum(g) { return g.rows.reduce((s, r) => s + r.amount, 0) },
+       count(g) { return g.rows.length + (g.rows.length === 1 ? ' order' : ' orders') }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Department</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Due</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <template x-for="g in groups" :key="g.vendor">
+      <tbody>
+        <tr class="border-t border-zinc-200 bg-zinc-50">
+          <th scope="colgroup" colspan="3" class="px-4 py-2 text-left text-[12px]/4 font-medium">
+            <span x-text="g.vendor"></span>
+            <span class="ml-2 font-normal tabular-nums text-zinc-500" x-text="count(g)"></span>
+          </th>
+          <td class="px-4 py-2 text-right text-[12px]/4 font-medium tabular-nums whitespace-nowrap" x-text="fmt(sum(g))"></td>
+        </tr>
+        <template x-for="r in g.rows" :key="r.po">
+          <tr class="border-t border-zinc-100 hover:bg-zinc-100">
+            <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.po"></td>
+            <td class="px-4 py-2.5 text-zinc-600" x-text="r.dept"></td>
+            <td class="px-4 py-2.5 text-zinc-600 tabular-nums" x-text="r.due"></td>
+            <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="fmt(r.amount)"></td>
+          </tr>
+        </template>
+      </tbody>
+    </template>
+  </table>
+
+  <!-- below md the same three groups, each an <h3> band over its own list. The
+       heading keeps its subtotal, because the subtotal is the reason a register
+       is grouped in the first place. -->
+  <div class="md:hidden">
+    <template x-for="g in groups" :key="g.vendor">
+      <section>
+        <h3 class="flex items-baseline justify-between gap-3 border-y border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 font-medium">
+          <span>
+            <span x-text="g.vendor"></span>
+            <span class="ml-1.5 font-normal tabular-nums text-zinc-500" x-text="count(g)"></span>
+          </span>
+          <span class="shrink-0 tabular-nums" x-text="fmt(sum(g))"></span>
+        </h3>
+        <ul class="divide-y divide-zinc-100">
+          <template x-for="r in g.rows" :key="r.po">
+            <li class="flex items-baseline justify-between gap-3 px-4 py-2.5">
+              <span>
+                <span class="block text-[13px]/5 font-medium tabular-nums" x-text="r.po"></span>
+                <span class="block text-[12px]/4 tabular-nums text-zinc-500"><span x-text="r.dept"></span> · due <span x-text="r.due"></span></span>
+              </span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums" x-text="fmt(r.amount)"></span>
+            </li>
+          </template>
+        </ul>
+      </section>
+    </template>
+  </div>
+</div>` },
+
+      { id: 'linked-rows', name: 'The row opens its record', tagNew: true, code:
+`<!-- One anchor per row, in the identifying cell, stretched over the row with
+     after:absolute after:inset-0 against a relative <tr>. The three obvious
+     alternatives are all worse. An <a> wrapped around a <tr> is deleted by the
+     parser before any stylesheet sees it. An <a> in every cell is six tab stops
+     for one record and sixty on a page of ten. A click handler on the <tr> is
+     not a link at all: middle-click does not open a tab, Ctrl-click does not
+     either, the status bar shows no URL, and nothing is copyable.
+
+     Anything else in the row that is interactive has to be lifted above the
+     overlay — relative z-10 on the vendor link and on the actions cell — or the
+     stretched anchor eats their clicks and every control in the row silently
+     opens the record instead of doing its own job.
+
+     The cost is real and worth stating: a stretched anchor makes the row text
+     unselectable by dragging. A register whose figures get copied into an email
+     should link from the PO number alone and leave the row inert.
+
+     Keyboard focus tints the row as well as drawing the outline on the anchor,
+     through has-[a:focus-visible]. Without it a keyboard user tabbing down the
+     column gets a 12px outline on a PO number and no sense of which row they
+     are on.
+
+     Below md the card is the link and the row menu is gone. Two overlapping hit
+     targets inside a 44px card is a coin toss on a phone; the actions live on
+     the record. -->
+<div data-kui="table/linked-rows" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+        <th scope="col" class="w-12 px-4 py-2.5"><span class="sr-only">Row actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="relative border-b border-zinc-100 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+        <td class="px-4 py-2 font-medium tabular-nums">
+          <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1187</a>
+        </td>
+        <td class="px-4 py-2">
+          <a href="#" class="relative z-10 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sharma Extrusions</a>
+        </td>
+        <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap">₹18,42,000</td>
+        <td class="px-4 py-2">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+        </td>
+        <td class="relative z-10 w-12 px-4 py-2 text-right">
+          <button type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for PO-24-1187"
+                  class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="more-horizontal" class="size-4"></i>
+          </button>
+        </td>
+      </tr>
+      <tr class="relative border-b border-zinc-100 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+        <td class="px-4 py-2 font-medium tabular-nums">
+          <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1191</a>
+        </td>
+        <td class="px-4 py-2">
+          <a href="#" class="relative z-10 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Nashik Steel Traders</a>
+        </td>
+        <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap">₹4,68,500</td>
+        <td class="px-4 py-2">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+          </span>
+        </td>
+        <td class="relative z-10 w-12 px-4 py-2 text-right">
+          <button type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for PO-24-1191"
+                  class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="more-horizontal" class="size-4"></i>
+          </button>
+        </td>
+      </tr>
+      <tr class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+        <td class="px-4 py-2 font-medium tabular-nums">
+          <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1194</a>
+        </td>
+        <td class="px-4 py-2">
+          <a href="#" class="relative z-10 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Gujarat Polymers Ltd</a>
+        </td>
+        <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap">₹27,10,400</td>
+        <td class="px-4 py-2">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+          </span>
+        </td>
+        <td class="relative z-10 w-12 px-4 py-2 text-right">
+          <button type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for PO-24-1194"
+                  class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="more-horizontal" class="size-4"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+      <div class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1187</a>
+          <span class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</span>
+        </div>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">Sharma Extrusions</p>
+        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+        </span>
+      </div>
+    </li>
+    <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+      <div class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1191</a>
+          <span class="shrink-0 text-[14px]/5 tabular-nums">₹4,68,500</span>
+        </div>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">Nashik Steel Traders</p>
+        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+        </span>
+      </div>
+    </li>
+    <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+      <div class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1194</a>
+          <span class="shrink-0 text-[14px]/5 tabular-nums">₹27,10,400</span>
+        </div>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd</p>
+        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+        </span>
+      </div>
+    </li>
+  </ul>
+</div>` },
+
+      { id: 'long-values', name: 'A value too long for its column', tagNew: true, code:
+`<!-- table-fixed first, and every width declared on the header. Under the
+     default auto layout one long description takes as much width as it wants
+     and squeezes the figures beside it into two lines each, so the column that
+     matters least decides the shape of the ones that matter most. Fixed layout
+     also gives every cell a definite width, which is what truncate needs — on
+     an auto-layout table it silently does nothing.
+
+     Three values, three different answers, and the choice is not a matter of
+     taste.
+
+     An identifier never truncates. A batch reference cut off at the column edge
+     is not a shortened value, it is a different value, and somebody will read
+     it into an email or type it into a search. It wraps instead, with break-all
+     because it has no spaces to wrap at.
+
+     A description clamps to two lines. Most of it is readable in place, the row
+     height stays bounded, and nothing is claimed to be complete.
+
+     Only incidental prose truncates, and title is a pointer-only affordance
+     that reaches nobody on a keyboard or a phone — so a value is only allowed
+     to truncate when the full text is one click away on the record itself.
+
+     align-top on the rows, or a two-line cell centres itself against the
+     single-line ones and the column of figures stops being a straight line.
+     Figures take whitespace-nowrap as well, or ₹10,44,000 breaks between the
+     symbol and the digits in a narrow column.
+
+     At 390px nothing truncates at all. A phone is short of width, not of
+     height, and the card can afford four lines. -->
+<div data-kui="table/long-values" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="hidden w-full table-fixed text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-[34%] px-4 py-2.5 font-medium">Item</th>
+        <th scope="col" class="w-[22%] px-4 py-2.5 font-medium">Vendor batch</th>
+        <th scope="col" class="w-[16%] px-4 py-2.5 text-right font-medium">Received</th>
+        <th scope="col" class="w-[28%] px-4 py-2.5 font-medium">Remark</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 align-top">
+        <td class="px-4 py-2.5">
+          <span class="line-clamp-2">Low density polyethylene granules, natural, film grade, MFI 0.9, 25 kg laminated bags</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">ITM-1042</span>
+        </td>
+        <td class="px-4 py-2.5 break-all tabular-nums text-zinc-600">GJ-POLY/2026/HDPE-NAT-25KG/4471</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">12,000 kg</td>
+        <td class="px-4 py-2.5">
+          <span class="block truncate text-zinc-600" title="Two bags short against the challan; short-supply note raised with the vendor on 05 Sep 2026.">Two bags short against the challan; short-supply note raised</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 align-top">
+        <td class="px-4 py-2.5">
+          <span class="line-clamp-2">Masterbatch, white, 60% titanium dioxide, food contact grade</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">ITM-1091</span>
+        </td>
+        <td class="px-4 py-2.5 break-all tabular-nums text-zinc-600">MB-WHT-60/AUG26/L-0912</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">250 kg</td>
+        <td class="px-4 py-2.5 text-zinc-500">—</td>
+      </tr>
+      <tr class="align-top">
+        <td class="px-4 py-2.5">
+          <span class="line-clamp-2">M12 × 60 hexagon head bolt, property class 8.8, zinc plated, with nut and washer</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">ITM-3310</span>
+        </td>
+        <td class="px-4 py-2.5 break-all tabular-nums text-zinc-600">NSTL/FAST/26-27/HEAT-K4419</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">4,000 nos</td>
+        <td class="px-4 py-2.5">
+          <span class="block truncate text-zinc-600" title="Mill test certificate pending; released to stores against an undertaking.">Mill test certificate pending; released against undertaking</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="px-4 py-3">
+      <p class="text-[13px]/5 font-medium">Low density polyethylene granules, natural, film grade, MFI 0.9, 25 kg laminated bags</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-1042 · 12,000 kg</p>
+      <p class="mt-1 text-[12px]/4 break-all tabular-nums text-zinc-500">GJ-POLY/2026/HDPE-NAT-25KG/4471</p>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-600">Two bags short against the challan; short-supply note raised with the vendor on 05 Sep 2026.</p>
+    </li>
+    <li class="px-4 py-3">
+      <p class="text-[13px]/5 font-medium">Masterbatch, white, 60% titanium dioxide, food contact grade</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-1091 · 250 kg</p>
+      <p class="mt-1 text-[12px]/4 break-all tabular-nums text-zinc-500">MB-WHT-60/AUG26/L-0912</p>
+    </li>
+    <li class="px-4 py-3">
+      <p class="text-[13px]/5 font-medium">M12 × 60 hexagon head bolt, property class 8.8, zinc plated, with nut and washer</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-3310 · 4,000 nos</p>
+      <p class="mt-1 text-[12px]/4 break-all tabular-nums text-zinc-500">NSTL/FAST/26-27/HEAT-K4419</p>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-600">Mill test certificate pending; released to stores against an undertaking.</p>
+    </li>
+  </ul>
+</div>` },
+
       { id: 'dense', name: 'Dense', code:
-`<div data-kui="table/dense" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+`<!-- The same table at py-1.5 and px-3 instead of py-2.5 and px-4, which puts
+     about half again as many rows in the same height. Nothing else changes: the
+     type stays at 13px, because a register read all day is read at the body
+     size and dropping it to 12 to fit one more row is a trade nobody asked for.
+
+     Density is a property of the screen, not of the record. A stores clerk
+     reconciling four hundred lines wants this; the same table on a dashboard
+     beside three charts wants the default. Do not mix the two in one view — two
+     row heights on one page reads as a rendering fault.
+
+     The overdue date is red text rather than a red row. Colour marks the one
+     fact that is wrong, and red-600 is the shade the token table gives for a
+     mark you read. A tinted row would say the whole record is in an alarm
+     state, which is not what a late delivery date means. -->
+<div data-kui="table/dense" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-[13px]/5">
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
@@ -297,43 +877,392 @@ register(
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1187</td>
         <td class="px-3 py-1.5">Sharma Extrusions</td>
         <td class="px-3 py-1.5 text-zinc-600">Fabrication</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹18,42,000</td>
-        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums">12 Aug</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹18,42,000</td>
+        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">12 Aug</td>
       </tr>
       <tr class="border-b border-zinc-100 hover:bg-zinc-100">
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1191</td>
         <td class="px-3 py-1.5">Nashik Steel Traders</td>
         <td class="px-3 py-1.5 text-zinc-600">Dispatch</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹4,68,500</td>
-        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums">19 Aug</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹4,68,500</td>
+        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">19 Aug</td>
       </tr>
       <tr class="border-b border-zinc-100 hover:bg-zinc-100">
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1194</td>
         <td class="px-3 py-1.5">Gujarat Polymers Ltd</td>
         <td class="px-3 py-1.5 text-zinc-600">Compounding</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹27,10,400</td>
-        <td class="px-3 py-1.5 text-right text-red-600 tabular-nums">02 Aug</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹27,10,400</td>
+        <td class="px-3 py-1.5 text-right text-red-600 tabular-nums whitespace-nowrap">02 Aug</td>
       </tr>
       <tr class="border-b border-zinc-100 hover:bg-zinc-100">
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1199</td>
         <td class="px-3 py-1.5">Nashik Steel Traders</td>
         <td class="px-3 py-1.5 text-zinc-600">Maintenance</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹1,32,900</td>
-        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums">22 Aug</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹1,32,900</td>
+        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">22 Aug</td>
       </tr>
       <tr class="hover:bg-zinc-100">
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1203</td>
         <td class="px-3 py-1.5">Sharma Extrusions</td>
         <td class="px-3 py-1.5 text-zinc-600">Tooling</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹96,750</td>
-        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums">28 Jul</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹96,750</td>
+        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">28 Jul</td>
       </tr>
     </tbody>
   </table>
 </div>` },
 
+      { id: 'sticky-header', name: 'The header stays put', tagNew: true, code:
+`<!-- border-separate border-spacing-0 is the whole trick, and it is not
+     cosmetic. Preflight sets border-collapse: collapse, and in a collapsed
+     table the borders belong to the table rather than to the cells, so the rule
+     under the header does not travel with the header when it sticks: the
+     labels float over the rows with nothing between them and the first row
+     looks like part of the head. Separated borders give the cells their own,
+     and the price is that the row rules move from the <tr> onto the <td>.
+
+     sticky goes on each <th>, not on the <thead> or the <tr>. Sticky table
+     sections are newer than sticky cells and still disagree between engines
+     about what a sticky <tr> does with its border; a sticky cell has behaved
+     the same way everywhere for years.
+
+     Each header cell carries bg-zinc-50 — the recessed band a table head takes
+     anyway. Without a fill of its own a sticky header is transparent and the
+     rows scroll straight through the labels, which is legible for exactly the
+     first two rows.
+
+     z-10 is the layer the rest of the system expects a sticky table head to sit
+     in, below the z-30 application header and well below the z-50 overlays.
+
+     The scroller is the div around the table, not the table, because a table is
+     not a scroll container. It takes overscroll-contain so that reaching the
+     last receipt does not hand the wheel to the page behind it and jump the
+     user somewhere else entirely.
+
+     Below md the table is gone and so is the sticky head: the cards are read in
+     the page's own scroll and a header of column names would have nothing to
+     label. -->
+<div data-kui="table/sticky-header" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="hidden max-h-80 overflow-y-auto overscroll-contain md:block">
+    <table class="w-full border-separate border-spacing-0 text-[13px]/5">
+      <thead>
+        <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">GRN number</th>
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">Vendor</th>
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">Item</th>
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium">Received</th>
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium">Value</th>
+        </tr>
+      </thead>
+      <tbody class="[&>tr:last-child>td]:border-b-0">
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0448</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Gujarat Polymers Ltd</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">HDPE granules</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">12,000 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹10,44,000</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0447</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Nashik Steel Traders</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">M12 hex bolt</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">4,000 nos</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹96,000</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0446</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Gujarat Polymers Ltd</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Masterbatch white</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">250 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹61,250</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0445</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Sharma Extrusions</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">MS angle 50×50×5</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">2,400 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,53,600</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0444</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Qureshi Metals</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Stretch film 23 micron</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">300 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹52,500</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0443</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Nashik Steel Traders</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">MS plate 6 mm</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">1,850 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,29,500</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0442</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Gujarat Polymers Ltd</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">LLDPE granules</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">8,000 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹7,04,000</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0441</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Qureshi Metals</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Aluminium section</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">640 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,17,600</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0440</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Sharma Extrusions</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Die steel H13</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">180 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹96,750</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0439</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Nashik Steel Traders</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Welding electrodes</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">120 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹28,800</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">GRN-26-0448</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹10,44,000</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · HDPE granules</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">12,000 kg received</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">GRN-26-0447</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹96,000</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Nashik Steel Traders · M12 hex bolt</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4,000 nos received</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">GRN-26-0446</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹61,250</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · Masterbatch white</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">250 kg received</p>
+    </li>
+  </ul>
+</div>` },
+
+      { id: 'sticky-column', name: 'The first column stays put', tagNew: true, code:
+`<!-- A stock ledger has nine columns and no way to lose any of them, so the
+     figures scroll sideways under an item name that does not. The scroll is
+     bounded to this div and exists only from md up: at 390px the same rows are
+     cards, because a table that scrolls sideways on a phone is
+     indistinguishable from a layout that broke, which is the rule the
+     responsive variant states and this one does not get to opt out of.
+
+     border-separate border-spacing-0 again, for the same reason as the sticky
+     header: with collapsed borders the rule down the right edge of the frozen
+     column belongs to the table and stays behind while the column travels, so
+     the figures slide under a label with no edge to stop at.
+
+     The sticky cells need an opaque fill or the columns scroll straight through
+     them. Because that fill is opaque it also stops taking the row tint, so the
+     tint is put back with group-hover on the frozen cell — otherwise hovering a
+     row lights up eight columns and leaves the ninth white, which reads as the
+     row ending where the frozen column starts.
+
+     The frozen cell is a <th scope="row">, not a <td>. Eight columns along, a
+     bare figure is read out with no idea which item it belongs to; scope="row"
+     is what attaches the two.
+
+     If the head is sticky as well, the top-left cell is sticky on both axes and
+     has to outrank both: z-20 on the corner, z-10 on the rest of the head and
+     on the frozen column, or the corner is painted over from one side or the
+     other as the ledger is scrolled.
+
+     Closing stock below the reorder level takes a red dot, not a red cell. It
+     is one fact about one figure and the row is otherwise fine. -->
+<div data-kui="table/sticky-column" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="hidden overflow-x-auto overscroll-x-contain md:block">
+    <table class="w-full min-w-[60rem] border-separate border-spacing-0 text-[13px]/5">
+      <thead>
+        <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="sticky left-0 z-10 w-56 border-r border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">Item</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Opening</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Received</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Issued</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Rejected</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Closing</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Value</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Reorder level</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Last receipt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">HDPE granules — natural</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-1042</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">12,400</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">8,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">9,600</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">120</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">10,680</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹9,29,160</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">6,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">04 Sep 2026</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">Masterbatch — white 60%</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-1091</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">640</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">250</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">410</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">480</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,17,600</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">300</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">28 Aug 2026</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">M12 hex bolt — 8.8 zinc</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-3310</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">24,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">4,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">11,500</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">250</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">16,250</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹3,90,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">8,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">02 Sep 2026</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">Stretch film — 23 micron</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-5140</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">1,180</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">300</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">640</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">840</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,47,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">500</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">30 Aug 2026</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-zinc-200 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">MS angle — 50×50×5</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-7702</span>
+          </th>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">9,250</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">3,400</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0</td>
+          <td class="px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>5,850
+              <span class="sr-only">below the reorder level</span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹3,74,400</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">6,000</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">19 Aug 2026</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- at 390px the ledger is five cards. Closing and value lead, because they
+       are what the screen is opened for; the movement that produced them
+       follows on one line. -->
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">HDPE granules — natural</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">10,680 kg</span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-1042 · reorder 6,000</span><span class="shrink-0">₹9,29,160</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 12,400 · received 8,000 · issued 9,600 · rejected 120</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Masterbatch — white 60%</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">480 kg</span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-1091 · reorder 300</span><span class="shrink-0">₹1,17,600</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 640 · received 250 · issued 410 · rejected 0</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">M12 hex bolt — 8.8 zinc</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">16,250 nos</span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-3310 · reorder 8,000</span><span class="shrink-0">₹3,90,000</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 24,000 · received 4,000 · issued 11,500 · rejected 250</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Stretch film — 23 micron</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">840 kg</span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-5140 · reorder 500</span><span class="shrink-0">₹1,47,000</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 1,180 · received 300 · issued 640 · rejected 0</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">MS angle — 50×50×5</span>
+        <span class="inline-flex shrink-0 items-center gap-1.5 text-[14px]/5 font-medium tabular-nums">
+          <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>5,850 kg
+          <span class="sr-only">below the reorder level</span>
+        </span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-7702 · reorder 6,000</span><span class="shrink-0">₹3,74,400</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 9,250 · received 0 · issued 3,400 · rejected 0</p>
+    </li>
+  </ul>
+</div>` },
+
       { id: 'responsive', name: 'Responsive', code:
-`<div data-kui="table/responsive" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+`<!-- Two renderings of the same records, one hidden at each breakpoint. Not a
+     table in a horizontal scroller, and not a table with three columns hidden
+     below md: the first is unusable on a phone and the second quietly takes
+     data away from the person least able to go and look it up.
+
+     The card carries the same fields in the same order as the row. The identity
+     and the money go on the first line, because those are what a phone user is
+     scanning for; the descriptive fields follow on one line separated by a
+     middot; the status and the date close it.
+
+     Both renderings are in the DOM at once, which is the thing to watch. Give
+     either of them a form control with a name and it posts even while
+     display:none, so the same record is submitted twice — checkbox/table has
+     the working version of that.
+
+     md is the breakpoint because five columns of thirteen-pixel text with px-4
+     padding stop fitting somewhere around 700px, not because 768 is a round
+     number. Count the columns before copying this. -->
+<div data-kui="table/responsive" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
@@ -349,15 +1278,15 @@ register(
         <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
         <td class="px-4 py-2.5">Sharma Extrusions</td>
         <td class="px-4 py-2.5 text-zinc-600">Fabrication</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹18,42,000</td>
-        <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums">12 Aug</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹18,42,000</td>
+        <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">12 Aug</td>
       </tr>
       <tr class="hover:bg-zinc-100">
         <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194</td>
         <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
         <td class="px-4 py-2.5 text-zinc-600">Compounding</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹27,10,400</td>
-        <td class="px-4 py-2.5 text-right text-red-600 tabular-nums">02 Aug</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹27,10,400</td>
+        <td class="px-4 py-2.5 text-right text-red-600 tabular-nums whitespace-nowrap">02 Aug</td>
       </tr>
     </tbody>
   </table>
@@ -366,12 +1295,12 @@ register(
     <li class="px-4 py-3">
       <div class="flex items-baseline justify-between gap-3">
         <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1187</span>
-        <span class="text-[14px]/5 tabular-nums">₹18,42,000</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</span>
       </div>
       <p class="mt-0.5 text-[13px]/5 text-zinc-600">Sharma Extrusions · Fabrication</p>
       <div class="mt-2 flex items-center gap-2">
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-900">
-          <span class="size-1.5 rounded-full bg-zinc-700"></span>Open
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
         </span>
         <span class="text-[12px]/4 text-zinc-500 tabular-nums">Due 12 Aug</span>
       </div>
@@ -379,16 +1308,158 @@ register(
     <li class="px-4 py-3">
       <div class="flex items-baseline justify-between gap-3">
         <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1194</span>
-        <span class="text-[14px]/5 tabular-nums">₹27,10,400</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹27,10,400</span>
       </div>
       <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · Compounding</p>
       <div class="mt-2 flex items-center gap-2">
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-700">
-          <span class="size-1.5 rounded-full bg-red-600"></span>Overdue
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
         </span>
         <span class="text-[12px]/4 text-zinc-500 tabular-nums">Due 02 Aug</span>
       </div>
     </li>
+  </ul>
+</div>` },
+
+      { id: 'django', name: 'Rendered from a queryset', tagNew: true, code:
+`<!-- views.py
+     from django.db.models import Sum
+
+     SORTS = {'number': 'number', 'vendor': 'vendor__name', 'amount': 'amount'}
+
+     def order_register(request):
+         # never hand a querystring to order_by(). It is an ORM expression, not
+         # a column name, so ?sort=vendor__contact__password walks a relation
+         # and orders the register by something nobody meant to expose. Map the
+         # keys the header offers, and fall back on anything else.
+         key = request.GET.get('sort', '-raised_on')
+         field = SORTS.get(key.lstrip('-'))
+         sort = ('-' if key.startswith('-') else '') + field if field else '-raised_on'
+         orders = (PurchaseOrder.objects
+                   .select_related('vendor')
+                   .filter(plant=request.user.plant)
+                   .order_by(sort))
+         return render(request, 'orders/register.html', {
+             'orders': orders,
+             'sort': sort,
+             # the foot totals the query, not the rows on screen. An aggregate
+             # is one extra query and it is the honest number; summing in the
+             # template gives the page total under a heading that says 148.
+             'committed': orders.aggregate(v=Sum('amount'))['v'] or 0,
+         })
+
+     templatetags/money.py
+         @register.filter
+         def rupees(n):
+             # Indian grouping is 2,2,3 above the last three digits. intcomma
+             # returns 1,245,000 where the register has to read 12,45,000, and
+             # a figure wrong by a factor of ten is read straight past.
+             s = str(int(n or 0)); head, tail = s[:-3], s[-3:]
+             if not head: return '₹' + tail
+             parts = []
+             while len(head) > 2: parts.insert(0, head[-2:]); head = head[:-2]
+             if head: parts.insert(0, head)
+             return '₹' + ','.join(parts + [tail])
+
+     The sort is a link, not a button, because it changes what the URL points at
+     — so it is bookmarkable, it opens in a new tab, and the back button undoes
+     it. aria-sort still goes on the <th>, as in the default variant, and only
+     on the columns that actually sort.
+
+     {% empty %} draws the no-rows case as a <tr> with one colspan cell inside
+     the <tbody>, never as a div after the table: a sibling div is outside the
+     table in the accessibility tree, so somebody reading with table navigation
+     walks a table of zero rows and is never told why. The message itself
+     belongs to empty-state — copy the wording from there. If the columns are
+     optional, the colspan comes from the view rather than being typed here.
+
+     The foot is skipped entirely when there is nothing to total, and its count
+     is pluralized, so a register with one receipt in it does not say 1 orders.
+
+     Paging around all of this is data-table, not table. -->
+{# orders/register.html #}
+<div data-kui="table/django" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5"
+            aria-sort="{% if sort == 'number' %}ascending{% elif sort == '-number' %}descending{% else %}none{% endif %}">
+          <a href="?sort={% if sort == 'number' %}-{% endif %}number"
+             class="inline-flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            PO number
+            <span class="{% if sort != 'number' and sort != '-number' %}invisible{% endif %}{% if sort == '-number' %} rotate-180{% endif %}"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </a>
+        </th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5"
+            aria-sort="{% if sort == 'amount' %}ascending{% elif sort == '-amount' %}descending{% else %}none{% endif %}">
+          <a href="?sort={% if sort == 'amount' %}-{% endif %}amount"
+             class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Amount
+            <span class="{% if sort != 'amount' and sort != '-amount' %}invisible{% endif %}{% if sort == '-amount' %} rotate-180{% endif %}"><i data-lucide="chevron-up" class="size-3.5"></i></span>
+          </a>
+        </th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
+          <td class="px-4 py-2.5">{{ o.vendor.name }}</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">{{ o.amount|rupees }}</td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full {{ o.status_dot }}" aria-hidden="true"></span>{{ o.get_status_display }}
+            </span>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4" class="px-6 py-12 text-center">
+            <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+              <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
+            </span>
+            <h3 class="mt-3 text-[16px]/6 font-semibold">No orders at {{ request.user.plant }}</h3>
+            <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">Nothing has been raised against this plant yet.</p>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    {% if orders %}
+      <tfoot class="bg-zinc-50">
+        <tr class="border-t border-zinc-200">
+          <th scope="row" colspan="2" class="px-4 py-2 text-left text-[12px]/4 font-medium text-zinc-600">
+            <span class="tabular-nums">{{ orders|length }}</span> order{{ orders|length|pluralize }} committed
+          </th>
+          <td class="px-4 py-2 text-right font-medium tabular-nums whitespace-nowrap">{{ committed|rupees }}</td>
+          <td class="px-4 py-2"></td>
+        </tr>
+      </tfoot>
+    {% endif %}
+  </table>
+
+  {% comment %} the same queryset as cards. It is already evaluated by the loop above, so
+     this second pass costs no query — and orders|length reads the same cache
+     rather than firing a second count(). {% endcomment %}
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    {% for o in orders %}
+      <li class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <span class="text-[14px]/5 font-medium tabular-nums">{{ o.number }}</span>
+          <span class="shrink-0 text-[14px]/5 tabular-nums">{{ o.amount|rupees }}</span>
+        </div>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">{{ o.vendor.name }}</p>
+        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full {{ o.status_dot }}" aria-hidden="true"></span>{{ o.get_status_display }}
+        </span>
+      </li>
+    {% empty %}
+      <li class="px-6 py-12 text-center">
+        <h3 class="text-[16px]/6 font-semibold">No orders at {{ request.user.plant }}</h3>
+        <p class="mt-1 text-[13px]/5 text-zinc-600">Nothing has been raised against this plant yet.</p>
+      </li>
+    {% endfor %}
   </ul>
 </div>` }
     ]
@@ -396,7 +1467,7 @@ register(
 
   {
     id: 'data-table', name: 'Data table', category: 'data',
-    description: 'The register screen assembled: a table with a search box, sortable headers, column visibility, row selection and a pager, all running off one array of records.',
+    description: 'The register screen assembled: a table with a search box, filters, sortable headers, column visibility, row selection, totals and a pager, all running off one array of records.',
     when: 'The main list screen of a module — the order register, the GRN register, the vendor list. If all you want is rows on a page, use table; this is table with working state around it, and every control it shows is one you then have to point at something real.',
     notes: [
       'Where the register holds its own data, every control is real state on the component root: the search filters the array, the column boxes hide cells, the headers reorder rows and the footer cuts the page out of the result. A toolbar whose controls do nothing is worse than no toolbar.',
@@ -405,15 +1476,28 @@ register(
       'indeterminate is a property with no matching attribute, so a select-all cannot be rendered mixed by the server. Bind it with x-effect on the box itself, not on the component root where $refs is not populated yet.',
       'The select-all covers the rows on the page in front of you and nothing beyond it. Say so in its label — "Select all" over a paged register is a promise the box does not keep.',
       'The panel cannot be overflow-hidden while the toolbar holds a menu, or the menu is clipped at the panel edge. The footer strip is what keeps the tinted rows off the rounded corners.',
-      'Sort the filtered set and then cut the page out of it, in that order. Paging a sorted copy of the unfiltered array is how a register ends up showing rows that do not match the search.'
+      'Sort the filtered set and then cut the page out of it, in that order. Paging a sorted copy of the unfiltered array is how a register ends up showing rows that do not match the search.',
+      'The first paint and a later page are different waits, and only one of them draws grey rows. Before anything is on screen the panel is a skeleton in the shape of the table it is about to become; once rows are up, a page in flight keeps them and marks them inert. Blanking a register back to skeletons on every page press is the cheapest way to make a fast screen feel slow.',
+      'Never disable the control that started the request. A browser blurs a disabled element to the body, so the keyboard user who pressed Next is thrown to the top of the document and the second press goes nowhere. Guard the handler instead: a press while busy returns.',
+      'A filter in force has to be visible and removable on its own. The usual cause of an empty register is one filter out of four, and a single Clear all throws away the three that were right.',
+      'A register with nothing in it and a register whose filters match nothing are different screens. The empty register drops the toolbar and the header row and offers the create action; the empty result keeps both, because the query is the thing that has to be undone, and it never offers create — under a filter that is hiding a record, a create button is how the same order gets raised twice.',
+      'A bulk bar states the scope of the selection as well as its size. "5 selected" over a paged register does not say whether the other four pages are in it, and the user finds out from the confirmation dialog or from the audit log.',
+      'Ticking every row on the page is not selecting the query. Where the action is meant to cover everything that matches, that is a second, explicit act carrying its own count and its own way back out.',
+      'A total goes in a <tfoot> and says what it is the total of. The page total and the total of the whole filtered set are two different numbers, and the second one cannot be added up from the rows on screen — it comes from the server with the page.',
+      'An export is a GET carrying the register\'s own query, so the file and the screen cannot disagree. A control labelled only "Export" over a filtered register means one of three things and picks one silently.',
+      'Below md there is no header row, so the sort has to move into the toolbar. A register that restacks into cards and takes its sorting with it is sorted by whatever the server chose last and cannot be changed from a phone.'
     ],
     anatomy: [
-      ['Toolbar', 'The strip above the header row: search on the left, column visibility on the right. Filters live here, inside the panel, never floating above it.'],
+      ['Toolbar', 'The strip above the header row: search on the left, filters and column visibility on the right. Filters live here, inside the panel, never floating above it.'],
       ['Search box', 'Filters the records as they are typed and returns to page one, because page 4 of a two-row result shows nothing.'],
       ['Column menu', 'A popover of checkboxes rather than a role="menu", because its items are settings and not commands. Hiding a column drops its header, its cells and the same field from the card layout.'],
-      ['Bulk bar', 'Appears only when something is selected, carrying the count and the actions that apply to it, between the toolbar and the header row.'],
+      ['Filter chips', 'The band under the toolbar carrying one removable chip per filter in force, and a clear-all that is a link rather than a second filled button.'],
+      ['Bulk bar', 'Appears only when something is selected, carrying the count, the scope of that count and the actions that apply to it, between the toolbar and the header row.'],
       ['Select-all', 'A box with no name and no value. It reads none, some or all off the rows on this page and writes indeterminate back through script.'],
       ['Sortable header', 'A button inside a <th>, and the <th> is what carries aria-sort. The chevron marks the sorted column and points the way the sort runs.'],
+      ['Row expander', 'A button in the first cell carrying aria-expanded and aria-controls, opening a second <tr> that holds the order\'s lines on a recessed band.'],
+      ['Totals row', 'A <tfoot> holding the page total and the total of the whole filtered set on the same columns, never computed from the rows on screen alone.'],
+      ['Export menu', 'A popover of links, one per scope, each naming the count it would write out and each carrying the register\'s own query string.'],
       ['Footer', 'The range, the total and the page position, with the ends disabled rather than removed so the control keeps its width.'],
       ['Empty state', 'What fills the panel when the filter matches nothing: what was searched for, and the way back out of it.']
     ],
@@ -421,11 +1505,16 @@ register(
       'The full register carries all of it — search, sort, column visibility, selection and paging. The compact one drops selection and the column menu and keeps search, sort and paging. The server-paged one holds no state at all: its search is a GET form, its headers and pager are links carrying q, sort and page, and htmx swaps the same panel back in.',
       'The search filters on every keystroke and resets to page one. The rows are filtered first, then sorted, then sliced into a page, so the pager can never disagree with the filter.',
       'Clicking a header sorts by that column ascending; clicking the sorted header reverses it. One column is sorted at a time and the rows are genuinely reordered.',
+      'Below md the header row is gone, so the same sort is offered as a select in the toolbar. It writes the same two pieces of state the headers write and returns to page one with them.',
       'Hiding a column from the menu removes its header and its cells, and drops the same field from the card layout below md.',
       'Selection is an array of record ids on the root. It survives sorting, filtering and paging, so the count in the bulk bar is the whole selection while the header checkbox speaks only for the page in front of you.',
       'The header checkbox reads none, some or all off the rows on this page, and \'some\' is indeterminate rather than unchecked. Ticking it adds that page to the selection; unticking it releases only that page.',
+      'A selection that outlives the page is the right default for approving, exporting and tagging. Drop it deliberately on a page change only where the action cannot be undone and the rows it would run against are no longer on screen — and say so where the count was, rather than clearing it silently.',
+      'A keystroke in the search replaces a request already in flight; a press on the pager does not queue a second one behind the first. Both leave the rows that are already up alone until the new ones arrive.',
+      'Rows expand in place and several can be open at once, because the lines of two orders are compared against each other more often than one is read on its own.',
       'When the filter matches nothing the rows are replaced by an empty state that names what was searched for and offers a control that clears it.',
       'The footer states the range and the total, and its ends disable rather than disappear so the buttons stay under the cursor.',
+      'The states that stay tables on a phone — filters, bulk, export and the expandable register — drop columns at the sm breakpoint rather than scrolling sideways. What goes is the widest column, never the one that identifies the row: the PO number and the figure stay, and the vendor and the status pill are the first two out.',
       'Below md the full register renders its rows as cards carrying the same fields and the same checkbox, while the compact and server-paged tables are three columns and stand at 390px as they are. The select-all stays in the table header, so at that width rows are selected one at a time.'
     ],
     a11y: [
@@ -434,10 +1523,15 @@ register(
       'The column menu trigger carries aria-haspopup and aria-expanded, and Escape closes the popover and puts focus back on the trigger. The popover is a labelled group of checkboxes, not a role="menu".',
       'Every row checkbox is labelled with its PO number, and the select-all says how many rows on this page it covers.',
       'The select-all is a native box carrying the indeterminate property, which is already mapped to mixed. Nothing here writes aria-checked.',
+      'A register still loading is aria-busy on the panel with one sr-only role="status" naming what is loading, and the grey rows under it are aria-hidden. Without that a screen reader walks a table of forty empty cells and is never told why.',
+      'The wait while a later page is in flight is announced by the range line changing, because it is already a role="status" and it already says the new answer. A second region that says "Loading" talks over the first, and the ring beside it is aria-hidden and is for the eye.',
+      'A filter chip\'s button is named for the filter it removes — "Remove the filter Overdue", never "Remove".',
+      'A row expander is a button carrying aria-expanded and aria-controls pointing at the id of the row it opens, and that row is a real <tr> in the same table, so it is read in place rather than after the table.',
+      'Export scopes are links rather than menu items, so the browser keeps its own gestures over them, and each one names its scope and its count in its own text rather than in a title.',
       'The footer is a <nav> with a label, its range is real text rather than a title attribute, and the ends are real disabled buttons that Tab skips.',
       'Below md each card in the full register is one label wrapped round its checkbox, so the whole card is the target, and the box keeps an explicit aria-label so its name stays the PO number instead of the whole card.'
     ],
-    related: ['table', 'pagination', 'dropdown'],
+    related: ['table', 'pagination', 'empty-state', 'skeleton', 'dropdown'],
     variants: [
       { id: 'default', name: 'Full register', code:
 `<!-- Everything the toolbar claims to do, it does: the search filters the array,
@@ -449,6 +1543,11 @@ register(
      element itself. It speaks for the rows on this page only, which is what
      its label says; the count in the bulk bar is the whole selection, which
      survives paging and filtering.
+
+     The sort select is md:hidden and duplicates nothing. Below md the header
+     row is gone, so without it the register a phone gets is sorted by whatever
+     the server chose and there is no way to change it — the sortable headers
+     are a desktop affordance and the sort itself is not.
 
      The panel is not overflow-hidden: the column menu opens out of it. -->
 <div data-kui="data-table/default" x-data="{
@@ -466,7 +1565,7 @@ register(
          { po: 'PO-24-1218', vendor: 'Gujarat Polymers Ltd', dept: 'Tooling', amount: 1290500, status: 'Open', due: '08 Sep' },
          { po: 'PO-24-1221', vendor: 'Sharma Extrusions', dept: 'Maintenance', amount: 43200, status: 'Closed', due: '31 Jul' }
        ],
-       dot: { Open: 'bg-zinc-700', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
        money(n) { return '₹' + n.toLocaleString('en-IN') },
        sortBy(c) { this.dir = this.col === c && this.dir === 'asc' ? 'desc' : 'asc'; this.col = c; this.page = 1 },
        ariaSort(c) { return this.col === c ? (this.dir === 'asc' ? 'ascending' : 'descending') : 'none' },
@@ -497,10 +1596,25 @@ register(
              class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
     </div>
 
+    <div class="min-w-0 md:hidden">
+      <label for="dt-sort" class="sr-only">Sort the register</label>
+      <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="dt-sort" @change="const [c, d] = $event.target.value.split('-'); col = c; dir = d; page = 1"
+                class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+          <option value="po-asc">PO number</option>
+          <option value="vendor-asc">Vendor</option>
+          <option value="amount-desc">Highest amount</option>
+        </select>
+        <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+          <i data-lucide="chevron-down" class="size-3.5"></i>
+        </span>
+      </div>
+    </div>
+
     <div class="relative" x-data="{ open: false }" @click.outside="open = false"
          @keydown.escape="if (open) { open = false; $refs.colTrigger.focus() }">
       <button type="button" x-ref="colTrigger" @click="open = !open" :aria-expanded="open" aria-haspopup="true"
-              class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+              class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
         <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
       </button>
@@ -520,12 +1634,12 @@ register(
   </div>
 
   <div x-show="sel.length" x-cloak class="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-zinc-100 px-4 py-2">
-    <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
+    <span class="text-[13px]/5 font-medium tabular-nums"><span x-text="sel.length"></span> selected</span>
     <div class="flex flex-wrap items-center gap-2">
-      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">Export</button>
+      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export</button>
     </div>
-    <button type="button" @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2">Clear</button>
+    <button type="button" @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
   </div>
 
   <table x-show="filtered.length" class="hidden w-full text-[13px]/5 md:table">
@@ -537,20 +1651,20 @@ register(
                  class="size-4 shrink-0 accent-zinc-700">
         </th>
         <th scope="col" :aria-sort="ariaSort('po')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'po' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'po' && 'text-zinc-900'">
             PO number
             <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th scope="col" :aria-sort="ariaSort('vendor')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'vendor' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'vendor' && 'text-zinc-900'">
             Vendor
             <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th x-show="cols.dept" scope="col" class="px-4 py-2.5 font-medium">Department</th>
         <th scope="col" :aria-sort="ariaSort('amount')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'amount' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'amount' && 'text-zinc-900'">
             Amount
             <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
@@ -565,7 +1679,7 @@ register(
           <td class="px-4 py-2.5">
             <input type="checkbox" :value="r.po" x-model="sel" :aria-label="'Select ' + r.po" class="size-4 shrink-0 accent-zinc-700">
           </td>
-          <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
           <td class="px-4 py-2.5" x-text="r.vendor"></td>
           <td x-show="cols.dept" class="px-4 py-2.5 text-zinc-600" x-text="r.dept"></td>
           <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
@@ -609,7 +1723,7 @@ register(
     </span>
     <p class="mt-3 text-[16px]/6 font-semibold">No orders match this search</p>
     <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">Nothing in the register matches <span class="font-medium text-zinc-900" x-text="q"></span>. Search on a PO number, a vendor or a department.</p>
-    <button type="button" @click="q = ''; page = 1" class="mt-4 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Clear the search</button>
+    <button type="button" @click="q = ''; page = 1" class="mt-4 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear the search</button>
   </div>
 
   <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
@@ -618,11 +1732,11 @@ register(
     <div class="flex items-center gap-2">
       <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
       <button type="button" @click="page--" :disabled="page === 1"
-              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-left" class="size-4"></i>Previous
       </button>
       <button type="button" @click="page++" :disabled="page === pages"
-              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Next<i data-lucide="chevron-right" class="size-4"></i>
       </button>
     </div>
@@ -630,7 +1744,15 @@ register(
 </div>` },
 
       { id: 'compact', name: 'Compact', code:
-`<div data-kui="data-table/compact" x-data="{
+`<!-- The register in a side panel: three columns, py-1.5 rows and an icon pager.
+     Selection and the column menu are gone rather than shrunk — a checkbox
+     column at this density is a 16px target beside 24px rows, and a column menu
+     over three columns is a control for hiding two of them.
+
+     Search and sort stay, because they are what make a list of forty rows
+     usable in a 320px column, and both are the same state the full register
+     keeps. -->
+<div data-kui="data-table/compact" x-data="{
        q: '', col: 'vendor', dir: 'asc', page: 1, size: 4,
        rows: [
          { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: 1842000 },
@@ -668,19 +1790,19 @@ register(
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" :aria-sort="ariaSort('po')" class="px-3 py-1.5">
-          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'po' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'po' && 'text-zinc-900'">
             PO number
             <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th scope="col" :aria-sort="ariaSort('vendor')" class="px-3 py-1.5">
-          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'vendor' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'vendor' && 'text-zinc-900'">
             Vendor
             <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th scope="col" :aria-sort="ariaSort('amount')" class="px-3 py-1.5">
-          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'amount' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'amount' && 'text-zinc-900'">
             Amount
             <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
@@ -707,15 +1829,1024 @@ register(
        x-text="filtered.length ? from + '–' + to + ' of ' + filtered.length : '0 of 0'"></p>
     <div class="flex items-center gap-1">
       <button type="button" @click="page--" :disabled="page === 1" aria-label="Previous page"
-              class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+              class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
       <button type="button" @click="page++" :disabled="page === pages" aria-label="Next page"
-              class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+              class="flex size-7 items-center justify-center rounded-lg border border-zinc-200 enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>
     </div>
   </nav>
+</div>` },
+
+      { id: 'loading', name: 'First paint, before any rows', tagNew: true, code:
+`<!-- The register in the second before it has anything to show. It is the
+     skeleton entry's table wearing this component's toolbar and footer, and the
+     split is what matters: everything that is not waiting on the fetch is drawn
+     for real, and only the cells are grey.
+
+     The toolbar is real and the search is live. Its value goes into the request
+     that replaces these rows, so typing in the first half-second is a query the
+     server can answer; disable it instead and the one control somebody reaches
+     for while a slow screen loads is the one that refuses them. The Columns
+     button is drawn in its resting state — its popover is the full register's
+     and is not repeated here — because a toolbar that arrives with the rows
+     makes the whole panel jump at the moment somebody starts reading it.
+
+     The header row is real too, and it does two jobs: somebody can decide which
+     column they are going to read before the figures land, and the browser sets
+     the column widths from the same markup the loaded table uses, so no column
+     moves on arrival.
+
+     Five grey rows because the page size is five. Guess low where it is not
+     known — growth pushes down only what is below the panel, while shrinkage
+     pulls the whole page up under a cursor already moving.
+
+     aria-busy sits on the panel and one sr-only status names what is loading.
+     The grey rows are aria-hidden, or a screen reader walks twenty-five empty
+     cells and is never told why.
+
+     The pager is disabled rather than drawn grey. There is no page count yet,
+     and a live Next over nothing is a promise; a grey bar where the buttons go
+     would make the footer change size when they arrive.
+
+     This is the first paint and nothing here is worth keeping. Once rows are up,
+     a later page in flight keeps them — see the paging variant, which never
+     comes back to this state. -->
+<div data-kui="data-table/loading" aria-busy="true" class="rounded-xl border border-zinc-300 bg-white">
+  <p role="status" class="sr-only">Loading the order register</p>
+
+  <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" aria-label="Search the order register" placeholder="Search PO, vendor or department"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+    <button type="button" aria-haspopup="true" aria-expanded="false"
+            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </button>
+  </div>
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Department</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+      </tr>
+    </thead>
+    <tbody class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-16 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-20 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-32 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-16 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-14 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+      <tr>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-16 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none md:hidden" aria-hidden="true">
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-20 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
+  </ul>
+
+  <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <div class="flex h-8 items-center">
+      <div class="h-2.5 w-40 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>` },
+
+      { id: 'paging', name: 'A later page in flight', tagNew: true, code:
+`<!-- Rows are already on screen, so the wait keeps them. The page somebody is
+     looking at is the last true answer the server gave; replacing it with grey
+     bars on every press throws away a readable screen and makes a 300ms fetch
+     feel like a reload. They are not dimmed either — half-opacity says "wrong",
+     and these figures are merely previous.
+
+     inert goes on the rows, not on the nav. A scrim stops a mouse and nothing
+     else: Tab still walks into rows that are about to be replaced and Enter
+     still fires a row action against them. Alpine treats inert as a boolean
+     attribute, so a false value removes it rather than writing inert="false",
+     which is a truthy string that would leave the table permanently unreachable.
+
+     The pager is not disabled while the fetch runs. The button somebody just
+     pressed is the one that would be disabled, and a browser blurs a disabled
+     element to the body — so the keyboard user who pressed Next is now at the
+     top of the document. The handler guards instead: a press while busy returns.
+
+     A keystroke and a page press want opposite rules, and both are here. The
+     search restarts the request every time, because only the last thing typed
+     matters; the pager refuses to queue a second page behind the first, because
+     both would arrive and only one of them would be the page under the cursor.
+
+     The ring appears at 500ms, and the delay lives in the bound class over a
+     delay-0 base — leave it in the base and the ring is still turning half a
+     second after the rows have landed. It holds its box with opacity rather than
+     x-show, so the footer does not widen and take the button out from under the
+     cursor. Most fetches answer first and it never paints.
+
+     The rows on screen answer the query the server last answered, not the one
+     in the box. That is the whole reason they are worth keeping and the reason
+     they are inert while the next answer is on its way: they are true about a
+     query somebody has already moved on from, and acting on them would act on
+     the wrong set.
+
+     The announcement is the range line, which is already a role="status" and
+     already says the new answer when it arrives. A second live region saying
+     "Loading" talks over it, so the ring is aria-hidden and is for the eye. -->
+<div data-kui="data-table/paging" x-data="{
+       q: '', applied: '', page: 1, size: 4, busy: false, t: null,
+       all: Array.from({ length: 14 }, (_, i) => ({
+         po: 'PO-24-' + (1187 + i * 3),
+         vendor: ['Sharma Extrusions', 'Nashik Steel Traders', 'Gujarat Polymers Ltd', 'Konkan Chemicals Pvt Ltd'][i % 4],
+         amount: 96750 + (i * 417350) % 4800000,
+         due: String(2 + i % 27).padStart(2, '0') + ' Sep 2026'
+       })),
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get result() {
+         const q = this.applied.trim().toLowerCase();
+         return q ? this.all.filter(o => (o.po + ' ' + o.vendor).toLowerCase().includes(q)) : this.all;
+       },
+       get total() { return this.result.length },
+       get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
+       get from() { return this.total ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get shown() { return this.result.slice((this.page - 1) * this.size, this.page * this.size) },
+       go(n) {
+         if (this.busy || n < 1 || n > this.pages) return;
+         this.busy = true;
+         clearTimeout(this.t);
+         this.t = setTimeout(() => { this.page = n; this.busy = false }, 1200);
+       },
+       search() {
+         this.busy = true;
+         clearTimeout(this.t);
+         this.t = setTimeout(() => { this.applied = this.q; this.page = 1; this.busy = false }, 900);
+       }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" x-model="q" @input.debounce.300ms="search()" aria-label="Search the order register"
+             placeholder="Search PO or vendor"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+  </div>
+
+  <div :inert="busy">
+    <table class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+          <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+          <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+          <th scope="col" class="px-4 py-2.5 text-right font-medium">Due</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="r in shown" :key="r.po">
+          <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+            <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+            <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+            <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+            <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums" x-text="r.due"></td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+
+  <nav aria-label="Register pages" :aria-busy="busy"
+       class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <div class="flex items-center gap-2">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 opacity-0 transition-opacity delay-0 motion-reduce:animate-none"
+            :class="busy && 'opacity-100 delay-500'" aria-hidden="true"></span>
+      <p role="status" class="text-[13px]/5 text-zinc-600 tabular-nums"
+         x-text="from + '–' + to + ' of ' + total + ' orders'">1–4 of 14 orders</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages">Page 1 of 4</span>
+      <button type="button" @click="go(page - 1)" :disabled="page === 1"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" @click="go(page + 1)" :disabled="page === pages"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>` },
+
+      { id: 'empty', name: 'A register with nothing in it', tagNew: true, code:
+`<!-- Nothing has ever been raised here, which is a different screen from a
+     search that matched nothing, and the difference is the toolbar. A search box
+     over an empty register offers to filter nothing, sortable headers offer to
+     reorder nothing, and a pager reading "0–0 of 0" is chrome describing an
+     absence. All three are gone; the panel keeps its heading and its count, so
+     the region still says what it is.
+
+     The create action is safe here in a way it never is under a filter. The
+     scope is the whole register and the count is zero, so nothing is being
+     hidden that a second purchase order could duplicate. Put the same button
+     under a filtered result and somebody raises an order that already exists
+     three rows outside the filter — which is why the no-results state in the
+     default variant offers to clear the search and nothing else.
+
+     Two answers, one of them filled. Raising an order is what this screen is
+     for; the import is the same job done in bulk and is a link, because two
+     graphite buttons side by side make somebody choose before they have read
+     why they are choosing.
+
+     The sentence carries a date and a fact. "No purchase orders yet" on its own
+     leaves a user wondering whether the register is empty or broken; the day the
+     plant was opened settles it. -->
+<div data-kui="data-table/empty" class="rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Purchase orders · Silvassa</h2>
+    <p class="text-[12px]/4 text-zinc-500 tabular-nums">0 orders</p>
+  </div>
+
+  <div class="px-6 py-12 text-center">
+    <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="clipboard-list" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">No purchase orders yet</h3>
+    <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      The Silvassa plant was opened on 01 Aug 2026 and nothing has been raised against it. The first order appears here the moment it is saved, draft or not.
+    </p>
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+      <button type="button" class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4"></i>Raise a purchase order
+      </button>
+      <a href="#" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Import open orders from Nashik
+      </a>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'filters', name: 'Filters in force, removable one at a time', tagNew: true, code:
+`<!-- Three predicates over the register, and the chips under the toolbar are
+     what they add up to. A filtered register that shows only the selects has
+     told the user which controls exist, not which ones are doing something —
+     and the usual reason a register looks empty is one filter out of three set
+     last Tuesday and never cleared.
+
+     Each chip removes its own filter, and its button is named for what it drops:
+     "Remove the filter Overdue", never "Remove". Clear all is beside them as a
+     link rather than a second filled button, because it is the blunt answer and
+     throws away the filters that were right along with the one that was not.
+
+     The selects apply on change. There is no Apply button for the same reason a
+     settings switch has no Save: put one there and half the users press it and
+     half do not, and the two groups get different lists out of the same gesture.
+
+     The count is a role="status" in the toolbar, in the document from first
+     paint. Put the live region inside the empty block instead and it arrives
+     with its message already in it, which is not a change and is announced to
+     nobody.
+
+     The empty state names the filters rather than the search, and offers to drop
+     the last one rather than all of them. It carries no create button: a record
+     that is merely hidden by a filter is the commonest reason the same order
+     gets raised twice.
+
+     At 390px the selects are a two-column grid and the chips wrap. min-w-0 on
+     each cell, or a long vendor name pushes the grid past the viewport. -->
+<div data-kui="data-table/filters" x-data="{
+       status: 'overdue', vendor: '', plant: 'silvassa',
+       orders: [
+         { po: 'PO-24-1187', vendor: 'sharma', vname: 'Sharma Extrusions', plant: 'silvassa', status: 'open', amount: 1842000, due: '28 Aug 2026' },
+         { po: 'PO-24-1191', vendor: 'nashik-steel', vname: 'Nashik Steel Traders', plant: 'nashik', status: 'approved', amount: 468500, due: '19 Aug 2026' },
+         { po: 'PO-24-1194', vendor: 'gujarat', vname: 'Gujarat Polymers Ltd', plant: 'silvassa', status: 'overdue', amount: 2710400, due: '02 Aug 2026' },
+         { po: 'PO-24-1199', vendor: 'nashik-steel', vname: 'Nashik Steel Traders', plant: 'silvassa', status: 'overdue', amount: 132900, due: '05 Aug 2026' },
+         { po: 'PO-24-1203', vendor: 'sharma', vname: 'Sharma Extrusions', plant: 'vadodara', status: 'closed', amount: 96750, due: '28 Jul 2026' },
+         { po: 'PO-24-1207', vendor: 'gujarat', vname: 'Gujarat Polymers Ltd', plant: 'nashik', status: 'approved', amount: 5460000, due: '30 Aug 2026' },
+         { po: 'PO-24-1211', vendor: 'sharma', vname: 'Sharma Extrusions', plant: 'silvassa', status: 'open', amount: 214300, due: '04 Sep 2026' },
+         { po: 'PO-24-1218', vendor: 'gujarat', vname: 'Gujarat Polymers Ltd', plant: 'vadodara', status: 'open', amount: 1290500, due: '08 Sep 2026' }
+       ],
+       names: { status: { open: 'Open', approved: 'Approved', overdue: 'Overdue', closed: 'Closed' },
+                vendor: { sharma: 'Sharma Extrusions', 'nashik-steel': 'Nashik Steel Traders', gujarat: 'Gujarat Polymers Ltd' },
+                plant: { silvassa: 'Silvassa', nashik: 'Nashik', vadodara: 'Vadodara' } },
+       dot: { open: 'bg-zinc-500', approved: 'bg-amber-500', overdue: 'bg-red-600', closed: 'bg-emerald-600' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get rows() {
+         return this.orders.filter(o =>
+           (!this.status || o.status === this.status) &&
+           (!this.vendor || o.vendor === this.vendor) &&
+           (!this.plant || o.plant === this.plant));
+       },
+       get chips() {
+         return ['status', 'vendor', 'plant']
+           .filter(k => this[k])
+           .map(k => ({ key: k, label: this.names[k][this[k]] }));
+       },
+       drop(key) { this[key] = '' },
+       clear() { this.status = ''; this.vendor = ''; this.plant = '' }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+      <div class="min-w-0">
+        <label for="dt-fl-status" class="sr-only">Status</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="dt-fl-status" x-model="status"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+            <option value="">All statuses</option>
+            <option value="open">Open</option>
+            <option value="approved">Approved</option>
+            <option value="overdue">Overdue</option>
+            <option value="closed">Closed</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-3.5"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="min-w-0">
+        <label for="dt-fl-vendor" class="sr-only">Vendor</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="dt-fl-vendor" x-model="vendor"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+            <option value="">All vendors</option>
+            <option value="sharma">Sharma Extrusions</option>
+            <option value="nashik-steel">Nashik Steel Traders</option>
+            <option value="gujarat">Gujarat Polymers Ltd</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-3.5"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="min-w-0">
+        <label for="dt-fl-plant" class="sr-only">Plant</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="dt-fl-plant" x-model="plant"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+            <option value="">All plants</option>
+            <option value="silvassa">Silvassa</option>
+            <option value="nashik">Nashik</option>
+            <option value="vadodara">Vadodara</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-3.5"></i>
+          </span>
+        </div>
+      </div>
+
+      <p role="status" class="col-span-2 text-[12px]/4 text-zinc-500 tabular-nums sm:ml-auto sm:text-right"
+         x-text="chips.length ? rows.length + ' of ' + orders.length + ' orders match' : orders.length + ' orders'"></p>
+    </div>
+  </div>
+
+  <div x-show="chips.length" class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-100 px-4 py-2">
+    <template x-for="c in chips" :key="c.key">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span x-text="c.label"></span>
+        <button type="button" @click="drop(c.key)" :aria-label="'Remove the filter ' + c.label"
+                class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-3"></i>
+        </button>
+      </span>
+    </template>
+    <button type="button" @click="clear()" class="ml-auto text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+  </div>
+
+  <table x-show="rows.length" class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in rows" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vname"></td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="names.status[r.status]"></span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <div x-show="!rows.length" x-cloak class="px-6 py-12 text-center">
+    <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+    </span>
+    <p class="mt-3 text-[16px]/6 font-semibold">No orders match these filters</p>
+    <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      There are <span class="font-medium text-zinc-900 tabular-nums" x-text="orders.length"></span> orders in the register. Every chip above is in force — drop one and the list widens.
+    </p>
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+      <button type="button" @click="if (chips.length) drop(chips[chips.length - 1].key)"
+              class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Drop the last filter
+      </button>
+      <button type="button" @click="clear()" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Clear all filters
+      </button>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'bulk', name: 'A selection that outlives the page', tagNew: true, code:
+`<!-- Twelve orders, four to a page, and the selection is an array of PO numbers
+     on the root — so it survives paging, sorting and filtering, and the count in
+     the bar is the whole of it. That is the right default for approving,
+     exporting and tagging.
+
+     The bar states the scope as well as the size. "5 selected" over a paged
+     register does not say whether the other two pages are in it, and the user
+     finds that out from the confirmation dialog or from the audit log, so the
+     second line spells out how many are on this page and how many are not.
+
+     Ticking every row on the page is not selecting the query, and the escalation
+     line is where the difference is drawn. The header box can only ever speak
+     for the four rows under it; selecting all twelve is a second, deliberate act
+     with its own count, and it is undone by the same line it was made from.
+     Touching any row afterwards drops the claim, because the selection is no
+     longer the query.
+
+     Drop the selection on a page change only where the action cannot be undone
+     and the rows it would run against are no longer on screen — a bulk cancel, a
+     posting run. Where you do, say so where the count was rather than clearing
+     it silently: a selection that disappears without a word reads as a bug and
+     gets rebuilt by hand.
+
+     indeterminate is a property with no matching attribute, so the header box is
+     bound with x-effect on the element itself; the root has no $refs at the time
+     the component initialises.
+
+     At 390px the vendor and the status pill go and the checkbox, the PO number
+     and the figure stay. A screen somebody is selecting on has to show what is
+     ticked and what it is worth; everything else is a column they can page to a
+     wider screen for. -->
+<div data-kui="data-table/bulk" x-data="{
+       page: 1, size: 4, sel: ['PO-24-1187', 'PO-24-1191'], all: false,
+       rows: Array.from({ length: 12 }, (_, i) => ({
+         po: 'PO-24-' + (1187 + i * 4),
+         vendor: ['Sharma Extrusions', 'Nashik Steel Traders', 'Gujarat Polymers Ltd', 'Konkan Chemicals Pvt Ltd'][i % 4],
+         amount: 96750 + (i * 417350) % 4800000,
+         status: ['Open', 'Approved', 'Overdue', 'Open'][i % 4]
+       })),
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get pages() { return Math.ceil(this.rows.length / this.size) },
+       get shown() { return this.rows.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.rows.length) },
+       get onPage() { return this.shown.filter(r => this.sel.includes(r.po)).length },
+       get scope() {
+         if (this.all) return 'Every order that matches the current filters';
+         if (this.sel.length === this.onPage) return 'All of them on this page';
+         return this.onPage + ' on this page · ' + (this.sel.length - this.onPage) + ' on other pages';
+       },
+       get every() { return this.shown.length > 0 && this.shown.every(r => this.sel.includes(r.po)) },
+       get some() { return !this.every && this.shown.some(r => this.sel.includes(r.po)) },
+       toggleAll(on) {
+         this.all = false;
+         const ids = this.shown.map(r => r.po);
+         this.sel = on ? [...new Set([...this.sel, ...ids])] : this.sel.filter(id => !ids.includes(id));
+       }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div x-show="sel.length" x-cloak class="border-b border-zinc-200 bg-zinc-100">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2">
+      <div class="min-w-0">
+        <p class="text-[13px]/5 font-medium tabular-nums"><span x-text="sel.length"></span> selected</p>
+        <p class="text-[12px]/4 text-zinc-600 tabular-nums" x-text="scope"></p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" class="inline-flex h-8 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
+        <button type="button" class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export</button>
+        <button type="button" class="inline-flex h-8 items-center rounded-lg px-3 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel orders</button>
+      </div>
+      <button type="button" @click="sel = []; all = false"
+              class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
+    </div>
+
+    <p x-show="every && !all" x-cloak class="border-t border-zinc-200 px-4 py-1.5 text-[12px]/4 text-zinc-600 tabular-nums">
+      All <span x-text="shown.length"></span> orders on this page are selected.
+      <button type="button" @click="sel = rows.map(r => r.po); all = true"
+              class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Select all <span x-text="rows.length"></span> orders that match
+      </button>
+    </p>
+    <p x-show="all" x-cloak class="border-t border-zinc-200 px-4 py-1.5 text-[12px]/4 text-zinc-600 tabular-nums">
+      All <span x-text="rows.length"></span> matching orders are selected.
+      <button type="button" @click="sel = shown.map(r => r.po); all = false"
+              class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Select only this page
+      </button>
+    </p>
+  </div>
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-10 px-4 py-2.5">
+          <input type="checkbox" :aria-label="'Select the ' + shown.length + ' orders on this page'"
+                 :checked="every" x-effect="$el.indeterminate = some" @change="toggleAll($event.target.checked)"
+                 class="size-4 shrink-0 accent-zinc-700">
+        </th>
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Status</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in shown" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0" :class="sel.includes(r.po) ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+          <td class="px-4 py-2.5">
+            <input type="checkbox" :value="r.po" x-model="sel" @change="all = false" :aria-label="'Select ' + r.po" class="size-4 shrink-0 accent-zinc-700">
+          </td>
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+          <td class="hidden px-4 py-2.5 sm:table-cell">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="from + '–' + to + ' of ' + rows.length + ' orders'"></p>
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
+      <button type="button" @click="page--" :disabled="page === 1"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" @click="page++" :disabled="page === pages"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>` },
+
+      { id: 'totals', name: 'A column that has to total', tagNew: true, code:
+`<!-- Two totals, because there are two questions and they have different
+     answers: what is on this page, and what the filter is worth. Page the
+     register and the first figure moves while the second holds still. A footer
+     that sums the five visible rows and calls it "Total" is the defect this
+     variant exists to prevent — it is off by every row the user has not paged
+     to, it looks right, and nothing on screen contradicts it.
+
+     The whole register is in the browser here, so both figures are added up. On
+     a real screen the client holds one page and the filter total arrives with it
+     as one more number in the response, which changes where the second figure
+     comes from and not what it means. Either way it is never the sum of what is
+     on screen.
+
+     It is a real <tfoot>, not a strip after the table. The cells sit in the
+     columns they total, so the figures line up under them at any width, and a
+     screen reader reading down the Amount column reaches the total in that
+     column rather than a paragraph after the table. It is written after the
+     <tbody> and the browser paints it last; it does not need moving and it must
+     not be a second <thead>.
+
+     The label cell is a <th scope="row"> spanning the columns that carry no
+     figure, and both rows say in words what they are the total of. Two
+     right-aligned figures under one column with no labels are a puzzle.
+
+     Quantity totals only where the unit is the same. These orders are all in MT,
+     so the column adds up; a register mixing MT with nos and litres gets no
+     quantity total at all, because a figure summed across three different units
+     is not a number anybody can use.
+
+     Below md the table restacks into cards and a tfoot has no columns to line up
+     with, so the same two totals become a strip at the foot of the list, labels
+     left and figures right. -->
+<div data-kui="data-table/totals" x-data="{
+       page: 1, size: 5,
+       rows: Array.from({ length: 42 }, (_, i) => ({
+         po: 'PO-24-' + (1187 + i * 4),
+         vendor: ['Sharma Extrusions', 'Nashik Steel Traders', 'Gujarat Polymers Ltd', 'Konkan Chemicals Pvt Ltd'][i % 4],
+         qty: (75 + (i * 137) % 1900) / 100,
+         amount: 96750 + (i * 417350) % 4800000
+       })),
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       tonnes(n) { return n.toLocaleString('en-IN', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' MT' },
+       sum(rows, key) { return rows.reduce((t, r) => t + r[key], 0) },
+       get pages() { return Math.ceil(this.rows.length / this.size) },
+       get shown() { return this.rows.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.rows.length) }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Open orders · HDPE</h2>
+    <p class="text-[12px]/4 text-zinc-500 tabular-nums" x-text="rows.length + ' orders match'"></p>
+  </div>
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Quantity</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in shown" :key="r.po">
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="px-4 py-2.5 text-zinc-600" x-text="r.vendor"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="tonnes(r.qty)"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+    <tfoot>
+      <tr class="border-b border-zinc-100 bg-zinc-50">
+        <th scope="row" colspan="2" class="px-4 py-2.5 text-left text-[13px]/5 font-medium">
+          This page
+        </th>
+        <td class="px-4 py-2.5 text-right font-medium tabular-nums" x-text="tonnes(sum(shown, 'qty'))"></td>
+        <td class="px-4 py-2.5 text-right font-medium tabular-nums" x-text="money(sum(shown, 'amount'))"></td>
+      </tr>
+      <tr class="bg-zinc-50">
+        <th scope="row" colspan="2" class="px-4 py-2.5 text-left text-[13px]/5 font-medium">
+          All <span class="tabular-nums" x-text="rows.length"></span> orders in this filter
+        </th>
+        <td class="px-4 py-2.5 text-right font-semibold tabular-nums" x-text="tonnes(sum(rows, 'qty'))"></td>
+        <td class="px-4 py-2.5 text-right font-semibold tabular-nums" x-text="money(sum(rows, 'amount'))"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <template x-for="r in shown" :key="r.po">
+      <li class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <span class="text-[14px]/5 font-medium tabular-nums" x-text="r.po"></span>
+          <span class="text-[14px]/5 tabular-nums" x-text="money(r.amount)"></span>
+        </div>
+        <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[13px]/5 text-zinc-600">
+          <span x-text="r.vendor"></span>
+          <span class="tabular-nums" x-text="tonnes(r.qty)"></span>
+        </p>
+      </li>
+    </template>
+  </ul>
+
+  <div class="space-y-1 border-t border-zinc-200 bg-zinc-50 px-4 py-3 md:hidden">
+    <p class="flex items-baseline justify-between gap-3 text-[13px]/5">
+      <span class="font-medium">This page</span>
+      <span class="tabular-nums"><span x-text="tonnes(sum(shown, 'qty'))"></span> · <span x-text="money(sum(shown, 'amount'))"></span></span>
+    </p>
+    <p class="flex items-baseline justify-between gap-3 text-[13px]/5">
+      <span class="font-medium">All <span class="tabular-nums" x-text="rows.length"></span> orders in this filter</span>
+      <span class="font-semibold tabular-nums"><span x-text="tonnes(sum(rows, 'qty'))"></span> · <span x-text="money(sum(rows, 'amount'))"></span></span>
+    </p>
+  </div>
+
+  <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="from + '–' + to + ' of ' + rows.length + ' orders'"></p>
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
+      <button type="button" @click="page--" :disabled="page === 1"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" @click="page++" :disabled="page === pages"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>` },
+
+      { id: 'expandable', name: 'A row that opens its lines', tagNew: true, code:
+`<!-- The lines open as a second <tr> in the same table, on a recessed band. A
+     floating panel or a drawer would measure its own widths, so the line
+     quantities would not stack under the order quantity they belong to, and the
+     row somebody was reading would be covered by the thing it opened.
+
+     Each record is its own <tbody>. x-for renders exactly one element per item
+     and a record here is two rows, so the pair is wrapped — and a table is
+     allowed as many tbody elements as it likes, while a div wrapping two <tr>
+     is thrown out by the parser and the rows land outside the table.
+
+     The expander is a button in the first cell, not the row itself. A clickable
+     <tr> is not focusable, announces nothing and takes the click away from the
+     text somebody is trying to select; and a register whose rows open on click
+     cannot also have rows that navigate.
+
+     The lines carry sentence-case column names at 12px rather than the 11px
+     uppercase labels of the register above them. Two rows of uppercase headings
+     eight pixels apart read as two tables that happen to be stacked; this one
+     reads as a part of the row it opened out of.
+
+     aria-controls points at an id minted from the PO number, and the row it
+     names is always in the DOM — x-show hides it with display:none rather than
+     removing it, so the reference resolves whether it is open or shut.
+
+     Several rows open at once. The lines of two orders are compared against each
+     other more often than one is read alone, and an accordion that shuts the
+     first when the second opens makes that comparison impossible.
+
+     The colspan is typed here because no column can be hidden by the user; the
+     only one that disappears goes at the sm breakpoint, where the browser clamps
+     the span to the columns that are left. Where a column menu can hide columns,
+     bind the colspan to the count that is actually rendered — a hardcoded span
+     stretches the cell past the header and the panel edge lands in the middle of
+     a sentence.
+
+     The chevron is a static Lucide icon inside a span, and the span is what
+     rotates: createIcons() replaces the <i> with an <svg> and takes any binding
+     written on it. -->
+<div data-kui="data-table/expandable" x-data="{
+       open: ['PO-24-1194'],
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: 1842000, lines: [
+           { item: 'HDPE granules, natural', hsn: '39012000', qty: '9.000 MT', rate: 138000, value: 1242000 },
+           { item: 'Masterbatch, black 2%', hsn: '32041790', qty: '0.500 MT', rate: 1200000, value: 600000 }
+         ] },
+         { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: 468500, lines: [
+           { item: 'MS angle 50×50×6', hsn: '72162100', qty: '4.200 MT', rate: 111547, value: 468500 }
+         ] },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: 2710400, lines: [
+           { item: 'LLDPE film grade', hsn: '39014010', qty: '12.000 MT', rate: 123333, value: 1480000 },
+           { item: 'HDPE blow moulding grade', hsn: '39012000', qty: '5.000 MT', rate: 166080, value: 830400 },
+           { item: 'Slip additive', hsn: '38122000', qty: '0.400 MT', rate: 1000000, value: 400000 }
+         ] }
+       ],
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       toggle(po) { this.open = this.open.includes(po) ? this.open.filter(p => p !== po) : [...this.open, po] }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-10 px-4 py-2.5"><span class="sr-only">Order lines</span></th>
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <template x-for="r in rows" :key="r.po">
+      <tbody>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <td class="px-4 py-2.5">
+            <button type="button" @click="toggle(r.po)" :aria-expanded="open.includes(r.po)" :aria-controls="'dt-lines-' + r.po"
+                    :aria-label="'Lines of ' + r.po"
+                    class="flex size-7 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform" :class="open.includes(r.po) && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+          </td>
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+        <tr x-show="open.includes(r.po)" x-cloak :id="'dt-lines-' + r.po" class="border-b border-zinc-100">
+          <td colspan="4" class="bg-zinc-50 px-4 py-3">
+            <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">
+              <span x-text="r.lines.length"></span> lines
+            </p>
+            <table class="mt-2 w-full text-[12px]/4">
+              <thead>
+                <tr class="text-left text-zinc-600">
+                  <th scope="col" class="py-1 pr-3 font-medium">Item</th>
+                  <th scope="col" class="py-1 pr-3 text-right font-medium">Quantity</th>
+                  <th scope="col" class="py-1 text-right font-medium">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="l in r.lines" :key="l.item">
+                  <tr class="border-t border-zinc-200">
+                    <td class="py-1.5 pr-3">
+                      <span class="block text-[13px]/5" x-text="l.item"></span>
+                      <span class="block text-zinc-500 tabular-nums" x-text="'HSN ' + l.hsn + ' · ' + money(l.rate) + ' per MT'"></span>
+                    </td>
+                    <td class="py-1.5 pr-3 text-right align-top whitespace-nowrap tabular-nums" x-text="l.qty"></td>
+                    <td class="py-1.5 text-right align-top tabular-nums" x-text="money(l.value)"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </template>
+  </table>
+</div>` },
+
+      { id: 'export', name: 'Exporting what is on screen', tagNew: true, code:
+`<!-- Three scopes, each named with the count it would write out, because a
+     control labelled only "Export" over a filtered register means one of three
+     things and picks one without saying which. The commonest complaint about a
+     register is a spreadsheet with 1,438 rows in it when the screen said 12.
+
+     Every item is a link carrying the register's own query string, so the file
+     and the screen cannot disagree, and the browser keeps its own gestures over
+     them — open in a new tab, copy the link, send it to somebody. That is also
+     why the popover is a labelled group of links rather than a role="menu",
+     which would take all three away in exchange for arrow keys.
+
+     Nothing here is busy and nothing here is disabled. The request is a
+     navigation the browser owns, and the file arrives with a Content-Disposition
+     header; a spinner drawn over a download somebody may have cancelled in the
+     save dialog is a wait the page cannot see the end of.
+
+     The scopes carry the columns that are on screen, in the order they are on
+     screen, so a hidden column is missing from the file — which is the point,
+     and which the last line in the popover says out loud rather than leaving
+     somebody to find in the spreadsheet.
+
+     There is a fourth scope this component does not draw. Past a few tens of
+     thousands of rows an export is a queued job that emails a link, not a
+     download, and that is a different component and a decision for a person.
+
+     Escape closes the popover and returns focus to the trigger. Without it a
+     keyboard user leaves a panel of three links by tabbing through all of
+     them. -->
+<div data-kui="data-table/export" x-data="{
+       status: 'overdue', open: false,
+       orders: [
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', status: 'overdue', amount: 2710400 },
+         { po: 'PO-24-1199', vendor: 'Nashik Steel Traders', status: 'overdue', amount: 132900 },
+         { po: 'PO-24-1211', vendor: 'Sharma Extrusions', status: 'overdue', amount: 214300 },
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', status: 'open', amount: 1842000 },
+         { po: 'PO-24-1218', vendor: 'Gujarat Polymers Ltd', status: 'open', amount: 1290500 }
+       ],
+       register: 1438,
+       counts: { '': 1438, open: 902, overdue: 126 },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       count(n) { return n.toLocaleString('en-IN') },
+       get rows() { return this.status ? this.orders.filter(o => o.status === this.status) : this.orders },
+       get matching() { return this.counts[this.status] },
+       get query() { return 'status=' + this.status + '&sort=-amount' }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <label for="dt-ex-status" class="sr-only">Status</label>
+      <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="dt-ex-status" x-model="status"
+                class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+          <option value="">All statuses</option>
+          <option value="open">Open</option>
+          <option value="overdue">Overdue</option>
+        </select>
+        <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+          <i data-lucide="chevron-down" class="size-3.5"></i>
+        </span>
+      </div>
+    </div>
+
+    <p role="status" class="text-[12px]/4 text-zinc-500 tabular-nums"
+       x-text="count(matching) + ' of ' + count(register) + ' orders match'"></p>
+
+    <div class="relative ml-auto" @click.outside="open = false"
+         @keydown.escape="if (open) { open = false; $refs.exTrigger.focus() }">
+      <button type="button" x-ref="exTrigger" @click="open = !open" :aria-expanded="open" aria-haspopup="true"
+              class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="download" class="size-4 text-zinc-600"></i>Export
+        <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+      </button>
+
+      <div x-show="open" x-cloak role="group" aria-label="Export the order register"
+           class="absolute right-0 z-40 mt-1 w-72 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+        <a :href="'/orders/export.csv?' + query" @click="open = false"
+           class="block rounded-lg px-2.5 py-2 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="block text-[13px]/5 font-medium">These <span class="tabular-nums" x-text="count(matching)"></span> filtered orders</span>
+          <span class="block text-[12px]/4 text-zinc-600">CSV · everything the filters above leave, not only this page</span>
+        </a>
+        <a :href="'/orders/export.csv?' + query + '&page=1'" @click="open = false"
+           class="block rounded-lg px-2.5 py-2 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="block text-[13px]/5 font-medium">This page only</span>
+          <span class="block text-[12px]/4 text-zinc-600 tabular-nums">CSV · the <span x-text="rows.length"></span> rows in front of you</span>
+        </a>
+        <a href="/orders/export.csv" @click="open = false"
+           class="block rounded-lg px-2.5 py-2 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="block text-[13px]/5 font-medium">The whole register</span>
+          <span class="block text-[12px]/4 text-zinc-600 tabular-nums">CSV · all <span x-text="count(register)"></span> orders, filters ignored</span>
+        </a>
+        <p class="border-t border-zinc-100 px-2.5 py-2 text-[12px]/4 text-zinc-500">
+          The file carries the columns you can see, in the order you can see them. A column hidden from the Columns menu is not in it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in rows" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
 </div>` },
 
       { id: 'server', name: 'Server-paged', code:
@@ -725,6 +2856,12 @@ register(
      They are links and a real form first, so the screen still works with the
      swap turned off, which is also what makes the browser Back button behave.
 
+     The search replaces the URL and the pager and the headers push it. A
+     debounced keystroke that pushes leaves one history entry per letter, so Back
+     out of an order walks "gujarat", "gujara", "gujar" one press at a time and
+     never reaches the page before the search. A page or a sort is a place
+     somebody chose to be and is worth a history entry; a keystroke is not.
+
      The view hands the template one entry per sortable column — its aria value
      and the query string that would sort by it next — because working that out
      in the template means writing the same comparison three times and getting
@@ -732,6 +2869,7 @@ register(
 
      Selection is deliberately absent: which rows are ticked is client state and
      does not survive a swap. Reach for the full register when you need it. -->
+{% load humanize %}
 
 {# orders/register.html #}
 <div data-kui="data-table/server" id="register" class="rounded-xl border border-zinc-300 bg-white">
@@ -743,11 +2881,11 @@ register(
       <input type="search" name="q" value="{{ q }}" aria-label="Search the order register"
              placeholder="Search PO, vendor or department"
              hx-get="{% url 'order-register' %}" hx-trigger="input changed delay:300ms, search"
-             hx-include="closest form" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+             hx-include="closest form" hx-target="#register" hx-swap="outerHTML" hx-replace-url="true"
              class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
     </div>
     <input type="hidden" name="sort" value="{{ sort }}">
-    <button type="submit" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Search</button>
+    <button type="submit" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Search</button>
   </form>
 
   {% if page_obj %}
@@ -757,7 +2895,7 @@ register(
           {% for c in columns %}
             <th scope="col" aria-sort="{{ c.aria }}" class="px-4 py-2.5 {% if c.numeric %}text-right{% endif %}">
               <a href="?{{ c.query }}" hx-get="?{{ c.query }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
-                 class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 {% if c.numeric %}justify-end{% endif %} {% if c.aria != 'none' %}text-zinc-900{% endif %}">
+                 class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 {% if c.numeric %}justify-end{% endif %} {% if c.aria != 'none' %}text-zinc-900{% endif %}">
                 {{ c.label }}
                 {% if c.aria != 'none' %}
                   <span class="{% if c.aria == 'descending' %}rotate-180{% endif %}"><i data-lucide="chevron-up" class="size-3.5"></i></span>
@@ -786,7 +2924,7 @@ register(
         <span class="text-[13px]/5 text-zinc-600 tabular-nums">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_previous %}
           <a href="?{{ prev_query }}" hx-get="?{{ prev_query }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
-             class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+             class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <i data-lucide="chevron-left" class="size-4"></i>Previous
           </a>
         {% else %}
@@ -796,7 +2934,7 @@ register(
         {% endif %}
         {% if page_obj.has_next %}
           <a href="?{{ next_query }}" hx-get="?{{ next_query }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
-             class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+             class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             Next<i data-lucide="chevron-right" class="size-4"></i>
           </a>
         {% else %}
@@ -814,12 +2952,12 @@ register(
       <p class="mt-3 text-[16px]/6 font-semibold">No orders match this search</p>
       <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">Nothing in the register matches <span class="font-medium text-zinc-900">{{ q }}</span>. Search on a PO number, a vendor or a department.</p>
       <a href="{% url 'order-register' %}" hx-get="{% url 'order-register' %}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
-         class="mt-4 inline-block rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Clear the search</a>
+         class="mt-4 inline-block rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear the search</a>
     </div>
   {% endif %}
 </div>
 
-{# orders/views.py — the three query strings the template renders, built once
+{% comment %} orders/views.py — the three query strings the template renders, built once
 
    def register(request):
        q = request.GET.get('q', '')
@@ -833,26 +2971,32 @@ register(
 
    where column() returns {'label', 'query', 'aria', 'numeric'} — query being
    urlencode({'q': q, 'sort': '-field' if already ascending on it else 'field'}),
-   and aria being 'ascending', 'descending' or 'none'. #}` }
+   and aria being 'ascending', 'descending' or 'none'. {% endcomment %}` }
     ]
   },
 
   {
-      id: 'pagination', name: 'Pagination', category: 'data',
+    id: 'pagination', name: 'Pagination', category: 'data',
       description: 'Moves through a long register a page at a time, and says where you are in it. The range and the total are the component; the arrows are only what you do about them.',
-      when: 'A list that is cut into pages, by the server or on the client — the order register, a ledger, a GRN list. Below about ten pages the numbers are noise and the simple form is the whole component, because nobody jumps on a nine-page register. Above about a hundred pages, paging by number has stopped being navigation at all: nobody finds a record by walking to page 74, and what the screen actually needs is a filter, a date range or a search box. A feed that only grows downwards — an activity log, a comment thread — takes the load-more form, and takes it knowing what a cursor list gives up. When the pager belongs to an assembled register that also has a search box and sortable headers, data-table already contains one and a second pager under it is two controls fighting over the same state.',
+      when: 'A list that is cut into pages, by the server or on the client — the order register, a ledger, a GRN list. Below about ten pages the numbers are noise and the simple form is the whole component, because nobody jumps on a nine-page register. Above about a hundred pages, paging by number has stopped being navigation at all: nobody finds a record by walking to page 74, and what the screen actually needs is a filter, a date range or a search box — with a jump field beside that filter, for the one thing a deep page number is still good for, which is going back to where you were yesterday. Where the total is a scan the register cannot afford, the pager drops to a cursor and works without knowing how many pages there are. A feed that only grows downwards — an activity log, a comment thread — takes the load-more form, and takes it knowing what a cursor list gives up. When the pager belongs to an assembled register that also has a search box and sortable headers, data-table already contains one and a second pager under it is two controls fighting over the same state.',
       notes: [
         'The number row is a fixed count of slots at every page, not a window that grows. Seven is the working size: first, a gap or a page, three around the current one, a gap or a page, last — and the two gaps are slots, the same square as a page button. Measured across all fifteen pages of a 148-row register, the row came back 276px at every one of them, and across a 58-page one it came back 276px again. Let the row grow from three slots at the start to seven in the middle and the control changes width as somebody pages through it, which means Next slides out from under the pointer between the first click and the second. That is the whole reason truncation exists here; hiding pages is a side effect.',
         'Every slot is a fixed square — size-9, size-7 in the dense form — and never a min-width that the digits push wider. A cell sized to its content is one width on page 9 and another on page 10, so the row still moves as you walk it even with the slot count pinned. Measured at text-[13px]/5 with tabular-nums, a 144-page register renders 1 … 99 100 101 … 144 in seven 36px squares with scrollWidth equal to clientWidth on every one of them, so three digits fit with room either side. Four do not, which is the same 999-page ceiling above which paging by number was already the wrong control. tabular-nums goes on the buttons as well as on the range line: proportional figures inside a fixed square sit off-centre by a different amount on 1 than on 8, so a row of page numbers wanders even when every box is the same size.',
         'Each gap carries its own key. Measured in Alpine 3: an x-for over [1, "…", 4, 5, 6, "…", 15] keyed on the slot value renders six items rather than seven — the first ellipsis is dropped, because the second one claims the same key and the loop reuses the node. The row comes back one square narrow and the width rule fails silently in the one place it matters most. Two keys, gap-start and gap-end, and the count holds.',
         'The ellipsis is a character, not a control. It is aria-hidden, it is not a button, and it does not expand into the pages it stands for: an ellipsis that unfolds into five more numbers on click is the width change this component exists to prevent, arriving on purpose. Somebody who needs page 34 of 58 needs a filter, and the way to give them one is not to hide it behind a full stop three times over.',
         'The current page stays an enabled button. Disable it to show it cannot be pressed and the click that got you there blurs the element under the cursor — the browser drops focus from a disabled element to the body, so a keyboard user who pressed Page 5 is now at the top of the document with the register somewhere below them. It is a real button that sets the page it is already on, which costs nothing and keeps the focus where the user put it.',
+        'Seven page buttons, two arrows and a size select is ten tab stops, and the pager sits under the table, so a keyboard user leaving a register walks every one of them on the way out. A row of controls that are all the same kind is a toolbar: role="toolbar", one tab stop, arrows moving inside it, and Home and End reaching the first and last page for free, because a truncated row already puts them at its ends — which is what First and Last buttons buy, without the two extra controls. The arrows move focus and do not commit, and that is where a toolbar and the radiogroup in button-group part company: there Right is the choice, which is right for a filter that costs nothing and wrong for a page that costs a fetch. Arrowing from 1 to 72 with the arrows committing is seventy-one requests. The roving stop follows focus and falls back to the current page when the window recomputes past whatever it was sitting on, or no slot holds tabindex="0" and the row drops out of the tab order altogether.',
         'Ends disable rather than disappear, and disabling them is not free either. Previous going away on page one shifts Next left by the width of a button, so the control under the pointer on the second click is not the one that was there on the first. Write enabled:hover: rather than hover:, or the disabled button still lights up under the cursor and reads as pressable. And an anchor cannot be disabled — aria-disabled on an <a href> leaves it focusable and clickable and lies about it — so a link-based pager swaps its edge control for a real <button disabled>, exactly as the server variant of data-table does.',
+        'A page that failed to load is not an empty page, and the reflex to draw the empty-state is the worst lie this component can tell: somebody who has spent a minute narrowing a filter is told the filter is wrong when the truth is that a gateway timed out. Keep the rows that are on screen and keep the page number that describes them — roll the number forward and the strip is describing a page nobody is looking at, and the next Previous goes back from somewhere the user has never been. The failure takes the range\'s place, in a role="alert", with the red in the icon and never behind the text. Nothing is disabled, because the failure belongs to one request and not to the control, so Previous still works. Retry re-issues that request rather than reloading the screen, which would throw away rows that are on screen and correct.',
         'Do not disable the controls while a page is in flight. The button somebody just pressed is the one that would be disabled, so focus falls to the body mid-request and the second press that would have fetched the page after this one goes nowhere. Mark the nav aria-busy, leave the buttons alone, and guard the handler so a press while busy returns — that stops the double fetch without taking the control away from the person holding it. Measured through a full idle-busy-idle cycle: focus stayed on Next for the whole 1.4s request, and aria-busy came off by itself when the rows landed, because Alpine removes a false aria-busy rather than writing the string "false".',
         'The range and the total are not decoration and not optional. "Next" on its own is a rumour: it does not say whether there are two more rows or two thousand, which is the one fact that decides whether somebody pages or goes back and filters. Where the count is genuinely expensive — a COUNT over a partitioned ledger — say "of about 1,400" and mean it, or drop to prev/next with no total at all. Never render "of 0" while the count is still being fetched; a register that says it is empty and then fills in is a bug report. The separator between the two ends of the range is an en dash — 21–40, not 21-40 — because in tabular figures a hyphen sits low and short enough to read as a minus sign in a ledger.',
+        'Where the total is a full scan the pager works without it, and what changes is the shape rather than the wording. There is no number row, no Last and no jump, because none of the three can be computed, and drawing them greyed is worse than leaving them out — a disabled Last promises it will work once you get close enough, and it never will. The range says where you are and stops: "Entries 26–50", no "of". Next is enabled because the server was asked for one row more than the page holds and got it; the extra row is never rendered and exists only to answer whether there is more. What goes in the URL is a cursor rather than a page number, and that is the second reason keyset is right for a ledger: OFFSET is measured against a list that is still being written to, so a receipt posted while somebody reads page 3 pushes a row across the boundary and it is shown twice or skipped. The one moment the total is free is the end — fewer rows came back than were asked for — and that is where to say it and nowhere earlier.',
         'The page number belongs in the URL. A register paged only in Alpine loses your place the moment somebody opens a record and presses Back, and it cannot be sent to a colleague, bookmarked or reloaded — the three things people do with a list they have worked to get to. Client state is for the demo and for a table inside a dialog; a register screen carries ?page= and ?size= and reads them at boot.',
+        'Where the page is a real URL the pager is anchors, not buttons. A button offers no context menu, so middle-click, Ctrl-click and long-press do nothing, and three tabs of one register at three different pages — which is how a buyer reconciles a month — is simply not available. The cost is that the end which is unavailable cannot stay an anchor: an <a href> has no unavailable state, aria-disabled on one leaves it focusable and clickable and stops nothing, and dropping the href takes it out of the tab order without ever saying why. Swap that one control for a <button disabled>, which keeps the width as well as the truth. rel="prev" and rel="next" cost one attribute each on the anchors that already mean it.',
+        'A register hundreds of pages deep gets a jump field, and gets it beside a filter rather than instead of one. Somebody looking for the entries of 14 Aug 2026 wants a date range, and a field that lets them bisect their way there is the screen failing politely rather than failing. Where a page number is still worth something is returning to one: you were on 214 yesterday. It refuses rather than clamps — type 900 into a 412-page register and a clamp lands you on 412, which reads as the register deciding what you meant — and it takes inputmode="numeric" rather than type="number", the same call input-group/stepper makes, because the browser draws its own spin buttons hard against the right-hand edge of the field and directly under the button beside it.',
         'Changing the page size returns to page one, always. Page 7 at 25 rows is rows 151–175 and page 7 at 100 rows is rows 601–700, so keeping the number means somebody who wanted to see more rows is now four hundred rows further down a list they were reading. Recompute the range and say the new one; do not try to keep the first visible row in view, because that is a scroll position and this control does not own it.',
         'Below md the number row is gone and a "Page 3 of 12" line takes its place beside prev and next. Seven squares plus two labelled buttons plus a range line do not fit in 390px and the failure is a sideways scroll on the footer of a table that has just been restacked into cards to avoid exactly that. The controls stay 36px at that width even where the desktop form is dense — density is a mouse affordance and a phone is a thumb.',
+        'A live region inside swapped content announces nothing. It has to be in the document before its text changes, and an outerHTML swap replaces the role="status" along with everything around it, so the range that speaks in a client-paged register goes silent the moment the server owns the page. The visible range drops to plain text and one persistent sr-only region outside the target is written by an out-of-band swap. The same reasoning covers the handlers: htmx fires its swap events at the target or its parent, so an after-settle written on the nav inside the target is destroyed by the swap it was waiting for and runs exactly once. Put both on a shell the swap cannot reach. Django has already drawn the number row — get_elided_page_range with on_each_side=1 and on_ends=1 is the same seven slots — and it is built in the view, because a template call takes no arguments.',
         'Load-more is not pagination wearing a different button. It appends, so there is no page to link to, no Back to press, and printing gives you whatever had been loaded when somebody hit print; the count line has to change from a range to "Showing 24 of 47" because there is no longer a window, only a depth. Infinite scroll on top of it is worse still: it swallows the footer, and the footer is where the totals and the export live.'
       ],
       anatomy: [
@@ -863,7 +3007,9 @@ register(
         ['Gap', 'The ellipsis slot. Same square as a page so the row keeps its width, aria-hidden, not focusable and not a button.'],
         ['Previous / next', 'The controls people actually use. h-9 labelled on the default form, size-9 icon-only where the row is tight, and real disabled buttons at the ends rather than removed ones.'],
         ['Page size', 'A native select labelled "Rows per page". Changing it resets to page one and rewrites the range.'],
-        ['Position', '"Page 3 of 12", md:hidden. What stands in for the number row at 390px, so nothing scrolls sideways and the user still knows where they are.']
+        ['Position', '"Page 3 of 12", md:hidden. What stands in for the number row at 390px, so nothing scrolls sideways and the user still knows where they are.'],
+        ['Jump field', 'A numeric box and a Go button in one enclosure, for a register too deep for the number row to be navigation. It refuses a page outside the range rather than clamping into it, and it is never the only way to find a record — the filter beside it is.'],
+        ['Failure line', 'What takes the range\'s place when the page did not arrive: which page failed, which one is still on screen, and a retry. role="alert", red in the icon only, and not one control disabled.']
       ],
       behaviour: [
         'The number row is seven slots wide at every page. The pages inside it change; the width does not, so no button moves under the pointer between two clicks.',
@@ -874,7 +3020,13 @@ register(
         'While a page is in flight the nav is aria-busy, the buttons stay enabled, a second press is ignored, and the spinner beside the range appears only after 500ms so a fast page never flickers.',
         'Below md the number row is replaced by "Page 3 of 12" beside prev and next, and the range wraps onto its own line rather than the footer scrolling sideways.',
         'Load-more appends rather than replaces: the count says how many are shown of how many exist, and when the last batch lands the button is replaced by the total and focus moves to the count.',
-        'Paging changes nothing else. The sort, the filter and the selection live above this control and survive it, which is why the range can say "filtered from 1,438" and be believed.'
+        'Paging changes nothing else. The sort, the filter and the selection live above this control and survive it, which is why the range can say "filtered from 1,438" and be believed.',
+        'A link pager puts the page in the address bar, so Back, refresh, a bookmark and a middle-click into a new tab all work, and the end that is unavailable is a real disabled button rather than an anchor pretending to be one.',
+        'Where the total cannot be counted the control drops to prev and next, says its range without an "of", offers no page number to jump to, and learns the total only when the last page comes back short.',
+        'The jump field commits on Enter and on Go, puts the number back on Escape, and refuses anything outside 1 to the last page rather than clamping to it.',
+        'In the toolbar form the number row is a single tab stop: the arrows move focus without paging, Home and End reach the first and last page, and Enter or Space is what fetches.',
+        'A page that failed leaves the rows and the page number where they were, puts what went wrong where the range was, and keeps every control live, so Previous still goes back and Retry re-issues the one request that failed.',
+        'Where the server owns the page, focus is put back after the swap by id, and the range is announced from a region that lives outside the swapped content.'
       ],
       a11y: [
         'The control is a <nav> carrying an aria-label that names the register — "Order register pages". Two pagers on a screen carry two different labels, or the landmark list has two identical entries in it.',
@@ -885,11 +3037,16 @@ register(
         'The range is text inside a role="status", present in the document before it changes, so paging is announced. The region holds the range and nothing else; a spinner beside it is aria-hidden and contributes no words.',
         'aria-busy goes on the nav while a page is being fetched, so the state is known and not merely drawn, and the content being replaced takes inert so Tab cannot walk into rows that are on their way out.',
         'Below md the number row is display:none and therefore out of the accessibility tree entirely, and the "Page 3 of 12" line that replaces it is real text — nothing that carried a name disappears without something saying the same thing.',
-        'The page size select has a real <label for>, and changing it announces the new range through the same status region rather than moving focus.'
+        'The page size select has a real <label for>, and changing it announces the new range through the same status region rather than moving focus.',
+        'Where the number row is a role="toolbar", the arrows move focus and never commit, so nobody fetches a page per keystroke on the way across it, and Home and End are the first and last page. The roving tabindex falls back to the current page whenever the number it was sitting on drops out of the window, because a row where nothing holds tabindex="0" is a row Tab cannot enter at all.',
+        'aria-current="page" goes on the anchor in a link pager exactly as it goes on the button in a client one. The end that is unavailable is the only control that changes element, because an anchor has no unavailable state and aria-disabled on one is not enforced by anything.',
+        'The jump field is named by its label alone — "Go to page" — and both the page count and the refusal live in the element aria-describedby points at. aria-invalid is bound as a string, because aria-invalid="false" is the valid state rather than a missing attribute.',
+        'A failure takes role="alert" rather than the range\'s role="status": it is the one thing on this strip worth interrupting for, and it names which page failed and which one is still on screen so the announcement stands on its own.',
+        'A live region that is itself replaced by a swap announces nothing. Where the server renders the pager, the announced range is a persistent sr-only region outside the swap target written out of band, and focus is restored after the swap by matching ids — with a fallback for the case where the control that was pressed came back disabled, since a disabled element cannot take focus and the keyboard would land on the body.'
       ],
-      related: ['data-table', 'table', 'empty-state', 'spinner'],
+      related: ['data-table', 'table', 'empty-state', 'spinner', 'input-group'],
       variants: [
-        { id: 'simple', name: 'Simple', code:
+      { id: 'simple', name: 'Simple', code:
 `<!-- Prev, next, and the sentence that makes them mean anything. Below about ten
      pages this is the whole component — numbers earn their space only when
      somebody has a reason to jump, and on a fifteen-page register nobody does.
@@ -938,7 +3095,7 @@ register(
   </div>
 </nav>` },
 
-        { id: 'numbered', name: 'Numbered with truncation', code:
+      { id: 'numbered', name: 'Numbered with truncation', code:
 `<!-- The window is seven slots at every page and that is the point of it. First,
      a gap or a page, three around the current one, a gap or a page, last — walk
      from page 1 to page 15 and the row is seven squares wide the whole way, so
@@ -965,7 +3122,10 @@ register(
 
      The current page stays enabled. Disable it to show it cannot be pressed and
      the click that got you there blurs the element under the cursor, because a
-     browser drops focus from a disabled element to the body.
+     browser drops focus from a disabled element to the body. The ends cannot
+     avoid that — one of them has to go dead at each limit — so each handler
+     hands focus to its opposite number on the way out, which is why Previous
+     and Next call prev() and next() here rather than go().
 
      Below md the row is display:none and "Page 4 of 15" stands in its place.
      Seven squares and two buttons and a range do not fit in 390px, and the
@@ -983,7 +3143,9 @@ register(
          if (p >= n - 3) return [1, 'gap-start', n - 4, n - 3, n - 2, n - 1, n];
          return [1, 'gap-start', p - 1, p, p + 1, 'gap-end', n];
        },
-       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
+       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) },
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
      }"
      class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
 
@@ -993,7 +3155,7 @@ register(
   <div class="flex items-center gap-2">
     <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden" x-text="'Page ' + page + ' of ' + pages">Page 4 of 15</span>
 
-    <button type="button" aria-label="Previous page" @click="go(page - 1)" :disabled="page === 1"
+    <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
@@ -1014,14 +3176,90 @@ register(
       </template>
     </ul>
 
-    <button type="button" aria-label="Next page" @click="go(page + 1)" :disabled="page === pages"
+    <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>
   </div>
 </nav>` },
 
-        { id: 'range', name: 'The range line', code:
+      { id: 'links', name: 'Pages that are real links', tagNew: true, code:
+`<!-- The same seven slots, rendered as anchors, because a page is a place and
+     not a gesture. ?page=1&amp;size=20 in the address bar is what makes the
+     register survive a refresh, arrive intact in a colleague's message, and
+     come back where it was when somebody opens PO-24-1204 and presses Back. A
+     pager built from buttons and client state loses all three without breaking
+     anything on screen, which is why nobody ever reports it.
+
+     Anchors also hand back the gestures a button never had. Middle-click,
+     Ctrl-click and long-press open page 5 in a new tab, and three tabs of one
+     register at three pages is how a buyer actually reconciles a month. A
+     button offers no context menu at all and swallows every one of them.
+
+     Previous is a <button disabled> rather than an anchor, which is the reason
+     to draw page one here. An anchor has no unavailable state: aria-disabled on
+     an <a href> leaves it focusable, clickable and in the context menu and
+     stops nothing, and removing the href stops it being a link at all, so it
+     leaves the tab order without ever announcing why. The one element with a
+     real unavailable state is a button, and swapping to it keeps the width,
+     which is the same reason the ends never disappear.
+
+     rel="next" costs one attribute on the anchor that already means it, and a
+     prefetcher and a reader mode both read it; rel="prev" goes on the opposite
+     anchor wherever there is one to put it on. The range is a plain paragraph
+     rather than a role="status", because every one of these is a real
+     navigation and a page load announces itself. -->
+<nav data-kui="pagination/links" aria-label="Ledger pages"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+
+  <p class="text-[13px]/5 tabular-nums text-zinc-600">1–20 of 1,438 entries</p>
+
+  <div class="flex items-center gap-2">
+    <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden">Page 1 of 72</span>
+
+    <button type="button" disabled aria-label="Previous page"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-400">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+
+    <ul role="list" class="hidden items-center gap-1 md:flex">
+      <li>
+        <a href="?page=1&amp;size=20" aria-label="Page 1" aria-current="page"
+           class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-medium tabular-nums text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">1</a>
+      </li>
+      <li>
+        <a href="?page=2&amp;size=20" aria-label="Page 2"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">2</a>
+      </li>
+      <li>
+        <a href="?page=3&amp;size=20" aria-label="Page 3"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">3</a>
+      </li>
+      <li>
+        <a href="?page=4&amp;size=20" aria-label="Page 4"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">4</a>
+      </li>
+      <li>
+        <a href="?page=5&amp;size=20" aria-label="Page 5"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">5</a>
+      </li>
+      <li>
+        <span aria-hidden="true" class="flex size-9 items-center justify-center text-[13px]/5 text-zinc-500">…</span>
+      </li>
+      <li>
+        <a href="?page=72&amp;size=20" aria-label="Page 72"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">72</a>
+      </li>
+    </ul>
+
+    <a href="?page=2&amp;size=20" rel="next" aria-label="Next page"
+       class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </a>
+  </div>
+</nav>` },
+
+      { id: 'range', name: 'The range line', code:
 `<!-- The half of the component that is not a button, in the five states a real
      register puts it through. It is the only thing on the strip that says how
      much is left, so every one of these is worth getting right.
@@ -1072,7 +3310,63 @@ register(
   </div>
 </div>` },
 
-        { id: 'page-size', name: 'With page size', code:
+      { id: 'unknown-total', name: 'When there is no total to count', tagNew: true, code:
+`<!-- A stock ledger of some millions of rows, partitioned by month, filtered by
+     item. COUNT over that is a full scan every time somebody changes a filter,
+     and the register cannot wait on it. So the total does not exist and the
+     pager has to work anyway.
+
+     What goes in the URL is a cursor, not a page. ?after=ENT-26-3164 is keyset
+     paging and it is the correct answer for a ledger for a second reason as
+     well: OFFSET 75 is measured against a list that is still being written to,
+     so a receipt posted while somebody reads page 3 pushes one row from page 4
+     onto page 3 and the row that was at the boundary is shown twice or not at
+     all. A cursor names a record, and records do not move.
+
+     Next is enabled because the server was asked for 26 rows and got 26. The
+     twenty-sixth is never rendered; it exists only to answer whether there is
+     more. Ask for 25 and you cannot tell a full page from the last one, so the
+     button either lies or costs a second query.
+
+     There is no number row, no Last and no jump, because none of the three can
+     be computed. Drawing them greyed out is worse than leaving them out: a
+     disabled Last says the button will work once you get close enough, and it
+     never will.
+
+     The end is the one moment the total becomes free — fewer rows came back
+     than were asked for, so this page is the last and the count is now known
+     exactly. Say it there and nowhere earlier. The snippet has to be told where
+     the end is in order to draw it; the server is not, and finds out the same
+     way the reader does. -->
+<nav data-kui="pagination/unknown-total" aria-label="Stock ledger pages"
+     x-data="{
+       size: 25, depth: 1, last: 4, tail: 19,
+       get end() { return this.depth === this.last },
+       get from() { return (this.depth - 1) * this.size + 1 },
+       get to() { return this.end ? (this.last - 1) * this.size + this.tail : this.depth * this.size },
+       get line() { return this.end
+         ? 'Entries ' + this.from + '–' + this.to + ' · ' + this.to + ' in all'
+         : 'Entries ' + this.from + '–' + this.to },
+       prev() { this.depth--; if (this.depth === 1) this.$refs.next.focus() },
+       next() { this.depth++; if (this.end) this.$refs.prev.focus() }
+     }"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+
+  <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600" x-text="line">Entries 1–25</p>
+
+  <div class="flex items-center gap-2">
+    <button type="button" x-ref="prev" @click="prev()" :disabled="depth === 1"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>Previous
+    </button>
+    <button type="button" x-ref="next" @click="next()" :disabled="end"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Next<i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+</nav>` },
+
+      { id: 'page-size', name: 'With page size', code:
 `<!-- The size select and the pager are one control and read left to right: how
      much is on a page, where in the register that page falls, and the arrows.
      They keep that order at every width — swapping the halves below md moves the
@@ -1092,14 +3386,24 @@ register(
 
      x-model.number, not x-model. A select yields a string, so page arithmetic on
      it silently concatenates: '25' * 3 is 75 but (page - 1) * '25' + 1 is fine
-     while total / '25' is fine and '25' + 1 is '251'. One of those turns up. -->
+     while total / '25' is fine and '25' + 1 is '251'. One of those turns up.
+
+     The option that matches the starting size carries selected. x-model writes
+     the right one the moment Alpine boots, but the browser has already painted
+     the first option by then, so a register that opens on 25 rows shows 10 for
+     a frame and anybody watching learns the control lies about its own value.
+
+     Previous and Next hand focus to each other at the limits, because the one
+     that was pressed is the one that goes dead and a browser blurs a disabled
+     element to the body. -->
 <nav data-kui="pagination/page-size" aria-label="Order register pages"
      x-data="{
        page: 2, size: 25, total: 148,
        get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
        get from() { return this.total ? (this.page - 1) * this.size + 1 : 0 },
        get to() { return Math.min(this.page * this.size, this.total) },
-       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
      }"
      class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
 
@@ -1109,7 +3413,7 @@ register(
       <select id="pager-size" x-model.number="size" @change="page = 1"
               class="h-9 bg-transparent px-2 text-[13px]/5 tabular-nums outline-none">
         <option value="10">10</option>
-        <option value="25">25</option>
+        <option value="25" selected>25</option>
         <option value="50">50</option>
         <option value="100">100</option>
       </select>
@@ -1121,11 +3425,11 @@ register(
        x-text="from + '–' + to + ' of ' + total + ' orders'">26–50 of 148 orders</p>
     <div class="flex items-center gap-1">
       <span class="mr-1 text-[13px]/5 tabular-nums text-zinc-600" x-text="'Page ' + page + ' of ' + pages">Page 2 of 6</span>
-      <button type="button" aria-label="Previous page" @click="go(page - 1)" :disabled="page === 1"
+      <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
               class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
-      <button type="button" aria-label="Next page" @click="go(page + 1)" :disabled="page === pages"
+      <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
               class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>
@@ -1133,7 +3437,96 @@ register(
   </div>
 </nav>` },
 
-        { id: 'dense', name: 'Under a dense table', code:
+      { id: 'jump', name: 'Typing the page number', tagNew: true, code:
+`<!-- 412 pages of ledger entries. The number row stopped being navigation
+     somewhere around page thirty: nobody walks to 214, and the seven squares
+     now show 1 … 213 214 215 … 412, which is a window onto a register the size
+     of a phone book. This is the control for the one case where a page number
+     is still worth something — you were on 214 yesterday and you want back.
+
+     It is not a substitute for the filter beside it. Somebody looking for the
+     entries of 14 Aug 2026 wants a date range, and a jump field that lets them
+     bisect their way there is the register failing politely rather than
+     failing. Ship both, and ship the filter first.
+
+     It refuses rather than clamps. Type 900 into a 412-page register and a
+     clamp silently lands you on 412, which reads as the register deciding you
+     meant something else; the field says how many pages there are and waits.
+     aria-invalid is bound as a string, because aria-invalid="false" is the
+     valid state and not an attribute to leave off. Two status regions on one
+     strip is usually one too many, and here they never speak together: a
+     commit that works changes the range and leaves the hint alone, and one
+     that is refused changes the hint and leaves the page where it was.
+
+     inputmode="numeric" rather than type="number", the same call
+     input-group/stepper makes: the browser draws its own spin buttons hard
+     against the right edge of the field, directly under Go, and the enclosure
+     ends with two hit areas nobody aimed at.
+
+     The height is declared once, on the enclosure. h-9 there is the 36px of the
+     size-9 buttons beside it, and the field and Go take it by stretching; put
+     the height on the field and the group comes out two pixels short of every
+     other control on the strip.
+
+     Enter commits, Escape puts the number back. Typing and reaching for the
+     button beside the box is not the gesture, and a field somebody has half
+     retyped needs a way out that is not the wrong page. -->
+<nav data-kui="pagination/jump" aria-label="Journal register pages"
+     x-data="{
+       page: 214, pages: 412, size: 25, total: 10287, draft: '214', bad: false,
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       n(v) { return v.toLocaleString('en-IN') },
+       commit() {
+         const v = Number(String(this.draft).replace(/[^0-9]/g, ''));
+         if (!v || v > this.pages) { this.bad = true; return }
+         this.bad = false; this.page = v; this.draft = String(v);
+       },
+       step(d) {
+         this.page = Math.min(Math.max(this.page + d, 1), this.pages);
+         this.draft = String(this.page); this.bad = false;
+         if (this.page === 1) this.$refs.next.focus();
+         else if (this.page === this.pages) this.$refs.prev.focus();
+       }
+     }"
+     class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+
+  <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+     x-text="n(from) + '–' + n(to) + ' of ' + n(total) + ' entries'">5,326–5,350 of 10,287 entries</p>
+
+  <div class="flex flex-wrap items-center gap-2">
+    <label for="pager-jump" class="text-[13px]/5 text-zinc-600">Go to page</label>
+
+    <div class="flex h-9 items-stretch rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+         :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                     : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+      <input id="pager-jump" x-model="draft" inputmode="numeric" aria-describedby="pager-jump-msg"
+             :aria-invalid="bad ? 'true' : 'false'"
+             @keydown.enter.prevent="commit()" @input="bad = false"
+             @keydown.escape.prevent="draft = String(page); bad = false"
+             class="w-14 min-w-0 bg-transparent px-2 text-center text-[13px]/5 tabular-nums outline-none">
+      <button type="button" @click="commit()"
+              class="shrink-0 rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">Go</button>
+    </div>
+
+    <button type="button" x-ref="prev" aria-label="Previous page" @click="step(-1)" :disabled="page === 1"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+    <button type="button" x-ref="next" aria-label="Next page" @click="step(1)" :disabled="page === pages"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+
+  <p id="pager-jump-msg" role="status" class="basis-full text-[12px]/4 tabular-nums"
+     :class="bad ? 'font-medium text-red-600' : 'text-zinc-500'"
+     x-text="bad
+               ? 'This register has ' + pages + ' pages. Type a number between 1 and ' + pages + '.'
+               : pages + ' pages at ' + size + ' rows. Looking for a date? The filter above is faster.'">412 pages at 25 rows. Looking for a date? The filter above is faster.</p>
+</nav>` },
+
+      { id: 'dense', name: 'Under a dense table', code:
 `<!-- A dense table gets a dense footer or the strip under it is taller than four
      of its own rows. The rows here are px-3 py-1.5, the pager takes size-7 icon
      buttons and a text-[12px]/4 range, and the whole strip comes in under 40px.
@@ -1149,7 +3542,12 @@ register(
 
      The panel is not overflow-hidden, so the focus outline at offset-2 is not
      clipped by the rounded corner. Where a panel has to clip, the pager's
-     buttons take focus-visible:-outline-offset-2 instead and draw inside. -->
+     buttons take focus-visible:-outline-offset-2 instead and draw inside.
+
+     Density does not change the focus rule at the ends: the control that was
+     pressed is the one that goes dead, and a browser blurs a disabled element
+     to the body, so each handler hands focus to its opposite number. A 28px
+     button is easier to lose focus off, not harder. -->
 <div data-kui="pagination/dense" class="max-w-xl rounded-xl border border-zinc-300 bg-white"
      x-data="{
        page: 1, size: 4,
@@ -1170,7 +3568,8 @@ register(
        get shown() { return this.rows.slice((this.page - 1) * this.size, this.page * this.size) },
        get from() { return (this.page - 1) * this.size + 1 },
        get to() { return Math.min(this.page * this.size, this.rows.length) },
-       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
      }">
 
   <table class="w-full text-[13px]/5">
@@ -1203,11 +3602,11 @@ register(
        x-text="from + '–' + to + ' of ' + rows.length + ' batches'">1–4 of 10 batches</p>
     <div class="flex items-center gap-1">
       <span class="mr-1 text-[12px]/4 tabular-nums text-zinc-500" x-text="'Page ' + page + ' of ' + pages">Page 1 of 3</span>
-      <button type="button" aria-label="Previous page" @click="go(page - 1)" :disabled="page === 1"
+      <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
               class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:size-7">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
-      <button type="button" aria-label="Next page" @click="go(page + 1)" :disabled="page === pages"
+      <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
               class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:size-7">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>
@@ -1215,7 +3614,7 @@ register(
   </nav>
 </div>` },
 
-        { id: 'edges', name: 'Disabled at the ends', code:
+      { id: 'edges', name: 'Disabled at the ends', code:
 `<!-- Four pages, so both ends are one click away and the rule is visible rather
      than described. First and Previous go dead together on page one; Next and
      Last go dead together on page four.
@@ -1273,7 +3672,106 @@ register(
   </div>
 </nav>` },
 
-        { id: 'loading', name: 'While a page is in flight', code:
+      { id: 'keyboard', name: 'One tab stop for the whole number row', tagNew: true, code:
+`<!-- Count the tab stops on the numbered form: seven page buttons plus two
+     arrows is nine, and the pager sits under the table, so a keyboard user
+     leaving a register walks every one of them on the way to whatever is below
+     it. A row of controls that are all the same kind is a toolbar, and a
+     toolbar is one stop with the arrows moving inside it. Nine becomes three.
+
+     Previous and Next stay outside it and keep their own stops. They are a
+     different kind of control — relative rather than absolute — and they are
+     the two anybody actually uses, so burying them inside an arrow walk to save
+     two stops would cost more than it saved.
+
+     The arrows move focus and do not commit. This is where a toolbar and the
+     radiogroup in button-group part company: there, Right is the choice, and
+     that is right for a filter that costs nothing. Here every page is a fetch,
+     so arrowing from 1 to 72 would fire seventy-one of them. Focus walks,
+     Enter and Space page.
+
+     Home and End are first and last page for free, because the first and last
+     controls in this toolbar are page 1 and page 72 — the truncated row puts
+     the ends in the ends. That is the whole of what First and Last buttons buy,
+     without the two extra controls the edges form has to carry.
+
+     The roving stop follows focus rather than the current page, so tabbing back
+     into the pager returns to the number the user was last on. It falls back to
+     the current page when the window recomputes and the number it was sitting
+     on is no longer a slot — with no slot holding tabindex="0" the row would
+     drop out of the tab order altogether.
+
+     The keys are what hold focus across the swap. x-for keyed on the slot value
+     moves the node for 5 rather than rebuilding the row, so the button that was
+     pressed still has focus after the window shifts around it. Drop the keys
+     and every page change re-renders seven buttons, the focused one among them,
+     and the keyboard lands on the body under a register that just changed. -->
+<nav data-kui="pagination/keyboard" aria-label="Order register pages"
+     x-data="{
+       page: 4, size: 20, total: 1438, roved: 4,
+       n(v) { return v.toLocaleString('en-IN') },
+       get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get slots() {
+         const n = this.pages, p = this.page;
+         if (n <= 7) return Array.from({ length: n }, (_, i) => i + 1);
+         if (p <= 4) return [1, 2, 3, 4, 5, 'gap-end', n];
+         if (p >= n - 3) return [1, 'gap-start', n - 4, n - 3, n - 2, n - 1, n];
+         return [1, 'gap-start', p - 1, p, p + 1, 'gap-end', n];
+       },
+       get stop() { return this.slots.includes(this.roved) ? this.roved : this.page },
+       keys() { return [...this.$refs.row.querySelectorAll('button')] },
+       move(d) {
+         const b = this.keys(), i = b.indexOf(document.activeElement);
+         b[Math.min(Math.max(i + d, 0), b.length - 1)].focus();
+       },
+       edge(last) { const b = this.keys(); (last ? b[b.length - 1] : b[0]).focus() },
+       go(n) { this.page = Math.min(Math.max(n, 1), this.pages); this.roved = this.page },
+       prev() { this.page--; this.roved = this.page; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; this.roved = this.page; if (this.page === this.pages) this.$refs.prev.focus() }
+     }"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+
+  <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+     x-text="n(from) + '–' + n(to) + ' of ' + n(total) + ' orders'">61–80 of 1,438 orders</p>
+
+  <div class="flex items-center gap-2">
+    <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden" x-text="'Page ' + page + ' of ' + pages">Page 4 of 72</span>
+
+    <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+
+    <div x-ref="row" role="toolbar" aria-orientation="horizontal" aria-label="Order register page numbers"
+         @keydown.arrow-right.prevent="move(1)" @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+         class="hidden items-center gap-1 md:flex">
+      <template x-for="s in slots" :key="s">
+        <span class="contents">
+          <template x-if="typeof s === 'number'">
+            <button type="button" @click="go(s)" @focus="roved = s" :tabindex="s === stop ? 0 : -1"
+                    :aria-label="'Page ' + s" :aria-current="s === page ? 'page' : false"
+                    class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="s === page ? 'bg-zinc-700 font-medium text-white' : 'hover:bg-zinc-100'"
+                    x-text="s"></button>
+          </template>
+          <template x-if="typeof s !== 'number'">
+            <span aria-hidden="true" class="flex size-9 items-center justify-center text-[13px]/5 text-zinc-500">…</span>
+          </template>
+        </span>
+      </template>
+    </div>
+
+    <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+</nav>` },
+
+      { id: 'loading', name: 'While a page is in flight', code:
 `<!-- The state between the click and the rows. The nav goes aria-busy, the table
      above goes inert, and the buttons stay exactly as they were.
 
@@ -1364,7 +3862,102 @@ register(
   </nav>
 </div>` },
 
-        { id: 'load-more', name: 'Load more', code:
+      { id: 'failed', name: 'The page that did not arrive', tagNew: true, code:
+`<!-- Next was pressed, the request for page 13 came back 502, and the rows on
+     screen are still page 12. The pager says page 12, because that is what is
+     underneath it. Rolling the number forward and leaving the old rows there is
+     the one thing that cannot be allowed: the strip then describes a page the
+     user is not looking at, and the next Previous takes them to page 11 from a
+     page they never saw.
+
+     A failed page is not an empty page. The reflex is to render the empty-state
+     — "No orders match this filter" — and it is a lie told at the worst
+     possible moment: somebody who has spent a minute narrowing a filter is now
+     told their filter is wrong when the truth is a gateway timed out. Empty is
+     a fact about the register. This is a fact about the network.
+
+     The failure line replaces the range and takes role="alert", because it is
+     the one thing here worth interrupting for. It carries what failed and what
+     to do, and the red is in the icon: a red field behind the text would read
+     as a status the register is in rather than as a request that did not land.
+
+     Nothing is disabled. Previous still goes back to page 11, which works,
+     because the failure belongs to one request and not to the control. Retry
+     re-issues that same request rather than reloading the screen — a reload
+     throws away rows that are on screen and correct, and on a register somebody
+     has filtered it throws away the minute they spent filtering.
+
+     x-cloak on the range, which is hidden at first paint here. Without it the
+     range and the failure line both paint for a frame and the strip is briefly
+     twice its height.
+
+     In this snippet Next always fails and Retry always works, so both halves of
+     the state can be walked. In a real screen both go through the same request
+     and the failure flag is set by its rejection. -->
+<div data-kui="pagination/failed" class="max-w-xl rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       page: 12, pages: 58, size: 25, total: 1438, failed: true, busy: false,
+       n(v) { return v.toLocaleString('en-IN') },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get rows() { return [0, 1, 2].map(i => 'PO-24-' + (1461 + (this.page - 1) * 3 + i)) },
+       retry() { if (this.busy) return; this.busy = true; setTimeout(() => { this.page++; this.failed = false; this.busy = false }, 1200) },
+       next() { if (this.busy) return; this.busy = true; setTimeout(() => { this.failed = true; this.busy = false }, 900) },
+       prev() { if (this.busy) return; this.page--; this.failed = false }
+     }">
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5">PO number</th>
+        <th scope="col" class="px-4 py-2.5">Vendor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="p in rows" :key="p">
+        <tr class="border-b border-zinc-100 last:border-0">
+          <td class="px-4 py-2.5 font-medium tabular-nums" x-text="p"></td>
+          <td class="px-4 py-2.5 text-zinc-600">Gujarat Polymers Ltd</td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <nav aria-label="Order register pages" :aria-busy="busy"
+       class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+
+    <p role="status" x-show="!failed" x-cloak class="text-[13px]/5 tabular-nums text-zinc-600"
+       x-text="n(from) + '–' + n(to) + ' of ' + n(total) + ' orders'">301–325 of 1,438 orders</p>
+
+    <p role="alert" x-show="failed" class="flex items-start gap-2 text-[13px]/5 text-zinc-900">
+      <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+      <span>
+        <span class="font-medium tabular-nums" x-text="'Page ' + (page + 1) + ' did not load.'">Page 13 did not load.</span>
+        <span class="tabular-nums text-zinc-600" x-text="'You are still on page ' + page + ' of ' + pages + '.'">You are still on page 12 of 58.</span>
+      </span>
+    </p>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="button" x-show="failed" @click="retry()"
+              class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span :class="busy && 'animate-spin'"><i data-lucide="rotate-cw" class="size-4"></i></span>
+        <span class="tabular-nums" x-text="busy ? 'Retrying…' : 'Try page ' + (page + 1) + ' again'">Try page 13 again</span>
+      </button>
+      <button type="button" @click="prev()" :disabled="page === 1"
+              class="inline-flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              aria-label="Previous page">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+      <button type="button" @click="next()" :disabled="page === pages"
+              class="inline-flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              aria-label="Next page">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>` },
+
+      { id: 'load-more', name: 'Load more', code:
 `<!-- Appending rather than paging, and it is a different component wearing the
      same footer. There is no window any more, only a depth, so the count line
      changes from a range to "Showing 6 of 21" and nothing here says "page".
@@ -1396,9 +3989,9 @@ register(
          what: ['Approved PO-24-1187', 'Posted GRN-26-0442', 'Raised debit note DN-26-0117'][i % 3]
        })) },
        more() {
-         const wasLast = this.shown + this.step >= this.total;
+         const finishes = this.shown + this.step >= this.total;
          this.shown = Math.min(this.shown + this.step, this.total);
-         if (wasLast) this.$refs.count.focus();
+         if (finishes) this.$refs.count.focus();
        }
      }">
 
@@ -1426,7 +4019,7 @@ register(
   </div>
 </div>` },
 
-        { id: 'footer', name: 'Order register footer', code:
+      { id: 'footer', name: 'Order register footer', code:
 `<!-- The assembled thing: 1,438 purchase orders, 58 pages at 25 rows, every
      control wired to the same three numbers. Page to 58 and back and the number
      row is seven squares wide the whole way — that is the fixed window doing its
@@ -1439,6 +4032,13 @@ register(
      The size select resets to page one. Page 30 at 25 rows is row 726; page 30
      at 100 rows is row 2,901, which is past the end of this register, so keeping
      the number would land somebody on an empty page after asking to see more.
+     It also carries selected on the option it starts at, or the browser paints
+     10 until Alpine boots and the control spends a frame disagreeing with the
+     range beside it.
+
+     Only four rows are drawn and the line under them counts the rest off the
+     same three numbers. Written as a literal it is right until the first time
+     somebody changes the page size, and then it says 21 on a page holding 96.
 
      Below md the seven squares are display:none and "Page 12 of 58" stands in
      for them, the range wraps to its own line, and the footer of a table that
@@ -1499,7 +4099,8 @@ register(
         </tr>
       </template>
       <tr>
-        <td colspan="4" class="px-4 py-2.5 text-[12px]/4 text-zinc-500 tabular-nums">…and 21 more rows on this page</td>
+        <td colspan="4" class="px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500"
+            x-text="'…and ' + (to - from + 1 - shown.length) + ' more rows on this page'">…and 21 more rows on this page</td>
       </tr>
     </tbody>
   </table>
@@ -1513,7 +4114,7 @@ register(
           <select id="order-pager-size" x-model.number="size" @change="page = 1"
                   class="h-9 bg-transparent px-2 text-[13px]/5 tabular-nums outline-none">
             <option value="10">10</option>
-            <option value="25">25</option>
+            <option value="25" selected>25</option>
             <option value="50">50</option>
             <option value="100">100</option>
           </select>
@@ -1553,7 +4154,174 @@ register(
       </button>
     </div>
   </nav>
-</div>` }
+</div>` },
+
+      { id: 'django', name: 'Django paginator, swapped by htmx', tagNew: true, code:
+`<!-- Django already draws the seven-slot window. get_elided_page_range with
+     on_each_side=1 and on_ends=1 returns first, a gap or a page, three around
+     the current one, a gap or a page, last — the same shape as the slots()
+     getter in the client variants and for the same reason, so the row does not
+     change width as somebody walks it. It cannot be called from a template
+     because template calls take no arguments, so the view builds it, exactly as
+     data-table/server builds its column list.
+
+     The gap is paginator.ELLIPSIS rather than a literal "…", because comparing
+     against the character means the template breaks the day the constant is
+     translated or changed. It renders the same square as a page and it is
+     aria-hidden.
+
+     Every control keeps a stable id. htmx restores focus after a swap by
+     matching the id of the element that had it, so pressing page 13 leaves the
+     keyboard on #page-13 once the register comes back. Where the pressed
+     control was an end that has now gone dead, its id is on a disabled button
+     and the restore quietly fails, so after-settle puts focus on the first
+     pager link that is still live rather than leaving it on the body.
+
+     The handlers sit on the shell rather than on the nav. htmx fires the swap
+     events at the target or its parent, and the nav is inside the target, so a
+     handler written there is destroyed by the swap it was waiting for and never
+     runs a second time. The shell is the element the swap cannot reach.
+
+     aria-busy goes on the div that is about to be replaced, so it clears itself
+     when the rows land and nothing has to remember to take it off. The removal
+     on after-request is for the case where nothing lands at all.
+
+     hx-sync, not hx-disabled-elt. Disabling the pager while a page is in flight
+     disables the button somebody is holding; replace aborts the request that is
+     still running and issues the new one, which is what a second press on Next
+     was asking for anyway.
+
+     The live region is the part a swap breaks. The swap replaces the whole
+     register including any role="status" inside it, and a live region that is
+     itself replaced announces nothing — it has to be in the document before its
+     text changes. So the visible range is plain text, and one persistent
+     sr-only region outside the target is written by an out-of-band swap. It is
+     the only element here that has to survive the request. -->
+{% load humanize %}
+
+{% comment %} orders/register.html — the page. The shell is only ever rendered here, and
+   nothing swaps it, which is what makes it the place the handlers and the live
+   region can live. {% endcomment %}
+<div data-kui="pagination/django" id="register-shell" hx-sync="this:replace"
+     hx-on::before-request="document.getElementById('register').setAttribute('aria-busy', 'true')"
+     hx-on::after-request="document.getElementById('register').removeAttribute('aria-busy')"
+     hx-on::after-settle="if (document.activeElement === document.body) document.querySelector('#register nav a[id^=pager-]')?.focus()">
+
+  <p id="register-status" role="status" class="sr-only"></p>
+
+  {% include "orders/_register.html" %}
+</div>
+
+{% comment %} orders/_register.html — what a page request renders inside the shell and what
+   every swap returns on its own. {% endcomment %}
+<div id="register" class="rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in page_obj %}
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">{{ o.vendor.name }}</td>
+          <td class="px-4 py-2.5 text-right tabular-nums">₹{{ o.amount|intcomma }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <nav aria-label="Order register pages"
+       class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">
+      {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count|intcomma }} orders
+    </p>
+
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_previous %}
+        <a id="pager-prev" href="?{{ base_query }}&amp;page={{ page_obj.previous_page_number }}" rel="prev" aria-label="Previous page"
+           hx-get="?{{ base_query }}&amp;page={{ page_obj.previous_page_number }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+           class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>
+        </a>
+      {% else %}
+        <button id="pager-prev" type="button" disabled aria-label="Previous page"
+                class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-400">
+          <i data-lucide="chevron-left" class="size-4"></i>
+        </button>
+      {% endif %}
+
+      <ul role="list" class="hidden items-center gap-1 md:flex">
+        {% for p in page_range %}
+          <li>
+            {% if p == page_obj.paginator.ELLIPSIS %}
+              <span aria-hidden="true" class="flex size-9 items-center justify-center text-[13px]/5 text-zinc-500">{{ p }}</span>
+            {% elif p == page_obj.number %}
+              <a id="page-{{ p }}" href="?{{ base_query }}&amp;page={{ p }}" aria-label="Page {{ p }}" aria-current="page"
+                 hx-get="?{{ base_query }}&amp;page={{ p }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+                 class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-medium tabular-nums text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ p }}</a>
+            {% else %}
+              <a id="page-{{ p }}" href="?{{ base_query }}&amp;page={{ p }}" aria-label="Page {{ p }}"
+                 hx-get="?{{ base_query }}&amp;page={{ p }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+                 class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ p }}</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if page_obj.has_next %}
+        <a id="pager-next" href="?{{ base_query }}&amp;page={{ page_obj.next_page_number }}" rel="next" aria-label="Next page"
+           hx-get="?{{ base_query }}&amp;page={{ page_obj.next_page_number }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+           class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-right" class="size-4"></i>
+        </a>
+      {% else %}
+        <button id="pager-next" type="button" disabled aria-label="Next page"
+                class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-400">
+          <i data-lucide="chevron-right" class="size-4"></i>
+        </button>
+      {% endif %}
+    </div>
+  </nav>
+</div>
+
+{% comment %} The out-of-band half, and only on a swap. htmx strips an oob element out of
+   a response and writes it into the node it names; on a full page load it is
+   ordinary markup and would print the sentence on screen. {% endcomment %}
+{% if request.htmx %}
+  <span hx-swap-oob="innerHTML:#register-status">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}, showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} orders</span>
+{% endif %}
+
+{% comment %} orders/views.py
+
+   def register(request):
+       orders = Order.objects.select_related('vendor').order_by('-raised_on')
+       paginator = Paginator(orders, 25)
+       page_obj = paginator.get_page(request.GET.get('page'))
+       template = ('orders/_register.html' if request.htmx
+                   else 'orders/register.html')
+       return render(request, template, {
+           'page_obj': page_obj,
+           'page_range': paginator.get_elided_page_range(
+               page_obj.number, on_each_side=1, on_ends=1),
+           'base_query': urlencode({'q': request.GET.get('q', ''),
+                                    'size': request.GET.get('size', '25')}),
+       })
+
+   get_page rather than page: it takes a page number that is not a number, or
+   is past the end, and returns the first or last page instead of raising, which
+   is what a bookmarked ?page=98 on a register that has since shrunk needs.
+
+   The swap returns the partial and the page returns the shell around it, which
+   is the only reason the shell survives its own swaps. Return the page template
+   to a swap and the response carries a second shell, which htmx drops inside
+   the first one along with a duplicate of every id in it. {% endcomment %}` }
       ]
     },
 
@@ -1573,6 +4341,10 @@ register(
       'The sparkline is shape, and it is the chart entry\'s sparkline rather than a second one written here. Hand-writing the points into an inline svg is the obvious shortcut and it is a dead end: <template x-for> is parsed in the SVG namespace and has no .content, so those points can never be bound to the data and stay hand-written while the figure above them updates every morning. The chart entry already reads its colour out of a real class in the DOM and waits a frame for Tailwind\'s browser build to compile it; copy that block. With no axis and no labels a sparkline states direction and volatility and nothing else, so the figure beside it is the data and the canvas gets role="img" with a sentence naming both ends of the range.',
       'The loading state is a skeleton in the tile\'s own shape, not a spinner. The layout is known before the data is — label, figure, delta — so there is nothing for a ring to be honest about, and a ring centred in a tile collapses the box to the height of the ring and shuffles the whole page under the strip, twice, on every load. Use the skeleton entry\'s blocks at this tile\'s measurements and do not build a second set here. Each grey bar sits in a box the height of the line it stands in for, so the strip measures the same before and after the data lands.',
       'Zero and no data are different tiles. Zero overdue orders is a fact, it is good news, and it renders as 0 with its delta intact. No data is the absence of a fact — the QC register timed out, the plant has not posted since the cut-over, the metric did not exist before April — and it renders as an em dash at the figure\'s size with one line saying which of those it was. Printing 0 for a failed read is the failure that gets acted on: somebody sees zero holds, stops checking, and the line runs a shift on material that was never released.',
+      'A figure with a plan behind it is not the same figure without it. 842 MT is a good month against 1,000 and a bad one against 1,400, so a tile that prints the achieved number alone makes every reader do the division and half of them do it against last month\'s plan. Where a target exists the target is the metric: write both figures, put the fraction in the line below and draw the rail. Where none exists, do not invent one out of last month to give the tile a rail — a comparison is a delta and belongs in the delta slot, and a rail measured against a number nobody committed to is a made-up denominator that gets quoted back in a review.',
+      'Not yet, no longer, could not, and none are four tiles, and only the last of them is a number. Loading is a skeleton at the tile\'s own measurements. Stale is the last true reading with the time it was computed and the run it is waiting on. Failed is an em dash, one sentence and a retry — never a zero, and never the last value with nothing marking it as old, because a plausible stale figure is more dangerous than a visible gap. Zero is a fact and renders as 0 with its delta intact. Every collapse of one of these into another ends the same way, with somebody deciding the tile is fine and not opening the register.',
+      'Where the period is a control rather than a decision made once in the query, rebasing moves three things together — the figure, the magnitude of the delta and the clause naming what the delta is measured against. Move the figure and leave the clause and the tile is not stale, it is false: "1,712 vs. July" is a sentence nobody catches, because both halves look like data. The new figure is read for the new period and never divided out of the one already on screen; 148 orders in thirty days does not become 34.5 in a week, and the week anybody is asking about is the one that just happened.',
+      'A tile that filters the register under it is still an anchor, and the filter is still a URL. Bookmark it, paste it into a message, press the back button — all three work for nothing, and none of them works for a filter that is a click handler holding state in a component. hx-get with hx-push-url swaps the register in place and leaves the address bar telling the truth. Mark the filter in force with aria-current and the chip fill, and pick one marker: a tick, a bold label and a fill all saying the same thing is three chances to disagree at the next breakpoint. Count the buckets and read the rows in one request, or the strip and the table disagree the first time a record moves between them, and it is the tile that gets blamed.',
       'Colour in a tile is only ever the delta tone and a status dot. No tinted card, no coloured left border, no red tile for the bad metric. A field of colour behind a number shouts louder than the overdue rows it is describing, and the moment one tile is red the graphite ones read as switched off. This is the alert rule arriving on a dashboard, and it is the reason the delta tone still means something when it appears.'
     ],
     anatomy: [
@@ -1583,6 +4355,8 @@ register(
       ['Delta', 'The arrow, the signed magnitude and the tone, at text-[12px]/4 font-medium tabular-nums. Emerald when the movement was wanted, red-600 when it was not, zinc-600 when there was none worth reporting.'],
       ['Comparison', 'The clause naming what the delta is measured against — "vs. July", "vs. previous 12 weeks", "since 12 Aug" — in zinc-500 beside the delta. Part of the delta, not a caption under it.'],
       ['Trend', 'The optional twelve-point sparkline, drawn by the chart entry on a canvas with role="img". Shape only: it carries no scale and never stands in for the figure.'],
+      ['Target', 'The committed figure the achieved one is measured against, written into the unit slot as "of 1,200 MT", with progress\'s rail under it at h-2. The rail is graphite at every value and clamps at 100% while the figure does not.'],
+      ['Freshness', 'The line saying when the figure was computed, and — once it is past the threshold for that metric — which run it is waiting on. Amber lives in the icon on this line and nowhere else on the tile.'],
       ['Strip', 'The grid the tiles sit in — grid-cols-1, sm:grid-cols-2, xl:grid-cols-4, gap-3 — carrying the section heading and the as-of time once for all of them.']
     ],
     behaviour: [
@@ -1594,6 +4368,10 @@ register(
       'Loading draws a skeleton at the tile\'s own measurements, so the strip is the same height before and after the data lands and nothing below it moves.',
       'No data shows an em dash and says why. Zero shows 0 and keeps its delta, because zero is an answer.',
       'A status value is the word plus the locked dot, at the heading step rather than the figure step, because a status is read and a number is scanned.',
+      'Against a target the rail clamps at 100% and the figure does not: the bar stops at its own end while the text keeps saying 1,308 of 1,200 MT.',
+      'Changing the period rebases the figure, the delta and the comparison clause together, and the new figure is read for the new period rather than divided out of the old one.',
+      'A tile that filters the register under it is an anchor to a filtered URL with aria-current on the one in force, and the counts and the rows come out of one read.',
+      'Stale keeps the figure and adds the time it was computed and the run that was missed. Failed keeps neither — an em dash, a sentence, a reference and a retry, and never the last value unmarked.',
       'Four across, restacking at sm and below, and nothing scrolls sideways. The fifth metric is a decision about which of the four to demote.'
     ],
     a11y: [
@@ -1601,13 +4379,16 @@ register(
       'The arrow is aria-hidden and the sign is real text, so "+8.4% vs. July" still reads with the icon and the colour both gone. Nothing in a tile depends on colour alone.',
       'A metric where up is bad says so in words — "Overdue value" beside "+₹4.10 L vs. 12 Aug" is unambiguous without the red, which matters because red is exactly what forced-colours mode takes away.',
       'The sparkline canvas takes role="img" and an aria-label naming both ends of the range and the shape between them. It is not aria-hidden: that sentence is the only route to the trend for anyone not reading the picture.',
-      'When the tile navigates, the anchor wraps the whole tile and its accessible name is the tile\'s own text — "Overdue value, ₹27.10 L, up ₹4.10 L vs. 12 Aug". Nothing else inside is focusable, so Tab walks the strip one tile at a time.',
+      'When the tile navigates, the anchor wraps the whole tile and its accessible name is the tile\'s own text — "Overdue value, ₹27.10 L, +₹4.10 L vs. 12 Aug". The word "up" is not in it, because the arrow that carries the direction is aria-hidden; the sign is what is left, which is the whole reason the sign is written out. Nothing else inside is focusable, so Tab walks the strip one tile at a time.',
       'Focus is an outline and never a ring: focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15. A ring compiles to a box-shadow and forced-colours mode drops every box-shadow.',
       'The loading tile carries aria-busy="true" and its grey blocks are aria-hidden, so the tile is announced as waiting rather than read out as a wall of nothing.',
       'A no-data tile spells out "No data" as sr-only text beside the aria-hidden em dash, because an em dash resolves to nothing and a silent tile is indistinguishable from a missing one.',
-      'A figure that refreshes in place goes in a role="status" only when the refresh is something the user asked for. A tile polling on a timer stays silent, because a live region firing every thirty seconds makes the rest of the page unusable.'
+      'A figure that refreshes in place goes in a role="status" only when the refresh is something the user asked for. A tile polling on a timer stays silent, because a live region firing every thirty seconds makes the rest of the page unusable. The region is the wrapper that was already on the page, never the message that arrives: a live region added with its text already in it announces nothing, because it was not a live region when the text was put there.',
+      'A tile that rebases on a control the user just pressed takes role="status" with aria-atomic="true", so the label, the new figure and the new comparison clause are read as one sentence rather than as a number with no period attached to it.',
+      'A filter strip is anchors, one tab stop each, with aria-current="true" on the filter in force. A strip that is one tab stop with arrow keys inside it is a radiogroup, and a filter that is a URL is not one.',
+      'A failed tile says "Not read" in sr-only text beside the aria-hidden em dash, and its retry names what it is retrying — "Try again" with sr-only "reading QC holds open" after it, so the visible label still opens the accessible name. Four tiles that all failed are otherwise four buttons called "Try again" in the tab order.'
     ],
-    related: ['card', 'chart', 'skeleton', 'progress'],
+    related: ['card', 'chart', 'skeleton', 'progress', 'empty-state', 'button-group'],
     variants: [
       { id: 'default', name: 'Default', code:
 `<!-- The plain tile: what the number is, the number, and when it was read. No
@@ -1911,14 +4692,87 @@ register(
   </div>
 </div>` },
 
+      { id: 'target', name: 'A fraction of a target', tagNew: true, code:
+`<!-- The metric is the plan, not the total. 842 MT is unreadable on its own —
+     it is a good month against 1,000 and a bad one against 1,400 — so the tile
+     that prints the achieved figure alone makes every reader do the division,
+     and half of them do it against last month's plan.
+
+     The target lives in the unit slot, at text-[13px]/5 in zinc-500, so the
+     achieved figure keeps the display step and the eye still lands on one
+     number. Set both at 24px and the tile becomes a fraction, at which point
+     the reader has to work out which half is the fact.
+
+     The rail is progress's rail at this scale, not a second one written here,
+     and the width is an inline style for the reason that entry gives: Tailwind
+     compiles out of literal strings, so class="w-[{{ pct }}%]" scans as the
+     token w-[{{ and emits no rule at all — the fill comes back zero wide and
+     renders as an empty rail rather than as an error.
+
+     The rail never changes colour. Behind plan is said by the amber mark in the
+     line under it, which is the alert rule at tile scale: a red bar is a field
+     of colour behind a number, and one red tile makes the graphite ones read as
+     switched off.
+
+     Over target the rail clamps and the figure does not — aria-valuenow and the
+     width stop at 100 while the text keeps saying 1,308 of 1,200. A bar drawn
+     past its own end is a rendering fault wearing an achievement.
+
+     Do not invent a target out of last month to give a tile a rail. A
+     comparison is a delta and belongs in the delta slot; a rail measured
+     against a number nobody committed to is a made-up denominator, and it gets
+     quoted back in a review. -->
+<div data-kui="stat-card/target" class="grid gap-3 sm:grid-cols-2">
+
+  <!-- on plan: the rail is graphite and the line under it is plain -->
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt id="sc-tgt-dispatch" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Dispatch against August plan</dt>
+      <dd class="mt-1.5 flex flex-wrap items-baseline gap-x-1.5">
+        <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">842</span>
+        <span class="text-[13px]/5 font-medium tabular-nums text-zinc-500">of 1,200 MT</span>
+      </dd>
+    </dl>
+    <div class="mt-3 h-2 overflow-hidden rounded-full bg-zinc-200"
+         role="progressbar" aria-labelledby="sc-tgt-dispatch"
+         aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
+      <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 70%"></div>
+    </div>
+    <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">70% of plan · 9 working days left</p>
+  </div>
+
+  <!-- behind plan: same graphite rail, and the state is the amber mark -->
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt id="sc-tgt-collect" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Collections against August target</dt>
+      <dd class="mt-1.5 flex flex-wrap items-baseline gap-x-1.5">
+        <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+        <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">1.24 Cr</span>
+        <span class="text-[13px]/5 font-medium tabular-nums text-zinc-500">of ₹2.00 Cr</span>
+      </dd>
+    </dl>
+    <div class="mt-3 h-2 overflow-hidden rounded-full bg-zinc-200"
+         role="progressbar" aria-labelledby="sc-tgt-collect"
+         aria-valuenow="62" aria-valuemin="0" aria-valuemax="100">
+      <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 62%"></div>
+    </div>
+    <p class="mt-2 flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+      <i data-lucide="alert-triangle" class="mt-0.5 size-3.5 shrink-0 text-amber-700" aria-hidden="true"></i>
+      <span class="tabular-nums">62% with 4 working days left · ₹42.00 L short at the current rate of collection</span>
+    </p>
+  </div>
+</div>` },
+
       { id: 'dense', name: 'Dense strip', code:
 `<!-- The dense form, for the strip that sits above a register where the table is
      the subject and the numbers are context. One card holding four cells instead
      of four cards: at this size four separate borders and four gaps is more
      furniture than data.
 
-     The rules are hairlines drawn by gap-px over a zinc-100 background rather
-     than by divide-x. divide-x has to be undone at every breakpoint where the
+     The rules are hairlines drawn by gap-px over a zinc-200 background rather
+     than by divide-x, and zinc-200 rather than zinc-100 because the strip sits
+     on the page: a 1px gap in the page colour is a gap in the strip and not a
+     rule through it. divide-x has to be undone at every breakpoint where the
      column count changes, and it draws nothing between the two rows at 390px;
      the gap paints both axes at any column count and reflows nothing, because a
      1px gap is a gap and not a border.
@@ -1929,11 +4783,18 @@ register(
      strip. Four copies of "vs. July" at 11px is four chances to disagree with
      itself and nothing gained.
 
+     The rupee mark stays inside the figure here, which is the one place this
+     component allows it. Stepping the unit down from 16px lands it at 11px
+     beside a 16px number, which is not a quieter unit, it is an unreadable one;
+     and the argument for splitting them — keeping the digits at the same x
+     across a row — is already gone, because these figures are separated by
+     rules rather than aligned against each other.
+
      Below sm it is two columns, not one: at this size two 16px figures fit side
      by side on a 390px screen, and eight rows of one number each is a list
      nobody scrolls. -->
 <div data-kui="stat-card/dense" class="max-w-3xl">
-  <div class="overflow-hidden rounded-xl border border-zinc-200">
+  <div class="overflow-hidden rounded-xl border border-zinc-300">
     <dl class="grid grid-cols-2 gap-px bg-zinc-200 sm:grid-cols-4">
 
       <div class="bg-white px-3 py-2.5">
@@ -1980,6 +4841,188 @@ register(
   <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">All plants · change vs. July · read at 09:12</p>
 </div>` },
 
+      { id: 'period', name: 'Rebasing the period', tagNew: true, code:
+`<!-- Every figure on a dashboard is a figure over a period, and the period is a
+     control on the strip more often than it is a decision made once in the
+     query.
+
+     Rebasing moves three things and drops none of them: the figure, the
+     magnitude of the delta, and the clause naming what the delta is measured
+     against. Move the figure and leave the clause and the tile is not stale, it
+     is false — "1,712 vs. July" is a sentence nobody catches, because both
+     halves look like data. All three come out of one record here for exactly
+     that reason; a template that reads the figure from one place and prints the
+     clause as a constant is the shape of the defect.
+
+     The new figure is read for the new period and never divided out of the one
+     already on screen. 148 orders in thirty days does not become 34.5 in a
+     week, and the week anybody is asking about is the one that just happened.
+
+     The text inside the bound elements is the thirty-day reading rather than a
+     placeholder, so the tile is correct in the frame before Alpine boots and in
+     the frame after the JavaScript fails altogether.
+
+     The arrow flips with the period, so it sits on two wrapping spans and never
+     on the <i> itself: createIcons() replaces that node with an <svg> and takes
+     any binding on it away. The one hidden at first paint carries x-cloak.
+
+     The sign picks the tone here only because orders raised is a metric where
+     up is good, and that is a fact about this tile rather than about the
+     component. Point the same template at overdue value and it congratulates
+     the buyer every morning. Carry good on the record and choose the tone with
+     delta > 0 === (good === "up") the moment there is a second metric.
+
+     role="status" with aria-atomic on the tile is legitimate here and only
+     here — a person pressed the control, so the announcement answers a question
+     they asked, and aria-atomic is what makes it read as "Orders raised, 1,712,
+     -38 vs. the twelve months before" rather than as a bare number. A tile that
+     repolls on a timer stays silent.
+
+     The control is button-group/segmented at its own size. On a real screen
+     each button also carries hx-get with the period in the query and swaps the
+     tile; Alpine holds only which one is pressed. -->
+<div data-kui="stat-card/period" class="max-w-sm space-y-3"
+     x-data="{
+       p: '30d',
+       opts: ['7d', '30d', '12m'],
+       label: { '7d': '7 days', '30d': '30 days', '12m': '12 months' },
+       fig:   { '7d': '41', '30d': '148', '12m': '1,712' },
+       mag:   { '7d': '+6', '30d': '+11', '12m': '-38' },
+       vs:    { '7d': 'vs. previous 7 days', '30d': 'vs. previous 30 days', '12m': 'vs. the 12 months before' },
+       get up() { return !this.mag[this.p].startsWith('-') },
+       move(step) {
+         const i = (this.opts.indexOf(this.p) + step + this.opts.length) % this.opts.length;
+         this.p = this.opts[i];
+         this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());
+       }
+     }">
+
+  <div role="radiogroup" aria-label="Period" x-ref="grp"
+       @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+       @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+       class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+    <template x-for="o in opts" :key="o">
+      <button type="button" role="radio" :aria-checked="p === o" :tabindex="p === o ? 0 : -1"
+              @click="p = o"
+              class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="p === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+        <span x-text="label[o]"></span>
+      </button>
+    </template>
+  </div>
+
+  <div role="status" aria-atomic="true" class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Orders raised · all plants</dt>
+      <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="fig[p]">148</dd>
+      <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums"
+              :class="up ? 'text-emerald-600' : 'text-red-600'">
+          <span x-show="up"><i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i></span>
+          <span x-show="!up" x-cloak><i data-lucide="trending-down" class="size-3.5" aria-hidden="true"></i></span>
+          <span x-text="mag[p]">+11</span>
+        </span>
+        <span class="text-zinc-500" x-text="vs[p]">vs. previous 30 days</span>
+      </dd>
+    </dl>
+  </div>
+</div>` },
+
+      { id: 'filter', name: 'Tiles that filter the register', tagNew: true, code:
+`<!-- The dashboard strip is a way out of the screen. This one is a control on
+     it: the tiles count the buckets and the register under them is what
+     changes.
+
+     Both are anchors, and that is the argument. A filter is a URL. Bookmark it,
+     paste it into a message, press the back button — all three work for
+     nothing, and none of them works for a filter that is a click handler
+     holding state in a component. hx-get with hx-push-url swaps in place and
+     still leaves the address bar telling the truth, which is the only version
+     that survives somebody sending a colleague the twelve overdue ones.
+
+     The swap takes the whole block, tiles and register together, because the
+     counts and the rows have to come out of one read. Counted by one query and
+     filtered by another, they disagree the first time a record moves between
+     them, and it is the tile that gets blamed.
+
+     The filter in force is aria-current plus the chip fill, and that is one
+     marker rather than three. A tick, a bold label and a fill all saying the
+     same thing is three chances to disagree at the next breakpoint. Being a
+     tinted shape it hovers one step deeper to zinc-300 — zinc-200 hovering to
+     zinc-200 is not a subtle hover, it is no hover.
+
+     No deltas. A delta answers "is this getting worse"; a filter tile answers
+     "how many are in this bucket, show me them", and a tile carrying both is
+     two controls wide while the count stops being the thing anyone clicks.
+
+     Two columns at 390px rather than one. A filter strip is chosen from rather
+     than read, and four full-width tiles push the register itself off the
+     screen, which is the thing the strip exists to scope.
+
+     Each tile is a flex column with the count pushed to the bottom, because a
+     bucket name is data and data wraps. "Awaiting approval" takes two lines in
+     a half-width tile while "Overdue" takes one, and a strip topped out at the
+     label leaves the two counts beside each other at different heights. The
+     grid already makes the tiles the same height; bottom-aligning the figure
+     inside them is what makes the counts line up, at every width, for a label
+     nobody has written yet. -->
+
+<div data-kui="stat-card/filter" id="sc-orders" class="max-w-4xl space-y-3">
+
+  <div role="group" aria-label="Filter the order register" class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+    <a href="?status=all" hx-get="?status=all" hx-target="#sc-orders" hx-swap="outerHTML" hx-push-url="true"
+       class="flex flex-col justify-between rounded-xl border border-zinc-300 bg-white p-4 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">All open</span>
+      <span class="mt-1.5 block text-[24px]/7 font-semibold tracking-tight tabular-nums">148</span>
+    </a>
+
+    <a href="?status=approval" hx-get="?status=approval" hx-target="#sc-orders" hx-swap="outerHTML" hx-push-url="true"
+       class="flex flex-col justify-between rounded-xl border border-zinc-300 bg-white p-4 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex items-center gap-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Awaiting approval
+      </span>
+      <span class="mt-1.5 block text-[24px]/7 font-semibold tracking-tight tabular-nums">9</span>
+    </a>
+
+    <a href="?status=part" hx-get="?status=part" hx-target="#sc-orders" hx-swap="outerHTML" hx-push-url="true"
+       class="flex flex-col justify-between rounded-xl border border-zinc-300 bg-white p-4 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Part received</span>
+      <span class="mt-1.5 block text-[24px]/7 font-semibold tracking-tight tabular-nums">35</span>
+    </a>
+
+    <!-- the filter in force: aria-current, the chip fill, one step deeper on hover -->
+    <a href="?status=overdue" aria-current="true" hx-get="?status=overdue" hx-target="#sc-orders" hx-swap="outerHTML" hx-push-url="true"
+       class="flex flex-col justify-between rounded-xl border border-zinc-300 bg-zinc-200 p-4 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex items-center gap-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+      </span>
+      <span class="mt-1.5 block text-[24px]/7 font-semibold tracking-tight tabular-nums">12</span>
+    </a>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+      <h3 class="text-[13px]/5 font-medium">Order register</h3>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">12 of 148 orders · overdue</p>
+    </div>
+    <ul class="divide-y divide-zinc-100 text-[13px]/5">
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+        <span class="min-w-0 truncate">PO-24-1187 · Gujarat Polymers Ltd</span>
+        <span class="shrink-0 tabular-nums text-zinc-600">₹4,82,000 · 9 days late</span>
+      </li>
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+        <span class="min-w-0 truncate">PO-24-1174 · Sharma Extrusions</span>
+        <span class="shrink-0 tabular-nums text-zinc-600">₹1,18,400 · 14 days late</span>
+      </li>
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+        <span class="min-w-0 truncate">PO-24-1169 · Nashik Steel Traders</span>
+        <span class="shrink-0 tabular-nums text-zinc-600">₹9,04,000 · 21 days late</span>
+      </li>
+    </ul>
+  </div>
+</div>` },
+
       { id: 'loading', name: 'Loading', code:
 `<!-- A skeleton, not a spinner. The layout is known before the data is — label,
      figure, delta — so there is nothing for a ring to be honest about, and a ring
@@ -1996,7 +5039,16 @@ register(
 
      aria-busy is on the tile, the bars are aria-hidden, and x-cloak keeps the
      loaded state from flashing before Alpine boots. x-init runs the cycle once
-     so the example resolves; in an application the swap is what clears it. -->
+     so the example resolves; in an application the swap is what clears it.
+
+     The sr-only line is a live region that sits outside both blocks and changes
+     its text, rather than a status message inside the skeleton that appears and
+     disappears with it. A region that is added to the page with its message
+     already in it announces nothing, so the version inside the skeleton was
+     announced neither when the wait started nor when it ended. Out here it says
+     the wait and then says the figure, and the figure is worth saying because
+     the user pressed the button that went and got it. -->
+
 <div data-kui="stat-card/loading" class="max-w-sm"
      x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 1800) } }"
      x-init="run()">
@@ -2014,7 +5066,6 @@ register(
       <div class="mt-2 flex h-4 items-center" aria-hidden="true">
         <div class="h-2.5 w-36 rounded bg-zinc-200"></div>
       </div>
-      <p role="status" class="sr-only">Loading open order value</p>
     </div>
 
     <!-- loaded -->
@@ -2031,12 +5082,187 @@ register(
         <span class="text-zinc-500">vs. July</span>
       </dd>
     </dl>
+
+    <p role="status" class="sr-only"
+       x-text="busy ? 'Loading open order value' : 'Open order value, ₹1.84 Cr, +8.4% vs. July'"></p>
   </div>
 
   <button type="button" @click="run()"
           class="mt-3 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     Load again
   </button>
+</div>` },
+
+      { id: 'stale', name: 'Computed at 06:00', tagNew: true, code:
+`<!-- A figure with no time on it is a claim to be current, and most tiles are
+     not entitled to make it. This one comes off a valuation run, and the only
+     question anybody asks when it disagrees with the register is when it was
+     read.
+
+     The figure does not grey out and the tile does not empty itself. ₹3.42 Cr
+     was true at 06:00 and it is still the last true reading; painting it
+     zinc-400 says the number is wrong, and it is not wrong, it is old. That is
+     the same call the stale input makes about a rate somebody else changed
+     underneath an open form.
+
+     Amber, in the icon, on the line that carries the time — never on the
+     border and never behind the figure. A tile that turns amber is
+     indistinguishable at a glance from a metric that is in a bad state, and
+     those are two different alarms competing for one colour.
+
+     Stale is a threshold rather than a fact about the clock, so the line names
+     the run that was missed instead of only how long ago the last one landed.
+     Three hours is alarming for a stock valuation and unremarkable for a
+     monthly ageing, and nothing on the tile can tell them apart.
+
+     Recompute is a real request, and what it targets is the region rather than
+     the whole tile — swap the tile and the button that asked for the swap goes
+     with it, along with the region that was supposed to announce the answer.
+     htmx puts
+     .htmx-request on the button for the length of it, which is what the class
+     on the icon reads — no Alpine, and nothing left spinning when the request
+     fails, times out or is aborted.
+
+     The wrapper is the live region and it is on the page from first paint, so
+     the figure that lands is announced. A region that arrives with its message
+     already in it announces nothing, because it was not a live region when the
+     message was put there. This one is allowed to speak because a person
+     pressed the button. -->
+<div data-kui="stat-card/stale" class="max-w-sm rounded-xl border border-zinc-300 bg-white p-4">
+
+  <div id="sc-stale-read" role="status" aria-atomic="true">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Stock value · Silvassa</dt>
+      <dd class="mt-1.5 flex items-baseline gap-1">
+        <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+        <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">3.42 Cr</span>
+      </dd>
+    </dl>
+    <p class="mt-2 flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+      <i data-lucide="alert-triangle" class="mt-0.5 size-3.5 shrink-0 text-amber-700" aria-hidden="true"></i>
+      <span class="tabular-nums">Computed 06:00, 3 h 14 m ago. The 12:00 valuation run has not posted.</span>
+    </p>
+  </div>
+
+  <button type="button"
+          hx-get="/dashboard/tiles/stock-value/" hx-target="#sc-stale-read" hx-swap="innerHTML"
+          hx-disabled-elt="this"
+          class="group mt-3 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="rotate-cw" class="size-4 group-[.htmx-request]:animate-spin"></i>Recompute now
+  </button>
+</div>` },
+
+      { id: 'failed', name: 'The read failed', tagNew: true, code:
+`<!-- The third absence, and the one the other two get mistaken for. Loading is
+     "not yet". Zero is "we asked, and the answer was none". This is "we asked
+     and got no answer", and a number is the one thing it must never be.
+
+     A failed read that renders 0 is the defect the whole component is arranged
+     around: somebody sees zero QC holds, stops checking, and a shift runs on
+     material that was never released. Nor does it render the last value it
+     had — a cached figure with nothing marking it as old is worse than the em
+     dash, because it is plausible. If the previous reading is worth showing
+     then this is the stale tile and it has to carry the time it was read.
+
+     One tile failing does not take the strip down. The other three were read
+     and are correct, so they keep their figures, and the em dash sits in a box
+     the height of the figure it stands in for — h-7 — so all four labels and
+     all four figures stay on the same two lines across the row. The reason and
+     the retry under it do make the strip taller, and that is the right trade: a
+     failed tile that fits the others exactly has nowhere to say what failed.
+
+     The region-sized version of this is empty-state/error. A tile has four
+     lines and cannot carry an icon well, a heading, two paragraphs and two
+     buttons, so it carries what is load-bearing: the glyph at red-600, one
+     sentence saying what did not answer, a reference support can search for,
+     and a retry. Colour is the glyph alone — no red border, no red tile.
+
+     Retry resolves. It goes busy and comes back with a figure or with the same
+     failure; a retry that leaves the tile exactly as it found it is
+     indistinguishable from a button that does nothing. The spin is bound on a
+     wrapping span rather than on the <i>, which createIcons() would replace.
+
+     "Try again" carries sr-only text naming what it retries, because a strip of
+     four failed tiles is four buttons called "Try again" in the tab order. The
+     sr-only words come after the visible ones so the visible label is still the
+     start of the accessible name. -->
+<div data-kui="stat-card/failed" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open orders</dt>
+      <dd class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight tabular-nums">148</dd>
+      <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+11
+        </span>
+        <span class="text-zinc-500">vs. July</span>
+      </dd>
+    </dl>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue value</dt>
+      <dd class="mt-1.5 flex h-7 items-baseline gap-1">
+        <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+        <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">27.10 L</span>
+      </dd>
+      <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+₹4.10 L
+        </span>
+        <span class="text-zinc-500">vs. 12 Aug</span>
+      </dd>
+    </dl>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">GRNs posted today</dt>
+      <dd class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight tabular-nums">12</dd>
+      <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+4
+        </span>
+        <span class="text-zinc-500">vs. same time yesterday</span>
+      </dd>
+    </dl>
+  </div>
+
+  <!-- the one that did not answer -->
+  <div class="rounded-xl border border-zinc-300 bg-white p-4"
+       role="status" aria-atomic="true" :aria-busy="state === 'busy'"
+       x-data="{ state: 'failed', retry() { this.state = 'busy'; setTimeout(() => this.state = 'ok', 1400) } }">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">QC holds open</dt>
+
+      <dd x-show="state !== 'ok'" class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight text-zinc-400">
+        <span aria-hidden="true">—</span><span class="sr-only">Not read</span>
+      </dd>
+
+      <dd x-show="state === 'ok'" x-cloak class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight tabular-nums">3</dd>
+      <dd x-show="state === 'ok'" x-cloak class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+2
+        </span>
+        <span class="text-zinc-500">since yesterday</span>
+      </dd>
+    </dl>
+
+    <p x-show="state !== 'ok'" class="mt-2 flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+      <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600" aria-hidden="true"></i>
+      <span class="tabular-nums">The QC register did not answer. Reference 8f21c4 · 09:12.</span>
+    </p>
+
+    <button type="button" x-show="state !== 'ok'" @click="retry()" :disabled="state === 'busy'"
+            class="mt-2 inline-flex items-center gap-1.5 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="inline-flex" :class="state === 'busy' && 'animate-spin'">
+        <i data-lucide="rotate-cw" class="size-3.5" aria-hidden="true"></i>
+      </span>
+      Try again<span class="sr-only"> reading QC holds open</span>
+    </button>
+  </div>
 </div>` },
 
       { id: 'empty', name: 'Zero and no data', code:
@@ -2109,8 +5335,9 @@ register(
      One anchor per tile, wrapping everything, and nothing else focusable inside
      it — a button nested in an anchor cannot be reached from the keyboard and is
      ambiguous with a mouse. Tab therefore walks the strip in four stops, and each
-     accessible name is the whole tile: "Overdue value, ₹27.10 L, up ₹4.10 L vs.
-     12 Aug".
+     accessible name is the whole tile: "Overdue value, ₹27.10 L, +₹4.10 L vs.
+     12 Aug". The arrow is aria-hidden and contributes nothing to that name,
+     which is why the sign is written out beside it.
 
      Focus is an outline, never a ring. ring-* is a box-shadow and forced-colours
      mode drops every box-shadow, which takes the focus indicator away from the
@@ -2223,7 +5450,14 @@ register(
       'A canvas is a picture with no text in it. Every chart takes role="img" and a one-line aria-label that states the trend, and repeats its numbers as text: an sr-only table, or a legend that already carries the values the way the donut does. Without one of the two a screen reader gets nothing at all.',
       'Animation is 250ms, and off entirely under prefers-reduced-motion. A dashboard that replays a grow-from-zero sweep on every filter change is a dashboard nobody filters twice.',
       'No gradients, no shadows, and no truncated axis on a bar chart. Starting bars at anything but zero exaggerates the difference the chart exists to report.',
-      'Format ticks in the units the reader uses. A y-axis of 1800000 is arithmetic; 18.0L is the number they would have said out loud.'
+      'Format ticks in the units the reader uses. A y-axis of 1800000 is arithmetic; 18.0L is the number they would have said out loud.',
+      'A period or a filter change mutates the chart that is already there — replace data.labels and data.datasets[n].data, then call update(). Do not build a second Chart on the same canvas: Chart.js keys its registry on the element and throws "Canvas is already in use". Destroy-then-recreate is the next thing people reach for and it is only a little better, because it discards the scale and the tooltip and pays for a full layout pass on every click of a control somebody is going to click four times in a row.',
+      'Two series side by side take zinc-600 and zinc-300 rather than two of the three stack fills. Grouped bars are separated from each other, at 5.3:1, rather than from the card, and the pale one gets its edge from the axis and the gridlines the way the bottom of a stack does. Two series stacked is the other case and takes zinc-500 and zinc-800, because there the pair has to separate where they touch.',
+      'Waiting and failed are chart states, and both of them keep the plot box\'s height. The box is a Tailwind height that exists before any data does, so a skeleton or a message goes inside it and the card measures the same before and after — a dashboard of four charts that each grow 40px on arrival reflows the page four times. The heading, the period and the legend are markup rather than data and stay put in every state.',
+      'Never draw a chart with no numbers in it while you wait. Chart.js given an empty dataset renders a real axis from 0 to 1, which is a picture of figures nobody has read and looks answered rather than pending.',
+      'Axis label density is Chart.js\' decision, not one made at init. autoSkip with maxRotation: 0 drops whichever labels do not fit and runs on every layout pass, so it is still right when the sidebar expands or the card moves from a two-column grid to one — neither of which is a window resize a matchMedia check would see. Shortening is not the alternative: initials turn June, July and January into three identical labels.',
+      'Where the figures are the point, put the table on the screen and delete the sr-only copy. Two tables carrying the same five rows is a screen reader reading the month column twice and a maintainer updating one of them. A visible table can also be the source the canvas paints from — parse it from data-* attributes rather than from the formatted cell text, and the picture and the figures under it cannot disagree.',
+      'The legend can be the switch as well as the palette, because it is already both the key and the one place a colour is written. Express the off state with opacity on the swatch rather than a different fill: opacity is not part of backgroundColor, so the swatch still reads back as the colour the canvas paints with. Rewriting the class to a paler grey silently repaints the series on the next redraw.'
     ],
     anatomy: [
       ['Frame', 'The card. Its zinc-200 border is also where the chart reads its grid colour.'],
@@ -2231,6 +5465,8 @@ register(
       ['Plot box', 'A wrapper with an explicit height. The canvas fills it; without it the chart grows without bound.'],
       ['Canvas', 'role="img" with an aria-label summarising the shape, because nothing inside a canvas is readable.'],
       ['Fallback table', 'The same numbers, sr-only, immediately after the canvas.'],
+      ['Period control', 'The segmented radiogroup in the card header. It owns the period, and the canvas, the aria-label sentence and the fallback table all read from the one object it selects, so none of the three can disagree with the others.'],
+      ['State box', 'The plot box holding a skeleton, an empty state or a failure message instead of a canvas. Same height as the canvas it stands in for, so nothing below the card moves as the data resolves.'],
       ['Footnote', 'Source and period, in tertiary text. A chart with no stated period is a chart nobody can check.']
     ],
     behaviour: [
@@ -2239,7 +5475,11 @@ register(
       'Hovering anywhere on a column reports every series at that point, rather than only the segment under the cursor.',
       'Animation runs for 250ms once, and not at all when the reader has asked for reduced motion.',
       'Tearing down the component destroys the Chart instance, so previews and htmx swaps can re-render the same markup safely.',
-      'With no data the component renders an empty state, never an empty grid. Axes with nothing in them read as a chart that failed to load.'
+      'With no data the component renders an empty state, never an empty grid. Axes with nothing in them read as a chart that failed to load.',
+      'Changing the period mutates the existing chart and calls update(). The instance is built once, on init, and destroyed once, on teardown, however many times the reader changes their mind.',
+      'A legend that switches series changes the picture and nothing else. The fallback table keeps every row, and the last series still showing cannot be switched off, because all of them off is the empty grid this component refuses to draw.',
+      'Month labels thin out as the box narrows rather than rotating or abbreviating, and they thin back in when it widens. The tooltip still names a month the axis dropped.',
+      'Waiting draws a skeleton in the plot box\'s own height, and a failed read draws a message in it. Both cards measure the same as the loaded one, so a strip of charts resolving one at a time does not walk the page up and down.'
     ],
     a11y: [
       'The canvas carries role="img" and an aria-label that says what the chart shows, not that it is a chart.',
@@ -2247,7 +5487,13 @@ register(
       'The legend is HTML, so its labels are text a screen reader can announce and a browser can find. The Chart.js canvas legend is turned off system wide for that reason.',
       'Nothing is told apart by hue, because there is no hue: the ramp is lightness only, which is the one channel every reader has. The legend still names each series in text and the fallback table still carries every value.',
       'Three fills is the ceiling, and the arithmetic sets it. zinc-200, zinc-500 and zinc-800 clear 3:1 against the neighbour they touch, at 3.81 and 3.08; a fourth grey squeezed in between drops a pair below 3:1 and the two segments stop separating. The palest step is 1.27:1 against the white card, so the bottom of a stacked bar is defined by the axis rather than by its own edge. That is the one edge that does not clear, and the fallback table is what pays for it.',
-      'Tooltips are pointer sugar and never the only place a value appears.'
+      'Tooltips are pointer sugar and never the only place a value appears.',
+      'A sparkline is the one chart with no fallback table, and it is not an exception to the rule above. It carries no scale and no axis, so there are no figures in it to repeat — the figure printed beside it is the data, and the aria-label names both ends of the range and the shape between them.',
+      'Where the figures are on the screen as a real table, that table is the text and the sr-only copy is deleted. Point it at the card heading with aria-labelledby rather than giving it a second name of its own, and leave role="img" and its sentence on the canvas: the shape is the part the table does not carry.',
+      'Legend switches are buttons with aria-pressed, and pressed means the series is drawn. The last one still on is aria-disabled rather than disabled, so it keeps its Tab stop and can still be read — a disabled control blurs to the body and drops a keyboard user at the top of the document.',
+      'The period control is a radiogroup and its aria-checked is the announcement. Do not add a live region beside it: a role="status" firing as the radio announces is two things talking at once, and the reader loses both.',
+      'A loading chart is aria-busy with one sr-only role="status" naming the chart that is coming. The skeleton blocks are aria-hidden, because eight rectangles announced one at a time is noise standing in for a wait.',
+      'A failed read says so in the card, as ordinary text — the icon repeats what the sentence already said and carries nothing on its own. No role="alert" in static markup — it fires on first paint whether or not anything just went wrong, and the swap that put the card there is what announces.'
     ],
     related: ['stat-card', 'table', 'progress'],
     variants: [
@@ -2271,14 +5517,18 @@ register(
       { id: 'line', name: 'Line', code:
 `<div data-kui="chart/line" class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
-       chart: null,
+       chart: null, gone: false,
        init() { this.wait(() => this.draw()); },
        /* Tailwind's browser build compiles after first paint, so a class can
           still be uncompiled when Alpine initialises and getComputedStyle
           hands back transparent. Check every swatch, not the first: they do
           not all land in the same pass. With a compiled stylesheet this
-          passes on the first frame and costs nothing. */
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
        wait(fn) {
+         if (this.gone) return;
          const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
          probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
            ? fn()
@@ -2318,7 +5568,7 @@ register(
            }
          });
        },
-       destroy() { this.chart && this.chart.destroy(); }
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
      }">
 
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -2358,14 +5608,18 @@ register(
       { id: 'bar', name: 'Grouped bar', code:
 `<div data-kui="chart/bar" class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
-       chart: null,
+       chart: null, gone: false,
        init() { this.wait(() => this.draw()); },
        /* Tailwind's browser build compiles after first paint, so a class can
           still be uncompiled when Alpine initialises and getComputedStyle
           hands back transparent. Check every swatch, not the first: they do
           not all land in the same pass. With a compiled stylesheet this
-          passes on the first frame and costs nothing. */
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
        wait(fn) {
+         if (this.gone) return;
          const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
          probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
            ? fn()
@@ -2396,7 +5650,7 @@ register(
            }
          });
        },
-       destroy() { this.chart && this.chart.destroy(); }
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
      }">
 
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -2435,14 +5689,18 @@ register(
       { id: 'horizontal', name: 'Ranking', code:
 `<div data-kui="chart/horizontal" class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
-       chart: null,
+       chart: null, gone: false,
        init() { this.wait(() => this.draw()); },
        /* Tailwind's browser build compiles after first paint, so a class can
           still be uncompiled when Alpine initialises and getComputedStyle
           hands back transparent. Check every swatch, not the first: they do
           not all land in the same pass. With a compiled stylesheet this
-          passes on the first frame and costs nothing. */
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
        wait(fn) {
+         if (this.gone) return;
          const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
          probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
            ? fn()
@@ -2473,7 +5731,19 @@ register(
                  grid: { color: grid }, border: { display: false },
                  ticks: { color: ink, callback: v => (v / 100000).toFixed(1).replace('.0', '') + 'L' }
                },
-               y: { grid: { display: false }, border: { color: grid }, ticks: { color: ink } }
+               y: {
+                 grid: { display: false }, border: { color: grid },
+                 /* A supplier name is as long as it is, and on a 390px card an
+                    untruncated one takes a third of the width off the plot.
+                    A method, not an arrow: Chart.js calls a tick callback with
+                    the scale as this, and the tooltip title still reads the raw
+                    label, so the full name is one hover away and every name is
+                    written out in the fallback table. */
+                 ticks: { color: ink, autoSkip: false, callback(v) {
+                   const s = this.getLabelForValue(v);
+                   return s.length > 16 ? s.slice(0, 15) + '…' : s;
+                 } }
+               }
              },
              plugins: {
                tooltip: { callbacks: { label: c => '₹' + c.parsed.x.toLocaleString('en-IN') } }
@@ -2481,7 +5751,7 @@ register(
            }
          });
        },
-       destroy() { this.chart && this.chart.destroy(); }
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
      }">
 
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -2518,14 +5788,18 @@ register(
       { id: 'stacked', name: 'Stacked by status', code:
 `<div data-kui="chart/stacked" class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
-       chart: null,
+       chart: null, gone: false,
        init() { this.wait(() => this.draw()); },
        /* Tailwind's browser build compiles after first paint, so a class can
           still be uncompiled when Alpine initialises and getComputedStyle
           hands back transparent. Check every swatch, not the first: they do
           not all land in the same pass. With a compiled stylesheet this
-          passes on the first frame and costs nothing. */
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
        wait(fn) {
+         if (this.gone) return;
          const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
          probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
            ? fn()
@@ -2557,7 +5831,7 @@ register(
            }
          });
        },
-       destroy() { this.chart && this.chart.destroy(); }
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
      }">
 
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -2604,14 +5878,18 @@ register(
       { id: 'donut', name: 'Donut', code:
 `<div data-kui="chart/donut" class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
-       chart: null,
+       chart: null, gone: false,
        init() { this.wait(() => this.draw()); },
        /* Tailwind's browser build compiles after first paint, so a class can
           still be uncompiled when Alpine initialises and getComputedStyle
           hands back transparent. Check every swatch, not the first: they do
           not all land in the same pass. With a compiled stylesheet this
-          passes on the first frame and costs nothing. */
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
        wait(fn) {
+         if (this.gone) return;
          const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
          probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
            ? fn()
@@ -2634,7 +5912,7 @@ register(
            }
          });
        },
-       destroy() { this.chart && this.chart.destroy(); }
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
      }">
 
   <h3 class="text-[14px]/5 font-semibold">Open order book</h3>
@@ -2680,14 +5958,18 @@ register(
       { id: 'sparkline', name: 'Sparkline', code:
 `<div data-kui="chart/sparkline" class="max-w-xs rounded-xl border border-zinc-300 bg-white p-4"
      x-data="{
-       chart: null,
+       chart: null, gone: false,
        init() { this.wait(() => this.draw()); },
-       /* Tailwind's browser build compiles after first paint, so a class can
-          still be uncompiled when Alpine initialises and getComputedStyle
-          hands back transparent. Check every swatch, not the first: they do
-          not all land in the same pass. With a compiled stylesheet this
-          passes on the first frame and costs nothing. */
+       /* Tailwind's browser build compiles after first paint, so the swatch
+          can still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. One probe here, because a sparkline has one
+          series. With a compiled stylesheet this passes on the first frame
+          and costs nothing. The gone flag is the teardown case: a card
+          swapped out while the loop is still running would otherwise resolve
+          a frame later and build a Chart on a detached canvas that nothing is
+          left alive to destroy. */
        wait(fn) {
+         if (this.gone) return;
          getComputedStyle(this.$refs.tone).backgroundColor !== 'rgba(0, 0, 0, 0)'
            ? fn()
            : requestAnimationFrame(() => this.wait(fn));
@@ -2709,7 +5991,7 @@ register(
            }
          });
        },
-       destroy() { this.chart && this.chart.destroy(); }
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
      }">
 
   <!-- a sparkline has no legend, so the palette is a hidden swatch. It has to be a
@@ -2724,7 +6006,562 @@ register(
 
   <div class="mt-3 h-10">
     <canvas x-ref="canvas" role="img"
-            aria-label="Committed value over the last twelve months, rising from ₹1.24 crore to ₹2.41 crore, with the steepest climb in March."></canvas>
+            aria-label="Committed value over the last twelve months, rising from ₹1.24 crore to ₹2.41 crore, stepping up from March onward and dipping only in April."></canvas>
+  </div>
+</div>` },
+
+      { id: 'table', name: 'Figures beside the shape', tagNew: true, code:
+`<!-- A reconciliation card: somebody is going to read ₹27,90,000 off it and
+     type that figure into something else, so the table is on the screen and
+     not behind sr-only. Where the table is visible the sr-only copy is deleted
+     — two tables carrying the same five rows is not redundancy, it is a screen
+     reader reading the month column twice and a maintainer updating one of
+     them.
+
+     The table is also the data. The canvas reads its series out of the tbody
+     the same way it reads its colour out of the legend, so the picture and the
+     figures under it cannot disagree — the defect this whole entry is built
+     to prevent, arriving one level up from the palette.
+
+     The number is parsed from data-value, never from the cell text. ₹18,40,000
+     is a formatted string, and round-tripping it through a strip-and-parse is
+     how a lakh separator becomes a decimal point on somebody\'s locale.
+
+     Row headers carry data-axis as well as their text. The axis has room for
+     Apr and the reader wants April, so both live on the same element instead
+     of in two lists that drift.
+
+     The total is a tfoot rather than a last row: the chart reads tbody only,
+     so a total row cannot become a sixth bar. -->
+<div data-kui="chart/table" class="rounded-xl border border-zinc-300 bg-white p-5"
+     x-data="{
+       chart: null, gone: false,
+       init() { this.wait(() => this.draw()); },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
+       wait(fn) {
+         if (this.gone) return;
+         const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+         probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const grid = getComputedStyle(this.$root).borderTopColor;
+         const ink  = getComputedStyle(this.$refs.legend).color;
+         const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                           .map(el => getComputedStyle(el).backgroundColor);
+         const rows = Array.from(this.$refs.figures.querySelectorAll('tbody tr')).map(tr => ({
+           label: tr.querySelector('th').dataset.axis,
+           value: Number(tr.querySelector('[data-value]').dataset.value)
+         }));
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'bar',
+           data: {
+             labels: rows.map(r => r.label),
+             datasets: [{
+               label: 'Receipt value', data: rows.map(r => r.value),
+               backgroundColor: tone[0], borderRadius: 4, maxBarThickness: 28
+             }]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false,
+             scales: {
+               x: { grid: { display: false }, border: { color: grid }, ticks: { color: ink } },
+               y: {
+                 beginAtZero: true,
+                 grid: { color: grid }, border: { display: false },
+                 ticks: { color: ink, padding: 8, callback: v => (v / 100000).toFixed(1).replace('.0', '') + 'L' }
+               }
+             },
+             plugins: {
+               tooltip: { callbacks: { label: c => '₹' + c.parsed.y.toLocaleString('en-IN') } }
+             }
+           }
+         });
+       },
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
+     }">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h3 id="chart-table-title" class="text-[14px]/5 font-semibold">Receipts by month</h3>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa stores · Apr to Aug 2026</p>
+  </div>
+
+  <ul x-ref="legend" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5">
+      <span data-series class="size-2 rounded-full bg-zinc-600" aria-hidden="true"></span>Receipt value
+    </li>
+  </ul>
+
+  <div class="mt-4 h-56">
+    <canvas x-ref="canvas" role="img"
+            aria-label="Receipt value by month, April to August. The level rises through the period apart from a dip in July, ending 52 per cent above April."></canvas>
+  </div>
+
+  <div class="mt-5 border-t border-zinc-100 pt-1">
+    <table x-ref="figures" aria-labelledby="chart-table-title" class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="py-2">Month</th>
+          <th scope="col" class="py-2 text-right">Receipts</th>
+          <th scope="col" class="py-2 text-right">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-zinc-100 last:border-0">
+          <th scope="row" data-axis="Apr" class="py-2 text-left font-normal">April</th>
+          <td class="py-2 text-right tabular-nums">42</td>
+          <td data-value="1840000" class="py-2 text-right tabular-nums">₹18,40,000</td>
+        </tr>
+        <tr class="border-b border-zinc-100 last:border-0">
+          <th scope="row" data-axis="May" class="py-2 text-left font-normal">May</th>
+          <td class="py-2 text-right tabular-nums">47</td>
+          <td data-value="2110000" class="py-2 text-right tabular-nums">₹21,10,000</td>
+        </tr>
+        <tr class="border-b border-zinc-100 last:border-0">
+          <th scope="row" data-axis="Jun" class="py-2 text-left font-normal">June</th>
+          <td class="py-2 text-right tabular-nums">51</td>
+          <td data-value="2460000" class="py-2 text-right tabular-nums">₹24,60,000</td>
+        </tr>
+        <tr class="border-b border-zinc-100 last:border-0">
+          <th scope="row" data-axis="Jul" class="py-2 text-left font-normal">July</th>
+          <td class="py-2 text-right tabular-nums">46</td>
+          <td data-value="2230000" class="py-2 text-right tabular-nums">₹22,30,000</td>
+        </tr>
+        <tr class="border-b border-zinc-100 last:border-0">
+          <th scope="row" data-axis="Aug" class="py-2 text-left font-normal">August</th>
+          <td class="py-2 text-right tabular-nums">55</td>
+          <td data-value="2790000" class="py-2 text-right tabular-nums">₹27,90,000</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="border-t border-zinc-200 font-medium">
+          <th scope="row" class="py-2 text-left">Total</th>
+          <td class="py-2 text-right tabular-nums">241</td>
+          <td class="py-2 text-right tabular-nums">₹1,14,30,000</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>` },
+
+      { id: 'toggle', name: 'Series switched off from the legend', tagNew: true, code:
+`<!-- The legend is already the palette, so making it the switch costs one
+     element change and no second source of truth. Accepted is 89 per cent of
+     every column and it flattens the two series anyone opened the card for;
+     switching it off rescales the axis and rejections become readable.
+
+     Each item is a real button with aria-pressed, not a div with a click
+     handler. Pressed is the state the button is in, which is what aria-pressed
+     says — a label that flips to "Show accepted" would announce the next
+     action instead and contradict it.
+
+     The off state is not carried by colour. line-through and zinc-400 text
+     survive forced-colours mode, aria-pressed survives everything, and the
+     dimmed swatch is the third copy rather than the only one.
+
+     opacity on the swatch, never a different fill. Opacity is not part of
+     backgroundColor, so a dimmed swatch still reads back as the colour the
+     canvas paints with and the one-definition rule holds through the toggle.
+     Rewriting the class to bg-zinc-300 would silently repaint the series on
+     any redraw.
+
+     The three items are written out rather than looped. Tailwind scans class
+     attributes, so bg-zinc-200 has to appear in the markup; a template x-for
+     over a tones array puts the only mention of it in JavaScript and the
+     utility is never generated.
+
+     The last visible series cannot be switched off — all three off is an empty
+     grid, which this entry treats as a chart that failed to load. It is
+     aria-disabled rather than disabled, so it keeps its Tab stop and can still
+     be read; the handler is what refuses.
+
+     Switching a series off changes the picture and never the fallback table.
+     The table is the record; the canvas is one view of it. -->
+<div data-kui="chart/toggle" class="rounded-xl border border-zinc-300 bg-white p-5"
+     x-data="{
+       chart: null, gone: false,
+       off: [false, false, false],
+       init() { this.wait(() => this.draw()); },
+       shown() { return this.off.filter(o => !o).length },
+       last(i) { return !this.off[i] && this.shown() === 1 },
+       flip(i) {
+         if (!this.chart || this.last(i)) return;
+         this.off[i] = !this.off[i];
+         this.chart.setDatasetVisibility(i, !this.off[i]);
+         this.chart.update();
+       },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
+       wait(fn) {
+         if (this.gone) return;
+         const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+         probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const grid = getComputedStyle(this.$root).borderTopColor;
+         const ink  = getComputedStyle(this.$refs.legend).color;
+         const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                           .map(el => getComputedStyle(el).backgroundColor);
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'bar',
+           data: {
+             labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug'],
+             datasets: [
+               { label: 'Accepted', data: [412, 448, 496, 461, 528], backgroundColor: tone[0], maxBarThickness: 28 },
+               { label: 'Held',     data: [38, 44, 51, 46, 55],      backgroundColor: tone[1], maxBarThickness: 28 },
+               { label: 'Rejected', data: [9, 7, 12, 15, 11],        backgroundColor: tone[2], maxBarThickness: 28 }
+             ]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false,
+             interaction: { mode: 'index', intersect: false },
+             scales: {
+               x: { stacked: true, grid: { display: false }, border: { color: grid }, ticks: { color: ink } },
+               y: { stacked: true, beginAtZero: true, grid: { color: grid }, border: { display: false }, ticks: { color: ink, padding: 8 } }
+             }
+           }
+         });
+       },
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
+     }">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold">GRN lines by disposition</h3>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa stores · Apr to Aug 2026</p>
+  </div>
+
+  <ul x-ref="legend" class="mt-2 -mx-2 flex flex-wrap items-center gap-x-1 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li>
+      <button type="button" @click="flip(0)" :aria-pressed="!off[0]" :aria-disabled="last(0)"
+              class="inline-flex items-center gap-1.5 rounded-full px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="off[0] && 'text-zinc-400 line-through'">
+        <span data-series class="size-2 rounded-full bg-zinc-200" aria-hidden="true" :class="off[0] && 'opacity-30'"></span>Accepted
+      </button>
+    </li>
+    <li>
+      <button type="button" @click="flip(1)" :aria-pressed="!off[1]" :aria-disabled="last(1)"
+              class="inline-flex items-center gap-1.5 rounded-full px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="off[1] && 'text-zinc-400 line-through'">
+        <span data-series class="size-2 rounded-full bg-zinc-500" aria-hidden="true" :class="off[1] && 'opacity-30'"></span>Held
+      </button>
+    </li>
+    <li>
+      <button type="button" @click="flip(2)" :aria-pressed="!off[2]" :aria-disabled="last(2)"
+              class="inline-flex items-center gap-1.5 rounded-full px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="off[2] && 'text-zinc-400 line-through'">
+        <span data-series class="size-2 rounded-full bg-zinc-800" aria-hidden="true" :class="off[2] && 'opacity-30'"></span>Rejected
+      </button>
+    </li>
+  </ul>
+
+  <div class="mt-4 h-64">
+    <canvas x-ref="canvas" role="img"
+            aria-label="GRN lines by disposition, April to August. Lines rise from 459 to 594 a month; rejections peak at 15 in July and holds run between 38 and 55."></canvas>
+  </div>
+
+  <p class="mt-3 text-[12px]/4 text-zinc-500">
+    Switching a series off changes the chart only. The figures below carry every line.
+  </p>
+
+  <div class="sr-only">
+    <table>
+      <caption>GRN lines by disposition, April to August 2026</caption>
+      <thead><tr><th scope="col">Month</th><th scope="col">Accepted</th><th scope="col">Held</th><th scope="col">Rejected</th><th scope="col">Total</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">April</th><td>412</td><td>38</td><td>9</td><td>459</td></tr>
+        <tr><th scope="row">May</th><td>448</td><td>44</td><td>7</td><td>499</td></tr>
+        <tr><th scope="row">June</th><td>496</td><td>51</td><td>12</td><td>559</td></tr>
+        <tr><th scope="row">July</th><td>461</td><td>46</td><td>15</td><td>522</td></tr>
+        <tr><th scope="row">August</th><td>528</td><td>55</td><td>11</td><td>594</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>` },
+
+      { id: 'period', name: 'Redrawn when the period changes', tagNew: true, code:
+`<!-- Three months, six or twelve, chosen from the card header. The chart is
+     built once and then mutated: data.labels and data.datasets[0].data are
+     replaced and update() is called.
+
+     Do not build a second Chart on the same canvas. Chart.js keeps a registry
+     keyed on the element and throws "Canvas is already in use" on the second
+     one, and the destroy-then-recreate that people reach for next drops the
+     scale, the tooltip and the animation state on the floor and pays for a
+     full layout pass on every click of a control somebody is going to click
+     four times in a row.
+
+     One period object feeds all three renderings — the canvas, the sentence in
+     aria-label and the rows of the fallback table. A screen that recomputes
+     the summary sentence separately gets a card that says twelve months while
+     showing three, and nobody sees it because nobody who can see the chart
+     reads the label.
+
+     The control is button-group/segmented: a real radiogroup, one Tab stop,
+     arrows to move, roving tabindex. Its aria-checked is what announces the
+     change, which is why there is no live region here — a role="status" firing
+     on top of the radio announcement is two things talking at once.
+
+     The track is a tinted shape and carries its ring. It wraps below the title
+     at 390px rather than shrinking, because a 36px control that has been
+     squeezed to 24px is no longer a touch target. -->
+<div data-kui="chart/period" class="rounded-xl border border-zinc-300 bg-white p-5"
+     x-data="{
+       chart: null, gone: false,
+       period: '6m',
+       opts: [{ id: '3m', label: '3 M' }, { id: '6m', label: '6 M' }, { id: '12m', label: '12 M' }],
+       sets: {
+         '3m': { labels: ['Jun', 'Jul', 'Aug'],
+                 data: [2240000, 2310000, 2410000],
+                 summary: 'Committed value over the last three months, rising from ₹22.4 lakh in June to ₹24.1 lakh in August.' },
+         '6m': { labels: ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                 data: [2030000, 1870000, 1960000, 2240000, 2310000, 2410000],
+                 summary: 'Committed value over the last six months, dipping to ₹18.7 lakh in April and recovering to ₹24.1 lakh by August.' },
+         '12m': { labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                  data: [1240000, 1380000, 1190000, 1560000, 1410000, 1680000, 2030000, 1870000, 1960000, 2240000, 2310000, 2410000],
+                  summary: 'Committed value over the last twelve months, roughly doubling from ₹12.4 lakh to ₹24.1 lakh, stepping up from March onward and dipping only in April.' }
+       },
+       get set() { return this.sets[this.period] },
+       get rows() { return this.set.labels.map((m, i) => ({ m: m, v: this.set.data[i] })) },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       choose(id) {
+         this.period = id;
+         if (!this.chart) return;
+         this.chart.data.labels = this.set.labels;
+         this.chart.data.datasets[0].data = this.set.data;
+         this.chart.update();
+       },
+       move(step) {
+         const i = (this.opts.findIndex(o => o.id === this.period) + step + this.opts.length) % this.opts.length;
+         this.choose(this.opts[i].id);
+         this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());
+       },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
+       init() { this.wait(() => this.draw()); },
+       wait(fn) {
+         if (this.gone) return;
+         const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+         probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const grid = getComputedStyle(this.$root).borderTopColor;
+         const ink  = getComputedStyle(this.$refs.legend).color;
+         const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                           .map(el => getComputedStyle(el).backgroundColor);
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'line',
+           data: {
+             labels: this.set.labels,
+             datasets: [{
+               label: 'Committed value', data: this.set.data,
+               borderColor: tone[0], backgroundColor: tone[0],
+               borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.3
+             }]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false,
+             interaction: { mode: 'index', intersect: false },
+             scales: {
+               x: { grid: { display: false }, border: { color: grid }, ticks: { color: ink, maxRotation: 0, autoSkipPadding: 12 } },
+               y: {
+                 beginAtZero: true,
+                 grid: { color: grid }, border: { display: false },
+                 ticks: { color: ink, padding: 8, callback: v => (v / 100000).toFixed(1).replace('.0', '') + 'L' }
+               }
+             },
+             plugins: {
+               tooltip: { callbacks: { label: c => '₹' + c.parsed.y.toLocaleString('en-IN') } }
+             }
+           }
+         });
+       },
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
+     }">
+
+  <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+    <div>
+      <h3 class="text-[14px]/5 font-semibold">Committed value by month</h3>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Silvassa plant · to 20 Aug 2026</p>
+    </div>
+
+    <div role="radiogroup" aria-label="Period" x-ref="grp"
+         @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+         class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+      <template x-for="o in opts" :key="o.id">
+        <button type="button" role="radio" :aria-checked="period === o.id" :tabindex="period === o.id ? 0 : -1"
+                @click="choose(o.id)"
+                class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium tabular-nums transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="period === o.id ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+          <span x-text="o.label"></span>
+        </button>
+      </template>
+    </div>
+  </div>
+
+  <ul x-ref="legend" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5">
+      <span data-series class="size-2 rounded-full bg-zinc-800" aria-hidden="true"></span>Committed value
+    </li>
+  </ul>
+
+  <div class="mt-4 h-64">
+    <canvas x-ref="canvas" role="img" :aria-label="set.summary"></canvas>
+  </div>
+
+  <div class="sr-only">
+    <table>
+      <caption>Committed value by month, Silvassa plant</caption>
+      <thead><tr><th scope="col">Month</th><th scope="col">Committed value</th></tr></thead>
+      <tbody>
+        <template x-for="r in rows" :key="r.m">
+          <tr><th scope="row" x-text="r.m"></th><td x-text="money(r.v)"></td></tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+</div>` },
+
+      { id: 'responsive', name: 'Twelve months on a phone', tagNew: true, code:
+`<!-- A 390px card gives the plot roughly 300px, and twelve month labels do not
+     fit in it. Chart.js answers that by rotating them to fifty degrees, which
+     eats a third of the height and leaves a chart whose axis is a fan.
+
+     maxRotation: 0 forbids the rotation and autoSkip drops whichever labels do
+     not fit — Aug, Oct, Dec and so on, six of twelve on a phone and all twelve
+     on a desk. Dropping labels beats shortening them: abbreviating to initials
+     turns June, July and January into J, J and J, which is a shorter axis that
+     says less than a blank one.
+
+     autoSkip runs on every layout pass, not once at init. That is the whole
+     reason it is Chart.js\' decision and not a matchMedia check written here —
+     the box also narrows when the sidebar expands and when the card moves from
+     a two-column grid to one, neither of which is a window resize.
+
+     maxTicksLimit on the value axis for the same reason: five gridlines is a
+     scale, nine is a hatch pattern.
+
+     Nothing is lost by thinning the axis. The tooltip reads the raw label
+     rather than whatever survived it, so a month the axis dropped still names
+     itself under the cursor, and the fallback table carries all twelve rows
+     whatever is on screen. The axis is a scale, not the data. -->
+<div data-kui="chart/responsive" class="rounded-xl border border-zinc-300 bg-white p-4 sm:p-5"
+     x-data="{
+       chart: null, gone: false,
+       init() { this.wait(() => this.draw()); },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
+       wait(fn) {
+         if (this.gone) return;
+         const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+         probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const grid = getComputedStyle(this.$root).borderTopColor;
+         const ink  = getComputedStyle(this.$refs.legend).color;
+         const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                           .map(el => getComputedStyle(el).backgroundColor);
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'bar',
+           data: {
+             labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+             datasets: [{
+               label: 'Receipts posted',
+               data: [38, 41, 34, 46, 39, 44, 52, 47, 49, 55, 51, 58],
+               backgroundColor: tone[0], borderRadius: 3, maxBarThickness: 22
+             }]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false,
+             interaction: { mode: 'index', intersect: false },
+             scales: {
+               x: {
+                 grid: { display: false }, border: { color: grid },
+                 ticks: { color: ink, autoSkip: true, maxRotation: 0, autoSkipPadding: 10 }
+               },
+               y: {
+                 beginAtZero: true,
+                 grid: { color: grid }, border: { display: false },
+                 ticks: { color: ink, padding: 8, maxTicksLimit: 5 }
+               }
+             }
+           }
+         });
+       },
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
+     }">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold">Receipts posted by month</h3>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Rolling twelve months</p>
+  </div>
+
+  <ul x-ref="legend" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5">
+      <span data-series class="size-2 rounded-full bg-zinc-600" aria-hidden="true"></span>Receipts posted
+    </li>
+  </ul>
+
+  <div class="mt-4 h-56 sm:h-64">
+    <canvas x-ref="canvas" role="img"
+            aria-label="Receipts posted each month over the last twelve months, rising from 38 to 58 with a low of 34 in November."></canvas>
+  </div>
+
+  <div class="sr-only">
+    <table>
+      <caption>Receipts posted by month, rolling twelve months to August 2026</caption>
+      <thead><tr><th scope="col">Month</th><th scope="col">Receipts posted</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">September 2025</th><td>38</td></tr>
+        <tr><th scope="row">October 2025</th><td>41</td></tr>
+        <tr><th scope="row">November 2025</th><td>34</td></tr>
+        <tr><th scope="row">December 2025</th><td>46</td></tr>
+        <tr><th scope="row">January 2026</th><td>39</td></tr>
+        <tr><th scope="row">February 2026</th><td>44</td></tr>
+        <tr><th scope="row">March 2026</th><td>52</td></tr>
+        <tr><th scope="row">April 2026</th><td>47</td></tr>
+        <tr><th scope="row">May 2026</th><td>49</td></tr>
+        <tr><th scope="row">June 2026</th><td>55</td></tr>
+        <tr><th scope="row">July 2026</th><td>51</td></tr>
+        <tr><th scope="row">August 2026</th><td>58</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>` },
 
@@ -2747,22 +6584,153 @@ register(
   </div>
 </div>` },
 
+      { id: 'loading', name: 'Waiting for the data', tagNew: true, code:
+`<!-- The same card as chart/line down to the heading and the legend, with the
+     plot box holding a skeleton instead of a canvas. Heading, period and
+     legend are markup rather than data, so they are known before the figures
+     are and there is no reason to hide them; keeping them is also what makes
+     this card and the loaded one the same height, and a dashboard of four
+     charts that each grow 40px on arrival reflows the page four times.
+
+     No canvas, and no Chart built on empty arrays. Chart.js given [] draws a
+     real chart with a real axis from 0 to 1, which is a picture of numbers
+     that were never read — worse than a blank box, because it looks answered.
+
+     The bars are the skeleton entry\'s blocks at this box\'s measurements, one
+     animate-pulse wrapper over the lot so they stay in phase, and
+     motion-reduce:animate-none because a third of the card is moving. Heights
+     differ, because eight identical bars read as a placeholder graphic rather
+     than as eight months nobody has counted yet.
+
+     The gutter is four short blocks where the value ticks will be. Leave it
+     out and the plot area starts 40px further left than it will end up, so
+     the bars slide sideways when the data lands — the axis nobody thinks to
+     check.
+
+     aria-busy on the card and one sr-only role="status" naming the chart that
+     is coming. The blocks themselves are aria-hidden: a screen reader has no
+     use for eight rectangles, and the status line is the whole announcement. -->
+<div data-kui="chart/loading" class="rounded-xl border border-zinc-300 bg-white p-5" aria-busy="true">
+  <p role="status" class="sr-only">Loading committed value by month</p>
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold">Committed value by month</h3>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa plant · 2026</p>
+  </div>
+
+  <ul class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5">
+      <span class="size-2 rounded-full bg-zinc-800" aria-hidden="true"></span>Committed value
+    </li>
+  </ul>
+
+  <div class="mt-4 flex h-64 animate-pulse gap-3 motion-reduce:animate-none" aria-hidden="true">
+    <div class="flex w-10 shrink-0 flex-col justify-between py-1">
+      <div class="h-2 w-8 rounded bg-zinc-200"></div>
+      <div class="h-2 w-8 rounded bg-zinc-200"></div>
+      <div class="h-2 w-8 rounded bg-zinc-200"></div>
+      <div class="h-2 w-8 rounded bg-zinc-200"></div>
+      <div class="h-2 w-8 rounded bg-zinc-200"></div>
+    </div>
+    <div class="flex min-w-0 flex-1 items-end gap-2 border-b border-zinc-200 pb-2">
+      <div class="h-2/5 min-w-0 flex-1 rounded-t bg-zinc-200"></div>
+      <div class="h-3/5 min-w-0 flex-1 rounded-t bg-zinc-200"></div>
+      <div class="h-1/2 min-w-0 flex-1 rounded-t bg-zinc-200"></div>
+      <div class="h-3/4 min-w-0 flex-1 rounded-t bg-zinc-200"></div>
+      <div class="h-3/5 min-w-0 flex-1 rounded-t bg-zinc-200"></div>
+      <div class="h-4/5 min-w-0 flex-1 rounded-t bg-zinc-200"></div>
+      <div class="h-2/3 min-w-0 flex-1 rounded-t bg-zinc-200"></div>
+      <div class="h-5/6 min-w-0 flex-1 rounded-t bg-zinc-200"></div>
+    </div>
+  </div>
+</div>` },
+
+      { id: 'failed', name: 'The data did not arrive', tagNew: true, code:
+`<!-- The read failed and the card says so in the card. Not a toast: a toast is
+     gone in four seconds and the hole it was explaining is still on the screen
+     when somebody comes back to the tab.
+
+     It holds the plot box\'s h-64 and keeps the legend, so the failed card, the
+     loading card and the loaded one are the same height and the three tiles
+     beside it do not move as each one resolves. The legend is static markup
+     describing which series this card plots, and that is still true of a card
+     whose figures never arrived.
+
+     The icon is the only colour, in a zinc-200 well with its zinc-300 ring
+     like every other icon well here. A red panel would shout louder than the
+     one chart that failed, and the twelve rows of genuinely overdue orders
+     elsewhere on the dashboard would be the quieter thing on the page.
+
+     Say what still works. "The orders themselves are unaffected" is the
+     sentence that stops somebody escalating a chart outage as a data loss, and
+     the link out is there because the register answers the same question
+     slowly and is not down.
+
+     Retry swaps the card, not the page — hx-target is the card root, so a
+     second failure lands back here rather than replacing a working dashboard
+     with an error screen.
+
+     No live region on the message. This block arrives as a swap into something
+     that already announces, and a role="alert" written into static markup
+     fires on first paint whether or not anything just went wrong. -->
+<div data-kui="chart/failed" class="rounded-xl border border-zinc-300 bg-white p-5">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold">Committed value by month</h3>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa plant · 2026</p>
+  </div>
+
+  <ul class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5">
+      <span class="size-2 rounded-full bg-zinc-800" aria-hidden="true"></span>Committed value
+    </li>
+  </ul>
+
+  <div class="mt-4 flex h-64 flex-col items-center justify-center rounded-lg border border-dashed border-zinc-200 px-6 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="alert-circle" class="size-4 text-red-600"></i>
+    </span>
+    <p class="mt-3 text-[14px]/5 font-medium">Could not load committed value</p>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      The plant ledger did not answer in time. The orders themselves are unaffected — this card is the only thing missing.
+    </p>
+    <div class="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+      <button type="button"
+              hx-get="/dashboard/committed/" hx-target="closest [data-kui]" hx-swap="outerHTML"
+              class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="rotate-ccw" class="size-3.5 text-zinc-600"></i>Try again
+      </button>
+      <a href="/orders/?plant=silvassa"
+         class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the order register</a>
+    </div>
+  </div>
+</div>` },
+
       { id: 'django', name: 'Django template', code:
-`{# json_script escapes the payload and puts it in a script tag the browser will
+`{% comment %} json_script escapes the payload and puts it in a script tag the browser will
    not execute. Never interpolate JSON into an attribute: one apostrophe in a
-   supplier name ends the attribute and takes the page with it. #}
+   supplier name ends the attribute and takes the page with it.
+
+   humanize is loaded here rather than assumed: intcomma is the only filter in
+   this block that is not a builtin, and a template that omits the load tag
+   raises TemplateSyntaxError on the row loop rather than on the line that
+   needs it, which sends the next person looking in the wrong place. {% endcomment %}
+{% load humanize %}
 {{ spend_by_month|json_script:"spend-by-month" }}
 
 <div data-kui="chart/django" class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
-       chart: null,
+       chart: null, gone: false,
        init() { this.wait(() => this.draw()); },
        /* Tailwind's browser build compiles after first paint, so a class can
           still be uncompiled when Alpine initialises and getComputedStyle
           hands back transparent. Check every swatch, not the first: they do
           not all land in the same pass. With a compiled stylesheet this
-          passes on the first frame and costs nothing. */
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
        wait(fn) {
+         if (this.gone) return;
          const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
          probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
            ? fn()
@@ -2797,7 +6765,7 @@ register(
            }
          });
        },
-       destroy() { this.chart && this.chart.destroy(); }
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
      }">
 
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -2837,7 +6805,7 @@ register(
     notes: [
       'The fill width is an inline style="width: 68%" and that is not a lapse in a utility-class system. Tailwind compiles its stylesheet out of the literal strings it finds in the source text, so a utility exists only if somebody wrote it down: class="w-[{{ pct }}%]" scans as the token w-[{{, emits no rule at all, and the fill renders zero wide — an empty rail rather than an error, which is why it reaches production. Safelisting w-[0%] through w-[100%] buys 101 classes that still cannot express 68.4, and there is no build step here to safelist in. A width that lives in a database row cannot be a class name. Colour stays a class, because the colour is a token and only the width is data.',
       'It is a div with role="progressbar", never a native <progress>. The element paints through three incompatible pseudo trees — ::-webkit-progress-bar and ::-webkit-progress-value in Blink, ::-moz-progress-bar in Gecko — none of which a utility class can reach, so styling one means writing the custom CSS this system does not have, and an unstyled <progress> is a different shape in every browser on the floor. It also carries an implicit indeterminate state that switches on the moment the value attribute is absent, so a template that renders <progress max="100"> while the figure is still null paints a browser-default animation nobody chose and nobody can turn off.',
-      'A progressbar is output. No tabindex, no keyboard handler, no click target, no hover state — a Tab landing on it is a stop with nothing to do at it, and a screen reader user who arrives there has been sent somewhere they cannot act. If the figure is something the user sets rather than something the system reports, it is a slider or a number input and it belongs in forms. The link out to the detail is the record number in the text beside the bar, which has a readable name.',
+      'A progressbar is output. No tabindex, no keyboard handler, no click target, no hover state — a Tab landing on it is a stop with nothing to do at it, and a screen reader user who arrives there has been sent somewhere they cannot act. If the figure is something the user sets rather than something the system reports, it is a slider or a number input and it belongs in forms. The link out to the detail is the record number in the text beside the bar, which has a readable name, and a control that acts on the job — Retry, Cancel — sits beside the rail with a name of its own rather than on it.',
       'All four of aria-valuenow, aria-valuemin, aria-valuemax and a name, every time. The two bounds default to 0 and 100 when omitted, which is true and still wrong to lean on: assistive tech computes the announcement as a percentage of the three numbers, so a bar counting lines with aria-valuenow="6" and no aria-valuemax is read out as six per cent instead of forty-three. The name says what is progressing — aria-labelledby pointed at the heading that is already on screen, or aria-label="Receipt against PO-24-1187" where there is no heading. "Progress" names none of the four bars in a panel.',
       'aria-valuetext when the reading is not a percentage, and only then. "6 of 14 lines received" is what the figure means; 43% is what the arithmetic makes of it. But a bar that genuinely is a percentage gets no valuetext at all, because supplying one replaces a string the browser has localised with one hardcoded in English, and an internal tool with a Marathi screen reader on it loses the translation for nothing.',
       'Over the total clamps the drawing and never the number. Over-receipt and over-production are ordinary in a plant — 12,480 kg built against a plan of 12,000 — and a bar has nowhere to put the extra, so the fill caps at 100% and the overshoot is carried in words: amber-500 on the bar, and a line that says over by 480 kg. aria-valuenow clamps to aria-valuemax as well, since a valuenow outside its own range is invalid ARIA and browsers differ on whether they report it, drop it or recompute it; the true figure goes in aria-valuetext and in the visible text where nothing can round it away. A bar sitting at a flat 100% otherwise looks identical whether it landed exactly or ran 4% past.',
@@ -2846,7 +6814,12 @@ register(
       'A bar is not a live region and never takes aria-live. An import that repaints the value every 200ms queues several hundred announcements that arrive minutes behind the work and talk over everything else on the page. If a long job is worth announcing, announce milestones — the same role="status" the spinner uses, written once every ten per cent, "1,240 of 3,100 rows" — and leave the bar to be read on demand.',
       'The width transitions when the value changes and never on the way in, and it is dropped under prefers-reduced-motion. Server-rendered markup carries the final width in the style attribute at first paint, so there is no starting value to move from and nothing animates — transition-[width] exists for the case where Alpine or an htmx swap changes a width that was already there. A bar written at width: 0 and driven up by x-init replays the whole fill on every navigation, and a receipt that is 68% done reads as a job restarting each time somebody opens the page. motion-reduce:transition-none then belongs on this component and is forbidden on the spinner, which is one reason applied twice: the bar\'s movement is decoration over a value that is correct at both ends of it, while the spinner\'s rotation is the only thing a spinner says, so removing that one leaves a static broken ring. The test is whether the motion carries the information.',
       'A tiny non-zero value has to paint something. 40 kg received against 12,000 is 0.33%, which is under a pixel on any rail narrower than 300px, so the fill rounds away and an order that has started looks exactly like one that has not. min-w-[2px] on the fill puts a floor under the drawing without touching the number. The zero case renders no fill element at all rather than a floored one, so nothing and almost-nothing stay two different pictures.',
-      'A stacked bar is three parts at the outside. Good, rework and scrap is a stack; six purchase categories is a chart, and squeezing them into an 8px rail produces four segments under two pixels wide that cannot be pointed at, told apart or read. Past three parts, or where the parts need naming on the bar itself, it is the stacked variant of chart. Every stack carries a legend list with the real figures under it, because the one thing nobody can do with a stacked bar is read a value off it.'
+      'A stacked bar is three parts at the outside. Good, rework and scrap is a stack; six purchase categories is a chart, and squeezing them into an 8px rail produces four segments under two pixels wide that cannot be pointed at, told apart or read. Past three parts, or where the parts need naming on the bar itself, it is the stacked variant of chart. Every stack carries a legend list with the real figures under it, because the one thing nobody can do with a stacked bar is read a value off it.',
+      'A fill has no velocity. A rail at 68% that is climbing and one that fell over four hours ago are the same picture, and the reading a stalled bar gets is "still going", because that is what a bar means. The state goes in the fill colour — graphite running, amber-500 held, red-600 failed — and the reason goes in words under it, naming what stopped and what clears it. What does not change is the value: 2,107 rows were posted before the import fell over and they are still posted, so a bar that snaps back to zero on failure describes work being undone and invites somebody to run the whole file again. aria-busy comes off the region the moment the work stops, whether it stopped by finishing or by failing.',
+      'Time can be the denominator, and then a full bar is the bad end. A delivery window, an SLA clock, a licence term — the fraction is honest and every convention around it inverts. The figure beside the bar is what is left rather than what is spent, because five days left is something a buyer can act on and 64% of a window whose length is not on screen is not. The colours run graphite to amber-500 to red-600 as the room runs out, and nothing ever turns emerald, since a window that filled completely is not a success. The clamp is unchanged: past the date the drawing stops at 100% and the days late are carried in words.',
+      'A stage that failed is the one place the segmented strip takes a semantic colour. The three greys hold because a stage is a position in a sequence, and a rejected stage is not a position — the run stopped at it and will not advance until somebody acts. The block that failed goes red-600 and no other block changes, and in particular no block ahead of it goes zinc-400: that grey means the stage in progress, and painting the next one with it says the run moved past the rejection, which is the one fact the panel exists to deny. aria-valuenow does not advance either. Two stages completed, the third was attempted, and a valuenow of three announces the failed stage as done.',
+      'A polled bar is drawn by the server, not computed on the client from two numbers the server sent. Where htmx replaces the element that carries hx-trigger, the response\'s own attributes decide whether there is another poll, so the finished render simply arrives without one and there is no client-side stop condition left to get wrong; an HTTP 286 is the other stop, for the case where the polled element is not the one being replaced. Two consequences worth expecting. The fill is a new element on every landing, so transition-[width] never fires and the rail steps rather than slides — correct at a two-second cadence, and buying the slide means keeping the fill across the swap and writing only its style attribute. And any live region has to sit outside the swap, because a role="status" that arrives with its text already in it never changed and is never read: write into it with hx-swap-oob="innerHTML:#id", and only at milestones, since a two-second poll on a six-minute job lands 180 times.',
+      '{% widthratio received ordered 100 %} cannot draw this bar. It rounds to a whole number, so 40 kg against 12,000 renders 0 and the fill collapses to nothing — the exact case min-w-[2px] exists for, defeated one level above it — and it has no clamp, so an over-receipt renders a width of 104% and, reused for aria-valuenow, an ARIA value outside its own declared range. Django has no min filter to clamp with, so the drawn percentage and the clamped valuenow are properties on the model rather than arithmetic in the template. The second trap is localisation: floatformat runs its output through the active locale, and a site grouping figures the Indian way emits 12,000 into aria-valuemax, where a comma is not a number and the attribute is invalid. Every ARIA attribute takes the u suffix that turns localisation off; intcomma goes on the visible figures, which is where the grouping was wanted in the first place.'
     ],
     anatomy: [
       ['Track', 'The rail the fill runs in: h-1 to h-2, rounded-full, bg-zinc-200, overflow-hidden so a fill at any width is clipped to the rail\'s own corners. This is the element that carries role="progressbar" and the three aria values, because it is the thing whose extent means something.'],
@@ -2854,9 +6827,11 @@ register(
       ['Name', 'What is progressing, in text — the heading the bar sits under, tied to it with aria-labelledby, or an aria-label where there is no heading. Never the word "Progress".'],
       ['Reading', 'The two figures with their unit — "7,800 of 12,000 kg", "₹12,52,560 received of ₹18,42,000" — on the line under the bar, tabular-nums. The bar shows the shape of the answer; this is the answer.'],
       ['Percentage', 'The derived figure, on the heading baseline, right-aligned, tabular-nums. Optional where the reading already says everything, and omitted entirely when the scale is not a percentage.'],
-      ['Segments', 'One block per stage in a flex gap-1 row for a run of named steps: graphite for done, zinc-400 for the one in progress, zinc-200 for the ones still ahead. Three greys, no semantic colour — the stage is a position, not a state.'],
+      ['Segments', 'One block per stage in a flex gap-1 row for a run of named steps: graphite for done, zinc-400 for the one in progress, zinc-200 for the ones still ahead. Three greys, no semantic colour — the stage is a position, not a state — and red-600 on the single block that a run stopped at.'],
       ['Legend', 'The list under a stacked bar: a swatch in the segment\'s own fill, the part name, the quantity. It is the accessible carrier of the numbers, since one progressbar cannot report three of them.'],
-      ['Arc', 'The radial form. Two SVG circles at r="15.9155", whose circumference is 100 to three places, so stroke-dasharray="68 100" is the percentage written literally with no arithmetic in the template.']
+      ['Arc', 'The radial form. Two SVG circles at r="15.9155", whose circumference is 100 to three places, so stroke-dasharray="68 100" is the percentage written literally with no arithmetic in the template.'],
+      ['Halt', 'What a stopped bar carries past its fill: the state in the fill colour, the value it reached left exactly as it was, and a line naming what stopped it and what clears it. A rail on its own cannot tell stalled from moving.'],
+      ['Status region', 'The role="status" a long job announces milestones through. In the document before the work starts, outside anything the server replaces, and written into rather than swapped. The bar itself never takes aria-live.']
     ],
     behaviour: [
       'The width comes out of the data as an inline style and the colour comes out of a class. Nothing about the fill is a Tailwind arbitrary value, because the value is not known when the stylesheet is compiled.',
@@ -2867,6 +6842,9 @@ register(
       'Nothing in it is focusable, clickable or hoverable. The bar reports; the link beside it acts.',
       'It does not announce itself as it moves. A long job announces milestones through a separate role="status", so a screen reader is not reading percentages for four minutes.',
       'With no total there is no bar. The unknown phase is a spinner, and the bar replaces it at the moment a denominator exists — appearing at its real value, not at zero with a run-up.',
+      'A stopped bar keeps the value it reached and changes its colour and its words instead. Held is amber-500, failed is red-600, a failed stage in a segmented run is the one red block in it, and every one of them says in text what stopped and what clears it.',
+      'Where the denominator is a period rather than a quantity, the bar fills towards the bad end: the reading beside it is the time left, the colours run graphite to amber to red as it closes, and nothing turns emerald.',
+      'A server-driven bar is re-rendered whole on every poll, so the width and aria-valuenow come out of one render and cannot drift apart. The poll stops because the finished response carries no trigger, not because the client decided it had seen enough.',
       'At 390px the row restacks: the bar goes full width, the figures drop under it, and the register becomes cards. A mini bar in a cell is the first thing to go, because 96px of rail in a 390px row is what forces the sideways scroll.'
     ],
     a11y: [
@@ -2874,11 +6852,14 @@ register(
       'The accessible name says what is progressing. aria-labelledby onto the heading already on the page where there is one, so the string is not maintained twice, and aria-label naming the record where there is not.',
       'aria-valuetext where the scale is not per cent — "6 of 14 lines received", "Stage 4 of 6, receipt in progress" — and no valuetext at all where it is, so the browser\'s own localised percentage is left in place.',
       'aria-valuenow is clamped into its declared range even when the real figure is outside it, because a value outside aria-valuemin and aria-valuemax is invalid and browsers disagree on what to do with it. The true figure lives in aria-valuetext and in the visible line, where nothing can drop it.',
-      'The bar takes no tabindex and no keyboard. It is a reported value, not a control, and a slider role would promise an interaction that does not exist.',
-      'No aria-live on the bar. A value that repaints every few hundred milliseconds under a live region generates announcements faster than they can be spoken; milestones go into a separate role="status" that is in the document before the job starts.',
+      'ARIA numeric attributes take a bare number and nothing else. aria-valuemax="12,000" is not twelve thousand, it is invalid, and a template that pushes a locale-grouped figure into aria-valuenow, aria-valuemin or aria-valuemax breaks the announcement in exactly the tool it was written for. Group the digits in aria-valuetext and in the visible line, which are strings, and nowhere else.',
+      'aria-valuetext carries the state as well as the figure once a bar has stopped. "1,922 of 3,100 rows posted" read on its own is a job in flight, and nothing in the three numbers tells a reader that this one will never reach 3,100.',
+      'The bar takes no tabindex and no keyboard. It is a reported value, not a control, and a slider role would promise an interaction that does not exist. A Retry or Cancel button acts on the job, sits beside the rail and carries its own name.',
+      'No aria-live on the bar. A value that repaints every few hundred milliseconds under a live region generates announcements faster than they can be spoken; milestones go into a separate role="status" that is in the document before the job starts and outside anything the server swaps, since a status region that arrives inside a fragment with its message already in it never changed.',
+      'aria-busy belongs to the region that is waiting, and it comes off the moment the work stops — finished or failed. A panel left at aria-busy="true" after an import fell over tells a screen reader that everything inside it is mid-update and not to be trusted, and no later event arrives to correct that.',
       'A stacked bar is aria-hidden and the legend under it is the real content, because role="progressbar" can report exactly one value and a stack has three. Hiding the shape and exposing the list is the same trade the checklist marker makes: colour and shape for the eye, the words for the data.',
       'A segmented run is one progressbar over the whole strip, not one per block. Six progressbars in a row are announced as six separate waits; one with aria-valuenow="3", aria-valuemax="6" and a valuetext naming the current stage is the one fact somebody wanted.',
-      'Colour is never the only carrier. A breached quota says "over limit" in text beside the red fill, and an over-receipt says by how much, so the state survives a greyscale screen, a forced-colours theme and a screen reader alike.'
+      'Colour is never the only carrier. A breached quota says "over limit" in text beside the red fill, an over-receipt says by how much, and a stopped run says what stopped it, so the state survives a greyscale screen, a forced-colours theme and a screen reader alike.'
     ],
     related: ['spinner', 'stat-card', 'chart', 'skeleton'],
     variants: [
@@ -3062,6 +7043,69 @@ register(
   </div>
 </div>` },
 
+      { id: 'stage-failed', name: 'A stage that was rejected', tagNew: true, code:
+`<!-- The segmented run says a stage is a position and spends three greys on it.
+     This is the one exception, and it is an exception because a rejected stage
+     has stopped being a position: the run halted at it and will not advance
+     until somebody approves a deviation or sends the lot back. red-600 is the
+     dot-or-bar shade from the semantic table, on the block that failed and on
+     no other block.
+
+     Nothing here is zinc-400. In the ordinary strip that grey is the stage in
+     progress, and there is no stage in progress — painting block 4 with it says
+     the run moved past the rejection, which is the single fact this panel exists
+     to deny.
+
+     aria-valuenow stays at 2 and does not advance to 3. Two stages completed;
+     the third was attempted and refused, and a valuenow of 3 announces the
+     failed one as done. The valuetext carries the halt, because "2 of 6" read on
+     its own is a run that is merely early.
+
+     No aria-live anywhere in it. The rejection happened on the floor on 19 Aug
+     and this panel is being read afterwards; a live region would announce it as
+     news every time the page rendered.
+
+     The reason line is part of the component, not decoration under it. A strip
+     with a red block in it can say that a stage failed and cannot say which
+     limit, which lot or what clears it, and "Rejected" with no figure beside it
+     is a screen somebody has to leave in order to act on. -->
+<div data-kui="progress/stage-failed" class="max-w-xl rounded-xl border border-zinc-300 bg-white p-4">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+    <h3 id="pg-halt-stage" class="text-[13px]/5 font-medium">GRN-24-0912 · Inward to putaway</h3>
+    <p class="text-[13px]/5 tabular-nums text-red-600">Stopped at stage 3 of 6</p>
+  </div>
+
+  <div class="mt-2.5 flex gap-1"
+       role="progressbar" aria-labelledby="pg-halt-stage"
+       aria-valuenow="2" aria-valuemin="0" aria-valuemax="6"
+       aria-valuetext="Stage 3 of 6, inward QC rejected — the run has stopped">
+    <span class="h-2 flex-1 rounded-full bg-zinc-700"></span>
+    <span class="h-2 flex-1 rounded-full bg-zinc-700"></span>
+    <span class="h-2 flex-1 rounded-full bg-red-600"></span>
+    <span class="h-2 flex-1 rounded-full bg-zinc-200"></span>
+    <span class="h-2 flex-1 rounded-full bg-zinc-200"></span>
+    <span class="h-2 flex-1 rounded-full bg-zinc-200"></span>
+  </div>
+
+  <div class="mt-1.5 hidden gap-1 sm:flex" aria-hidden="true">
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Gate entry</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Unloaded</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 font-medium text-zinc-900">Inward QC</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">GRN posted</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Putaway</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Invoice</span>
+  </div>
+
+  <div class="mt-3 flex items-start gap-2.5 border-t border-zinc-100 pt-3">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 font-medium">Inward QC rejected 2 of 8 bags on 19 Aug</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Moisture 0.42% against a 0.25% limit · lot GP-4471, Gujarat Polymers Ltd. Nothing moves to putaway until a deviation is approved or the lot goes back on a return note.</p>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-500">Raised by Ritu Deshpande · <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">open the QC record</a></p>
+    </div>
+  </div>
+</div>` },
+
       { id: 'inline', name: 'In a register row', code:
 `<!-- A column of bars is read down, not across, so every rail is the same fixed
      w-24 and every fill starts at the same x. Let them size to the column and a
@@ -3091,7 +7135,11 @@ register(
      Below md the table goes and cards take over. 96px of rail plus a percentage
      plus a vendor name in a 390px row is what forces the sideways scroll rule to
      be broken, so on a phone the bar goes full width under the record and the
-     figures sit above it. -->
+     figures sit above it. The card list carries every record the table does: a
+     responsive pair that drops rows below the breakpoint is a register showing
+     four orders at 391px and two at 389px, and the two easiest to leave out are
+     the 3% row and the zero row, which are the pair the column exists to tell
+     apart. -->
 <div data-kui="progress/inline" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
@@ -3193,8 +7241,33 @@ register(
       </div>
       <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">8,320 of 8,000 kg received · over by 320 kg</p>
     </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1211</span>
+        <span class="text-[13px]/5 tabular-nums text-zinc-600">3%</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Nashik Steel Traders</p>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-label="Received against PO-24-1211"
+           aria-valuenow="3" aria-valuemin="0" aria-valuemax="100">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 3%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">360 of 12,000 kg received</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1218</span>
+        <span class="text-[13px]/5 tabular-nums text-zinc-500">0%</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Aurangabad Castings</p>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-label="Received against PO-24-1218"
+           aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Nothing received yet · 0 of 2,400 kg</p>
+    </li>
   </ul>
 </div>` },
+
 
       { id: 'tones', name: 'Over a limit', code:
 `<!-- The three cases where a bar stops being graphite, and the one where it does
@@ -3280,6 +7353,173 @@ register(
   </ul>
 </div>` },
 
+
+      { id: 'stalled', name: 'Stopped, and why', tagNew: true, code:
+`<!-- A fill has no velocity. A rail at 68% that is climbing and a rail at 68%
+     that fell over four hours ago are the same picture, and the reading the
+     second one gets is "still going", because that is what a bar means. So the
+     difference is drawn twice: the fill takes the record's state out of the
+     dot-or-bar column — graphite running, amber-500 held, red-600 failed — and
+     the line under it says what stopped and what clears it.
+
+     The value is not reset. 2,107 rows were posted before the import fell over
+     and every one of them is still posted, so a rail that snaps back to zero on
+     failure describes work being undone and invites somebody to run the whole
+     file again. It keeps the ground it took; the words say it will take no more.
+
+     aria-valuetext carries the state, not just the arithmetic. "1,922 of 3,100
+     rows posted" read on its own is a job in flight, and nothing in the three
+     numbers tells a reader that this one will never reach 3,100.
+
+     aria-busy is on the running row and on neither of the others. It belongs to
+     the region that is waiting, and a row left at aria-busy="true" after a
+     failed import tells a screen reader that everything in it is mid-update and
+     not to be trusted, with no later event coming to correct that.
+
+     Retry acts on the job, not on the bar. The rail stays output with no
+     tabindex and nothing to focus; the button sits beside it and has a name of
+     its own, because "Retry" three rows down a list names nothing. -->
+<div data-kui="progress/stalled" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Background jobs</h2>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Started today · Nashik plant</p>
+  </div>
+  <ul role="list" class="divide-y divide-zinc-100">
+
+    <li class="px-4 py-3" aria-busy="true">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-job-run" class="text-[13px]/5 font-medium">Posting the August rate card</h3>
+        <p class="text-[13px]/5 tabular-nums text-zinc-600">62%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-job-run"
+           aria-valuenow="1922" aria-valuemin="0" aria-valuemax="3100"
+           aria-valuetext="1,922 of 3,100 rows posted, running">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700 transition-[width] duration-300 motion-reduce:transition-none"
+             style="width: 62%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">1,922 of 3,100 rows · last row posted 4 seconds ago</p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-job-held" class="text-[13px]/5 font-medium">Posting GRN-24-0912 to the ledger</h3>
+        <p class="text-[13px]/5 tabular-nums text-amber-700">Held at 41%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-job-held"
+           aria-valuenow="7" aria-valuemin="0" aria-valuemax="17"
+           aria-valuetext="7 of 17 lines posted, held since 09:40">
+        <div class="h-full min-w-[2px] rounded-full bg-amber-500" style="width: 41%"></div>
+      </div>
+      <p class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <i data-lucide="alert-triangle" class="mt-0.5 size-3.5 shrink-0 text-amber-700"></i>
+        <span>7 of 17 lines posted · held since 09:40, waiting on the QC deviation for lot GP-4471. The seven that posted stay posted.</span>
+      </p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-job-failed" class="text-[13px]/5 font-medium">Importing the vendor price list</h3>
+        <p class="text-[13px]/5 tabular-nums text-red-600">Stopped at 68%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-job-failed"
+           aria-valuenow="2107" aria-valuemin="0" aria-valuemax="3100"
+           aria-valuetext="Stopped at 2,107 of 3,100 rows, the import failed">
+        <div class="h-full min-w-[2px] rounded-full bg-red-600" style="width: 68%"></div>
+      </div>
+      <p class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600"></i>
+        <span>Failed at row 2,108 · HSN 39231090 is not in the item master. Rows 1 to 2,107 were posted and stay posted; a retry starts at 2,108.</span>
+      </p>
+      <div class="mt-2.5 flex flex-wrap items-center gap-2">
+        <button type="button"
+                class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry the price list import
+        </button>
+        <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Download the rejected rows</a>
+      </div>
+    </li>
+  </ul>
+</div>` },
+
+      { id: 'elapsed', name: 'Days left, not days spent', tagNew: true, code:
+`<!-- Everywhere else in this entry a full rail is the good end. Here it is the
+     bad one: the denominator is the delivery window and the fill is time spent,
+     so the bar reaching 100% is the promised date arriving with the material
+     still outside the gate.
+
+     That inverts what goes beside it. The figure on the heading baseline is what
+     is left — "5 days left" — and not the 64% the arithmetic makes of it, because
+     nobody chasing a vendor can act on a percentage of a window whose length is
+     not in front of them. This is the one variant that drops the percentage
+     entirely, and aria-valuetext says the same thing the eye is given.
+
+     The colours run in the opposite direction to a receipt bar and they are
+     still the semantic table rather than a gradient: graphite while there is
+     room, amber-500 as the window closes, red-600 past the date. Nothing here
+     ever turns emerald-600 — a window that filled completely is not a success,
+     and green on the last row would read as the order having landed.
+
+     Past the date the drawing clamps and the number does not, exactly as an
+     over-receipt does. A window overrun by three days and one overrun by three
+     weeks are both a full red rail, so the days late are carried in words.
+
+     The rail does not tick. It is repainted when the page is, because a bar
+     animating towards a deadline is motion carrying nothing anybody can use at
+     the resolution of a day. -->
+<div data-kui="progress/elapsed" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Delivery windows</h2>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Open orders against their promised date · as at 22 Aug</p>
+  </div>
+  <ul role="list" class="divide-y divide-zinc-100">
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-win-a" class="text-[13px]/5 font-medium">PO-24-1187 · Sharma Extrusions</h3>
+        <p class="text-[13px]/5 tabular-nums text-zinc-600">5 days left</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-win-a"
+           aria-valuenow="9" aria-valuemin="0" aria-valuemax="14"
+           aria-valuetext="5 of 14 days left, due 27 Aug 2026">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 64%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Raised 13 Aug, due 27 Aug 2026 · 8,160 of 12,000 kg already received</p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-win-b" class="text-[13px]/5 font-medium">PO-24-1194 · Gujarat Polymers Ltd</h3>
+        <p class="text-[13px]/5 tabular-nums text-amber-700">1 day left</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-win-b"
+           aria-valuenow="20" aria-valuemin="0" aria-valuemax="21"
+           aria-valuetext="1 of 21 days left, due 23 Aug 2026">
+        <div class="h-full min-w-[2px] rounded-full bg-amber-500" style="width: 95%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Raised 02 Aug, due 23 Aug 2026 · nothing received, no despatch advice on file</p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-win-c" class="text-[13px]/5 font-medium">PO-24-1203 · Nashik Steel Traders</h3>
+        <p class="text-[13px]/5 tabular-nums text-red-600">3 days over</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-win-c"
+           aria-valuenow="10" aria-valuemin="0" aria-valuemax="10"
+           aria-valuetext="3 days past the promised date of 19 Aug 2026">
+        <div class="h-full min-w-[2px] rounded-full bg-red-600" style="width: 100%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Raised 09 Aug, due 19 Aug 2026 · 6 of 14 lines received, penalty clause runs from 20 Aug</p>
+    </li>
+  </ul>
+</div>` },
+
       { id: 'stacked', name: 'Stacked', code:
 `<!-- One total split three ways. The segments are a flex row inside the same
      overflow-hidden rounded-full track, each with its width in an inline style,
@@ -3301,12 +7541,18 @@ register(
      anybody can read off the bar.
 
      The legend swatches carry the segment fills exactly, so a swatch and the
-     block it names cannot drift. They are aria-hidden because the row already
-     names its part in text.
+     block it names cannot drift. That includes the last one: "Still to build"
+     names the track, so its swatch is the track's own bg-zinc-200 and not a
+     lighter grey picked to look recessive. A swatch a shade off the thing it
+     stands for is the drift this arrangement exists to prevent, and it is
+     hardest to catch on the row nobody checks. They are aria-hidden because the
+     row already names its part in text.
 
-     The swatches are solid shapes and take no ring — the ring rule is for tinted
-     shapes, and a pale ring around a 10px emerald square looks like a rendering
-     fault. -->
+     The three solid swatches take no ring — the ring rule is for tinted shapes,
+     and a pale ring around a 10px emerald square looks like a rendering fault.
+     The zinc-200 one is a tinted shape and takes ring-zinc-300 for the same
+     reason every chip in the system does: without it a 10px zinc-200 square on
+     white has no edge of its own. -->
 <div data-kui="progress/stacked" class="max-w-lg rounded-xl border border-zinc-300 bg-white p-4">
   <div class="flex items-baseline justify-between gap-3">
     <h3 class="text-[13px]/5 font-medium">PRD-24-0417 · quantity built</h3>
@@ -3339,7 +7585,7 @@ register(
       <span class="w-12 shrink-0 text-right text-[13px]/5 tabular-nums text-zinc-500">1.5%</span>
     </li>
     <li class="flex items-center gap-2.5 border-t border-zinc-100 pt-1.5">
-      <span class="size-2.5 shrink-0 rounded-sm bg-zinc-100 ring-1 ring-inset ring-zinc-300" aria-hidden="true"></span>
+      <span class="size-2.5 shrink-0 rounded-sm bg-zinc-200 ring-1 ring-inset ring-zinc-300" aria-hidden="true"></span>
       <span class="min-w-0 flex-1 text-[13px]/5 text-zinc-600">Still to build</span>
       <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">2,460 kg</span>
       <span class="w-12 shrink-0 text-right text-[13px]/5 tabular-nums text-zinc-500">20.5%</span>
@@ -3395,6 +7641,7 @@ register(
   <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">August plan · Nashik · 9 working days left</p>
 </div>` },
 
+
       { id: 'indeterminate', name: 'When the total is not known yet', code:
 `<!-- The handoff. One job, two shapes, and the thing that decides which is
      whether a denominator exists yet.
@@ -3421,6 +7668,14 @@ register(
      the swap between them. The bar itself takes no aria-live — a value repainting
      every 400ms under a live region queues announcements faster than they can be
      spoken — so the status carries milestones only, at every 25%.
+
+     The handoff itself gets its own message, and it is the total rather than a
+     zero. At the moment the count lands the first milestone has not been crossed
+     yet, so a status written as the milestone alone announces "0 per cent
+     imported" — which is both the least useful thing it could say and, arriving
+     immediately after "Counting the rows", reads as the job having gone
+     backwards. The denominator is the news: that is what the spinner could not
+     give and what the bar exists because of.
 
      x-cloak on the branch hidden at first paint, because Alpine boots after the
      HTML renders and without it the bar flashes under the spinner on load. -->
@@ -3478,9 +7733,11 @@ register(
        document before either message lands. -->
   <p role="status" class="sr-only"
      x-text="phase === 'counting' ? 'Counting the rows in the upload'
-             : phase === 'done' ? 'Import finished, 3,100 rows'
+             : phase === 'done' ? 'Import finished, ' + total.toLocaleString('en-IN') + ' rows'
+             : said === 0 ? 'Importing ' + total.toLocaleString('en-IN') + ' rows'
              : said + ' per cent imported'"></p>
 </div>` },
+
 
       { id: 'production', name: 'A production order', code:
 `<!-- The assembled case: one order, three of these shapes, each doing the job the
@@ -3502,6 +7759,15 @@ register(
      read down, and a grid that puts the bar on its own line below sm rather than
      shrinking it. The bar in the last row is zinc-700 at 0%, which renders as a
      bare rail — a step that has not started, not a step at 2px.
+
+     Operation 10 is the same overshoot one level down and is drawn the same way.
+     It reports 12,480 kg against a plan of 12,000, so it cannot print a flat
+     emerald 100% under a panel heading that says 104%: a reader comparing the
+     two would take the operation as having landed on plan and the variance as
+     coming from somewhere further down the route. Amber, clamped, with the true
+     figure in aria-valuetext, exactly as above. Operation 20 is emerald at a
+     real 100% — 12,480 trimmed of 12,480 — which is what the difference between
+     the two rows is there to show.
 
      Nothing in the panel is focusable except the link out to the order, which is
      the record number in text. A progressbar is output, and Tab has nothing to do
@@ -3568,10 +7834,11 @@ register(
         <span class="flex items-center gap-2 sm:order-3">
           <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                 role="progressbar" aria-label="Operation 10, blow moulding"
-                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-            <span class="block h-full rounded-full bg-emerald-600" style="width: 100%"></span>
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+                aria-valuetext="104% built, over by 480 kg">
+            <span class="block h-full rounded-full bg-amber-500" style="width: 100%"></span>
           </span>
-          <span class="w-10 shrink-0 text-right text-[12px]/4 tabular-nums text-zinc-600">100%</span>
+          <span class="w-10 shrink-0 text-right text-[12px]/4 tabular-nums text-amber-700">104%</span>
         </span>
         <span class="text-[12px]/4 tabular-nums text-zinc-500 sm:order-2 sm:pr-4">12,480 / 12,000 kg</span>
       </li>
@@ -3619,62 +7886,218 @@ register(
     </p>
   </div>
 </div>` }
+,
+
+      { id: 'htmx', name: 'Climbing from the server', tagNew: true, code:
+`<!-- The server holds both figures, so the server draws the bar. A client that
+     divides done by total has to be sent both numbers anyway and then rounds
+     them a second time, which is how a panel ends up printing 40% over a fill
+     drawn at 39.6%. Nothing here computes anything; the markup below is the
+     fragment exactly as it came back at 1,240 rows.
+
+     hx-trigger and hx-swap="outerHTML" sit on the same element, so each response
+     replaces the thing that was polling and the response's own attributes decide
+     whether there is another poll. The finished render carries no hx-trigger and
+     no aria-busy, and the polling stops with no client-side condition left to
+     get wrong. Where the polled element is not the one being replaced, the other
+     stop is an HTTP 286, which htmx reads as "cancel this poll".
+
+     Expect the rail to step rather than slide. The fill is a new element on every
+     landing, so transition-[width] has no previous width to move from and never
+     fires — correct at a two-second cadence, and buying the slide would mean
+     keeping the fill across the swap and writing only its style attribute, which
+     is more machinery than a 2% step is worth.
+
+     The live region is outside everything the server replaces. A role="status"
+     that arrives inside a fragment with its text already in it never changed, so
+     nothing is announced; this one stays in the document and is written into
+     with hx-swap-oob="innerHTML:#import-8841-status".
+
+     Milestones, not landings. A two-second poll on a six-minute job lands 180
+     times, and a status that spoke on every one would be minutes behind the work
+     inside the first minute, so the view emits the out-of-band status only when
+     the percentage crosses a multiple of 25. The bar takes no aria-live at all.
+
+     # views.py
+     def import_progress(request, pk):
+         job = RateCardImport.objects.get(pk=pk)
+         crossed = job.percent // 25 > job.announced // 25
+         if crossed:
+             job.announced = job.percent
+             job.save(update_fields=['announced'])
+         # imports/_progress.html renders the div below, and renders it without
+         # hx-trigger and without aria-busy once job.finished is true
+         return render(request, 'imports/_progress.html',
+                       {'job': job, 'announce': crossed})
+
+     {# imports/_progress.html, at the end #}
+     {% if announce %}<span hx-swap-oob="innerHTML:#import-8841-status">{{ job.percent }} per cent imported</span>{% endif %} -->
+<div data-kui="progress/htmx" class="max-w-md">
+
+  <div id="import-8841"
+       hx-get="/imports/8841/progress/"
+       hx-trigger="every 2s"
+       hx-swap="outerHTML"
+       aria-busy="true"
+       class="rounded-xl border border-zinc-300 bg-white p-4">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 id="pg-hx-import" class="text-[13px]/5 font-medium">Importing the August rate card</h3>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">40%</p>
+    </div>
+    <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+         role="progressbar" aria-labelledby="pg-hx-import"
+         aria-valuenow="1240" aria-valuemin="0" aria-valuemax="3100"
+         aria-valuetext="1,240 of 3,100 rows imported">
+      <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 40%"></div>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">1,240 of 3,100 rows · started 11:04, you can leave this page and it keeps running</p>
+  </div>
+
+  <p id="import-8841-status" role="status" class="sr-only">Importing 3,100 rows</p>
+</div>` },
+
+      { id: 'django', name: 'Rendering the width server-side', tagNew: true, code:
+`<!-- Every figure on this bar is computed in the model, because both of the
+     things a template can reach for are wrong.
+
+     {% widthratio received ordered 100 %} rounds to a whole number, so 40 kg
+     against 12,000 renders 0 and the fill collapses to nothing — the exact case
+     min-w-[2px] exists for, defeated one level above it. It has no clamp either,
+     so an over-receipt renders width: 104%, and the same tag reused for
+     aria-valuenow puts an ARIA value outside its own declared range. Django has
+     no min filter to clamp with, which is why fill_pct and aria_now are
+     properties rather than arithmetic in the markup.
+
+     Localisation is the second trap and the quieter one. floatformat runs its
+     output through the active locale, and these sites group figures the Indian
+     way — NUMBER_GROUPING = (3, 2, 0) in a FORMAT_MODULE_PATH — so a plain
+     {{ qty|floatformat:0 }} inside aria-valuemax emits 12,000. A comma is not a
+     number: the attribute is invalid and what gets announced is not twelve
+     thousand. The u suffix turns localisation off per filter, so every ARIA
+     attribute here takes floatformat:'0u' and every visible figure takes
+     intcomma, which is where the grouping was wanted. The width takes '1u' for
+     the same reason — a locale whose decimal separator is a comma writes
+     width: 68,4% and the browser drops the declaration.
+
+     Do not put the width in a class. class="w-[{{ pct }}%]" scans as the token
+     w-[{{, Tailwind emits no rule, and the rail comes back empty rather than
+     broken, which is why it survives review.
+
+     {% if po.received_qty %} around the fill, so a Decimal('0') renders no fill
+     element at all rather than one floored to 2px.
+
+     # models.py
+     class PurchaseOrder(models.Model):
+         @property
+         def received_pct(self):
+             if not self.ordered_qty:
+                 return Decimal('0')
+             return self.received_qty / self.ordered_qty * 100
+
+         @property
+         def fill_pct(self):       # what the rail draws
+             return min(self.received_pct, Decimal('100'))
+
+         @property
+         def aria_now(self):       # clamped into the declared range
+             return min(self.received_qty, self.ordered_qty)
+
+         @property
+         def over_by(self):
+             return max(self.received_qty - self.ordered_qty, Decimal('0')) -->
+{% load humanize %}
+<div data-kui="progress/django" class="rounded-xl border border-zinc-300 bg-white p-4">
+  <div class="flex items-baseline justify-between gap-3">
+    <h3 id="pg-recv-{{ po.pk }}" class="text-[13px]/5 font-medium">Receipt against {{ po.number }}</h3>
+    <p class="text-[13px]/5 tabular-nums {% if po.over_by %}text-amber-700{% else %}text-zinc-600{% endif %}">{{ po.received_pct|floatformat:'0u' }}%</p>
+  </div>
+
+  <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
+       role="progressbar" aria-labelledby="pg-recv-{{ po.pk }}"
+       aria-valuenow="{{ po.aria_now|floatformat:'0u' }}"
+       aria-valuemin="0" aria-valuemax="{{ po.ordered_qty|floatformat:'0u' }}"
+       aria-valuetext="{{ po.received_qty|intcomma }} of {{ po.ordered_qty|intcomma }} {{ po.uom }} received{% if po.over_by %}, over by {{ po.over_by|intcomma }} {{ po.uom }}{% endif %}">
+    {% if po.received_qty %}
+      <div class="h-full min-w-[2px] rounded-full {% if po.over_by %}bg-amber-500{% else %}bg-zinc-700{% endif %} transition-[width] duration-300 motion-reduce:transition-none"
+           style="width: {{ po.fill_pct|floatformat:'1u' }}%"></div>
+    {% endif %}
+  </div>
+
+  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    {{ po.received_qty|intcomma }} of {{ po.ordered_qty|intcomma }} {{ po.uom }} received · {{ po.vendor.name }}
+    {% if po.over_by %} · over by {{ po.over_by|intcomma }} {{ po.uom }}, awaiting a variance note{% endif %}
+    {% if po.last_grn_on %} · last GRN {{ po.last_grn_on|date:"d M Y" }}{% endif %}
+  </p>
+</div>` }
     ]
   },
 
   {
-      id: 'empty-state', name: 'Empty state', category: 'data',
-      description: 'What a region shows when it has nothing to draw. Four different situations wearing one shape — nothing created yet, nothing matching the query, nothing this account may see, and nothing that loaded — and the whole job of the component is saying which one it is.',
-      when: 'Any region that renders a collection and can render none of it: a register, a search result, a list of attachments, a panel of recent activity, the lines on a draft order. It is not the component for a page that cannot be shown at all — a 404, a 403 on the record itself or a 500 is error-page, which owns the whole viewport and the way back into the app. It is not the component for a wait, either: rows that have not arrived yet are a skeleton or a spinner, and an empty state shown while the request is still in flight tells the user there is nothing there and then contradicts itself a moment later. Reach for it the instant a count is known to be zero, and not before.',
+    id: 'empty-state', name: 'Empty state', category: 'data',
+      description: 'What a region shows when it has nothing to draw. Several situations wearing one shape — nothing created yet, nothing matching the query, nothing asked for yet, nothing left to do, nothing this account may see and nothing that loaded — and the whole job of the component is saying which one it is.',
+      when: 'Any region that renders a collection and can render none of it: a register, a search result, a list of attachments, a panel of recent activity, the lines on a draft order. It is not the component for a page that cannot be shown at all — a 404, a 403 on the record itself or a 500 is error-page, which owns the whole viewport and the way back into the app. It is not the component for a wait, either: rows that have not arrived yet are a skeleton or a spinner, and an empty state shown while the request is still in flight tells the user there is nothing there and then contradicts itself a moment later. Reach for it the instant a count is known to be zero, and not before. The one exception is a region waiting on a choice — a price list with no vendor picked, a lookup below its character threshold — where no count will ever be known because no query is going to be sent until the user acts, and the empty state is correct at first paint.',
       notes: [
-        'There are four empties and they are not interchangeable. Nothing-yet is a table with no rows in it at all, and it offers the create action. No-results is a table with rows in it that the query excluded, and it offers to widen or clear the query. No-permission is a table with rows in it that this account may not read, and it names the permission and the person who grants it. Error is a table whose rows nobody has seen, because the request failed, and it says what failed and offers Retry. Using the wrong one is the defect this entry exists to prevent, and every one of the four is a defect somebody shipped: a create button under a filtered register, a "no results" over a permission failure, and a timeout rendered as "No orders found" have all been in production.',
+        'Four empties are the spine and they are not interchangeable. Nothing-yet is a table with no rows in it at all, and it offers the create action. No-results is a table with rows in it that the query excluded, and it offers to widen or clear the query. No-permission is a table with rows in it that this account may not read, and it names the permission and the person who grants it. Error is a table whose rows nobody has seen, because the request failed, and it says what failed and offers Retry. Using the wrong one is the defect this entry exists to prevent, and every one of the four is a defect somebody shipped: a create button under a filtered register, a "no results" over a permission failure, and a timeout rendered as "No orders found" have all been in production. Three more sit off the spine and each is routinely mislabelled as one of the four — a query nobody has asked yet, a query too short to run, and a queue that is empty because the work is finished.',
         'Never offer create in a no-results state. The rows exist; the filter is hiding them. A buyer who searches for an order by the wrong number, gets "No purchase orders found" with a New purchase order button under it and takes the offer has now raised the same order twice, and the duplicate is discovered at three-way match a fortnight later. The test is mechanical and belongs in the view, not in the template: if the unfiltered count for this scope is greater than zero, the state is no-results and the create button is not on the page. The mirror of it is the same rule read backwards — never offer "Clear filters" on a nothing-yet, where with no predicates set the control does nothing when it is pressed, and a control that does nothing when it is pressed reads as a broken page rather than an empty one.',
+        'A default nobody chose is still a predicate. A register that shows open enquiries only, out of the box, in a category where every enquiry is closed, has zero rows and not one filter the user set — so the mechanical test above reads it as nothing-yet and offers create. Count the unscoped set rather than the scoped one: rows exist, they are merely all in a state the default excludes. Name the default that is in force, say how many are behind it, and make the action reveal them rather than create beside them. The empty state cannot tell whether the rows it is hiding are live or dead, so it does not get to decide that a new record is wanted; once the four closed enquiries are on screen the user can decide that for themselves. Create stays in the toolbar, where it is a thing the user came to do rather than an answer to an emptiness.',
+        'A panel waiting on a choice has not queried anything and must not report a result. A price list with no vendor picked is not "No prices found" — that sentence says this vendor holds no contract, which is a different fact, and it gets raised as a data bug against a vendor whose rates are fine. Name the control instead of the record: "Choose a vendor to see its contract prices". Echo the predicates that are already set, because half a query is still a query and the financial year in force will shape the answer. And let the action focus the control that unblocks it rather than repeat it — a second vendor select inside the panel is two controls holding one value, and they drift the moment somebody changes the first.',
+        'A search below its threshold has not run. Typing two characters into a lookup that queries at three and getting "No items match hd" tells the user the item is not in the masters, and the conscientious ones then raise a request to have it created — for an item that was there all along, under a third character they had not finished typing. Say the threshold and count the shortfall: "the search runs at 3 characters and you have typed 2" leaves nobody guessing. There is no action on this state and that is correct, because the user is already doing the only thing that helps, and a button beside a search box somebody is mid-word in is a target for a stray click.',
+        'Empty is sometimes the outcome the screen exists to produce, and the same box has to read as success without changing shape. An approval inbox at zero is finished work, not missing data, and "No approvals found" over it is demoralising and wrong in the same breath. The glyph carries half of it — check-circle-2 in text-red-600\'s green counterpart, text-emerald-600, on the same graphite well every other state uses — and the words carry the rest. Print the evidence rather than the mood: "14 approved today, none waiting" is a fact somebody can check, where "All caught up" is indistinguishable from a filter that quietly hid eleven of them. That is the trap in this one. A queue emptied by a predicate is not cleared, and rendering success over it is the create-under-a-filter defect one register worse, because the user believes it and goes home.',
         'A load failure is not an empty state in disguise. "No goods receipts found" after a 30-second timeout tells the user their receipts are gone, and the honest ones then go and re-enter them. The error variant says what failed, says whether anything was changed — which is the question anybody who just pressed Save is actually asking — and offers Retry as a real button. A view that raises must render the failed fragment into the same slot at the same height rather than 500ing, or the spinner above it turns forever.',
         'A permission failure is not an empty state in disguise either, and it is the one most often mislabelled, because the query genuinely does return zero rows once the row-level filter has run. Showing that as "No orders yet" is a lie that costs a support ticket: the user creates a record to fill the emptiness, cannot see it afterwards either, and now believes the save failed. Say which scope is closed, say who opens it — a name and a role, not "your administrator" — and show no create action at all.',
-        'The empty state is announced, not only drawn. Filtering a register to zero swaps one silent block of markup for another, and to a screen-reader user the rows simply stop existing with nothing said. Put a role="status" on the panel that survives the swap, in the document before the filter is ever touched, and write the count into it — "No goods receipts match these filters" landing in a region that was already there is the thing that gets read. A role="status" that arrives inside the empty state with its message already in it has not changed, so it announces nothing at all.',
+        'The state is picked in the view, in one place, from counts, and the template gets one fragment per state with no branch in it at all. By the time a queryset reaches a template every one of these empties looks identical: a list of length zero. A bare {% if not receipts %} is the whole defect in four words, and it is the shape almost every register starts life in. The order of the checks matters as much as the checks themselves — permission before the filter, because filtering by permission and then counting produces a zero that has lost its reason; the failure before the count, because an exception has no count to read; and the unfiltered probe last, which is the one query that separates nothing-yet from no-results and is cheap enough that arguing about it costs more than running it.',
+        'The empty state is announced, not only drawn. Filtering a register to zero swaps one silent block of markup for another, and to a screen-reader user the rows simply stop existing with nothing said. Put a role="status" on the panel that survives the swap, in the document before the filter is ever touched, and write the count into it — "No goods receipts match these filters" landing in a region that was already there is the thing that gets read. A role="status" that arrives inside the empty state with its message already in it has not changed, so it announces nothing at all. Under htmx that means swapping the text and not the region: hx-swap-oob="innerHTML:#count" leaves the element in place, where a plain hx-swap-oob replaces it with a new one and puts you back where you started.',
         'Never make the results region itself aria-live. It fires on every re-render, so narrowing 128 receipts to 40 reads forty rows aloud before the user has finished typing, and the one sentence that mattered is buried in the middle of it. One short status line outside the rows carries the count for every state, empty or not. role="alert" is worse again: assertive interrupts the person still typing into the search box that caused it.',
         'It occupies the box the rows would have. A panel that collapses from 420px to 140px when a filter matches nothing drags everything below it up under the cursor, and the next click lands on whatever moved into that place. Give the slot the min-height the loaded panel has, and give the empty state the panel\'s own padding rather than a margin that a sibling can collapse against.',
         'Inside a table the empty state is a single <td colspan> row in the <tbody>, never a div dropped after the </table>. A sibling div is outside the table in the accessibility tree, so somebody reading the table with table navigation walks a table of zero rows and is never told why; the colspan cell is a row and gets read in place. The colspan has to equal the number of columns actually rendered, so where a column-visibility menu exists it is bound and not typed — a hardcoded colspan="6" under four visible columns stretches the cell past the header and the panel edge lands in the middle of the sentence. Keep the header row above it when the emptiness is a query result — the sort and the column choices are still in force and the header is where the user goes to undo them — and drop the whole table when the scope has genuinely never held a record, where a row of column names describing nothing is the empty table that reads as a bug.',
-        'The icon well is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 in all four states, the error one included. There is no red well, no amber well and no -50 tint anywhere in this component: a full panel of red behind a timeout shouts louder than the overdue rows it is failing to show, and it makes a transient network fault look like data loss. The tone lives in the glyph and in the words — alert-circle in text-red-600 on the same graphite disc every other state uses.',
-        'One action, and which action it is carries the meaning. A second route is allowed and is a link, never a second filled button — two graphite buttons side by side make the user choose before they have read why they are choosing. Past two, the empty state has become a menu, and a menu is what the toolbar above it already is.',
-        'The headline states what is true in the words of the register it sits in. "No goods receipts on 21 Aug" is a fact somebody can act on; "No data" is the variable name. The explanation underneath says why, and where a query caused it, it echoes the query — the string that was typed, the chips that are set, the date scope in force — because with five controls above the panel the user cannot otherwise tell which one is holding the rows back.',
+        'The icon well is bg-zinc-200 with ring-1 ring-inset ring-zinc-300 in every state, the error one included. There is no red well, no green well, no amber well and no -50 tint anywhere in this component: a full panel of red behind a timeout shouts louder than the overdue rows it is failing to show, and it makes a transient network fault look like data loss. The tone lives in the glyph and in the words — alert-circle in text-red-600, check-circle-2 in text-emerald-600, on the same graphite disc every other state uses.',
+        'One action, and which action it is carries the meaning. A second route is allowed and is a link, never a second filled button — two graphite buttons side by side make the user choose before they have read why they are choosing. Past two, the empty state has become a menu, and a menu is what the toolbar above it already is. Two of these states carry no action at all, for opposite reasons: the permission state because there is nothing the account may press, and the below-threshold state because the user is already pressing the only keys that help.',
+        'The headline states what is true in the words of the register it sits in. "No goods receipts on 21 Aug" is a fact somebody can act on; "No data" is the variable name. The explanation underneath says why, and where a query caused it, it echoes the query — the string that was typed, the chips that are set, the date scope in force, the default nobody set — because with five controls above the panel the user cannot otherwise tell which one is holding the rows back.',
         'No illustration. A 200px drawing of an empty box is the largest thing on a screen that is by definition telling somebody nothing happened, it has to be redrawn for every state, and it says less than the sentence it is pushing below the fold. One size-10 well, one glyph, and the words.'
       ],
       anatomy: [
         ['Slot', 'The box inside the panel that the rows would have filled, carrying the panel\'s own padding and the loaded panel\'s min-height, so nothing moves when data arrives.'],
-        ['Icon well', 'size-10 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 round a size-5 glyph. Graphite in every state; only the glyph takes a tone, and only in the error case.'],
+        ['Icon well', 'size-10 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 round a size-5 glyph. Graphite in every state; only the glyph takes a tone, and only where the state is a failure or a success.'],
         ['Headline', 'One sentence of fact, as a real heading one level below the panel\'s title. Names the register and the scope: "No goods receipts on 21 Aug", not "No data".'],
         ['Explanation', 'Why it is empty and what would change it, in a max-w-sm line of zinc-600 so it wraps into two readable lines rather than one wide one.'],
-        ['Query echo', 'The predicates that produced the emptiness, rendered as they were set — the typed string, the filter chips, the date scope. Only in the no-results states; a nothing-yet has no query to show.'],
-        ['Action', 'The one control that answers the state: create for nothing-yet, clear for no-results, Retry for error, and none at all for no-permission.'],
+        ['Query echo', 'The predicates that produced the emptiness, rendered as they were set — the typed string, the filter chips, the date scope, the default scope nobody chose. Only where a query caused it; a nothing-yet has no query to show.'],
+        ['Action', 'The one control that answers the state: create for nothing-yet, clear for no-results, reveal for a default scope, Retry for error, and none at all for no-permission or a search below its threshold.'],
+        ['Unblocking control', 'The select, the toggle or the search box a waiting-on-a-choice empty names. The action focuses it rather than repeating it, so one value stays in one control.'],
         ['Secondary route', 'A link beside the action — Request access, Report this, Show this week. Text with an underline, so it does not compete with the button.'],
         ['Status region', 'A role="status" on the panel above the rows, present before any filter is touched, holding the count. This is what announces the emptiness; the block of markup below it announces nothing.']
       ],
       behaviour: [
         'The state is chosen from the counts, not from the render. Zero rows after a query with predicates is no-results; zero rows with no predicates is nothing-yet; zero rows because the scope is closed is no-permission; zero rows because nothing answered is error.',
+        'A default scope counts as a predicate. Where the register filters to open records out of the box, the state is chosen from the unscoped count, and the action reveals the excluded rows rather than offering to create beside them.',
+        'A panel waiting on a choice draws its empty state immediately and correctly, because no request is pending and none will be sent until the user acts. The rule against drawing an empty before a count is known is a rule about results, and a prerequisite is not reporting one.',
+        'Where the work being finished is the point, the empty state says so — the success glyph, the count of what was cleared, and no offer to widen anything. It may only say so when no predicate is in force, because a queue emptied by a filter has not been cleared.',
         'The action follows the state. Create appears only where there is genuinely nothing to find, clear appears only where something is being hidden, Retry appears only where a request failed, and the permission state offers no action on the data at all.',
         'The message names the register and the scope, and echoes the query that emptied it, so the user can see which of the controls above the panel is the one to reach for.',
         'It fills the box the rows would have filled. The panel keeps its height, so arriving data does not shift the page under the cursor and a filter that matches nothing does not drag the footer up the screen.',
         'Inside a table it is one row with one full-width cell, and the colspan tracks the columns actually rendered rather than the columns that were designed.',
         'The header row survives a query-driven empty, because the sort and the column choices are still in force and still the way out, and disappears entirely on a register that has never held a record.',
         'The count is written into a status region that was on the page before the filter changed, so the emptiness is spoken as well as drawn.',
+        'A control inside the empty state that empties the empty state removes itself along with it, so the handler hands focus on deliberately. Clear the filters and the button that cleared them is gone; the browser drops focus to the body and the next Tab starts at the top of the document.',
         'It does not appear while a request is in flight. The skeleton or the spinner holds the slot until a count is known, because an empty state that flashes for 300ms on every keystroke says "nothing found" and is wrong every time.',
         'At 390px it keeps the same order — well, headline, explanation, action — with the action full-width under the text rather than beside it, and the table header it replaces is hidden rather than scrolled sideways.'
       ],
       a11y: [
         'The headline is a real heading at the level the surrounding panel implies — h3 under an h2 panel title — so it appears in the heading list and somebody jumping by heading lands on the explanation of why the panel is bare.',
-        'The icon is decoration and is aria-hidden. The alert-circle in the error state is aria-hidden too: what makes it an error is the sentence, not the glyph, exactly as in an alert.',
-        'The announcement is text content arriving inside a role="status" that already existed, never an aria-label and never a region that arrives with its message in it. A region that was not there before the filter ran has nothing to report.',
+        'In a tile the tile title is already that heading and the message under it is a paragraph. A second heading inside a 110px box adds a level to the document outline that nobody navigates by.',
+        'The icon is decoration and is aria-hidden. The alert-circle in the error state and the check-circle-2 in the cleared state are aria-hidden too: what makes one an error and the other a success is the sentence, not the glyph, exactly as in an alert.',
+        'The announcement is text content arriving inside a role="status" that already existed, never an aria-label and never a region that arrives with its message in it. A region that was not there before the filter ran has nothing to report, and under htmx that means swapping the region\'s innerHTML rather than the region.',
         'The results region is not itself a live region. Making the tbody aria-live reads every row of every re-render aloud, and role="alert" on the empty state interrupts the user mid-keystroke in the search box that triggered it.',
+        'A shortfall that changes on every keystroke is drawn and not spoken. Writing "one more character" into the status region on every press queues a sentence per keypress and buries the count that follows it; the threshold is text in the panel, and the region speaks once the search has actually run.',
         'Inside a table the empty state is a <td colspan> in a real <tr>, so table navigation reaches it. A div after the table is outside the table for anyone reading it as a grid.',
         'The action is a real <button> or <a> with a name that says what it does — "Clear the search", "Log a goods receipt", "Retry" — reachable by Tab and carrying focus-visible:outline-3, never a clickable div.',
+        'A control that removes the empty state hands focus on deliberately, because it removes itself in the same breath. Move focus to the status line, which survives the swap, carries tabindex="-1" for exactly that reason, and is also the sentence saying what just happened.',
         'The error state says what failed and whether anything was changed in words. Colour on the glyph is not a message and is not available to everyone reading the screen.',
         'The permission state names the scope and the person who grants access, and offers no control the account cannot use. A disabled create button is a dead Tab stop that explains nothing.',
         'Where the empty state replaces the rows, focus is not moved into it. Somebody who has just typed into the search box is still typing, and pulling focus out of the field loses the keystroke.'
       ],
       related: ['data-table', 'skeleton', 'error-page'],
       variants: [
-        { id: 'nothing-yet', name: 'Nothing created yet', code:
+      { id: 'nothing-yet', name: 'Nothing created yet', code:
 `<!-- The genuinely new register: no rows, and no query hiding any. This is the
      only one of the four that offers to create something, and it offers it as
      the one filled button on the panel.
@@ -3688,8 +8111,8 @@ register(
      screen gets. Draft orders not counting is the kind of thing a user
      otherwise discovers by raising one and watching nothing appear.
 
-     The well is graphite, as it is in all four states. Nothing in this
-     component takes a tint. -->
+     The well is graphite, as it is in every state. Nothing in this component
+     takes a tint. -->
 <div data-kui="empty-state/nothing-yet" class="rounded-xl border border-zinc-300 bg-white">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h2 class="text-[14px]/5 font-semibold">Purchase orders</h2>
@@ -3704,13 +8127,13 @@ register(
       Orders raised against the Silvassa cost centres — Fabrication, Compounding, Dispatch, Maintenance and Tooling — appear here as soon as they are approved. Drafts stay in your own list until then.
     </p>
     <button type="button"
-            class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+            class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="plus" class="size-4"></i>New purchase order
     </button>
   </div>
 </div>` },
 
-        { id: 'no-results', name: 'No search results', code:
+      { id: 'no-results', name: 'No search results', code:
 `<!-- One predicate: the string somebody typed. The empty state echoes it back,
      because with a search box, a column menu and a date range above the panel
      the user cannot otherwise tell which of the three is holding the rows.
@@ -3725,6 +8148,11 @@ register(
      Say what the search covers. "No results" leaves somebody retyping the same
      string; naming the three fields it searches is what makes the second
      attempt land.
+
+     Clear the search and the button that cleared it is gone with the block it
+     sat in, so the handler puts focus back in the search box rather than
+     letting the browser drop it on the body. The field is where the user was
+     going anyway, and it survives every state this panel has.
 
      The status line above the table is the announcement, and it is on the panel
      rather than inside the empty block so it is in the document before the
@@ -3747,7 +8175,7 @@ register(
   <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
     <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
       <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
-      <input type="search" x-model="q" aria-label="Search the order register"
+      <input type="search" x-model="q" x-ref="q" aria-label="Search the order register"
              placeholder="Search PO, vendor or material"
              class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
     </div>
@@ -3772,14 +8200,117 @@ register(
     <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
       Nothing in the register matches <span class="font-medium text-zinc-900" x-text="q"></span>. The search covers the PO number, the vendor and the material description.
     </p>
-    <button type="button" @click="q = ''"
+    <button type="button" @click="q = ''; $nextTick(() => $refs.q.focus())"
             class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       Clear the search
     </button>
   </div>
 </div>` },
 
-        { id: 'filtered', name: 'Behind an active filter set', code:
+      { id: 'too-short', name: 'Below the search threshold', tagNew: true, code:
+`<!-- Three empties in one box, and the middle one is the one that gets skipped.
+     Nothing typed, not enough typed, and enough typed with nothing matching are
+     three different facts, and a lookup that renders the second as the third
+     lies about the masters. Two characters into an item search that queries at
+     three, "No items match hd" tells a storekeeper the item does not exist —
+     and the conscientious ones raise a request to have it created, for an item
+     that was sitting there under a third character they had not finished
+     typing.
+
+     Count the shortfall rather than gesturing at it. "The search runs at 3
+     characters and you have typed 2" ends the guessing; "keep typing" does not
+     say for how long.
+
+     No action on the threshold state. The user is already pressing the only
+     keys that help, and a button beside a search box somebody is mid-word in is
+     a target for a stray click. This is the second of the two states in the
+     entry with nothing to press, and it is for the opposite reason to the
+     first: permission has nothing the account may do, and this one has nothing
+     the component can do better than the user already is.
+
+     The status region stays silent below the threshold. It reports the count
+     once the search has actually run, because a sentence written into it on
+     every keypress queues one announcement per key and buries the count that
+     finally matters. The shortfall is drawn, in the panel, where the person
+     typing can see it without being read to. -->
+<div data-kui="empty-state/too-short" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       min: 3,
+       q: 'hd',
+       items: [
+         { code: 'RM-HDPE-NAT', name: 'HDPE granules, natural', hsn: '3901 20 00', stock: '1,240 kg' },
+         { code: 'RM-HDPE-BLU', name: 'HDPE granules, blue', hsn: '3901 20 00', stock: '0 kg' },
+         { code: 'SC-HDPE-FLM', name: 'HDPE film scrap', hsn: '3915 10 00', stock: '320 kg' },
+         { code: 'RM-MS-ANG50', name: 'MS angle 50x50x5', hsn: '7216 21 00', stock: '4.6 MT' }
+       ],
+       get hits() {
+         const q = this.q.trim().toLowerCase();
+         return this.items.filter(i => (i.code + ' ' + i.name + ' ' + i.hsn).toLowerCase().includes(q));
+       },
+       get mode() {
+         const n = this.q.trim().length;
+         if (!n) return 'idle';
+         if (n < this.min) return 'short';
+         return this.hits.length ? 'rows' : 'none';
+       }
+     }">
+
+  <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" x-model="q" aria-label="Search the item master"
+             placeholder="Item code, description or HSN"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+    <p role="status" class="text-[12px]/4 text-zinc-500 tabular-nums"
+       x-text="mode === 'rows' ? hits.length + ' of 4,180 items' : mode === 'none' ? 'No items match this search' : ''"></p>
+  </div>
+
+  <div x-show="mode === 'short'" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="search" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">The search has not run yet</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      It runs at <span class="font-medium text-zinc-900 tabular-nums" x-text="min"></span> characters and you have typed <span class="font-medium text-zinc-900 tabular-nums" x-text="q.trim().length"></span>. Nothing has been looked up, so nothing here says the item is missing.
+    </p>
+    <p class="mt-2 text-[12px]/4 text-zinc-500 tabular-nums">4,180 items across Silvassa and Umbergaon</p>
+  </div>
+
+  <div x-show="mode === 'idle'" x-cloak class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="package-search" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">Search the item master</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      Raw material, bought-out parts, consumables and scrap codes. Search by item code, description or HSN.
+    </p>
+  </div>
+
+  <div x-show="mode === 'none'" x-cloak class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">No items match this search</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      The search ran across 4,180 items and matched nothing for <span class="font-medium text-zinc-900" x-text="q"></span>. It covers the item code, the description and the HSN.
+    </p>
+  </div>
+
+  <ul x-show="mode === 'rows'" x-cloak role="list" class="divide-y divide-zinc-100 text-[13px]/5">
+    <template x-for="i in hits" :key="i.code">
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 px-4 py-2.5">
+        <span class="min-w-0">
+          <span class="font-medium tabular-nums" x-text="i.code"></span>
+          <span class="text-zinc-600" x-text="' · ' + i.name"></span>
+        </span>
+        <span class="text-zinc-600 tabular-nums" x-text="'HSN ' + i.hsn + ' · ' + i.stock"></span>
+      </li>
+    </template>
+  </ul>
+</div>` },
+
+      { id: 'filtered', name: 'Behind an active filter set', code:
 `<!-- Four predicates instead of one, so echoing the query means rendering the
      chips. Each is removable on its own, because the usual cause is one filter
      out of four and clearing all of them throws away the three that were right.
@@ -3793,11 +8324,22 @@ register(
      button — two graphite buttons side by side make the user choose before they
      have read why they are choosing.
 
+     Clearing everything deletes the control that did it, along with the chips
+     and the block they were in, so the handler moves focus to the count line.
+     It is still on the page, it is tabindex="-1" for exactly this, and it is
+     also the sentence that says what just happened. Left alone, the browser
+     drops focus on the body and the next Tab restarts at the top of the
+     document.
+
      The role="status" sits on the toolbar, above the swap. It was in the
      document before any chip was touched, so writing the new count into it is a
      change a screen reader reports. Put it inside the empty block instead and
      it arrives with its message already in it, which is not a change and is
-     announced to nobody. -->
+     announced to nobody.
+
+     The chip strip is bg-zinc-50 — a band recessed inside a white panel — and
+     its divider is zinc-200. A zinc-100 band under a zinc-100 divider draws the
+     divider in the fill it sits on, which is a hairline nobody can see. -->
 <div data-kui="empty-state/filtered" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        filters: ['Gujarat Polymers Ltd', 'Gate 2', 'Rejected at QC', '01–12 Aug'],
@@ -3806,11 +8348,12 @@ register(
 
   <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
     <h2 class="text-[14px]/5 font-semibold">Goods receipts</h2>
-    <p role="status" class="text-[12px]/4 text-zinc-500 tabular-nums"
+    <p role="status" x-ref="count" tabindex="-1"
+       class="text-[12px]/4 text-zinc-500 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
        x-text="filters.length ? '0 of ' + total + ' receipts match these filters' : total + ' receipts'"></p>
   </div>
 
-  <div x-show="filters.length" class="flex flex-wrap items-center gap-2 border-b border-zinc-100 bg-zinc-100 px-4 py-2">
+  <div x-show="filters.length" class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-50 px-4 py-2">
     <template x-for="f in filters" :key="f">
       <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
         <span x-text="f"></span>
@@ -3835,7 +8378,7 @@ register(
               class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Drop the date range
       </button>
-      <button type="button" @click="filters = []"
+      <button type="button" @click="filters = []; $nextTick(() => $refs.count.focus())"
               class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Clear all filters
       </button>
@@ -3847,7 +8390,247 @@ register(
   </div>
 </div>` },
 
-        { id: 'error', name: 'The load failed', code:
+      { id: 'archived', name: 'Emptied by a default nobody set', tagNew: true, code:
+`<!-- Zero rows, and not one filter the user chose. The register shows open
+     enquiries out of the box, every enquiry in Packaging is closed, and the
+     mechanical test that separates the four empties reads this as a register
+     with nothing in it. It is not: there are four enquiries here and all four
+     are done. Offer create on the strength of that count and the buyer raises a
+     fifth without ever seeing that the vendor was already asked.
+
+     A default nobody chose is still a predicate, so it gets echoed like one.
+     The sentence names the default in force, gives the count behind it and says
+     when the last of them closed — a date is what tells somebody whether this
+     category is dormant or was worked yesterday.
+
+     The action reveals rather than creates. The empty state cannot see whether
+     the rows it is hiding are live or dead, so it does not get to decide a new
+     record is wanted; it puts the four closed enquiries on the screen and lets
+     the user decide. New enquiry is still on the panel, in the toolbar, where
+     it is a thing somebody came to do rather than an answer to an emptiness.
+     That placement is the whole point of the variant.
+
+     Revealing removes the block the button was in, so focus goes to the count
+     line — tabindex="-1", still on the page, and the sentence that reports the
+     new number.
+
+     The header checkbox and the empty state's button drive one piece of state,
+     bound once. Two controls holding one value is fine; two copies of a value
+     is what drifts. -->
+<div data-kui="empty-state/archived" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       includeClosed: false,
+       closed: [
+         { no: 'ENQ-26-0071', vendor: 'Sharma Extrusions', item: 'Corrugated boxes 5-ply', on: '02 Aug 2026' },
+         { no: 'ENQ-26-0078', vendor: 'Gujarat Polymers Ltd', item: 'Stretch film, 23 micron', on: '07 Aug 2026' },
+         { no: 'ENQ-26-0084', vendor: 'Konkan Packaging Co', item: 'Strapping, 12 mm', on: '11 Aug 2026' },
+         { no: 'ENQ-26-0088', vendor: 'Nashik Steel Traders', item: 'Pallet, 1200x1000', on: '14 Aug 2026' }
+       ],
+       get rows() { return this.includeClosed ? this.closed : [] }
+     }">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <h2 class="text-[14px]/5 font-semibold">Enquiries · Packaging</h2>
+      <p role="status" x-ref="count" tabindex="-1"
+         class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+         x-text="rows.length ? rows.length + ' enquiries, all closed' : 'No open enquiries · 4 closed are hidden'"></p>
+    </div>
+    <div class="ml-auto flex flex-wrap items-center gap-3">
+      <label class="flex items-center gap-2 text-[12px]/4 text-zinc-600">
+        <input type="checkbox" x-model="includeClosed" class="size-4 shrink-0 accent-zinc-700">Include closed
+      </label>
+      <button type="button"
+              class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-3.5 text-zinc-600"></i>New enquiry
+      </button>
+    </div>
+  </div>
+
+  <div x-show="!rows.length" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="archive" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">Every enquiry for Packaging is closed</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      There are <span class="font-medium text-zinc-900 tabular-nums">4</span> enquiries in this category and all four were closed, the last of them on 14 Aug 2026. The register shows open enquiries unless you ask for the rest.
+    </p>
+    <button type="button" @click="includeClosed = true; $nextTick(() => $refs.count.focus())"
+            class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="archive-restore" class="size-4 text-zinc-600"></i>Show the 4 closed enquiries
+    </button>
+  </div>
+
+  <ul x-show="rows.length" x-cloak role="list" class="divide-y divide-zinc-100 text-[13px]/5">
+    <template x-for="r in rows" :key="r.no">
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-2.5">
+        <span class="min-w-0">
+          <span class="font-medium tabular-nums" x-text="r.no"></span>
+          <span class="text-zinc-600" x-text="' · ' + r.vendor + ' · ' + r.item"></span>
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 tabular-nums">
+          <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span><span x-text="'Closed ' + r.on"></span>
+        </span>
+      </li>
+    </template>
+  </ul>
+</div>` },
+
+      { id: 'prerequisite', name: 'Waiting on a choice above', tagNew: true, code:
+`<!-- Empty because nobody has asked for anything yet. Contract rates are held
+     per vendor, so with no vendor picked there is no query to run and no result
+     to report — and the panel must not pretend there is one. "No prices found"
+     here says this vendor holds no contract, which is a different fact about a
+     different thing, and it gets raised as a data bug against rates that are
+     perfectly fine.
+
+     Name the control, not the record. The headline points at the select in the
+     toolbar because that is where the answer is, and at 390px the toolbar is
+     directly above this block, so the sentence still points the right way.
+
+     Half a query is still a query, so the predicate that is already set gets
+     echoed. The financial year shapes every rate that will land here and the
+     user did not necessarily choose it.
+
+     The button focuses the select rather than carrying a second copy of it. A
+     native select cannot be opened from script, and faking one means replacing
+     the control — so the honest move is to hand focus over and let the user
+     press Space. Two selects holding one vendor is the alternative, and they
+     drift the moment somebody changes the first.
+
+     The status line sits under the title and says "No vendor chosen · 2026-27"
+     from first paint, so when a vendor is picked the count is written into a
+     region that was already there. Put it inside the rates block and it arrives
+     with its message in it, which is not a change and is announced to nobody.
+
+     This is the one empty in the entry that is correct before any count is
+     known. The rule against drawing an empty state while a request is in flight
+     is a rule about results; nothing is in flight here and nothing will be
+     until the choice is made. -->
+<div data-kui="empty-state/prerequisite" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       vendor: '',
+       book: {
+         'Gujarat Polymers Ltd': [
+           { item: 'HDPE granules, natural', hsn: '3901 20 00', rate: '₹1,04,400', uom: 'per MT' },
+           { item: 'Masterbatch, blue', hsn: '3206 49 00', rate: '₹2,86,000', uom: 'per MT' },
+           { item: 'Stretch film, 23 micron', hsn: '3920 10 99', rate: '₹1,42,500', uom: 'per MT' }
+         ],
+         'Sharma Extrusions': [
+           { item: 'HDPE granules, natural', hsn: '3901 20 00', rate: '₹1,06,800', uom: 'per MT' },
+           { item: 'PP woven sacks', hsn: '6305 33 00', rate: '₹12,45,000', uom: 'per lakh nos' }
+         ]
+       },
+       get rates() { return this.book[this.vendor] || [] }
+     }">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <h2 class="text-[14px]/5 font-semibold">Contract prices</h2>
+      <p role="status" class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums"
+         x-text="vendor ? rates.length + ' contracted rates · ' + vendor + ' · 2026-27' : 'No vendor chosen · 2026-27'"></p>
+    </div>
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      <select x-model="vendor" x-ref="vendor" aria-label="Vendor"
+              class="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[13px]/5 focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option value="">Choose a vendor</option>
+        <option>Gujarat Polymers Ltd</option>
+        <option>Sharma Extrusions</option>
+      </select>
+      <select aria-label="Financial year"
+              class="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[13px]/5 tabular-nums focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option>2026-27</option>
+        <option>2025-26</option>
+      </select>
+    </div>
+  </div>
+
+  <div x-show="!vendor" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="mouse-pointer-click" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">Choose a vendor to see its contract prices</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      Rates are held per vendor and per financial year, so nothing is looked up until a vendor is picked. This panel is waiting, not reporting that a rate is missing.
+    </p>
+    <p class="mt-2 text-[12px]/4 text-zinc-500 tabular-nums">Financial year 2026-27 is already set and will apply</p>
+    <button type="button" @click="$refs.vendor.focus()"
+            class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Choose a vendor
+    </button>
+  </div>
+
+  <div x-show="vendor" x-cloak>
+    <ul role="list" class="divide-y divide-zinc-100 text-[13px]/5">
+      <template x-for="r in rates" :key="r.item">
+        <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 px-4 py-2.5">
+          <span class="min-w-0">
+            <span class="font-medium" x-text="r.item"></span>
+            <span class="text-zinc-500 tabular-nums" x-text="' · HSN ' + r.hsn"></span>
+          </span>
+          <span class="tabular-nums"><span class="font-medium" x-text="r.rate"></span><span class="text-zinc-600" x-text="' ' + r.uom"></span></span>
+        </li>
+      </template>
+    </ul>
+  </div>
+</div>` },
+
+      { id: 'all-clear', name: 'Empty because the work is done', tagNew: true, code:
+`<!-- The same box read the other way round. Every other state in this entry
+     says something is missing; this one says nothing is left, and the shape does
+     not change — so the glyph and the words have to carry the whole difference.
+     "No approvals found" over a queue somebody has just emptied is demoralising
+     and wrong in one sentence.
+
+     Print the evidence, not the mood. "14 approved today, none waiting" is a
+     fact that can be checked against the log; "All caught up" is exactly what a
+     filter hiding eleven approvals would also produce. The scope line under the
+     count is the same idea — it says what this queue covers, so the claim to be
+     clear is falsifiable rather than cheerful.
+
+     Which is the trap in this variant. A queue emptied by a predicate has not
+     been cleared, and rendering success over one is the create-under-a-filter
+     defect one register worse: the user believes it and goes home. The view may
+     only choose this state when no predicate is in force and the unscoped count
+     for the scope is zero.
+
+     check-circle-2 in text-emerald-600 on the same bg-zinc-200 well every other
+     state uses. There is no green panel and no -50 tint here, for the same
+     reason there is no red one behind the timeout: the tone belongs to the mark,
+     not to a field of colour behind the text.
+
+     No action. There is nothing to widen, nothing to clear and nothing to
+     create, and an offer to do any of them turns a finished queue back into a
+     problem. The one route out is a link to what was done. -->
+<div data-kui="empty-state/all-clear" class="rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Approvals waiting on you</h2>
+    <p role="status" class="text-[12px]/4 text-zinc-500 tabular-nums">0 waiting · 14 approved today</p>
+  </div>
+
+  <div class="flex min-h-72 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">You are through the approval queue</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      Fourteen purchase orders reached you today and all fourteen are cleared. The last was PO-24-1211 for Gujarat Polymers Ltd, ₹8,64,000, at 16:20.
+    </p>
+    <p class="mt-2 max-w-sm text-[12px]/4 text-zinc-500 tabular-nums">
+      All cost centres · orders up to your ₹5,00,000 limit · nothing filtered
+    </p>
+    <a href="#" class="mt-4 text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      See what you approved today
+    </a>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 text-zinc-500 tabular-nums">Orders above ₹5,00,000 go to Nilesh Patil</p>
+    <p class="text-[12px]/4 text-zinc-500 tabular-nums">Checked 21 Aug 2026, 17:02</p>
+  </div>
+</div>` },
+
+      { id: 'error', name: 'The load failed', code:
 `<!-- Not an empty state in disguise. "No goods receipts found" after a
      thirty-second timeout tells somebody their receipts are gone, and the
      conscientious ones go and enter them again.
@@ -3890,7 +8673,7 @@ register(
     <p class="mt-1 text-[12px]/4 text-zinc-500 tabular-nums">Reference 8f21c4 · 21 Aug 2026, 11:04</p>
     <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
       <button type="button" @click="retry()"
-              class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30">
+              class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="rotate-cw" class="size-4"></i>Retry
       </button>
       <a href="mailto:it@konspec.com?subject=Receipt%20register%208f21c4"
@@ -3920,7 +8703,7 @@ register(
      x-text="state === 'busy' ? 'Retrying the receipt register' : state === 'ok' ? 'Receipt register loaded, 2 receipts' : ''"></p>
 </div>` },
 
-        { id: 'permission', name: 'Nothing you may see', code:
+      { id: 'permission', name: 'Nothing you may see', code:
 `<!-- The state most often mislabelled, because the query really does return
      zero rows once the row-level filter has run, and "No orders yet" is what
      falls out of a template that only counts. It is a lie that costs a ticket:
@@ -3965,7 +8748,7 @@ register(
   </div>
 </div>` },
 
-        { id: 'in-table', name: 'Inside the table body', code:
+      { id: 'in-table', name: 'Inside the table body', code:
 `<!-- One <tr> with one full-width <td colspan>, inside the <tbody>. Not a div
      after the </table>: a sibling div is outside the table in the
      accessibility tree, so somebody reading with table navigation walks a table
@@ -3975,7 +8758,10 @@ register(
      The colspan is bound, not typed. Hide the Received column from the menu and
      a hardcoded colspan="4" stretches the cell one column past the header, so
      the panel edge lands in the middle of the sentence. It is bound to the
-     count of columns actually rendered and cannot drift from them.
+     count of columns actually rendered and cannot drift from them. The literal
+     colspan="4" beside the binding is the server-rendered default for the paint
+     before Alpine boots, and Alpine overwrites it on init — without it the cell
+     spans one column for a frame and the panel snaps sideways.
 
      The header row stays, because the emptiness here is a query result: the
      sort and the column choices are still in force and the header is where the
@@ -4016,7 +8802,7 @@ register(
     </thead>
     <tbody>
       <tr>
-        <td :colspan="span" class="px-6 py-12 text-center">
+        <td colspan="4" :colspan="span" class="px-6 py-12 text-center">
           <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
             <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
           </span>
@@ -4034,7 +8820,7 @@ register(
   </table>
 </div>` },
 
-        { id: 'compact', name: 'In a small panel', code:
+      { id: 'compact', name: 'In a small panel', code:
 `<!-- A size-10 well, a 16px headline, two lines of explanation and a 36px
      button is roughly 200px of content, which is more than a dashboard tile
      has. Compact drops the well to size-8, the headline to 13px, the
@@ -4044,7 +8830,13 @@ register(
      What it does not drop is the distinction between the states. The first tile
      has nothing yet and offers the create route; the second has rows that a
      filter is hiding and offers to clear it; the third failed and offers Retry.
-     Shrinking the box is not a reason to collapse four messages into "No data".
+     Shrinking the box is not a reason to collapse the states into "No data".
+
+     The tile title is the heading and the message under it is a paragraph. A
+     second heading inside a 110px box adds a level to the document outline that
+     nobody navigates by, which is the opposite of the rule in the full-size
+     variants, where the panel title is an h2 and the empty headline is the h3
+     under it.
 
      No min-height here. A tile sized to a fixed grid row already has its height
      from the grid, and adding one on top of it is how a dashboard ends up with
@@ -4069,7 +8861,7 @@ register(
         <i data-lucide="filter-x" class="size-4 text-zinc-600"></i>
       </span>
       <p class="mt-2 text-[13px]/5 font-medium">None for Dispatch</p>
-      <p class="mt-0.5 text-[12px]/4 text-zinc-500">Seven overdue across the other cost centres.</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums">Seven overdue across the other cost centres.</p>
       <button type="button"
               class="mt-2 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Show all cost centres
@@ -4093,7 +8885,7 @@ register(
   </div>
 </div>` },
 
-        { id: 'inline-create', name: 'Empty list with an inline add', code:
+      { id: 'inline-create', name: 'Empty list with an inline add', code:
 `<!-- The lines of a draft order, before anybody has added one. The affordance
      sits where the first line will land, so when the row arrives the eye does
      not have to move and the button steps down to the next empty position
@@ -4112,7 +8904,7 @@ register(
      One sentence above it, no icon well. The panel title says what the list is
      and the button says what to do, so a glyph between them is a third thing
      saying nothing. Once there are lines the sentence goes and the button
-     stays. -->
+     stays, which is why the button is outside the block that x-show removes. -->
 <div data-kui="empty-state/inline-create" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{ lines: [] }">
 
@@ -4143,12 +8935,12 @@ register(
   </div>
 </div>` },
 
-        { id: 'register', name: 'The GRN register, nothing today', code:
+      { id: 'register', name: 'The GRN register, nothing today', code:
 `<!-- Assembled: the Silvassa gate at 11:04 on a day nothing has arrived. Three
      receipts were logged yesterday, so this is not a new register and it is not
      a filter hiding anything either — it is a scope with nothing in it, and
-     that is a fifth shading of nothing-yet with its own two answers. Widen the
-     scope, or log the receipt that is standing at the gate.
+     that is a shading of nothing-yet with its own two answers. Widen the scope,
+     or log the receipt that is standing at the gate.
 
      Both answers are on the panel and only one of them is filled. Log a goods
      receipt is the create action and it is safe here in a way it never is under
@@ -4157,10 +8949,15 @@ register(
 
      The status region is the sentence beside the title. It was rendered with
      the panel, before any scope button was pressed, so writing the new count
-     into it is a change and gets read out. The scope buttons are the segmented
-     control from the button-group entry, copied rather than reinvented: a real
-     radiogroup with one Tab stop, a roving tabindex and aria-checked, so which
-     day is showing is announced and not only tinted.
+     into it is a change and gets read out. It is also where focus goes when the
+     empty state's own link changes the scope, because that link is removed
+     along with the block it sits in and the browser would otherwise drop focus
+     on the body.
+
+     The scope buttons are the segmented control from the button-group entry,
+     copied rather than reinvented: a real radiogroup with one Tab stop, a roving
+     tabindex and aria-checked, so which day is showing is announced and not only
+     tinted.
 
      The empty state replaces the table rather than sitting inside it, because
      the emptiness is the scope and not a query — there is no sort and no column
@@ -4190,7 +8987,8 @@ register(
   <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
     <div class="min-w-0">
       <h2 class="text-[14px]/5 font-semibold">Goods receipts · Silvassa</h2>
-      <p role="status" class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums"
+      <p role="status" x-ref="count" tabindex="-1"
+         class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
          x-text="rows.length ? rows.length + ' receipts on ' + label : 'No goods receipts on ' + label"></p>
     </div>
     <div role="radiogroup" aria-label="Date scope" x-ref="grp"
@@ -4258,10 +9056,10 @@ register(
     </p>
     <div class="mt-4 flex w-full max-w-xs flex-col items-center gap-3 sm:w-auto sm:max-w-none sm:flex-row">
       <button type="button"
-              class="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30 sm:w-auto">
+              class="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto">
         <i data-lucide="truck" class="size-4"></i>Log a goods receipt
       </button>
-      <button type="button" @click="scope = 'yesterday'"
+      <button type="button" @click="scope = 'yesterday'; $nextTick(() => $refs.count.focus())"
               class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Show yesterday instead
       </button>
@@ -4273,36 +9071,192 @@ register(
        x-text="rows.length ? '1–' + rows.length + ' of ' + rows.length + ' receipts' : 'No receipts to show'"></p>
     <p class="text-[12px]/4 text-zinc-500 tabular-nums">Gate closes 18:00</p>
   </div>
-</div>` }
+</div>` },
+
+      { id: 'django', name: 'Choosing the state in the view', tagNew: true, code:
+`<!-- views.py
+     def receipt_register(request):
+         # the page answers immediately and the panel fetches itself. Nothing
+         # on this path waits on the register query.
+         return render(request, 'grn/register.html', {'form': FilterForm(request.GET)})
+
+     def receipt_rows(request):
+         # Permission first. Filter by permission and then count and the zero
+         # that comes back has lost its reason — it is indistinguishable from an
+         # empty register, which is the "No orders yet" over a closed scope that
+         # costs a support ticket every time it ships.
+         scopes = request.user.profile.readable_cost_centres
+         if not scopes:
+             return render(request, 'grn/_empty_permission.html',
+                           {'granted_by': settings.ACCESS_OWNER})
+
+         base = GoodsReceipt.objects.filter(cost_centre__in=scopes)
+         form = FilterForm(request.GET)
+
+         # Failure next, because an exception has no count to read. Status 200
+         # with the fragment in the body: htmx does not swap a 500 by default,
+         # so a raised view leaves the spinner turning until somebody reloads.
+         try:
+             rows = list(form.filter(base).select_related('vendor')[:50])
+         except DatabaseError:
+             return render(request, 'grn/_empty_error.html',
+                           {'ref': request.headers.get('X-Request-Id')}, status=200)
+
+         if rows:
+             return render(request, 'grn/_rows.html', {'rows': rows, 'form': form})
+
+         # The count last, and it is the whole component. base.count() is the
+         # unfiltered figure for this scope and it is the only thing that tells
+         # nothing-yet from no-results. One extra indexed count against the
+         # duplicate purchase order that gets raised without it is not a trade
+         # worth arguing about.
+         total = base.count()
+         if form.has_predicates():
+             tpl = 'grn/_empty_filtered.html'
+         elif total:
+             # rows exist and no predicate is set, so a default is hiding them
+             tpl = 'grn/_empty_archived.html'
+         else:
+             tpl = 'grn/_empty_nothing_yet.html'
+         return render(request, tpl, {'form': form, 'total': total})
+
+     urls.py
+         path('grn/', views.receipt_register, name='grn-register'),
+         path('grn/rows/', views.receipt_rows, name='grn-rows'),
+
+     Six fragments, one per state, and not a single {% if %} between them. That
+     is the point of doing it here: by the time a queryset reaches a template
+     every one of these empties is a list of length zero, so {% if not receipts %}
+     cannot tell them apart and picks whichever message was typed first.
+
+     The status line lives in the page, outside hx-target, and the fragment
+     writes into it with hx-swap-oob="innerHTML:#grn-count". The innerHTML: prefix
+     is load-bearing. A plain hx-swap-oob="true" replaces the whole <p>, so the
+     region a screen reader was watching is gone and a different one has arrived
+     with its message already in it — which is not a change and is announced to
+     nobody. Swapping the text inside leaves the region in place and the count is
+     read out.
+
+     The chip removals are real links carrying hx-get, so the register still
+     narrows with JavaScript off and the URL still describes the view somebody is
+     looking at. -->
+
+{% comment %} grn/register.html — everything the swap must survive lives here: the
+   toolbar, the search form and the status line. {% endcomment %}
+<div data-kui="empty-state/django" class="rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Goods receipts</h2>
+    {% comment %} empty at first paint, and that is the point: the region has to be in the
+       document before the first swap for anything written into it to count as a
+       change. {% endcomment %}
+    <p id="grn-count" role="status" class="text-[12px]/4 text-zinc-500 tabular-nums"></p>
+
+    <form hx-get="{% url 'grn-rows' %}" hx-target="#grn-rows" hx-swap="outerHTML"
+          hx-trigger="input changed delay:300ms from:find input, change from:find select"
+          class="ml-auto flex flex-wrap items-center gap-2">
+      <div class="flex min-w-48 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+        <input type="search" name="q" value="{{ form.q.value|default:'' }}"
+               aria-label="Search the receipt register" placeholder="GRN, vendor or material"
+               class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+      </div>
+      <select name="status" aria-label="Status"
+              class="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[13px]/5 focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option value="">All statuses</option>
+        <option value="open">Open</option>
+        <option value="qc">Rejected at QC</option>
+      </select>
+    </form>
+  </div>
+
+  {% comment %} the deferred first load. This div is the spinner and it is also what
+     hx-swap="outerHTML" replaces, so nothing has to remove it. {% endcomment %}
+  <div id="grn-rows" hx-get="{% url 'grn-rows' %}" hx-trigger="load" hx-swap="outerHTML"
+       class="flex min-h-64 items-center justify-center p-6">
+    <div class="flex flex-col items-center gap-3 text-center">
+      <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <p class="text-[13px]/5 text-zinc-600">Loading the receipt register</p>
+    </div>
+  </div>
+</div>
+
+{% comment %} grn/_empty_filtered.html — one of the six. It knows which state it is
+   because the view decided; there is nothing to work out in here. It carries
+   the panel's own bg-white, because the fragment is what fills the panel once
+   the spinner has gone and a fragment with no fill of its own leaves the page
+   showing through the hole the swap made. {% endcomment %}
+<div id="grn-rows" class="bg-white">
+  <div class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-50 px-4 py-2">
+    {% for chip in form.active_chips %}
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        {{ chip.label }}
+        <a href="?{{ chip.querystring_without }}"
+           hx-get="{% url 'grn-rows' %}?{{ chip.querystring_without }}"
+           hx-target="#grn-rows" hx-swap="outerHTML"
+           aria-label="Remove the filter {{ chip.label }}"
+           class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-3"></i>
+        </a>
+      </span>
+    {% endfor %}
+  </div>
+
+  <div class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">No receipts match these filters</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      There are <span class="font-medium text-zinc-900 tabular-nums">{{ total }}</span> receipts you can see. Drop a filter above and the list widens.
+    </p>
+    {% comment %} no create button in this fragment, and none in _empty_filtered ever. The
+       rows exist; a New receipt here is the duplicate GRN. {% endcomment %}
+    <a href="?" hx-get="{% url 'grn-rows' %}" hx-target="#grn-rows" hx-swap="outerHTML"
+       class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Clear all filters
+    </a>
+  </div>
+</div>
+
+{% comment %} the count, swapped into the region that was already on the page rather than
+   swapped in as a new one. {% endcomment %}
+<span hx-swap-oob="innerHTML:#grn-count">0 of {{ total }} receipts match these filters</span>` }
       ]
   },
 
   {
-      id: 'skeleton', name: 'Skeleton', category: 'data',
+    id: 'skeleton', name: 'Skeleton', category: 'data',
       description: 'Grey blocks standing in the exact box the content will occupy — same rows, same leading, same column widths — so the first paint of a screen whose layout is already known lands without moving.',
-      when: 'The first paint of a region whose shape you already know: a register you have rendered a thousand times, a record card, a dashboard strip, the panel behind a deferred fetch. The line against a spinner is not how long the wait is, it is whether you can draw the answer. A skeleton is a promise about the layout, so it is only honest where the layout is fixed before the data arrives; a filter that may return four rows or four thousand has no shape to promise and gets the spinner. The other half of the line is what is already on screen: a skeleton is for a region that is empty, never for a refresh of rows somebody is reading — replacing filled rows with grey bars deletes data mid-read and looks like the record was wiped. That case is the spinner\'s scrim over content that stays. And if you know the total rather than the shape, neither of them is right and progress is.',
+      when: 'The first paint of a region whose shape you already know: a register you have rendered a thousand times, a record card, a dashboard strip, the panel behind a deferred fetch. The line against a spinner is not how long the wait is, it is whether you can draw the answer. A skeleton is a promise about the layout, so it is only honest where the layout is fixed before the data arrives; a filter that may return four rows or four thousand has no shape to promise and gets the spinner. The other half of the line is what is already on screen: a skeleton is for a region that is empty, never for a refresh of rows somebody is reading — replacing filled rows with grey bars deletes data mid-read and looks like the record was wiped. That case is the spinner\'s scrim over content that stays. Two shapes sit just inside that line rather than outside it, and both are covered here: rows appended below rows already on screen, where the grey lands in space that was empty, and one column of a rendered table that has not answered yet, where the cell has never held a value there was anything to delete. And if you know the total rather than the shape, neither of them is right and progress is.',
       notes: [
         'The skeleton occupies the box the content will occupy. Same number of rows, same leading, same column widths, same paddings, same border on the same wrapper. That is the whole component and everything else here is in service of it: a skeleton that reflows when the data lands is worse than a spinner, because a spinner never promised a layout and this one promised the wrong one. The test is to toggle between the two states with the panel under the cursor and watch whether anything below it moves.',
         'Every bar sits inside a box the height of the line it stands in for, and the bar is centred in it — flex h-5 items-center round an h-2.5 bar for text-[13px]/5, h-6 round h-2.5 for prose at /6, h-4 round h-2 for a 12px caption, h-7 round h-4 for a 24px figure. Stack bare bars with space-y-2 instead and a four-line paragraph measures 72px of skeleton against 96px of text, so the card grows by a line and a half on arrival. This is the marker\'s dot doing the same job for the same reason: the box is derived from the leading, the leading is already written in the class name beside it, and the two cannot drift. A margin tuned by eye is correct for exactly one type size.',
+        'No space-y-* between the bars of one paragraph — the leading is already inside the line boxes and a gap on top of it is exactly the drift the boxes exist to stop. Between whole rows it is the opposite: copy whatever the loaded list uses, because that gap is part of the layout being promised. marker/dot sets its items space-y-2 and a skeleton of that list is space-y-2 too. The rule is not "never space-y", it is "never a second source of vertical rhythm".',
+        'The measurements are copied from the entry the content comes from, not estimated from the rendered picture. A form control is 38px and not h-9: py-2 on a 20px line box is 36px and the input\'s wrapper adds a 1px border top and bottom. A three-row textarea is 78px by the same arithmetic. A dense table row is 32px because px-3 py-1.5 is what table/dense writes, against 40px for the comfortable one. Every one of those is a couple of pixels, and a couple of pixels times twenty-five rows is half a screen. Open the entry, read the classes, do the addition.',
         'The row count is the page size, not a guess. A register that asked for 25 rows draws 25. Where the count genuinely cannot be known — a permission-filtered list, a variable set of exceptions — guess low rather than high: growth pushes down only what is below the panel, while shrinkage pulls the whole page up under a cursor that has already started moving towards something.',
         'Draw for real everything the page already knows. Table headers, tile labels, the section titles, the record number and vendor name that came from the row somebody clicked to get here. None of that is waiting on the query, and greying it out makes the page flash its own headings away and land them again. It also costs the only thing a skeleton is good for over a spinner: with the column headers and the tile labels drawn, somebody can decide where to look before the figures arrive.',
         'Blocks are bg-zinc-200 and carry no ring. zinc-100 is a surface — the page, a selected row, an open menu trigger — so a zinc-100 bar on a white card is one step from invisible and on the page behind it is the identical colour. The ring that every other tinted shape takes is deliberately absent here: a ring draws an edge, and a skeleton bar is ink standing in for text, not a shape you are meant to read the outline of. Twelve ringed bars in a column read as twelve empty input boxes.',
         'The radius of a block is the radius of the thing it replaces. rounded for a line of text, rounded-lg for a control or a button, rounded-full for an avatar or a status pill, and the pill block is h-5 because the real pill is py-0.5 on text-[12px]/4. Give a text bar rounded-full and a paragraph reads as a stack of lozenges, which is a row of badges, which is a different component.',
-        'animate-pulse goes on the smallest wrapper that contains nothing but blocks, and it always carries motion-reduce:animate-none. One wrapper over the whole group is what keeps the bars in phase, and the phase problem is real for anything a template inserts a row at a time — forty blocks that started their animations at forty different moments fade against each other and the panel reads as static rather than as a wait. Where real text is interleaved with the blocks, as it is in a form of drawn labels, the classes move down onto each block instead: they all begin in the same paint so they stay in step, and a label that is not loading has no business pulsing. The reduced-motion suppression is where this parts company with the spinner, which must never take it — a stopped ring is a broken ring and the only signal is gone, whereas a stopped skeleton is still an accurate picture of the layout that is coming, and it is a much larger area of the screen moving, which is the motion the preference exists for.',
+        'animate-pulse goes on the smallest wrapper that contains nothing but blocks, and it always carries motion-reduce:animate-none. One wrapper over the whole group is what keeps the bars in phase, and the phase problem is real for anything a template inserts a row at a time — forty blocks that started their animations at forty different moments fade against each other and the panel reads as static rather than as a wait. Where real text is interleaved with the blocks, as it is in a form of drawn labels or a table with one column still answering, the classes move down onto each block instead: they all begin in the same paint so they stay in step, and a label that is not loading has no business pulsing. The reduced-motion suppression is where this parts company with the spinner, which must never take it — a stopped ring is a broken ring and the only signal is gone, whereas a stopped skeleton is still an accurate picture of the layout that is coming, and it is a much larger area of the screen moving, which is the motion the preference exists for.',
         'The last line of a paragraph is short, because real paragraphs end mid-line. Three bars at w-full and a fourth at about w-2/5 reads as text; four bars at w-full reads as a table. The widths are written into the markup and never generated — a width randomised per render changes between two paints of the same wait, and Alpine re-evaluating an expression is enough to make the block jump while it is standing still.',
-        'A skeleton is a first paint. It belongs in the markup the server sent, or in the region a deferred fetch is about to replace, and it needs no delay floor because it is already the first frame — the reason the panel was deferred is that the query is slow. Reaching for one on a refresh is the mistake: rows that are already rendered get the spinner\'s bg-white/70 scrim over them with the stale figures still legible underneath, and the panel keeps its height through the whole cycle.',
+        'Free prose has no line count. The skeleton has to commit to one, and the same paragraph is four lines in a card and six at 390px, so a skeleton drawn to the widest case is short everywhere else. Either the loaded text is bounded — line-clamp-4 on the paragraph, a field with a known format, a summary that is always two lines — and the count is then true at every width, or the count is a guess and the only thing the skeleton is really promising is the line box. Where it is a guess, guess low, and do not put the skeleton on a region whose whole content is unbounded prose.',
+        'A skeleton the server rendered needs no delay floor: it is already the first frame, and the reason the panel was deferred is that the query is slow. A skeleton the client raises because somebody pressed something is the other case and needs the same 500ms floor the spinner takes, because the answer may be in a cache and a whole panel that turns grey at 90ms and back at 180ms is more disruptive than the wait it was drawn for. The floor is on the opacity of the blocks and never on their display: the box is held from the first frame either way, and a skeleton that appears with display grows the panel half a second after the click and moves the control out from under the cursor.',
+        'It has to resolve, and there are three ways out rather than one: the rows, nothing, or the request failed. The branch that gets missed is nothing, because in a template "no rows yet" and "no rows at all" are the same falsy value, so the loop simply draws no rows and the bars above it keep pulsing at an answer that already arrived. Write the empty branch and the error branch before the loaded one. The error branch is a server question as much as a markup one — a fragment served outside 2xx is not swapped in, so the failure leaves the skeleton exactly where it was. Serve the failure at 200 into the same slot. And give the region a ceiling: past about thirty seconds nothing is coming, and bars still pulsing then are indistinguishable from a hung page, so the region times itself out into the error branch rather than waiting for somebody to reload.',
+        'Reaching for a skeleton on a refresh is the mistake: rows that are already rendered get the spinner\'s bg-white/70 scrim over them with the stale figures still legible underneath, and the panel keeps its height through the whole cycle. Appending is not a refresh and is the one arrangement where grey and real content share a screen legitimately — the grey rows sit below the last row anybody has read, in space that was empty, and nothing legible is replaced. Draw exactly the batch size, so the footer moves down once by the height it will end at rather than twice. The same test settles the single-cell case: a column fed by a second system has never held a value in those cells, so the block there is that cell\'s first paint and not a wipe.',
         'Nothing in a skeleton is real, and least of all a control. Never draw a bordered empty input while the values are still coming — it is indistinguishable from a form that is ready, so somebody types into it and the swap eats what they typed. The field is a grey block until the response lands, or the real input is present carrying disabled and the value arrives inside it. The same goes for buttons and links: a block, not a <button>, because a Tab landing on a grey rectangle is a dead end.',
         'Do not draw data-shaped nonsense. A chart skeleton is one flat block at the canvas\'s exact height, never a set of plausible bars — anything shaped like a chart gets read as a chart, and somebody takes a trend off a shape that came out of the markup. Same for a sparkline and a donut. The legend above it is real, because in this system the legend is written in the HTML and is the palette the canvas paints from, so it was never waiting on anything.',
         'aria-busy="true" goes on the container that will hold the real content and survives the swap; aria-hidden="true" goes on the pulse wrapper, so one attribute hides every block inside it; and one sr-only role="status" naming the work sits outside that wrapper, or it is hidden along with the bars and the wait is announced to nobody. Where real labels sit among the blocks the aria-hidden moves down onto the blocks alongside the animation, because hiding the wrapper there would take out the labels too, and those are the only part of the region worth reading while it waits. The container is what is busy, the blocks are what got drawn, and the status is what is said — three jobs, and collapsing any two of them loses one of the three.'
       ],
       anatomy: [
         ['Container', 'The wrapper the loaded content will use — same rounded-xl, same border, same padding — carrying aria-busy="true" while it waits. It is the element the swap replaces the inside of, so the border never appears or disappears on arrival.'],
-        ['Pulse wrapper', 'One div carrying animate-pulse motion-reduce:animate-none and aria-hidden="true". Every block is inside it, so they fade in phase and one attribute hides the lot. Where drawn labels are interleaved with the blocks there is no such wrapper and both classes go on each block.'],
+        ['Pulse wrapper', 'One div carrying animate-pulse motion-reduce:animate-none and aria-hidden="true". Every block is inside it, so they fade in phase and one attribute hides the lot. Where drawn labels or real cells are interleaved with the blocks there is no such wrapper and both classes go on each block.'],
         ['Line box', 'flex h-5 items-center — a box exactly one line of the real text tall, holding the bar centred. h-4 for text-[12px]/4, h-5 for text-[13px]/5, h-6 for prose at /6 and for a 16px title, h-7 for a 24px figure.'],
         ['Bar', 'The block itself: h-2.5 w-full rounded bg-zinc-200 for a line of text, h-2 for a caption or an 11px label, h-4 for a display figure. No ring, and the radius is the radius of what it stands in for.'],
-        ['Shape block', 'A block standing in for something that is not text — size-8 rounded-full for an avatar, h-5 w-16 rounded-full for a status pill, h-9 rounded-lg for an input or a button, h-64 rounded-lg for a chart canvas.'],
+        ['Shape block', 'A block standing in for something that is not text — size-8 rounded-full for an avatar, h-5 w-16 rounded-full for a status pill, h-[38px] rounded-lg for a form control, h-9 rounded-lg for a button, h-64 rounded-lg for a chart canvas.'],
         ['Repeated unit', 'The row, the tile or the list item, written out as many times as the answer will have. Inside a real <table> where the loaded content is a table, so the same layout algorithm sets the same column widths.'],
         ['Known content', 'The parts drawn for real through the wait — table headers, tile labels, the record number, the page title. Not part of the skeleton and not inside the pulse wrapper.'],
+        ['Delay gate', 'On a skeleton the client raises rather than one the server sent: opacity-0 on the block wrapper, picking up opacity-100 delay-500 only while the request is in flight, so a cached answer never paints one. The box is held from the first frame regardless, and the wrapper is pointer-events-none because it lies over the content it resolves into.'],
+        ['Resolution', 'What replaces the blocks: the rows, the empty state, or the error state — all three at the height the skeleton drew, held by one min-height on the box they share.'],
         ['Status line', 'One sr-only role="status" saying what is loading, outside the aria-hidden wrapper and in the document before the swap, so the arrival can be announced in the same region.']
       ],
       behaviour: [
@@ -4311,23 +9265,30 @@ register(
         'It pulses in phase from one wrapper, and stops pulsing under prefers-reduced-motion — where it is still a correct picture of what is coming, which is why it may stop and a spinner may not.',
         'What the page already knows stays drawn the whole time: headers, labels, the record number. Only what the query returns is grey.',
         'It is the first frame of an empty region. Content already on screen is covered by a scrim instead, so nobody loses a row they were reading to a wall of grey.',
-        'It restacks exactly where the loaded layout restacks. If the table becomes cards below md, the skeleton becomes card-shaped skeletons at the same breakpoint, or the phone gets a promise the tablet keeps.',
-        'It resolves. Content replaces it, or the error variant of empty-state replaces it at the same height. Bars still pulsing at forty seconds are indistinguishable from a hung page.',
+        'Raised by a click rather than by the server, it waits 500ms before it paints, so an answer that comes back from a cache never flashes a panel of grey on the way past.',
+        'Appended below rows already on screen, it draws exactly the batch that was asked for, so the footer under it moves once and lands where it will stay.',
+        'It restacks exactly where the loaded layout restacks. If the table becomes cards below md, the skeleton becomes card-shaped skeletons at the same breakpoint, or the phone gets a promise the tablet keeps. The count restacks with it: five rows on the desktop and three on the phone is two different promises made by one query.',
+        'It resolves three ways — the rows, nothing, or the request failed — and all three come back at the height it drew. It also resolves on its own: a region that has waited past its ceiling shows the error state rather than pulsing indefinitely.',
         'Nothing in it answers a pointer or a key. There is no hover, no focus, no control and no link — the region is inert in fact, not only in appearance.'
       ],
       a11y: [
         'aria-busy="true" sits on the container that is waiting, not on a block. The container is the region whose content is in flight; the bars are only what got drawn in the meantime.',
         'The pulse wrapper takes aria-hidden="true", which hides every block under it with one attribute. Read out, a skeleton is a wall of empty groups with nothing in them, and the count is the only thing it would communicate.',
+        'Where the container that is busy and the wrapper that is hidden are forced onto one element — a <tbody> that is itself the swap target — the two attributes cannot share it, because aria-hidden takes the busy state out of the tree along with the bars. aria-busy stays on the element and aria-hidden moves down onto the rows.',
+        'On a deferred load with no client state there is nothing left to turn aria-busy off, so it goes on the element the swap removes rather than on the frame around it. The attribute leaves with the skeleton and the replacement never carried one.',
         'One sr-only role="status" names the work — "Loading the order register", not "Loading" — and it lives outside the aria-hidden wrapper, or it is hidden with the bars and the wait is announced to nobody.',
-        'That status region is in the document before the swap and survives it, exactly as the spinner\'s is: a live region that arrives with its message already inside it never changed, so nothing is said. Swap the rows under it, not the panel around it, and the same region can announce the arrival.',
+        'That status region is in the document before the swap and survives it, exactly as the spinner\'s is: a live region that arrives with its message already inside it never changed, so nothing is said. Swap the rows under it, not the panel around it, and the same region can announce the arrival — with htmx that is an hx-swap-oob update of the region from the same response.',
+        'The announcement names the outcome and not only the fact that something happened: how many rows arrived, that there were none, or that the load failed. All three end the same wait and a screen reader user cannot see which of them the panel settled into.',
+        'A skeleton behind a delay floor gives the live region its own timer. x-text fires the moment the flag flips, so without one a request that answered in 90ms and never painted a block is still announced as a wait.',
         'Nothing in the skeleton is focusable. No tabindex, no <button>, no <a> — Tab during the wait runs past the region to the next real control instead of stopping on a grey rectangle with no name.',
+        'A control that stays on screen through the wait — Load more, Retry — is never given the disabled attribute to hold it shut. Browsers drop focus from a disabled element to the body, so disabling the button somebody just pressed sends their next Tab back to the top of the page. aria-disabled says the same thing and the handler refuses the second press.',
         'The real content replaces the skeleton inside the same container, so focus that was outside the region is undisturbed and the page does not scroll itself while somebody is reading.',
         'Where the loaded content is a table, the skeleton is a real table with the real <thead> and its scope="col" headers, so the column structure is announced correctly the moment the cells land and no header is rebuilt by the swap.',
         'The animation carries motion-reduce:animate-none on every element that pulses. A large region breathing at 2s is exactly the motion the preference was written for, and the layout it draws is the signal, not the movement.'
       ],
       related: ['spinner', 'empty-state', 'progress'],
       variants: [
-        { id: 'text', name: 'Text lines', code:
+      { id: 'text', name: 'Text lines', code:
 `<!-- The claim the whole component rests on, made checkable: toggle it and
      nothing below the card moves. The skeleton is four line boxes at h-6 and
      the paragraph is four lines of text-[14px]/6, so both are 96px, and the
@@ -4339,15 +9300,25 @@ register(
      h-6 is the leading already written in text-[14px]/6, so the two cannot
      drift apart; a margin picked by eye is right for one type size only.
 
+     The loaded paragraph carries line-clamp-4, and that is what makes four the
+     right number at every width rather than at one. Free prose has no line
+     count: this note is four lines in the card and six at 390px, so a skeleton
+     drawn for the card is two lines short on a phone — the defect the component
+     exists to prevent, arriving through the one dimension nobody measures.
+     Either the loaded text is bounded, as it is here, or the count is a guess
+     and the skeleton is only promising the line box.
+
      The last bar is short. Real paragraphs end mid-line, and four bars at
      w-full is a picture of a table rather than of prose. The widths are written
      into the markup and never generated: a width from Math.random changes
      between two paints of the same wait.
 
-     aria-busy on the card, aria-hidden on the pulse wrapper, and the sr-only
-     status outside that wrapper — inside it, it would be hidden along with the
-     bars and the wait would be announced to nobody. -->
-<div data-kui="skeleton/text" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5" x-data="{ loaded: false }" :aria-busy="!loaded">
+     aria-busy is written on the card as an attribute as well as a binding, so
+     the region is busy in the frame before Alpine boots. aria-hidden goes on
+     the pulse wrapper, and the sr-only status outside that wrapper — inside it,
+     it would be hidden along with the bars and the wait would be announced to
+     nobody. -->
+<div data-kui="skeleton/text" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5" x-data="{ loaded: false }" aria-busy="true" :aria-busy="!loaded">
   <h3 class="text-[13px]/5 font-medium">Vendor note · Sharma Extrusions</h3>
 
   <div class="mt-3">
@@ -4360,7 +9331,7 @@ register(
       <div class="flex h-6 items-center"><div class="h-2.5 w-2/5 rounded bg-zinc-200"></div></div>
     </div>
 
-    <p x-show="loaded" x-cloak class="text-[14px]/6 text-zinc-600">Rates hold to 31 Mar 2027 and are quoted ex-works Nashik. Freight is billed at actuals against the transporter's receipt and does not carry the contract discount. Any revision needs a signed amendment.</p>
+    <p x-show="loaded" x-cloak class="line-clamp-4 text-[14px]/6 text-zinc-600">Rates hold to 31 Mar 2027 and are quoted ex-works Nashik. Freight is billed at actuals against the transporter's receipt and does not carry the contract discount. Any revision needs a signed amendment countersigned by the buyer before the next order is raised, and the amendment number is printed on every order that follows it.</p>
   </div>
 
   <button type="button" @click="loaded = !loaded"
@@ -4369,10 +9340,11 @@ register(
   </button>
 </div>` },
 
-        { id: 'heading', name: 'Heading and body', code:
+      { id: 'heading', name: 'Heading and body', code:
 `<!-- The same block twice at the same size: the skeleton on the left and what
      it becomes on the right. Read down the two columns and every edge lines up,
-     because each bar is inside a box the height of the line it stands in for.
+     because each bar is inside a box the height of the line it stands in for
+     and the loaded paragraph is clamped to the three lines the skeleton drew.
 
      The ladder, and it is the whole of the sizing rule:
        text-[11px]/4 and text-[12px]/4  ->  h-4 box, h-2 bar
@@ -4380,16 +9352,22 @@ register(
        text-[14px]/6 and text-[16px]/6  ->  h-6 box, h-2.5 and h-3 bar
        text-[20px]/7 and text-[24px]/7  ->  h-7 box, h-3.5 and h-4 bar
      The gaps between blocks are the real mt-* values, copied across unchanged.
-     There is no space-y-* anywhere in a skeleton: the leading is already inside
-     the boxes, and adding a gap on top of it is how the two columns stop
-     matching.
+     No space-y-* between the bars of one paragraph: the leading is already
+     inside the boxes and a gap on top of it is a second source of vertical
+     rhythm, which is exactly how the two columns stop matching. Between whole
+     rows the opposite holds — copy whatever gap the loaded list uses, because
+     that one is part of the layout being promised.
 
      Blocks are bg-zinc-200 with no ring. zinc-100 is a surface — the page, a
      selected row, a table header — so a zinc-100 bar on white is one step from
      invisible. The ring every other tinted shape carries is left off on
      purpose: a ring draws an edge, and twelve edged bars in a column read as
-     twelve empty inputs rather than as text. -->
-<div data-kui="skeleton/heading" class="grid gap-4 sm:grid-cols-2">
+     twelve empty inputs rather than as text.
+
+     max-w-2xl on the grid is not decoration. Without a bound on the column the
+     paragraph reflows to two lines on a wide screen and the clamp has nothing
+     to clamp, which puts the two cards 20px apart again. -->
+<div data-kui="skeleton/heading" class="grid max-w-2xl gap-4 sm:grid-cols-2">
 
   <div class="rounded-xl border border-zinc-300 bg-white p-5" aria-busy="true">
     <p role="status" class="sr-only">Loading the receipt summary</p>
@@ -4411,7 +9389,7 @@ register(
   <div class="rounded-xl border border-zinc-300 bg-white p-5">
     <h3 class="text-[16px]/6 font-semibold tabular-nums">GRN-26-0442</h3>
     <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Posted 16 Aug 2026 · Ritu Deshpande</p>
-    <p class="mt-4 text-[13px]/5 text-zinc-600">Short receipt of 600 kg against PO-24-1187. Two bags opened at the gate and 48 kg written off to the debit note.</p>
+    <p class="mt-4 line-clamp-3 text-[13px]/5 text-zinc-600">Short receipt of 600 kg against PO-24-1187. Two bags were opened at the gate for a moisture check and 48 kg was written off to the debit note; the balance went to bin B-14 the same evening and is available against the next indent.</p>
     <div class="mt-4 flex items-center gap-2 border-t border-zinc-100 pt-3">
       <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
         <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
@@ -4421,7 +9399,7 @@ register(
   </div>
 </div>` },
 
-        { id: 'table', name: 'Table rows', code:
+      { id: 'table', name: 'Table rows', code:
 `<!-- A real table, with the real thead. The header text is not waiting on
      anything — it comes from the column definition — so it is drawn for real,
      and drawing it does two jobs at once: somebody can decide which column they
@@ -4444,8 +9422,9 @@ register(
      text-[12px]/4. The radius of a block is the radius of what it replaces.
 
      Below md the loaded table restacks into cards, so the skeleton restacks at
-     the same breakpoint. A skeleton that keeps its columns on a phone is a
-     promise the table does not keep. -->
+     the same breakpoint, and it restacks with the same count. Five rows on the
+     desktop and three on the phone is one query making two different promises,
+     and the phone is where the difference costs a whole screen of scroll. -->
 <div data-kui="skeleton/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <p role="status" class="sr-only">Loading the order register</p>
 
@@ -4532,10 +9511,241 @@ register(
         <div class="h-2 w-20 rounded bg-zinc-200"></div>
       </div>
     </li>
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-14 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
   </ul>
 </div>` },
 
-        { id: 'card', name: 'Card', code:
+      { id: 'dense', name: 'The dense register at 32px a row', tagNew: true, code:
+`<!-- Density is part of the layout being promised, and it is the part most
+     often left behind. The comfortable table is px-4 py-2.5 and its row is
+     40px; table/dense is px-3 py-1.5 and its row is 32px. Copy the comfortable
+     skeleton over a dense register and every row is 8px tall, which across the
+     25 rows a dense register is for is 200px — half a screen of the page below
+     it stepping up when the data lands.
+
+     The bar does not shrink with the padding. It is still h-2.5 in a flex h-5
+     box, because a dense table is dense in its padding and not in its type:
+     table/dense is text-[13px]/5 exactly like the comfortable one. Drop the bar
+     to h-2 and the skeleton says the type got smaller, which is a promise the
+     rows arrive to break.
+
+     Six rows here because six is what a documentation page can show. The number
+     you copy is your page size — a dense register exists to put 25 or 50 rows
+     on a screen, and it should draw 25 or 50.
+
+     The phone gets the same six as cards at the same breakpoint the loaded
+     table restacks at, at px-3 py-2 for the same reason the desktop row is
+     px-3: the density travels. -->
+<div data-kui="skeleton/dense" class="overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
+  <p role="status" class="sr-only">Loading the order register</p>
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-1.5 font-medium">PO number</th>
+        <th scope="col" class="px-3 py-1.5 font-medium">Vendor</th>
+        <th scope="col" class="px-3 py-1.5 font-medium">Dept</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Amount</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Due</th>
+      </tr>
+    </thead>
+    <tbody class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-32 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none md:hidden" aria-hidden="true">
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+    </li>
+  </ul>
+</div>` },
+
+      { id: 'cell', name: 'One column still answering', tagNew: true, code:
+`<!-- The rows are real and one column is not. Ordered quantity comes out of the
+     order; stock at the plant comes from a second system, one line at a time,
+     and arrives whenever it arrives.
+
+     This is not the case the rules forbid. Greying rows somebody is reading
+     deletes values they can see, and that is the spinner's scrim. These cells
+     have never held a value, so the block is that cell's first paint, and the
+     test is exactly that: is anything legible being replaced. Nothing here is.
+
+     aria-busy is on the <td> and not on the table. The table is not busy —
+     three of its cells are, and the rest are finished and should be read as
+     finished. A busy attribute on the table tells a screen reader the whole
+     register is in flight, and the eleven cells that already answered stop
+     counting.
+
+     The bar is w-16 and ml-auto: about the width of "3,240 kg", right-aligned
+     in the right-aligned column. Wider than the widest answer and the column
+     holds a width nothing needs for the length of the wait, then snaps narrower
+     when the figures land — the same reflow this component exists to prevent,
+     arriving one column at a time.
+
+     animate-pulse is on each block rather than on a wrapper, because there is
+     no wrapper that contains only blocks: the rows are real. They stay in phase
+     anyway, because every block was in the first paint. Cells only leave this
+     state and never enter it, so nothing starts an animation late.
+
+     Three columns and no restack. This table wraps at 390px rather than
+     becoming cards, because the point of it is the column, and a column that
+     becomes a card is not one. -->
+<div data-kui="skeleton/cell" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">Order lines · PO-24-1187</h2>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Stock at Nashik is read from the plant system one line at a time.</p>
+  </div>
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">Item</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Ordered</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">At Nashik</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5">PP copolymer, 1100 MFI</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">12,000 kg</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">3,240 kg</td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5">Masterbatch, black 2%</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">800 kg</td>
+        <td class="px-4 py-2.5" aria-busy="true">
+          <div class="flex h-5 items-center" aria-hidden="true">
+            <div class="ml-auto h-2.5 w-16 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div>
+          </div>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5">HDPE blow moulding grade</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">6,500 kg</td>
+        <td class="px-4 py-2.5" aria-busy="true">
+          <div class="flex h-5 items-center" aria-hidden="true">
+            <div class="ml-auto h-2.5 w-16 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-4 py-2.5">Calcium carbonate filler</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">2,400 kg</td>
+        <td class="px-4 py-2.5" aria-busy="true">
+          <div class="flex h-5 items-center" aria-hidden="true">
+            <div class="ml-auto h-2.5 w-16 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p role="status" class="sr-only">Stock at Nashik is still loading for 3 of 4 lines</p>
+</div>` },
+
+      { id: 'card', name: 'Card', code:
 `<!-- The card's own frame is drawn for real and only its contents are grey. The
      border, the radius, the padding and the divider are structure the page
      already has, so wrapping a skeleton in a plainer box and swapping the whole
@@ -4588,7 +9798,7 @@ register(
   </div>
 </div>` },
 
-        { id: 'stats', name: 'Stat tiles', code:
+      { id: 'stats', name: 'Stat tiles', code:
 `<!-- Four tiles in the dashboard's own grid, at the dashboard's own gap, and the
      labels are real text. The labels come from the dashboard definition and not
      from the query, so they were never waiting: greying them makes the strip
@@ -4598,9 +9808,11 @@ register(
 
      Each tile is the loaded tile's geometry, mt-* for mt-*: an 11px uppercase
      label, then mt-1.5 and an h-4 bar in an h-7 box for the text-[24px]/7
-     figure, then mt-1.5 and an h-2 bar in an h-4 box for the delta line. Tile
-     height is identical loaded and loading, which is what stops the whole page
-     below the strip stepping down on arrival.
+     figure, then mt-2 and an h-2 bar in an h-4 box for the delta line. Those
+     two margins are not the same and neither is a rounding of the other —
+     stat-card writes mt-1.5 above the figure and mt-2 above the delta, and
+     using mt-1.5 for both leaves every tile 2px short and the whole strip 2px
+     up from where it will settle.
 
      Figure widths differ across the tiles because the figures do — a count and
      a rupee value are not the same width, and four identical bars read as a
@@ -4616,7 +9828,7 @@ register(
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open orders</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-16 rounded bg-zinc-200"></div></div>
-      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
     </div>
   </div>
 
@@ -4624,7 +9836,7 @@ register(
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open value</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-40 rounded bg-zinc-200"></div></div>
-      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
     </div>
   </div>
 
@@ -4632,7 +9844,7 @@ register(
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-36 rounded bg-zinc-200"></div></div>
-      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-28 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-4 items-center"><div class="h-2 w-28 rounded bg-zinc-200"></div></div>
     </div>
   </div>
 
@@ -4640,12 +9852,12 @@ register(
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Awaiting approval</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-12 rounded bg-zinc-200"></div></div>
-      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-24 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-4 items-center"><div class="h-2 w-24 rounded bg-zinc-200"></div></div>
     </div>
   </div>
 </div>` },
 
-        { id: 'list', name: 'List with markers', code:
+      { id: 'list', name: 'List with markers', code:
 `<!-- The marker column is the thing to get right. Marks are a column of their
      own and the eye reads down them, so a skeleton whose avatars are a
      different size from the real ones moves every line of text sideways when
@@ -4659,8 +9871,17 @@ register(
      drawing it in zinc-300 rather than a status colour says the state is not
      known yet without claiming one.
 
-     Rows are py-3 on a 40px content block, so a row is 64px loading and 64px
-     loaded, and five of them is the page size the list asked for. -->
+     A row is py-3 on a 38px content block — a 20px line, mt-0.5, a 16px second
+     line — so 62px loading and 62px loaded, and five of them is the page size
+     this panel asked for. The avatar is 32px and does not set the height; the
+     text column does, which is why the two lines are the measurement that
+     matters and not the circle beside them.
+
+     The exceptions list below takes space-y-2 between its items, and that is
+     not a contradiction of the no-space-y rule. Bars inside one paragraph never
+     take a gap, because the line boxes already carry the leading. Whole items
+     take whatever gap the loaded list takes, and marker/dot sets its items
+     space-y-2. -->
 <div data-kui="skeleton/list" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[14px]/5 font-semibold">Awaiting your approval</h3>
@@ -4689,6 +9910,22 @@ register(
       <div class="min-w-0 flex-1">
         <div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div>
         <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+      </div>
+      <div class="flex h-5 shrink-0 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="flex items-start gap-3 px-4 py-3">
+      <div class="size-8 shrink-0 rounded-full bg-zinc-200"></div>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      </div>
+      <div class="flex h-5 shrink-0 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="flex items-start gap-3 px-4 py-3">
+      <div class="size-8 shrink-0 rounded-full bg-zinc-200"></div>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-32 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
       </div>
       <div class="flex h-5 shrink-0 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div>
     </li>
@@ -4721,7 +9958,7 @@ register(
   </ul>
 </div>` },
 
-        { id: 'form', name: 'Edit form loading its values', code:
+      { id: 'form', name: 'Edit form loading its values', code:
 `<!-- The only form worth a skeleton is one whose values are still coming. A
      create form has nothing to wait for and should be rendered.
 
@@ -4733,21 +9970,31 @@ register(
      arriving inside it — what is not allowed is the appearance of a control
      that is not one yet.
 
-     The labels are drawn for real, and they are real <label> elements rather
-     than bars. Field names are not data; greying them leaves a page of
-     unlabelled grey slots that cannot be read at all while it loads, and moves
-     the label text sideways when it arrives.
+     The control block is h-[38px] and not h-9, and the difference is the point
+     of this entry rather than a rounding. A field is py-2 on a 20px line box,
+     which is 36px, inside a wrapper carrying a 1px border top and bottom. Five
+     fields at h-9 leave the card 10px short and the footer buttons move up
+     under a cursor already on its way to Save. The textarea block is h-[78px]
+     by the same arithmetic: three rows of 20px, py-2, two borders.
+
+     The labels are drawn for real, they are real <label> elements rather than
+     bars, and they carry the field entry's classes exactly — text-[13px]/5
+     font-medium with no colour class, because a label drawn zinc-600 that lands
+     zinc-900 changes colour on arrival for no reason anybody can name. They
+     carry no for attribute: the swap replaces the whole field and the label
+     arrives already bound to its input, whereas a for written now points at
+     nothing for the length of the wait, which is a broken association rather
+     than a head start.
 
      Because the labels are interleaved with the blocks there is no single pulse
      wrapper here — animate-pulse motion-reduce:animate-none and aria-hidden go
      on each block. They all start in the same paint, so they stay in step, and
      a label that is not loading has no business pulsing.
 
-     Control blocks are h-9 rounded-lg, the input entry's height and radius. The
-     textarea block is h-24, three rows plus its padding. The footer buttons are
-     h-9 rounded-lg blocks in the real footer, on the real border. Nothing here
-     is focusable, so a Tab during the wait leaves the form entirely rather than
-     stopping on a rectangle with no accessible name. -->
+     The footer buttons are h-9 rounded-lg blocks, which is the button height
+     and not the field height, in the real footer on the real border. Nothing
+     here is focusable, so a Tab during the wait leaves the form entirely rather
+     than stopping on a rectangle with no accessible name. -->
 <div data-kui="skeleton/form" class="max-w-2xl rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <div class="border-b border-zinc-200 px-5 py-4">
     <h2 class="text-[16px]/6 font-semibold">Edit purchase order</h2>
@@ -4757,24 +10004,24 @@ register(
   <div class="p-5">
     <div class="grid gap-4 sm:grid-cols-2">
       <div>
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Vendor</label>
-        <div class="h-9 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+        <div class="h-[38px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
       </div>
       <div>
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Plant</label>
-        <div class="h-9 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Plant</label>
+        <div class="h-[38px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
       </div>
       <div>
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Order date</label>
-        <div class="h-9 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Order date</label>
+        <div class="h-[38px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
       </div>
       <div>
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Delivery date</label>
-        <div class="h-9 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Delivery date</label>
+        <div class="h-[38px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
       </div>
       <div class="sm:col-span-2">
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Delivery address</label>
-        <div class="h-24 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Delivery address</label>
+        <div class="h-[78px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
         <div class="mt-1.5 flex h-4 items-center" aria-hidden="true"><div class="h-2 w-48 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div></div>
       </div>
     </div>
@@ -4786,7 +10033,7 @@ register(
   </div>
 </div>` },
 
-        { id: 'chart', name: 'Chart panel', code:
+      { id: 'chart', name: 'Chart panel', code:
 `<!-- One flat block at the canvas's exact height, and no bars.
 
      A skeleton that draws plausible bars or a plausible line is showing data.
@@ -4795,8 +10042,11 @@ register(
      load, because it is silent and it is wrong. The same applies to a donut and
      to a sparkline: flat block, real height, nothing inside it.
 
-     The height is not guessed. The loaded canvas is h-64 inside this card, so
-     the block is h-64, and the card is the same height in both states.
+     The frame is chart/line's frame class for class — p-4 on the card, the
+     title row, mt-3 to the legend, mt-4 to a plot box of h-64 — because
+     chart/line is what lands here. A skeleton drawn in a card of its own shape,
+     with a bordered header band the loaded chart does not have, promises a
+     layout that arrives 30px different and moves everything under it.
 
      The title and the legend are drawn for real. In this system the legend is
      HTML and doubles as the palette the canvas reads its colours out of at
@@ -4807,31 +10057,29 @@ register(
      Nothing here is an svg. A skeleton built out of <template x-for> inside an
      svg does not render at all — the template is parsed in the SVG namespace
      and has no .content — and it would be a fake series if it did. -->
-<div data-kui="skeleton/chart" class="rounded-xl border border-zinc-300 bg-white" aria-busy="true">
-  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
-    <div>
-      <h2 class="text-[16px]/6 font-semibold">Receipts against orders</h2>
-      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Apr 2026 to Aug 2026 · all plants</p>
-    </div>
-    <ul class="flex flex-wrap items-center gap-x-4 gap-y-1">
-      <li class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
-        <span class="size-2 shrink-0 rounded-full bg-zinc-700" aria-hidden="true"></span>Ordered
-      </li>
-      <li class="flex items-center gap-1.5 text-[12px]/4 text-zinc-600">
-        <span class="size-2 shrink-0 rounded-full bg-zinc-400" aria-hidden="true"></span>Received
-      </li>
-    </ul>
+<div data-kui="skeleton/chart" class="rounded-xl border border-zinc-300 bg-white p-4" aria-busy="true">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold">Receipts against orders</h3>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Apr 2026 to Aug 2026 · all plants</p>
   </div>
 
-  <div class="p-4">
-    <p role="status" class="sr-only">Loading the receipts chart</p>
-    <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
-      <div class="h-64 rounded-lg bg-zinc-200"></div>
-    </div>
+  <ul class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5">
+      <span class="size-2 shrink-0 rounded-full bg-zinc-700" aria-hidden="true"></span>Ordered
+    </li>
+    <li class="flex items-center gap-1.5">
+      <span class="size-2 shrink-0 rounded-full bg-zinc-400" aria-hidden="true"></span>Received
+    </li>
+  </ul>
+
+  <p role="status" class="sr-only">Loading the receipts chart</p>
+
+  <div class="mt-4 animate-pulse motion-reduce:animate-none" aria-hidden="true">
+    <div class="h-64 rounded-lg bg-zinc-200"></div>
   </div>
 </div>` },
 
-        { id: 'record', name: 'Purchase order detail loading', code:
+      { id: 'record', name: 'Purchase order detail loading', code:
 `<!-- The assembled case, and the point of it is which parts are grey.
 
      Everything on the record header is drawn for real: the breadcrumbs, the PO
@@ -4917,7 +10165,9 @@ register(
       </div>
 
       <!-- lines. Real thead, four rows because the order has four lines, and
-           the totals row is drawn because the footer is structure. -->
+           the totals row is drawn because the footer is structure. The band is
+           bg-zinc-50 and not bg-zinc-100: zinc-100 is the page fill, and a band
+           of it inside a white card reads as a hole punched through the card. -->
       <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
         <div class="border-b border-zinc-200 px-4 py-3">
           <h2 class="text-[14px]/5 font-semibold">Order lines</h2>
@@ -4995,7 +10245,7 @@ register(
           </li>
         </ul>
 
-        <div class="flex items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
+        <div class="flex items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-2.5">
           <span class="text-[13px]/5 font-medium">Order total</span>
           <div class="flex h-5 items-center" aria-hidden="true">
             <div class="h-2.5 w-24 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div>
@@ -5004,7 +10254,7 @@ register(
       </div>
     </div>
 
-    <!-- the rail. Receipts against this order, four rows of a list that has
+    <!-- the rail. Receipts against this order, three rows of a list that has
          not answered yet. -->
     <div class="space-y-4">
       <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
@@ -5038,7 +10288,7 @@ register(
 
       <div class="rounded-xl border border-zinc-300 bg-white p-4">
         <h2 class="text-[14px]/5 font-semibold">Terms</h2>
-        <div class="animate-pulse mt-3 motion-reduce:animate-none" aria-hidden="true">
+        <div class="mt-3 animate-pulse motion-reduce:animate-none" aria-hidden="true">
           <div class="flex h-5 items-center"><div class="h-2.5 w-full rounded bg-zinc-200"></div></div>
           <div class="flex h-5 items-center"><div class="h-2.5 w-full rounded bg-zinc-200"></div></div>
           <div class="flex h-5 items-center"><div class="h-2.5 w-2/5 rounded bg-zinc-200"></div></div>
@@ -5046,7 +10296,550 @@ register(
       </div>
     </div>
   </div>
-</div>` }
+</div>` },
+
+      { id: 'append', name: 'More rows under rows already read', tagNew: true, code:
+`<!-- The one arrangement where grey blocks and real records share a screen
+     legitimately, and the reason is geometric rather than an exception. The
+     three grey rows sit below the last row anybody has read, in space that was
+     empty a moment ago, so nothing legible is replaced. Put the same bars over
+     the four rows above and you have deleted four records mid-read, which is
+     the case the spinner's scrim exists for.
+
+     Three, because the step is three. Draw a guess and the footer moves twice —
+     down to wherever the guess put it, then back to where the batch actually
+     ended — and the second move happens after the eye has already gone to find
+     the button.
+
+     The rows are pagination/load-more's rows, class for class: px-4 py-2.5, a
+     20px line, mt-0.5, a 16px second line. 58px either way, and the divider
+     above each of them is 1px, so the footer lands exactly 177px lower and
+     stops. The skeleton block carries its own border-t for the divider the
+     loaded list will draw between the fourth row and the fifth, or the footer
+     travels 176px now and 177px on arrival.
+
+     The button is not disabled while the batch is in flight, and that is not an
+     oversight. Browsers drop focus from a disabled element to the body, so
+     disabling the control somebody just pressed sends their next Tab back to
+     the top of the page — mid-request, with no warning. aria-disabled says the
+     same thing, the handler refuses the second press, and focus stays where the
+     user put it.
+
+     The count is a role="status", so the arrival is announced. Rows appended
+     below the fold are silent otherwise: the only other feedback is that the
+     button moved, which is not feedback if you cannot see it. -->
+<div data-kui="skeleton/append" class="max-w-md rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       shown: 4, step: 3, total: 10, busy: false, said: '',
+       get rows() { return Array.from({ length: this.shown }, (_, i) => ({
+         id: 'ENT-26-' + (3140 + i),
+         who: ['Ritu Deshpande', 'Amit Kulkarni', 'Farida Qureshi'][i % 3],
+         what: ['Approved PO-24-1187', 'Posted GRN-26-0442', 'Raised debit note DN-26-0117'][i % 3]
+       })) },
+       more() {
+         if (this.busy || this.shown >= this.total) return;
+         this.busy = true;
+         this.said = 'Loading ' + this.step + ' more entries';
+         setTimeout(() => {
+           this.shown = Math.min(this.shown + this.step, this.total);
+           this.busy = false;
+           this.said = 'Showing ' + this.shown + ' of ' + this.total + ' entries';
+         }, 1400);
+       }
+     }"
+     :aria-busy="busy">
+
+  <ul role="list" class="divide-y divide-zinc-100">
+    <template x-for="r in rows" :key="r.id">
+      <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block" x-text="r.what"></span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500" x-text="r.who + ' · ' + r.id"></span>
+        </span>
+      </li>
+    </template>
+  </ul>
+
+  <ul x-show="busy" x-cloak class="animate-pulse divide-y divide-zinc-100 border-t border-zinc-100 motion-reduce:animate-none" aria-hidden="true">
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <span class="min-w-0 flex-1">
+        <span class="flex h-5 items-center"><span class="h-2.5 w-48 rounded bg-zinc-200"></span></span>
+        <span class="mt-0.5 flex h-4 items-center"><span class="h-2 w-36 rounded bg-zinc-200"></span></span>
+      </span>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <span class="min-w-0 flex-1">
+        <span class="flex h-5 items-center"><span class="h-2.5 w-40 rounded bg-zinc-200"></span></span>
+        <span class="mt-0.5 flex h-4 items-center"><span class="h-2 w-44 rounded bg-zinc-200"></span></span>
+      </span>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <span class="min-w-0 flex-1">
+        <span class="flex h-5 items-center"><span class="h-2.5 w-56 rounded bg-zinc-200"></span></span>
+        <span class="mt-0.5 flex h-4 items-center"><span class="h-2 w-32 rounded bg-zinc-200"></span></span>
+      </span>
+    </li>
+  </ul>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p role="status" class="sr-only" x-text="said"></p>
+    <p class="text-[13px]/5 tabular-nums text-zinc-600"
+       x-text="'Showing ' + shown + ' of ' + total + ' entries'">Showing 4 of 10 entries</p>
+    <button type="button" x-show="shown < total" @click="more()" :aria-disabled="busy"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>Load 3 more
+    </button>
+  </div>
+</div>` },
+
+      { id: 'delayed', name: 'No blocks for a cached answer', tagNew: true, code:
+`<!-- The entry says a skeleton needs no delay floor, and that is about the frame
+     the server sent: the grey is on screen before anybody could have asked for
+     anything, and the panel was deferred because the query is slow. This is the
+     other case. Somebody changes the scope, the switch empties the panel, and
+     what fills it may already be in a cache — so a whole region turns grey at
+     90ms and back at 180ms, which is more disruptive than the wait it was drawn
+     for and reads as a rendering fault rather than as loading.
+
+     It is still a first paint and not a refresh, and the difference is the
+     emptying. August's entries are not the year's entries, so the switch has
+     nothing to keep. A Refresh on the scope already showing does have something
+     to keep, and that one gets the spinner's scrim over figures that stay
+     legible underneath. Skeleton where the region was emptied, scrim where it
+     was not.
+
+     The floor is 500ms, the same number spinner/delayed takes. Two waits on one
+     screen that appear at two different thresholds read as two different
+     mechanisms, and nobody can tell which one a panel is using.
+
+     The floor is on the opacity of the blocks and never on their display. The
+     box is held from the first frame either way — that is what the skeleton is
+     for — so delaying opacity delays only the ink. Delay the box with x-show
+     and the panel grows half a second after the click and moves the buttons out
+     from under the cursor.
+
+     delay-500 is in the bound class and not the base class. Left in the base it
+     delays the fade out too, and the grey lingers over rows that have already
+     landed, which reads as a panel still loading something it has finished
+     drawing.
+
+     The blocks and the rows are stacked in one grid cell, which is what makes
+     them provably the same height rather than approximately: if they were not,
+     the cell would take the taller of the two and the shorter one would sit
+     against a gap you can see. The block layer is pointer-events-none, because
+     it lies invisible over the rows for the whole time they are on screen and
+     would otherwise swallow every click in the panel.
+
+     The announcement gets its own timer. x-text fires the moment the flag
+     flips, so without one a 90ms answer that never painted a block is still
+     announced as a wait. -->
+<div data-kui="skeleton/delayed" class="max-w-md rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       busy: false, late: false, loaded: true, timer: null, done: null,
+       run(ms) {
+         clearTimeout(this.timer); clearTimeout(this.done);
+         this.loaded = false; this.busy = true; this.late = false;
+         this.timer = setTimeout(() => { this.late = this.busy }, 500);
+         this.done = setTimeout(() => {
+           this.busy = false; this.late = false; this.loaded = true;
+           clearTimeout(this.timer);
+         }, ms);
+       }
+     }"
+     :aria-busy="busy">
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Ledger · Sharma Extrusions</h2>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Changing the scope empties the panel. August is cached and answers in 90ms, so it never paints a block; the full year takes 1.6s and does.</p>
+  </div>
+
+  <div class="grid">
+    <div class="col-start-1 row-start-1 animate-pulse divide-y divide-zinc-100 opacity-0 transition-opacity delay-0 duration-150 pointer-events-none motion-reduce:animate-none"
+         :class="busy && 'opacity-100 delay-500'" aria-hidden="true">
+      <div class="flex items-start gap-2.5 px-4 py-2.5">
+        <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <div class="min-w-0 flex-1">
+          <div class="flex h-5 items-center"><div class="h-2.5 w-48 rounded bg-zinc-200"></div></div>
+          <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+        </div>
+      </div>
+      <div class="flex items-start gap-2.5 px-4 py-2.5">
+        <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <div class="min-w-0 flex-1">
+          <div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+          <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+        </div>
+      </div>
+      <div class="flex items-start gap-2.5 px-4 py-2.5">
+        <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <div class="min-w-0 flex-1">
+          <div class="flex h-5 items-center"><div class="h-2.5 w-56 rounded bg-zinc-200"></div></div>
+          <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <ul role="list" x-show="loaded" x-cloak class="col-start-1 row-start-1 divide-y divide-zinc-100">
+      <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block tabular-nums">Invoice SE-26-0881 · ₹18,42,000</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">04 Aug 2026 · against PO-24-1187</span>
+        </span>
+      </li>
+      <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block tabular-nums">Payment RTGS 0042118 · ₹12,00,000</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">12 Aug 2026 · part settlement</span>
+        </span>
+      </li>
+      <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block tabular-nums">Debit note DN-26-0117 · ₹48,000</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026 · short receipt on GRN-26-0442</span>
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-2 border-t border-zinc-200 px-4 py-2.5">
+    <button type="button" @click="run(90)"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">August · cached 90ms</button>
+    <button type="button" @click="run(1600)"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Full year · cold 1.6s</button>
+  </div>
+
+  <p role="status" class="sr-only"
+     x-text="late ? 'Loading the vendor ledger' : loaded ? 'Vendor ledger loaded, 3 entries' : ''"></p>
+</div>` },
+
+      { id: 'states', name: 'Rows, nothing, or the load failed', tagNew: true, code:
+`<!-- A skeleton is a claim that something is coming, and there are three ways it
+     can stop being true. The template that writes only the loaded branch leaves
+     the bars pulsing forever on the other two.
+
+     Nothing is the branch that gets missed, and it is missed for a reason worth
+     naming: in a template "no rows yet" and "no rows at all" are the same falsy
+     value, so the loop draws nothing, the skeleton above it is never removed,
+     and the answer that already arrived is invisible. Write the empty branch
+     first. It also has to say what it means — "No goods receipts against this
+     order" is a fact about the order, where bars still turning say the page is
+     broken, and somebody reloads and posts the receipt a second time.
+
+     Failure is as much a server question as a markup one. A fragment served
+     outside 2xx is not swapped in, so a view that 500s leaves the skeleton
+     exactly where it was: render the failure into the same slot with a 200.
+
+     And the region needs a ceiling. Past about thirty seconds nothing is
+     coming, and pulsing bars at that point are indistinguishable from a hung
+     page with no move left but a reload — which on a form means posting it
+     twice. The timeout here is four seconds so the demonstration is watchable;
+     thirty is the number for a real one.
+
+     All four states are one grid cell at min-h-[294px], which is the height of
+     the five rows the skeleton drew: five at 58px and the four 1px dividers
+     between them. Write 290 and forget the dividers and the two states that
+     have no rows come back four pixels short of the two that do — which is the
+     whole defect of this component, reintroduced by the fix for it. The panel
+     is the same size
+     whichever way it resolves, so nothing below it moves on any of the three
+     outcomes, and that is checkable rather than asserted.
+
+     The status line sits outside all four branches and survives every swap, so
+     what is announced is the change. It names the outcome and not just the
+     fact: how many receipts, or none, or that it failed. All three end the same
+     wait, and nobody listening can see which one it settled into. -->
+<div data-kui="skeleton/states" class="max-w-md"
+     x-data="{
+       state: 'busy', timer: null, ceiling: null,
+       run(outcome, ms) {
+         clearTimeout(this.timer); clearTimeout(this.ceiling);
+         this.state = 'busy';
+         this.ceiling = setTimeout(() => { this.state = 'failed' }, 4000);
+         if (outcome) this.timer = setTimeout(() => {
+           clearTimeout(this.ceiling); this.state = outcome;
+         }, ms || 1200);
+       }
+     }"
+     x-init="run('rows')">
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white" :aria-busy="state === 'busy'">
+    <div class="border-b border-zinc-200 px-4 py-3">
+      <h2 class="text-[14px]/5 font-semibold tabular-nums">Receipts against PO-24-1187</h2>
+    </div>
+
+    <div class="grid min-h-[294px]">
+
+      <div x-show="state === 'busy'" class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none" aria-hidden="true">
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-48 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-56 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-52 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-28 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul role="list" x-show="state === 'rows'" x-cloak class="divide-y divide-zinc-100">
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0442 · 12,000 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026 · Ritu Deshpande</span>
+          </span>
+        </li>
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0451 · 6,500 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">19 Aug 2026 · Amit Kulkarni</span>
+          </span>
+        </li>
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0458 · 800 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">21 Aug 2026 · held for moisture check</span>
+          </span>
+        </li>
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0463 · 2,400 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">24 Aug 2026 · Farida Qureshi</span>
+          </span>
+        </li>
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0470 · 1,100 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">27 Aug 2026 · Amit Kulkarni</span>
+          </span>
+        </li>
+      </ul>
+
+      <div x-show="state === 'empty'" x-cloak class="flex flex-col items-center justify-center px-6 py-8 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="package-open" class="size-5 text-zinc-500"></i>
+        </span>
+        <h3 class="mt-3 text-[16px]/6 font-semibold">No receipts against this order</h3>
+        <p class="mt-1 max-w-xs text-[13px]/5 text-zinc-600">The order is open and nothing has been received yet. Receipts appear here as the gate posts them.</p>
+      </div>
+
+      <div x-show="state === 'failed'" x-cloak class="flex flex-col items-center justify-center px-6 py-8 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="alert-circle" class="size-5 text-red-600"></i>
+        </span>
+        <h3 class="mt-3 text-[16px]/6 font-semibold">The receipt list did not load</h3>
+        <p class="mt-1 max-w-xs text-[13px]/5 text-zinc-600">The request did not answer. Nothing was changed and no receipt was lost — this is the list failing to read, not the records failing to exist.</p>
+        <button type="button" @click="run('rows')"
+                class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-cw" class="size-4"></i>Retry
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only"
+     x-text="state === 'busy' ? 'Loading the receipts for PO-24-1187'
+           : state === 'rows' ? '5 receipts loaded'
+           : state === 'empty' ? 'No receipts against this order'
+           : 'The receipt list did not load'"></p>
+
+  <div class="mt-3 flex flex-wrap gap-2">
+    <button type="button" @click="run('rows')"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium tabular-nums hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Answer with 5</button>
+    <button type="button" @click="run('empty')"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Answer with none</button>
+    <button type="button" @click="run('failed')"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Fail</button>
+    <button type="button" @click="run(null)"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Never answer</button>
+  </div>
+</div>` },
+
+      { id: 'django', name: 'A deferred region, server side', tagNew: true, code:
+`<!-- The transport. A region the first response cannot afford to wait for, sent
+     as a skeleton and swapped by htmx the moment the page loads.
+
+     There is no indicator machinery and no delay floor. The skeleton is what
+     the server rendered into the page and hx-swap="outerHTML" is what removes
+     it — the reason the region was deferred is that the query is slow, so there
+     is nothing to wait to find out. The floor belongs to the delayed variant,
+     where the request starts from a click.
+
+     aria-busy and aria-hidden collide on the swap target, and the resolution is
+     the part worth copying. aria-hidden takes the whole subtree out of the
+     accessibility tree, so an aria-busy sharing the element is never read.
+     aria-busy stays on the container the rows will land in and aria-hidden
+     moves down onto each row, which is the same move the form variant makes for
+     a different reason. That container is also what the swap removes, and that
+     is what clears the busy state: a deferred load has no client state and
+     nothing left to turn an attribute off, so the attribute has to leave with
+     the skeleton.
+
+     All three outcomes are here, because a region that only handles the loaded
+     case pulses forever on the other two. {% empty %} is what makes the empty
+     branch impossible to forget — it is part of the loop rather than a template
+     somebody has to remember exists — and the empty state is the list's single
+     item rather than a second root, because one item saying there are none
+     reads correctly where a list of zero items reads as nothing at all. The
+     failure is not a list, so it comes back as a div with the same id; outerHTML
+     does not care what the element it replaces was.
+
+     status=200 on the failure, and it is not a detail. htmx does not swap a
+     response outside 2xx, so a view that raises leaves the bars turning at a
+     request that finished half a minute ago.
+
+     The status region lives in the card header, outside everything the swap
+     touches, and each fragment updates it with hx-swap-oob — a live region that
+     arrives inside a response with its message already in it never changed, so
+     nothing is said, while the same message swapped out of band into a region
+     that was already on the page is a change and is read. This works because
+     the region is a list. Where the deferred region is a table the swap target
+     is the <tbody>, so the header is not rebuilt, and an out-of-band paragraph
+     cannot ride along in that response: htmx parses a bare tbody inside a
+     <table> and the HTML parser moves any non-table element straight back out
+     of it. Announce that case from an HX-Trigger header instead. -->
+
+     views.py
+         from django.db import DatabaseError
+         from django.shortcuts import get_object_or_404, render
+
+         def order_receipts(request, pk):
+             order = get_object_or_404(Order, pk=pk)
+             try:
+                 receipts = list(order.receipts.select_related('posted_by')
+                                              .order_by('-posted_on'))
+             except DatabaseError:
+                 # 200, not 500. htmx does not swap a response outside 2xx, so a
+                 # 500 here leaves the skeleton on screen pulsing at nothing.
+                 return render(request, 'orders/_receipts_failed.html', {'order': order})
+             return render(request, 'orders/_receipts.html',
+                           {'order': order, 'receipts': receipts})
+
+     urls.py
+         path('orders/<int:pk>/receipts/', views.order_receipts, name='order-receipts'),
+
+{# orders/detail.html #}
+<div data-kui="skeleton/django" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">Receipts against {{ order.number }}</h2>
+    <p id="po-receipts-status" role="status" class="sr-only">Loading the receipts</p>
+  </div>
+
+  <div id="po-receipts" aria-busy="true"
+       hx-get="{% url 'order-receipts' order.pk %}"
+       hx-trigger="load"
+       hx-swap="outerHTML"
+       class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none">
+    <div class="flex items-start gap-2.5 px-4 py-2.5" aria-hidden="true">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-48 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="flex items-start gap-2.5 px-4 py-2.5" aria-hidden="true">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="flex items-start gap-2.5 px-4 py-2.5" aria-hidden="true">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-56 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="flex items-start gap-2.5 px-4 py-2.5" aria-hidden="true">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% comment %} orders/_receipts.html — the whole response and nothing around it, keeping the
+   id so a later request still has a target. No aria-busy: the element that
+   carried it left with the skeleton. {% endcomment %}
+<ul id="po-receipts" role="list" class="divide-y divide-zinc-100">
+  {% for r in receipts %}
+    <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+        <span class="size-1.5 rounded-full {% if r.on_hold %}bg-amber-500{% else %}bg-emerald-600{% endif %}"></span>
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="block tabular-nums">{{ r.number }} · {{ r.quantity|floatformat:"0" }} {{ r.uom }}</span>
+        <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">{{ r.posted_on|date:"d M Y" }} · {{ r.posted_by.get_full_name }}</span>
+      </span>
+    </li>
+  {% empty %}
+    <li class="px-4 py-10 text-center">
+      <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="package-open" class="size-5 text-zinc-500"></i>
+      </span>
+      <span class="mt-3 block text-[14px]/5 font-medium">No receipts against this order</span>
+      <span class="mt-1 block text-[13px]/5 text-zinc-600">The order is open and nothing has been received yet. Receipts appear here as the gate posts them.</span>
+    </li>
+  {% endfor %}
+</ul>
+<p id="po-receipts-status" role="status" class="sr-only" hx-swap-oob="true">{% if receipts %}{{ receipts|length }} receipts loaded{% else %}No receipts against this order{% endif %}</p>
+
+{% comment %} orders/_receipts_failed.html — the same id in the same slot, so the swap
+   always happens and the skeleton always goes away {% endcomment %}
+<div id="po-receipts" class="px-4 py-10 text-center">
+  <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+    <i data-lucide="alert-circle" class="size-5 text-red-600"></i>
+  </span>
+  <p class="mt-3 text-[14px]/5 font-medium">The receipts did not load</p>
+  <p class="mt-1 text-[13px]/5 text-zinc-600">Nothing was changed. The order and its receipts are intact — this is the panel failing to read them.</p>
+  <button type="button"
+          hx-get="{% url 'order-receipts' order.pk %}"
+          hx-target="#po-receipts" hx-swap="outerHTML"
+          class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="rotate-cw" class="size-4"></i>Retry
+  </button>
+</div>
+<p id="po-receipts-status" role="status" class="sr-only" hx-swap-oob="true">The receipts did not load</p>` }
       ]
   },
 
@@ -5061,12 +10854,16 @@ register(
       'A dot sits inside a box the height of one line — flex h-5 items-center for the 20px leading of text-[13px]/5 — and is not pushed down by a margin. A 6px disc on a 20px line wants 7px of offset, 7px is not a step on the scale, and mt-[7px] is correct for exactly one type size and silently wrong the day the list is set at 14px. The box is derived from the leading, and the leading is already written in the class name, so the two cannot drift. An icon marker is the exception and takes size-4 shrink-0 mt-0.5, which is the alert icon exactly and not a coincidence — it is the same mark doing the same job one level down, 16px into a 20px line is 2px of offset, and 2px is a step. Two mechanisms for one alignment reads as an inconsistency, which is why both are written out here rather than reasoned out again per screen.',
       'shrink-0 on the marker box or the first unbroken token in the item — an item code, a GSTIN, a long PO number — compresses the mark instead of wrapping itself, and a 6px dot squeezed to 4px in one row of five is a rendering fault nobody can name. The text column takes min-w-0 for the other half of the same problem: without it truncate never truncates and the row grows past the card.',
       'A number column is fixed-width, text-right and tabular-nums, all three. Proportional figures alone break it — 9 and 11 are different widths in Inter, so the item text starts at two different x positions and the left edge of the list wobbles down the page. The right edge pins the periods, the fixed width pins the text. Do not centre the column: centring splits the difference and moves both edges instead of neither.',
+      'Right-align a flat sequence and left-align a dotted hierarchy, and keep the fixed width in both. 9. and 11. are each read as one integer, so the right edge is where the number ends and pinning it is what lines the periods up. 4.2 and 4.10 are read left to right as a section and a clause inside it, so the left edge is the one that carries the meaning — right-align them and 4.2 hangs further in than 4.10 for a reason no reader can name. Size the column for the widest clause the document can reach rather than the widest one on screen, because the first section that runs past nine sub-clauses spills into the gap.',
       'A painted number belongs to the record or it does not exist. ::marker recounts when a row is removed; a span written by the template does not, so the moment a list is filtered, sorted or paged the painted numbers are either the record\'s own line numbers, which is correct and the reason to paint them, or a stale copy of a position, which is a bug the buyer finds on the phone when their line 5 and yours are different lines. If the number is only the position, delete the column and use list-decimal.',
       'An icon marker is aria-hidden and the state it carries is a sr-only word beside it. A screen reader reading circle-check, circle-check, circle-check down a nine-item checklist is noise, and the list already announces the count — but hiding the icon without putting the word back deletes the only carrier of Failed, so the two go together and neither is optional. This is the alert rule and the badge rule arriving in a list: colour and shape are for the eye, the word is the data.',
       'A coloured mark means the item\'s state and there are only a few of them in any list. The default is zinc-400, and the locked mapping applies unchanged when the item has a status — zinc-500 open, amber-500 waiting, red-600 overdue, emerald-600 done. One red dot in a column of graphite reads across the room; nine coloured dots read as a decorative pattern and the overdue one is no longer findable. Never colour marks to categorise — a blue dot for freight and a green one for material is decoration wearing the status palette, and it burns the colours that were meant to mean something.',
       'A well around a number or a count is a tinted shape and carries its ring: bg-zinc-200 ring-1 ring-inset ring-zinc-300. Give it bg-zinc-100 and it is the identical colour as the page behind it and as a selected row, so it does not read as low contrast, it reads as absent. The one solid well is the current step, bg-zinc-700 text-white, and a solid shape takes no ring — a pale ring round a dark disc looks like a rendering fault.',
       'The connecting rail on a timeline is a flex child of the marker column, not an absolutely positioned line, and it stops at the last item. Positioned absolutely it needs a left offset that has to be kept in step with the width of the mark by hand, and a 1px rail under an even-width column lands on a half pixel; as a flex child the same flexbox that centres the mark centres the rail, with no number to maintain. A single full-height rail on the list instead of one per item is the other failure: it runs past the last mark by the height of the last item\'s text, which is not a height you can hardcode because that item wraps.',
-      'The mark is never the click target and never takes a hover or a focus style. The link is the text of the item, which is a target with a readable name; a 6px disc is 6px of hit area and a screen reader announces it as nothing. A list where the dot is clickable and the label is not is a list that cannot be used from a keyboard.'
+      'The mark is never the click target. A 6px disc is 6px of hit area and a screen reader announces it as nothing, so a list where the dot is clickable and the label is not cannot be used from a keyboard at all. What may be a target is the item — either its text, or the whole row — and the choice between those two is decided by whether the second line is worth hearing. A row link takes everything inside it as its accessible name, so wrapping the row when the meta line reads "Held 11 days · Gujarat Polymers Ltd · 18.5 MT" gives a useful name and wrapping it when the meta line reads "updated 2m ago" gives a name nobody can skim. Either way the mark stays aria-hidden inside the target and takes no hover and no focus style of its own.',
+      'A row that is the target is a SURFACE and hovers one step off the band it crosses — zinc-100 inside a white panel — and it takes the negative focus offset, focus-visible:-outline-offset-2. A full-bleed row inside a card that is overflow-hidden has its left and right edges flush with the clip, so a positive offset draws two thirds of an outline and loses the sides. The rounded corners of the card are the reason the card clips, and the row is not going to stop being full-bleed, so the outline moves inward instead.',
+      'A heading between two groups of items is not a list item. Give each group its own ul carrying role="list" and aria-labelledby at the heading above it, rather than one ul with headings inside it: a heading written as an li is announced as item 1 of 4 and every count in the region is off by one, and a heading dropped between two lis without an li round it is markup the parser moves out of the list entirely. The heading stays full-bleed rather than indented to the text column, because indenting it makes the column of marks look as though it restarts at every group when the whole value of the column is that it does not.',
+      'A run that is still going says so in the mark and never in the rail. The rail is a picture of the entries being one sequence, and colouring the part above the current step turns it into a progress bar with no total written anywhere — by the third of eight steps it reads as 37% of something, which is a figure nobody put there. Done, running and failed are three marks in one column: check-circle-2 emerald-600, loader-circle turning in zinc-500, alert-circle red-600, and circle zinc-400 for the steps not reached. The step count belongs in the heading, in words, where it can be read and quoted.'
     ],
     anatomy: [
       ['List', 'The real ul or ol, carrying role="list" because preflight has already removed list-style and WebKit reads that as "not a list". Ordered content stays an ol even when the numbers are painted by hand.'],
@@ -5075,7 +10872,9 @@ register(
       ['Mark', 'The 6px dot, the size-4 Lucide icon, or the figure. aria-hidden when it is decoration, real text when it is a number people quote. zinc-400 by default, and a status colour only when the item has a status.'],
       ['Content', 'min-w-0 flex-1 so long values truncate rather than pushing the card wide. Everything that can be read or clicked lives here, including the item\'s link.'],
       ['Rail', 'w-px flex-1 bg-zinc-200 below the mark in a flex-col marker column, hidden on the last item with group-last:hidden. It fills the item\'s bottom padding, so the gap between two marks is bridged and the gap after the last one is not.'],
-      ['Well', 'A size-5 disc round a step number or a count: bg-zinc-200 ring-1 ring-inset ring-zinc-300, or solid bg-zinc-700 for the current step. At 20px it is the line box itself, so it needs no box around it and no offset.']
+      ['Well', 'A size-5 disc round a step number or a count: bg-zinc-200 ring-1 ring-inset ring-zinc-300, or solid bg-zinc-700 for the current step. At 20px it is the line box itself, so it needs no box around it and no offset.'],
+      ['Row target', 'The anchor or button that fills the item when the row rather than its text is what you click. It carries the item\'s padding, its hover and its focus outline, and the marker box and the content sit inside it; the li itself keeps no padding of its own, or the target stops short of the edge it looks like it reaches.'],
+      ['Group heading', 'A full-bleed bg-zinc-50 band between two groups, outside the lists and above them, with an id that each group\'s ul points at with aria-labelledby. It is never an li, and it is never indented into the text column.']
     ],
     behaviour: [
       'The mark holds the first line when the item wraps. It is centred inside a fixed one-line box rather than against the item, so a three-line exception and a one-line one start at the same y.',
@@ -5084,7 +10883,8 @@ register(
       'The rail bridges the gap between two marks and stops under the last one. It is per-item and hidden on the last, so adding or removing items needs no measurement anywhere.',
       'At most a couple of marks in a list are coloured. The list runs zinc-400 and the exceptions are the coloured ones — the colour is the answer to "which of these needs me", and it stops being an answer once most of them have it.',
       'Nesting steps the mark down in size and shade, 6px zinc-500 to 4px zinc-300, and the indent comes from padding on the nested list. Widening the child items\' gap instead detaches each child mark from its own text and the second level stops reading as a list at all.',
-      'Nothing here is interactive. The mark takes no hover, no focus and no pointer; the item\'s link is its text.',
+      'Nothing in the marker column is interactive. The mark takes no hover, no focus and no pointer, whether the item around it is plain text, a link on its text, or a row that is a target end to end.',
+      'A group heading does not break the column. The marks run one straight edge from the first item to the last regardless of how many headings sit between them, because the heading is full-bleed and the items keep the same padding on both sides of it.',
       'At 390px the marker column keeps its width and the text wraps under itself, never under the mark. Amounts and dates drop to a second line inside the content column rather than the row scrolling sideways.'
     ],
     a11y: [
@@ -5094,7 +10894,11 @@ register(
       'The state an icon carries is repeated as a sr-only word at the start of the item, so hiding the icon does not delete the only carrier of Failed. Colour is never the sole signal, for the same reason the alert states its severity in words.',
       'A painted number is real text and stays readable, because with list-style already none nothing else will say it and because a step number is what people quote. Chrome will also announce the item\'s position, so the number is heard twice; that is the cheaper of the two mistakes.',
       'The current step in a sequence carries aria-current="step" on the item. Filling its well graphite is the visual half of the same fact and does nothing on its own for anyone who cannot see the fill.',
-      'The item\'s link is the text and carries the accessible name — "PO-24-1187, Sharma Extrusions", not "link". Nothing in the marker column is focusable, so the Tab order runs down the labels with no dead stops in it.'
+      'The item\'s link is the text and carries the accessible name — "PO-24-1187, Sharma Extrusions", not "link". Nothing in the marker column is focusable, so the Tab order runs down the labels with no dead stops in it.',
+      'When the whole row is the target, everything inside the anchor is its accessible name, including the sr-only status word and the meta line. That is the reason to check the meta line before wrapping the row: "Overdue, Lot 26-119, HDPE granules, held 11 days, Gujarat Polymers Ltd" is a name worth hearing, and "Lot 26-119, updated 2m ago" is a name that gets in the way of the next one. A row that is not a target keeps the same padding and the same marker box, so the column reads straight whether or not every row can be opened.',
+      'A control that shows or hides a row carries aria-expanded and aria-controls at that row. Changing the button\'s own label from "Show" to "Hide" is what a sighted user reads and is not a substitute: the label says what pressing will do, never what the list currently holds, so anyone arriving at the button afterwards is told the same sentence in both states.',
+      'Each group in a grouped list is its own ul with role="list" and aria-labelledby at its heading, so the heading names the group and the count belongs to the group rather than to the page. A single list with headings inside it either counts the headings as items or has them lifted out of the list by the parser, and both are silent.',
+      'An entry that failed or is still running is a word before it is a colour. Failed is red-600 to the eye and "Failed — " to a screen reader, running is a turning icon and "Running — ", and the ones not reached carry "Not started — " for the same reason: grey is a colour, and a list that announces four entries and describes two of them has hidden the half that matters.'
     ],
     related: ['badge', 'progress', 'separator'],
     variants: [
@@ -5192,11 +10996,19 @@ register(
      the column moves both edges instead of neither.
 
      x-cloak on the row that starts hidden, or it flashes on every load before
-     Alpine boots. -->
+     Alpine boots.
+
+     The toggle is a disclosure and carries aria-expanded and aria-controls at
+     the li it shows, because the changing label is not a substitute for either:
+     a label reading "Show cancelled line" says what the button will do and
+     nothing about what the list currently holds, so a screen reader user who
+     tabs past it after it has been pressed is told the same sentence in both
+     states. -->
 <div data-kui="marker/numbered" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5" x-data="{ cancelled: false }">
   <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
     <h3 class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · lines</h3>
     <button type="button" @click="cancelled = !cancelled"
+            aria-controls="po-1187-line-30" :aria-expanded="cancelled"
             class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <span x-text="cancelled ? 'Hide cancelled line' : 'Show cancelled line'">Show cancelled line</span>
     </button>
@@ -5213,7 +11025,7 @@ register(
       <span class="min-w-0 flex-1 text-zinc-600">Masterbatch, black, 5% loading</span>
       <span class="shrink-0 tabular-nums text-zinc-600">₹64,500</span>
     </li>
-    <li class="flex items-start gap-3" x-show="cancelled" x-cloak>
+    <li id="po-1187-line-30" class="flex items-start gap-3" x-show="cancelled" x-cloak>
       <span class="w-8 shrink-0 text-right text-[13px]/5 tabular-nums text-zinc-400">30.</span>
       <span class="min-w-0 flex-1 text-zinc-500">Anti-slip additive — cancelled 09 Aug 2026</span>
       <span class="shrink-0 tabular-nums text-zinc-500">₹0</span>
@@ -5226,6 +11038,83 @@ register(
   </ol>
 
   <p class="mt-3 border-t border-zinc-100 pt-3 text-[12px]/4 tabular-nums text-zinc-500">Line numbers are the order's own and do not renumber.</p>
+</div>` },
+
+      { id: 'clauses', name: 'Clause numbers in an annexure', tagNew: true, code:
+`<!-- The other numbering, and it aligns on the opposite edge. A flat sequence
+     is right-aligned because 9. and 11. are each one integer and the right edge
+     is where the number ends, so pinning it lines the periods up. A dotted
+     clause is read left to right as a section and a clause inside it, so its
+     left edge is the part that carries the meaning — right-align 4.2 against
+     4.10 and the shorter clause hangs further in than the longer one, which is
+     a wobble with no cause a reader can name.
+
+     Both columns are still fixed width and still tabular-nums. w-10 holds 4.10
+     rather than the widest number currently on the page: the first section that
+     runs past nine sub-clauses is the one that spills into the gap, and it does
+     it in the annexure that has already been signed.
+
+     The section numbers are left-aligned as well, even though 4. and 5. are a
+     flat run when you look only at them. Both columns are fixed, so the clause
+     text starts at the same x either way and the only thing the alignment moves
+     is the figure itself — and a section number is a reference people scan down
+     the left of, not a quantity they compare. Right-align it and section 4
+     starts a character further in than section 10, which is the one place in an
+     annexure where a reader is counting on a straight edge.
+
+     The sub-list takes no padding of its own. It sits inside the parent's
+     content column, so the parent's own w-6 and gap-2 have already paid for the
+     indent, and a second one costs a phone another 32px of text width for a
+     step the change of column width has already made. That is the difference
+     from the nested variant, where both levels share one column width and the
+     padding is the only thing separating them.
+
+     The numbers are the document's and never the loop's. A supplier quotes
+     clause 5.2 in a letter; a template that counts renumbers every clause below
+     a deleted one, and then 5.2 in the file and 5.2 in the letter are two
+     different sentences with nothing on either screen to say so. -->
+<div data-kui="marker/clauses" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+  <h3 class="text-[13px]/5 font-medium">Annexure B — commercial terms</h3>
+  <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">RC-26-0041 · Gujarat Polymers Ltd · 04 Apr 2026</p>
+
+  <ol role="list" class="mt-4 space-y-4 text-[13px]/5">
+    <li class="flex items-start gap-2">
+      <span class="w-6 shrink-0 tabular-nums text-zinc-500">4.</span>
+      <div class="min-w-0 flex-1">
+        <p class="font-medium">Delivery and freight</p>
+        <ol role="list" class="mt-1.5 space-y-1.5 text-zinc-600">
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">4.1</span>
+            <span class="min-w-0 flex-1">Material is delivered ex-works Nashik. Freight is billed at actuals against the transporter's receipt and does not carry the contract discount.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">4.2</span>
+            <span class="min-w-0 flex-1 tabular-nums">A delivery window of 14 days from the order date applies to any quantity up to 20 MT.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">4.10</span>
+            <span class="min-w-0 flex-1 tabular-nums">Short receipts beyond 2% of the ordered quantity are debited at the contract rate without further intimation.</span>
+          </li>
+        </ol>
+      </div>
+    </li>
+    <li class="flex items-start gap-2">
+      <span class="w-6 shrink-0 tabular-nums text-zinc-500">5.</span>
+      <div class="min-w-0 flex-1">
+        <p class="font-medium">Payment</p>
+        <ol role="list" class="mt-1.5 space-y-1.5 text-zinc-600">
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">5.1</span>
+            <span class="min-w-0 flex-1 tabular-nums">45 days from the date of the goods receipt note, against a tax invoice quoting the order number.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">5.2</span>
+            <span class="min-w-0 flex-1 tabular-nums">Interest of 1% a month runs on any amount held beyond the credit period and is set off against the next invoice.</span>
+          </li>
+        </ol>
+      </div>
+    </li>
+  </ol>
 </div>` },
 
       { id: 'checklist', name: 'Icon checklist', code:
@@ -5245,7 +11134,7 @@ register(
      makes the red one findable. -->
 <div data-kui="marker/checklist" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium">Three-way match — INV-8841</h3>
-  <p class="mt-0.5 text-[12px]/4 text-zinc-500">Nashik Steel Traders · checked 16 Aug 2026, 11:04</p>
+  <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Nashik Steel Traders · checked 16 Aug 2026, 11:04</p>
 
   <ul role="list" class="mt-3 space-y-2 text-[13px]/5 text-zinc-600">
     <li class="flex items-start gap-2.5">
@@ -5301,7 +11190,7 @@ register(
         <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
       </span>
       <div class="min-w-0 flex-1">
-        <p class="text-[13px]/5">GRN-26-0442 posted against the order.</p>
+        <p class="text-[13px]/5 tabular-nums">GRN-26-0442 posted against the order.</p>
         <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026, 11:04 · Ritu Deshpande</p>
       </div>
     </li>
@@ -5331,11 +11220,99 @@ register(
         <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
       </span>
       <div class="min-w-0 flex-1">
-        <p class="text-[13px]/5">Raised against the rate contract dated 04 Apr 2026.</p>
+        <p class="text-[13px]/5 tabular-nums">Raised against the rate contract dated 04 Apr 2026.</p>
         <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">07 Aug 2026, 09:48 · Ritu Deshpande</p>
       </div>
     </li>
   </ul>
+</div>` },
+
+      { id: 'pending', name: 'A run that is still going', tagNew: true, code:
+`<!-- The timeline variant is a history, so every entry has already happened and
+     one dot does for all of them. A run is the other case: some of it is done,
+     one part of it is happening now, one part of it failed, and the rest has
+     not been reached. That is four marks in one column and it is an ol, not a
+     ul — a payment run is ordered and the order is the record, not the layout.
+
+     The rail stays zinc-200 the whole way down. Colouring the part above the
+     current step turns the rail into a progress bar with its total written
+     nowhere: three of eight steps reads as a bar at 37% of something, and steps
+     are not equal lengths, so the figure the eye takes off it is wrong as well
+     as unlabelled. The state is in the mark; the rail only says these entries
+     are one sequence. Step 3 of 5 goes in the heading, in words, where it can
+     be read and quoted.
+
+     Marks come straight off the semantic table — check-circle-2 emerald-600,
+     alert-circle red-600, circle zinc-400 for not reached — and the running one
+     is loader-circle turning in zinc-500, which is the same icon the async
+     button spins. All four are size-4 with mt-0.5, the alert icon's offset, and
+     the rail picks up a mt-1 under them because an icon fills its box where a
+     6px dot floats in the middle of one.
+
+     Every mark is aria-hidden and every entry opens with its state as a word,
+     including the two that have not started: grey is a colour, and a run that
+     announces five steps and describes three has hidden the half a screen
+     reader user is there for. aria-current="step" marks the one in flight.
+
+     There is no live region here. A polled or swapped list needs one on the
+     panel that survives the swap, never on the entries — nine of them each
+     announcing themselves is unusable — and a role="status" rendered by the
+     server with its message already inside it never changed, so it says
+     nothing at all. -->
+<div data-kui="marker/pending" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+  <h3 class="text-[13px]/5 font-medium tabular-nums">Payment run 26-0819 · step 3 of 5</h3>
+  <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Started 11:02 · 118 invoices · ₹1,42,80,000</p>
+
+  <ol role="list" class="mt-3">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="check-circle-2" class="mt-0.5 size-4 text-emerald-600"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5"><span class="sr-only">Done — </span>Invoices selected and locked</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">11:02 · 118 of 131 eligible</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 text-red-600"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="sr-only">Failed — </span>Bank file rejected 2 invoices</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">11:03 · IFSC on Qureshi Metals does not match the account on the vendor master. The other 116 carried on.</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0" aria-current="step">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="loader-circle" class="mt-0.5 size-4 animate-spin text-zinc-500"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 font-medium"><span class="sr-only">Running — </span>Posting to the bank</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Since 11:04 · 74 of 116 sent</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="circle" class="mt-0.5 size-4 text-zinc-400"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 text-zinc-500"><span class="sr-only">Not started — </span>Remittance advice emailed to vendors</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="circle" class="mt-0.5 size-4 text-zinc-400"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 text-zinc-500"><span class="sr-only">Not started — </span>Payment entries posted to the ledger</p>
+      </div>
+    </li>
+  </ol>
 </div>` },
 
       { id: 'register', name: 'Status marks down a register', code:
@@ -5412,6 +11389,165 @@ register(
   </ul>
 </div>` },
 
+      { id: 'rows', name: 'The whole row is the target', tagNew: true, code:
+`<!-- The register puts the link on the title. Here the whole row is the link,
+     which is right when the second line is worth hearing and wrong when it is
+     not: everything inside the anchor becomes its accessible name, so this row
+     announces as "Overdue, Lot 26-119, HDPE granules, held 11 days, Gujarat
+     Polymers Ltd, 18.5 MT" — a name somebody can act on — while the same shape
+     round a title and "updated 2m ago" gives four rows that all end in noise.
+     That is the whole test. It is not about the row being easier to hit.
+
+     The mark still is not the target. It is aria-hidden inside the anchor and
+     takes no hover and no focus of its own; what got bigger is the item, not
+     the dot. The chevron is decoration for the same reason and carries no
+     title.
+
+     The row is a SURFACE, not a shape, so it hovers one step off the band it
+     crosses — zinc-100 inside a white panel — and it takes no rounding of its
+     own. And it takes the negative focus offset. A full-bleed row inside a card
+     that is overflow-hidden has its left and right edges flush with the clip,
+     so focus-visible:outline-offset-2 draws the top and bottom of an outline
+     and loses both sides.
+
+     The padding lives on the anchor, never on the li. On the li the target
+     stops short of the edge it appears to reach, and the 12px strip the pointer
+     lands on at the bottom of each row belongs to nothing.
+
+     The last row is not a link, and it keeps the same padding and the same
+     marker box. A queue where some rows can be opened and some cannot still has
+     to read as one column of marks; shrinking the row that is not a target is
+     how the column develops a kink nobody can explain.
+
+     The titles wrap rather than truncate, which is why items-start earns its
+     place here more than anywhere else in this entry — at 390px every one of
+     these is three lines and the marks stay on the first. -->
+<div data-kui="marker/rows" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium">Lots on QC hold</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 lots · oldest held 11 days</p>
+  </div>
+
+  <ul role="list" class="divide-y divide-zinc-100">
+    <li>
+      <a href="#" class="flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-red-600"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-[13px]/5 font-medium tabular-nums text-zinc-900">Lot 26-119 · HDPE granules, melt flow index outside the band on two of five samples</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Overdue — </span>Held 11 days · Gujarat Polymers Ltd · 18.5 MT</span>
+        </span>
+        <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-[13px]/5 font-medium tabular-nums text-zinc-900">Lot 26-121 · bags torn in transit, 48 kg written off at the gate</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Approved — </span>Retest with the vendor since 18 Aug 2026 · Sharma Extrusions · 22.0 MT</span>
+        </span>
+        <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-[13px]/5 font-medium tabular-nums text-zinc-900">Lot 26-124 · mill certificate not supplied with the consignment</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Held 2 days · Nashik Steel Traders · 6.4 MT</span>
+        </span>
+        <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-3">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 font-medium tabular-nums text-zinc-600">Lot 26-126 · moisture above 0.08% on the composite sample</p>
+        <p class="mt-0.5 flex items-start gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <i data-lucide="lock" class="size-3.5 shrink-0 translate-y-px text-zinc-500" aria-hidden="true"></i>
+          <span>Open — being released by Anil Kulkarni since 11:12</span>
+        </p>
+      </div>
+    </li>
+  </ul>
+</div>` },
+
+      { id: 'grouped', name: 'Groups down one column of marks', tagNew: true, code:
+`<!-- A heading between two groups of items is not a list item. Write it as an
+     li and it is announced as item 1 of 4, so every count in the region is off
+     by one and the group's own count is the one people were reading. Drop it
+     between two lis without an li round it and the parser lifts it out of the
+     list, which fixes the count by deleting the association. The shape that
+     works is the plain one: a real heading, and one ul per group under it,
+     pointing back at the heading with aria-labelledby so the count belongs to
+     the group and the group has a name.
+
+     The heading is full-bleed and recessed — bg-zinc-50, the band a table
+     header takes inside a white surface — rather than indented to the text
+     column. Indenting it makes the column of marks look as though it restarts
+     at every group, and the one thing the column is for is that it does not
+     restart. The marks run one straight edge from the first item to the last
+     regardless of how many bands sit between them.
+
+     Colour is still the exception rather than the sorting. The groups are the
+     due weeks and the dots are what each line is doing, so this week's group
+     holds a red dot and a graphite one; grouping by status and then colouring
+     every dot in a group to match its heading paints the same fact twice and
+     spends the palette on a heading that already says it. -->
+<div data-kui="marker/grouped" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium">Deliveries due</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">7 lines · next three weeks</p>
+  </div>
+
+  <h4 id="due-week-34" class="border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">This week · 24–30 Aug</h4>
+  <ul role="list" aria-labelledby="due-week-34" class="divide-y divide-zinc-100">
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-red-600"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1187 · Sharma Extrusions</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Overdue — </span>Due 12 Aug 2026 · 3,000 kg · part received</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1194 · Gujarat Polymers Ltd</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Due 28 Aug 2026 · 20 MT</p>
+      </div>
+    </li>
+  </ul>
+
+  <h4 id="due-week-35" class="border-y border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Next week · 31 Aug–06 Sep</h4>
+  <ul role="list" aria-labelledby="due-week-35" class="divide-y divide-zinc-100">
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1201 · Qureshi Metals</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Due 02 Sep 2026 · 4.2 MT</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1203 · Deshpande Traders</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Approved — </span>Due 05 Sep 2026 · awaiting the vendor's despatch advice</p>
+      </div>
+    </li>
+  </ul>
+
+  <h4 id="due-week-36" class="border-y border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">07–13 Sep</h4>
+  <ul role="list" aria-labelledby="due-week-36" class="divide-y divide-zinc-100">
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1209 · Konkan Fabricators</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Due 09 Sep 2026 · 120 nos</p>
+      </div>
+    </li>
+  </ul>
+</div>` },
+
       { id: 'nested', name: 'Nested list', code:
 `<!-- The second level steps down in size and shade — 6px zinc-500 to 4px
      zinc-300 — and not in shape. A hollow ring at 6px is a tinted shape under
@@ -5424,10 +11560,12 @@ register(
      it and every child mark floats away from the line it opens, so the second
      level stops looking like a list and starts looking like two columns.
 
-     pl-5 is the parent's 6px mark plus its gap-2.5 rounded to a step, so the
-     child marks hang under the parent's text rather than under its mark. Line
-     the two levels of mark up with each other instead and the nesting is
-     invisible. -->
+     pl-5 is a step in from the parent's text, not from the parent's mark. The
+     nested ul already sits inside the content column, so pl-0 would start the
+     child marks under the first letter of the line above them and the two
+     levels would read as one paragraph with a gap in it; repeating the parent's
+     own indent — its 6px mark plus its gap-2.5, rounded to a step — is what
+     makes the second level visible as a second level. -->
 <div data-kui="marker/nested" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium">Rejections this month</h3>
 
@@ -5483,7 +11621,12 @@ register(
      fill says nothing to anyone who cannot see it. The step numbers stay real
      text: they are what people quote when a run stalls, and with list-style
      already gone nothing else is going to say them. The done steps swap the
-     number for a check and put the word back with sr-only. -->
+     number for a check and put the word back with sr-only.
+
+     The steps below the current one carry the word too. Their only visual
+     signal that they have not happened is zinc-500 text, and grey is a colour
+     — a list that says Done, Done, current step, and then two lines with
+     nothing in front of them reads as three states and announces two. -->
 <div data-kui="marker/steps" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium tabular-nums">Invoice INV-8841 · payment run</h3>
 
@@ -5516,13 +11659,13 @@ register(
     <li class="flex items-start gap-3">
       <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium tabular-nums text-zinc-600 ring-1 ring-inset ring-zinc-300">4</span>
       <div class="min-w-0 flex-1">
-        <p class="text-zinc-500">Released to the payment run</p>
+        <p class="text-zinc-500"><span class="sr-only">Not started — </span>Released to the payment run</p>
       </div>
     </li>
     <li class="flex items-start gap-3">
       <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium tabular-nums text-zinc-600 ring-1 ring-inset ring-zinc-300">5</span>
       <div class="min-w-0 flex-1">
-        <p class="text-zinc-500">Paid, 45 days from GRN</p>
+        <p class="tabular-nums text-zinc-500"><span class="sr-only">Not started — </span>Paid, 45 days from GRN</p>
       </div>
     </li>
   </ol>
@@ -5590,26 +11733,133 @@ register(
       <span class="min-w-0">The lorry receipt number does not match the one quoted on the invoice.</span>
     </li>
   </ul>
-</div>` }
+</div>` },
+
+      { id: 'django', name: 'Marks chosen from the record', tagNew: true, code:
+`<!-- The mark comes off the record's own state field, through one lookup that
+     lives in one place — and it is the lookup the badge already reads. Import
+     it, do not re-declare it: two copies of the mapping is how one screen ends
+     up amber and another green for the same order, and the screen that is wrong
+     is always the one nobody opened during the review.
+
+     # templatetags/ui.py
+     DOT = {
+         'open':     'bg-zinc-500',
+         'approved': 'bg-amber-500',
+         'overdue':  'bg-red-600',
+         'closed':   'bg-emerald-600',
+         'draft':    'bg-zinc-400',
+     }
+
+     @register.filter
+     def status_dot(value):
+         return DOT.get(value, DOT['open'])
+
+     The word beside the dot is get_status_display, so it follows the model's
+     choices and cannot drift from the colour the same field picked. It is
+     sr-only because the due line already tells a sighted reader what they need;
+     delete it and the state of every row is a colour and nothing else.
+
+     There is no empty clause inside the for, and that is deliberate. Django's
+     empty block renders inside the loop, which is inside the ul, so "nothing
+     due" becomes item 1 of a list of 1 and is announced as "list, one item"
+     before the sentence saying the list is empty. The if/else puts it outside
+     the ul, where an empty state belongs.
+
+     The rail is group-last:hidden rather than a forloop.last test. Both are
+     right on a full render and only one of them survives htmx appending the
+     next page: forloop.last was true for the row that used to be last, so that
+     row's rail is gone for good and nothing on the page knows to redraw it.
+     :last-child recomputes itself on every insertion.
+
+     Line numbers are line.line_no and never forloop.counter. A counter
+     renumbers the moment the queryset is filtered or paged, and then the
+     buyer's line 40 and the screen's line 40 are different lines with nothing
+     on either to say so.
+
+     Amounts go through the project's own inr filter, not intcomma. intcomma
+     groups in thousands and prints 1,242,000 where every other figure on the
+     screen reads 12,42,000. -->
+{% load ui %}
+
+{# orders/_due.html #}
+<div data-kui="marker/django" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium">Orders awaiting receipt</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ orders|length }} of {{ total }} · sorted by due date</p>
+  </div>
+
+  {% if orders %}
+    <ul role="list" class="divide-y divide-zinc-100">
+      {% for order in orders %}
+        <li>
+          <a href="{% url 'order-detail' order.pk %}"
+             class="flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full {{ order.status|status_dot }}"></span></span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[13px]/5 font-medium tabular-nums text-zinc-900">{{ order.number }} · {{ order.vendor.name }}</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">{{ order.get_status_display }} — </span>Due {{ order.due_on|date:"d M Y" }} · ₹{{ order.value|inr }}</span>
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="px-4 py-6 text-center text-[13px]/5 text-zinc-500">No orders are awaiting receipt.</p>
+  {% endif %}
+</div>
+
+{# orders/_lines.html — the order's line numbers, so a filter cannot move them #}
+<ol role="list" class="mt-3 max-w-md space-y-2 text-[13px]/5">
+  {% for line in order.lines.all %}
+    <li class="flex items-start gap-3">
+      <span class="w-8 shrink-0 text-right text-[13px]/5 tabular-nums text-zinc-500">{{ line.line_no }}.</span>
+      <span class="min-w-0 flex-1 text-zinc-600">{{ line.description }}</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹{{ line.value|inr }}</span>
+    </li>
+  {% endfor %}
+</ol>
+
+{# orders/_history.html — appended into the ol by htmx, so the rail is CSS #}
+{% for event in events %}
+  <li class="group flex gap-3 pb-4 last:pb-0">
+    <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+      <span class="flex h-5 items-center"><span class="size-1.5 rounded-full {{ event.status|status_dot }}"></span></span>
+      <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+    </span>
+    <div class="min-w-0 flex-1">
+      <p class="text-[13px]/5 tabular-nums">{{ event.summary }}</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ event.at|date:"d M Y, H:i" }} · {{ event.by.get_full_name }}</p>
+    </div>
+  </li>
+{% endfor %}` }
     ]
   },
 
   {
     id: 'spinner', name: 'Spinner', category: 'data',
     description: 'The indeterminate wait. A graphite ring that turns while work of unknown length is in flight, and a line of text that says what the work is.',
-    when: 'Work whose length you cannot predict and whose answer you cannot draw — a report the server is still assembling, a save you are waiting on, a filter that may return four rows or four thousand. It is the wrong answer twice over: if you know the total, a progress bar can say how far along it is, and if you know the layout coming back, a skeleton can hold its shape so the page does not jump. A spinner over a register you have rendered a thousand times is a skeleton nobody wrote.',
+    when: 'Work whose length you cannot predict and whose answer you cannot draw — a report the server is still assembling, a save you are waiting on, a filter that may return four rows or four thousand. It is the wrong answer twice over: if you know the total, a progress bar can say how far along it is, and if you know the layout coming back, a skeleton can hold its shape so the page does not jump. A spinner over a register you have rendered a thousand times is a skeleton nobody wrote. Nothing in this entry draws a rail, and that includes the indeterminate bar ARIA defines: a full-width track under animate-pulse is a value, and a wrong one. Where a denominator arrives partway through the job, the ring hands over to the bar at that moment, and the handover is drawn in progress rather than here.',
     notes: [
       'The ring is borders, not a Lucide icon. Measured: loader-circle is a 2-unit stroke on a 24-unit viewBox, so it paints 1.33px inside size-4 and 3.33px inside size-10 — the same glyph two and a half times heavier — and a size scale built on it thickens as it grows, while a border width is chosen per size. The second reason matters more. An <i data-lucide> is an empty inline element with no box at all until createIcons() has run over it, and a spinner arriving inside an htmx swap is exactly the case that cannot count on that.',
       'The ring is aria-hidden and the words are the announcement. A turning shape resolves to nothing worth reading, so a spinner that is only a shape is a wait nobody was told about. Real text goes in a role="status" beside it — sr-only where the panel already names what is loading, visible where it does not.',
       'aria-label on a role="status" is a name, not content, and a live region announces content. Resolved in the accessibility tree, a role="status" carrying aria-label="Loading orders" and no children comes back as a status named "Loading orders" with nothing inside it: it appears, nothing within it changed, and nothing is said. The same string as a text node comes back as status: Loading orders, which is the part that gets read.',
       'The live region has to be in the document before the text lands, the same way the combobox match count is. A role="status" that arrives inside an htmx fragment with its message already in it never changed. Put the status on the panel that survives the swap and let the fragment replace only the rows under it.',
       'Never motion-reduce:animate-none on a spinner. Measured under prefers-reduced-motion: reduce, animation-name computes to none and the ring stops as a zinc-200 circle with one graphite quarter — a static broken ring that reads as a rendering fault, and the only sign that anything is still happening is gone. A 20px ring turning once a second is not the large-area motion the preference exists for. The accommodation is the label beside it, which is there for everybody.',
+      'What prefers-reduced-motion may change here is the words, not the ring. A label that is sr-only because the panel header already names the work can come forward under motion-reduce:not-sr-only, so somebody who has turned motion down reads the wait instead of only being shown it. That is an addition and not a substitution — the ring turns either way — and a spinner whose label is already visible has nothing to change, which is the usual case and the reason the accommodation is cheap.',
       'Graphite, always. Colour means data state and a wait has no state yet, so a green ring claims success before the server has answered and an amber one raises a warning nobody filed. There is no success spinner and no danger spinner. There is a spinner, and then there is what it resolved into.',
       'Keep the zinc-200 track. It is one step off white and one step off the zinc-100 page, so the circle is visible on both, and it is what makes the graphite quarter read as a position on a ring rather than a stray mark. Three transparent sides leave a bare arc that at 16px looks like a comma somebody typed by accident.',
       'Size and stroke move together: size-4 with border-2, size-5 with border-2, size-8 with border-[3px] — measured 16, 20 and 32px carrying 2, 2 and 3px. border-4 inside size-8 is a ring an eighth of its own diameter and reads as a donut chart rather than a spinner.',
       'The ring is shrink-0 and the label is what wraps. Measured at 390px beside a two-line sentence: a size-8 ring came back 32.0px wide with shrink-0 and 24.5px without it, and a size-4 ring 16.0px against 12.9px. Neither is a smaller spinner — height is untouched, so what you get is an ellipse turning on its long axis. Flex takes width out of whatever will give it, and a circle will.',
       'A spinner never replaces content that is already on screen. Swapping a rendered table for a centred ring throws away the scroll position and the row somebody was reading, and the panel collapses to the height of a ring and a caption, so everything below it jumps up under the cursor. Cover it instead: a bg-white/70 scrim with the ring on top and the rows still legible underneath. Measured across a full idle-busy-idle cycle of the overlay variant, the panel held 218px at every step.',
       'Covering content is not blocking it. A scrim stops the mouse and nothing else — Tab still walks into the stale rows underneath and Enter still fires a row action against data that is being replaced. The content wrapper takes :inert="busy". Verified in Alpine 3.16: inert is on the boolean-attribute list, so a false value removes the attribute rather than writing inert="false", which is a truthy string and would leave the region permanently inert.',
+      'Never disable the control that started the wait. It is the control focus is sitting on, and a browser blurs a disabled element to the body — so the keyboard user who pressed Refresh is now at the top of the document, and the second press that would have run it again goes nowhere. Guard the handler instead: a press while busy returns. That stops the double request without taking the control out of the hands of the person holding it, and it is the rule pagination already states for its pager.',
+      'A live region has to be empty when it enters the document, not merely present. x-text is evaluated during Alpine\'s first pass, so a status bound to a flag that already reads true arrives with its message inside it and announces nothing — the same defect as a role="status" swapped in by htmx with its text already written. Hold the string in its own property, start it empty, and set it in $nextTick, so the first message is a change rather than an initial value.',
+      'Holding the box means both axes. A ring dropped into an h-5 slot stops the row growing taller and does nothing about width, so a right-aligned figure column still jumps sideways when ₹18,42,000 lands where a 16px ring was. In a flowing line, put the ring and the widest string the cell can hold in one grid cell and leave the string invisible. In a table, set the width once on the column header and let every cell inherit it — a per-cell reservation in a table is a width fight with the layout algorithm.',
+      'A wait may say what it is doing without saying how far along it is. A posting run that validates, then matches vendors, then writes to the ledger has three labels and no denominator, and replacing the label inside the status region is worth announcing where a percentage is not: three announcements over six seconds is information, one every two hundred milliseconds is a queue nobody can interrupt. The ring does not restart between phases, because a ring that stops and starts says the work began again.',
+      'Named phases are not stages on a rail. progress draws a segmented run when the steps are a fixed list you can count, and the count is the whole claim it makes; phases are what the server reports as it goes, and an upload with no new vendors skips one of them. Four blocks with one silently skipped is a lie about the shape of the work. So the phases stay a line of text, and the moment a real denominator exists the bar takes over — that handover is progress\'s own variant and not this entry\'s. Nothing here draws a bar, indeterminate or otherwise.',
+      'The way out has to abort the request, not only stop drawing the ring. A Stop that clears the flag leaves the fetch running, and its answer lands two minutes later over whatever the user did next. Abort it — AbortController on fetch, htmx.trigger(el, \'htmx:abort\') on htmx — and then resolve the panel into a state that says it was stopped rather than into the content that never came. Reload is not a way out: on a form it posts the thing twice, which is the defect the whole component exists to keep away from.',
+      'A row can be the region. A bulk approval running down a queue is many units of work, and a ring on every row is the four-rings screen the one-per-region rule warns about. Only the unit actually in flight turns; the ones behind it say Queued in text and the ones ahead of it carry their outcome. One ring on screen, and where it sits is what says how far the run has got.',
       'aria-busy belongs to the region that is waiting, not to the ring. The ring is what is drawn; the panel is what is busy. Alpine preserves only aria-pressed, aria-checked, aria-expanded and aria-selected when they are false, so :aria-busy="false" removes the attribute outright — correct here, because aria-busy defaults to false, but not a thing to assume of any other aria-* binding.',
       'Below about 300ms a spinner is noise. The request answers before the eye has resolved the shape and all anyone sees is a flicker where the number was. Give every spinner a 500ms floor and most of them never paint at all.',
       'The floor is opacity, not x-show. opacity-0 keeps the box, so nothing moves when the ring arrives; display does not, and a spinner that appears 500ms after the click widens the row and takes the button out from under the cursor at exactly the moment somebody is going for a second one.',
@@ -5631,7 +11881,9 @@ register(
       ['Busy region', 'The panel carrying aria-busy="true" while it waits, and :inert="busy" on its content while a scrim covers it.'],
       ['Slot', 'The fixed box the spinner occupies. opacity-0 with the delay in the bound class, never display, so a 500ms floor costs no layout movement.'],
       ['Scrim', 'bg-white/70 over content that stays on screen through a refresh, so the rows underneath read as stale rather than gone.'],
-      ['Escalation', 'The second line that appears past about ten seconds, inside the same status region, saying why this one is slow.']
+      ['Escalation', 'The second line that appears past about ten seconds, inside the same status region, saying why this one is slow.'],
+      ['Phase label', 'The line naming the step the work is on now, replacing the one before it inside the same status region. It says what is happening and deliberately nothing about how much is left.'],
+      ['Way out', 'The button offered past about twenty-five seconds. It aborts the request and resolves the panel into a stopped state with something to do next — a narrower range, a retry — rather than leaving the ring turning.']
     ],
     behaviour: [
       'It is graphite whatever it is waiting for. Colour describes what a record is doing, and a request in flight has not done anything yet.',
@@ -5641,7 +11893,12 @@ register(
       'Content already on screen is covered, not replaced, and the covered content goes inert so the keyboard cannot reach rows that are being swapped out.',
       'One per region. A screen with four rings on it reads as broken rather than busy.',
       'The animation keeps running under prefers-reduced-motion, because stopping it removes the only signal. The label beside it is what carries the state without motion.',
-      'Inside a button, the button\'s own busy state does the work — the ring starts at size-5 and above, where a button\'s size-4 icon slot has run out.'
+      'Inside a button, the button\'s own busy state does the work — the ring starts at size-5 and above, where a button\'s size-4 icon slot has run out.',
+      'The control that started the wait stays enabled and stays focusable. The handler refuses the second press; the disabled attribute would refuse it by taking the control away and sending focus to the body.',
+      'It may change what it says without claiming how far along it is. Phase labels replace each other inside the same status region, and the ring runs through all of them without restarting.',
+      'Past about twenty-five seconds it offers a way out, and taking it aborts the request rather than hiding the ring.',
+      'In a queue only the unit in flight turns. What is behind it is text and what is ahead of it is its outcome.',
+      'It never draws a bar. With no denominator there is nothing to fill, and the moment a denominator exists the work belongs to progress.'
     ],
     a11y: [
       'The ring is aria-hidden="true". It is a shape, and a shape announces nothing worth hearing.',
@@ -5651,9 +11908,14 @@ register(
       'Content under a scrim takes inert, so Tab cannot walk into rows that are about to be replaced and Enter cannot fire an action against them.',
       'The animation is not disabled under prefers-reduced-motion, because a frozen ring is a spinner that has stopped saying anything. The visible or sr-only label is the non-motion signal.',
       'The ten-second escalation is written into the same status region, so the change is announced rather than only rendered.',
-      'Nothing inside a spinner is focusable. A Tab landing on a turning ring is a dead end, and there is no action there to take.'
+      'Nothing inside a spinner is focusable. A Tab landing on a turning ring is a dead end, and there is no action there to take. The way out offered past twenty-five seconds is the exception, and it is a real button beside the ring rather than anything inside it.',
+      'The status region enters the document empty. A message written into it during the same initialisation pass was always there, and a live region reports what changed.',
+      'The control that started the wait keeps its focus. Disabling it blurs to the body and the keyboard user loses their place, so the handler guards the second press instead.',
+      'A control waiting on its own contents — a select still loading its options — carries aria-busy="true" and an aria-describedby pointing at the line that says what it is waiting for, since the ring in its icon slot is aria-hidden and says nothing.',
+      'A phase change is announced and a percentage is not. Four labels across seven seconds is information; a figure repainting every few hundred milliseconds is a live region talking over everything else on the page.',
+      'The way out is a real button with a real name — "Stop waiting" — and pressing it removes it, so focus moves to the line that says what happened, which carries tabindex="-1" for that purpose. A control that disappears under the finger drops focus to the body and leaves a keyboard user at the top of the document with no account of what they just did.'
     ],
-    related: ['skeleton', 'progress', 'button'],
+    related: ['skeleton', 'progress', 'button', 'empty-state', 'pagination'],
     variants: [
       { id: 'default', name: 'The spinner', code:
 `<!-- The whole component. A zinc-200 track with one quarter repainted graphite by
@@ -5735,6 +11997,50 @@ register(
   </div>
 </div>` },
 
+      { id: 'motion', name: 'What reduced motion changes', tagNew: true, code:
+`<!-- A permanently rotating element is a real complaint and motion-reduce owes it
+     an honest answer. The dishonest one is motion-reduce:animate-none, which is
+     forbidden on this component: animation-name computes to none, the ring stops
+     as a zinc-200 circle with one graphite quarter, and a static broken ring is a
+     rendering fault rather than a wait. Whoever set the preference is then the
+     only person on the floor with no signal at all.
+
+     So the ring keeps turning — a 16px ring at one turn a second is not the
+     large-area motion the preference exists for — and what changes is the words.
+     The left panel's label is sr-only, because the heading above it already names
+     the record and a second visible line would say the same thing twice. Under
+     motion-reduce:not-sr-only that label comes forward as text, so a wait that
+     was being carried by a shape is carried by a sentence instead. The margin is
+     on the wrapper and not on the label, because sr-only sets margin:-1px and a
+     mt-1.5 on the same element is two utilities arguing over one property.
+
+     The right panel is the common case and has nothing to change. Its label was
+     always visible, so the accommodation was already made and the two utilities
+     would only add a class list for nothing. Reach for the pair when the label is
+     sr-only, and not otherwise. -->
+<div data-kui="spinner/motion" class="grid gap-4 sm:grid-cols-2">
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4" aria-busy="true">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 class="text-[13px]/5 font-medium">August rate card</h3>
+      <span class="flex h-5 shrink-0 items-center">
+        <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      </span>
+    </div>
+    <div class="motion-reduce:mt-1.5">
+      <p role="status" class="sr-only text-[12px]/4 tabular-nums text-zinc-500 motion-reduce:not-sr-only">Loading 1,240 vendor rates</p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4" aria-busy="true">
+    <h3 class="text-[13px]/5 font-medium">GRN reconciliation</h3>
+    <div class="mt-1.5 flex items-center gap-2.5" role="status">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <span class="text-[12px]/4 tabular-nums text-zinc-500">Matching 418 receipts to 96 orders</span>
+    </div>
+  </div>
+</div>` },
+
       { id: 'panel', name: 'Centred in a panel', code:
 `<!-- A region with nothing in it yet. The box is already the height the loaded
      panel will be, so the rows land without the page shuffling itself — a
@@ -5762,17 +12068,23 @@ register(
 
      Each of the three has its own role="status", because each names a different
      piece of work. One region for the page would have them overwriting each
-     other, and the last one to finish would be the only one ever announced. -->
+     other, and the last one to finish would be the only one ever announced.
+
+     The field's status line is also its description. The ring inside the field
+     is aria-hidden, so without aria-describedby a screen reader on that input
+     hears its label and nothing about the check running against it — the one
+     fact that explains why the field has not answered yet. aria-busy goes on
+     the input for the same reason: the field is what is waiting. -->
 <div data-kui="spinner/inline" class="max-w-md space-y-6 rounded-xl border border-zinc-300 bg-white p-4">
 
   <!-- inside the field's ring, where the input entry puts its icons -->
   <div>
     <label for="sp-gstin" class="mb-1.5 block text-[13px]/5 font-medium">Vendor GSTIN</label>
     <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
-      <input id="sp-gstin" value="27AABCS1429B1ZX" class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 outline-none">
+      <input id="sp-gstin" name="gstin" value="27AABCS1429B1ZX" aria-busy="true" aria-describedby="sp-gstin-wait" class="w-full min-w-0 bg-transparent px-3 py-2 font-mono text-[13px]/5 outline-none">
       <span class="mr-3 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
     </div>
-    <p role="status" class="mt-1.5 text-[12px]/4 text-zinc-500">Checking this GSTIN against the GST portal</p>
+    <p id="sp-gstin-wait" role="status" class="mt-1.5 text-[12px]/4 text-zinc-500">Checking this GSTIN against the GST portal</p>
   </div>
 
   <!-- in a cell, where the figure will be. Right-aligned into the same column
@@ -5798,6 +12110,181 @@ register(
   </div>
 </div>` },
 
+      { id: 'slot', name: 'A ring in a box that cannot move', tagNew: true, code:
+`<!-- Two places where the wait happens inside something that already has a size,
+     and the size is not allowed to change while it waits.
+
+     The filter is the first. Both selects are the same control at two moments,
+     drawn side by side so the point is checkable: the ring sits in the same
+     absolutely positioned box the chevron sits in, so the field is exactly as
+     wide loading as it is loaded and the filter bar does not re-wrap under the
+     cursor when the options land. appearance-none is what removes the browser's
+     own arrow, which would otherwise sit behind the ring. The overlay is
+     pointer-events-none, so a click anywhere across the field still opens the
+     select rather than landing on a decoration.
+
+     The ring in that box is aria-hidden and says nothing, which is why the select
+     carries aria-busy="true" and an aria-describedby onto the line underneath.
+     Without it a screen reader on that field gets its label and no explanation of
+     why it holds one option.
+
+     The total is the second, and it is the harder half. An h-5 slot holds the
+     height and does nothing about width, so a right-aligned figure column still
+     jumps sideways when ₹18,42,000 lands where a 16px ring was. The ring and the
+     widest figure the cell can hold go in one grid cell — same col-start-1
+     row-start-1 the button entry uses to hold a label width — with the figure
+     left invisible, which keeps its box while removing it from the accessibility
+     tree. min-w on the cell would be a guess; the string is the measurement.
+
+     In a real table this reservation belongs on the column header instead. One
+     w-* on the <th> settles the width for every cell at once, and a per-cell
+     grid inside a table is a width fight with the table layout algorithm. -->
+<div data-kui="spinner/slot" class="max-w-md space-y-4">
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <label for="sp-plant" class="mb-1.5 block text-[13px]/5 font-medium">Plant</label>
+    <div class="relative">
+      <select id="sp-plant" name="plant" aria-busy="true" aria-describedby="sp-plant-wait"
+              class="w-full appearance-none rounded-lg border border-zinc-200 bg-white py-2 pr-9 pl-3 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option>All plants</option>
+      </select>
+      <span class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+        <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      </span>
+    </div>
+    <p id="sp-plant-wait" role="status" class="mt-1.5 text-[12px]/4 text-zinc-500">Loading the plant list</p>
+
+    <!-- the same control once the options are in, at the same width -->
+    <label for="sp-plant-done" class="mt-4 mb-1.5 block text-[13px]/5 font-medium">Plant, once the list has arrived</label>
+    <div class="relative">
+      <select id="sp-plant-done" name="plant_done"
+              class="w-full appearance-none rounded-lg border border-zinc-200 bg-white py-2 pr-9 pl-3 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option>All plants</option>
+        <option>Nashik</option>
+        <option>Silvassa</option>
+        <option>Halol</option>
+      </select>
+      <span class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="flex items-center justify-between gap-4 border-b border-zinc-100 px-4 py-2.5">
+      <span class="text-[13px]/5 text-zinc-600">Received value</span>
+      <span class="text-[13px]/5 font-medium tabular-nums">₹12,52,560</span>
+    </div>
+    <div class="flex items-center justify-between gap-4 px-4 py-2.5">
+      <span class="text-[13px]/5 text-zinc-600">Closing stock, revalued</span>
+      <span class="grid">
+        <span class="invisible col-start-1 row-start-1 text-[13px]/5 font-medium tabular-nums">₹18,42,000</span>
+        <span class="col-start-1 row-start-1 flex items-center justify-end">
+          <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+        </span>
+      </span>
+    </div>
+    <p role="status" class="sr-only">Revaluing closing stock at 31 Aug 2026</p>
+  </div>
+</div>` },
+
+      { id: 'queue', name: 'One row in flight, the rest waiting', tagNew: true, code:
+`<!-- A bulk approval running down four orders, and exactly one ring on screen.
+
+     A ring on every queued row is the four-rings page the one-per-region rule
+     warns about: it does not say that four things are loading, it says the screen
+     is broken. Only the unit actually in flight turns. What is behind it says
+     Queued in plain text, what is ahead of it carries its outcome, and where the
+     ring sits is the thing that says how far the run has got — which is the one
+     fact a progress bar over the whole queue would flatten into a percentage.
+
+     There is a denominator here — four orders — and it still does not make this a
+     bar. What is unknown is each posting, and the run is the posting somebody is
+     watching. The count goes in the heading as words.
+
+     The state column is fixed at w-28 and every row keeps it, so nothing shifts
+     as a row moves from Queued to a ring to Approved. Rows are a list rather than
+     a table because at 390px four columns of this would scroll sideways and a
+     queue has no columns worth keeping.
+
+     One role="status" for the whole queue, not one per row. Four regions would
+     announce over each other and only the last would ever be heard. It carries
+     the row that just finished, so the announcement is a fact — "PO-24-1187
+     approved" — rather than the word Loading four times.
+
+     The ring never restarts. It is one animate-spin in one place; the row under
+     it is what changes.
+
+     Approved is marked with the emerald dot and not a Lucide check, because these
+     three states are inserted by x-if after lucide.createIcons() has already run
+     and an <i data-lucide> that arrives later hydrates into nothing. A dot needs
+     no hydration, and it is the same 6px disc the status pills use. The size-4
+     box around it is what keeps the word level with the ring in the row above. -->
+<div data-kui="spinner/queue" class="max-w-lg rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       at: 0,
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '₹18,42,000' },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: '₹4,16,500' },
+         { po: 'PO-24-1203', vendor: 'Nashik Steel Traders', amount: '₹9,07,250' },
+         { po: 'PO-24-1211', vendor: 'Halol Fasteners', amount: '₹1,84,900' }
+       ],
+       said: '', t: null,
+       run() {
+         if (this.t) return;
+         this.at = 0; this.said = '';
+         this.t = setInterval(() => {
+           this.at++;
+           if (this.at >= this.rows.length) { clearInterval(this.t); this.t = null }
+           this.said = this.rows[this.at - 1].po + ' approved';
+         }, 1800);
+       }
+     }"
+     x-init="run()"
+     :aria-busy="t !== null">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
+    <p class="text-[14px]/5 font-semibold tabular-nums">Approving 4 orders</p>
+    <button type="button" @click="run()"
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Run again
+    </button>
+  </div>
+
+  <ul role="list" class="divide-y divide-zinc-100">
+    <template x-for="(r, i) in rows" :key="r.po">
+      <li class="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5" :aria-busy="i === at">
+        <span class="min-w-0 flex-1">
+          <span class="block text-[13px]/5 font-medium tabular-nums" x-text="r.po"></span>
+          <span class="block text-[12px]/4 text-zinc-500" x-text="r.vendor"></span>
+        </span>
+        <span class="text-[13px]/5 tabular-nums" x-text="r.amount"></span>
+        <span class="flex w-28 shrink-0 items-center gap-2">
+          <template x-if="i < at">
+            <span class="flex items-center gap-2">
+              <span class="flex size-4 shrink-0 items-center justify-center" aria-hidden="true">
+                <span class="size-1.5 rounded-full bg-emerald-600"></span>
+              </span>
+              <span class="text-[12px]/4 text-zinc-600">Approved</span>
+            </span>
+          </template>
+          <template x-if="i === at">
+            <span class="flex items-center gap-2">
+              <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+              <span class="text-[12px]/4 text-zinc-600">Posting</span>
+            </span>
+          </template>
+          <template x-if="i > at">
+            <span class="text-[12px]/4 text-zinc-500">Queued</span>
+          </template>
+        </span>
+      </li>
+    </template>
+  </ul>
+
+  <p role="status" class="sr-only" x-text="said"></p>
+</div>` },
+
       { id: 'overlay', name: 'Over content already on screen', code:
 `<!-- A refresh of rows somebody is already reading. Replacing them with a centred
      ring would throw away the scroll position and collapse the panel, so the rows
@@ -5812,18 +12299,42 @@ register(
      aria-busy is on the panel, and the sr-only status is outside the scrim so it
      stays in the document across the whole cycle and reports both ends of it.
 
+     The status carries its own string rather than reading busy, and that string
+     starts empty. x-text runs during Alpine's first pass, so a region bound to a
+     flag that is already true arrives with its message inside it and announces
+     nothing — present is not the same as empty. Setting it in $nextTick makes
+     the first message a change.
+
+     Refresh is not disabled while it runs. It is the control focus is sitting on
+     and a browser blurs a disabled element to the body, so disabling it puts the
+     keyboard user at the top of the document and the press that would have run
+     it again goes nowhere. A run in flight owns the timer and a press while that
+     timer exists returns, which stops the double request and leaves the control
+     under the hand that pressed it.
+
      busy starts true so the scrim is already there at first paint rather than
      appearing over rows somebody has begun reading, and x-init runs the cycle
      once so it resolves. In an application the swap is what clears it. -->
 <div data-kui="spinner/overlay" class="relative overflow-hidden rounded-xl border border-zinc-300 bg-white"
-     x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 2400) } }"
+     x-data="{
+       busy: true, said: '', t: null,
+       run() {
+         if (this.t) return;
+         this.busy = true;
+         this.$nextTick(() => this.said = 'Refreshing the order register');
+         this.t = setTimeout(() => {
+           this.busy = false; this.t = null;
+           this.said = 'Order register updated, 24 orders';
+         }, 2400);
+       }
+     }"
      x-init="run()"
      :aria-busy="busy">
 
   <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
     <p class="text-[14px]/5 font-semibold">Order register</p>
-    <button type="button" @click="run()" :disabled="busy"
-            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 disabled:text-zinc-400">
+    <button type="button" @click="run()"
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Refresh
     </button>
   </div>
@@ -5864,7 +12375,7 @@ register(
     </span>
   </div>
 
-  <p role="status" class="sr-only" x-text="busy ? 'Refreshing the order register' : 'Order register updated'"></p>
+  <p role="status" class="sr-only" x-text="said"></p>
 </div>` },
 
       { id: 'delayed', name: 'The 500ms floor', code:
@@ -5907,9 +12418,9 @@ register(
 
   <div class="mt-3 flex flex-wrap items-center gap-3">
     <button type="button" @click="run(120)"
-            class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">Nashik only</button>
+            class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Nashik only</button>
     <button type="button" @click="run(1600)"
-            class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100">All five plants</button>
+            class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All five plants</button>
 
     <span class="flex items-center gap-2 opacity-0 transition-opacity delay-0 duration-150"
           :class="busy && 'opacity-100 delay-500'">
@@ -5919,6 +12430,75 @@ register(
   </div>
 
   <p role="status" class="sr-only" x-text="late ? 'Recalculating committed value' : ''"></p>
+</div>` },
+
+      { id: 'phases', name: 'A wait that changes what it is doing', tagNew: true, code:
+`<!-- One ring, three labels, and no number anywhere. The posting run validates
+     the file, then matches vendors against the master, then writes to the ledger,
+     and the only thing it can honestly report at any moment is which of those it
+     is on.
+
+     This is not progress/steps wearing different clothes. That variant draws a
+     rail of blocks because the stages are a fixed list you can count and the
+     count is the claim it makes; these come back from the server as it goes, and
+     an upload with no new vendors on it skips the middle one. Three blocks with
+     one silently missing is a lie about the shape of the work, so the phase stays
+     a line of text. The moment the server can say 1,240 of 3,100, the ring hands
+     over to the bar and this component is finished with it.
+
+     The label is replaced inside the one role="status", so what gets announced is
+     the change. Four labels across seven seconds is information — a
+     percentage repainting every two hundred milliseconds under the same region is
+     a queue that arrives minutes behind the work and talks over everything else.
+     said starts empty and is set in $nextTick, because a region initialised with
+     its first string already inside it never changed and is never read.
+
+     The ring is one element across all three phases and is never re-created. A
+     ring that stops and starts between steps says the work began again, which is
+     the one thing a user watching a posting run must not be told.
+
+     The finished line is x-show and not x-if, because it holds a Lucide icon:
+     x-show leaves the <i> in the document for createIcons() to hydrate at load,
+     while x-if inserts it afterwards and it comes up empty. x-cloak keeps it off
+     the first frame. -->
+<div data-kui="spinner/phases" class="max-w-md rounded-xl border border-zinc-300 bg-white p-4"
+     x-data="{
+       steps: ['Validating 214 rows', 'Matching vendors against the master', 'Posting to the purchase ledger'],
+       at: 0, done: false, said: '', t: null,
+       run() {
+         if (this.t) return;
+         this.at = 0; this.done = false; this.said = '';
+         this.$nextTick(() => this.said = this.steps[0]);
+         this.t = setInterval(() => {
+           if (this.at + 1 < this.steps.length) { this.at++; this.said = this.steps[this.at]; return }
+           clearInterval(this.t); this.t = null;
+           this.done = true; this.said = 'Posted. 214 rows written to the purchase ledger.';
+         }, 2200);
+       }
+     }"
+     x-init="run()"
+     :aria-busy="!done">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-3">
+    <h3 class="text-[13px]/5 font-medium">August rate card, Gujarat Polymers Ltd</h3>
+    <button type="button" @click="run()"
+            class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Run again
+    </button>
+  </div>
+
+  <div class="mt-3 flex min-h-10 items-start gap-3">
+    <span x-show="!done" class="mt-0.5 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <span x-show="done" x-cloak class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
+      <i data-lucide="check-circle-2" class="size-4 text-emerald-600"></i>
+    </span>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 tabular-nums text-zinc-600" x-text="done ? 'Posted 214 rows to the purchase ledger' : steps[at]">Validating 214 rows</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500" x-text="done ? 'Finished at 11:07' : 'Started 11:04 · you can leave this page, it keeps running'">Started 11:04 · you can leave this page, it keeps running</p>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="said"></p>
 </div>` },
 
       { id: 'states', name: 'Running, slow, failed', code:
@@ -5932,16 +12512,22 @@ register(
      The failure is not a spinner in a different colour — there is no danger
      spinner. The ring is gone and the error variant of empty-state is what
      stands in its place, at the size the panel already was, because a ring still
-     turning at forty seconds is indistinguishable from a hung page. -->
+     turning at forty seconds is indistinguishable from a hung page.
+
+     All three rings and the error well are size-8, which is what puts the three
+     cards on one line. A ring drawn a size smaller than the icon that replaces
+     it moves the whole column when the panel resolves, and the sizes note gives
+     three sizes rather than four for the same reason: a spinner at size-6 is a
+     fourth weight nobody documented. -->
 <div data-kui="spinner/states" class="grid gap-4 sm:grid-cols-3">
 
   <div class="flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-5 text-center" aria-busy="true">
-    <span class="size-6 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
     <p role="status" class="text-[13px]/5 text-zinc-600">Loading the order register</p>
   </div>
 
   <div class="flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-5 text-center" aria-busy="true">
-    <span class="size-6 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
     <div role="status">
       <p class="text-[13px]/5 text-zinc-600">Loading the order register</p>
       <p class="mt-1 text-[12px]/4 text-zinc-500">Still working. 14 months of receipts is a wide range.</p>
@@ -5953,11 +12539,113 @@ register(
       <i data-lucide="alert-circle" class="size-4 text-red-600"></i>
     </span>
     <p class="mt-1 text-[13px]/5 font-medium">The register did not load</p>
-    <p class="text-[12px]/4 text-zinc-500">Timed out after 30 seconds. Nothing was changed.</p>
-    <button type="button" class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Timed out after 30 seconds. Nothing was changed.</p>
+    <button type="button" class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry
     </button>
   </div>
+</div>` },
+
+      { id: 'stalled', name: 'Too long, and the way out', tagNew: true, code:
+`<!-- The ladder, running in real time. A ring that has turned for forty seconds is
+     indistinguishable from a hung page, and the only move a user has left is a
+     reload — which on a form posts the thing twice. So the wait grows a second
+     line at ten seconds and an escape at twenty-five.
+
+     Both thresholds are the real ones and the request in this demo is written
+     never to land, so the two rungs arrive when they would arrive on a screen.
+     Nothing here counts seconds at the user. A visible timer turns a slow report
+     into something to watch, and the reading changes nothing they can act on.
+
+     The escalation goes inside the one role="status" that was already there, so
+     what is announced is the change. A second region beside it would be a new
+     thing announcing itself while the first still has nothing new to say.
+
+     Stop waiting is the only focusable thing this component ever offers, and it
+     has to do more than clear a flag. A stop that only stops drawing leaves the
+     request running, and its answer lands two minutes later on top of whatever
+     the user did next — abort it: controller.abort() on a fetch,
+     htmx.trigger(el, 'htmx:abort') on an htmx request. Then resolve the panel
+     into a state that says it was stopped and offers a smaller version of the
+     same question, because a user who has waited twenty-five seconds for 14
+     months of receipts wants three of them, not the same request again.
+
+     Pressing Stop removes the button that was pressed, and a browser drops focus
+     from a removed element to the body — so the keyboard user who stopped the
+     report is at the top of the document with no idea what happened. Focus moves
+     to the line that says it, which is tabindex="-1" for exactly that reason and
+     is also the sentence somebody needs. Try again does the same in the other
+     direction. The first paint does not, because start() only moves focus when it
+     was pressed.
+
+     Stopped is the info glyph in a zinc-200 well, not the danger one. Nothing
+     failed and nothing was written; a red icon here would file an alarm against a
+     decision the user made. A request that genuinely failed lands in this same
+     box at this same height, and that picture is the third card of the states
+     variant.
+
+     Both branches are min-h-40, so the panel is the same height stopping as it
+     was waiting and the page below it does not jump. Both are x-show rather than
+     x-if, because each holds a Lucide icon and an <i data-lucide> inserted after
+     createIcons() has run comes up empty. x-cloak on the branch that is hidden at
+     first paint. -->
+<div data-kui="spinner/stalled" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5"
+     x-data="{
+       state: 'running', elapsed: 0, said: '', tick: null,
+       start(pressed) {
+         clearInterval(this.tick);
+         this.state = 'running'; this.elapsed = 0; this.said = '';
+         this.$nextTick(() => {
+           this.said = 'Building the ageing report';
+           if (pressed) this.$refs.running.focus();
+         });
+         this.tick = setInterval(() => {
+           this.elapsed++;
+           if (this.elapsed === 10) this.said = 'Still building the ageing report. 14 months of receipts across five plants.';
+           if (this.elapsed === 25) this.said = 'The ageing report is slower than usual. You can stop waiting.';
+         }, 1000);
+       },
+       stop() {
+         clearInterval(this.tick); this.tick = null;
+         this.state = 'stopped';
+         this.said = 'Stopped. The report was not built and nothing was changed.';
+         this.$nextTick(() => this.$refs.stopped.focus());
+       }
+     }"
+     x-init="start()"
+     :aria-busy="state === 'running'">
+
+  <div x-show="state === 'running'" class="flex min-h-40 flex-col items-center justify-center gap-3 text-center">
+    <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <div>
+      <p x-ref="running" tabindex="-1" class="text-[13px]/5 text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Building the ageing report</p>
+      <p x-show="elapsed >= 10" x-cloak class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Still working. 14 months of receipts across five plants.</p>
+    </div>
+    <button type="button" x-show="elapsed >= 25" x-cloak @click="stop()"
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="circle-x" class="size-3.5 text-zinc-600"></i>Stop waiting
+    </button>
+  </div>
+
+  <div x-show="state === 'stopped'" x-cloak class="flex min-h-40 flex-col items-center justify-center gap-2 text-center">
+    <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="info" class="size-4 text-zinc-500"></i>
+    </span>
+    <p x-ref="stopped" tabindex="-1" class="mt-1 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">You stopped waiting</p>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">The report was not built. Nothing was changed.</p>
+    <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
+      <button type="button"
+              class="inline-flex h-8 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-3 text-[12px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Build one month instead
+      </button>
+      <button type="button" @click="start(true)"
+              class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Try again
+      </button>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="said"></p>
 </div>` },
 
       { id: 'django', name: 'Django and htmx', code:
@@ -6012,6 +12700,7 @@ register(
      role="status" is on the panel, which survives the swap. A status region that
      arrives inside a fragment with its message already in it never changed, so
      there is nothing for a screen reader to report. -->
+{% load humanize %}
 
 {# orders/register.html #}
 <div data-kui="spinner/django" id="register" class="relative overflow-hidden rounded-xl border border-zinc-300 bg-white"
@@ -6024,7 +12713,7 @@ register(
     <button type="button"
             hx-get="{% url 'order-register-rows' %}"
             hx-target="#register-rows" hx-swap="outerHTML"
-            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Refresh
     </button>
   </div>
@@ -6054,8 +12743,8 @@ register(
      x-text="busy ? 'Refreshing the order register' : ''"></p>
 </div>
 
-{# orders/_register_rows.html — the whole response and nothing around it,
-   keeping the id so the next Refresh still has a target #}
+{% comment %} orders/_register_rows.html — the whole response and nothing around it,
+   keeping the id so the next Refresh still has a target {% endcomment %}
 <div id="register-rows" :inert="busy">
   <table class="w-full text-[13px]/5">
     <thead>
@@ -6077,8 +12766,8 @@ register(
   </table>
 </div>
 
-{# orders/_register_failed.html — the spinner resolved into an error, in the
-   same slot and at the same height, so the panel does not change size #}
+{% comment %} orders/_register_failed.html — the spinner resolved into an error, in the
+   same slot and at the same height, so the panel does not change size {% endcomment %}
 <div id="register-rows" class="flex min-h-64 flex-col items-center justify-center gap-2 p-6 text-center">
   <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
     <i data-lucide="alert-circle" class="size-4 text-red-600"></i>
@@ -6087,7 +12776,7 @@ register(
   <p class="text-[12px]/4 text-zinc-500">Nothing was changed.</p>
   <button type="button" hx-get="{% url 'order-register-rows' %}"
           hx-target="#register-rows" hx-swap="outerHTML"
-          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200">
+          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry
   </button>
 </div>` }

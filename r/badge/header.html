@@ -1,0 +1,23 @@
+<!-- The pill next to a record title, and the fact it is not allowed to hold.
+     "Overdue" is the state; "12 days past the promised date" is why anybody
+     cares, and it stays outside the shape. A pill that grows to a phrase is no
+     longer a fixed shape, so the header stops matching the column the same
+     record occupies on the register screen it was opened from.
+
+     The qualifier takes no dot of its own. Two dots on one line is two states
+     and there is only one here — the second one would be read as an axis this
+     record has and does not.
+
+     The pill follows the heading in the DOM rather than preceding it, so the
+     record is named before it is described. Ahead of the title it is announced
+     with nothing yet for it to be about. -->
+<div data-kui="badge/header" class="border-b border-zinc-300 bg-white px-4 py-4 sm:px-6">
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">PO-24-1187</h1>
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+    </span>
+    <span class="text-[13px]/5 tabular-nums text-zinc-600">12 days past the promised date</span>
+  </div>
+  <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Gujarat Polymers Ltd · raised 14 Aug 2026 · ₹12,45,000 · 6 lines</p>
+</div>

@@ -1,0 +1,150 @@
+<!-- The empty query is where a palette spends most of its life: every open
+     starts there, and most opens end there too, on Enter. So the rest state is
+     the design, not a placeholder for one.
+
+     What it is not is the catalogue with no filter applied. Filtering nothing
+     out of 1,284 orders gives a list nobody scrolls, and the first keystroke
+     then looks like a reset rather than a search. It is five records this
+     person opened today and the three actions their role fires — a set
+     somebody chose, not a page of history.
+
+     The first row is already highlighted, so ⌘K then Enter reopens what you
+     were last in. That is the shortest path through the component and the one
+     people use twenty times a day; every other path costs at least a word.
+
+     One record is one object. The recent list is five ids mapped over the same
+     records array the search reads, rather than a second array of copies —
+     two lists of the same record drift the moment a vendor is renamed, and the
+     one on screen is whichever list happened to be rendered.
+
+     The group heading changes with the query, from Recent to Records, because
+     a match is not a recent and a heading that says otherwise is a claim the
+     component cannot support. The right-hand column changes with it for the
+     same reason: at rest it is when the record was opened, and once anything
+     is typed it is the order value, because 11:20 beside a record nobody
+     opened is a fact the component made up. -->
+<div data-kui="command-palette/recents" x-data="{
+       open: false, q: '', ai: 0,
+       recentIds: ['po-1187', 'grn-0442', 'ven-deccan', 'po-1179', 'req-0318'],
+       actions: [
+         { id: 'new-po',    label: 'New purchase order',   icon: 'plus',          key: 'N' },
+         { id: 'post-grn',  label: 'Post goods receipt',   icon: 'package-check', key: 'G' },
+         { id: 'approvals', label: 'Go to my approvals',   icon: 'check-check',   key: 'A' },
+         { id: 'gstr2b',    label: 'Reconcile GSTR-2B',    icon: 'receipt' }
+       ],
+       records: [
+         { id: 'po-1187',     label: 'PO-24-1187 — Gujarat Polymers Ltd',    sub: 'HDPE granules · 14 lines',                  amount: '₹18,42,000', seen: '11:20',     icon: 'file-text' },
+         { id: 'grn-0442',    label: 'GRN-0442 — Sharma Steel Traders',      sub: 'MS angle 50×50×6 · 12.400 MT',                                    seen: '10:52',     icon: 'package-check' },
+         { id: 'ven-deccan',  label: 'Deccan Fasteners Pvt Ltd',             sub: 'Vendor · rate contract to 31 March 2027',                         seen: '10:04',     icon: 'building-2' },
+         { id: 'po-1179',     label: 'PO-24-1179 — Sharma Steel Traders',    sub: 'Receipt overdue 9 days',                    amount: '₹2,74,900',  seen: 'Yesterday', icon: 'file-text' },
+         { id: 'req-0318',    label: 'REQ-0318 — Maintenance, Silvassa',     sub: 'Waiting on your approval',                  amount: '₹84,600',    seen: 'Yesterday', icon: 'clipboard-list' },
+         { id: 'po-1206',     label: 'PO-24-1206 — Konkan Chemicals Pvt Ltd', sub: 'Caustic soda lye · 8 lines',               amount: '₹6,18,400',                     icon: 'file-text' },
+         { id: 'ven-gujarat', label: 'Gujarat Polymers Ltd',                 sub: 'Vendor · VEN-0142 · Vapi',                                                           icon: 'building-2' }
+       ],
+       get rest() { return !this.q.trim(); },
+       hit(a) {
+         const s = this.q.trim().toLowerCase();
+         return a.filter(o => (o.label + ' ' + (o.sub || '')).toLowerCase().includes(s));
+       },
+       get groups() {
+         if (this.rest) return [
+           { name: 'Recent', items: this.recentIds.map(id => this.records.find(o => o.id === id)) },
+           { name: 'Actions you use', items: this.actions.slice(0, 3) }
+         ];
+         return [
+           { name: 'Records', items: this.hit(this.records) },
+           { name: 'Actions', items: this.hit(this.actions) }
+         ];
+       },
+       get list() { return this.groups.flatMap(g => g.items); },
+       rowId(o) { return 'cpr-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { this.open = true; this.q = ''; this.ai = 0; },
+       hide() { this.open = false; this.q = ''; this.ai = 0; },
+       move(n) {
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { this.hide(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @keydown.window.meta.k.prevent="show()"
+     @keydown.window.ctrl.k.prevent="show()"
+     @keydown.escape.window="hide()">
+
+  <button type="button" @click="show()" aria-haspopup="dialog"
+          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="search" class="size-4 text-zinc-600"></i>
+    <span class="flex-1 text-left">Search Operations</span>
+    <kbd aria-hidden="true" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/40 px-3 pt-16 sm:pt-24">
+    <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
+         class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+
+      <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
+        <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+        <label for="cpr-q" class="sr-only">Search orders, vendors and actions</label>
+        <input id="cpr-q" x-model="q" type="text" role="combobox" autocomplete="off" autofocus
+               aria-autocomplete="list" aria-controls="cpr-list"
+               :aria-expanded="open" :aria-activedescendant="activeId"
+               placeholder="Search orders, vendors, actions…"
+               @input="ai = 0"
+               @keydown.arrow-down.prevent="move(1)"
+               @keydown.arrow-up.prevent="move(-1)"
+               @keydown.enter.prevent="commit()"
+               class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        <button type="button" @click="hide()" class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px]/4 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Esc</button>
+      </div>
+
+      <div id="cpr-list" role="listbox" aria-label="Results" class="max-h-80 overflow-y-auto pb-1">
+        <template x-for="g in groups" :key="g.name">
+          <div role="group" :aria-label="g.name" x-show="g.items.length">
+            <p aria-hidden="true"
+               class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+               x-text="g.name"></p>
+            <template x-for="o in g.items" :key="o.id">
+              <div :id="rowId(o)" role="option"
+                   @mousedown.prevent @click="pick(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+                   :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+                   class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+                <span class="flex size-4 shrink-0 items-center justify-center text-zinc-600">
+                  <i :data-lucide="o.icon" class="size-4"></i>
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate tabular-nums" x-text="o.label"></span>
+                  <span x-show="o.sub" class="block truncate text-[12px]/4 text-zinc-500" x-text="o.sub"></span>
+                </span>
+                <!-- when it was opened while the box is empty, what it is worth
+                     once it is a search result: the timestamp is only true of a
+                     record this person actually opened -->
+                <span x-show="rest ? o.seen : o.amount"
+                      class="hidden shrink-0 text-[12px]/4 tabular-nums text-zinc-600 sm:block"
+                      x-text="rest ? (o.seen || '') : (o.amount || '')"></span>
+                <kbd x-show="o.key" class="shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500" x-text="o.key"></kbd>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">Nothing matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Try an order number — PO-24-1187 — or a vendor name.</p>
+      </div>
+
+      <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
+        <span class="ml-auto" x-text="rest ? 'Your last five' : 'Operations'">Your last five</span>
+      </div>
+
+      <p role="status" class="sr-only"
+         x-text="open ? (rest ? 'Recent records and actions' : (list.length === 1 ? '1 result' : list.length + ' results')) : ''"></p>
+    </div>
+  </div>
+</div>

@@ -1,20 +1,25 @@
 <!-- The locked mapping. One pill class on all five; the dot is the only thing
      that differs. Copy these verbatim, and do not invent a sixth colour for a
-     sixth state — add the state to this list or reuse Open. -->
+     sixth state — add the state to this list or reuse Open.
+
+     Every pill carries whitespace-nowrap. One-word labels never needed it and
+     that is exactly why it goes on now: the first two-word state anybody adds —
+     "Part received", "Awaiting approval" — breaks across two lines inside a
+     narrow column and stops reading as one object. -->
 <div data-kui="badge/status" class="flex flex-wrap items-center gap-2">
-  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
     <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
   </span>
-  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
     <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
   </span>
-  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
     <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
   </span>
-  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
     <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Closed
   </span>
-  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">
+  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-600 ring-1 ring-inset ring-zinc-300">
     <span class="size-1.5 rounded-full bg-zinc-400" aria-hidden="true"></span>Draft
   </span>
 </div>

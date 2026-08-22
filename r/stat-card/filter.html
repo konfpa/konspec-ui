@@ -1,0 +1,93 @@
+<!-- The dashboard strip is a way out of the screen. This one is a control on
+     it: the tiles count the buckets and the register under them is what
+     changes.
+
+     Both are anchors, and that is the argument. A filter is a URL. Bookmark it,
+     paste it into a message, press the back button — all three work for
+     nothing, and none of them works for a filter that is a click handler
+     holding state in a component. hx-get with hx-push-url swaps in place and
+     still leaves the address bar telling the truth, which is the only version
+     that survives somebody sending a colleague the twelve overdue ones.
+
+     The swap takes the whole block, tiles and register together, because the
+     counts and the rows have to come out of one read. Counted by one query and
+     filtered by another, they disagree the first time a record moves between
+     them, and it is the tile that gets blamed.
+
+     The filter in force is aria-current plus the chip fill, and that is one
+     marker rather than three. A tick, a bold label and a fill all saying the
+     same thing is three chances to disagree at the next breakpoint. Being a
+     tinted shape it hovers one step deeper to zinc-300 — zinc-200 hovering to
+     zinc-200 is not a subtle hover, it is no hover.
+
+     No deltas. A delta answers "is this getting worse"; a filter tile answers
+     "how many are in this bucket, show me them", and a tile carrying both is
+     two controls wide while the count stops being the thing anyone clicks.
+
+     Two columns at 390px rather than one. A filter strip is chosen from rather
+     than read, and four full-width tiles push the register itself off the
+     screen, which is the thing the strip exists to scope.
+
+     Each tile is a flex column with the count pushed to the bottom, because a
+     bucket name is data and data wraps. "Awaiting approval" takes two lines in
+     a half-width tile while "Overdue" takes one, and a strip topped out at the
+     label leaves the two counts beside each other at different heights. The
+     grid already makes the tiles the same height; bottom-aligning the figure
+     inside them is what makes the counts line up, at every width, for a label
+     nobody has written yet. -->
+
+<div data-kui="stat-card/filter" id="sc-orders" class="max-w-4xl space-y-3">
+
+  <div role="group" aria-label="Filter the order register" class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+    <a href="?status=all" hx-get="?status=all" hx-target="#sc-orders" hx-swap="outerHTML" hx-push-url="true"
+       class="flex flex-col justify-between rounded-xl border border-zinc-300 bg-white p-4 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">All open</span>
+      <span class="mt-1.5 block text-[24px]/7 font-semibold tracking-tight tabular-nums">148</span>
+    </a>
+
+    <a href="?status=approval" hx-get="?status=approval" hx-target="#sc-orders" hx-swap="outerHTML" hx-push-url="true"
+       class="flex flex-col justify-between rounded-xl border border-zinc-300 bg-white p-4 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex items-center gap-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Awaiting approval
+      </span>
+      <span class="mt-1.5 block text-[24px]/7 font-semibold tracking-tight tabular-nums">9</span>
+    </a>
+
+    <a href="?status=part" hx-get="?status=part" hx-target="#sc-orders" hx-swap="outerHTML" hx-push-url="true"
+       class="flex flex-col justify-between rounded-xl border border-zinc-300 bg-white p-4 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Part received</span>
+      <span class="mt-1.5 block text-[24px]/7 font-semibold tracking-tight tabular-nums">35</span>
+    </a>
+
+    <!-- the filter in force: aria-current, the chip fill, one step deeper on hover -->
+    <a href="?status=overdue" aria-current="true" hx-get="?status=overdue" hx-target="#sc-orders" hx-swap="outerHTML" hx-push-url="true"
+       class="flex flex-col justify-between rounded-xl border border-zinc-300 bg-zinc-200 p-4 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex items-center gap-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+      </span>
+      <span class="mt-1.5 block text-[24px]/7 font-semibold tracking-tight tabular-nums">12</span>
+    </a>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+      <h3 class="text-[13px]/5 font-medium">Order register</h3>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">12 of 148 orders · overdue</p>
+    </div>
+    <ul class="divide-y divide-zinc-100 text-[13px]/5">
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+        <span class="min-w-0 truncate">PO-24-1187 · Gujarat Polymers Ltd</span>
+        <span class="shrink-0 tabular-nums text-zinc-600">₹4,82,000 · 9 days late</span>
+      </li>
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+        <span class="min-w-0 truncate">PO-24-1174 · Sharma Extrusions</span>
+        <span class="shrink-0 tabular-nums text-zinc-600">₹1,18,400 · 14 days late</span>
+      </li>
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 py-2.5">
+        <span class="min-w-0 truncate">PO-24-1169 · Nashik Steel Traders</span>
+        <span class="shrink-0 tabular-nums text-zinc-600">₹9,04,000 · 21 days late</span>
+      </li>
+    </ul>
+  </div>
+</div>

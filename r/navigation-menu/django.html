@@ -1,0 +1,97 @@
+<!-- The bar built out of a context processor, where three things are decided
+     that the static variants can only draw.
+
+     Whether an item exists at all is a permission question, and it is settled
+     in sections_for, where the user is: a section this account may never open
+     is left out of the list rather than drawn locked. The restricted variant is
+     the other case — a destination this user reaches most days that is closed
+     right now — and the two must not be written the same way.
+
+     Which item is current comes out of request.resolver_match rather than out
+     of request.path. The namespace of order-detail is procurement whatever the
+     pk is, so a record two levels down still marks its section; matching on the
+     path loses the mark the moment anyone opens a record. Which of page, true
+     or nothing an item takes has three outcomes and a rule behind each, so the
+     context processor writes one of them into state and the template prints it
+     — a trigger never takes page, because it has no URL to be current for.
+
+     The counts come from the same place. A count rendered by the template is a
+     query inside a loop that runs on every page in the application, so it is
+     computed once per user and per plant and cached there.
+
+     # context_processors.py — listed in TEMPLATES[0]["OPTIONS"]["context_processors"]
+     def navigation(request):
+         if not request.user.is_authenticated:
+             return {}
+         return {"nav_sections": sections_for(request.user, request.resolver_match)} -->
+<nav data-kui="navigation-menu/django" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    {% for section in nav_sections %}
+      {% if section.pages %}
+        <li class="relative">
+          <button type="button" x-ref="{{ section.key }}" id="nmdj-t-{{ section.key }}"
+                  aria-controls="nmdj-p-{{ section.key }}" :aria-expanded="open === '{{ section.key }}'"
+                  {% if section.state %}aria-current="true"{% endif %}
+                  @mouseenter="hover('{{ section.key }}')"
+                  @click="open === '{{ section.key }}' ? shut($refs['{{ section.key }}']) : jump('{{ section.key }}')"
+                  @keydown.arrow-down.prevent="jump('{{ section.key }}')"
+                  class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="open === '{{ section.key }}' || {{ section.state|yesno:'true,false' }} ? 'bg-zinc-200 font-medium text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
+            {{ section.label }}
+            <span class="flex transition-transform motion-reduce:transition-none" :class="open === '{{ section.key }}' && 'rotate-180'">
+              <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+            </span>
+          </button>
+
+          <div x-ref="{{ section.key }}Panel" x-show="open === '{{ section.key }}'" x-cloak
+               id="nmdj-p-{{ section.key }}" role="group" aria-labelledby="nmdj-t-{{ section.key }}"
+               class="absolute top-full left-0 z-40 pt-2">
+            <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+              {% for page in section.pages %}
+                <li>
+                  <a href="{% url page.url_name %}"
+                     {% if page.state %}aria-current="{{ page.state }}"{% endif %}
+                     class="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-[13px]/5 {% if page.state %} bg-zinc-200 font-medium text-zinc-900 hover:bg-zinc-300{% else %}text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900{% endif %} focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    {{ page.label }}
+                    {% if page.count %}
+                      <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">{{ page.count }}</span>
+                    {% endif %}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </li>
+      {% else %}
+        <li>
+          <a href="{% url section.url_name %}" @mouseenter="if (open) shut()"
+             {% if section.state %}aria-current="{{ section.state }}"{% endif %}
+             class="block rounded-lg px-3 py-2 text-[13px]/5 {% if section.state %} bg-zinc-200 font-medium text-zinc-900 hover:bg-zinc-300{% else %}text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900{% endif %} focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ section.label }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</nav>

@@ -1,15 +1,38 @@
-<!-- A job the user started that outlives the request. Poll the bar with htmx:
-     hx-get="/imports/8841/progress/" hx-trigger="every 2s" hx-swap="outerHTML". -->
-<div data-kui="alert/progress" class="rounded-lg border border-zinc-300 bg-white px-4 py-3">
+<!-- A job the user started that outlives the request. Poll the whole alert with
+     htmx: hx-get="/imports/8841/progress/" hx-trigger="every 2s"
+     hx-swap="outerHTML", and return the success alert when it is done, so the
+     last swap replaces the running alert with the outcome instead of leaving
+     both on the page.
+
+     aria-live="off" is the reason this variant is not simply alert/tags with a
+     rail under it. Polled into a live region — which is where a swapped alert
+     otherwise belongs — this reads the percentage out loud every two seconds
+     for as long as the import runs. The one announcement worth making is the
+     last one, and that arrives with the alert that replaces this.
+
+     role="progressbar" goes on the track, because the track is the element
+     whose extent means something, and it is named by pointing aria-labelledby
+     at the sentence already on screen rather than repeating it in an aria-label
+     where the two can drift. The width is an inline style and has to be: a
+     class built from a template variable is not a literal string in the source,
+     so Tailwind emits no rule for it and the fill comes back zero wide.
+
+     The percentage beside the text and the width on the fill are one number.
+     Rounding one of them for display and not the other is how a rail ends up
+     at 39% under a label reading 40%. -->
+<div data-kui="alert/progress" aria-live="off" class="rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <div class="flex items-start gap-3">
-    <i data-lucide="loader-2" class="mt-0.5 size-4 shrink-0 animate-spin text-zinc-500"></i>
+    <i data-lucide="loader-circle" class="mt-0.5 size-4 shrink-0 animate-spin text-zinc-500"></i>
     <div class="min-w-0 flex-1">
-      <p class="text-[13px]/5 font-medium">Importing the August rate card.</p>
-      <p class="mt-0.5 text-[12px]/4 text-zinc-600">1,240 of 3,100 rows · you can leave this page, it keeps running.</p>
+      <p id="al-import8841" class="text-[13px]/5 font-medium">Importing the August rate card.</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-600"><span class="tabular-nums">1,240</span> of <span class="tabular-nums">3,100</span> rows · you can leave this page, it keeps running.</p>
     </div>
     <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">40%</span>
   </div>
-  <div class="mt-3 h-1 overflow-hidden rounded-full bg-zinc-200">
-    <div class="h-full rounded-full bg-zinc-700 transition-[width] duration-500" style="width: 40%"></div>
+  <div class="mt-3 h-1 overflow-hidden rounded-full bg-zinc-200"
+       role="progressbar" aria-labelledby="al-import8841"
+       aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+    <div class="h-full min-w-[2px] rounded-full bg-zinc-700 transition-[width] duration-500 motion-reduce:transition-none"
+         style="width: 40%"></div>
   </div>
 </div>

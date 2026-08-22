@@ -1,12 +1,27 @@
+<!-- Dismiss belongs on an alert that is safe to lose and on no other. This one
+     is: the bank details have changed whether or not the notice is on screen,
+     and the record itself says so.
+
+     What this does not do is remember. The alert is back on the next request,
+     because nothing was told about the dismissal — Alpine set a boolean in a
+     page that is about to be replaced. That is the right default: an alert
+     nobody has acted on returning is a smaller defect than one that vanished
+     for good because somebody swatted it on the way to something else. When it
+     genuinely has to stay gone, that is alert/remembered.
+
+     The close button is a 28px shape on a white card, so it hovers to the chip
+     fill rather than to zinc-100, which is what a white-on-white control needs
+     to keep an edge. Negative margins pull it out to the padding so the icon
+     sits square in the corner without widening the row. -->
 <div data-kui="alert/dismissible" x-data="{ show: true }" x-show="show" x-cloak
      class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
   <div class="min-w-0 flex-1">
-    <p class="text-[13px]/5 font-medium">Vendor bank details changed on 12 Aug 2024.</p>
+    <p class="text-[13px]/5 font-medium">Vendor bank details changed on 12 Aug 2026.</p>
     <p class="mt-0.5 text-[12px]/4 text-zinc-600">Payments to Nashik Steel Traders now go to HDFC ••4471.</p>
   </div>
   <button type="button" @click="show = false" aria-label="Dismiss"
-          class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
+          class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="x" class="size-4"></i>
   </button>
 </div>

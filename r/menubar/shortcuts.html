@@ -13,10 +13,15 @@
      claiming Ctrl S on a Mac.
 
      The panel is a list of groups rather than a flat list with separator
-     elements dropped into it, because the rule is the group boundary. Modelled
-     this way a group that empties out — every command in it hidden by a
-     permission check — takes its own rule with it. role="group" is a permitted
-     child of role="menu"; a bare div is not. -->
+     elements dropped into it, because the rule is the group boundary — and the
+     rule is bound rather than written as first:border-t-0. x-for inserts what
+     it renders after the <template> element, so the first group is never
+     :first-child, first: never matches, and the panel draws a stray rule flush
+     under its own top edge. Binding it on whether any earlier group still has
+     items in it also answers the case first: could never have answered: a group
+     emptied by a permission check takes its rule with it instead of handing it
+     down. role="group" is a permitted child of role="menu"; a bare div is
+     not. -->
 <div data-kui="menubar/shortcuts" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
@@ -93,7 +98,7 @@
                 @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
                 @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
                 class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                :class="open === m.id && 'bg-zinc-200 text-zinc-900'" x-text="m.label"></button>
+                :class="open === m.id && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'" x-text="m.label"></button>
 
         <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
              @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -102,7 +107,8 @@
              @keydown.tab="close()"
              class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
           <template x-for="(g, gi) in m.groups" :key="gi">
-            <div role="group" x-show="g.length" class="border-t border-zinc-100 py-1 first:border-t-0">
+            <div role="group" x-show="g.length" class="py-1"
+                 :class="m.groups.slice(0, gi).some(x => x.length) && 'border-t border-zinc-100'">
               <template x-for="it in g" :key="it.label">
                 <button type="button" role="menuitem" tabindex="-1" :aria-keyshortcuts="it.keys" @click="close()"
                         class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">

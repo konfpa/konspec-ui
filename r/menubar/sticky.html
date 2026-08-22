@@ -1,0 +1,153 @@
+<!-- A document long enough to scroll is the case a menubar was invented for,
+     and a bar that scrolls off the top of it has given the commands back to
+     wherever the user happens to have stopped. So the bar sticks.
+
+     What sticky cannot survive is a scrolling ancestor. An absolutely
+     positioned panel is clipped by the nearest ancestor that scrolls, so moving
+     the scroll off the page and onto the card — the obvious way to keep a bar
+     in view — turns every menu into a sliver the height of the bar, which is
+     the same failure as wrapping the card in overflow-hidden and arrives by a
+     more reasonable-looking route. sticky needs no scroller of its own: the
+     page scrolls, the bar pins to the top of the viewport, the panels hang
+     free. If the region genuinely has to scroll on its own, the bar cannot be
+     sticky inside it and belongs above it.
+
+     Three z values, and they are not interchangeable. The bar is z-30 so the
+     rows pass under it, the table head is z-20 so it passes under the bar, and
+     the panels are z-40 so they clear both. A sticky element with a z-index
+     opens a stacking context, so the panels are z-40 within the bar and z-30
+     against the page — nothing else in the document may take more than 30 or a
+     menu opens behind the sheet it is acting on.
+
+     The bar takes an opaque fill and border-zinc-200 rather than the zinc-100
+     divider it wears when it is static. A divider between two things at rest
+     becomes the only edge between the bar and rows sliding underneath it, and
+     zinc-100 is not enough at that job. The rounded top corner moves onto the
+     bar for the same reason: the card's corner scrolls away and would leave a
+     square strip sitting on a rounded card.
+
+     top-11 on the head is h-11 on the bar written twice. Two sticky elements in
+     one scroller have to agree on that number and nothing computes it. -->
+<div data-kui="menubar/sticky" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       menus: [
+         { id: 'file', label: 'File', items: [
+           { label: 'Save revision', icon: 'save', hint: 'Ctrl S', keys: 'Control+S' },
+           { label: 'Export to Excel', icon: 'sheet' },
+           { label: 'Print', icon: 'printer', hint: 'Ctrl P', keys: 'Control+P' }
+         ] },
+         { id: 'edit', label: 'Edit', items: [
+           { label: 'Insert line', icon: 'rows-3', hint: 'Ctrl Enter', keys: 'Control+Enter' },
+           { label: 'Duplicate line', icon: 'copy' },
+           { label: 'Find item code', icon: 'search', hint: 'Ctrl F', keys: 'Control+F' }
+         ] },
+         { id: 'view', label: 'View', items: [
+           { label: 'Tax breakup', icon: 'percent' },
+           { label: 'Revision history', icon: 'history' }
+         ] }
+       ],
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Rate contract commands"
+       class="sticky top-0 z-30 flex h-11 items-center gap-0.5 rounded-t-xl border-b border-zinc-200 bg-white px-1">
+    <template x-for="m in menus" :key="m.id">
+      <div class="relative max-md:static">
+        <button type="button" role="menuitem" aria-haspopup="menu" :data-menu="m.id"
+                :aria-expanded="open === m.id" :tabindex="at === m.id ? 0 : -1"
+                @click="open === m.id ? close() : show(m.id)"
+                @mouseenter="if (open !== null) to(m.id)"
+                @keydown.arrow-down.prevent="show(m.id)" @keydown.arrow-up.prevent="show(m.id, true)"
+                @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+                @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+                class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="open === m.id && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'" x-text="m.label"></button>
+
+        <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
+             @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+             @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+             @keydown.tab="close()"
+             class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+          <template x-for="it in m.items" :key="it.label">
+            <button type="button" role="menuitem" tabindex="-1" :aria-keyshortcuts="it.keys" @click="close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span class="flex text-zinc-600"><i :data-lucide="it.icon" class="size-4"></i></span>
+              <span x-text="it.label"></span>
+              <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 tabular-nums text-zinc-500" x-text="it.hint"></span>
+            </button>
+          </template>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <table class="w-full text-[13px]/5">
+    <caption class="sr-only">Rate contract RC-2026-041, 12 lines</caption>
+    <thead>
+      <tr class="text-left text-[12px]/4 text-zinc-600">
+        <th scope="col" class="sticky top-11 z-20 border-b border-zinc-200 bg-zinc-50 px-3 py-2 font-medium">Item</th>
+        <th scope="col" class="sticky top-11 z-20 border-b border-zinc-200 bg-zinc-50 px-3 py-2 text-right font-medium">Qty</th>
+        <th scope="col" class="sticky top-11 z-20 hidden border-b border-zinc-200 bg-zinc-50 px-3 py-2 text-right font-medium sm:table-cell">Rate</th>
+        <th scope="col" class="sticky top-11 z-20 border-b border-zinc-200 bg-zinc-50 px-3 py-2 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-100">
+      <tr><td class="px-3 py-2">HDPE 5200B</td><td class="px-3 py-2 text-right tabular-nums">840 kg</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹94</td><td class="px-3 py-2 text-right tabular-nums">₹78,960</td></tr>
+      <tr><td class="px-3 py-2">LDPE 1020FA</td><td class="px-3 py-2 text-right tabular-nums">420 kg</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹102</td><td class="px-3 py-2 text-right tabular-nums">₹42,840</td></tr>
+      <tr><td class="px-3 py-2">PP copolymer</td><td class="px-3 py-2 text-right tabular-nums">600 kg</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹88</td><td class="px-3 py-2 text-right tabular-nums">₹52,800</td></tr>
+      <tr><td class="px-3 py-2">Masterbatch</td><td class="px-3 py-2 text-right tabular-nums">18 kg</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹390</td><td class="px-3 py-2 text-right tabular-nums">₹7,020</td></tr>
+      <tr><td class="px-3 py-2">Calcium carbonate</td><td class="px-3 py-2 text-right tabular-nums">240 kg</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹22</td><td class="px-3 py-2 text-right tabular-nums">₹5,280</td></tr>
+      <tr><td class="px-3 py-2">UV stabiliser</td><td class="px-3 py-2 text-right tabular-nums">12 kg</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹640</td><td class="px-3 py-2 text-right tabular-nums">₹7,680</td></tr>
+      <tr><td class="px-3 py-2">Carton 400×300</td><td class="px-3 py-2 text-right tabular-nums">120 nos</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹38</td><td class="px-3 py-2 text-right tabular-nums">₹4,560</td></tr>
+      <tr><td class="px-3 py-2">Stretch film</td><td class="px-3 py-2 text-right tabular-nums">36 kg</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹146</td><td class="px-3 py-2 text-right tabular-nums">₹5,256</td></tr>
+      <tr><td class="px-3 py-2">Pallet 1200×1000</td><td class="px-3 py-2 text-right tabular-nums">24 nos</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹710</td><td class="px-3 py-2 text-right tabular-nums">₹17,040</td></tr>
+      <tr><td class="px-3 py-2">Strapping roll</td><td class="px-3 py-2 text-right tabular-nums">8 nos</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹980</td><td class="px-3 py-2 text-right tabular-nums">₹7,840</td></tr>
+      <tr><td class="px-3 py-2">Label roll</td><td class="px-3 py-2 text-right tabular-nums">6 nos</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹1,240</td><td class="px-3 py-2 text-right tabular-nums">₹7,440</td></tr>
+      <tr><td class="px-3 py-2">Adhesive tape</td><td class="px-3 py-2 text-right tabular-nums">48 nos</td><td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">₹42</td><td class="px-3 py-2 text-right tabular-nums">₹2,016</td></tr>
+    </tbody>
+  </table>
+
+  <p class="border-t border-zinc-200 px-3 py-2.5 text-[12px]/4 tabular-nums text-zinc-600">
+    RC-2026-041 · Gujarat Polymers Ltd · 12 lines · ₹2,38,732 before tax · effective 01 Sep 2026
+  </p>
+</div>

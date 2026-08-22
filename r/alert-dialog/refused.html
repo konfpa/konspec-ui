@@ -1,0 +1,65 @@
+<!-- The user answered and the server refused. The refusal belongs inside this
+     dialog, above the same two buttons, and the dialog does not move.
+
+     The shape being rejected is closing on the click and raising an error
+     toast. It throws away everything that made the question legible — the
+     record, the figures, the consequence line — and hands the user a red
+     sentence in a corner with no way back to the decision they were making. It
+     also loses the retry: a toast has no confirm button in it, so the user has
+     to find the trigger again and read the whole dialog a second time.
+
+     The refusal says whether anything was written. "Could not post" and "could
+     not post and nothing was written" are different facts, and only one of them
+     is safe to press again — so the line states it, and the confirm changes to
+     Try again only because it is safe here. Where a refusal leaves the record
+     half-written, the confirm goes away and the dialog becomes the blocked
+     shape instead.
+
+     The region carrying the refusal is in the DOM from first paint, empty, with
+     role="alert" on it and the card inside it doing the showing. This is the
+     toast rule and it exists for the same reason: a live region created in the
+     same frame as its first message counts as content that was always there and
+     is never announced. Only the card is x-show, so the region itself never
+     leaves.
+
+     Nothing else in the dialog changes. aria-describedby still points at the
+     consequence line rather than at the refusal — the refusal announces itself,
+     and pointing describedby at a node that is empty most of the time gives a
+     screen reader nothing to read on open.
+
+     In a real screen the string is the server's, swapped in by htmx or read off
+     an HX-Trigger detail; the Alpine here only stands in for it. -->
+<div data-kui="alert-dialog/refused" x-data="{ open: false, error: '' }">
+  <button type="button" @click="open = true; error = ''"
+          class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve PO-24-1187</button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="sync-title" aria-describedby="sync-body"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <h2 id="sync-title" class="text-[16px]/6 font-semibold">Approve PO-24-1187</h2>
+      <p id="sync-body" class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+        Sharma Extrusions · ₹18,42,000 · 6 lines. Approving commits the value against the Wada plant
+        budget and emails the vendor a copy.
+      </p>
+
+      <!-- present and empty from the first paint, which is what makes it announce -->
+      <div role="alert" aria-live="assertive">
+        <div x-show="error" x-cloak class="mt-4 flex items-start gap-2.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5">
+          <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+          <p class="min-w-0 text-[13px]/5 tabular-nums text-zinc-900" x-text="error"></p>
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button"
+                @click="error = 'Approval refused. The budget service did not answer in 30 seconds, so nothing was written and the order is still awaiting approval.'"
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span x-text="error ? 'Try again' : 'Approve order'">Approve order</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

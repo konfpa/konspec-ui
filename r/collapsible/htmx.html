@@ -1,0 +1,79 @@
+<!-- The audit trail is a join across four tables, run for everyone who opens a
+     purchase order and read by one in twenty of them, so it is not in the
+     template. The two words that matter
+     are in hx-trigger: click, so a panel nobody opens costs nothing, and once,
+     so the fifth open of the same panel is not the fifth request.
+
+     x-show and never x-if. x-show keeps the fetched rows in the document after
+     the panel closes, so re-opening it is free — and with the trigger's one
+     request already spent, x-if would tear the answer out on close and leave
+     the panel permanently empty.
+
+     The swap is outerHTML and the target is the skeleton itself. innerHTML
+     would leave the skeleton's wrapper in place around the answer, and that
+     wrapper is aria-hidden — the rows would land inside an element that hides
+     them from the accessibility tree. The skeleton is three rows the height of
+     three events, so the panel does not resize under the pointer when the
+     answer arrives; x-collapse finishes at height auto, so a swap landing after
+     the 200ms reflows correctly, but one landing inside it measures whatever is
+     there at the time.
+
+     A failure has to reach the closed row. Left alone, a panel that failed to
+     load looks identical shut to one that never opened: the user opens it,
+     finds nothing, closes it and reports that the audit trail is empty. The
+     trigger carries the failure, the panel carries the retry, and the retry
+     needs its own hx-get because click once has already spent the trigger's.
+
+     htmx writes no aria-live of its own, so the wait is announced by the
+     role="status" line outside the panel. The skeleton cannot do it — it is
+     aria-hidden, and a pulsing rectangle announces nothing in any case.
+
+     A panel the server decides to render open never receives that first click.
+     That instance swaps hx-trigger for load, or moves it to intersect once on
+     the panel body — a display:none element never intersects, so it still
+     fires on the first open and once only. -->
+<div data-kui="collapsible/htmx" class="max-w-xl rounded-xl border border-zinc-300 bg-white"
+     x-data="{ open: false, loaded: false, failed: false }"
+     @htmx:after-swap="loaded = true; failed = false"
+     @htmx:response-error="failed = true"
+     @htmx:send-error="failed = true">
+  <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-audit-1187"
+          hx-get="/orders/PO-24-1187/audit/" hx-target="#col-audit-1187-body"
+          hx-swap="outerHTML" hx-trigger="click once"
+          class="flex h-12 w-full items-center gap-3 px-4 text-left focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">Audit trail</span>
+    <span x-show="failed" x-cloak class="flex shrink-0 items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
+      <i data-lucide="alert-circle" class="size-4"></i>Did not load
+    </span>
+    <span x-show="!failed" class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">7 events</span>
+    <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </button>
+
+  <div id="col-audit-1187" x-show="open" x-cloak x-collapse.duration.200ms class="motion-reduce:transition-none!">
+    <div class="border-t border-zinc-100 px-4 py-3">
+      <!-- replaced whole by the response: three rows the height of three
+           events, and hidden from the accessibility tree while it waits -->
+      <div id="col-audit-1187-body" x-show="!failed" aria-hidden="true" class="space-y-3 animate-pulse motion-reduce:animate-none">
+        <div class="flex gap-3"><span class="h-3 w-24 shrink-0 rounded bg-zinc-100"></span><span class="h-3 flex-1 rounded bg-zinc-100"></span></div>
+        <div class="flex gap-3"><span class="h-3 w-24 shrink-0 rounded bg-zinc-100"></span><span class="h-3 flex-1 rounded bg-zinc-100"></span></div>
+        <div class="flex gap-3"><span class="h-3 w-24 shrink-0 rounded bg-zinc-100"></span><span class="h-3 flex-1 rounded bg-zinc-100"></span></div>
+      </div>
+
+      <div x-show="failed" x-cloak>
+        <p class="flex items-start gap-2 text-[13px]/5 text-zinc-600">
+          <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+          The audit service did not answer. Nothing else on this order is affected.
+        </p>
+        <button type="button"
+                hx-get="/orders/PO-24-1187/audit/" hx-target="#col-audit-1187-body" hx-swap="outerHTML"
+                class="mt-3 inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-ccw" class="size-4 text-zinc-600"></i>Try again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="open && !loaded && !failed ? 'Loading the audit trail' : ''"></p>
+</div>

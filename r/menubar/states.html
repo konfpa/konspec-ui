@@ -16,8 +16,16 @@
      classes kept in step by hand, and the hover tint is dropped so the pointer
      does not promise a click that does nothing. Focus still shows.
 
+     The two uses of that one column pull in opposite directions on the
+     announcement, so they are attributed in opposite directions too: an enabled
+     row hides its glyphs and carries aria-keyshortcuts, a disabled row hides
+     nothing and carries no attribute at all. Hide the reason and the greyed row
+     is a dead end for exactly the users who cannot see that it is greyed.
+
      Void order is last, below its own rule, in red-600, named by its verb
-     rather than by its colour, and not adjacent to Print. -->
+     rather than by its colour, and not adjacent to Print. Here it only closes
+     the menu; what a destructive item actually has to do with the press is the
+     confirm variant. -->
 <div data-kui="menubar/states" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', typed: '', clock: null,
@@ -74,7 +82,7 @@
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'file' && 'bg-zinc-200 text-zinc-900'">File</button>
+              :class="open === 'file' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">File</button>
 
       <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -82,7 +90,7 @@
            @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
            @keydown.tab="close()"
            class="absolute top-full left-0 z-40 mt-1 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
-        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+        <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+S" @click="close()"
                 class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
           <i data-lucide="save" class="size-4 text-zinc-600"></i>Save draft
           <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Ctrl S</span>
@@ -91,12 +99,12 @@
         <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
                 class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
           <i data-lucide="send" class="size-4 text-zinc-600"></i>Submit for approval
-          <span class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">2 lines have no rate</span>
+          <span class="ml-auto shrink-0 pl-6 text-[12px]/4 tabular-nums text-zinc-500">2 lines have no rate</span>
         </button>
 
         <div role="separator" class="my-1 h-px bg-zinc-100"></div>
 
-        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+        <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+P" @click="close()"
                 class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
           <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
           <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Ctrl P</span>
@@ -120,7 +128,7 @@
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'edit' && 'bg-zinc-200 text-zinc-900'">Edit</button>
+              :class="open === 'edit' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">Edit</button>
 
       <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -133,7 +141,7 @@
           <i data-lucide="undo-2" class="size-4 text-zinc-600"></i>Undo
           <span class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Nothing to undo</span>
         </button>
-        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+        <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+Enter" @click="close()"
                 class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
           <i data-lucide="rows-3" class="size-4 text-zinc-600"></i>Insert line
           <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Ctrl Enter</span>
@@ -155,7 +163,7 @@
               @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
               @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
               class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'help' && 'bg-zinc-200 text-zinc-900'">Help</button>
+              :class="open === 'help' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">Help</button>
 
       <div x-show="open === 'help'" x-cloak data-panel="help" role="menu" aria-label="Help"
            @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"

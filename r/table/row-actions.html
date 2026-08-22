@@ -8,10 +8,14 @@
      items one tabindex="-1" at a time — the same idiom as the dropdown
      component. items() is read out of the DOM on every keystroke, so a row
      whose Approve is hidden by a permission check drops out of the keyboard
-     order with it. -->
+     order with it.
+
+     The trigger is named for its row. Twelve buttons all called "Actions" is a
+     keyboard user reading a list of twelve identical things, so the label
+     carries the PO number the menu will act on. -->
 <div data-kui="table/row-actions" x-data="{
        rows: [
-         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '₹18,42,000', status: 'Open', dot: 'bg-zinc-700' },
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '₹18,42,000', status: 'Open', dot: 'bg-zinc-500' },
          { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: '₹4,68,500', status: 'Approved', dot: 'bg-amber-500' },
          { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: '₹27,10,400', status: 'Overdue', dot: 'bg-red-600' }
        ]
@@ -32,7 +36,7 @@
         <tr class="border-b border-zinc-100 last:border-0 hover:[&>td]:bg-zinc-100 [&:last-child>td:first-child]:rounded-bl-xl [&:last-child>td:last-child]:rounded-br-xl">
           <td class="px-4 py-2 font-medium tabular-nums" x-text="r.po"></td>
           <td class="px-4 py-2" x-text="r.vendor"></td>
-          <td class="px-4 py-2 text-right tabular-nums" x-text="r.amount"></td>
+          <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap" x-text="r.amount"></td>
           <td class="px-4 py-2">
             <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
               <span class="size-1.5 shrink-0 rounded-full" :class="r.dot" aria-hidden="true"></span><span x-text="r.status"></span>
@@ -64,13 +68,13 @@
               <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
                       @keydown.arrow-down.prevent="show()" @keydown.arrow-up.prevent="show(true)"
                       :aria-expanded="open" aria-haspopup="menu" :aria-label="'Actions for ' + r.po"
-                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900">
+                      class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
                 <i data-lucide="more-horizontal" class="size-4"></i>
               </button>
               <div x-show="open" x-cloak x-ref="menu" role="menu" :aria-label="'Actions for ' + r.po"
                    @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
                    @keydown.tab="close(false)"
-                   class="absolute right-0 z-40 mt-1 w-44 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 text-left shadow-lg">
+                   class="absolute top-full right-0 z-40 mt-1 w-44 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white py-1 text-left shadow-lg">
                 <button type="button" role="menuitem" tabindex="-1" @click="close()"
                         class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
                   <i data-lucide="eye" class="size-4 text-zinc-600"></i>Open order

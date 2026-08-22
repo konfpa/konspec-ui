@@ -1,0 +1,114 @@
+<!-- The material is not in the list, so the panel that needs it opens the panel
+     that creates it. Two deep is the limit — a third is a screen, and a screen
+     has a URL somebody can send.
+
+     .noscroll is on the outer trap only. The plugin compensates for the
+     scrollbar it removes by writing a padding onto the documentElement; a
+     second noscroll activating over the first measures the scrollbar as already
+     gone, writes 0px, and the dimmed page behind shifts by its width — then
+     back again when the inner panel closes. The inner trap is a plain x-trap.
+
+     Nothing else is needed to make the nesting work. focus-trap keeps one
+     shared stack, so activating the inner trap pauses the outer one and
+     deactivating it resumes the outer and returns focus to the button that
+     opened it.
+
+     Escape is stopped at the inner overlay rather than guarded on a flag in the
+     outer handler. Both handlers are on window and both fire, and by the time
+     the outer one reads the flag the inner one has already cleared it — one
+     press closing both panels. .stop keeps the event off window entirely.
+
+     The inner overlay covers the viewport, so while it is open a click anywhere
+     outside the second panel — including over the first — dismisses the second
+     and only the second. Its backdrop carries the same zinc-900/40 as the
+     first, and the two compound: that deeper field is the only thing telling
+     the user the first panel is not what they are working on. -->
+<div data-kui="dialog/stacked" x-data="{ open: false, inner: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="plus" class="size-4"></i>Add a line
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="dstack-title"
+         class="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+        <div class="min-w-0">
+          <h2 id="dstack-title" class="text-[16px]/6 font-semibold">Add a line to PO-24-1187</h2>
+          <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">Sharma Extrusions · rate contract RC-2026-14</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <label for="dstack-item" class="mb-1.5 block text-[13px]/5 font-medium">Material <span aria-hidden="true" class="text-red-600">*</span></label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="dstack-item" autofocus required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            <option>MS angle 50×50×6</option>
+            <option>MS plate 10 mm</option>
+            <option>MS channel 100×50</option>
+          </select>
+        </div>
+        <button type="button" @click="inner = true"
+                class="mt-2 inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[12px]/4 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-3.5 text-zinc-600"></i>Material not in the list
+        </button>
+
+        <label for="dstack-qty" class="mt-4 mb-1.5 block text-[13px]/5 font-medium">Quantity <span aria-hidden="true" class="text-red-600">*</span></label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="dstack-qty" required inputmode="decimal" value="2,500"
+                 class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+          <span class="pr-3 text-[13px]/5 text-zinc-600">kg</span>
+        </div>
+      </div>
+
+      <div class="flex shrink-0 flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="open = false"
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Add line</button>
+      </div>
+
+      <!-- the second panel: plain x-trap, and Escape stops here rather than reaching window -->
+      <div x-show="inner" x-cloak x-trap="inner" @keydown.escape.stop="inner = false" @click.self="inner = false"
+           class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+        <div role="dialog" aria-modal="true" aria-labelledby="dstack-new-title"
+             class="flex max-h-[80vh] w-full max-w-sm flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+          <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+            <h2 id="dstack-new-title" class="text-[16px]/6 font-semibold">New material</h2>
+            <button type="button" @click="inner = false" aria-label="Close"
+                    class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-4"></i>
+            </button>
+          </div>
+
+          <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+            <label for="dstack-new-desc" class="mb-1.5 block text-[13px]/5 font-medium">Description <span aria-hidden="true" class="text-red-600">*</span></label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="dstack-new-desc" autofocus required value="MS flat 60×8"
+                     class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            </div>
+
+            <label for="dstack-new-hsn" class="mt-4 mb-1.5 block text-[13px]/5 font-medium">HSN code <span aria-hidden="true" class="text-red-600">*</span></label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="dstack-new-hsn" required inputmode="numeric" value="7216" aria-describedby="dstack-new-hsn-help"
+                     class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums outline-none">
+            </div>
+            <p id="dstack-new-hsn-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Sets the GST rate on every order for this material.</p>
+          </div>
+
+          <div class="flex shrink-0 flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+            <button type="button" @click="inner = false"
+                    class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+            <button type="button" @click="inner = false"
+                    class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Create and select</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

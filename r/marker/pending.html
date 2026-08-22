@@ -1,0 +1,86 @@
+<!-- The timeline variant is a history, so every entry has already happened and
+     one dot does for all of them. A run is the other case: some of it is done,
+     one part of it is happening now, one part of it failed, and the rest has
+     not been reached. That is four marks in one column and it is an ol, not a
+     ul — a payment run is ordered and the order is the record, not the layout.
+
+     The rail stays zinc-200 the whole way down. Colouring the part above the
+     current step turns the rail into a progress bar with its total written
+     nowhere: three of eight steps reads as a bar at 37% of something, and steps
+     are not equal lengths, so the figure the eye takes off it is wrong as well
+     as unlabelled. The state is in the mark; the rail only says these entries
+     are one sequence. Step 3 of 5 goes in the heading, in words, where it can
+     be read and quoted.
+
+     Marks come straight off the semantic table — check-circle-2 emerald-600,
+     alert-circle red-600, circle zinc-400 for not reached — and the running one
+     is loader-circle turning in zinc-500, which is the same icon the async
+     button spins. All four are size-4 with mt-0.5, the alert icon's offset, and
+     the rail picks up a mt-1 under them because an icon fills its box where a
+     6px dot floats in the middle of one.
+
+     Every mark is aria-hidden and every entry opens with its state as a word,
+     including the two that have not started: grey is a colour, and a run that
+     announces five steps and describes three has hidden the half a screen
+     reader user is there for. aria-current="step" marks the one in flight.
+
+     There is no live region here. A polled or swapped list needs one on the
+     panel that survives the swap, never on the entries — nine of them each
+     announcing themselves is unusable — and a role="status" rendered by the
+     server with its message already inside it never changed, so it says
+     nothing at all. -->
+<div data-kui="marker/pending" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+  <h3 class="text-[13px]/5 font-medium tabular-nums">Payment run 26-0819 · step 3 of 5</h3>
+  <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Started 11:02 · 118 invoices · ₹1,42,80,000</p>
+
+  <ol role="list" class="mt-3">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="check-circle-2" class="mt-0.5 size-4 text-emerald-600"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5"><span class="sr-only">Done — </span>Invoices selected and locked</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">11:02 · 118 of 131 eligible</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 text-red-600"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="sr-only">Failed — </span>Bank file rejected 2 invoices</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">11:03 · IFSC on Qureshi Metals does not match the account on the vendor master. The other 116 carried on.</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0" aria-current="step">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="loader-circle" class="mt-0.5 size-4 animate-spin text-zinc-500"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 font-medium"><span class="sr-only">Running — </span>Posting to the bank</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Since 11:04 · 74 of 116 sent</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="circle" class="mt-0.5 size-4 text-zinc-400"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 text-zinc-500"><span class="sr-only">Not started — </span>Remittance advice emailed to vendors</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="circle" class="mt-0.5 size-4 text-zinc-400"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 text-zinc-500"><span class="sr-only">Not started — </span>Payment entries posted to the ledger</p>
+      </div>
+    </li>
+  </ol>
+</div>

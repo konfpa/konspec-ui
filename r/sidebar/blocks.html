@@ -12,44 +12,79 @@
      open at once, stacked over each other, and the click that should have closed
      the first one opens the second.
 
+     These are menus in the sense the dropdown entry means it, and they are built
+     the way it builds them rather than as a div of buttons under a trigger
+     claiming aria-haspopup. Real role="menu" with role="menuitem" children at
+     tabindex="-1", focus moved item to item with the arrow keys, Escape closing
+     back to the trigger, Tab closing without swallowing the tab. That is the
+     opposite of what the nav list itself does, and the difference is the point:
+     an action menu closes when you pick something and a navigation list does
+     not, so the roving-focus model that is wrong for the nav is right here.
+     Anything that is not an item — the name-and-email block, the group heading —
+     sits outside the role="menu" element or is marked aria-hidden inside its
+     group, because a paragraph is not a permitted child of a menu.
+
+     Menu items take focus:bg-zinc-100 with a solid outline rather than
+     focus-visible, because focus here is moved by script: after a click on the
+     trigger the browser has no reason to call it visible, and a roving focus
+     nobody can see is the whole widget broken.
+
      Neither survives the rail as-is: a 240px menu hanging off a 40px avatar
      looks unattached, so at 68px both become right-side flyouts anchored to the
      icon. The switcher marks the selected plant with a check rather than a tint,
      because a tinted row in a menu is the hover state and a permanently tinted
      one reads as permanently hovered. -->
 <div data-kui="sidebar/blocks" class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
-     x-data="{ menu: '' }" @keydown.escape.window="menu = ''">
+     x-data="{
+       menu: '',
+       items() { return this.menu ? [...this.$refs[this.menu].querySelectorAll('[role^=menuitem]')] : [] },
+       show(name) { this.menu = name; this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus())) },
+       close(toTrigger = true) { const m = this.menu; if (!m) return; this.menu = ''; if (toTrigger) this.$refs[m + '-trigger'].focus() },
+       move(step) { const i = this.items(), at = i.indexOf(document.activeElement); i[(at + step + i.length) % i.length]?.focus() }
+     }"
+     @keydown.escape="if (menu) { $event.stopPropagation(); close() }">
 
   <div class="shrink-0 border-b border-zinc-200 p-2">
     <div class="relative">
-      <button type="button" @click="menu = menu === 'plant' ? '' : 'plant'"
-              :aria-expanded="menu === 'plant'" aria-haspopup="true" aria-controls="sb8-plant"
+      <button type="button" x-ref="plant-trigger"
+              @click="menu === 'plant' ? close(false) : show('plant')" @keydown.arrow-down.prevent="show('plant')"
+              aria-expanded="false" :aria-expanded="menu === 'plant'" aria-haspopup="menu" aria-controls="sb8-plant"
               class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
-        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+        <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
         <span class="min-w-0 flex-1">
           <span class="block truncate text-[13px]/5 font-medium">Operations</span>
-          <span class="block truncate text-[11px]/4 text-zinc-500">Vasai plant · FY 2026–27</span>
+          <span class="block truncate text-[11px]/4 tabular-nums text-zinc-500">Vasai plant · FY 2026–27</span>
         </span>
         <i data-lucide="chevrons-up-down" class="size-4 shrink-0 text-zinc-500"></i>
       </button>
 
-      <div id="sb8-plant" x-show="menu === 'plant'" x-cloak @click.outside="menu = ''"
-           class="absolute top-full right-0 left-0 z-50 mt-1 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
-        <p class="px-2.5 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Plants</p>
-        <button type="button" @click="menu = ''" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
-          <span class="min-w-0 flex-1 truncate font-medium">Vasai plant</span>
-          <i data-lucide="check" class="size-4 shrink-0 text-zinc-600"></i>
-        </button>
-        <button type="button" @click="menu = ''" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
-          <span class="min-w-0 flex-1 truncate">Waluj MIDC plant</span>
-        </button>
-        <button type="button" @click="menu = ''" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
-          <span class="min-w-0 flex-1 truncate">Silvassa unit</span>
-        </button>
-        <div class="my-1 border-t border-zinc-100"></div>
-        <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
-          <i data-lucide="settings" class="size-4 shrink-0"></i>Plant settings
-        </a>
+      <div x-show="menu === 'plant'" x-cloak @click.outside="close(false)"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="items()[0]?.focus()" @keydown.end.prevent="items().at(-1)?.focus()"
+           @keydown.tab="close(false)"
+           class="absolute top-full right-0 left-0 z-50 mt-1 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <div id="sb8-plant" x-ref="plant" role="menu" aria-label="Switch plant">
+          <div role="group" aria-label="Plants">
+            <p aria-hidden="true" class="px-3 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Plants</p>
+            <button type="button" role="menuitemradio" aria-checked="true" tabindex="-1" @click="close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <i data-lucide="check" class="size-4 shrink-0 text-zinc-700"></i><span class="min-w-0 flex-1 truncate font-medium">Vasai plant</span>
+            </button>
+            <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" @click="close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span aria-hidden="true" class="size-4 shrink-0"></span><span class="min-w-0 flex-1 truncate">Waluj MIDC plant</span>
+            </button>
+            <button type="button" role="menuitemradio" aria-checked="false" tabindex="-1" @click="close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <span aria-hidden="true" class="size-4 shrink-0"></span><span class="min-w-0 flex-1 truncate">Silvassa unit</span>
+            </button>
+          </div>
+          <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+          <a href="#" role="menuitem" tabindex="-1" @click="close(false)"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="settings" class="size-4 shrink-0"></i>Plant settings
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -76,10 +111,11 @@
   </nav>
 
   <div class="relative shrink-0 border-t border-zinc-200 p-2">
-    <button type="button" @click="menu = menu === 'user' ? '' : 'user'"
-            :aria-expanded="menu === 'user'" aria-haspopup="true" aria-controls="sb8-user"
+    <button type="button" x-ref="user-trigger"
+            @click="menu === 'user' ? close(false) : show('user')" @keydown.arrow-up.prevent="show('user')"
+            aria-expanded="false" :aria-expanded="menu === 'user'" aria-haspopup="menu" aria-controls="sb8-user"
             class="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
-      <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
       <span class="min-w-0 flex-1">
         <span class="block truncate text-[13px]/5 font-medium">Akshay Prabhu</span>
         <span class="block truncate text-[11px]/4 text-zinc-500">Level 2 approver</span>
@@ -87,18 +123,27 @@
       <i data-lucide="chevrons-up-down" class="size-4 shrink-0 text-zinc-500"></i>
     </button>
 
-    <div id="sb8-user" x-show="menu === 'user'" x-cloak @click.outside="menu = ''"
-         class="absolute right-2 bottom-full left-2 z-50 mb-1 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
-      <div class="px-2.5 py-2">
+    <div x-show="menu === 'user'" x-cloak @click.outside="close(false)"
+         @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+         @keydown.home.prevent="items()[0]?.focus()" @keydown.end.prevent="items().at(-1)?.focus()"
+         @keydown.tab="close(false)"
+         class="absolute right-2 bottom-full left-2 z-50 mb-1 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+      <div class="px-3 py-2">
         <p class="truncate text-[13px]/5 font-medium">Akshay Prabhu</p>
         <p class="truncate text-[12px]/4 text-zinc-500">akshay.prabhu@konspec.com</p>
       </div>
-      <div class="my-1 border-t border-zinc-100"></div>
-      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="user" class="size-4 shrink-0"></i>My profile</a>
-      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="sliders-horizontal" class="size-4 shrink-0"></i>Preferences</a>
-      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="stamp" class="size-4 shrink-0"></i>Approval limits</a>
-      <div class="my-1 border-t border-zinc-100"></div>
-      <a href="#" class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
+      <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+      <div id="sb8-user" x-ref="user" role="menu" aria-label="Account">
+        <a href="#" role="menuitem" tabindex="-1" @click="close(false)"
+           class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"><i data-lucide="user" class="size-4 shrink-0"></i>My profile</a>
+        <a href="#" role="menuitem" tabindex="-1" @click="close(false)"
+           class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"><i data-lucide="sliders-horizontal" class="size-4 shrink-0"></i>Preferences</a>
+        <a href="#" role="menuitem" tabindex="-1" @click="close(false)"
+           class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"><i data-lucide="stamp" class="size-4 shrink-0"></i>Approval limits · ₹5,00,000</a>
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <a href="#" role="menuitem" tabindex="-1" @click="close(false)"
+           class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
+      </div>
     </div>
   </div>
 </div>

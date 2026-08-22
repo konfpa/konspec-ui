@@ -1,0 +1,173 @@
+<!-- Three predicates over the register, and the chips under the toolbar are
+     what they add up to. A filtered register that shows only the selects has
+     told the user which controls exist, not which ones are doing something —
+     and the usual reason a register looks empty is one filter out of three set
+     last Tuesday and never cleared.
+
+     Each chip removes its own filter, and its button is named for what it drops:
+     "Remove the filter Overdue", never "Remove". Clear all is beside them as a
+     link rather than a second filled button, because it is the blunt answer and
+     throws away the filters that were right along with the one that was not.
+
+     The selects apply on change. There is no Apply button for the same reason a
+     settings switch has no Save: put one there and half the users press it and
+     half do not, and the two groups get different lists out of the same gesture.
+
+     The count is a role="status" in the toolbar, in the document from first
+     paint. Put the live region inside the empty block instead and it arrives
+     with its message already in it, which is not a change and is announced to
+     nobody.
+
+     The empty state names the filters rather than the search, and offers to drop
+     the last one rather than all of them. It carries no create button: a record
+     that is merely hidden by a filter is the commonest reason the same order
+     gets raised twice.
+
+     At 390px the selects are a two-column grid and the chips wrap. min-w-0 on
+     each cell, or a long vendor name pushes the grid past the viewport. -->
+<div data-kui="data-table/filters" x-data="{
+       status: 'overdue', vendor: '', plant: 'silvassa',
+       orders: [
+         { po: 'PO-24-1187', vendor: 'sharma', vname: 'Sharma Extrusions', plant: 'silvassa', status: 'open', amount: 1842000, due: '28 Aug 2026' },
+         { po: 'PO-24-1191', vendor: 'nashik-steel', vname: 'Nashik Steel Traders', plant: 'nashik', status: 'approved', amount: 468500, due: '19 Aug 2026' },
+         { po: 'PO-24-1194', vendor: 'gujarat', vname: 'Gujarat Polymers Ltd', plant: 'silvassa', status: 'overdue', amount: 2710400, due: '02 Aug 2026' },
+         { po: 'PO-24-1199', vendor: 'nashik-steel', vname: 'Nashik Steel Traders', plant: 'silvassa', status: 'overdue', amount: 132900, due: '05 Aug 2026' },
+         { po: 'PO-24-1203', vendor: 'sharma', vname: 'Sharma Extrusions', plant: 'vadodara', status: 'closed', amount: 96750, due: '28 Jul 2026' },
+         { po: 'PO-24-1207', vendor: 'gujarat', vname: 'Gujarat Polymers Ltd', plant: 'nashik', status: 'approved', amount: 5460000, due: '30 Aug 2026' },
+         { po: 'PO-24-1211', vendor: 'sharma', vname: 'Sharma Extrusions', plant: 'silvassa', status: 'open', amount: 214300, due: '04 Sep 2026' },
+         { po: 'PO-24-1218', vendor: 'gujarat', vname: 'Gujarat Polymers Ltd', plant: 'vadodara', status: 'open', amount: 1290500, due: '08 Sep 2026' }
+       ],
+       names: { status: { open: 'Open', approved: 'Approved', overdue: 'Overdue', closed: 'Closed' },
+                vendor: { sharma: 'Sharma Extrusions', 'nashik-steel': 'Nashik Steel Traders', gujarat: 'Gujarat Polymers Ltd' },
+                plant: { silvassa: 'Silvassa', nashik: 'Nashik', vadodara: 'Vadodara' } },
+       dot: { open: 'bg-zinc-500', approved: 'bg-amber-500', overdue: 'bg-red-600', closed: 'bg-emerald-600' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get rows() {
+         return this.orders.filter(o =>
+           (!this.status || o.status === this.status) &&
+           (!this.vendor || o.vendor === this.vendor) &&
+           (!this.plant || o.plant === this.plant));
+       },
+       get chips() {
+         return ['status', 'vendor', 'plant']
+           .filter(k => this[k])
+           .map(k => ({ key: k, label: this.names[k][this[k]] }));
+       },
+       drop(key) { this[key] = '' },
+       clear() { this.status = ''; this.vendor = ''; this.plant = '' }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+      <div class="min-w-0">
+        <label for="dt-fl-status" class="sr-only">Status</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="dt-fl-status" x-model="status"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+            <option value="">All statuses</option>
+            <option value="open">Open</option>
+            <option value="approved">Approved</option>
+            <option value="overdue">Overdue</option>
+            <option value="closed">Closed</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-3.5"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="min-w-0">
+        <label for="dt-fl-vendor" class="sr-only">Vendor</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="dt-fl-vendor" x-model="vendor"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+            <option value="">All vendors</option>
+            <option value="sharma">Sharma Extrusions</option>
+            <option value="nashik-steel">Nashik Steel Traders</option>
+            <option value="gujarat">Gujarat Polymers Ltd</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-3.5"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="min-w-0">
+        <label for="dt-fl-plant" class="sr-only">Plant</label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="dt-fl-plant" x-model="plant"
+                  class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+            <option value="">All plants</option>
+            <option value="silvassa">Silvassa</option>
+            <option value="nashik">Nashik</option>
+            <option value="vadodara">Vadodara</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-3.5"></i>
+          </span>
+        </div>
+      </div>
+
+      <p role="status" class="col-span-2 text-[12px]/4 text-zinc-500 tabular-nums sm:ml-auto sm:text-right"
+         x-text="chips.length ? rows.length + ' of ' + orders.length + ' orders match' : orders.length + ' orders'"></p>
+    </div>
+  </div>
+
+  <div x-show="chips.length" class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-100 px-4 py-2">
+    <template x-for="c in chips" :key="c.key">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        <span x-text="c.label"></span>
+        <button type="button" @click="drop(c.key)" :aria-label="'Remove the filter ' + c.label"
+                class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-3"></i>
+        </button>
+      </span>
+    </template>
+    <button type="button" @click="clear()" class="ml-auto text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+  </div>
+
+  <table x-show="rows.length" class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in rows" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vname"></td>
+          <td class="px-4 py-2.5">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="names.status[r.status]"></span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <div x-show="!rows.length" x-cloak class="px-6 py-12 text-center">
+    <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+    </span>
+    <p class="mt-3 text-[16px]/6 font-semibold">No orders match these filters</p>
+    <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      There are <span class="font-medium text-zinc-900 tabular-nums" x-text="orders.length"></span> orders in the register. Every chip above is in force — drop one and the list widens.
+    </p>
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+      <button type="button" @click="if (chips.length) drop(chips[chips.length - 1].key)"
+              class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Drop the last filter
+      </button>
+      <button type="button" @click="clear()" class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Clear all filters
+      </button>
+    </div>
+  </div>
+</div>

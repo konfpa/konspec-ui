@@ -1,0 +1,141 @@
+<!-- The legend is already the palette, so making it the switch costs one
+     element change and no second source of truth. Accepted is 89 per cent of
+     every column and it flattens the two series anyone opened the card for;
+     switching it off rescales the axis and rejections become readable.
+
+     Each item is a real button with aria-pressed, not a div with a click
+     handler. Pressed is the state the button is in, which is what aria-pressed
+     says — a label that flips to "Show accepted" would announce the next
+     action instead and contradict it.
+
+     The off state is not carried by colour. line-through and zinc-400 text
+     survive forced-colours mode, aria-pressed survives everything, and the
+     dimmed swatch is the third copy rather than the only one.
+
+     opacity on the swatch, never a different fill. Opacity is not part of
+     backgroundColor, so a dimmed swatch still reads back as the colour the
+     canvas paints with and the one-definition rule holds through the toggle.
+     Rewriting the class to bg-zinc-300 would silently repaint the series on
+     any redraw.
+
+     The three items are written out rather than looped. Tailwind scans class
+     attributes, so bg-zinc-200 has to appear in the markup; a template x-for
+     over a tones array puts the only mention of it in JavaScript and the
+     utility is never generated.
+
+     The last visible series cannot be switched off — all three off is an empty
+     grid, which this entry treats as a chart that failed to load. It is
+     aria-disabled rather than disabled, so it keeps its Tab stop and can still
+     be read; the handler is what refuses.
+
+     Switching a series off changes the picture and never the fallback table.
+     The table is the record; the canvas is one view of it. -->
+<div data-kui="chart/toggle" class="rounded-xl border border-zinc-300 bg-white p-5"
+     x-data="{
+       chart: null, gone: false,
+       off: [false, false, false],
+       init() { this.wait(() => this.draw()); },
+       shown() { return this.off.filter(o => !o).length },
+       last(i) { return !this.off[i] && this.shown() === 1 },
+       flip(i) {
+         if (!this.chart || this.last(i)) return;
+         this.off[i] = !this.off[i];
+         this.chart.setDatasetVisibility(i, !this.off[i]);
+         this.chart.update();
+       },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
+       wait(fn) {
+         if (this.gone) return;
+         const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+         probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const grid = getComputedStyle(this.$root).borderTopColor;
+         const ink  = getComputedStyle(this.$refs.legend).color;
+         const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                           .map(el => getComputedStyle(el).backgroundColor);
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'bar',
+           data: {
+             labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug'],
+             datasets: [
+               { label: 'Accepted', data: [412, 448, 496, 461, 528], backgroundColor: tone[0], maxBarThickness: 28 },
+               { label: 'Held',     data: [38, 44, 51, 46, 55],      backgroundColor: tone[1], maxBarThickness: 28 },
+               { label: 'Rejected', data: [9, 7, 12, 15, 11],        backgroundColor: tone[2], maxBarThickness: 28 }
+             ]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false,
+             interaction: { mode: 'index', intersect: false },
+             scales: {
+               x: { stacked: true, grid: { display: false }, border: { color: grid }, ticks: { color: ink } },
+               y: { stacked: true, beginAtZero: true, grid: { color: grid }, border: { display: false }, ticks: { color: ink, padding: 8 } }
+             }
+           }
+         });
+       },
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
+     }">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold">GRN lines by disposition</h3>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Silvassa stores · Apr to Aug 2026</p>
+  </div>
+
+  <ul x-ref="legend" class="mt-2 -mx-2 flex flex-wrap items-center gap-x-1 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li>
+      <button type="button" @click="flip(0)" :aria-pressed="!off[0]" :aria-disabled="last(0)"
+              class="inline-flex items-center gap-1.5 rounded-full px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="off[0] && 'text-zinc-400 line-through'">
+        <span data-series class="size-2 rounded-full bg-zinc-200" aria-hidden="true" :class="off[0] && 'opacity-30'"></span>Accepted
+      </button>
+    </li>
+    <li>
+      <button type="button" @click="flip(1)" :aria-pressed="!off[1]" :aria-disabled="last(1)"
+              class="inline-flex items-center gap-1.5 rounded-full px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="off[1] && 'text-zinc-400 line-through'">
+        <span data-series class="size-2 rounded-full bg-zinc-500" aria-hidden="true" :class="off[1] && 'opacity-30'"></span>Held
+      </button>
+    </li>
+    <li>
+      <button type="button" @click="flip(2)" :aria-pressed="!off[2]" :aria-disabled="last(2)"
+              class="inline-flex items-center gap-1.5 rounded-full px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="off[2] && 'text-zinc-400 line-through'">
+        <span data-series class="size-2 rounded-full bg-zinc-800" aria-hidden="true" :class="off[2] && 'opacity-30'"></span>Rejected
+      </button>
+    </li>
+  </ul>
+
+  <div class="mt-4 h-64">
+    <canvas x-ref="canvas" role="img"
+            aria-label="GRN lines by disposition, April to August. Lines rise from 459 to 594 a month; rejections peak at 15 in July and holds run between 38 and 55."></canvas>
+  </div>
+
+  <p class="mt-3 text-[12px]/4 text-zinc-500">
+    Switching a series off changes the chart only. The figures below carry every line.
+  </p>
+
+  <div class="sr-only">
+    <table>
+      <caption>GRN lines by disposition, April to August 2026</caption>
+      <thead><tr><th scope="col">Month</th><th scope="col">Accepted</th><th scope="col">Held</th><th scope="col">Rejected</th><th scope="col">Total</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">April</th><td>412</td><td>38</td><td>9</td><td>459</td></tr>
+        <tr><th scope="row">May</th><td>448</td><td>44</td><td>7</td><td>499</td></tr>
+        <tr><th scope="row">June</th><td>496</td><td>51</td><td>12</td><td>559</td></tr>
+        <tr><th scope="row">July</th><td>461</td><td>46</td><td>15</td><td>522</td></tr>
+        <tr><th scope="row">August</th><td>528</td><td>55</td><td>11</td><td>594</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

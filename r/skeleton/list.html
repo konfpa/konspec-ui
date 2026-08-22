@@ -11,8 +11,17 @@
      drawing it in zinc-300 rather than a status colour says the state is not
      known yet without claiming one.
 
-     Rows are py-3 on a 40px content block, so a row is 64px loading and 64px
-     loaded, and five of them is the page size the list asked for. -->
+     A row is py-3 on a 38px content block — a 20px line, mt-0.5, a 16px second
+     line — so 62px loading and 62px loaded, and five of them is the page size
+     this panel asked for. The avatar is 32px and does not set the height; the
+     text column does, which is why the two lines are the measurement that
+     matters and not the circle beside them.
+
+     The exceptions list below takes space-y-2 between its items, and that is
+     not a contradiction of the no-space-y rule. Bars inside one paragraph never
+     take a gap, because the line boxes already carry the leading. Whole items
+     take whatever gap the loaded list takes, and marker/dot sets its items
+     space-y-2. -->
 <div data-kui="skeleton/list" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <div class="border-b border-zinc-200 px-4 py-3">
     <h3 class="text-[14px]/5 font-semibold">Awaiting your approval</h3>
@@ -41,6 +50,22 @@
       <div class="min-w-0 flex-1">
         <div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div>
         <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+      </div>
+      <div class="flex h-5 shrink-0 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="flex items-start gap-3 px-4 py-3">
+      <div class="size-8 shrink-0 rounded-full bg-zinc-200"></div>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      </div>
+      <div class="flex h-5 shrink-0 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="flex items-start gap-3 px-4 py-3">
+      <div class="size-8 shrink-0 rounded-full bg-zinc-200"></div>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-32 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
       </div>
       <div class="flex h-5 shrink-0 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div>
     </li>

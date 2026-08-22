@@ -1,19 +1,40 @@
-<div data-kui="accordion/default" class="rounded-xl border border-zinc-300 bg-white" x-data="{ open: true }">
+<!-- One section, and the shape the rest of the entry is built from. It is here
+     to be read, not pasted on its own: one header over one panel is a
+     collapsible, and that entry owns it.
+
+     The panel carries the id, x-show and x-collapse and nothing else. Padding
+     on the animated element makes the close snap — border-box means height:0
+     cannot go below padding-top plus padding-bottom, so the panel bottoms out
+     at 24px and x-show then removes it in one frame. The dl inside takes the
+     padding and the divider.
+
+     This one starts open, so it must not carry x-cloak. x-cloak would hold it
+     hidden until Alpine boots and the section would assemble itself in front of
+     the reader.
+
+     The root is overflow-hidden, so the header hover is clipped by the card's
+     corners rather than squaring them off, and the focus outline takes the
+     negative offset because that same clip would cut an outward one.
+
+     "3 of 3 filled" is what the row says while it is shut. A heading with
+     nothing beside it is a door with nothing written on it. -->
+<div data-kui="accordion/default" class="overflow-hidden rounded-xl border border-zinc-300 bg-white" x-data="{ open: true }">
   <h3>
-    <button @click="open = !open" :aria-expanded="open" aria-controls="acc-delivery"
-            class="flex h-12 w-full items-center gap-3 px-4 text-left">
-      <span class="flex-1 text-[14px]/5 font-medium">Delivery and freight</span>
-      <span class="text-[12px]/4 text-zinc-500">3 of 3 filled</span>
-      <span class="flex transition-transform" :class="open && 'rotate-180'">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="acc-delivery"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">Delivery and freight</span>
+      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">3 of 3 filled</span>
+      <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
         <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
       </span>
     </button>
   </h3>
-  <div id="acc-delivery" x-show="open" class="border-t border-zinc-100 px-4 py-3 text-[14px]/5">
-    <dl class="grid gap-2 sm:grid-cols-2">
+  <div id="acc-delivery" x-show="open" x-collapse.duration.200ms>
+    <dl class="grid gap-x-6 gap-y-2.5 border-t border-zinc-100 px-4 py-3 text-[14px]/5 sm:grid-cols-2">
       <div><dt class="text-[12px]/4 text-zinc-600">Deliver to</dt><dd>Site store — Vasai plant</dd></div>
-      <div><dt class="text-[12px]/4 text-zinc-600">Promised date</dt><dd class="tabular-nums">22 August 2026</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Promised date</dt><dd class="tabular-nums">22 Aug 2026</dd></div>
       <div><dt class="text-[12px]/4 text-zinc-600">Freight</dt><dd class="tabular-nums">₹14,500 — to pay</dd></div>
+      <div><dt class="text-[12px]/4 text-zinc-600">Transporter</dt><dd>Konkan Roadlines — 2 day lead</dd></div>
     </dl>
   </div>
 </div>

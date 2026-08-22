@@ -1,0 +1,75 @@
+<!-- The precondition is not met, so there is no question to ask, and the
+     honest dialog says so with no confirm button in it at all.
+
+     The shape to avoid is a greyed-out Delete sitting where the confirm
+     normally is. A disabled button is a promise that something would enable it,
+     so the user goes hunting: they check their permissions, they log out and
+     back in, they ask somebody. Nothing will enable it — the order has a posted
+     GRN against it and it never will be deletable while that is true. Removing
+     the button entirely is what makes the dialog readable in one pass.
+
+     What replaces it is a route. Each blocker names the record and links to it,
+     and the primary action is the first step out of the situation rather than a
+     restatement of the problem. A dialog that reports a dead end and offers
+     nothing is a dead end with a border around it.
+
+     Close is first in the DOM, so focus opens on the harmless answer, and the
+     route is last where the primary action always sits. Both are safe here,
+     which is the one dialog in this entry where the DOM order costs nothing.
+
+     It is still role="alertdialog". The interruption and the announced body are
+     what the role is for; the number of answers is not part of it, and this
+     dialog leans on aria-describedby harder than any of the others because the
+     body is the entire content. -->
+<div data-kui="alert-dialog/blocked" x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Delete order</button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="block-title" aria-describedby="block-body"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <div class="flex items-start gap-3">
+        <i data-lucide="lock" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+        <div class="min-w-0">
+          <h2 id="block-title" class="text-[16px]/6 font-semibold">PO-24-1189 cannot be deleted</h2>
+          <p id="block-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
+            Two records are already posted against this order. Deleting it would leave both without a
+            parent, so the delete is not offered. Reverse them first, or cancel the order instead —
+            a cancelled order keeps its history and stops any further receipt.
+          </p>
+        </div>
+      </div>
+
+      <ul class="mt-4 divide-y divide-zinc-100 rounded-lg border border-zinc-200 px-4">
+        <li class="flex items-center justify-between gap-4 py-2.5">
+          <div class="min-w-0">
+            <p class="truncate text-[13px]/5 font-medium">
+              <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN 1142</a>
+            </p>
+            <p class="text-[12px]/4 tabular-nums text-zinc-500">4,200 kg received 28 Aug 2026</p>
+          </div>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹5,46,000</span>
+        </li>
+        <li class="flex items-center justify-between gap-4 py-2.5">
+          <div class="min-w-0">
+            <p class="truncate text-[13px]/5 font-medium">
+              <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PMT-26-0181</a>
+            </p>
+            <p class="text-[12px]/4 tabular-nums text-zinc-500">Advance paid 22 Aug 2026</p>
+          </div>
+          <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">₹2,45,000</span>
+        </li>
+      </ul>
+
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Close</button>
+        <a href="#"
+           class="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="undo-2" class="size-4"></i>Reverse GRN 1142
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

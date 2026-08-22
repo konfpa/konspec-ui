@@ -1,0 +1,96 @@
+<!-- The nav does not wait for its counts. The destinations are a list the
+     server already has in hand; the counts behind them are a dozen aggregates
+     over open orders, held invoices and pending GRNs, and holding the first
+     paint for those turns a 200ms page into an 800ms one on every single
+     navigation — a nav is on every screen, so it pays that cost every time.
+     Links first, figures second.
+
+     The placeholder is the width of the figure it stands in for and no wider.
+     Get that wrong and the label reflows sideways when the number lands, which
+     is the one moment the user is looking at the row. On the current row it
+     steps to zinc-300: a zinc-200 block on the zinc-200 current row is the same
+     colour twice and there is no placeholder there at all.
+
+     It is aria-hidden and the anchor stays named by its label alone. A name of
+     "Purchase orders, loading" is written once and never rewritten, so it is a
+     lie from the instant the figure arrives — and the arrival is what the live
+     region is for. That region starts empty rather than saying Loading,
+     because the nav is already usable and the wait is not news; only the
+     result is. It sits outside both lists, so an out-of-band swap writes into a
+     region that was in the document before its text changed.
+
+     A count that failed is absent, not zero. Rendering 0 pending approvals is a
+     fact about the queue and somebody will act on it. The failure is reported
+     once, as a line under the group that shares the source, with a retry that
+     re-fetches only that group — not as a red mark on each of the six rows,
+     which says the same thing six times and makes the nav look broken rather
+     than late. -->
+<div data-kui="sidebar/counts-async" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
+  </div>
+
+  <p id="sb10-status" class="sr-only" role="status"></p>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+    <p id="sb10-g1" class="px-2.5 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">My queues</p>
+    <ul id="sb10-queues" role="list" aria-labelledby="sb10-g1" class="space-y-0.5" aria-busy="true"
+        hx-get="/nav/counts/queues/" hx-trigger="load delay:150ms" hx-swap="outerHTML">
+      <li>
+        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="truck" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
+          <span aria-hidden="true" class="h-4 w-8 shrink-0 animate-pulse rounded-full bg-zinc-300 motion-reduce:animate-none"></span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="stamp" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Pending my approval</span>
+          <span aria-hidden="true" class="h-4 w-8 shrink-0 animate-pulse rounded-full bg-zinc-200 motion-reduce:animate-none"></span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="receipt" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Invoices on hold</span>
+          <span aria-hidden="true" class="h-4 w-8 shrink-0 animate-pulse rounded-full bg-zinc-200 motion-reduce:animate-none"></span>
+        </a>
+      </li>
+    </ul>
+
+    <p id="sb10-g2" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Registers</p>
+    <ul id="sb10-registers" role="list" aria-labelledby="sb10-g2" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Purchase orders</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Vendors</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="book-open" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Item ledger</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="mt-1.5 flex items-start gap-2 rounded-lg bg-zinc-50 px-2.5 py-2">
+      <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0 text-red-600"></i>
+      <p class="min-w-0 flex-1 text-[12px]/4 text-zinc-600">Register counts unavailable.</p>
+      <button type="button" hx-get="/nav/counts/registers/" hx-target="#sb10-registers" hx-swap="outerHTML"
+              class="-my-0.5 shrink-0 rounded-md px-1.5 py-0.5 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">Retry</button>
+    </div>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 text-zinc-500">Queue counts refresh every 60 seconds.</p>
+  </div>
+</div>

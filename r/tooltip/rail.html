@@ -1,0 +1,112 @@
+<!-- The rail is the largest single consumer of this component and the one
+     place a screen is entirely dependent on it: eleven destinations, no visible
+     text, and a bubble that is the only thing telling a sighted user which is
+     which.
+
+     sidebar/rail ships this with no JavaScript at all — group-hover and
+     group-focus-within on a wrapper, which is right for a rail of eleven links
+     and costs nothing. Two things it cannot do, and this is the swap-in for
+     when either matters. A CSS-only bubble has no state to clear, so Escape
+     does nothing and the dismissible half of 1.4.13 is simply unmet. And
+     group-focus-within fires on any focus, including the focus a click puts on
+     the item, so clicking a destination leaves its label sitting over the page
+     that has just been navigated to. focus-visible is the whole difference.
+
+     One delay group over the nav, warmed at 150ms rather than the toolbar's
+     400ms. A pointer resting on a rail item is nearly always asking what it is;
+     a pointer crossing a toolbar is usually on its way somewhere else.
+
+     Right placement is forced, not chosen: above and below a rail item is the
+     next rail item. Copy the whole thing to the left edge of the page and it
+     stays right — the bubble opens into the content column, which is the one
+     direction with room.
+
+     The nav must not scroll. overflow-y:auto forces overflow-x to auto and
+     every bubble is then cut off at the 68px edge; more destinations than fit
+     is what sidebar/flyout is for.
+
+     The count is a real element on the item and only a shorthand in the bubble.
+     Two digits fit the pill and three do not, and the quantity that cannot be
+     drawn goes into the aria-label — which is why the anchor is named
+     "Approvals, 4 waiting" while the bubble, aria-hidden, says four. -->
+<div data-kui="tooltip/rail" class="flex w-[68px] flex-col rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       open: null, warm: false, timer: 0, cool: 0,
+       over(id) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id) },
+       show(id, now = false) {
+         clearTimeout(this.timer); clearTimeout(this.cool);
+         if (now || this.warm) { this.open = id; this.warm = true; return }
+         this.timer = setTimeout(() => { this.open = id; this.warm = true }, 150);
+       },
+       hide() {
+         clearTimeout(this.timer);
+         this.open = null;
+         this.cool = setTimeout(() => this.warm = false, 800);
+       }
+     }"
+     @keydown.escape.window="hide()">
+
+  <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
+    <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-white" aria-hidden="true"><i data-lucide="package" class="size-[18px]"></i></span>
+  </div>
+
+  <nav aria-label="Main" class="space-y-1 py-2">
+
+    <div class="relative flex justify-center">
+      <a href="#" aria-label="Overview"
+         @mouseenter="over('overview')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('overview', true)" @blur="hide()"
+         class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="layout-dashboard" class="size-[18px]"></i>
+      </a>
+      <span aria-hidden="true" x-show="open === 'overview'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Overview</span>
+    </div>
+
+    <div class="relative flex justify-center">
+      <a href="#" aria-current="page" aria-label="Purchase orders"
+         @mouseenter="over('orders')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('orders', true)" @blur="hide()"
+         class="flex size-10 items-center justify-center rounded-lg bg-zinc-200 text-zinc-900 ring-1 ring-inset ring-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="file-text" class="size-[18px]"></i>
+      </a>
+      <span aria-hidden="true" x-show="open === 'orders'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Purchase orders</span>
+    </div>
+
+    <div class="relative flex justify-center">
+      <a href="#" aria-label="Goods receipts"
+         @mouseenter="over('grn')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('grn', true)" @blur="hide()"
+         class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="truck" class="size-[18px]"></i>
+      </a>
+      <span aria-hidden="true" x-show="open === 'grn'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Goods receipts</span>
+    </div>
+
+    <div class="relative flex justify-center">
+      <a href="#" aria-label="Approvals, 4 waiting"
+         @mouseenter="over('approvals')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('approvals', true)" @blur="hide()"
+         class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="check-circle-2" class="size-[18px]"></i>
+        <span aria-hidden="true" class="absolute -top-1 -right-1 rounded-full bg-zinc-700 px-1 text-[11px]/4 tabular-nums text-white ring-2 ring-white">4</span>
+      </a>
+      <span aria-hidden="true" x-show="open === 'approvals'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Approvals · 4 waiting</span>
+    </div>
+
+    <div class="relative flex justify-center">
+      <a href="#" aria-label="Vendors"
+         @mouseenter="over('vendors')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('vendors', true)" @blur="hide()"
+         class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="building-2" class="size-[18px]"></i>
+      </a>
+      <span aria-hidden="true" x-show="open === 'vendors'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Vendors</span>
+    </div>
+
+  </nav>
+</div>

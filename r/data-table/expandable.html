@@ -1,0 +1,114 @@
+<!-- The lines open as a second <tr> in the same table, on a recessed band. A
+     floating panel or a drawer would measure its own widths, so the line
+     quantities would not stack under the order quantity they belong to, and the
+     row somebody was reading would be covered by the thing it opened.
+
+     Each record is its own <tbody>. x-for renders exactly one element per item
+     and a record here is two rows, so the pair is wrapped — and a table is
+     allowed as many tbody elements as it likes, while a div wrapping two <tr>
+     is thrown out by the parser and the rows land outside the table.
+
+     The expander is a button in the first cell, not the row itself. A clickable
+     <tr> is not focusable, announces nothing and takes the click away from the
+     text somebody is trying to select; and a register whose rows open on click
+     cannot also have rows that navigate.
+
+     The lines carry sentence-case column names at 12px rather than the 11px
+     uppercase labels of the register above them. Two rows of uppercase headings
+     eight pixels apart read as two tables that happen to be stacked; this one
+     reads as a part of the row it opened out of.
+
+     aria-controls points at an id minted from the PO number, and the row it
+     names is always in the DOM — x-show hides it with display:none rather than
+     removing it, so the reference resolves whether it is open or shut.
+
+     Several rows open at once. The lines of two orders are compared against each
+     other more often than one is read alone, and an accordion that shuts the
+     first when the second opens makes that comparison impossible.
+
+     The colspan is typed here because no column can be hidden by the user; the
+     only one that disappears goes at the sm breakpoint, where the browser clamps
+     the span to the columns that are left. Where a column menu can hide columns,
+     bind the colspan to the count that is actually rendered — a hardcoded span
+     stretches the cell past the header and the panel edge lands in the middle of
+     a sentence.
+
+     The chevron is a static Lucide icon inside a span, and the span is what
+     rotates: createIcons() replaces the <i> with an <svg> and takes any binding
+     written on it. -->
+<div data-kui="data-table/expandable" x-data="{
+       open: ['PO-24-1194'],
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: 1842000, lines: [
+           { item: 'HDPE granules, natural', hsn: '39012000', qty: '9.000 MT', rate: 138000, value: 1242000 },
+           { item: 'Masterbatch, black 2%', hsn: '32041790', qty: '0.500 MT', rate: 1200000, value: 600000 }
+         ] },
+         { po: 'PO-24-1191', vendor: 'Nashik Steel Traders', amount: 468500, lines: [
+           { item: 'MS angle 50×50×6', hsn: '72162100', qty: '4.200 MT', rate: 111547, value: 468500 }
+         ] },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: 2710400, lines: [
+           { item: 'LLDPE film grade', hsn: '39014010', qty: '12.000 MT', rate: 123333, value: 1480000 },
+           { item: 'HDPE blow moulding grade', hsn: '39012000', qty: '5.000 MT', rate: 166080, value: 830400 },
+           { item: 'Slip additive', hsn: '38122000', qty: '0.400 MT', rate: 1000000, value: 400000 }
+         ] }
+       ],
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       toggle(po) { this.open = this.open.includes(po) ? this.open.filter(p => p !== po) : [...this.open, po] }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-10 px-4 py-2.5"><span class="sr-only">Order lines</span></th>
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <template x-for="r in rows" :key="r.po">
+      <tbody>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <td class="px-4 py-2.5">
+            <button type="button" @click="toggle(r.po)" :aria-expanded="open.includes(r.po)" :aria-controls="'dt-lines-' + r.po"
+                    :aria-label="'Lines of ' + r.po"
+                    class="flex size-7 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform" :class="open.includes(r.po) && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+          </td>
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+        <tr x-show="open.includes(r.po)" x-cloak :id="'dt-lines-' + r.po" class="border-b border-zinc-100">
+          <td colspan="4" class="bg-zinc-50 px-4 py-3">
+            <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">
+              <span x-text="r.lines.length"></span> lines
+            </p>
+            <table class="mt-2 w-full text-[12px]/4">
+              <thead>
+                <tr class="text-left text-zinc-600">
+                  <th scope="col" class="py-1 pr-3 font-medium">Item</th>
+                  <th scope="col" class="py-1 pr-3 text-right font-medium">Quantity</th>
+                  <th scope="col" class="py-1 text-right font-medium">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="l in r.lines" :key="l.item">
+                  <tr class="border-t border-zinc-200">
+                    <td class="py-1.5 pr-3">
+                      <span class="block text-[13px]/5" x-text="l.item"></span>
+                      <span class="block text-zinc-500 tabular-nums" x-text="'HSN ' + l.hsn + ' · ' + money(l.rate) + ' per MT'"></span>
+                    </td>
+                    <td class="py-1.5 pr-3 text-right align-top whitespace-nowrap tabular-nums" x-text="l.qty"></td>
+                    <td class="py-1.5 text-right align-top tabular-nums" x-text="money(l.value)"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </template>
+  </table>
+</div>

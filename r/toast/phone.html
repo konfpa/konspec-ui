@@ -1,0 +1,85 @@
+<!-- The region is anchored to the bottom edge and on a phone the bottom edge
+     is where the keyboard is. A gate clerk typing a vehicle number gets a
+     confirmation drawn underneath 300px of keyboard: it is in the DOM, it is
+     announced, it expires on time, and it was never on screen. position: fixed
+     is measured against the layout viewport, which the keyboard does not
+     change, so no combination of bottom-* fixes this.
+
+     visualViewport is the only thing that reports the covered strip. The offset
+     is data rather than design — a measurement in pixels that changes as the
+     keyboard opens and closes — so it goes on :style, and the class list keeps
+     the rest. Where the API is missing the toast simply sits at the bottom, as
+     it does today.
+
+     One at a time below sm. A 96px card is a third of a 390px screen, and three
+     of them are the screen. The cap is the phone equivalent of the stack of
+     three, and the reason it costs nothing is the same: the register behind it
+     is the durable copy.
+
+     The dismiss button is size-11 here rather than size-7. 28px is a mouse
+     target; the thumb needs 44, and the negative margins keep the card the same
+     height as the two lines it holds. -->
+<div data-kui="toast/phone" class="max-w-sm" x-data="{
+       toasts: [], seq: 0, lift: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       track() {
+         const vv = window.visualViewport;
+         if (!vv) return;
+         const fit = () => { this.lift = Math.max(0, window.innerHeight - vv.height - vv.offsetTop); };
+         vv.addEventListener('resize', fit);
+         vv.addEventListener('scroll', fit);
+         fit();
+       },
+       push(t) {
+         const n = { id: ++this.seq, ms: 6000, timer: 0, ...t };
+         this.toasts.push(n);
+         while (this.toasts.length > 1) this.close(this.toasts[0].id);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }" x-init="track()">
+
+  <label for="tp-vehicle" class="mb-1.5 block text-[13px]/5 font-medium">Vehicle number</label>
+  <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+    <input id="tp-vehicle" type="text" value="MH 12 KL 4417" autocomplete="off"
+           class="block w-full rounded-lg bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+  </div>
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'Gate entry 2208 saved', meta: 'Gujarat Polymers Ltd · 8.400 MT · 04 Sep 2026' })"
+          class="mt-3 w-full rounded-lg bg-zinc-700 px-3 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Save gate entry
+  </button>
+
+  <div role="status" aria-live="polite" :style="{ bottom: (lift + 16) + 'px' }"
+       class="pointer-events-none fixed inset-x-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
+           @pointerenter="pause(t)" @pointerleave="start(t)"
+           @focusin="pause(t)" @focusout="start(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+        </div>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-my-2 -mr-2 flex size-11 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>

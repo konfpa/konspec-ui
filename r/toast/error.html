@@ -14,7 +14,7 @@
 <div data-kui="toast/error" x-data="{
        toasts: [], seq: 0,
        push(t) {
-         this.toasts.push({ id: ++this.seq, ms: 0, ...t });
+         this.toasts.push({ id: ++this.seq, ...t, ms: 0 });
          this.$nextTick(() => { if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons(); });
        },
        close(id) { this.toasts = this.toasts.filter(x => x.id !== id); }
@@ -36,7 +36,7 @@
            x-transition:leave-end="translate-y-2 opacity-0">
         <span class="mt-0.5 flex size-4 shrink-0 text-red-600"><i data-lucide="alert-circle" class="size-4"></i></span>
         <div class="min-w-0 flex-1">
-          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
           <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
           <a href="/exports/" class="mt-1.5 inline-block rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             Open the export log

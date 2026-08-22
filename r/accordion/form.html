@@ -1,0 +1,198 @@
+<!-- The failure this variant exists to prevent: a required field inside a
+     collapsed panel. The browser refuses to report on a display:none control —
+     Chrome logs "An invalid form control with name='ifsc' is not focusable" and
+     stops — so the submit does nothing at all, no message appears anywhere, and
+     the user presses Save four more times. novalidate turns that off. The form
+     validates in one place and reports in one place, which is the same
+     arrangement form-page/invalid uses; the accordion only adds the part about
+     opening the section first.
+
+     So every summary entry runs through go(). In form-page the entry is a plain
+     fragment link, because the control is on screen — here it may be three
+     sections down inside a shut panel, and a fragment to a display:none element
+     scrolls nowhere and focuses nothing. The href stays, so the entry is still
+     a link and still says where it goes; the handler opens the owning section
+     and then moves the caret onto the control itself, never onto the header,
+     because the header is not what needs correcting.
+
+     Focusing needs a frame as well as a tick. At $nextTick the panel is still
+     display:none and .focus() on it is a silent no-op that leaves the keyboard
+     in the summary.
+
+     The header count is what stops this being a hunt. A section that is shut
+     and wrong looks exactly like a section that is shut and right, so a failing
+     section carries a red dot and a count of fields while it is closed. Here
+     the sections are left as the user had them and the marks plus the summary
+     do the work; on a real page rendered after a failed POST the server opens
+     the failing sections itself, which is accordion/django.
+
+     type="button" on every header. Inside a form the default is submit, so
+     without it the first click on Bank details posts the half-filled vendor. -->
+<form data-kui="accordion/form" novalidate @submit.prevent="save()"
+      x-data="{
+        open: { general: true, bank: false, tax: false },
+        submitted: true,
+        errors: [
+          { sec: 'bank', id: 'af-ifsc',  label: 'IFSC code', msg: 'eleven characters — four letters, a zero, then the branch code.' },
+          { sec: 'tax',  id: 'af-gstin', label: 'GSTIN',     msg: 'characters 3 to 12 have to be the PAN, AABCG1429P.' }
+        ],
+        get shown() { return this.submitted ? this.errors : [] },
+        count(sec) { return this.shown.filter(e => e.sec === sec).length },
+        bad(id) { return this.shown.some(e => e.id === id) },
+        msg(id) { const e = this.shown.find(x => x.id === id); return e ? e.msg : '' },
+        go(e) {
+          this.open[e.sec] = true;
+          this.$nextTick(() => requestAnimationFrame(() => { const el = document.getElementById(e.id); if (el) el.focus() }));
+        },
+        save() { this.submitted = true; if (this.errors.length) this.$refs.summary.focus() }
+      }">
+
+  <div x-show="shown.length" x-cloak role="alert" tabindex="-1" x-ref="summary"
+       class="mb-4 rounded-xl border border-zinc-300 bg-white px-4 py-3 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+    <div class="flex items-start gap-3">
+      <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+      <div class="min-w-0">
+        <p class="text-[13px]/5 font-medium tabular-nums"
+           x-text="'This vendor was not saved — ' + shown.length + (shown.length === 1 ? ' field needs' : ' fields need') + ' attention.'">
+          This vendor was not saved — 2 fields need attention.
+        </p>
+        <ul class="mt-2 space-y-1 text-[12px]/4 text-zinc-600">
+          <template x-for="e in shown" :key="e.id">
+            <li>
+              <!-- the href names the control; the handler is what opens the
+                   section it is sitting inside -->
+              <a :href="'#' + e.id" @click.prevent="go(e)" class="font-medium text-zinc-900 underline underline-offset-2" x-text="e.label"></a>
+              <span x-text="' — ' + e.msg"></span>
+            </li>
+          </template>
+        </ul>
+        <p class="mt-2 text-[12px]/4 text-zinc-500">Everything you typed is still here. Nothing was cleared.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+    <div>
+      <h3>
+        <button type="button" @click="open.general = !open.general" :aria-expanded="open.general" aria-controls="acc-af-general"
+                class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+            <span class="text-[14px]/5 font-medium">General</span>
+            <span class="ml-auto text-[12px]/4 tabular-nums text-zinc-500">2 of 2 filled</span>
+          </span>
+          <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.general && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+          </span>
+        </button>
+      </h3>
+      <div id="acc-af-general" x-show="open.general" x-collapse.duration.200ms>
+        <div class="grid gap-4 border-t border-zinc-100 px-4 py-4 sm:grid-cols-2">
+          <div>
+            <label for="af-name" class="mb-1.5 block text-[13px]/5 font-medium">Vendor name</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="af-name" name="name" value="Gujarat Polymers Ltd" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            </div>
+          </div>
+          <div>
+            <label for="af-msme" class="mb-1.5 block text-[13px]/5 font-medium">Udyam registration</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="af-msme" name="udyam" value="UDYAM-GJ-01-0044182" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>
+        <button type="button" @click="open.bank = !open.bank" :aria-expanded="open.bank" aria-controls="acc-af-bank"
+                class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+            <span class="text-[14px]/5 font-medium">Bank details</span>
+            <span x-show="count('bank')" x-cloak class="ml-auto flex items-center gap-1.5 text-[12px]/4 font-medium tabular-nums text-red-600">
+              <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>
+              <span x-text="count('bank') + ' to fix'">1 to fix</span>
+            </span>
+          </span>
+          <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.bank && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+          </span>
+        </button>
+      </h3>
+      <div id="acc-af-bank" x-show="open.bank" x-cloak x-collapse.duration.200ms>
+        <div class="grid gap-4 border-t border-zinc-100 px-4 py-4 sm:grid-cols-2">
+          <div>
+            <label for="af-acct" class="mb-1.5 block text-[13px]/5 font-medium">Account number</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="af-acct" name="account" value="50200041882271" inputmode="numeric" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+          </div>
+          <div>
+            <label for="af-ifsc" class="mb-1.5 block text-[13px]/5 font-medium">IFSC code</label>
+            <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+                 :class="bad('af-ifsc') ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+              <input id="af-ifsc" name="ifsc" value="HDFC523" maxlength="11"
+                     aria-describedby="af-ifsc-msg" :aria-invalid="bad('af-ifsc') ? 'true' : 'false'"
+                     class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+            <p id="af-ifsc-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+              <span x-show="!bad('af-ifsc')" x-cloak class="block text-zinc-500">As printed on the cancelled cheque.</span>
+              <span x-show="bad('af-ifsc')" x-cloak class="flex items-start gap-1.5 font-medium text-red-600">
+                <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+                <span x-text="msg('af-ifsc')"></span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>
+        <button type="button" @click="open.tax = !open.tax" :aria-expanded="open.tax" aria-controls="acc-af-tax"
+                class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+            <span class="text-[14px]/5 font-medium">Tax registration</span>
+            <span x-show="count('tax')" x-cloak class="ml-auto flex items-center gap-1.5 text-[12px]/4 font-medium tabular-nums text-red-600">
+              <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>
+              <span x-text="count('tax') + ' to fix'">1 to fix</span>
+            </span>
+          </span>
+          <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.tax && 'rotate-180'">
+            <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+          </span>
+        </button>
+      </h3>
+      <div id="acc-af-tax" x-show="open.tax" x-cloak x-collapse.duration.200ms>
+        <div class="grid gap-4 border-t border-zinc-100 px-4 py-4 sm:grid-cols-2">
+          <div>
+            <label for="af-pan" class="mb-1.5 block text-[13px]/5 font-medium">PAN</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="af-pan" name="pan" value="AABCG1429P" maxlength="10" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+          </div>
+          <div>
+            <label for="af-gstin" class="mb-1.5 block text-[13px]/5 font-medium">GSTIN</label>
+            <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+                 :class="bad('af-gstin') ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+              <input id="af-gstin" name="gstin" value="24AABCG9902B1ZP" maxlength="15"
+                     aria-describedby="af-gstin-msg" :aria-invalid="bad('af-gstin') ? 'true' : 'false'"
+                     class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+            </div>
+            <p id="af-gstin-msg" class="mt-1.5 min-h-4 text-[12px]/4">
+              <span x-show="!bad('af-gstin')" x-cloak class="block text-zinc-500">15 characters, as printed on the certificate.</span>
+              <span x-show="bad('af-gstin')" x-cloak class="flex items-start gap-1.5 font-medium text-red-600">
+                <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+                <span x-text="msg('af-gstin')"></span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Save vendor
+  </button>
+</form>

@@ -1,0 +1,57 @@
+<!-- The sixth state that keeps getting asked for, and the answer is that there
+     is no sixth colour. Two different facts get confused here and they need
+     different shapes.
+
+     A record whose status the system genuinely does not have yet keeps the pill
+     and loses the dot. The shape still says "this column is a state"; the
+     missing marker says the state is missing. A field that does not apply to
+     this record takes no pill at all — a pill is the claim that the record is
+     in some state, and "not applicable" is the claim that it is in none.
+
+     Neither of them borrows the Draft dot. Draft means somebody started this
+     and has not finished it, which is a real state with an owner; unknown means
+     nobody has told us. Printing them the same grey loses the one difference
+     that decides who gets chased.
+
+     A hollow dot was the other candidate and is not in the system: an unfilled
+     6px ring needs a ring colour the token table does not have, and inventing
+     one here would put a second edge weight into every status column. -->
+<div data-kui="badge/unknown" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full table-fixed text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="px-4 py-2 font-medium sm:w-32">Order</th>
+        <th scope="col" class="hidden px-4 py-2 font-medium sm:table-cell">Supplier</th>
+        <th scope="col" class="px-4 py-2 font-medium sm:w-32">ERP status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
+        <td class="hidden truncate px-4 py-2.5 sm:table-cell">Gujarat Polymers Ltd</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 bg-zinc-50">
+        <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1186</td>
+        <td class="hidden truncate px-4 py-2.5 sm:table-cell">Konkan Fabricators</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-600 ring-1 ring-inset ring-zinc-300">Unknown</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5 font-medium tabular-nums">PR-24-0412</td>
+        <td class="hidden truncate px-4 py-2.5 sm:table-cell">Not yet assigned</td>
+        <td class="px-4 py-2.5 text-zinc-500">
+          <span aria-hidden="true">—</span><span class="sr-only">Not applicable</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="border-t border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 text-zinc-600">
+    Unknown means the nightly sync has not answered for that order since 04 Sep 2026. A requisition that was never released has no ERP status to be unknown about.
+  </p>
+</div>

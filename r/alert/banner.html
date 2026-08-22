@@ -1,15 +1,28 @@
 <!-- Full-bleed, above the application header, outside the content column.
-     Graphite — never red. A red bar across the top reads as an outage. -->
+     Graphite and never red: a red bar across the top of every screen reads as
+     an outage, and the message it usually carries is a maintenance window
+     three days away.
+
+     The text scale inverts on the zinc-900 band. Secondary copy is zinc-400
+     here, not the zinc-500 it would be on white — darkening secondary text on a
+     dark surface makes it less readable, not more, and zinc-500 on zinc-900 is
+     the first thing to disappear on a laptop screen at an angle.
+
+     It dismisses to browser state only, which is right for a window that has
+     not started yet and wrong the moment it has. If the banner must stay gone
+     across a reload, take the localStorage key from alert/remembered and
+     version it with the window, so next month's maintenance is not silently
+     hidden from everybody who dismissed this one. -->
 <div data-kui="alert/banner" x-data="{ show: true }" x-show="show" x-cloak
      class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-zinc-900 px-4 py-2.5 text-white sm:px-6">
-  <i data-lucide="wrench" class="size-4 shrink-0 text-zinc-500"></i>
+  <i data-lucide="wrench" class="size-4 shrink-0 text-zinc-400"></i>
   <p class="min-w-[14rem] flex-1 text-[13px]/5">
     <span class="font-medium">Scheduled maintenance.</span>
-    <span class="text-zinc-500">Purchase orders are read-only on Sun 24 Aug, 01:00–03:00 IST.</span>
+    <span class="text-zinc-400">Purchase orders are read-only on Sun 24 Aug, 01:00–03:00 IST.</span>
   </p>
-  <a href="#" class="shrink-0 text-[13px]/5 font-medium underline underline-offset-2">What changes</a>
+  <a href="#" class="shrink-0 text-[13px]/5 font-medium underline underline-offset-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">What changes</a>
   <button type="button" @click="show = false" aria-label="Dismiss"
-          class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-800 hover:text-white">
+          class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
     <i data-lucide="x" class="size-4"></i>
   </button>
 </div>

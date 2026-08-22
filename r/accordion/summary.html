@@ -1,0 +1,143 @@
+<!-- Four sections of a vendor master, all shut, and the screen still answers
+     the question somebody came to it with. Each header carries the one fact
+     that decides whether this section is worth opening: how many contacts,
+     whether the bank details are verified, what the live contracts come to.
+
+     Several may be open at once, so the state is one x-data per section rather
+     than one for the group. There is no reason to close Contacts because
+     somebody opened Bank details.
+
+     The meta sits inside the button, so it is part of the accessible name —
+     "Bank details, Verified" reads correctly. That is the limit of what belongs
+     there. The compliance sentence is a sentence, and a sentence in the name is
+     read out on every pass through the set, so it sits in a paragraph under the
+     header, outside the button and outside the panel. Closing the section
+     cannot take it off the screen, which is the whole point of it: a filing
+     default that only shows once somebody opens Compliance is a filing default
+     nobody knows about.
+
+     Colour follows the status rule. Verified is a graphite pill with an
+     emerald dot, not a green pill. The overdue return is amber-700 text with
+     an amber-700 stroke beside it — a mark you read, at the weight that stays
+     legible on white — and never a field of amber behind the words.
+
+     The header is min-h-12 and wraps rather than truncating the meta: at 390px
+     the label takes the first line and the meta drops to the second, and it
+     wraps identically whether the panel is open or shut, so the second click
+     still lands on the header. -->
+<div data-kui="accordion/summary" class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div x-data="{ open: false }">
+    <h3>
+      <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="acc-vn-contacts"
+              class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="text-[14px]/5 font-medium">Contacts</span>
+          <span class="ml-auto inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4 people</span>
+        </span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+        </span>
+      </button>
+    </h3>
+    <div id="acc-vn-contacts" x-show="open" x-cloak x-collapse.duration.200ms>
+      <ul class="divide-y divide-zinc-100 border-t border-zinc-100 text-[13px]/5">
+        <li class="flex flex-wrap items-baseline gap-x-3 px-4 py-2.5">
+          <span class="min-w-0 flex-1 font-medium">Anil Bhatt</span>
+          <span class="text-zinc-600">Sales — plant 1</span>
+          <span class="tabular-nums text-zinc-600">+91 98250 41127</span>
+        </li>
+        <li class="flex flex-wrap items-baseline gap-x-3 px-4 py-2.5">
+          <span class="min-w-0 flex-1 font-medium">Kiran Shah</span>
+          <span class="text-zinc-600">Accounts</span>
+          <span class="tabular-nums text-zinc-600">+91 98795 20034</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div x-data="{ open: false }">
+    <h3>
+      <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="acc-vn-bank"
+              class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="text-[14px]/5 font-medium">Bank details</span>
+          <span class="ml-auto inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Verified
+          </span>
+        </span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+        </span>
+      </button>
+    </h3>
+    <div id="acc-vn-bank" x-show="open" x-cloak x-collapse.duration.200ms>
+      <dl class="grid gap-x-6 gap-y-2.5 border-t border-zinc-100 px-4 py-3 text-[14px]/5 sm:grid-cols-2">
+        <div><dt class="text-[12px]/4 text-zinc-600">Account</dt><dd class="tabular-nums">50200041882271</dd></div>
+        <div><dt class="text-[12px]/4 text-zinc-600">IFSC</dt><dd class="tabular-nums">HDFC0000523</dd></div>
+        <div><dt class="text-[12px]/4 text-zinc-600">Branch</dt><dd>Naroda, Ahmedabad</dd></div>
+        <div><dt class="text-[12px]/4 text-zinc-600">Penny drop</dt><dd class="tabular-nums">Matched 12 Jul 2026</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div x-data="{ open: false }">
+    <h3>
+      <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="acc-vn-compliance"
+              class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="text-[14px]/5 font-medium">Compliance</span>
+          <span class="ml-auto flex items-center gap-1.5 text-[12px]/4 font-medium text-amber-700">
+            <i data-lucide="alert-triangle" class="size-3.5 shrink-0"></i>Return overdue
+          </span>
+        </span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+        </span>
+      </button>
+    </h3>
+
+    <!-- outside the panel on purpose: closing the section must not take the
+         consequence off the screen -->
+    <p class="border-t border-zinc-100 px-4 py-2 text-[12px]/4 tabular-nums text-zinc-600">
+      GSTR-3B unfiled since 20 Jul 2026. New orders above ₹5,00,000 are held until it clears.
+    </p>
+
+    <div id="acc-vn-compliance" x-show="open" x-cloak x-collapse.duration.200ms>
+      <dl class="grid gap-x-6 gap-y-2.5 border-t border-zinc-100 px-4 py-3 text-[14px]/5 sm:grid-cols-2">
+        <div><dt class="text-[12px]/4 text-zinc-600">GSTIN</dt><dd class="tabular-nums">24AABCG1429P1ZK</dd></div>
+        <div><dt class="text-[12px]/4 text-zinc-600">PAN</dt><dd class="tabular-nums">AABCG1429P</dd></div>
+        <div><dt class="text-[12px]/4 text-zinc-600">MSME</dt><dd class="tabular-nums">UDYAM-GJ-01-0044182</dd></div>
+        <div><dt class="text-[12px]/4 text-zinc-600">Last filed</dt><dd class="tabular-nums">GSTR-1, 11 Jul 2026</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div x-data="{ open: false }">
+    <h3>
+      <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="acc-vn-contracts"
+              class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="text-[14px]/5 font-medium">Rate contracts</span>
+          <span class="ml-auto text-[13px]/5 tabular-nums text-zinc-600">3 live · ₹1,24,50,000</span>
+        </span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+        </span>
+      </button>
+    </h3>
+    <div id="acc-vn-contracts" x-show="open" x-cloak x-collapse.duration.200ms>
+      <ul class="divide-y divide-zinc-100 border-t border-zinc-100 text-[13px]/5">
+        <li class="flex flex-wrap items-baseline gap-x-3 px-4 py-2.5">
+          <span class="min-w-0 flex-1">RC-2026-041 — HDPE granules M60075</span>
+          <span class="tabular-nums text-zinc-600">to 31 Mar 2027</span>
+          <span class="tabular-nums">₹60.00/kg</span>
+        </li>
+        <li class="flex flex-wrap items-baseline gap-x-3 px-4 py-2.5">
+          <span class="min-w-0 flex-1">RC-2026-052 — Masterbatch white 20%</span>
+          <span class="tabular-nums text-zinc-600">to 30 Sep 2026</span>
+          <span class="tabular-nums">₹240.00/kg</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -11,7 +11,12 @@
      someone was listening to.
 
      push() forces ms: 0 on the danger tone whatever the call site asked for. A
-     failure is not removed by a timer. -->
+     failure is not removed by a timer.
+
+     The control focus returns to is carried on the toast as el: $el rather than
+     read off a single x-ref. Four buttons can raise a toast here, and one ref
+     names one of them — dismiss the danger toast from the keyboard and the caret
+     lands on Info, which is not where the user was. -->
 <div data-kui="toast/tones" x-data="{
        toasts: [], seq: 0,
        still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -37,13 +42,13 @@
      }">
 
   <div class="flex flex-wrap gap-2">
-    <button type="button" x-ref="fire" @click="push({ tone: 'info', text: 'Rate card refreshed', meta: 'August 2024 · 3,100 rows' })"
+    <button type="button" @click="push({ tone: 'info', text: 'Rate card refreshed', meta: 'August 2024 · 3,100 rows', el: $el })"
             class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Info</button>
-    <button type="button" @click="push({ tone: 'success', text: 'PO-24-1187 emailed to Sharma Extrusions', meta: 'Sent 11:42' })"
+    <button type="button" @click="push({ tone: 'success', text: 'PO-24-1187 emailed to Sharma Extrusions', meta: 'Sent 11:42', el: $el })"
             class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Success</button>
-    <button type="button" @click="push({ tone: 'warning', text: 'Saved, but 2 lines are over the rate contract', meta: 'MS plate 10 mm · MS angle 50×50' })"
+    <button type="button" @click="push({ tone: 'warning', text: 'Saved, but 2 lines are over the rate contract', meta: 'MS plate 10 mm · MS angle 50×50', el: $el })"
             class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Warning</button>
-    <button type="button" @click="push({ tone: 'danger', text: 'PO-24-1187 could not be emailed', meta: 'The vendor has no contact address on file' })"
+    <button type="button" @click="push({ tone: 'danger', text: 'PO-24-1187 could not be emailed', meta: 'The vendor has no contact address on file', el: $el })"
             class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Danger</button>
   </div>
 
@@ -59,10 +64,10 @@
              x-transition:leave-end="translate-y-2 opacity-0">
           <span class="mt-0.5 flex size-4 shrink-0" :class="hue[t.tone]"><i :data-lucide="icon[t.tone]" class="size-4"></i></span>
           <div class="min-w-0 flex-1">
-            <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+            <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
             <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
           </div>
-          <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+          <button type="button" aria-label="Dismiss" @click="if ($event.detail === 0 && t.el) t.el.focus(); close(t.id)"
                   class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <i data-lucide="x" class="size-4"></i>
           </button>
@@ -80,10 +85,10 @@
              x-transition:leave-end="translate-y-2 opacity-0">
           <span class="mt-0.5 flex size-4 shrink-0" :class="hue[t.tone]"><i :data-lucide="icon[t.tone]" class="size-4"></i></span>
           <div class="min-w-0 flex-1">
-            <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+            <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
             <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
           </div>
-          <button type="button" aria-label="Dismiss" @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+          <button type="button" aria-label="Dismiss" @click="if ($event.detail === 0 && t.el) t.el.focus(); close(t.id)"
                   class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <i data-lucide="x" class="size-4"></i>
           </button>

@@ -1,0 +1,104 @@
+<!-- One toast per action, not one per row the action wrote. Approving eleven
+     orders raises two messages at most — what went through and what did not —
+     never eleven cards racing each other out of the corner and a live region
+     reading them one at a time for half a minute.
+
+     The mixed outcome is two toasts and not one because the halves are governed
+     by different rules. Nine approved is a confirmation: polite, five seconds,
+     gone. Two refused is a failure: assertive, no timer, and it waits. Writing
+     both into one card forces one rule onto both, and the rule that loses is
+     always the failure's.
+
+     Neither toast is where the outcome is recorded. The register behind this is
+     already filtered and already correct, and both counts are links into it —
+     the toast is the fact that it finished, not the list of what it did. The
+     screen has to make sense with both cards deleted.
+
+     Two pushes in the same tick, which is exactly the case start(n) exists for:
+     both $nextTick callbacks run after both pushes, so a start() that reached
+     for the last element would set one toast's timer twice and leave the other
+     one running until the page is reloaded. -->
+<div data-kui="toast/bulk" x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, tone: 'success', ms: 5000, timer: 0, ...t };
+         if (n.tone === 'danger') n.ms = 0;
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       },
+       bucket(name) { return this.toasts.filter(t => (t.tone === 'danger') === (name === 'danger')); },
+       approve() {
+         this.push({ tone: 'success', text: '9 of 11 orders approved',
+                     meta: '₹1,84,26,500 released · 04 Sep 2026',
+                     href: '/orders/?batch=2208&status=approved', cta: 'Open the 9 approved' });
+         this.push({ tone: 'danger', text: '2 orders were not approved',
+                     meta: 'Above your approval limit of ₹25,00,000 · Gujarat Polymers Ltd, Deccan Fasteners',
+                     href: '/orders/?batch=2208&status=refused', cta: 'Open the 2 refused' });
+       }
+     }">
+
+  <button type="button" x-ref="fire" @click="approve()"
+          class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Approve <span class="tabular-nums">11</span> selected
+  </button>
+
+  <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <div role="alert" aria-live="assertive" class="flex flex-col gap-2">
+      <template x-for="t in bucket('danger')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0 text-red-600"><i data-lucide="alert-circle" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+            <a :href="t.href" x-text="t.cta"
+               class="mt-1.5 inline-block rounded-sm text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></a>
+          </div>
+          <button type="button" aria-label="Dismiss"
+                  @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div role="status" aria-live="polite" class="flex flex-col gap-2">
+      <template x-for="t in bucket('polite')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
+             @pointerenter="pause(t)" @pointerleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+            <a :href="t.href" x-text="t.cta"
+               class="mt-1.5 inline-block rounded-sm text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></a>
+          </div>
+          <button type="button" aria-label="Dismiss"
+                  @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>

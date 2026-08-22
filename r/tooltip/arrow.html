@@ -16,12 +16,13 @@
   <span class="relative inline-flex"
         x-data="{
           open: false, timer: 0,
+          over() { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show() },
           show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
           hide() { clearTimeout(this.timer); this.open = false }
         }"
         @keydown.escape.window="hide()">
     <button type="button" aria-labelledby="tt-arrow"
-            @mouseenter="show()" @mouseleave="hide()"
+            @mouseenter="over()" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="paperclip" class="size-4"></i>

@@ -17,14 +17,24 @@
 
      x-model.number, not x-model. A select yields a string, so page arithmetic on
      it silently concatenates: '25' * 3 is 75 but (page - 1) * '25' + 1 is fine
-     while total / '25' is fine and '25' + 1 is '251'. One of those turns up. -->
+     while total / '25' is fine and '25' + 1 is '251'. One of those turns up.
+
+     The option that matches the starting size carries selected. x-model writes
+     the right one the moment Alpine boots, but the browser has already painted
+     the first option by then, so a register that opens on 25 rows shows 10 for
+     a frame and anybody watching learns the control lies about its own value.
+
+     Previous and Next hand focus to each other at the limits, because the one
+     that was pressed is the one that goes dead and a browser blurs a disabled
+     element to the body. -->
 <nav data-kui="pagination/page-size" aria-label="Order register pages"
      x-data="{
        page: 2, size: 25, total: 148,
        get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
        get from() { return this.total ? (this.page - 1) * this.size + 1 : 0 },
        get to() { return Math.min(this.page * this.size, this.total) },
-       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
      }"
      class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
 
@@ -34,7 +44,7 @@
       <select id="pager-size" x-model.number="size" @change="page = 1"
               class="h-9 bg-transparent px-2 text-[13px]/5 tabular-nums outline-none">
         <option value="10">10</option>
-        <option value="25">25</option>
+        <option value="25" selected>25</option>
         <option value="50">50</option>
         <option value="100">100</option>
       </select>
@@ -46,11 +56,11 @@
        x-text="from + '–' + to + ' of ' + total + ' orders'">26–50 of 148 orders</p>
     <div class="flex items-center gap-1">
       <span class="mr-1 text-[13px]/5 tabular-nums text-zinc-600" x-text="'Page ' + page + ' of ' + pages">Page 2 of 6</span>
-      <button type="button" aria-label="Previous page" @click="go(page - 1)" :disabled="page === 1"
+      <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
               class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
-      <button type="button" aria-label="Next page" @click="go(page + 1)" :disabled="page === pages"
+      <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
               class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>

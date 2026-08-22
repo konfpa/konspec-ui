@@ -2,7 +2,16 @@
      carries the state: createIcons() replaces the <i> with an <svg>, so a
      binding written on the icon itself is thrown away on hydration. It is
      invisible rather than absent on the unsorted columns, so the header labels
-     do not shift when the sort moves. -->
+     do not shift when the sort moves, and it starts invisible in the class
+     attribute rather than only in the binding, so the unsorted chevrons do not
+     show for the frame before Alpine boots.
+
+     The sortable header is a button inside the <th> and the aria-sort is on the
+     <th>. Both halves are needed: the button is what a keyboard reaches, and
+     aria-sort on the cell is the only thing that says which way the column is
+     ordered. Department and Due do not sort, so they are plain cells carrying
+     no aria-sort at all — aria-sort="none" on a column that cannot be sorted
+     announces a control that is not there. -->
 <div data-kui="table/default" x-data="{
        col: 'po', dir: 'asc',
        rows: [
@@ -12,7 +21,7 @@
          { po: 'PO-24-1203', vendor: 'Sharma Extrusions', dept: 'Tooling', amount: 96750, status: 'Closed', due: '28 Jul' },
          { po: 'PO-24-1206', vendor: 'Nashik Steel Traders', dept: 'Maintenance', amount: 132900, status: 'Draft', due: '—' }
        ],
-       dot: { Open: 'bg-zinc-700', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
        sortBy(c) { this.dir = this.col === c && this.dir === 'asc' ? 'desc' : 'asc'; this.col = c },
        ariaSort(c) { return this.col === c ? (this.dir === 'asc' ? 'ascending' : 'descending') : 'none' },
        money(n) { return '₹' + n.toLocaleString('en-IN') },
@@ -26,20 +35,20 @@
     <thead>
       <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
         <th scope="col" :aria-sort="ariaSort('po')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'po' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'po' && 'text-zinc-900'">
             PO number
             <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th scope="col" :aria-sort="ariaSort('vendor')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'vendor' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'vendor' && 'text-zinc-900'">
             Vendor
             <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th scope="col" class="px-4 py-2.5 font-medium">Department</th>
         <th scope="col" :aria-sort="ariaSort('amount')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'amount' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'amount' && 'text-zinc-900'">
             Amount
             <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
@@ -54,7 +63,7 @@
           <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.po"></td>
           <td class="px-4 py-2.5" x-text="r.vendor"></td>
           <td class="px-4 py-2.5 text-zinc-600" x-text="r.dept"></td>
-          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="money(r.amount)"></td>
           <td class="px-4 py-2.5">
             <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
               <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>

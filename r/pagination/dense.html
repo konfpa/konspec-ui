@@ -13,7 +13,12 @@
 
      The panel is not overflow-hidden, so the focus outline at offset-2 is not
      clipped by the rounded corner. Where a panel has to clip, the pager's
-     buttons take focus-visible:-outline-offset-2 instead and draw inside. -->
+     buttons take focus-visible:-outline-offset-2 instead and draw inside.
+
+     Density does not change the focus rule at the ends: the control that was
+     pressed is the one that goes dead, and a browser blurs a disabled element
+     to the body, so each handler hands focus to its opposite number. A 28px
+     button is easier to lose focus off, not harder. -->
 <div data-kui="pagination/dense" class="max-w-xl rounded-xl border border-zinc-300 bg-white"
      x-data="{
        page: 1, size: 4,
@@ -34,7 +39,8 @@
        get shown() { return this.rows.slice((this.page - 1) * this.size, this.page * this.size) },
        get from() { return (this.page - 1) * this.size + 1 },
        get to() { return Math.min(this.page * this.size, this.rows.length) },
-       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
      }">
 
   <table class="w-full text-[13px]/5">
@@ -67,11 +73,11 @@
        x-text="from + '–' + to + ' of ' + rows.length + ' batches'">1–4 of 10 batches</p>
     <div class="flex items-center gap-1">
       <span class="mr-1 text-[12px]/4 tabular-nums text-zinc-500" x-text="'Page ' + page + ' of ' + pages">Page 1 of 3</span>
-      <button type="button" aria-label="Previous page" @click="go(page - 1)" :disabled="page === 1"
+      <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
               class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:size-7">
         <i data-lucide="chevron-left" class="size-4"></i>
       </button>
-      <button type="button" aria-label="Next page" @click="go(page + 1)" :disabled="page === pages"
+      <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
               class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 md:size-7">
         <i data-lucide="chevron-right" class="size-4"></i>
       </button>

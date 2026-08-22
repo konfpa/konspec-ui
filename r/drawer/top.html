@@ -1,0 +1,97 @@
+<!-- The same component against the other horizontal edge, and the reason is
+     the software keyboard.
+
+     A panel whose first control is a text field cannot live on the bottom edge
+     of a phone. Focus the field and the keyboard takes the bottom third of the
+     viewport; dvh shrinks, the cap re-evaluates, and the panel is squeezed
+     between the top of the keyboard and its own cap with the field, the list
+     and the footer all fighting for what is left. Hang the same panel from the
+     top and it loses that height off the far end, where there is nothing but
+     page.
+
+     So the edge follows two questions: what is going to cover the panel, and
+     what is going to press it. A panel of tap targets stays at the bottom,
+     where the thumb already is — that is drawer/actions and it should not move.
+     A panel you type into goes to the top. The other two edges are not this
+     component: a full-height panel from the right is sheet, and a full-height
+     panel from the left is the app shell's off-canvas navigation, which
+     sidebar/mobile owns.
+
+     Four swaps, and they travel together or the panel arrives from the top
+     wearing a bottom sheet's corners: items-start for items-end,
+     -translate-y-full for translate-y-full, rounded-b-2xl for rounded-t-2xl,
+     border-b for border-t.
+
+     The handle is gone rather than moved to the bottom of the panel. It is a
+     bottom-sheet convention borrowed from platforms that implement the drag;
+     on a panel hanging from the top it is a bar pointing at a gesture that has
+     neither an implementation nor a convention behind it.
+
+     Scans land newest-first, directly under the field, because the operator is
+     watching the place they are typing into and a list that grows away from it
+     is a list nobody reads. The count is aria-live="polite": a barcode gun
+     fires faster than a screen reader can finish a sentence, and assertive
+     would make the panel unusable for the person it is meant to reassure. -->
+<div data-kui="drawer/top" x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="scan-line" class="size-4"></i>Scan to receive
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="dw-scan-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="-translate-y-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="-translate-y-full"
+         class="flex max-h-[calc(100dvh-6rem)] w-full flex-col rounded-b-2xl border-b border-zinc-200 bg-white shadow-lg sm:max-w-md">
+
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-100 px-5 pt-4 pb-3">
+        <div class="min-w-0">
+          <h2 id="dw-scan-title" class="text-[16px]/6 font-semibold">Scan to receive</h2>
+          <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">GRN 1142 · PO-24-1187 · Sharma Extrusions</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="shrink-0 px-5 pt-4 pb-3">
+        <label for="dw-scan-code" class="mb-1.5 block text-[13px]/5 font-medium">Barcode</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <i data-lucide="scan-line" class="ml-3 size-4 shrink-0 text-zinc-500"></i>
+          <input id="dw-scan-code" autofocus autocomplete="off" placeholder="Scan or type a bundle tag"
+                 class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto border-t border-zinc-100">
+        <p aria-live="polite" class="bg-zinc-50 px-5 py-2 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">3 bundles scanned · 3,640 kg</p>
+        <ul class="divide-y divide-zinc-100">
+          <li class="flex items-center justify-between gap-4 px-5 py-3">
+            <span class="min-w-0 truncate text-[13px]/5 tabular-nums">MS plate 10 mm · HT-4471</span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">1,240 kg</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 px-5 py-3">
+            <span class="min-w-0 truncate text-[13px]/5 tabular-nums">MS plate 10 mm · HT-4470</span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">1,180 kg</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 px-5 py-3">
+            <span class="min-w-0 truncate text-[13px]/5 tabular-nums">MS angle 50×50×6 · HT-4468</span>
+            <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">1,220 kg</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="open = false"
+                class="flex-1 rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Post 3 bundles</button>
+      </div>
+    </div>
+  </div>
+</div>

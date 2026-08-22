@@ -1,0 +1,85 @@
+<!-- Every figure on a dashboard is a figure over a period, and the period is a
+     control on the strip more often than it is a decision made once in the
+     query.
+
+     Rebasing moves three things and drops none of them: the figure, the
+     magnitude of the delta, and the clause naming what the delta is measured
+     against. Move the figure and leave the clause and the tile is not stale, it
+     is false — "1,712 vs. July" is a sentence nobody catches, because both
+     halves look like data. All three come out of one record here for exactly
+     that reason; a template that reads the figure from one place and prints the
+     clause as a constant is the shape of the defect.
+
+     The new figure is read for the new period and never divided out of the one
+     already on screen. 148 orders in thirty days does not become 34.5 in a
+     week, and the week anybody is asking about is the one that just happened.
+
+     The text inside the bound elements is the thirty-day reading rather than a
+     placeholder, so the tile is correct in the frame before Alpine boots and in
+     the frame after the JavaScript fails altogether.
+
+     The arrow flips with the period, so it sits on two wrapping spans and never
+     on the <i> itself: createIcons() replaces that node with an <svg> and takes
+     any binding on it away. The one hidden at first paint carries x-cloak.
+
+     The sign picks the tone here only because orders raised is a metric where
+     up is good, and that is a fact about this tile rather than about the
+     component. Point the same template at overdue value and it congratulates
+     the buyer every morning. Carry good on the record and choose the tone with
+     delta > 0 === (good === "up") the moment there is a second metric.
+
+     role="status" with aria-atomic on the tile is legitimate here and only
+     here — a person pressed the control, so the announcement answers a question
+     they asked, and aria-atomic is what makes it read as "Orders raised, 1,712,
+     -38 vs. the twelve months before" rather than as a bare number. A tile that
+     repolls on a timer stays silent.
+
+     The control is button-group/segmented at its own size. On a real screen
+     each button also carries hx-get with the period in the query and swaps the
+     tile; Alpine holds only which one is pressed. -->
+<div data-kui="stat-card/period" class="max-w-sm space-y-3"
+     x-data="{
+       p: '30d',
+       opts: ['7d', '30d', '12m'],
+       label: { '7d': '7 days', '30d': '30 days', '12m': '12 months' },
+       fig:   { '7d': '41', '30d': '148', '12m': '1,712' },
+       mag:   { '7d': '+6', '30d': '+11', '12m': '-38' },
+       vs:    { '7d': 'vs. previous 7 days', '30d': 'vs. previous 30 days', '12m': 'vs. the 12 months before' },
+       get up() { return !this.mag[this.p].startsWith('-') },
+       move(step) {
+         const i = (this.opts.indexOf(this.p) + step + this.opts.length) % this.opts.length;
+         this.p = this.opts[i];
+         this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());
+       }
+     }">
+
+  <div role="radiogroup" aria-label="Period" x-ref="grp"
+       @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+       @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+       class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+    <template x-for="o in opts" :key="o">
+      <button type="button" role="radio" :aria-checked="p === o" :tabindex="p === o ? 0 : -1"
+              @click="p = o"
+              class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="p === o ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+        <span x-text="label[o]"></span>
+      </button>
+    </template>
+  </div>
+
+  <div role="status" aria-atomic="true" class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Orders raised · all plants</dt>
+      <dd class="mt-1.5 text-[24px]/7 font-semibold tracking-tight tabular-nums" x-text="fig[p]">148</dd>
+      <dd class="mt-2 flex flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums"
+              :class="up ? 'text-emerald-600' : 'text-red-600'">
+          <span x-show="up"><i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i></span>
+          <span x-show="!up" x-cloak><i data-lucide="trending-down" class="size-3.5" aria-hidden="true"></i></span>
+          <span x-text="mag[p]">+11</span>
+        </span>
+        <span class="text-zinc-500" x-text="vs[p]">vs. previous 30 days</span>
+      </dd>
+    </dl>
+  </div>
+</div>

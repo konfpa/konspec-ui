@@ -1,0 +1,109 @@
+<!-- The confirmation belongs to an action that finished on the previous
+     request. post-redirect-get means the page carrying the message is a fresh
+     document, so the message cannot be pushed by the code that raised it — it
+     comes back down inside the response and has to be turned into a toast on
+     arrival.
+
+     views.py
+         messages.success(request, 'GRN 4417 posted against PO-24-1187.')
+         return redirect('grn-detail', number=4417)
+
+     The messages go into a data island and not into the region. Render the
+     cards server-side and they are content that was present when the region
+     first appeared, which is the one thing a live region does not report: it
+     paints perfectly and announces nothing. Alpine boots on DOMContentLoaded,
+     after the whole document — including the empty region — has been parsed and
+     handed to the accessibility tree, so a push from x-init is a change to a
+     region that already existed.
+
+     messages is consumed by iterating it. This block and the alert/django block
+     cannot both be on one page: whichever renders first empties the store and
+     the second one draws nothing. Choose per screen. A confirmation of what the
+     user just did is this; a condition that is still true when they look away —
+     the period is closed, three invoices are unmatched — is an alert in the
+     page, and it is not a toast however it was produced.
+
+     message.tags is the Django tag string, and error maps to danger, which
+     routes to the assertive region and takes no timer at all. Anything the user
+     has to read, copy or act on should have been messages.error, and error is
+     the tag this component refuses to put a timer on.
+
+     Nothing here restores focus on dismiss. The control that raised the message
+     was on the request before this one and does not exist any more, so the only
+     honest thing to do with the caret is leave it where the user put it. -->
+<div data-kui="toast/django" x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       icon: { info: 'info', debug: 'info', success: 'check-circle-2', warning: 'alert-triangle', danger: 'alert-circle' },
+       hue: { info: 'text-zinc-500', debug: 'text-zinc-500', success: 'text-emerald-600', warning: 'text-amber-700', danger: 'text-red-600' },
+       drain() {
+         const el = document.getElementById('kui-messages');
+         if (!el) return;
+         JSON.parse(el.textContent).forEach(m => this.push({
+           tone: m.tags === 'error' ? 'danger' : (this.icon[m.tags] ? m.tags : 'info'),
+           text: m.text
+         }));
+       },
+       push(t) {
+         const n = { id: ++this.seq, tone: 'info', ms: 5000, timer: 0, ...t };
+         if (n.tone === 'danger') n.ms = 0;
+         this.toasts.push(n);
+         while (this.toasts.length > 3) this.close(this.toasts[0].id);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       },
+       bucket(name) { return this.toasts.filter(t => (t.tone === 'danger') === (name === 'danger')); }
+     }" x-init="drain()">
+
+  {% if messages %}
+    <script id="kui-messages" type="application/json">
+      [{% for message in messages %}{"tags": "{{ message.tags|escapejs }}", "text": "{{ message|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
+    </script>
+  {% endif %}
+
+  <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <div role="alert" aria-live="assertive" class="flex flex-col gap-2">
+      <template x-for="t in bucket('danger')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0" :class="hue[t.tone]"><i :data-lucide="icon[t.tone]" class="size-4"></i></span>
+          <p class="min-w-0 flex-1 text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
+          <button type="button" aria-label="Dismiss" @click="close(t.id)"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div role="status" aria-live="polite" class="flex flex-col gap-2">
+      <template x-for="t in bucket('polite')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
+             @pointerenter="pause(t)" @pointerleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0" :class="hue[t.tone]"><i :data-lucide="icon[t.tone]" class="size-4"></i></span>
+          <p class="min-w-0 flex-1 text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
+          <button type="button" aria-label="Dismiss" @click="close(t.id)"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>

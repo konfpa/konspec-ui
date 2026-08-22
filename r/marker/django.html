@@ -1,0 +1,97 @@
+<!-- The mark comes off the record's own state field, through one lookup that
+     lives in one place — and it is the lookup the badge already reads. Import
+     it, do not re-declare it: two copies of the mapping is how one screen ends
+     up amber and another green for the same order, and the screen that is wrong
+     is always the one nobody opened during the review.
+
+     # templatetags/ui.py
+     DOT = {
+         'open':     'bg-zinc-500',
+         'approved': 'bg-amber-500',
+         'overdue':  'bg-red-600',
+         'closed':   'bg-emerald-600',
+         'draft':    'bg-zinc-400',
+     }
+
+     @register.filter
+     def status_dot(value):
+         return DOT.get(value, DOT['open'])
+
+     The word beside the dot is get_status_display, so it follows the model's
+     choices and cannot drift from the colour the same field picked. It is
+     sr-only because the due line already tells a sighted reader what they need;
+     delete it and the state of every row is a colour and nothing else.
+
+     There is no empty clause inside the for, and that is deliberate. Django's
+     empty block renders inside the loop, which is inside the ul, so "nothing
+     due" becomes item 1 of a list of 1 and is announced as "list, one item"
+     before the sentence saying the list is empty. The if/else puts it outside
+     the ul, where an empty state belongs.
+
+     The rail is group-last:hidden rather than a forloop.last test. Both are
+     right on a full render and only one of them survives htmx appending the
+     next page: forloop.last was true for the row that used to be last, so that
+     row's rail is gone for good and nothing on the page knows to redraw it.
+     :last-child recomputes itself on every insertion.
+
+     Line numbers are line.line_no and never forloop.counter. A counter
+     renumbers the moment the queryset is filtered or paged, and then the
+     buyer's line 40 and the screen's line 40 are different lines with nothing
+     on either to say so.
+
+     Amounts go through the project's own inr filter, not intcomma. intcomma
+     groups in thousands and prints 1,242,000 where every other figure on the
+     screen reads 12,42,000. -->
+{% load ui %}
+
+{# orders/_due.html #}
+<div data-kui="marker/django" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium">Orders awaiting receipt</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ orders|length }} of {{ total }} · sorted by due date</p>
+  </div>
+
+  {% if orders %}
+    <ul role="list" class="divide-y divide-zinc-100">
+      {% for order in orders %}
+        <li>
+          <a href="{% url 'order-detail' order.pk %}"
+             class="flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full {{ order.status|status_dot }}"></span></span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[13px]/5 font-medium tabular-nums text-zinc-900">{{ order.number }} · {{ order.vendor.name }}</span>
+              <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">{{ order.get_status_display }} — </span>Due {{ order.due_on|date:"d M Y" }} · ₹{{ order.value|inr }}</span>
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="px-4 py-6 text-center text-[13px]/5 text-zinc-500">No orders are awaiting receipt.</p>
+  {% endif %}
+</div>
+
+{# orders/_lines.html — the order's line numbers, so a filter cannot move them #}
+<ol role="list" class="mt-3 max-w-md space-y-2 text-[13px]/5">
+  {% for line in order.lines.all %}
+    <li class="flex items-start gap-3">
+      <span class="w-8 shrink-0 text-right text-[13px]/5 tabular-nums text-zinc-500">{{ line.line_no }}.</span>
+      <span class="min-w-0 flex-1 text-zinc-600">{{ line.description }}</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹{{ line.value|inr }}</span>
+    </li>
+  {% endfor %}
+</ol>
+
+{# orders/_history.html — appended into the ol by htmx, so the rail is CSS #}
+{% for event in events %}
+  <li class="group flex gap-3 pb-4 last:pb-0">
+    <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+      <span class="flex h-5 items-center"><span class="size-1.5 rounded-full {{ event.status|status_dot }}"></span></span>
+      <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+    </span>
+    <div class="min-w-0 flex-1">
+      <p class="text-[13px]/5 tabular-nums">{{ event.summary }}</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ event.at|date:"d M Y, H:i" }} · {{ event.by.get_full_name }}</p>
+    </div>
+  </li>
+{% endfor %}

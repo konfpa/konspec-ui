@@ -1,0 +1,65 @@
+<!-- The answer is a form submission, and it has to be a POST. The trigger is a
+     button that opens the dialog, never an anchor pointing at the delete URL:
+     a link that changes state is followed by link prefetch, by a mail scanner
+     unrolling the URL in a notification, and by the browser's own preview, and
+     each of those deletes the order with nobody pressing anything. GET reads,
+     POST writes, and this component exists precisely for the writes worth
+     interrupting over.
+
+     {% csrf_token %} sits inside the form. It is not inside the panel by
+     accident — a dialog assembled from an include that puts the token outside
+     the <form> renders fine and posts a 403 the first time somebody confirms.
+
+     Nothing here reports the outcome, and that is deliberate. The submission
+     replaces the whole document, so anything this dialog draws afterwards is
+     never seen. The view redirects and django.contrib.messages carries the
+     result into the next page, where alert/django renders it. If you want the
+     outcome reported without a page change, that is the running variant and
+     htmx, not this one.
+
+     The two failure modes both have a shape in this entry. Check the
+     precondition in get_context_data and render the blocked shape instead of
+     this one, so the confirm is never drawn for a delete that cannot happen;
+     catch ProtectedError from on_delete=PROTECT in the view and re-render with
+     the refused shape, because a database that refuses after the POST is the
+     server saying no.
+
+     Indian digit grouping is not something intcomma does — it groups in
+     thousands — so the value arrives already formatted from the model rather
+     than through a template filter. -->
+<div data-kui="alert-dialog/django" x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Delete order</button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="dj-title" aria-describedby="dj-body"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <div class="flex items-start gap-3">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+        <div class="min-w-0">
+          <h2 id="dj-title" class="text-[16px]/6 font-semibold">Delete {{ order.number }}</h2>
+          <p class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+            {{ order.vendor.name }} · ₹{{ order.total_inr }} · raised {{ order.raised_on|date:"d M Y" }}.
+          </p>
+          <p id="dj-body" class="mt-2 text-[13px]/5 font-medium text-red-600">
+            {% if order.cascade_count %}
+              {{ order.cascade_count }} linked record{{ order.cascade_count|pluralize }} will be deleted with it.
+            {% endif %}
+            This cannot be undone.
+          </p>
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'orders:delete' order.pk %}">
+        {% csrf_token %}
+        <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button type="button" @click="open = false"
+                  class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+          <button type="submit" name="confirm" value="delete"
+                  class="rounded-lg bg-red-600 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Delete order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,97 @@
+<!-- The trigger sits in the middle of a sentence, which is the arrangement
+     the entry warns about everywhere else. A table cell and a labelled field
+     both give the trigger the start of a line, so left-0 is safe; a reference
+     inside running text falls wherever the word falls, and at 390px a word
+     near the end of a line anchors a 320px panel most of the way off the
+     screen. The clamp is not a refinement here — it is the thing that makes
+     this arrangement allowed at all.
+
+     The clamp goes on the positioned wrapper, the element that also carries
+     the pt-2 bridge, and never on the card inside it. Put it on the card and
+     the strip the pointer crosses stays under the word while the card slides
+     out from over it, so the pointer falls through the gap at exactly the
+     offsets where the clamp had something to do.
+
+     An open card covers the entries below it, and the answer is not a smaller
+     card or a shorter close delay. The answer is that every reference is a
+     link before it is a trigger: the entry underneath is still reachable the
+     moment the card closes, and it was always reachable by tabbing to it.
+
+     One place() for both jobs, the same one the placement variant explains at
+     length, including why the offset is written as left and not as a
+     transform. Two positioning strategies in one component is one too many.
+
+     The line of prose is a div and not a p. The panel is a div, and a div
+     inside a p closes the p where it starts: the parser ends the paragraph,
+     drops the panel out into the list item as a sibling, and the timestamp
+     after it becomes a second paragraph. It renders as a layout that broke
+     rather than as invalid markup, which is why it survives review. -->
+<div data-kui="hovercard/trail" class="rounded-xl border border-zinc-300 bg-white p-4"
+     x-data="{ trail: [
+       { who: 'Ritu Deshpande', verb: 'approved', id: 'PO-24-1187', href: '/orders/1187/', vendor: 'Gujarat Polymers Ltd', value: '₹18,42,000', due: '28 Aug 2026', at: '12 Aug 2026, 4:20 pm' },
+       { who: 'Sanjay More',    verb: 'raised',   id: 'PO-24-1191', href: '/orders/1191/', vendor: 'Nashik Steel Traders',  value: '₹6,04,750',  due: '02 Aug 2026', at: '18 Aug 2026, 11:05 am' },
+       { who: 'Meena Iyer',     verb: 'amended',  id: 'PO-24-1179', href: '/orders/1179/', vendor: 'Vapi Polymer Works',    value: '₹2,71,300',  due: '19 Sep 2026', at: '09 Aug 2026, 2:40 pm' }
+     ] }">
+  <p class="text-[11px]/4 tracking-wider text-zinc-500 uppercase">Activity</p>
+  <ul class="mt-2 space-y-2.5">
+    <template x-for="e in trail" :key="e.id">
+      <li class="flex gap-2.5">
+        <span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-zinc-300" aria-hidden="true"></span>
+        <div class="text-[13px]/5 text-zinc-600">
+          <span class="font-medium text-zinc-900" x-text="e.who"></span>
+          <span x-text="e.verb"></span>
+
+          <span class="relative inline-block"
+                x-data="{
+                  open: false, timer: 0, up: false, dx: 0,
+                  place() {
+                    const r = this.$root.getBoundingClientRect(), p = this.$refs.panel, m = 12;
+                    this.up = r.bottom + p.offsetHeight > innerHeight - m && r.top - p.offsetHeight > m;
+                    this.dx = Math.round(Math.max(m, Math.min(r.left, innerWidth - m - p.offsetWidth)) - r.left);
+                  },
+                  show(d = 350) {
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(() => {
+                      this.open = true;
+                      this.$nextTick(() => this.place());
+                      window.dispatchEvent(new CustomEvent('hovercard-open', { detail: this.$root }));
+                    }, d);
+                  },
+                  hide() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = false, 200); },
+                  shut() { clearTimeout(this.timer); this.open = false; }
+                }"
+                @mouseenter="show()" @mouseleave="hide()"
+                @focusin="show(0)" @focusout="hide()"
+                @keydown.escape.window="shut()"
+                @hovercard-open.window="if ($event.detail !== $root) shut()"
+                @resize.window.debounce="open && place()">
+
+            <a :href="e.href" x-text="e.id" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></a>
+
+            <div x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.150ms
+                 :class="up ? 'bottom-full pb-2' : 'top-full pt-2'"
+                 :style="'left: ' + dx + 'px'"
+                 class="absolute left-0 z-40">
+              <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 text-left shadow-lg">
+                <p class="truncate text-[14px]/5 font-semibold tabular-nums" x-text="e.id"></p>
+                <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600" x-text="e.vendor"></p>
+                <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">Value</dt>
+                    <dd class="text-[12px]/4 font-medium tabular-nums" x-text="e.value"></dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">Delivery</dt>
+                    <dd class="text-[12px]/4 tabular-nums" x-text="e.due"></dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </span>
+
+          <span class="text-zinc-500 tabular-nums">· <span x-text="e.at"></span></span>
+        </div>
+      </li>
+    </template>
+  </ul>
+</div>

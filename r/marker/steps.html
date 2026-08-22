@@ -13,7 +13,12 @@
      fill says nothing to anyone who cannot see it. The step numbers stay real
      text: they are what people quote when a run stalls, and with list-style
      already gone nothing else is going to say them. The done steps swap the
-     number for a check and put the word back with sr-only. -->
+     number for a check and put the word back with sr-only.
+
+     The steps below the current one carry the word too. Their only visual
+     signal that they have not happened is zinc-500 text, and grey is a colour
+     — a list that says Done, Done, current step, and then two lines with
+     nothing in front of them reads as three states and announces two. -->
 <div data-kui="marker/steps" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium tabular-nums">Invoice INV-8841 · payment run</h3>
 
@@ -46,13 +51,13 @@
     <li class="flex items-start gap-3">
       <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium tabular-nums text-zinc-600 ring-1 ring-inset ring-zinc-300">4</span>
       <div class="min-w-0 flex-1">
-        <p class="text-zinc-500">Released to the payment run</p>
+        <p class="text-zinc-500"><span class="sr-only">Not started — </span>Released to the payment run</p>
       </div>
     </li>
     <li class="flex items-start gap-3">
       <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-medium tabular-nums text-zinc-600 ring-1 ring-inset ring-zinc-300">5</span>
       <div class="min-w-0 flex-1">
-        <p class="text-zinc-500">Paid, 45 days from GRN</p>
+        <p class="tabular-nums text-zinc-500"><span class="sr-only">Not started — </span>Paid, 45 days from GRN</p>
       </div>
     </li>
   </ol>

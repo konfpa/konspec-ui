@@ -1,0 +1,151 @@
+<!-- Three months, six or twelve, chosen from the card header. The chart is
+     built once and then mutated: data.labels and data.datasets[0].data are
+     replaced and update() is called.
+
+     Do not build a second Chart on the same canvas. Chart.js keeps a registry
+     keyed on the element and throws "Canvas is already in use" on the second
+     one, and the destroy-then-recreate that people reach for next drops the
+     scale, the tooltip and the animation state on the floor and pays for a
+     full layout pass on every click of a control somebody is going to click
+     four times in a row.
+
+     One period object feeds all three renderings — the canvas, the sentence in
+     aria-label and the rows of the fallback table. A screen that recomputes
+     the summary sentence separately gets a card that says twelve months while
+     showing three, and nobody sees it because nobody who can see the chart
+     reads the label.
+
+     The control is button-group/segmented: a real radiogroup, one Tab stop,
+     arrows to move, roving tabindex. Its aria-checked is what announces the
+     change, which is why there is no live region here — a role="status" firing
+     on top of the radio announcement is two things talking at once.
+
+     The track is a tinted shape and carries its ring. It wraps below the title
+     at 390px rather than shrinking, because a 36px control that has been
+     squeezed to 24px is no longer a touch target. -->
+<div data-kui="chart/period" class="rounded-xl border border-zinc-300 bg-white p-5"
+     x-data="{
+       chart: null, gone: false,
+       period: '6m',
+       opts: [{ id: '3m', label: '3 M' }, { id: '6m', label: '6 M' }, { id: '12m', label: '12 M' }],
+       sets: {
+         '3m': { labels: ['Jun', 'Jul', 'Aug'],
+                 data: [2240000, 2310000, 2410000],
+                 summary: 'Committed value over the last three months, rising from ₹22.4 lakh in June to ₹24.1 lakh in August.' },
+         '6m': { labels: ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                 data: [2030000, 1870000, 1960000, 2240000, 2310000, 2410000],
+                 summary: 'Committed value over the last six months, dipping to ₹18.7 lakh in April and recovering to ₹24.1 lakh by August.' },
+         '12m': { labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                  data: [1240000, 1380000, 1190000, 1560000, 1410000, 1680000, 2030000, 1870000, 1960000, 2240000, 2310000, 2410000],
+                  summary: 'Committed value over the last twelve months, roughly doubling from ₹12.4 lakh to ₹24.1 lakh, stepping up from March onward and dipping only in April.' }
+       },
+       get set() { return this.sets[this.period] },
+       get rows() { return this.set.labels.map((m, i) => ({ m: m, v: this.set.data[i] })) },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       choose(id) {
+         this.period = id;
+         if (!this.chart) return;
+         this.chart.data.labels = this.set.labels;
+         this.chart.data.datasets[0].data = this.set.data;
+         this.chart.update();
+       },
+       move(step) {
+         const i = (this.opts.findIndex(o => o.id === this.period) + step + this.opts.length) % this.opts.length;
+         this.choose(this.opts[i].id);
+         this.$nextTick(() => this.$refs.grp.querySelector('[aria-checked=true]').focus());
+       },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
+       init() { this.wait(() => this.draw()); },
+       wait(fn) {
+         if (this.gone) return;
+         const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+         probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const grid = getComputedStyle(this.$root).borderTopColor;
+         const ink  = getComputedStyle(this.$refs.legend).color;
+         const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                           .map(el => getComputedStyle(el).backgroundColor);
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'line',
+           data: {
+             labels: this.set.labels,
+             datasets: [{
+               label: 'Committed value', data: this.set.data,
+               borderColor: tone[0], backgroundColor: tone[0],
+               borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.3
+             }]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false,
+             interaction: { mode: 'index', intersect: false },
+             scales: {
+               x: { grid: { display: false }, border: { color: grid }, ticks: { color: ink, maxRotation: 0, autoSkipPadding: 12 } },
+               y: {
+                 beginAtZero: true,
+                 grid: { color: grid }, border: { display: false },
+                 ticks: { color: ink, padding: 8, callback: v => (v / 100000).toFixed(1).replace('.0', '') + 'L' }
+               }
+             },
+             plugins: {
+               tooltip: { callbacks: { label: c => '₹' + c.parsed.y.toLocaleString('en-IN') } }
+             }
+           }
+         });
+       },
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
+     }">
+
+  <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+    <div>
+      <h3 class="text-[14px]/5 font-semibold">Committed value by month</h3>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Silvassa plant · to 20 Aug 2026</p>
+    </div>
+
+    <div role="radiogroup" aria-label="Period" x-ref="grp"
+         @keydown.arrow-right.prevent="move(1)" @keydown.arrow-down.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)" @keydown.arrow-up.prevent="move(-1)"
+         class="inline-flex rounded-lg bg-zinc-200 p-0.5 ring-1 ring-inset ring-zinc-300">
+      <template x-for="o in opts" :key="o.id">
+        <button type="button" role="radio" :aria-checked="period === o.id" :tabindex="period === o.id ? 0 : -1"
+                @click="choose(o.id)"
+                class="inline-flex h-8 items-center rounded-md px-3 text-[13px]/5 font-medium tabular-nums transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="period === o.id ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'">
+          <span x-text="o.label"></span>
+        </button>
+      </template>
+    </div>
+  </div>
+
+  <ul x-ref="legend" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5">
+      <span data-series class="size-2 rounded-full bg-zinc-800" aria-hidden="true"></span>Committed value
+    </li>
+  </ul>
+
+  <div class="mt-4 h-64">
+    <canvas x-ref="canvas" role="img" :aria-label="set.summary"></canvas>
+  </div>
+
+  <div class="sr-only">
+    <table>
+      <caption>Committed value by month, Silvassa plant</caption>
+      <thead><tr><th scope="col">Month</th><th scope="col">Committed value</th></tr></thead>
+      <tbody>
+        <template x-for="r in rows" :key="r.m">
+          <tr><th scope="row" x-text="r.m"></th><td x-text="money(r.v)"></td></tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<!-- 412 pages of ledger entries. The number row stopped being navigation
+     somewhere around page thirty: nobody walks to 214, and the seven squares
+     now show 1 … 213 214 215 … 412, which is a window onto a register the size
+     of a phone book. This is the control for the one case where a page number
+     is still worth something — you were on 214 yesterday and you want back.
+
+     It is not a substitute for the filter beside it. Somebody looking for the
+     entries of 14 Aug 2026 wants a date range, and a jump field that lets them
+     bisect their way there is the register failing politely rather than
+     failing. Ship both, and ship the filter first.
+
+     It refuses rather than clamps. Type 900 into a 412-page register and a
+     clamp silently lands you on 412, which reads as the register deciding you
+     meant something else; the field says how many pages there are and waits.
+     aria-invalid is bound as a string, because aria-invalid="false" is the
+     valid state and not an attribute to leave off. Two status regions on one
+     strip is usually one too many, and here they never speak together: a
+     commit that works changes the range and leaves the hint alone, and one
+     that is refused changes the hint and leaves the page where it was.
+
+     inputmode="numeric" rather than type="number", the same call
+     input-group/stepper makes: the browser draws its own spin buttons hard
+     against the right edge of the field, directly under Go, and the enclosure
+     ends with two hit areas nobody aimed at.
+
+     The height is declared once, on the enclosure. h-9 there is the 36px of the
+     size-9 buttons beside it, and the field and Go take it by stretching; put
+     the height on the field and the group comes out two pixels short of every
+     other control on the strip.
+
+     Enter commits, Escape puts the number back. Typing and reaching for the
+     button beside the box is not the gesture, and a field somebody has half
+     retyped needs a way out that is not the wrong page. -->
+<nav data-kui="pagination/jump" aria-label="Journal register pages"
+     x-data="{
+       page: 214, pages: 412, size: 25, total: 10287, draft: '214', bad: false,
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       n(v) { return v.toLocaleString('en-IN') },
+       commit() {
+         const v = Number(String(this.draft).replace(/[^0-9]/g, ''));
+         if (!v || v > this.pages) { this.bad = true; return }
+         this.bad = false; this.page = v; this.draft = String(v);
+       },
+       step(d) {
+         this.page = Math.min(Math.max(this.page + d, 1), this.pages);
+         this.draft = String(this.page); this.bad = false;
+         if (this.page === 1) this.$refs.next.focus();
+         else if (this.page === this.pages) this.$refs.prev.focus();
+       }
+     }"
+     class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+
+  <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+     x-text="n(from) + '–' + n(to) + ' of ' + n(total) + ' entries'">5,326–5,350 of 10,287 entries</p>
+
+  <div class="flex flex-wrap items-center gap-2">
+    <label for="pager-jump" class="text-[13px]/5 text-zinc-600">Go to page</label>
+
+    <div class="flex h-9 items-stretch rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+         :class="bad ? 'border-red-600 focus-within:outline-red-600/15'
+                     : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+      <input id="pager-jump" x-model="draft" inputmode="numeric" aria-describedby="pager-jump-msg"
+             :aria-invalid="bad ? 'true' : 'false'"
+             @keydown.enter.prevent="commit()" @input="bad = false"
+             @keydown.escape.prevent="draft = String(page); bad = false"
+             class="w-14 min-w-0 bg-transparent px-2 text-center text-[13px]/5 tabular-nums outline-none">
+      <button type="button" @click="commit()"
+              class="shrink-0 rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">Go</button>
+    </div>
+
+    <button type="button" x-ref="prev" aria-label="Previous page" @click="step(-1)" :disabled="page === 1"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+    <button type="button" x-ref="next" aria-label="Next page" @click="step(1)" :disabled="page === pages"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+
+  <p id="pager-jump-msg" role="status" class="basis-full text-[12px]/4 tabular-nums"
+     :class="bad ? 'font-medium text-red-600' : 'text-zinc-500'"
+     x-text="bad
+               ? 'This register has ' + pages + ' pages. Type a number between 1 and ' + pages + '.'
+               : pages + ' pages at ' + size + ' rows. Looking for a date? The filter above is faster.'">412 pages at 25 rows. Looking for a date? The filter above is faster.</p>
+</nav>

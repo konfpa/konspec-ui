@@ -1,0 +1,171 @@
+<!-- A skeleton is a claim that something is coming, and there are three ways it
+     can stop being true. The template that writes only the loaded branch leaves
+     the bars pulsing forever on the other two.
+
+     Nothing is the branch that gets missed, and it is missed for a reason worth
+     naming: in a template "no rows yet" and "no rows at all" are the same falsy
+     value, so the loop draws nothing, the skeleton above it is never removed,
+     and the answer that already arrived is invisible. Write the empty branch
+     first. It also has to say what it means — "No goods receipts against this
+     order" is a fact about the order, where bars still turning say the page is
+     broken, and somebody reloads and posts the receipt a second time.
+
+     Failure is as much a server question as a markup one. A fragment served
+     outside 2xx is not swapped in, so a view that 500s leaves the skeleton
+     exactly where it was: render the failure into the same slot with a 200.
+
+     And the region needs a ceiling. Past about thirty seconds nothing is
+     coming, and pulsing bars at that point are indistinguishable from a hung
+     page with no move left but a reload — which on a form means posting it
+     twice. The timeout here is four seconds so the demonstration is watchable;
+     thirty is the number for a real one.
+
+     All four states are one grid cell at min-h-[294px], which is the height of
+     the five rows the skeleton drew: five at 58px and the four 1px dividers
+     between them. Write 290 and forget the dividers and the two states that
+     have no rows come back four pixels short of the two that do — which is the
+     whole defect of this component, reintroduced by the fix for it. The panel
+     is the same size
+     whichever way it resolves, so nothing below it moves on any of the three
+     outcomes, and that is checkable rather than asserted.
+
+     The status line sits outside all four branches and survives every swap, so
+     what is announced is the change. It names the outcome and not just the
+     fact: how many receipts, or none, or that it failed. All three end the same
+     wait, and nobody listening can see which one it settled into. -->
+<div data-kui="skeleton/states" class="max-w-md"
+     x-data="{
+       state: 'busy', timer: null, ceiling: null,
+       run(outcome, ms) {
+         clearTimeout(this.timer); clearTimeout(this.ceiling);
+         this.state = 'busy';
+         this.ceiling = setTimeout(() => { this.state = 'failed' }, 4000);
+         if (outcome) this.timer = setTimeout(() => {
+           clearTimeout(this.ceiling); this.state = outcome;
+         }, ms || 1200);
+       }
+     }"
+     x-init="run('rows')">
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white" :aria-busy="state === 'busy'">
+    <div class="border-b border-zinc-200 px-4 py-3">
+      <h2 class="text-[14px]/5 font-semibold tabular-nums">Receipts against PO-24-1187</h2>
+    </div>
+
+    <div class="grid min-h-[294px]">
+
+      <div x-show="state === 'busy'" class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none" aria-hidden="true">
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-48 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-56 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5 px-4 py-2.5">
+          <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex h-5 items-center"><div class="h-2.5 w-52 rounded bg-zinc-200"></div></div>
+            <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-28 rounded bg-zinc-200"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <ul role="list" x-show="state === 'rows'" x-cloak class="divide-y divide-zinc-100">
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0442 · 12,000 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026 · Ritu Deshpande</span>
+          </span>
+        </li>
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0451 · 6,500 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">19 Aug 2026 · Amit Kulkarni</span>
+          </span>
+        </li>
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0458 · 800 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">21 Aug 2026 · held for moisture check</span>
+          </span>
+        </li>
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0463 · 2,400 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">24 Aug 2026 · Farida Qureshi</span>
+          </span>
+        </li>
+        <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+          <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+          <span class="min-w-0 flex-1">
+            <span class="block tabular-nums">GRN-26-0470 · 1,100 kg</span>
+            <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">27 Aug 2026 · Amit Kulkarni</span>
+          </span>
+        </li>
+      </ul>
+
+      <div x-show="state === 'empty'" x-cloak class="flex flex-col items-center justify-center px-6 py-8 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="package-open" class="size-5 text-zinc-500"></i>
+        </span>
+        <h3 class="mt-3 text-[16px]/6 font-semibold">No receipts against this order</h3>
+        <p class="mt-1 max-w-xs text-[13px]/5 text-zinc-600">The order is open and nothing has been received yet. Receipts appear here as the gate posts them.</p>
+      </div>
+
+      <div x-show="state === 'failed'" x-cloak class="flex flex-col items-center justify-center px-6 py-8 text-center">
+        <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+          <i data-lucide="alert-circle" class="size-5 text-red-600"></i>
+        </span>
+        <h3 class="mt-3 text-[16px]/6 font-semibold">The receipt list did not load</h3>
+        <p class="mt-1 max-w-xs text-[13px]/5 text-zinc-600">The request did not answer. Nothing was changed and no receipt was lost — this is the list failing to read, not the records failing to exist.</p>
+        <button type="button" @click="run('rows')"
+                class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-cw" class="size-4"></i>Retry
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only"
+     x-text="state === 'busy' ? 'Loading the receipts for PO-24-1187'
+           : state === 'rows' ? '5 receipts loaded'
+           : state === 'empty' ? 'No receipts against this order'
+           : 'The receipt list did not load'"></p>
+
+  <div class="mt-3 flex flex-wrap gap-2">
+    <button type="button" @click="run('rows')"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium tabular-nums hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Answer with 5</button>
+    <button type="button" @click="run('empty')"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Answer with none</button>
+    <button type="button" @click="run('failed')"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Fail</button>
+    <button type="button" @click="run(null)"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Never answer</button>
+  </div>
+</div>

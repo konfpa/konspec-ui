@@ -1,0 +1,140 @@
+<!-- A buyer with a ₹5,00,000 limit searching for "approve" has to be told the
+     action exists and why it is not theirs. Drop the row and they search for
+     it again next week, ask somebody, and find out from a person what the
+     screen could have said; drop it and the list is also a different shape for
+     every role, so nobody can be told "it is the third one down".
+
+     So the row keeps its place, greyed, with the reason on the second line.
+     The reason is grey and not red: red says a record is overdue or a request
+     failed, and an approval limit that has always applied is neither.
+
+     aria-disabled announces and blocks nothing, so three things have to honour
+     it separately. step() walks past disabled rows and still clamps at the
+     ends, so Down at the bottom of the list stays put rather than jumping back
+     over the locked row it just skipped. The pointer does not highlight them,
+     or the row under the cursor and the row Enter would take stop being the
+     same row. And pick() returns early, because a click lands on a div
+     regardless of what any attribute says.
+
+     Two kinds of unavailable, and the difference is worth drawing. The
+     approval is refused by a rule about this person — a limit, a role — and
+     the reason names it. The GRN is refused by the state of the record: the
+     order is closed, so posting a receipt against it is not a permission
+     question and never becomes one. Both read the same way to somebody
+     scanning, which is the point: the palette is where they find out. -->
+<div data-kui="command-palette/unavailable" x-data="{
+       open: false, q: '', ai: 0,
+       groups: [
+         { name: 'Actions', items: [
+           { id: 'new-po',    label: 'New purchase order',            icon: 'plus',          key: 'N' },
+           { id: 'approve',   label: 'Approve PO-24-1187',            icon: 'check-check',   off: 'Above your ₹5,00,000 approval limit — Ritu Deshpande can approve this' },
+           { id: 'post-grn',  label: 'Post goods receipt on PO-24-1187', icon: 'package-check', key: 'G' },
+           { id: 'grn-1179',  label: 'Post goods receipt on PO-24-1179', icon: 'package-check', off: 'PO-24-1179 is closed — reopen it from the order first' },
+           { id: 'export',    label: 'Export the order register',     icon: 'download' }
+         ] },
+         { name: 'Recent records', items: [
+           { id: 'po-1187', label: 'PO-24-1187 — Gujarat Polymers Ltd', sub: 'HDPE granules · 14 lines', amount: '₹18,42,000', icon: 'file-text' },
+           { id: 'po-1179', label: 'PO-24-1179 — Sharma Steel Traders', sub: 'Closed 02 Sep 2026',       amount: '₹2,74,900',  icon: 'file-text' }
+         ] }
+       ],
+       match(g) {
+         const s = this.q.trim().toLowerCase();
+         if (!s) return g.items;
+         return g.items.filter(o => (o.label + ' ' + (o.sub || '') + ' ' + (o.off || '') + ' ' + g.name).toLowerCase().includes(s));
+       },
+       get list() { return this.groups.flatMap(g => this.match(g)); },
+       rowId(o) { return 'cpu-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       first() { const i = this.list.findIndex(o => !o.off); return i < 0 ? 0 : i; },
+       show() { this.open = true; this.q = ''; this.ai = this.first(); },
+       hide() { this.open = false; this.q = ''; this.ai = 0; },
+       step(n) {
+         let i = this.ai;
+         for (let k = 0; k < this.list.length; k++) {
+           const j = i + n;
+           if (j < 0 || j >= this.list.length) return;
+           i = j;
+           if (!this.list[i].off) { this.ai = i; this.scroll(); return; }
+         }
+       },
+       pick(o) { if (o.off) return; this.hide(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @keydown.window.meta.k.prevent="show()"
+     @keydown.window.ctrl.k.prevent="show()"
+     @keydown.escape.window="hide()">
+
+  <button type="button" @click="show()" aria-haspopup="dialog"
+          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="search" class="size-4 text-zinc-600"></i>
+    <span class="flex-1 text-left">Search Operations</span>
+    <kbd aria-hidden="true" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/40 px-3 pt-16 sm:pt-24">
+    <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
+         class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+
+      <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
+        <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+        <label for="cpu-q" class="sr-only">Search orders, vendors and actions</label>
+        <input id="cpu-q" x-model="q" type="text" role="combobox" autocomplete="off" autofocus
+               aria-autocomplete="list" aria-controls="cpu-list"
+               :aria-expanded="open" :aria-activedescendant="activeId"
+               placeholder="Search orders, vendors, actions…"
+               @input="ai = first()"
+               @keydown.arrow-down.prevent="step(1)"
+               @keydown.arrow-up.prevent="step(-1)"
+               @keydown.enter.prevent="commit()"
+               class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        <button type="button" @click="hide()" class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px]/4 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Esc</button>
+      </div>
+
+      <div id="cpu-list" role="listbox" aria-label="Results" class="max-h-80 overflow-y-auto pb-1">
+        <template x-for="g in groups" :key="g.name">
+          <div role="group" :aria-label="g.name" x-show="match(g).length">
+            <p aria-hidden="true"
+               class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+               x-text="g.name"></p>
+            <template x-for="o in match(g)" :key="o.id">
+              <div :id="rowId(o)" role="option" :aria-disabled="o.off ? 'true' : null"
+                   @mousedown.prevent @click="pick(o)"
+                   @mousemove="if (!o.off) ai = list.findIndex(x => x.id === o.id)"
+                   :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+                   class="flex items-start gap-2.5 px-3 py-2 text-[13px]/5">
+                <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center" :class="o.off ? 'text-zinc-500' : 'text-zinc-600'">
+                  <i :data-lucide="o.off ? 'lock' : o.icon" class="size-4"></i>
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate tabular-nums" :class="o.off ? 'text-zinc-500' : ''" x-text="o.label"></span>
+                  <span x-show="o.sub" class="block truncate text-[12px]/4 tabular-nums text-zinc-500" x-text="o.sub"></span>
+                  <!-- the reason is grey. Red would say the record is overdue
+                       or something failed, and a limit is neither -->
+                  <span x-show="o.off" class="block text-[12px]/4 tabular-nums text-zinc-500" x-text="o.off"></span>
+                </span>
+                <span x-show="o.amount" class="mt-0.5 hidden shrink-0 text-[12px]/4 tabular-nums text-zinc-600 sm:block" x-text="o.amount"></span>
+                <kbd x-show="o.key" class="mt-0.5 shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500" x-text="o.key"></kbd>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">Nothing matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Try an order number — PO-24-1187 — or a vendor name.</p>
+      </div>
+
+      <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
+        <span class="ml-auto">Buyer · Nashik</span>
+      </div>
+
+      <p role="status" class="sr-only"
+         x-text="open ? list.length + (list.length === 1 ? ' result' : ' results') + (list.filter(o => o.off).length ? ', ' + list.filter(o => o.off).length + ' unavailable' : '') : ''"></p>
+    </div>
+  </div>
+</div>

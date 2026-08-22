@@ -1,0 +1,140 @@
+<!-- A rejection reason is prose somebody composed while standing at a
+     receiving bay, and the backdrop is the easiest thing on a phone to press
+     by accident: the panel is full-bleed, the thumb rests at the edge of the
+     screen, and the strip of dimmed page above it is a live dismiss target for
+     as long as the drawer is open. A dismissible drawer over a textarea loses
+     that paragraph roughly once a week, and nobody ever reports it as a bug —
+     they retype it.
+
+     So dismissal is routed through attempt(). Clean, it closes. Dirty, it puts
+     the question in the footer, which is fixed, already under the thumb, and
+     already where the two answers would have gone.
+
+     What it does not do is open an alert dialog on top of the drawer. Two
+     nested x-traps both want to restore focus when they close, and the one
+     that runs last wins, so focus lands back on the drawer's trigger while the
+     drawer is still open and the next Tab walks off into a page that is still
+     behind a scrim. When the question genuinely has three answers — discard,
+     keep editing, save and leave — it is not a footer strip and not a drawer:
+     that is alert-dialog/unsaved.
+
+     Escape is deliberately unable to lose anything. The first press asks, the
+     second press backs out of the question, and there is no third state where
+     it closes. A user hammering Escape to get out of a panel is precisely the
+     user who has not read the question, which is why the answer they cannot
+     reach by mashing a key is the destructive one.
+
+     dirty is set by a delegated @input and @change on the body rather than by a
+     handler on each control — typing raises input, the select raises change,
+     and a field added next month is covered without anyone remembering to wire
+     it. Save clears the flag before closing, or the next open starts dirty.
+
+     The confirm strip is role="alert" so it is announced when it appears, and
+     focus moves to Keep editing, which is the safe answer and the one a blind
+     press should land on. Both footers carry x-cloak: neither is guaranteed to
+     be the one showing at first paint.
+
+     Backing out of the question puts focus back where it came from, and that
+     is not a nicety. Keep editing is inside the strip that x-show is about to
+     set to display:none, and focus on an element that goes display:none falls
+     to the body — inside the trap it is recoverable with a Tab, but the caret
+     has still vanished out of a panel the user is standing in. The element is
+     remembered before the question is raised and restored after it, with the
+     first field as the fallback for the case the question came from a backdrop
+     click, which has already blurred to the body by the time it is handled. -->
+<div data-kui="drawer/guarded"
+     x-data="{
+       open: false, dirty: false, confirming: false, was: null,
+       attempt() {
+         if (this.confirming) return;
+         if (!this.dirty) return this.close();
+         this.was = document.activeElement;
+         this.confirming = true;
+         this.$nextTick(() => this.$refs.keep.focus());
+       },
+       keep() {
+         this.confirming = false;
+         this.$nextTick(() => {
+           const back = this.was && this.$root.contains(this.was) ? this.was : this.$refs.reason;
+           back.focus();
+         });
+       },
+       escape() { if (this.confirming) return this.keep(); this.attempt() },
+       discard() { this.dirty = false; this.close() },
+       save() { this.dirty = false; this.close() },
+       close() { this.confirming = false; this.open = false }
+     }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="undo-2" class="size-4"></i>Send back
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="escape()" @click.self="attempt()"
+       class="fixed inset-0 z-50 flex items-end justify-center bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="dw-guard-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-y-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-y-full"
+         class="flex max-h-[calc(100dvh-6rem)] w-full flex-col rounded-t-2xl border-t border-zinc-200 bg-white shadow-lg sm:max-w-md">
+
+      <div class="flex shrink-0 justify-center pt-2.5 pb-1">
+        <div class="h-1 w-9 rounded-full bg-zinc-300" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-100 px-5 pt-2 pb-3">
+        <div class="min-w-0">
+          <h2 id="dw-guard-title" class="text-[16px]/6 font-semibold">Send back for revision</h2>
+          <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">PO-24-1187 · Gujarat Polymers Ltd · ₹12,45,000</p>
+        </div>
+        <button type="button" @click="attempt()" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div @input="dirty = true" @change="dirty = true" class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <div>
+          <label for="dw-guard-reason" class="mb-1.5 block text-[13px]/5 font-medium">Reason</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="dw-guard-reason" x-ref="reason" autofocus class="w-full bg-transparent px-3 py-2.5 text-[14px]/5 outline-none">
+              <option>Rate does not match the contract</option>
+              <option>Delivery window is too late</option>
+              <option>Quantity exceeds the indent</option>
+              <option>Vendor is on QC hold</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label for="dw-guard-note" class="mb-1.5 block text-[13px]/5 font-medium">Note to the buyer</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <textarea id="dw-guard-note" rows="4" aria-describedby="dw-guard-note-help"
+                      class="w-full resize-none bg-transparent px-3 py-2.5 text-[14px]/5 outline-none"></textarea>
+          </div>
+          <p id="dw-guard-note-help" class="mt-1.5 text-[12px]/4 text-zinc-500">The buyer sees this on the order and in the mail that goes out.</p>
+        </div>
+      </div>
+
+      <div x-show="!confirming" x-cloak
+           class="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" @click="attempt()"
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="save()"
+                class="flex-1 rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Send back</button>
+      </div>
+
+      <div x-show="confirming" x-cloak role="alert"
+           class="flex shrink-0 flex-col gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-[13px]/5 font-medium">Discard what you have written?</p>
+        <div class="flex items-center gap-2">
+          <button type="button" x-ref="keep" @click="keep()"
+                  class="flex-1 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:flex-none">Keep editing</button>
+          <button type="button" @click="discard()"
+                  class="flex-1 rounded-lg px-4 py-2.5 text-[13px]/5 font-medium text-red-700 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:flex-none">Discard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

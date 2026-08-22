@@ -1,0 +1,42 @@
+<!-- A permanently rotating element is a real complaint and motion-reduce owes it
+     an honest answer. The dishonest one is motion-reduce:animate-none, which is
+     forbidden on this component: animation-name computes to none, the ring stops
+     as a zinc-200 circle with one graphite quarter, and a static broken ring is a
+     rendering fault rather than a wait. Whoever set the preference is then the
+     only person on the floor with no signal at all.
+
+     So the ring keeps turning — a 16px ring at one turn a second is not the
+     large-area motion the preference exists for — and what changes is the words.
+     The left panel's label is sr-only, because the heading above it already names
+     the record and a second visible line would say the same thing twice. Under
+     motion-reduce:not-sr-only that label comes forward as text, so a wait that
+     was being carried by a shape is carried by a sentence instead. The margin is
+     on the wrapper and not on the label, because sr-only sets margin:-1px and a
+     mt-1.5 on the same element is two utilities arguing over one property.
+
+     The right panel is the common case and has nothing to change. Its label was
+     always visible, so the accommodation was already made and the two utilities
+     would only add a class list for nothing. Reach for the pair when the label is
+     sr-only, and not otherwise. -->
+<div data-kui="spinner/motion" class="grid gap-4 sm:grid-cols-2">
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4" aria-busy="true">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 class="text-[13px]/5 font-medium">August rate card</h3>
+      <span class="flex h-5 shrink-0 items-center">
+        <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      </span>
+    </div>
+    <div class="motion-reduce:mt-1.5">
+      <p role="status" class="sr-only text-[12px]/4 tabular-nums text-zinc-500 motion-reduce:not-sr-only">Loading 1,240 vendor rates</p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4" aria-busy="true">
+    <h3 class="text-[13px]/5 font-medium">GRN reconciliation</h3>
+    <div class="mt-1.5 flex items-center gap-2.5" role="status">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <span class="text-[12px]/4 tabular-nums text-zinc-500">Matching 418 receipts to 96 orders</span>
+    </div>
+  </div>
+</div>

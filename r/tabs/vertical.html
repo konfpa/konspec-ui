@@ -6,7 +6,12 @@
      turned on its side. The zinc-100 fill is the second half of the statement
      and never the whole of it: drop these tabs onto the zinc-100 page surface
      and a fill-only marker measures 1.00 against its background, which is not
-     faint but invisible. -->
+     faint but invisible.
+
+     For the same reason the inactive tabs take no hover fill and change text
+     colour only. The component does not know which surface it was pasted onto,
+     so any fill it picks is one step wrong on the other one — and the entry's
+     own rule is that colour belongs to the selected tab alone. -->
 <div data-kui="tabs/vertical" x-id="['tab', 'panel']"
      x-data="{
        tab: 'approvals',
@@ -45,7 +50,7 @@
               :tabindex="tab === t.id ? 0 : -1"
               @click="pick(t.id)"
               class="rounded-r-lg border-l-2 px-3 py-2 text-left text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="tab === t.id ? 'border-zinc-900 bg-zinc-100 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'"
+              :class="tab === t.id ? 'border-zinc-900 bg-zinc-100 font-medium text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
               x-text="t.label"></button>
     </template>
   </div>

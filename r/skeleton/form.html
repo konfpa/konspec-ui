@@ -9,21 +9,31 @@
      arriving inside it — what is not allowed is the appearance of a control
      that is not one yet.
 
-     The labels are drawn for real, and they are real <label> elements rather
-     than bars. Field names are not data; greying them leaves a page of
-     unlabelled grey slots that cannot be read at all while it loads, and moves
-     the label text sideways when it arrives.
+     The control block is h-[38px] and not h-9, and the difference is the point
+     of this entry rather than a rounding. A field is py-2 on a 20px line box,
+     which is 36px, inside a wrapper carrying a 1px border top and bottom. Five
+     fields at h-9 leave the card 10px short and the footer buttons move up
+     under a cursor already on its way to Save. The textarea block is h-[78px]
+     by the same arithmetic: three rows of 20px, py-2, two borders.
+
+     The labels are drawn for real, they are real <label> elements rather than
+     bars, and they carry the field entry's classes exactly — text-[13px]/5
+     font-medium with no colour class, because a label drawn zinc-600 that lands
+     zinc-900 changes colour on arrival for no reason anybody can name. They
+     carry no for attribute: the swap replaces the whole field and the label
+     arrives already bound to its input, whereas a for written now points at
+     nothing for the length of the wait, which is a broken association rather
+     than a head start.
 
      Because the labels are interleaved with the blocks there is no single pulse
      wrapper here — animate-pulse motion-reduce:animate-none and aria-hidden go
      on each block. They all start in the same paint, so they stay in step, and
      a label that is not loading has no business pulsing.
 
-     Control blocks are h-9 rounded-lg, the input entry's height and radius. The
-     textarea block is h-24, three rows plus its padding. The footer buttons are
-     h-9 rounded-lg blocks in the real footer, on the real border. Nothing here
-     is focusable, so a Tab during the wait leaves the form entirely rather than
-     stopping on a rectangle with no accessible name. -->
+     The footer buttons are h-9 rounded-lg blocks, which is the button height
+     and not the field height, in the real footer on the real border. Nothing
+     here is focusable, so a Tab during the wait leaves the form entirely rather
+     than stopping on a rectangle with no accessible name. -->
 <div data-kui="skeleton/form" class="max-w-2xl rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <div class="border-b border-zinc-200 px-5 py-4">
     <h2 class="text-[16px]/6 font-semibold">Edit purchase order</h2>
@@ -33,24 +43,24 @@
   <div class="p-5">
     <div class="grid gap-4 sm:grid-cols-2">
       <div>
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Vendor</label>
-        <div class="h-9 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Vendor</label>
+        <div class="h-[38px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
       </div>
       <div>
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Plant</label>
-        <div class="h-9 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Plant</label>
+        <div class="h-[38px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
       </div>
       <div>
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Order date</label>
-        <div class="h-9 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Order date</label>
+        <div class="h-[38px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
       </div>
       <div>
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Delivery date</label>
-        <div class="h-9 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Delivery date</label>
+        <div class="h-[38px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
       </div>
       <div class="sm:col-span-2">
-        <label class="mb-1.5 block text-[13px]/5 font-medium text-zinc-600">Delivery address</label>
-        <div class="h-24 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+        <label class="mb-1.5 block text-[13px]/5 font-medium">Delivery address</label>
+        <div class="h-[78px] animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
         <div class="mt-1.5 flex h-4 items-center" aria-hidden="true"><div class="h-2 w-48 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div></div>
       </div>
     </div>

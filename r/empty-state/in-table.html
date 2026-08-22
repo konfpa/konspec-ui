@@ -7,7 +7,10 @@
      The colspan is bound, not typed. Hide the Received column from the menu and
      a hardcoded colspan="4" stretches the cell one column past the header, so
      the panel edge lands in the middle of the sentence. It is bound to the
-     count of columns actually rendered and cannot drift from them.
+     count of columns actually rendered and cannot drift from them. The literal
+     colspan="4" beside the binding is the server-rendered default for the paint
+     before Alpine boots, and Alpine overwrites it on init — without it the cell
+     spans one column for a frame and the panel snaps sideways.
 
      The header row stays, because the emptiness here is a query result: the
      sort and the column choices are still in force and the header is where the
@@ -48,7 +51,7 @@
     </thead>
     <tbody>
       <tr>
-        <td :colspan="span" class="px-6 py-12 text-center">
+        <td colspan="4" :colspan="span" class="px-6 py-12 text-center">
           <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
             <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
           </span>

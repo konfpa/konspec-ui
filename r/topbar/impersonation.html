@@ -1,0 +1,70 @@
+<!-- A pill is not enough for this. A pill is read once on the first screen and
+     then stops being seen, and what is wrong here is not a corner of the page —
+     every action the user takes for the rest of the session is recorded against
+     an account that is not theirs. That takes a full-bleed row above the bar,
+     and it stays there until the state ends.
+
+     Graphite, not red. Red is what a record is doing — overdue, failed — and a
+     red band across the top of a console reads as an outage, which sends people
+     to the helpdesk about a system that is working. The on-dark step of the text
+     scale is zinc-400, and it is used here for the sentence under the claim;
+     zinc-600 on zinc-900 is the same mistake as zinc-400 on white.
+
+     The band is not dismissible, and alert/banner — which is the same shape —
+     is. That one announces something about the system that will pass on its
+     own. This one is a fact about the session, and the only thing that ends it
+     is the button sitting on the band.
+
+     Focus on the band is outline-white at a negative offset. The standard
+     zinc-700/15 outline has nothing to sit against on a zinc-900 fill: it
+     measures as styled and renders as nothing, which is worse than the browser
+     default it replaced.
+
+     The band is part of the sticky stack, so the anchor rule grows with it:
+       [id] { scroll-margin-top: 128px }
+     56px of bar plus 40px of band plus the gap. Leave it at 88 and every anchor
+     target lands under the band that was added to keep people safe. -->
+<div data-kui="topbar/impersonation" class="min-h-64 bg-zinc-100 text-[14px]/5 text-zinc-900">
+  <div class="sticky top-0 z-30">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-zinc-900 px-3 py-2 text-white sm:px-4">
+      <i data-lucide="user-check" class="size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      <p class="min-w-[14rem] flex-1 text-[13px]/5">
+        <span class="font-medium">You are signed in as Priya Nair.</span>
+        <span class="text-zinc-400">Approvals and receipts you post are recorded against her account, not yours.</span>
+      </p>
+      <form method="post" action="#" class="shrink-0">
+        <button type="submit"
+                class="rounded-lg px-2.5 py-1 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          Return to Rajesh Menon
+        </button>
+      </form>
+    </div>
+
+    <header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
+      <button type="button" aria-label="Open navigation" aria-expanded="false"
+              class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+        <i data-lucide="menu" class="size-5"></i>
+      </button>
+
+      <nav aria-label="Breadcrumb" class="min-w-0 flex-1">
+        <ol class="flex items-center gap-1.5 text-[13px]/5">
+          <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stores</a></li>
+          <li aria-hidden="true" class="hidden text-zinc-500 sm:block">/</li>
+          <li class="min-w-0"><span aria-current="page" class="block truncate font-medium">Goods receipt</span></li>
+        </ol>
+      </nav>
+
+      <button type="button" aria-label="Account — Priya Nair, impersonated by Rajesh Menon" aria-haspopup="menu" aria-expanded="false"
+              class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        PN
+      </button>
+    </header>
+  </div>
+
+  <div class="p-4">
+    <div class="rounded-xl border border-zinc-300 bg-white p-4">
+      <p class="text-[13px]/5 font-medium tabular-nums">GRN-8842 · Gujarat Polymers Ltd</p>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">4 lines · 12.400 MT · posted 11 Aug 2026 by Priya Nair</p>
+    </div>
+  </div>
+</div>

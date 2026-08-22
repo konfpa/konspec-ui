@@ -13,8 +13,13 @@
 
      Exactly one primary button. The saved state is text, not a toast — a toast
      for an autosave is a notification of nothing, fired forty times an hour.
-     Below sm the button keeps its icon and drops its label; it does not shrink
-     and the row does not wrap. -->
+
+     Below sm the button shows its icon alone, and the label goes to sr-only
+     rather than to hidden. hidden is display:none, which takes the text out of
+     the accessible name as well as off the screen, and the primary action on
+     the whole screen becomes an unnamed button on exactly the width where it
+     is hardest to guess from context. The button does not shrink and the row
+     does not wrap. -->
 <header data-kui="topbar/compact" class="flex h-12 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4">
   <a href="#" aria-label="Back to rate contracts"
      class="-ml-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -32,7 +37,7 @@
       Preview
     </button>
     <button type="button" class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
-      <i data-lucide="check" class="size-4"></i><span class="hidden sm:inline">Submit for approval</span>
+      <i data-lucide="check" class="size-4"></i><span class="sr-only sm:not-sr-only">Submit for approval</span>
     </button>
   </div>
 </header>

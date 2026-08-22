@@ -1,7 +1,15 @@
 <!-- One line, 32px tall. For a table toolbar or a card header, where a
-     three-line alert would push the data below the fold. -->
+     three-line alert would push the data below the fold.
+
+     The text truncates and the link does not. A row that lets both shrink ends
+     up with two half-sentences at 390px and no way to act on either; holding
+     the link at its full width and cutting the explanation is the right way
+     round, because the explanation is recoverable by widening the window and a
+     three-character link target is not. min-w-0 on the paragraph is what makes
+     truncate work at all inside a flex row — without it a flex item refuses to
+     shrink below its content and the alert pushes the page sideways. -->
 <div data-kui="alert/compact" class="flex items-center gap-2.5 rounded-lg border border-zinc-300 bg-white px-3 py-2">
   <i data-lucide="alert-triangle" class="size-3.5 shrink-0 text-amber-700"></i>
   <p class="min-w-0 flex-1 truncate text-[12px]/4">Showing the first 200 of <span class="tabular-nums">1,438</span> matching rows.</p>
-  <a href="#" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Narrow the filters</a>
+  <a href="#" class="shrink-0 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Narrow the filters</a>
 </div>

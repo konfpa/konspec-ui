@@ -1,0 +1,69 @@
+<!-- The metric is the plan, not the total. 842 MT is unreadable on its own —
+     it is a good month against 1,000 and a bad one against 1,400 — so the tile
+     that prints the achieved figure alone makes every reader do the division,
+     and half of them do it against last month's plan.
+
+     The target lives in the unit slot, at text-[13px]/5 in zinc-500, so the
+     achieved figure keeps the display step and the eye still lands on one
+     number. Set both at 24px and the tile becomes a fraction, at which point
+     the reader has to work out which half is the fact.
+
+     The rail is progress's rail at this scale, not a second one written here,
+     and the width is an inline style for the reason that entry gives: Tailwind
+     compiles out of literal strings, so class="w-[{{ pct }}%]" scans as the
+     token w-[{{ and emits no rule at all — the fill comes back zero wide and
+     renders as an empty rail rather than as an error.
+
+     The rail never changes colour. Behind plan is said by the amber mark in the
+     line under it, which is the alert rule at tile scale: a red bar is a field
+     of colour behind a number, and one red tile makes the graphite ones read as
+     switched off.
+
+     Over target the rail clamps and the figure does not — aria-valuenow and the
+     width stop at 100 while the text keeps saying 1,308 of 1,200. A bar drawn
+     past its own end is a rendering fault wearing an achievement.
+
+     Do not invent a target out of last month to give a tile a rail. A
+     comparison is a delta and belongs in the delta slot; a rail measured
+     against a number nobody committed to is a made-up denominator, and it gets
+     quoted back in a review. -->
+<div data-kui="stat-card/target" class="grid gap-3 sm:grid-cols-2">
+
+  <!-- on plan: the rail is graphite and the line under it is plain -->
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt id="sc-tgt-dispatch" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Dispatch against August plan</dt>
+      <dd class="mt-1.5 flex flex-wrap items-baseline gap-x-1.5">
+        <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">842</span>
+        <span class="text-[13px]/5 font-medium tabular-nums text-zinc-500">of 1,200 MT</span>
+      </dd>
+    </dl>
+    <div class="mt-3 h-2 overflow-hidden rounded-full bg-zinc-200"
+         role="progressbar" aria-labelledby="sc-tgt-dispatch"
+         aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
+      <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 70%"></div>
+    </div>
+    <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500">70% of plan · 9 working days left</p>
+  </div>
+
+  <!-- behind plan: same graphite rail, and the state is the amber mark -->
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt id="sc-tgt-collect" class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Collections against August target</dt>
+      <dd class="mt-1.5 flex flex-wrap items-baseline gap-x-1.5">
+        <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+        <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">1.24 Cr</span>
+        <span class="text-[13px]/5 font-medium tabular-nums text-zinc-500">of ₹2.00 Cr</span>
+      </dd>
+    </dl>
+    <div class="mt-3 h-2 overflow-hidden rounded-full bg-zinc-200"
+         role="progressbar" aria-labelledby="sc-tgt-collect"
+         aria-valuenow="62" aria-valuemin="0" aria-valuemax="100">
+      <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 62%"></div>
+    </div>
+    <p class="mt-2 flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+      <i data-lucide="alert-triangle" class="mt-0.5 size-3.5 shrink-0 text-amber-700" aria-hidden="true"></i>
+      <span class="tabular-nums">62% with 4 working days left · ₹42.00 L short at the current rate of collection</span>
+    </p>
+  </div>
+</div>

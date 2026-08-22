@@ -1,0 +1,30 @@
+<!-- Badges do not wrap, so in a fixed cell a row of them either pushes the
+     column out or breaks across two lines, and a badge on two lines stops
+     reading as one object. Show the first two and count the rest.
+
+     Never truncate a badge's own label to buy the space. "Gujarat Polym…" is a
+     half-word inside a graphite pill and reads as a rendering fault rather than
+     as a name that was too long; at 11px it is not readable as either. The
+     whole badge goes and the +3 stands in for it.
+
+     The +3 is a real button because it does something, and it is styled as the
+     pills beside it because it is a member of that set. It carries
+     aria-expanded and aria-controls pointing at the strip that grows, so the
+     press is announced as a disclosure and not as a filter that removed two
+     tags. The label under it says how many, since "+3" alone is a fragment. -->
+<div data-kui="badge/overflow" class="max-w-sm rounded-xl border border-zinc-300 bg-white p-4"
+     x-data="{ all: false, tags: ['Rate approved', 'MSME vendor', 'Site delivery', 'Retention 5%', 'Freight paid'] }">
+  <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
+  <div id="badge-overflow-tags" class="mt-2 flex flex-wrap items-center gap-1.5">
+    <template x-for="(tag, i) in tags" :key="tag">
+      <span x-show="all || i < 2"
+            class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300"
+            x-text="tag"></span>
+    </template>
+    <button type="button" @click="all = !all" :aria-expanded="all" aria-controls="badge-overflow-tags"
+            :aria-label="all ? 'Show fewer tags' : 'Show ' + (tags.length - 2) + ' more tags'"
+            class="rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium tabular-nums whitespace-nowrap text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span x-text="all ? 'Fewer' : '+' + (tags.length - 2)">+3</span>
+    </button>
+  </div>
+</div>

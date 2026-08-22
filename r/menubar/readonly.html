@@ -1,0 +1,202 @@
+<!-- The order is approved and a GRN is posted against it, so every command in
+     Edit is unavailable for the same reason. Repeating that reason on each row
+     is the version that looks thorough and reads as noise: the hint column
+     fills with the same date four times, the labels stop being scannable, and
+     the panel needs 90px it does not have at 390px. So the reason moves up to
+     the role="group" holding them — announced once, on the way in, because a
+     group is named as focus enters it — and the rows say nothing but their own
+     labels.
+
+     The per-row reason has not gone away, it has a different job. File has one
+     unavailable command among four, and there the reason belongs on the row,
+     because the rows around it are fine and the question is only about that
+     one. One reason for one row, one reason for a whole menu. The mistake is
+     using the row treatment for the menu case, and it is the more tempting one
+     because it is what the previous variant already does.
+
+     A menu whose items are all dead needs one that is not. Raise amendment sits
+     under the rule in its own group and is the only enabled item in the panel.
+     Without it the user has learned that the document cannot be edited and
+     nothing about what to do instead, which is the support call.
+
+     The Edit trigger itself is not disabled. Disabling it takes the menu out of
+     the bar and the explanation out with it: the user presses a dead title,
+     gets nothing back, and never reaches the sentence that would have told them
+     why. Whatever else is locked, the way to the reason stays open. -->
+<div data-kui="menubar/readonly" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="file-plus" class="size-4 text-zinc-600"></i>New purchase order
+        </button>
+
+        <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save draft
+          <span class="ml-auto shrink-0 pl-6 text-[12px]/4 tabular-nums text-zinc-500">Approved 18 Aug 2026</span>
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+P" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="printer" class="size-4 text-zinc-600"></i>Print
+          <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Ctrl P</span>
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="file-text" class="size-4 text-zinc-600"></i>Export as PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="edit"
+              :aria-expanded="open === 'edit'" :tabindex="at === 'edit' ? 0 : -1"
+              @click="open === 'edit' ? close() : show('edit')"
+              @mouseenter="if (open !== null) to('edit')"
+              @keydown.arrow-down.prevent="show('edit')" @keydown.arrow-up.prevent="show('edit', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'edit' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">Edit</button>
+
+      <div x-show="open === 'edit'" x-cloak data-panel="edit" role="menu" aria-label="Edit"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+        <div role="group" aria-label="Editing locked: approved 18 Aug 2026, GRN 4471 posted" class="py-1">
+          <p aria-hidden="true" class="flex items-start gap-2 px-3 pb-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+            <span class="flex shrink-0 pt-px"><i data-lucide="lock" class="size-3.5"></i></span>
+            Approved 18 Aug 2026 · GRN 4471 posted against 9 of 14 lines
+          </p>
+
+          <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="rows-3" class="size-4 text-zinc-600"></i>Insert line
+          </button>
+          <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="copy" class="size-4 text-zinc-600"></i>Duplicate line
+          </button>
+          <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="trash-2" class="size-4 text-zinc-600"></i>Delete line
+          </button>
+          <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="calculator" class="size-4 text-zinc-600"></i>Recalculate tax
+          </button>
+        </div>
+
+        <div role="group" aria-label="Change the order" class="border-t border-zinc-100 py-1">
+          <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                  class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="pencil" class="size-4 text-zinc-600"></i>Raise amendment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="view"
+              :aria-expanded="open === 'view'" :tabindex="at === 'view' ? 0 : -1"
+              @click="open === 'view' ? close() : show('view')"
+              @mouseenter="if (open !== null) to('view')"
+              @keydown.arrow-down.prevent="show('view')" @keydown.arrow-up.prevent="show('view', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'view' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">View</button>
+
+      <div x-show="open === 'view'" x-cloak data-panel="view" role="menu" aria-label="View"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="percent" class="size-4 text-zinc-600"></i>Tax breakup
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="history" class="size-4 text-zinc-600"></i>Revision history
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">PO-24-1187 — Gujarat Polymers Ltd</h2>
+    <p class="mt-1 flex items-center gap-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+      <span class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>
+      Approved 18 Aug 2026 by Anand Kulkarni · 14 lines · ₹18,42,000 before tax
+    </p>
+  </div>
+</div>

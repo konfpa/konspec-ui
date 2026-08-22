@@ -1,0 +1,95 @@
+<!-- Four rows of one purchase order, and only the first is an ordinary
+     section. The other three are the cases that turn an accordion into a set of
+     doors that lie.
+
+     Locked. The header is disabled, so it leaves the Tab order, and the reason
+     is text under it rather than a title attribute nobody on a touchscreen will
+     ever see. No chevron — a chevron promises something opens. There is no
+     panel in the document, so there is no aria-controls either: pointing it at
+     an id that does not exist is worse than omitting it. The content is absent
+     rather than hidden because a collapsed panel is not a permission boundary —
+     x-show renders the markup and hides it, and a margin breakdown behind a
+     shut header is in the page source of everyone who can load the page. This
+     one is withheld by the view.
+
+     Empty. A section with nothing behind it is a control that opens onto a
+     blank panel, and the only way to find that out is to click it. The answer
+     goes on the row and the control goes away.
+
+     Not collapsible. The short receipt is the reason somebody opened this
+     order, so it is drawn open with no trigger on it at all. Nothing the user
+     has to act on gets a lid, and a section that is technically collapsible but
+     always rendered open is the same defect with an extra click in it. -->
+<div data-kui="accordion/states" class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div x-data="{ open: false }">
+    <h3>
+      <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="acc-st-lines"
+              class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="text-[14px]/5 font-medium">Order lines</span>
+          <span class="ml-auto text-[12px]/4 tabular-nums text-zinc-500">6 lines · ₹18,42,000</span>
+        </span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+        </span>
+      </button>
+    </h3>
+    <div id="acc-st-lines" x-show="open" x-cloak x-collapse.duration.200ms>
+      <ul class="divide-y divide-zinc-100 border-t border-zinc-100 text-[13px]/5">
+        <li class="flex items-baseline gap-3 px-4 py-2.5">
+          <span class="min-w-0 flex-1 truncate">HDPE granules — grade M60075</span>
+          <span class="shrink-0 tabular-nums text-zinc-600">8,600 kg</span>
+          <span class="shrink-0 tabular-nums">₹5,16,000</span>
+        </li>
+        <li class="flex items-baseline gap-3 px-4 py-2.5">
+          <span class="min-w-0 flex-1 truncate">Masterbatch — white 20%</span>
+          <span class="shrink-0 tabular-nums text-zinc-600">300 kg</span>
+          <span class="shrink-0 tabular-nums">₹72,000</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div>
+    <h3>
+      <button type="button" disabled aria-expanded="false"
+              class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left text-zinc-500">
+        <i data-lucide="lock" class="size-4 shrink-0"></i>
+        <span class="min-w-0 flex-1 text-[14px]/5 font-medium">Margin and landed cost</span>
+      </button>
+    </h3>
+    <p class="px-4 pb-2.5 pl-11 text-[12px]/4 text-zinc-500">
+      Category managers and above. Raise a request with the buying desk.
+    </p>
+  </div>
+
+  <div class="px-4 py-3">
+    <p class="text-[14px]/5 font-medium">Amendments</p>
+    <p class="mt-1 flex items-center gap-2 text-[13px]/5 tabular-nums text-zinc-600">
+      <i data-lucide="minus" class="size-4 shrink-0 text-zinc-500"></i>
+      None since this order was released on 04 Aug 2026.
+    </p>
+  </div>
+
+  <div>
+    <div class="flex min-h-12 items-center gap-3 px-4 py-2">
+      <h3 class="min-w-0 flex-1 text-[14px]/5 font-medium">Short receipt — needs a decision</h3>
+      <span class="flex shrink-0 items-center gap-1.5 text-[12px]/4 font-medium text-amber-700">
+        <i data-lucide="alert-triangle" class="size-3.5 shrink-0"></i>Since 11 Aug 2026
+      </span>
+    </div>
+    <div class="border-t border-zinc-100 px-4 py-3">
+      <p class="text-[14px]/5 tabular-nums text-zinc-600">
+        GRN-3391 posted 8,400 kg against 8,600 kg ordered. Short by 200 kg, ₹12,000 at contract rate.
+      </p>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Raise debit note
+        </button>
+        <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Short-close the line
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

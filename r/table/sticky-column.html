@@ -1,0 +1,184 @@
+<!-- A stock ledger has nine columns and no way to lose any of them, so the
+     figures scroll sideways under an item name that does not. The scroll is
+     bounded to this div and exists only from md up: at 390px the same rows are
+     cards, because a table that scrolls sideways on a phone is
+     indistinguishable from a layout that broke, which is the rule the
+     responsive variant states and this one does not get to opt out of.
+
+     border-separate border-spacing-0 again, for the same reason as the sticky
+     header: with collapsed borders the rule down the right edge of the frozen
+     column belongs to the table and stays behind while the column travels, so
+     the figures slide under a label with no edge to stop at.
+
+     The sticky cells need an opaque fill or the columns scroll straight through
+     them. Because that fill is opaque it also stops taking the row tint, so the
+     tint is put back with group-hover on the frozen cell — otherwise hovering a
+     row lights up eight columns and leaves the ninth white, which reads as the
+     row ending where the frozen column starts.
+
+     The frozen cell is a <th scope="row">, not a <td>. Eight columns along, a
+     bare figure is read out with no idea which item it belongs to; scope="row"
+     is what attaches the two.
+
+     If the head is sticky as well, the top-left cell is sticky on both axes and
+     has to outrank both: z-20 on the corner, z-10 on the rest of the head and
+     on the frozen column, or the corner is painted over from one side or the
+     other as the ledger is scrolled.
+
+     Closing stock below the reorder level takes a red dot, not a red cell. It
+     is one fact about one figure and the row is otherwise fine. -->
+<div data-kui="table/sticky-column" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="hidden overflow-x-auto overscroll-x-contain md:block">
+    <table class="w-full min-w-[60rem] border-separate border-spacing-0 text-[13px]/5">
+      <thead>
+        <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="sticky left-0 z-10 w-56 border-r border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">Item</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Opening</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Received</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Issued</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Rejected</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Closing</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Value</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Reorder level</th>
+          <th scope="col" class="border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium whitespace-nowrap">Last receipt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">HDPE granules — natural</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-1042</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">12,400</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">8,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">9,600</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">120</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">10,680</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹9,29,160</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">6,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">04 Sep 2026</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">Masterbatch — white 60%</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-1091</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">640</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">250</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">410</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">480</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,17,600</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">300</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">28 Aug 2026</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">M12 hex bolt — 8.8 zinc</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-3310</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">24,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">4,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">11,500</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">250</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">16,250</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹3,90,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">8,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">02 Sep 2026</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">Stretch film — 23 micron</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-5140</span>
+          </th>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">1,180</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">300</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">640</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">840</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,47,000</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">500</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">30 Aug 2026</td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-zinc-200 bg-white px-4 py-2.5 text-left font-medium group-hover:bg-zinc-100">
+            <span class="block">MS angle — 50×50×5</span>
+            <span class="block text-[12px]/4 font-normal tabular-nums text-zinc-500">ITM-7702</span>
+          </th>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">9,250</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">3,400</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">0</td>
+          <td class="px-4 py-2.5 text-right font-medium tabular-nums whitespace-nowrap">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>5,850
+              <span class="sr-only">below the reorder level</span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹3,74,400</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">6,000</td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap text-zinc-600">19 Aug 2026</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- at 390px the ledger is five cards. Closing and value lead, because they
+       are what the screen is opened for; the movement that produced them
+       follows on one line. -->
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">HDPE granules — natural</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">10,680 kg</span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-1042 · reorder 6,000</span><span class="shrink-0">₹9,29,160</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 12,400 · received 8,000 · issued 9,600 · rejected 120</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Masterbatch — white 60%</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">480 kg</span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-1091 · reorder 300</span><span class="shrink-0">₹1,17,600</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 640 · received 250 · issued 410 · rejected 0</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">M12 hex bolt — 8.8 zinc</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">16,250 nos</span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-3310 · reorder 8,000</span><span class="shrink-0">₹3,90,000</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 24,000 · received 4,000 · issued 11,500 · rejected 250</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">Stretch film — 23 micron</span>
+        <span class="shrink-0 text-[14px]/5 font-medium tabular-nums">840 kg</span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-5140 · reorder 500</span><span class="shrink-0">₹1,47,000</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 1,180 · received 300 · issued 640 · rejected 0</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[13px]/5 font-medium">MS angle — 50×50×5</span>
+        <span class="inline-flex shrink-0 items-center gap-1.5 text-[14px]/5 font-medium tabular-nums">
+          <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>5,850 kg
+          <span class="sr-only">below the reorder level</span>
+        </span>
+      </div>
+      <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[12px]/4 tabular-nums text-zinc-500">
+        <span>ITM-7702 · reorder 6,000</span><span class="shrink-0">₹3,74,400</span>
+      </p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Opening 9,250 · received 0 · issued 3,400 · rejected 0</p>
+    </li>
+  </ul>
+</div>

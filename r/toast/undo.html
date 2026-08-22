@@ -3,9 +3,14 @@
      the button is a lie by the time it is pressed; shorter and the offer expires
      while it is still on the screen.
 
-     Undo posts to a real endpoint — hx-post="/orders/1187/lines/4/restore/" —
-     it is not a client-side rollback of something the server already wrote. And
-     it is a shortcut, not the only route: the removed line is still on the
+     Undo posts to a real endpoint and it is not a client-side rollback of
+     something the server already wrote. hx-swap="none" because the answer is a
+     status code: the row it restores is not on this screen, and the toast is
+     already leaving. There is no form around this button to carry a CSRF token,
+     so under Django the region root takes
+     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'.
+
+     Undo is a shortcut, not the only route: the removed line is still on the
      order's history page after the toast has gone.
 
      The timer clears on focusin as well as on hover, so tabbing towards Undo
@@ -49,10 +54,11 @@
            x-transition:leave-end="translate-y-2 opacity-0">
         <span class="mt-0.5 flex size-4 shrink-0 text-zinc-500"><i data-lucide="trash-2" class="size-4"></i></span>
         <div class="min-w-0 flex-1">
-          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
           <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
         </div>
         <button type="button"
+                hx-post="/orders/1187/lines/4/restore/" hx-swap="none"
                 @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
                 class="shrink-0 rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           Undo

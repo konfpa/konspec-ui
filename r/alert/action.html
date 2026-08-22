@@ -1,11 +1,28 @@
+<!-- The action is what makes this an alert rather than a sentence somewhere on
+     the record. If there is nothing to press, the fact belongs wherever the
+     order is already drawn and this component is not the answer.
+
+     One action and no more. A second button turns a notice into a decision, and
+     a decision with two answers is alert-dialog — Remind, Escalate and Cancel
+     laid across a notice reads as a form the user has to complete before the
+     page will let them past. The secondary route lives in the detail line as a
+     link, which is why "open the order" is prose here and not a third control.
+
+     flex-wrap plus a min-width on the text block is the whole responsive
+     behaviour. Above roughly 480px the button shares the first line; below it
+     the text cannot shrink past 16rem, so the button drops to its own row
+     instead of compressing to two words per line. shrink-0 keeps its label off
+     a second line when it does share the row. The version that also carries a
+     dismiss is alert/responsive, because four things in one row is where this
+     shape actually breaks. -->
 <div data-kui="alert/action" class="flex flex-wrap items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
   <div class="min-w-[16rem] flex-1">
-    <p class="text-[13px]/5 font-medium">PO-24-1163 has been waiting for approval for 9 days.</p>
+    <p class="text-[13px]/5 font-medium">PO-24-1163 has been waiting for approval for <span class="tabular-nums">9</span> days.</p>
     <p class="mt-0.5 text-[12px]/4 text-zinc-600">
       Nashik Steel Traders · <span class="tabular-nums">₹4,26,500</span> ·
-      <a href="#" class="text-zinc-900 underline underline-offset-2">open the order</a>
+      <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">open the order</a>
     </p>
   </div>
-  <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Remind approver</button>
+  <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Remind approver</button>
 </div>

@@ -1,0 +1,81 @@
+<!-- Three things hold the timer and the third is the one that is always
+     missing: the pointer, focus, and the document being visible at all. A toast
+     raised by a request that finished while the user was in another tab spends
+     its whole six seconds in a hidden document — the work happened, the
+     confirmation existed, and nobody was ever in a position to see it. The
+     timer measures reading time, so it may only run while there is somebody
+     there to read.
+
+     holds is a count and not a flag. Hover and focus overlap constantly — the
+     pointer sits on the card while the keyboard is in Undo — and two booleans
+     mean whichever one leaves first restarts a timer the other is still
+     holding. A toast pushed into a hidden tab starts at one hold rather than
+     zero, so it is waiting rather than expiring by the time it is looked at.
+
+     pointerenter and pointerleave rather than mouseenter and mouseleave. They
+     carry the pen and the finger as well as the mouse, and on a touch screen
+     the browser brackets a tap with the pair, so a thumb held on the card holds
+     the toast and lifting it releases it. mouseenter on a phone is emulated,
+     late, and often never pairs with a leave, which strands the toast on screen
+     until the page is reloaded.
+
+     Leaving restarts from full. Resuming with 400ms left is not a resume: the
+     user looked away mid-sentence and the toast is gone before they look back. -->
+<div data-kui="toast/held" x-data="{
+       toasts: [], seq: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       push(t) {
+         const n = { id: ++this.seq, ms: 6000, timer: 0, holds: document.hidden ? 1 : 0, ...t };
+         this.toasts.push(n);
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(n);
+         });
+       },
+       start(t) {
+         if (!t || !t.ms || this.still || t.holds) return;
+         clearTimeout(t.timer);
+         t.timer = setTimeout(() => this.close(t.id), t.ms);
+       },
+       hold(t) { t.holds++; clearTimeout(t.timer); },
+       release(t) { t.holds = Math.max(0, t.holds - 1); this.start(t); },
+       sleep() { this.toasts.forEach(t => this.hold(t)); },
+       wake() { this.toasts.forEach(t => this.release(t)); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       }
+     }"
+     @visibilitychange.document="document.hidden ? sleep() : wake()">
+
+  <button type="button" x-ref="fire"
+          @click="push({ text: 'Vendor bill 8842 matched to GRN 4417', meta: 'Gujarat Polymers Ltd · ₹12,45,000 · 3-way match clean' })"
+          class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Match bill
+  </button>
+
+  <div role="status" aria-live="polite"
+       class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
+           @pointerenter="hold(t)" @pointerleave="release(t)"
+           @focusin="hold(t)" @focusout="release(t)"
+           x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:enter-start="translate-y-2 opacity-0"
+           x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+           x-transition:leave-end="translate-y-2 opacity-0">
+        <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+        </div>
+        <button type="button" aria-label="Dismiss"
+                @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+    </template>
+  </div>
+</div>

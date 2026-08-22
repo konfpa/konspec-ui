@@ -20,8 +20,9 @@
      text-[12px]/4. The radius of a block is the radius of what it replaces.
 
      Below md the loaded table restacks into cards, so the skeleton restacks at
-     the same breakpoint. A skeleton that keeps its columns on a phone is a
-     promise the table does not keep. -->
+     the same breakpoint, and it restacks with the same count. Five rows on the
+     desktop and three on the phone is one query making two different promises,
+     and the phone is where the difference costs a whole screen of scroll. -->
 <div data-kui="skeleton/table" class="overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
   <p role="status" class="sr-only">Loading the order register</p>
 
@@ -103,6 +104,28 @@
         <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
       </div>
       <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-14 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div>
       <div class="mt-2 flex h-5 items-center gap-2">
         <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
         <div class="h-2 w-20 rounded bg-zinc-200"></div>

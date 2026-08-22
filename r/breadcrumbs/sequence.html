@@ -1,0 +1,40 @@
+<!-- A four-step create screen. The trail has four crumbs and none of them is a
+     step.
+
+     A crumb promises a page: a URL you can bookmark, reload and send to
+     somebody. A wizard step is none of those things. It is a state in a form
+     holding input nobody has saved yet, so a crumb reading "Lines and rates"
+     offers to navigate to something that does not exist, and the press either
+     does nothing or throws away work. Draw the steps as steps — that is
+     progress, and it is the component that owns them — and let the trail say
+     the only thing that is true about location here: this is the new-order page
+     under Purchase orders.
+
+     A dialog is the same argument one step further. It is not a location at
+     all, so nothing in the trail moves while it is open: the page underneath is
+     still where the user is, and the dialog says what it is in its own title.
+     A trail that grows a crumb when a modal opens has to lose it again on
+     cancel, and for the length of that modal the address bar and the trail
+     disagree.
+
+     "New order" is the current crumb and it is not a link, exactly as on any
+     other page. The step count sits with the h1, in tabular figures so it does
+     not jitter between step 2 and step 3. -->
+<div data-kui="breadcrumbs/sequence" class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
+  <nav aria-label="Breadcrumb">
+    <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Home</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><span aria-current="page" class="font-medium text-zinc-900">New order</span></li>
+    </ol>
+  </nav>
+
+  <div class="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">New purchase order</h1>
+    <p class="text-[13px]/5 text-zinc-600"><span class="tabular-nums">Step 2 of 4</span> · Lines and rates</p>
+  </div>
+</div>

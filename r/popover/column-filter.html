@@ -1,0 +1,148 @@
+<!-- The densest arrangement in the entry: the trigger is a 14px funnel inside a
+     header cell, and everything about the panel follows from where it is.
+
+     The positioning root is a div inside the th, not the th itself. A header
+     cell is sized by the table algorithm, so its box is the whole column — a
+     panel anchored left-0 to it starts at the column edge, which on a wide
+     Vendor column is nowhere near the funnel the user pressed. Anchored to a
+     wrapper around the label and the button, it opens under the button.
+
+     The panel resets four properties it inherits and has no business carrying.
+     A thead sets uppercase, tracking-wider, 11px type and zinc-600 on
+     everything inside it, and a dialog rendered in that subtree inherits the
+     lot: a vendor list in 11px small caps, which reads as a second header. Only
+     a panel opened from inside a header has to undo its surroundings, and it is
+     the reason a container is never allowed to set type on a popover.
+
+     The card carries no overflow-hidden and the header band carries no fill.
+     Those two facts are the same fact: a clipping ancestor cuts the panel off
+     at the row it opened on, and the usual reason to clip is a bg-zinc-50
+     header whose corners would otherwise square off over the card radius. The
+     other way out — rounding the header cells by hand — cannot be used here,
+     because first: and last: match the first and last cells in the markup and
+     the Order column is display:none below sm, so the corner would be painted
+     on a cell nobody can see. Drop the band and keep the popover.
+
+     The rows are markup and the filter only hides them. A tbody built by x-for
+     is empty for every frame before Alpine boots, and unlike a panel there is
+     no x-cloak to hide that with — the register is the page. The counts beside
+     each vendor and the total are the server's figures, so the line under the
+     table is derived from those rather than from the rows, and there is one
+     source for it either way.
+
+     It applies live, for the same reason the column picker does: the effect is
+     the register behind the open panel changing, and an Apply button would only
+     make the user press it to see what they can already see. What live
+     application costs is an announcement. There is no ARIA property that says a
+     column is filtered, and binding the state into the button's name gives a
+     control that renames itself under the cursor, announced afresh on every
+     pass; so the count line is a role="status" and the ticks in the panel are
+     where the state is read. -->
+<div data-kui="popover/column-filter" x-data="{
+       open: false,
+       picked: [],
+       total: 4,
+       vendors: [
+         { name: 'Aurangabad Castings', n: 0 },
+         { name: 'Bharat Fasteners', n: 1 },
+         { name: 'Gujarat Polymers Ltd', n: 2 },
+         { name: 'Kolhapur Foundry', n: 0 },
+         { name: 'Nashik Steel Traders', n: 1 },
+         { name: 'Pune Polymers', n: 0 }
+       ],
+       match(v) { return this.picked.length === 0 || this.picked.includes(v) },
+       shown() {
+         if (this.picked.length === 0) return this.total;
+         return this.vendors.filter(v => this.picked.includes(v.name)).reduce((a, v) => a + v.n, 0);
+       },
+       show() {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs.panel.focus()));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <table class="w-full text-left text-[13px]/5">
+      <thead class="border-b border-zinc-200 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+        <tr>
+          <th scope="col" class="hidden px-3 py-2 font-medium sm:table-cell sm:px-4">Order</th>
+          <th scope="col" class="px-3 py-2 font-medium sm:px-4">
+
+            <!-- the popover root: the handlers sit here and not on the x-data
+                 element, which is the whole block including the tbody -->
+            <div class="relative inline-flex items-center gap-1"
+                 @click.outside="close(false)"
+                 @focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) close(false)"
+                 @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+              Vendor
+              <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+                      :aria-expanded="open" aria-controls="pop-cf" aria-label="Filter by vendor"
+                      class="inline-flex items-center gap-0.5 rounded-md p-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span :class="picked.length > 0 ? 'text-zinc-900' : 'text-zinc-500'" class="flex">
+                  <i data-lucide="list-filter" class="size-3.5"></i>
+                </span>
+                <span x-show="picked.length > 0" x-cloak x-text="picked.length" aria-hidden="true"
+                      class="text-[11px]/4 font-medium tabular-nums text-zinc-900"></span>
+              </button>
+
+              <div id="pop-cf" x-ref="panel" x-show="open" x-cloak
+                   role="dialog" tabindex="-1" aria-labelledby="pop-cf-title"
+                   class="absolute top-full left-0 z-40 mt-1.5 w-56 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-2 text-left text-[13px]/5 tracking-normal text-zinc-900 normal-case shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+                <div class="flex items-center justify-between gap-3 px-1.5 pt-1 pb-1.5">
+                  <p id="pop-cf-title" class="text-[12px]/4 font-medium text-zinc-600">Vendor</p>
+                  <button type="button" x-show="picked.length > 0" x-cloak @click="picked = []"
+                          class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
+                </div>
+
+                <div class="max-h-40 overflow-y-auto">
+                  <template x-for="v in vendors" :key="v.name">
+                    <label class="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 hover:bg-zinc-100">
+                      <input type="checkbox" x-model="picked" :value="v.name" class="size-4 shrink-0 accent-zinc-700">
+                      <span class="min-w-0 flex-1 truncate" x-text="v.name"></span>
+                      <span class="text-[12px]/4 tabular-nums text-zinc-500" x-text="v.n"></span>
+                    </label>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </th>
+          <th scope="col" class="px-3 py-2 text-right font-medium sm:px-4">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-zinc-100" x-show="match('Gujarat Polymers Ltd')">
+          <td class="hidden px-3 py-2.5 font-medium tabular-nums sm:table-cell sm:px-4">PO-24-1187</td>
+          <td class="px-3 py-2.5 text-zinc-600 sm:px-4">Gujarat Polymers Ltd</td>
+          <td class="px-3 py-2.5 text-right tabular-nums sm:px-4">₹18,42,000</td>
+        </tr>
+        <tr class="border-b border-zinc-100" x-show="match('Nashik Steel Traders')">
+          <td class="hidden px-3 py-2.5 font-medium tabular-nums sm:table-cell sm:px-4">PO-24-1191</td>
+          <td class="px-3 py-2.5 text-zinc-600 sm:px-4">Nashik Steel Traders</td>
+          <td class="px-3 py-2.5 text-right tabular-nums sm:px-4">₹6,04,750</td>
+        </tr>
+        <tr class="border-b border-zinc-100" x-show="match('Gujarat Polymers Ltd')">
+          <td class="hidden px-3 py-2.5 font-medium tabular-nums sm:table-cell sm:px-4">PO-24-1204</td>
+          <td class="px-3 py-2.5 text-zinc-600 sm:px-4">Gujarat Polymers Ltd</td>
+          <td class="px-3 py-2.5 text-right tabular-nums sm:px-4">₹2,31,900</td>
+        </tr>
+        <tr x-show="match('Bharat Fasteners')">
+          <td class="hidden px-3 py-2.5 font-medium tabular-nums sm:table-cell sm:px-4">PO-24-1210</td>
+          <td class="px-3 py-2.5 text-zinc-600 sm:px-4">Bharat Fasteners</td>
+          <td class="px-3 py-2.5 text-right tabular-nums sm:px-4">₹94,120</td>
+        </tr>
+        <tr x-show="shown() === 0" x-cloak>
+          <td colspan="3" class="px-3 py-6 text-center text-[12px]/4 text-zinc-500 sm:px-4">No orders from the vendors ticked.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p role="status" class="mt-2 text-[12px]/4 tabular-nums text-zinc-500"
+     x-text="shown() + ' of ' + total + ' orders'">4 of 4 orders</p>
+</div>

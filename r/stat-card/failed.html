@@ -1,0 +1,111 @@
+<!-- The third absence, and the one the other two get mistaken for. Loading is
+     "not yet". Zero is "we asked, and the answer was none". This is "we asked
+     and got no answer", and a number is the one thing it must never be.
+
+     A failed read that renders 0 is the defect the whole component is arranged
+     around: somebody sees zero QC holds, stops checking, and a shift runs on
+     material that was never released. Nor does it render the last value it
+     had — a cached figure with nothing marking it as old is worse than the em
+     dash, because it is plausible. If the previous reading is worth showing
+     then this is the stale tile and it has to carry the time it was read.
+
+     One tile failing does not take the strip down. The other three were read
+     and are correct, so they keep their figures, and the em dash sits in a box
+     the height of the figure it stands in for — h-7 — so all four labels and
+     all four figures stay on the same two lines across the row. The reason and
+     the retry under it do make the strip taller, and that is the right trade: a
+     failed tile that fits the others exactly has nowhere to say what failed.
+
+     The region-sized version of this is empty-state/error. A tile has four
+     lines and cannot carry an icon well, a heading, two paragraphs and two
+     buttons, so it carries what is load-bearing: the glyph at red-600, one
+     sentence saying what did not answer, a reference support can search for,
+     and a retry. Colour is the glyph alone — no red border, no red tile.
+
+     Retry resolves. It goes busy and comes back with a figure or with the same
+     failure; a retry that leaves the tile exactly as it found it is
+     indistinguishable from a button that does nothing. The spin is bound on a
+     wrapping span rather than on the <i>, which createIcons() would replace.
+
+     "Try again" carries sr-only text naming what it retries, because a strip of
+     four failed tiles is four buttons called "Try again" in the tab order. The
+     sr-only words come after the visible ones so the visible label is still the
+     start of the accessible name. -->
+<div data-kui="stat-card/failed" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open orders</dt>
+      <dd class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight tabular-nums">148</dd>
+      <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+11
+        </span>
+        <span class="text-zinc-500">vs. July</span>
+      </dd>
+    </dl>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue value</dt>
+      <dd class="mt-1.5 flex h-7 items-baseline gap-1">
+        <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+        <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">27.10 L</span>
+      </dd>
+      <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+₹4.10 L
+        </span>
+        <span class="text-zinc-500">vs. 12 Aug</span>
+      </dd>
+    </dl>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">GRNs posted today</dt>
+      <dd class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight tabular-nums">12</dd>
+      <dd class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-emerald-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+4
+        </span>
+        <span class="text-zinc-500">vs. same time yesterday</span>
+      </dd>
+    </dl>
+  </div>
+
+  <!-- the one that did not answer -->
+  <div class="rounded-xl border border-zinc-300 bg-white p-4"
+       role="status" aria-atomic="true" :aria-busy="state === 'busy'"
+       x-data="{ state: 'failed', retry() { this.state = 'busy'; setTimeout(() => this.state = 'ok', 1400) } }">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">QC holds open</dt>
+
+      <dd x-show="state !== 'ok'" class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight text-zinc-400">
+        <span aria-hidden="true">—</span><span class="sr-only">Not read</span>
+      </dd>
+
+      <dd x-show="state === 'ok'" x-cloak class="mt-1.5 flex h-7 items-baseline text-[24px]/7 font-semibold tracking-tight tabular-nums">3</dd>
+      <dd x-show="state === 'ok'" x-cloak class="mt-2 flex h-4 flex-wrap items-center gap-x-1.5 text-[12px]/4">
+        <span class="inline-flex items-center gap-1 font-medium tabular-nums text-red-600">
+          <i data-lucide="trending-up" class="size-3.5" aria-hidden="true"></i>+2
+        </span>
+        <span class="text-zinc-500">since yesterday</span>
+      </dd>
+    </dl>
+
+    <p x-show="state !== 'ok'" class="mt-2 flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+      <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600" aria-hidden="true"></i>
+      <span class="tabular-nums">The QC register did not answer. Reference 8f21c4 · 09:12.</span>
+    </p>
+
+    <button type="button" x-show="state !== 'ok'" @click="retry()" :disabled="state === 'busy'"
+            class="mt-2 inline-flex items-center gap-1.5 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="inline-flex" :class="state === 'busy' && 'animate-spin'">
+        <i data-lucide="rotate-cw" class="size-3.5" aria-hidden="true"></i>
+      </span>
+      Try again<span class="sr-only"> reading QC holds open</span>
+    </button>
+  </div>
+</div>

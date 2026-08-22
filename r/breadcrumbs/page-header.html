@@ -1,12 +1,21 @@
 <!-- Where a trail actually lives. It sits above the title, not beside it, and
      the title repeats the last crumb — that repetition is correct: the crumb is
-     navigation and the h1 is the page. -->
+     navigation and the h1 is the page.
+
+     Render it here only if the topbar does not carry one. One of the two,
+     decided once for the whole application; on screen twice, the second one is
+     the one that goes stale.
+
+     Both buttons are h-8, not padding-sized. A pair of controls that take their
+     height from py-1.5 on a 13px line measure 32px, which is not one of the
+     three button heights, and the mismatch shows the moment one of them sits
+     next to a control that is. -->
 <div data-kui="breadcrumbs/page-header" class="rounded-xl border border-zinc-300 bg-white px-5 py-4">
   <nav aria-label="Breadcrumb">
     <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
-      <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Home</a></li>
       <li aria-hidden="true" class="text-zinc-500">/</li>
-      <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
       <li aria-hidden="true" class="text-zinc-500">/</li>
       <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">PO-24-1187</span></li>
     </ol>
@@ -15,11 +24,11 @@
   <div class="mt-2 flex flex-wrap items-start justify-between gap-3">
     <div>
       <h1 class="text-[20px]/7 font-semibold tracking-tight tabular-nums">PO-24-1187</h1>
-      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · raised 14 Aug 2026 · 6 lines</p>
+      <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">Gujarat Polymers Ltd · raised 14 Aug 2026 · 6 lines · ₹12,45,000</p>
     </div>
     <div class="flex shrink-0 items-center gap-2">
-      <button type="button" class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">Export</button>
-      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
+      <button type="button" class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export</button>
+      <button type="button" class="inline-flex h-8 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
     </div>
   </div>
 </div>

@@ -1,0 +1,57 @@
+<!-- A figure with no time on it is a claim to be current, and most tiles are
+     not entitled to make it. This one comes off a valuation run, and the only
+     question anybody asks when it disagrees with the register is when it was
+     read.
+
+     The figure does not grey out and the tile does not empty itself. ₹3.42 Cr
+     was true at 06:00 and it is still the last true reading; painting it
+     zinc-400 says the number is wrong, and it is not wrong, it is old. That is
+     the same call the stale input makes about a rate somebody else changed
+     underneath an open form.
+
+     Amber, in the icon, on the line that carries the time — never on the
+     border and never behind the figure. A tile that turns amber is
+     indistinguishable at a glance from a metric that is in a bad state, and
+     those are two different alarms competing for one colour.
+
+     Stale is a threshold rather than a fact about the clock, so the line names
+     the run that was missed instead of only how long ago the last one landed.
+     Three hours is alarming for a stock valuation and unremarkable for a
+     monthly ageing, and nothing on the tile can tell them apart.
+
+     Recompute is a real request, and what it targets is the region rather than
+     the whole tile — swap the tile and the button that asked for the swap goes
+     with it, along with the region that was supposed to announce the answer.
+     htmx puts
+     .htmx-request on the button for the length of it, which is what the class
+     on the icon reads — no Alpine, and nothing left spinning when the request
+     fails, times out or is aborted.
+
+     The wrapper is the live region and it is on the page from first paint, so
+     the figure that lands is announced. A region that arrives with its message
+     already in it announces nothing, because it was not a live region when the
+     message was put there. This one is allowed to speak because a person
+     pressed the button. -->
+<div data-kui="stat-card/stale" class="max-w-sm rounded-xl border border-zinc-300 bg-white p-4">
+
+  <div id="sc-stale-read" role="status" aria-atomic="true">
+    <dl>
+      <dt class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Stock value · Silvassa</dt>
+      <dd class="mt-1.5 flex items-baseline gap-1">
+        <span class="text-[13px]/5 font-medium text-zinc-500">₹</span>
+        <span class="text-[24px]/7 font-semibold tracking-tight tabular-nums">3.42 Cr</span>
+      </dd>
+    </dl>
+    <p class="mt-2 flex items-start gap-1.5 text-[12px]/4 text-zinc-600">
+      <i data-lucide="alert-triangle" class="mt-0.5 size-3.5 shrink-0 text-amber-700" aria-hidden="true"></i>
+      <span class="tabular-nums">Computed 06:00, 3 h 14 m ago. The 12:00 valuation run has not posted.</span>
+    </p>
+  </div>
+
+  <button type="button"
+          hx-get="/dashboard/tiles/stock-value/" hx-target="#sc-stale-read" hx-swap="innerHTML"
+          hx-disabled-elt="this"
+          class="group mt-3 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="rotate-cw" class="size-4 group-[.htmx-request]:animate-spin"></i>Recompute now
+  </button>
+</div>

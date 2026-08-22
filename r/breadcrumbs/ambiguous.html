@@ -1,0 +1,46 @@
+<!-- One receipt, three plausible parents. Stores reached it from the receipt
+     register, purchase reached it from PO-24-1187, and accounts reached it from
+     the vendor. Each of those is a real relationship and none of them is the
+     hierarchy.
+
+     So the trail stops at the level that is the same for everybody — the
+     register the record lives in — and the relationships are written under it,
+     labelled, as ordinary links. A short honest trail beats a long one whose
+     third crumb depends on the referrer: that crumb is browsing history wearing
+     a hierarchy's clothes, and because it looks like structure it is believed.
+     Two people compare notes on the same GRN and read different paths to it.
+
+     The tempting alternative is to make the middle crumb a picker of the three
+     parents. It is a control that changes what the page above it claims to be
+     while the page itself does not change, and the first thing a user does with
+     it is assume the record moved.
+
+     Every link on that line is named by what the relationship is — order,
+     vendor, store — and all three are underlined, unlike the crumbs. Between
+     the label and the underline there is nothing left to mistake: what is in
+     the <ol> is a level, what is under it is a related record, and a bare row
+     of three links with no labels would read as the trail continuing. -->
+<div data-kui="breadcrumbs/ambiguous">
+  <nav aria-label="Breadcrumb">
+    <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Home</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stores</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">GRN-26-0418</span></li>
+    </ol>
+  </nav>
+
+  <p class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px]/4 text-zinc-600">
+    <span class="text-zinc-500">Order</span>
+    <a href="#" class="tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1187</a>
+    <span aria-hidden="true" class="text-zinc-500">·</span>
+    <span class="text-zinc-500">Vendor</span>
+    <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sharma Steel &amp; Alloys</a>
+    <span aria-hidden="true" class="text-zinc-500">·</span>
+    <span class="text-zinc-500">Store</span>
+    <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Silvassa</a>
+  </p>
+</div>

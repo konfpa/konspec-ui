@@ -3,6 +3,8 @@
      preview and the page cannot drift apart.
 
      # views.py
+     @vary_on_headers('HX-Request')
+     @cache_control(private=True, max_age=120)
      def order_card(request, pk):
          order = get_object_or_404(
              Order.objects.select_related('vendor', 'raised_by'), pk=pk
@@ -22,9 +24,14 @@
      htmx hx-target — the id needs {{ order.pk }} in it on every row, and
      duplicate ids are the failure that follows a copy-paste into a loop.
 
-     Give the view the same cache headers as any other read-only partial. A
-     hovercard is the one component a user can fire fifty times in ten seconds
-     without meaning to. -->
+     The two decorators are the whole cross-row cache. private, because the
+     card carries a price a different plant is not entitled to and a shared
+     proxy has no idea. vary_on_headers, because this URL answers a hovercard
+     with a fragment and a direct visit with a full page, and a cache that
+     cannot tell those apart will serve one where the other was asked for.
+     A hovercard is the one component a user can fire fifty times in ten
+     seconds without meaning to. -->
+{% load humanize %}
 {% for order in page_obj %}
   <tr data-kui="hovercard/django" class="border-b border-zinc-200">
     <td class="px-4 py-2.5">
@@ -48,17 +55,21 @@
             @hovercard-open.window="if ($event.detail !== $root) shut()"
             @htmx:after-swap.camel="loaded = true">
 
-        <a href="{% url 'order-detail' order.pk %}" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums">{{ order.number }}</a>
+        <a href="{% url 'order-detail' order.pk %}" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ order.number }}</a>
 
         <div x-show="open" x-cloak x-transition.opacity.duration.150ms
              class="absolute top-full left-0 z-40 pt-2">
           <div x-ref="body"
                hx-get="{% url 'order-card' order.pk %}" hx-trigger="hovercard-fetch"
                hx-swap="innerHTML" hx-sync="this:drop"
+               :aria-busy="loaded ? 'false' : 'true'"
                class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
-            <div class="animate-pulse" aria-hidden="true">
-              <div class="h-3 w-28 rounded bg-zinc-200"></div>
-              <div class="mt-2 h-2.5 w-40 rounded bg-zinc-200"></div>
+            <div role="status">
+              <span class="sr-only">Loading {{ order.number }}</span>
+              <div class="animate-pulse" aria-hidden="true">
+                <div class="h-3 w-28 rounded bg-zinc-200"></div>
+                <div class="mt-2 h-2.5 w-40 rounded bg-zinc-200"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -69,9 +80,9 @@
   </tr>
 {% endfor %}
 
-{# orders/_hovercard.html — swapped into the panel, and rendered on its own
+{% comment %} orders/_hovercard.html — swapped into the panel, and rendered on its own
    when someone opens the URL directly. status_dot is the filter the badge
-   component defines; it is the single place the status colour is decided. #}
+   component defines; it is the single place the status colour is decided. {% endcomment %}
 {% load humanize ui %}
 <div class="flex items-start justify-between gap-3">
   <div class="min-w-0">

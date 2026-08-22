@@ -1,0 +1,148 @@
+<!-- The register in the second before it has anything to show. It is the
+     skeleton entry's table wearing this component's toolbar and footer, and the
+     split is what matters: everything that is not waiting on the fetch is drawn
+     for real, and only the cells are grey.
+
+     The toolbar is real and the search is live. Its value goes into the request
+     that replaces these rows, so typing in the first half-second is a query the
+     server can answer; disable it instead and the one control somebody reaches
+     for while a slow screen loads is the one that refuses them. The Columns
+     button is drawn in its resting state — its popover is the full register's
+     and is not repeated here — because a toolbar that arrives with the rows
+     makes the whole panel jump at the moment somebody starts reading it.
+
+     The header row is real too, and it does two jobs: somebody can decide which
+     column they are going to read before the figures land, and the browser sets
+     the column widths from the same markup the loaded table uses, so no column
+     moves on arrival.
+
+     Five grey rows because the page size is five. Guess low where it is not
+     known — growth pushes down only what is below the panel, while shrinkage
+     pulls the whole page up under a cursor already moving.
+
+     aria-busy sits on the panel and one sr-only status names what is loading.
+     The grey rows are aria-hidden, or a screen reader walks twenty-five empty
+     cells and is never told why.
+
+     The pager is disabled rather than drawn grey. There is no page count yet,
+     and a live Next over nothing is a promise; a grey bar where the buttons go
+     would make the footer change size when they arrive.
+
+     This is the first paint and nothing here is worth keeping. Once rows are up,
+     a later page in flight keeps them — see the paging variant, which never
+     comes back to this state. -->
+<div data-kui="data-table/loading" aria-busy="true" class="rounded-xl border border-zinc-300 bg-white">
+  <p role="status" class="sr-only">Loading the order register</p>
+
+  <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" aria-label="Search the order register" placeholder="Search PO, vendor or department"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+    <button type="button" aria-haspopup="true" aria-expanded="false"
+            class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
+      <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+    </button>
+  </div>
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Department</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+      </tr>
+    </thead>
+    <tbody class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-16 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-20 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-32 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-16 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-14 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+      <tr>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-28 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-4 py-2.5"><div class="flex h-5 items-center"><div class="h-5 w-16 rounded-full bg-zinc-200"></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none md:hidden" aria-hidden="true">
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-20 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-5 items-center gap-2">
+        <div class="h-5 w-16 shrink-0 rounded-full bg-zinc-200"></div>
+        <div class="h-2 w-20 rounded bg-zinc-200"></div>
+      </div>
+    </li>
+  </ul>
+
+  <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <div class="flex h-8 items-center">
+      <div class="h-2.5 w-40 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none" aria-hidden="true"></div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" disabled class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium text-zinc-400">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>

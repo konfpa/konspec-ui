@@ -1,0 +1,121 @@
+<!-- The entry says a skeleton needs no delay floor, and that is about the frame
+     the server sent: the grey is on screen before anybody could have asked for
+     anything, and the panel was deferred because the query is slow. This is the
+     other case. Somebody changes the scope, the switch empties the panel, and
+     what fills it may already be in a cache — so a whole region turns grey at
+     90ms and back at 180ms, which is more disruptive than the wait it was drawn
+     for and reads as a rendering fault rather than as loading.
+
+     It is still a first paint and not a refresh, and the difference is the
+     emptying. August's entries are not the year's entries, so the switch has
+     nothing to keep. A Refresh on the scope already showing does have something
+     to keep, and that one gets the spinner's scrim over figures that stay
+     legible underneath. Skeleton where the region was emptied, scrim where it
+     was not.
+
+     The floor is 500ms, the same number spinner/delayed takes. Two waits on one
+     screen that appear at two different thresholds read as two different
+     mechanisms, and nobody can tell which one a panel is using.
+
+     The floor is on the opacity of the blocks and never on their display. The
+     box is held from the first frame either way — that is what the skeleton is
+     for — so delaying opacity delays only the ink. Delay the box with x-show
+     and the panel grows half a second after the click and moves the buttons out
+     from under the cursor.
+
+     delay-500 is in the bound class and not the base class. Left in the base it
+     delays the fade out too, and the grey lingers over rows that have already
+     landed, which reads as a panel still loading something it has finished
+     drawing.
+
+     The blocks and the rows are stacked in one grid cell, which is what makes
+     them provably the same height rather than approximately: if they were not,
+     the cell would take the taller of the two and the shorter one would sit
+     against a gap you can see. The block layer is pointer-events-none, because
+     it lies invisible over the rows for the whole time they are on screen and
+     would otherwise swallow every click in the panel.
+
+     The announcement gets its own timer. x-text fires the moment the flag
+     flips, so without one a 90ms answer that never painted a block is still
+     announced as a wait. -->
+<div data-kui="skeleton/delayed" class="max-w-md rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       busy: false, late: false, loaded: true, timer: null, done: null,
+       run(ms) {
+         clearTimeout(this.timer); clearTimeout(this.done);
+         this.loaded = false; this.busy = true; this.late = false;
+         this.timer = setTimeout(() => { this.late = this.busy }, 500);
+         this.done = setTimeout(() => {
+           this.busy = false; this.late = false; this.loaded = true;
+           clearTimeout(this.timer);
+         }, ms);
+       }
+     }"
+     :aria-busy="busy">
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Ledger · Sharma Extrusions</h2>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Changing the scope empties the panel. August is cached and answers in 90ms, so it never paints a block; the full year takes 1.6s and does.</p>
+  </div>
+
+  <div class="grid">
+    <div class="col-start-1 row-start-1 animate-pulse divide-y divide-zinc-100 opacity-0 transition-opacity delay-0 duration-150 pointer-events-none motion-reduce:animate-none"
+         :class="busy && 'opacity-100 delay-500'" aria-hidden="true">
+      <div class="flex items-start gap-2.5 px-4 py-2.5">
+        <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <div class="min-w-0 flex-1">
+          <div class="flex h-5 items-center"><div class="h-2.5 w-48 rounded bg-zinc-200"></div></div>
+          <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+        </div>
+      </div>
+      <div class="flex items-start gap-2.5 px-4 py-2.5">
+        <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <div class="min-w-0 flex-1">
+          <div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+          <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+        </div>
+      </div>
+      <div class="flex items-start gap-2.5 px-4 py-2.5">
+        <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <div class="min-w-0 flex-1">
+          <div class="flex h-5 items-center"><div class="h-2.5 w-56 rounded bg-zinc-200"></div></div>
+          <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <ul role="list" x-show="loaded" x-cloak class="col-start-1 row-start-1 divide-y divide-zinc-100">
+      <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block tabular-nums">Invoice SE-26-0881 · ₹18,42,000</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">04 Aug 2026 · against PO-24-1187</span>
+        </span>
+      </li>
+      <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block tabular-nums">Payment RTGS 0042118 · ₹12,00,000</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">12 Aug 2026 · part settlement</span>
+        </span>
+      </li>
+      <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block tabular-nums">Debit note DN-26-0117 · ₹48,000</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">16 Aug 2026 · short receipt on GRN-26-0442</span>
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-2 border-t border-zinc-200 px-4 py-2.5">
+    <button type="button" @click="run(90)"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">August · cached 90ms</button>
+    <button type="button" @click="run(1600)"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Full year · cold 1.6s</button>
+  </div>
+
+  <p role="status" class="sr-only"
+     x-text="late ? 'Loading the vendor ledger' : loaded ? 'Vendor ledger loaded, 3 entries' : ''"></p>
+</div>

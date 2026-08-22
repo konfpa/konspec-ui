@@ -1,11 +1,16 @@
 <!-- Three levels, which is the common case. The separator is aria-hidden so a
      screen reader reads "Home, Procurement, Purchase orders" rather than
-     spelling out a slash between each one. -->
+     spelling out a slash between each one.
+
+     The focus outline is declared on the crumbs rather than left to the
+     browser. On a record page the trail is usually the first thing after the
+     skip link, so it is the first thing a keyboard reaches, and it is the one
+     control on the page guaranteed to be tabbed through. -->
 <nav data-kui="breadcrumbs/default" aria-label="Breadcrumb">
   <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
-    <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
+    <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Home</a></li>
     <li aria-hidden="true" class="text-zinc-500">/</li>
-    <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
+    <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
     <li aria-hidden="true" class="text-zinc-500">/</li>
     <li><span aria-current="page" class="font-medium text-zinc-900">Purchase orders</span></li>
   </ol>

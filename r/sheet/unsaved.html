@@ -1,0 +1,116 @@
+<!-- A sheet has four exits and a dirty one has to guard all four. Escape, the
+     backdrop, the close button and Cancel are four separate handlers, so
+     guarding three of them leaves the fourth to throw the work away — and since
+     the backdrop is the largest click target on the screen, the fourth is the
+     one that gets found. attempt() is written once and called from all four.
+
+     The guard is an alert dialog, not a second sheet, and its three answers are
+     alert-dialog/unsaved: keep editing, discard, save. A two-way choice is what
+     makes people press the destructive one to get out of the panel. What this
+     variant owns is not the question, it is the routing of every exit through
+     it.
+
+     The scrim covers the panel and not the page. The question is about this
+     sheet, and dimming the whole window a second time says the whole window is
+     blocked when the list behind was already unreachable.
+
+     It carries its own x-trap, or Tab walks back into the fields underneath the
+     question. @alpinejs/focus keeps one stack of traps, so the inner one pauses
+     the sheet's trap while it is up and hands focus back to the control that
+     raised it on the way out. autofocus is on Keep editing: the safe answer is
+     where the keyboard should land, and Escape inside the guard means the same
+     thing.
+
+     Both flags live in one x-data on the root, so one window handler decides
+     what Escape means. Two handlers and a single press closes the guard and the
+     sheet together, which is exactly the loss the guard was written to stop.
+
+     dirty starts true here so the state can be read; in a real screen it is set
+     by @input on the form, which is also wired below, and cleared by the save. -->
+<div data-kui="sheet/unsaved"
+     x-data="{
+       open: false, dirty: true, ask: false,
+       attempt() { this.dirty ? this.ask = true : this.open = false },
+       discard() { this.ask = false; this.dirty = false; this.open = false },
+       save() { this.ask = false; this.dirty = false; this.open = false }
+     }">
+  <button type="button" @click="open = true"
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Edit GRN 1142</button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       @keydown.escape.window="ask ? ask = false : attempt()" @click.self="attempt()"
+       class="fixed inset-0 z-50 flex justify-end bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="sheet-unsaved-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-x-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-x-full"
+         class="relative flex h-full w-full flex-col border-l border-zinc-300 bg-white shadow-lg sm:w-[28rem]">
+
+      <div class="flex items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+        <div class="min-w-0">
+          <h2 id="sheet-unsaved-title" class="truncate text-[16px]/6 font-semibold tabular-nums">GRN 1142</h2>
+          <div class="mt-1.5 flex flex-wrap items-center gap-2">
+            <p class="truncate text-[12px]/4 tabular-nums text-zinc-600">PO-24-1187 · received 16 Aug 2026</p>
+            <span x-show="dirty" x-cloak
+                  class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Unsaved changes
+            </span>
+          </div>
+        </div>
+        <button type="button" @click="attempt()" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <form class="flex min-h-0 flex-1 flex-col" @input="dirty = true" @submit.prevent="save()">
+        <div class="flex-1 overflow-y-auto px-5 py-4">
+          <div>
+            <label for="su-qty" class="mb-1.5 block text-[13px]/5 font-medium">Accepted quantity</label>
+            <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="su-qty" inputmode="decimal" value="3,940" autofocus aria-describedby="su-qty-help"
+                     class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+              <span class="border-l border-zinc-200 px-3 py-2 text-[13px]/5 text-zinc-600">kg</span>
+            </div>
+            <p id="su-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Challan says 4,000 kg. 60 kg short-received.</p>
+          </div>
+
+          <div class="mt-4">
+            <label for="su-reason" class="mb-1.5 block text-[13px]/5 font-medium">Short receipt reason</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <textarea id="su-reason" rows="3" class="w-full resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none">Two bundles rejected at gate — visible rust. Debit note to follow.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+          <button type="button" @click="attempt()"
+                  class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+          <button type="submit"
+                  class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save receipt</button>
+        </div>
+      </form>
+
+      <div x-show="ask" x-cloak x-trap="ask"
+           class="absolute inset-0 z-10 flex items-center justify-center bg-zinc-900/40 p-4">
+        <div role="alertdialog" aria-modal="true" aria-labelledby="sheet-unsaved-guard" aria-describedby="sheet-unsaved-guard-body"
+             class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+          <h3 id="sheet-unsaved-guard" class="text-[14px]/5 font-semibold">Close without saving?</h3>
+          <p id="sheet-unsaved-guard-body" class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+            GRN 1142 has a changed accepted quantity and a short receipt reason. Closing now loses both.
+          </p>
+          <div class="mt-4 flex flex-wrap justify-end gap-2">
+            <button type="button" @click="ask = false" autofocus
+                    class="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Keep editing</button>
+            <button type="button" @click="discard()"
+                    class="rounded-lg px-3 py-1.5 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Discard changes</button>
+            <button type="button" @click="save()"
+                    class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save and close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

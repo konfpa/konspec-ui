@@ -1,0 +1,125 @@
+<!-- Past about twenty destinations the panel stops being scannable and the eye
+     starts reading it as a wall. This is not the command palette and does not
+     replace it: the palette is a modal jump to anywhere in the application from
+     a keystroke, and it leaves the nav where it was. This narrows the panel in
+     place, for somebody already in it with a pointer, and keeps the groups, the
+     counts and the current mark on whatever survives.
+
+     The filter walks the DOM rather than rebuilding the list from a model.
+     There is no model here — the rows are server-rendered, and an x-for over
+     one invented in Alpine to make the filter tidy throws away the permission
+     branches, the counts and the template tags that made them real rows. What
+     the server does provide is the haystack: data-nav-item carries the label
+     already lowercased plus the words people actually type, which is why GRN
+     finds Goods receipt and PO finds Purchase orders.
+
+     Rows hide with the hidden attribute, not with opacity or a width. hidden
+     takes the row out of the tab order and the accessibility tree in the same
+     moment it takes it off the screen; anything else leaves a keyboard user
+     tabbing through destinations that are not there. Groups are hidden in a
+     second pass, after the rows, by asking whether anything under them
+     survived — a group label over nothing is the thing that makes a filtered
+     nav look broken.
+
+     The match count goes in a live region and the empty case names what was
+     typed. A panel that silently empties reads as the nav having crashed, and
+     "Nothing matches grn" is the only text that tells the user the filter is
+     working and the word is wrong.
+
+     Group labels are sticky, which needs the opaque fill and the negative
+     margin together: without bg-white the rows scroll through the label, and
+     without -mx-3 the fill stops short of the scroller edge and a two-pixel
+     stripe of row shows down each side.
+
+     The panel opens scrolled to the current item, by arithmetic on the
+     scroller's own scrollTop rather than scrollIntoView — which walks up the
+     ancestors and scrolls the page behind the sidebar as well. -->
+<div data-kui="sidebar/filter" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{
+       q: '', shown: 0, total: 0,
+       run() {
+         const q = this.q.trim().toLowerCase();
+         let n = 0;
+         this.$refs.nav.querySelectorAll('[data-nav-item]').forEach(el => {
+           const on = !q || el.dataset.navItem.includes(q);
+           el.hidden = !on;
+           if (on) n++;
+         });
+         this.$refs.nav.querySelectorAll('[data-nav-group]').forEach(g => {
+           g.hidden = !g.querySelector('[data-nav-item]:not([hidden])');
+         });
+         this.shown = n;
+       },
+       clear() { this.q = ''; this.run(); this.$refs.q.focus() }
+     }"
+     x-init="$nextTick(() => { total = $refs.nav.querySelectorAll('[data-nav-item]').length; shown = total })">
+
+  <div class="shrink-0 border-b border-zinc-200 p-2">
+    <label for="sb12-q" class="sr-only">Filter destinations</label>
+    <div class="relative">
+      <i data-lucide="search" class="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-zinc-500"></i>
+      <input id="sb12-q" type="search" x-ref="q" x-model="q" placeholder="Filter destinations"
+             @input.debounce.150ms="run()" @search="run()" @keydown.escape.prevent.stop="clear()"
+             class="h-9 w-full rounded-lg border border-zinc-200 bg-white pr-8 pl-8 text-[13px]/5 text-zinc-900 placeholder:text-zinc-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <button type="button" x-show="q" x-cloak @click="clear()" aria-label="Clear filter"
+              class="absolute top-1/2 right-1.5 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="x" class="size-3.5"></i>
+      </button>
+    </div>
+    <p class="sr-only" role="status" x-text="q ? shown + ' of ' + total + ' destinations match' : ''"></p>
+  </div>
+
+  <nav aria-label="Main" x-ref="nav" class="relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-2"
+       x-init="const c = $el.querySelector('[aria-current=page]'); if (c) $el.scrollTop = Math.max(0, c.offsetTop - $el.clientHeight / 2)">
+
+    <p x-show="q && shown === 0" x-cloak class="px-2.5 py-8 text-center text-[13px]/5 text-zinc-500">
+      Nothing matches “<span class="font-medium text-zinc-900" x-text="q"></span>”
+    </p>
+
+    <div data-nav-group>
+      <p id="sb12-g1" class="sticky top-0 z-10 -mx-3 bg-white px-5.5 pt-3 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Procurement</p>
+      <ul role="list" aria-labelledby="sb12-g1" class="space-y-0.5">
+        <li data-nav-item="requisitions pr indent"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="clipboard-list" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Requisitions</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">62</span></a></li>
+        <li data-nav-item="request for quotation rfq"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="mail" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Requests for quotation</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">9</span></a></li>
+        <li data-nav-item="purchase orders po"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="file-text" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Purchase orders</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">1,438</span></a></li>
+        <li data-nav-item="goods receipt grn inward"><a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="truck" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Goods receipt</span><span class="shrink-0 rounded-full bg-zinc-300 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700">12</span></a></li>
+        <li data-nav-item="invoices bills ap"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="receipt" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Invoices</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">204</span></a></li>
+        <li data-nav-item="debit notes returns"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="corner-up-left" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Debit notes</span></a></li>
+      </ul>
+    </div>
+
+    <div data-nav-group>
+      <p id="sb12-g2" class="sticky top-0 z-10 -mx-3 bg-white px-5.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Stores</p>
+      <ul role="list" aria-labelledby="sb12-g2" class="space-y-0.5">
+        <li data-nav-item="stock on hand inventory"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="boxes" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Stock on hand</span></a></li>
+        <li data-nav-item="issues to production"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="arrow-up-from-line" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Issues to production</span></a></li>
+        <li data-nav-item="transfer orders sto"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="arrow-left-right" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Transfer orders</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">7</span></a></li>
+        <li data-nav-item="physical stock count"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="clipboard-check" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Physical count</span></a></li>
+        <li data-nav-item="item ledger movements"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="book-open" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Item ledger</span></a></li>
+      </ul>
+    </div>
+
+    <div data-nav-group>
+      <p id="sb12-g3" class="sticky top-0 z-10 -mx-3 bg-white px-5.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Quality</p>
+      <ul role="list" aria-labelledby="sb12-g3" class="space-y-0.5">
+        <li data-nav-item="inward inspection grn qc"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="scan-search" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Inward inspection</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">31</span></a></li>
+        <li data-nav-item="lab results coa"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="flask-conical" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Lab results</span></a></li>
+        <li data-nav-item="rejections ncr"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="ban" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Rejections</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">4</span></a></li>
+      </ul>
+    </div>
+
+    <div data-nav-group>
+      <p id="sb12-g4" class="sticky top-0 z-10 -mx-3 bg-white px-5.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Master data</p>
+      <ul role="list" aria-labelledby="sb12-g4" class="space-y-0.5">
+        <li data-nav-item="vendors suppliers gstin"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="building-2" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Vendors</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span></a></li>
+        <li data-nav-item="materials items hsn"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="package" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Materials</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">2,418</span></a></li>
+        <li data-nav-item="rate contracts pricing"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="scale" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Rate contracts</span><span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">24</span></a></li>
+        <li data-nav-item="warehouses plants"><a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"><i data-lucide="warehouse" class="size-[18px] shrink-0"></i><span class="min-w-0 flex-1 truncate">Warehouses</span></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 text-zinc-500">Press Escape in the field to clear.</p>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<!-- Ctrl-F does not reach an x-show panel. display:none text is not text as far
+     as the browser is concerned, so somebody searching a long order page for
+     "liquidated damages" is told there are no matches on a page that contains
+     the words twice. hidden="until-found" is the one way to keep a scripted
+     disclosure and still be searchable: the browser hides the panel with
+     content-visibility instead of display, finds the text inside it, fires
+     beforematch and opens the panel on the match.
+
+     Which is why nothing here toggles display. x-show would write display:none
+     straight over the attribute and take the searchability with it, so the
+     panel is opened and closed by adding and removing the attribute itself, and
+     Alpine is left holding only what the trigger needs: aria-expanded and the
+     chevron. beforematch is what keeps those two in step — without it the
+     browser opens the panel and the trigger still says collapsed.
+
+     No x-cloak, and none is needed. The attribute is in the HTML from the first
+     byte, so the panel is closed before any script runs; x-cloak is the fix for
+     a panel that is only closed once Alpine says so.
+
+     The panel still carries no padding. content-visibility:hidden skips the
+     contents but keeps the element's own box, so padding on this div would
+     leave a band of empty white on the closed row.
+
+     Where a browser has not implemented until-found, any value of hidden is
+     still hidden: the panel closes, the trigger opens it, and only the
+     find-in-page reveal is missing. The cost is the animation — there is no
+     height to interpolate, so this opens in one frame. Reference text somebody
+     will search takes this or <details>; a panel that has to move takes the
+     Alpine one. -->
+<div data-kui="collapsible/findable" class="max-w-xl rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       open: false,
+       set(v) {
+         this.open = v;
+         v ? this.$refs.panel.removeAttribute('hidden')
+           : this.$refs.panel.setAttribute('hidden', 'until-found');
+       }
+     }">
+  <button type="button" @click="set(!open)" :aria-expanded="open" aria-controls="col-terms-printed"
+          class="flex h-12 w-full items-center gap-3 px-4 text-left focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="scroll-text" class="size-4 shrink-0 text-zinc-600"></i>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">Terms printed on the order</span>
+    <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">6 clauses</span>
+    <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </button>
+
+  <div id="col-terms-printed" x-ref="panel" hidden="until-found" @beforematch="open = true">
+    <ol class="space-y-2.5 border-t border-zinc-100 px-4 py-3 text-[13px]/5 text-zinc-600">
+      <li><span class="font-medium text-zinc-900">Payment</span> — 45 days from GRN posting. 2% discount on settlement inside 10 days.</li>
+      <li><span class="font-medium text-zinc-900">Liquidated damages</span> — 0.5% of the line value per completed week of delay, capped at 5% of the order value.</li>
+      <li><span class="font-medium text-zinc-900">Tolerance</span> — 2% over-receipt accepted. Anything beyond it is returned at the vendor's cost.</li>
+      <li><span class="font-medium text-zinc-900">Documents</span> — mill test certificate per heat number, packing list and e-way bill with every despatch.</li>
+      <li><span class="font-medium text-zinc-900">Rejection</span> — material rejected at inbound QC is lifted within 14 days of the debit note.</li>
+      <li><span class="font-medium text-zinc-900">Jurisdiction</span> — courts at Mumbai, Maharashtra.</li>
+    </ol>
+  </div>
+</div>

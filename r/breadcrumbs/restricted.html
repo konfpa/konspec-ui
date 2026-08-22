@@ -1,0 +1,46 @@
+<!-- A rate contract hangs off exactly one vendor, so the vendor is a level and
+     not a relationship. The stores user reading this contract for its prices
+     has no access to the vendor master at all: the level is real and the page
+     behind it is closed to them.
+
+     Three ways to draw this and two of them are wrong. Dropping the level makes
+     the trail claim a depth the record does not have, so somebody counts three
+     crumbs and concludes the contract belongs to the register rather than to a
+     vendor. Leaving the link in ships a path whose third step is a 403, which
+     is a trap the user can only find by falling into it. What is left is the
+     label with no href: the hierarchy stays honest and nothing on screen offers
+     to take you somewhere you cannot go.
+
+     A parent that was deleted takes this exact shape — the label the record
+     stored, no href, one line saying what happened. Only the reason differs.
+
+     The reason is a line on the page rather than a title attribute. title never
+     appears on a touch device and cannot be reached by keyboard, so a trail
+     that explains itself only on hover explains itself to about half the people
+     who need it.
+
+     The lock is aria-hidden and the grey is not announced at all, so the fact
+     that this crumb is not a link is carried by an sr-only clause on the label.
+     A crumb that is silently inert reads to a screen reader as a crumb whose
+     link the page forgot.
+
+     Where the label is itself what the permission protects — a customer name on
+     a costing branch, a salary band — the crumb reads "Restricted" and nothing
+     more. Naming it in the trail leaks the thing the lock was for. -->
+<div data-kui="breadcrumbs/restricted">
+  <nav aria-label="Breadcrumb">
+    <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Home</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rate contracts</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li class="flex items-center gap-1.5">
+        <i data-lucide="lock" class="size-3.5 text-zinc-500" aria-hidden="true"></i>
+        <span class="text-zinc-500">Gujarat Polymers Ltd<span class="sr-only">, not available to you</span></span>
+      </li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">RC-24-0089</span></li>
+    </ol>
+  </nav>
+  <p class="mt-1.5 text-[12px]/4 text-zinc-500">Vendor records are open to purchase and finance. The contract is yours to read; the vendor page behind it is not.</p>
+</div>

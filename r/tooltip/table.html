@@ -22,6 +22,7 @@
 <div data-kui="tooltip/table" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, timer: 0,
+       over(id) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id) },
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
        hide() { clearTimeout(this.timer); this.open = null }
      }"
@@ -33,7 +34,7 @@
         <th scope="col" class="px-3 py-2 text-right font-medium">
           <span class="relative inline-flex">
             <button type="button" aria-describedby="tt-mfi"
-                    @mouseenter="show('mfi')" @mouseleave="hide()"
+                    @mouseenter="over('mfi')" @mouseleave="hide()"
                     @focus="if ($event.target.matches(':focus-visible')) show('mfi', 0)" @blur="hide()"
                     class="underline decoration-dotted underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">MFI</button>
             <span id="tt-mfi" role="tooltip" x-show="open === 'mfi'" x-cloak x-transition.opacity.duration.100ms
@@ -43,7 +44,7 @@
         <th scope="col" class="px-3 py-2 text-right font-medium">
           <span class="relative inline-flex">
             <button type="button" aria-describedby="tt-ash"
-                    @mouseenter="show('ash')" @mouseleave="hide()"
+                    @mouseenter="over('ash')" @mouseleave="hide()"
                     @focus="if ($event.target.matches(':focus-visible')) show('ash', 0)" @blur="hide()"
                     class="underline decoration-dotted underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Ash</button>
             <span id="tt-ash" role="tooltip" x-show="open === 'ash'" x-cloak x-transition.opacity.duration.100ms
@@ -71,7 +72,7 @@
         <td class="px-3 py-1.5">
           <span class="relative inline-flex">
             <button type="button" aria-label="Failed" aria-describedby="tt-fail"
-                    @mouseenter="show('fail')" @mouseleave="hide()"
+                    @mouseenter="over('fail')" @mouseleave="hide()"
                     @focus="if ($event.target.matches(':focus-visible')) show('fail', 0)" @blur="hide()"
                     class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
               <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Fail

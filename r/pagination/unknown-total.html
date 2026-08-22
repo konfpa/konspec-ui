@@ -1,0 +1,54 @@
+<!-- A stock ledger of some millions of rows, partitioned by month, filtered by
+     item. COUNT over that is a full scan every time somebody changes a filter,
+     and the register cannot wait on it. So the total does not exist and the
+     pager has to work anyway.
+
+     What goes in the URL is a cursor, not a page. ?after=ENT-26-3164 is keyset
+     paging and it is the correct answer for a ledger for a second reason as
+     well: OFFSET 75 is measured against a list that is still being written to,
+     so a receipt posted while somebody reads page 3 pushes one row from page 4
+     onto page 3 and the row that was at the boundary is shown twice or not at
+     all. A cursor names a record, and records do not move.
+
+     Next is enabled because the server was asked for 26 rows and got 26. The
+     twenty-sixth is never rendered; it exists only to answer whether there is
+     more. Ask for 25 and you cannot tell a full page from the last one, so the
+     button either lies or costs a second query.
+
+     There is no number row, no Last and no jump, because none of the three can
+     be computed. Drawing them greyed out is worse than leaving them out: a
+     disabled Last says the button will work once you get close enough, and it
+     never will.
+
+     The end is the one moment the total becomes free — fewer rows came back
+     than were asked for, so this page is the last and the count is now known
+     exactly. Say it there and nowhere earlier. The snippet has to be told where
+     the end is in order to draw it; the server is not, and finds out the same
+     way the reader does. -->
+<nav data-kui="pagination/unknown-total" aria-label="Stock ledger pages"
+     x-data="{
+       size: 25, depth: 1, last: 4, tail: 19,
+       get end() { return this.depth === this.last },
+       get from() { return (this.depth - 1) * this.size + 1 },
+       get to() { return this.end ? (this.last - 1) * this.size + this.tail : this.depth * this.size },
+       get line() { return this.end
+         ? 'Entries ' + this.from + '–' + this.to + ' · ' + this.to + ' in all'
+         : 'Entries ' + this.from + '–' + this.to },
+       prev() { this.depth--; if (this.depth === 1) this.$refs.next.focus() },
+       next() { this.depth++; if (this.end) this.$refs.prev.focus() }
+     }"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+
+  <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600" x-text="line">Entries 1–25</p>
+
+  <div class="flex items-center gap-2">
+    <button type="button" x-ref="prev" @click="prev()" :disabled="depth === 1"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>Previous
+    </button>
+    <button type="button" x-ref="next" @click="next()" :disabled="end"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Next<i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+</nav>

@@ -1,0 +1,50 @@
+<!-- An alert that offers to delete something is the worst place in the system
+     to put a single press. It sits at the top of the page, it is the first
+     thing the eye lands on, and its whole job is to be acted on quickly — so
+     the one control on it is pressed before it is read more often than any
+     other button in the console.
+
+     alert-dialog is the wrong fix. A dialog is right when there is something
+     the user has to read before deciding, and here they have already read it:
+     the alert is the sentence the dialog would repeat back at them. A modal
+     that says what the screen behind it already says is ceremony, and ceremony
+     that is not deserved gets clicked through without being read, which makes
+     the mistake more likely rather than less.
+
+     So the alert arms instead. The mechanic is button/confirm, copied rather
+     than re-invented, because two implementations of one safety measure drift
+     apart and only one of them keeps the aria-live: the armed button says a
+     double click on the first press cannot sail through the second; it disarms
+     on Escape and after four seconds so nothing is left armed on a screen
+     somebody walked away from; and both labels share one grid cell so the row
+     does not move between the two presses.
+
+     The alert itself takes no role="alert" — it is a condition the page found
+     on load, not an answer to anything. The announcement that matters here is
+     the button telling a screen reader its own label changed under focus that
+     was already sitting on it. -->
+<div data-kui="alert/confirm" class="flex flex-wrap items-start gap-x-3 gap-y-2.5 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+  <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+  <div class="min-w-[15rem] flex-1">
+    <p class="text-[13px]/5 font-medium">An import that failed on 12 Aug 2026 left <span class="tabular-nums">12</span> draft lines on PR-24-0442.</p>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-600">They carry no rate and never reach a vendor. Discarding them cannot be undone.</p>
+  </div>
+  <button type="button" aria-live="polite"
+          x-data="{ armed: false, t: null,
+                    press() {
+                      clearTimeout(this.t);
+                      if (this.armed) { this.armed = false; return }
+                      this.armed = true;
+                      this.t = setTimeout(() => this.armed = false, 4000);
+                    } }"
+          @click="press()"
+          @keydown.escape.window="armed = false; clearTimeout(t)"
+          class="inline-flex h-8 shrink-0 items-center gap-2 rounded-lg border px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+          :class="armed ? 'border-transparent bg-red-600 text-white hover:bg-red-700' : 'border-zinc-200 bg-white text-red-600 hover:bg-zinc-100'">
+    <i data-lucide="trash-2" class="size-4"></i>
+    <span class="grid">
+      <span class="col-start-1 row-start-1" :class="armed && 'invisible'">Discard drafts</span>
+      <span class="col-start-1 row-start-1 tabular-nums" :class="!armed && 'invisible'">Discard 12 lines?</span>
+    </span>
+  </button>
+</div>

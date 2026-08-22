@@ -1,0 +1,84 @@
+<!-- Zero rows, and not one filter the user chose. The register shows open
+     enquiries out of the box, every enquiry in Packaging is closed, and the
+     mechanical test that separates the four empties reads this as a register
+     with nothing in it. It is not: there are four enquiries here and all four
+     are done. Offer create on the strength of that count and the buyer raises a
+     fifth without ever seeing that the vendor was already asked.
+
+     A default nobody chose is still a predicate, so it gets echoed like one.
+     The sentence names the default in force, gives the count behind it and says
+     when the last of them closed — a date is what tells somebody whether this
+     category is dormant or was worked yesterday.
+
+     The action reveals rather than creates. The empty state cannot see whether
+     the rows it is hiding are live or dead, so it does not get to decide a new
+     record is wanted; it puts the four closed enquiries on the screen and lets
+     the user decide. New enquiry is still on the panel, in the toolbar, where
+     it is a thing somebody came to do rather than an answer to an emptiness.
+     That placement is the whole point of the variant.
+
+     Revealing removes the block the button was in, so focus goes to the count
+     line — tabindex="-1", still on the page, and the sentence that reports the
+     new number.
+
+     The header checkbox and the empty state's button drive one piece of state,
+     bound once. Two controls holding one value is fine; two copies of a value
+     is what drifts. -->
+<div data-kui="empty-state/archived" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       includeClosed: false,
+       closed: [
+         { no: 'ENQ-26-0071', vendor: 'Sharma Extrusions', item: 'Corrugated boxes 5-ply', on: '02 Aug 2026' },
+         { no: 'ENQ-26-0078', vendor: 'Gujarat Polymers Ltd', item: 'Stretch film, 23 micron', on: '07 Aug 2026' },
+         { no: 'ENQ-26-0084', vendor: 'Konkan Packaging Co', item: 'Strapping, 12 mm', on: '11 Aug 2026' },
+         { no: 'ENQ-26-0088', vendor: 'Nashik Steel Traders', item: 'Pallet, 1200x1000', on: '14 Aug 2026' }
+       ],
+       get rows() { return this.includeClosed ? this.closed : [] }
+     }">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <h2 class="text-[14px]/5 font-semibold">Enquiries · Packaging</h2>
+      <p role="status" x-ref="count" tabindex="-1"
+         class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+         x-text="rows.length ? rows.length + ' enquiries, all closed' : 'No open enquiries · 4 closed are hidden'"></p>
+    </div>
+    <div class="ml-auto flex flex-wrap items-center gap-3">
+      <label class="flex items-center gap-2 text-[12px]/4 text-zinc-600">
+        <input type="checkbox" x-model="includeClosed" class="size-4 shrink-0 accent-zinc-700">Include closed
+      </label>
+      <button type="button"
+              class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-3.5 text-zinc-600"></i>New enquiry
+      </button>
+    </div>
+  </div>
+
+  <div x-show="!rows.length" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="archive" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">Every enquiry for Packaging is closed</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      There are <span class="font-medium text-zinc-900 tabular-nums">4</span> enquiries in this category and all four were closed, the last of them on 14 Aug 2026. The register shows open enquiries unless you ask for the rest.
+    </p>
+    <button type="button" @click="includeClosed = true; $nextTick(() => $refs.count.focus())"
+            class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="archive-restore" class="size-4 text-zinc-600"></i>Show the 4 closed enquiries
+    </button>
+  </div>
+
+  <ul x-show="rows.length" x-cloak role="list" class="divide-y divide-zinc-100 text-[13px]/5">
+    <template x-for="r in rows" :key="r.no">
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-2.5">
+        <span class="min-w-0">
+          <span class="font-medium tabular-nums" x-text="r.no"></span>
+          <span class="text-zinc-600" x-text="' · ' + r.vendor + ' · ' + r.item"></span>
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 tabular-nums">
+          <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span><span x-text="'Closed ' + r.on"></span>
+        </span>
+      </li>
+    </template>
+  </ul>
+</div>

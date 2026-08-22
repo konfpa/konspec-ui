@@ -21,6 +21,7 @@
 <div data-kui="tooltip/placement" class="flex flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white p-10"
      x-data="{
        open: null, timer: 0,
+       over(id) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id) },
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
        hide() { clearTimeout(this.timer); this.open = null }
      }"
@@ -28,7 +29,7 @@
 
   <span class="relative inline-flex">
     <button type="button" aria-labelledby="tt-place-top"
-            @mouseenter="show('top')" @mouseleave="hide()"
+            @mouseenter="over('top')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('top', 0)" @blur="hide()"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="arrow-up" class="size-4"></i>
@@ -39,7 +40,7 @@
 
   <span class="relative inline-flex">
     <button type="button" aria-labelledby="tt-place-right"
-            @mouseenter="show('right')" @mouseleave="hide()"
+            @mouseenter="over('right')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('right', 0)" @blur="hide()"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="arrow-right" class="size-4"></i>
@@ -50,7 +51,7 @@
 
   <span class="relative inline-flex">
     <button type="button" aria-labelledby="tt-place-bottom"
-            @mouseenter="show('bottom')" @mouseleave="hide()"
+            @mouseenter="over('bottom')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('bottom', 0)" @blur="hide()"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="arrow-down" class="size-4"></i>
@@ -61,7 +62,7 @@
 
   <span class="relative inline-flex">
     <button type="button" aria-labelledby="tt-place-left"
-            @mouseenter="show('left')" @mouseleave="hide()"
+            @mouseenter="over('left')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('left', 0)" @blur="hide()"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="arrow-left" class="size-4"></i>

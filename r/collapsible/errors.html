@@ -1,0 +1,98 @@
+<!-- The section is open because something inside it failed validation, and for
+     no other reason. A collapsed panel holding a rejected field is an error
+     message nobody can see: the form refuses to save, and the reason is one
+     click away behind a trigger that looks exactly as it did before.
+
+     Two things carry that. The panel is rendered open, so it takes no x-cloak —
+     x-cloak would hold it hidden until Alpine boots and blank the very thing
+     the page reloaded to show. And the trigger keeps the tally while it is
+     closed, because closing it again is the user's right and the fact has to
+     survive on the row when they do.
+
+     $watch and not x-effect. x-effect re-runs whenever anything it reads
+     changes, so a section deliberately closed springs open again the next time
+     any state on the page moves — the user closes it, types in a field above
+     it, and it is back. The watcher fires only when the list of bad fields is
+     replaced, which is once per validation run: the form re-opens the section
+     when it re-rejects it, and leaves it alone the rest of the time.
+
+     reveal() also moves focus to the first bad field. Opening a panel and
+     leaving the caret on the trigger asks the user to hunt for what is wrong
+     inside a section they did not choose to open.
+
+     aria-invalid is bound as a string. Written once by the server it is still
+     true after the value has been fixed, and a field announced as invalid while
+     its message reads as help is worse than one that says nothing.
+
+     check() stands in for the server here so the variant can be pasted and
+     pressed. On a real form the list arrives rendered from the view, the submit
+     is not prevented, and the watcher does the same work on the round trip. -->
+<form data-kui="collapsible/errors" class="max-w-xl"
+      x-data="{
+        open: true,
+        bad: ['tol', 'hsn'],
+        has(f) { return this.bad.includes(f) },
+        check() {
+          const next = [], tol = this.$refs.tol.value.trim(), hsn = this.$refs.hsn.value.trim();
+          if (tol === '' || Number.isNaN(Number(tol)) || Number(tol) > 10) next.push('tol');
+          if (hsn.length !== 8) next.push('hsn');
+          this.bad = next;
+        },
+        reveal() {
+          this.open = true;
+          this.$nextTick(() => this.$refs[this.bad[0]].focus());
+        }
+      }"
+      x-init="$watch('bad', v => v.length && reveal())"
+      @submit.prevent="check()">
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-tax"
+            class="flex h-12 w-full items-center gap-3 px-4 text-left focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">Tax and receipt settings</span>
+      <span x-show="bad.length" class="flex shrink-0 items-center gap-1.5 text-[12px]/4 font-medium text-red-600">
+        <i data-lucide="alert-circle" class="size-4"></i>
+        <span class="tabular-nums" x-text="bad.length + ' to fix'">2 to fix</span>
+      </span>
+      <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+        <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+      </span>
+    </button>
+
+    <div id="col-tax" x-show="open" x-collapse.duration.200ms class="motion-reduce:transition-none!">
+      <div class="space-y-4 border-t border-zinc-100 px-4 py-4">
+        <div>
+          <label for="er-tol" class="mb-1.5 block text-[13px]/5 font-medium">Receipt tolerance</label>
+          <div class="flex items-center rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+               :class="has('tol') ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+            <input id="er-tol" name="tolerance" x-ref="tol" value="25" inputmode="decimal"
+                   :aria-invalid="has('tol') ? 'true' : 'false'" aria-describedby="er-tol-msg"
+                   class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+            <span class="pr-3 text-[14px]/5 text-zinc-600">%</span>
+          </div>
+          <p id="er-tol-msg" class="mt-1.5 flex min-h-4 items-start gap-1.5 text-[12px]/4"
+             :class="has('tol') ? 'font-medium text-red-600' : 'text-zinc-500'">
+            <span x-show="has('tol')" class="flex"><i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i></span>
+            <span x-text="has('tol') ? 'Over-receipt cannot exceed 10%. Anything above that needs a fresh purchase order.' : 'Over-receipt allowed against the ordered quantity.'">Over-receipt cannot exceed 10%. Anything above that needs a fresh purchase order.</span>
+          </p>
+        </div>
+
+        <div>
+          <label for="er-hsn" class="mb-1.5 block text-[13px]/5 font-medium">HSN code</label>
+          <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+               :class="has('hsn') ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+            <input id="er-hsn" name="hsn" x-ref="hsn" value="3901" inputmode="numeric" maxlength="8"
+                   :aria-invalid="has('hsn') ? 'true' : 'false'" aria-describedby="er-hsn-msg"
+                   class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums outline-none">
+          </div>
+          <p id="er-hsn-msg" class="mt-1.5 flex min-h-4 items-start gap-1.5 text-[12px]/4"
+             :class="has('hsn') ? 'font-medium text-red-600' : 'text-zinc-500'">
+            <span x-show="has('hsn')" class="flex"><i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i></span>
+            <span x-text="has('hsn') ? 'HSN is eight digits. 3901 is the four-digit chapter heading for polymers of ethylene.' : 'Eight digits, as printed on the vendor invoice.'">HSN is eight digits. 3901 is the four-digit chapter heading for polymers of ethylene.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save settings</button>
+</form>

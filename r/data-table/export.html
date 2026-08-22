@@ -1,0 +1,117 @@
+<!-- Three scopes, each named with the count it would write out, because a
+     control labelled only "Export" over a filtered register means one of three
+     things and picks one without saying which. The commonest complaint about a
+     register is a spreadsheet with 1,438 rows in it when the screen said 12.
+
+     Every item is a link carrying the register's own query string, so the file
+     and the screen cannot disagree, and the browser keeps its own gestures over
+     them — open in a new tab, copy the link, send it to somebody. That is also
+     why the popover is a labelled group of links rather than a role="menu",
+     which would take all three away in exchange for arrow keys.
+
+     Nothing here is busy and nothing here is disabled. The request is a
+     navigation the browser owns, and the file arrives with a Content-Disposition
+     header; a spinner drawn over a download somebody may have cancelled in the
+     save dialog is a wait the page cannot see the end of.
+
+     The scopes carry the columns that are on screen, in the order they are on
+     screen, so a hidden column is missing from the file — which is the point,
+     and which the last line in the popover says out loud rather than leaving
+     somebody to find in the spreadsheet.
+
+     There is a fourth scope this component does not draw. Past a few tens of
+     thousands of rows an export is a queued job that emails a link, not a
+     download, and that is a different component and a decision for a person.
+
+     Escape closes the popover and returns focus to the trigger. Without it a
+     keyboard user leaves a panel of three links by tabbing through all of
+     them. -->
+<div data-kui="data-table/export" x-data="{
+       status: 'overdue', open: false,
+       orders: [
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', status: 'overdue', amount: 2710400 },
+         { po: 'PO-24-1199', vendor: 'Nashik Steel Traders', status: 'overdue', amount: 132900 },
+         { po: 'PO-24-1211', vendor: 'Sharma Extrusions', status: 'overdue', amount: 214300 },
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', status: 'open', amount: 1842000 },
+         { po: 'PO-24-1218', vendor: 'Gujarat Polymers Ltd', status: 'open', amount: 1290500 }
+       ],
+       register: 1438,
+       counts: { '': 1438, open: 902, overdue: 126 },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       count(n) { return n.toLocaleString('en-IN') },
+       get rows() { return this.status ? this.orders.filter(o => o.status === this.status) : this.orders },
+       get matching() { return this.counts[this.status] },
+       get query() { return 'status=' + this.status + '&sort=-amount' }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0">
+      <label for="dt-ex-status" class="sr-only">Status</label>
+      <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="dt-ex-status" x-model="status"
+                class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+          <option value="">All statuses</option>
+          <option value="open">Open</option>
+          <option value="overdue">Overdue</option>
+        </select>
+        <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+          <i data-lucide="chevron-down" class="size-3.5"></i>
+        </span>
+      </div>
+    </div>
+
+    <p role="status" class="text-[12px]/4 text-zinc-500 tabular-nums"
+       x-text="count(matching) + ' of ' + count(register) + ' orders match'"></p>
+
+    <div class="relative ml-auto" @click.outside="open = false"
+         @keydown.escape="if (open) { open = false; $refs.exTrigger.focus() }">
+      <button type="button" x-ref="exTrigger" @click="open = !open" :aria-expanded="open" aria-haspopup="true"
+              class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="download" class="size-4 text-zinc-600"></i>Export
+        <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+      </button>
+
+      <div x-show="open" x-cloak role="group" aria-label="Export the order register"
+           class="absolute right-0 z-40 mt-1 w-72 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
+        <a :href="'/orders/export.csv?' + query" @click="open = false"
+           class="block rounded-lg px-2.5 py-2 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="block text-[13px]/5 font-medium">These <span class="tabular-nums" x-text="count(matching)"></span> filtered orders</span>
+          <span class="block text-[12px]/4 text-zinc-600">CSV · everything the filters above leave, not only this page</span>
+        </a>
+        <a :href="'/orders/export.csv?' + query + '&page=1'" @click="open = false"
+           class="block rounded-lg px-2.5 py-2 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="block text-[13px]/5 font-medium">This page only</span>
+          <span class="block text-[12px]/4 text-zinc-600 tabular-nums">CSV · the <span x-text="rows.length"></span> rows in front of you</span>
+        </a>
+        <a href="/orders/export.csv" @click="open = false"
+           class="block rounded-lg px-2.5 py-2 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="block text-[13px]/5 font-medium">The whole register</span>
+          <span class="block text-[12px]/4 text-zinc-600 tabular-nums">CSV · all <span x-text="count(register)"></span> orders, filters ignored</span>
+        </a>
+        <p class="border-t border-zinc-100 px-2.5 py-2 text-[12px]/4 text-zinc-500">
+          The file carries the columns you can see, in the order you can see them. A column hidden from the Columns menu is not in it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in rows" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+</div>

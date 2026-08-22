@@ -1,24 +1,39 @@
-<!-- Discard / Cancel / Save. When there is a middle answer, offer it — forcing
-     a two-way choice makes people pick the destructive one to get out. -->
+<!-- Discard, keep editing, save. When there is a genuine third answer, offer
+     it: forced into two, people pick the destructive one because it is the only
+     one that gets them out of the dialog, and the work is gone.
+
+     The three are not equal and the styling says which is which. Keep editing
+     is the safe answer and takes focus. Discard is the destructive one and
+     carries red text with no fill — a solid red button here would out-shout
+     Save, which is the answer most people want. Save and leave is the primary,
+     because it is the one that loses nothing.
+
+     Three buttons do not fit on a 390px row, so the footer stacks below sm with
+     flex-col-reverse. That puts the primary at the top of the stack under the
+     thumb and leaves the DOM order alone, so focus still opens on Keep editing.
+
+     This is the dialog that must not be raised by beforeunload. The browser
+     draws its own text for that event and none of this is shown; use it for a
+     real page unload and use this for in-app navigation you control. -->
 <div data-kui="alert-dialog/unsaved" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Leave page</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Leave page</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="leave-title" aria-describedby="leave-body"
          class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <h2 id="leave-title" class="text-[16px]/6 font-semibold">Leave without saving?</h2>
-      <p id="leave-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
+      <p id="leave-body" class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
         PO-24-1187 has 4 unsaved line items and a changed delivery date. Leaving now loses them.
       </p>
-      <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Keep editing</button>
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Keep editing</button>
         <button type="button" @click="open = false"
-                class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Discard changes</button>
+                class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Discard changes</button>
         <button type="button" @click="open = false"
-                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Save and leave</button>
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save and leave</button>
       </div>
     </div>
   </div>

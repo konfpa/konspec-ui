@@ -11,18 +11,42 @@
      aria-busy is on the panel, and the sr-only status is outside the scrim so it
      stays in the document across the whole cycle and reports both ends of it.
 
+     The status carries its own string rather than reading busy, and that string
+     starts empty. x-text runs during Alpine's first pass, so a region bound to a
+     flag that is already true arrives with its message inside it and announces
+     nothing — present is not the same as empty. Setting it in $nextTick makes
+     the first message a change.
+
+     Refresh is not disabled while it runs. It is the control focus is sitting on
+     and a browser blurs a disabled element to the body, so disabling it puts the
+     keyboard user at the top of the document and the press that would have run
+     it again goes nowhere. A run in flight owns the timer and a press while that
+     timer exists returns, which stops the double request and leaves the control
+     under the hand that pressed it.
+
      busy starts true so the scrim is already there at first paint rather than
      appearing over rows somebody has begun reading, and x-init runs the cycle
      once so it resolves. In an application the swap is what clears it. -->
 <div data-kui="spinner/overlay" class="relative overflow-hidden rounded-xl border border-zinc-300 bg-white"
-     x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 2400) } }"
+     x-data="{
+       busy: true, said: '', t: null,
+       run() {
+         if (this.t) return;
+         this.busy = true;
+         this.$nextTick(() => this.said = 'Refreshing the order register');
+         this.t = setTimeout(() => {
+           this.busy = false; this.t = null;
+           this.said = 'Order register updated, 24 orders';
+         }, 2400);
+       }
+     }"
      x-init="run()"
      :aria-busy="busy">
 
   <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
     <p class="text-[14px]/5 font-semibold">Order register</p>
-    <button type="button" @click="run()" :disabled="busy"
-            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 disabled:text-zinc-400">
+    <button type="button" @click="run()"
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Refresh
     </button>
   </div>
@@ -63,5 +87,5 @@
     </span>
   </div>
 
-  <p role="status" class="sr-only" x-text="busy ? 'Refreshing the order register' : 'Order register updated'"></p>
+  <p role="status" class="sr-only" x-text="said"></p>
 </div>

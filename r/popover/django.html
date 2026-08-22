@@ -1,0 +1,150 @@
+<!-- A real form is the draft. The server renders the panel with the filters
+     that are actually applied, so those are the controls' default values, and
+     form.reset() on every open restores them — which is exactly the reseed the
+     filter variant writes by hand in JavaScript. Light dismiss throws the
+     unsubmitted values away and the next open is back to what the register is
+     showing. No draft object, no Object.assign, nothing to keep in step.
+
+     It is method="get" and it carries no csrf_token. Django does not check one
+     on GET, and a token rendered into a GET form is submitted as a querystring
+     parameter — into the address bar, the history, the referer header and every
+     link the user pastes into a ticket. The filters belong in the URL; the
+     token does not.
+
+     The hidden inputs are the search and the sort the register is already
+     using. A GET form submits its own fields and nothing else, so without them
+     applying a filter silently clears the search box at the top of the page and
+     resets the sort to the default — the commonest bug in a server-rendered
+     filter panel, and one that reads as the filter being broken rather than the
+     form being incomplete.
+
+     Nothing hard-codes a widget id. auto_id generates them, a prefix or a
+     second instance of the form changes them, and a template that writes
+     id_status by hand binds its label to whatever else on the page happens to
+     own that id. Labels take id_for_label, messages take auto_id, and the panel
+     finds its first field to focus by query rather than by ref.
+
+     aria-describedby and aria-invalid are set on the widget in the form's
+     __init__ and never written in the template: widget attrs are fixed before
+     the template renders, and __init__ is the only place that knows both the
+     errors and the generated ids.
+
+     Apply submits and the browser navigates, so the panel's open state does not
+     have to survive anything — the next page renders it closed with a fresh
+     count on the trigger. That is why a filter that batches suits a
+     server-rendered register better than one applied live: there is exactly one
+     request per decision, and the URL is the state.
+
+     # forms.py
+     class OrderFilterForm(forms.Form):
+         status = forms.ChoiceField(
+             required=False, label='Status',
+             choices=[('', 'Any status')] + PurchaseOrder.Status.choices,
+             widget=forms.Select(attrs={
+                 'class': 'w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none'}))
+         min_value = forms.IntegerField(
+             required=False, label='Order value at least',
+             widget=forms.NumberInput(attrs={
+                 'inputmode': 'numeric',
+                 'class': 'w-full bg-transparent px-3 py-2 text-right '
+                          'text-[14px]/5 tabular-nums outline-none'}))
+         overdue = forms.BooleanField(
+             required=False, label='Only orders past their delivery date',
+             widget=forms.CheckboxInput(attrs={
+                 'class': 'size-4 shrink-0 accent-zinc-700'}))
+
+         def __init__(self, *args, **kwargs):
+             kwargs.setdefault('label_suffix', '')
+             super().__init__(*args, **kwargs)
+             for name in self.fields:
+                 bf = self[name]
+                 if bf.errors:
+                     self.fields[name].widget.attrs.update({
+                         'aria-invalid': 'true',
+                         'aria-describedby': bf.auto_id + '-err'})
+
+     # views.py
+     def order_list(request):
+         # request.GET or None, not request.GET: a bare page load would bind an
+         # empty form and the panel would open reporting errors for filters
+         # nobody has set yet.
+         form = OrderFilterForm(request.GET or None)
+         active = sum(1 for f in ('status', 'min_value', 'overdue') if request.GET.get(f)) -->
+<div data-kui="popover/django" class="relative inline-block"
+     x-data="{
+       open: false,
+       show() {
+         this.$refs.form.reset();
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const f = this.$refs.form.querySelector('select, input:not([type=hidden])');
+           (f || this.$refs.panel).focus();
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       }
+     }"
+     @click.outside="close(false)"
+     @focusout="if ($event.relatedTarget && !$root.contains($event.relatedTarget)) close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          :aria-expanded="open" aria-controls="pop-dj"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="filter" class="size-4 text-zinc-600"></i>Filters
+    {% if active %}
+      <span class="inline-flex min-w-5 items-center justify-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300">{{ active }}</span>
+    {% endif %}
+  </button>
+
+  <div id="pop-dj" x-ref="panel" x-show="open" x-cloak
+       role="dialog" tabindex="-1" aria-labelledby="pop-dj-title"
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+    <form x-ref="form" method="get" action="{% url 'orders:list' %}">
+      {# what the register is already showing and this form does not own #}
+      <input type="hidden" name="q" value="{{ request.GET.q|default:'' }}">
+      <input type="hidden" name="sort" value="{{ request.GET.sort|default:'-raised_on' }}">
+
+      <div class="space-y-3 px-4 py-3.5">
+        <p id="pop-dj-title" class="text-[13px]/5 font-medium">Filter purchase orders</p>
+
+        <div>
+          <label for="{{ form.status.id_for_label }}" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">{{ form.status.label }}</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            {{ form.status }}
+          </div>
+        </div>
+
+        <div>
+          <label for="{{ form.min_value.id_for_label }}" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">{{ form.min_value.label }}</label>
+          <div class="rounded-lg bg-white {% if form.min_value.errors %}border border-red-600 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15{% else %}border border-zinc-200 focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15{% endif %}">
+            {{ form.min_value }}
+          </div>
+          {% if form.min_value.errors %}
+            <p id="{{ form.min_value.auto_id }}-err" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium text-red-600">
+              <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>{{ form.min_value.errors.0 }}
+            </p>
+          {% endif %}
+        </div>
+
+        {# the widget is inside the label, so no for attribute and no second #}
+        {# copy of the string in the accessible name                        #}
+        <label class="flex items-center gap-2.5 py-1 text-[13px]/5">
+          {{ form.overdue }}
+          {{ form.overdue.label }}
+        </label>
+      </div>
+
+      <div class="flex items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
+        <a href="{% url 'orders:list' %}?q={{ request.GET.q|urlencode }}&sort={{ request.GET.sort|default:'-raised_on'|urlencode }}"
+           class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</a>
+        <button type="submit"
+                class="rounded-lg bg-zinc-700 px-3.5 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Apply</button>
+      </div>
+    </form>
+  </div>
+</div>

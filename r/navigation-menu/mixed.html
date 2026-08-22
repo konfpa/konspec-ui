@@ -56,8 +56,8 @@
               @mouseenter="hover('proc')"
               @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
               @keydown.arrow-down.prevent="jump('proc')"
-              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'proc' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'proc' ? 'bg-zinc-200 font-medium text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
         Procurement
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -65,7 +65,7 @@
       </button>
 
       <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
-           id="nmm-p-proc" aria-labelledby="nmm-t-proc"
+           id="nmm-p-proc" role="group" aria-labelledby="nmm-t-proc"
            class="absolute top-full left-0 z-40 pt-2">
         <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
@@ -83,8 +83,8 @@
               @mouseenter="hover('inv')"
               @click="open === 'inv' ? shut($refs.inv) : jump('inv')"
               @keydown.arrow-down.prevent="jump('inv')"
-              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'inv' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'inv' ? 'bg-zinc-200 font-medium text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
         Inventory
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'inv' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -92,7 +92,7 @@
       </button>
 
       <div x-ref="invPanel" x-show="open === 'inv'" x-cloak
-           id="nmm-p-inv" aria-labelledby="nmm-t-inv"
+           id="nmm-p-inv" role="group" aria-labelledby="nmm-t-inv"
            class="absolute top-full left-0 z-40 pt-2">
         <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/inventory/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Inventory</a></li>
@@ -105,7 +105,7 @@
 
     <li>
       <a href="/reports/" aria-current="page" @mouseenter="if (open) shut()"
-         class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+         class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
     </li>
   </ul>
 </nav>

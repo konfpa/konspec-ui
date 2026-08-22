@@ -15,8 +15,9 @@
      One anchor per tile, wrapping everything, and nothing else focusable inside
      it — a button nested in an anchor cannot be reached from the keyboard and is
      ambiguous with a mouse. Tab therefore walks the strip in four stops, and each
-     accessible name is the whole tile: "Overdue value, ₹27.10 L, up ₹4.10 L vs.
-     12 Aug".
+     accessible name is the whole tile: "Overdue value, ₹27.10 L, +₹4.10 L vs.
+     12 Aug". The arrow is aria-hidden and contributes nothing to that name,
+     which is why the sign is written out beside it.
 
      Focus is an outline, never a ring. ring-* is a box-shadow and forced-colours
      mode drops every box-shadow, which takes the focus indicator away from the

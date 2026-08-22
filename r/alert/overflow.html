@@ -1,0 +1,55 @@
+<!-- A bulk action that fails on twenty-seven of thirty-four rows. The list
+     cannot go in the alert and the count cannot go in on its own.
+
+     Five rows, then a link. Five is where a list stops being readable at a
+     glance and starts being a register drawn without a header, and an alert
+     that has become a register is one that will grow a sort control next.
+     Capping it with overflow-y-auto instead was rejected: a scroller inside an
+     alert hides rows behind a bar nobody looks for, and at 390px it is a
+     hundred-pixel window onto twenty-seven records.
+
+     The link carries the filter that reproduces exactly this set, which is the
+     part that gets skipped. A link to the bare register drops the user into
+     1,438 rows and makes them rebuild a query the alert already knew the answer
+     to, so the run id goes in the querystring.
+
+     Both counts come off one number on the server. Twenty-seven in the sentence
+     and twenty-two in the link is five rows listed above them, and if that
+     arithmetic is done twice it will disagree the first time somebody changes
+     the cap. Render the list, then write the remainder as total minus its
+     length. -->
+<div data-kui="alert/overflow" class="rounded-lg border border-zinc-300 bg-white px-4 py-3" role="alert">
+  <div class="flex items-start gap-3">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 font-medium"><span class="tabular-nums">27</span> of <span class="tabular-nums">34</span> orders were not approved.</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-600">Each is over the approval limit for your role and has gone to the plant head. The other <span class="tabular-nums">7</span> are approved and with the vendor.</p>
+    </div>
+  </div>
+  <ul class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3 text-[12px]/4">
+    <li class="flex items-center justify-between gap-4">
+      <a href="/orders/PO-24-1187/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1187 · Gujarat Polymers Ltd</a>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹18,42,000</span>
+    </li>
+    <li class="flex items-center justify-between gap-4">
+      <a href="/orders/PO-24-1186/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1186 · Nashik Steel Traders</a>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹14,90,000</span>
+    </li>
+    <li class="flex items-center justify-between gap-4">
+      <a href="/orders/PO-24-1181/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1181 · Sharma Extrusions</a>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹12,45,000</span>
+    </li>
+    <li class="flex items-center justify-between gap-4">
+      <a href="/orders/PO-24-1178/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1178 · Deccan Fasteners</a>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹11,08,400</span>
+    </li>
+    <li class="flex items-center justify-between gap-4">
+      <a href="/orders/PO-24-1174/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1174 · Gujarat Polymers Ltd</a>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹10,62,000</span>
+    </li>
+  </ul>
+  <p class="mt-2.5 text-[12px]/4">
+    <a href="/orders/?state=over_limit&amp;run=8841"
+       class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the remaining <span class="tabular-nums">22</span> in the register</a>
+  </p>
+</div>

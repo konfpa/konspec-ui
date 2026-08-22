@@ -1,9 +1,23 @@
 <!-- For the small number of actions that cannot be undone at all. Do not reach
      for this every time something is deleted — if every dialog asks for typing,
-     people learn to type without reading. -->
+     people learn to type without reading, and the friction has bought nothing
+     except a slower way to make the same mistake.
+
+     The input is first in the DOM, so the trap opens on it rather than on
+     Cancel. That is the one case where focus does not land on the safe answer,
+     and it is safe because the field is not an answer: nothing happens until
+     the string matches and the user then goes looking for the button.
+
+     The confirm carries a real disabled attribute rather than an ignored click.
+     A disabled button leaves the tab order and is announced as unavailable; an
+     enabled button whose handler quietly returns reads as a broken screen.
+
+     The border and the focus outline are on the wrapper and the input takes
+     outline-none, which is the carve-out rule 11 allows — the wrapper draws the
+     outline for it. -->
 <div data-kui="alert-dialog/typed" x-data="{ open: false, typed: '', target: 'SHARMA-EXT' }">
   <button type="button" @click="open = true; typed = ''"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Delete vendor</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Delete vendor</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
@@ -11,7 +25,7 @@
          class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
       <h2 id="wipe-title" class="text-[16px]/6 font-semibold">Delete Sharma Extrusions</h2>
       <p id="wipe-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
-        <span class="font-medium text-red-600">34 orders, 61 invoices and the rate contract</span>
+        <span class="font-medium tabular-nums text-red-600">34 orders, 61 invoices and the rate contract</span>
         are attached to this vendor and go with it. There is no recycle bin and no undo.
       </p>
 
@@ -25,12 +39,11 @@
         </div>
       </div>
 
-      <div class="mt-5 flex flex-wrap justify-end gap-2">
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
         <button type="button" @click="open = false" :disabled="typed !== target"
-                class="rounded-lg px-4 py-2 text-[13px]/5 font-medium"
-                :class="typed === target ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-zinc-200 text-zinc-500'">
+                class="rounded-lg border border-transparent bg-red-600 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-300 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
           Delete vendor
         </button>
       </div>

@@ -1,0 +1,124 @@
+<!-- Density is part of the layout being promised, and it is the part most
+     often left behind. The comfortable table is px-4 py-2.5 and its row is
+     40px; table/dense is px-3 py-1.5 and its row is 32px. Copy the comfortable
+     skeleton over a dense register and every row is 8px tall, which across the
+     25 rows a dense register is for is 200px — half a screen of the page below
+     it stepping up when the data lands.
+
+     The bar does not shrink with the padding. It is still h-2.5 in a flex h-5
+     box, because a dense table is dense in its padding and not in its type:
+     table/dense is text-[13px]/5 exactly like the comfortable one. Drop the bar
+     to h-2 and the skeleton says the type got smaller, which is a promise the
+     rows arrive to break.
+
+     Six rows here because six is what a documentation page can show. The number
+     you copy is your page size — a dense register exists to put 25 or 50 rows
+     on a screen, and it should draw 25 or 50.
+
+     The phone gets the same six as cards at the same breakpoint the loaded
+     table restacks at, at px-3 py-2 for the same reason the desktop row is
+     px-3: the density travels. -->
+<div data-kui="skeleton/dense" class="overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
+  <p role="status" class="sr-only">Loading the order register</p>
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-1.5 font-medium">PO number</th>
+        <th scope="col" class="px-3 py-1.5 font-medium">Vendor</th>
+        <th scope="col" class="px-3 py-1.5 font-medium">Dept</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Amount</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Due</th>
+      </tr>
+    </thead>
+    <tbody class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-32 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-20 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-36 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="h-2.5 w-16 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-24 rounded bg-zinc-200"></div></div></td>
+        <td class="px-3 py-1.5"><div class="flex h-5 items-center"><div class="ml-auto h-2.5 w-12 rounded bg-zinc-200"></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none md:hidden" aria-hidden="true">
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+    </li>
+    <li class="px-3 py-2">
+      <div class="flex h-5 items-center justify-between gap-3">
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+        <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+      </div>
+      <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+    </li>
+  </ul>
+</div>

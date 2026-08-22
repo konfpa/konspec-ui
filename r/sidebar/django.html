@@ -1,0 +1,167 @@
+<!-- Everything the other variants demonstrate in Alpine is decided here before
+     a byte is sent, and that is the point of this one.
+
+     The active test is on the resolved route name, never on the path. Matching
+     request.path with startswith marks /invoices while the user is on
+     /invoices-archive, and it marks two rows at once the moment a record URL
+     sits under a list URL. resolver_match.view_name is exactly one string per
+     response and it either equals the item's route or it does not.
+
+     The open map is rendered from the current section rather than starting
+     empty, because every click inside a section is a full page load and a map
+     that starts empty folds the section up underneath the user on each one.
+     current_section comes from the same resolver match; a section the user
+     opened by hand is remembered separately and neither closes the other.
+
+     The permission decision is made in Python and arrives here as two booleans
+     per item. Spreading it across template tags means the rule that decides who
+     sees Approvals lives in a place with no tests, and the branch that hides
+     the row and the branch that hides the view drift apart — at which point the
+     nav is the only thing enforcing the permission.
+
+     The collapsed width comes from a cookie the view already has, stamped into
+     the class attribute, so the first byte is the right width. Alpine writes
+     the same cookie when the user toggles, which keeps one source of truth
+     rather than a cookie and a localStorage key disagreeing. The page must send
+     Vary: Cookie or a shared cache serves one user's width to another.
+
+     Counts come from a context processor cached per user, not from queries in
+     the template. The nav renders on every page in the console, so an uncached
+     count is a dozen aggregates on every request the application serves. They
+     arrive pre-formatted, because humanize's intcomma groups in threes and a
+     rupee figure in this application is 12,45,000 — the formatting decision
+     belongs next to the currency, not in a filter that cannot see it.
+
+     The current branch and the hover branch are mutually exclusive halves of
+     one class attribute, which is why the row can carry bg-zinc-200 in one and
+     hover:bg-zinc-100 in the other without the two ever meeting.
+
+     Every row carries an aria-label as well as its visible text, because at
+     68px that text is display:none and a name assembled from hidden nodes is
+     no name at all. The collapsed bubble is sidebar/collapse's: one element at
+     the root, positioned from the trigger rectangle, because a bubble anchored
+     inside a scrolling nav is clipped at the rail edge. -->
+<div data-kui="sidebar/django" class="flex h-full flex-col border-r border-zinc-200 bg-white text-[14px]/5 text-zinc-900 {% if sidebar_collapsed %}w-[68px]{% else %}w-64{% endif %}"
+     x-data="{
+       expanded: {% if sidebar_collapsed %}false{% else %}true{% endif %}, ready: false,
+       open: { {% for s in nav.sections %}{{ s.key }}: {% if s.key == nav.current_section %}true{% else %}{{ s.user_open|yesno:'true,false' }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %} },
+       tip: '', tipTop: 0, tipLeft: 0, warm: false, timer: 0, cool: 0,
+       over(el, text) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(el, text) },
+       show(el, text, now = false) {
+         if (this.expanded) return;
+         clearTimeout(this.timer); clearTimeout(this.cool);
+         const put = () => {
+           const r = el.getBoundingClientRect();
+           this.tipTop = r.top + r.height / 2; this.tipLeft = r.right + 6;
+           this.tip = text; this.warm = true;
+         };
+         if (now || this.warm) { put(); return }
+         this.timer = setTimeout(put, 150);
+       },
+       hide() { clearTimeout(this.timer); this.tip = ''; this.cool = setTimeout(() => this.warm = false, 800) }
+     }"
+     x-init="$nextTick(() => ready = true);
+             $watch('expanded', v => { hide(); document.cookie = 'kon_sidebar=' + (v ? '1' : '0') + '; path=/; max-age=31536000; samesite=lax' })"
+     @keydown.escape.window="hide()" @scroll.window.passive="hide()" @resize.window="hide()"
+     :class="[ expanded ? 'w-64' : 'w-[68px]', ready && 'transition-all duration-200 motion-reduce:transition-none' ]">
+
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+    <span class="min-w-0 flex-1" :class="!expanded && 'hidden'">
+      <span class="block truncate text-[14px]/5 font-semibold">{{ request.tenant.name }}</span>
+      <span class="block truncate text-[11px]/4 text-zinc-500">{{ request.plant.name }} · FY {{ request.fy.label }}</span>
+    </span>
+  </div>
+
+  <nav id="sbd-nav" aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2" @scroll.passive="hide()">
+    {% for group in nav.groups %}
+    <p id="sbd-g{{ forloop.counter }}" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase" :class="!expanded && 'sr-only'">{{ group.label }}</p>
+    <ul role="list" aria-labelledby="sbd-g{{ forloop.counter }}" class="space-y-0.5">
+      {% for item in group.items %}{% if item.visible %}
+      <li>
+        {% if item.allowed %}
+        <a href="{% url item.route %}"{% if item.route == current_route %} aria-current="page"{% endif %}
+           aria-label="{{ item.label }}{% if item.count %}, {{ item.count_display }}{% endif %}"
+           @mouseenter="over($el, '{{ item.label|escapejs }}')" @mouseleave="hide()"
+           @focus="if ($event.target.matches(':focus-visible')) show($el, '{{ item.label|escapejs }}', true)" @blur="hide()"
+           class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 {% if item.route == current_route %}bg-zinc-200 font-medium text-zinc-900{% else %}text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900{% endif %}">
+          <i data-lucide="{{ item.icon }}" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">{{ item.label }}</span>
+          {% if item.count %}<span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600" :class="!expanded && 'hidden'">{{ item.count_display }}</span>{% endif %}
+        </a>
+        {% else %}
+        <span role="link" aria-disabled="true" tabindex="0" aria-label="{{ item.label }}" aria-describedby="sbd-why-{{ item.route|slugify }}"
+              @mouseenter="over($el, '{{ item.label|escapejs }}')" @mouseleave="hide()"
+              @focus="if ($event.target.matches(':focus-visible')) show($el, '{{ item.label|escapejs }}', true)" @blur="hide()"
+              class="flex min-h-9 items-start gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="lock" class="mt-0.5 size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1" :class="!expanded && 'hidden'">
+            <span class="block truncate">{{ item.label }}</span>
+            <span id="sbd-why-{{ item.route|slugify }}" class="mt-0.5 block text-[11px]/4 text-zinc-500">{{ item.denied_reason }}</span>
+          </span>
+        </span>
+        {% endif %}
+      </li>
+      {% endif %}{% endfor %}
+    </ul>
+    {% endfor %}
+
+    {% for section in nav.sections %}
+    <div>
+      <button type="button" @click="open.{{ section.key }} = !open.{{ section.key }}"
+              aria-label="{{ section.label }}"
+              @mouseenter="over($el, '{{ section.label|escapejs }}')" @mouseleave="hide()"
+              @focus="if ($event.target.matches(':focus-visible')) show($el, '{{ section.label|escapejs }}', true)" @blur="hide()"
+              aria-expanded="{% if section.key == nav.current_section %}true{% else %}false{% endif %}" :aria-expanded="open.{{ section.key }}" aria-controls="sbd-sec-{{ section.key }}"
+              class="flex min-h-9 w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[13px]/5 hover:bg-zinc-100 hover:text-zinc-900 {% if section.key == nav.current_section %}font-medium text-zinc-900{% else %}text-zinc-600{% endif %} focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="{{ section.icon }}" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">{{ section.label }}</span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="[ open.{{ section.key }} && 'rotate-180', !expanded && 'hidden' ]">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+        </span>
+      </button>
+      <div id="sbd-sec-{{ section.key }}" x-show="open.{{ section.key }}"{% if section.key != nav.current_section %} x-cloak{% endif %} x-collapse.duration.200ms>
+        <ul role="list" class="ml-[26px] space-y-0.5 border-l border-zinc-100 py-1 pl-2">
+          {% for child in section.children %}
+          <li>
+            <a href="{% url child.route %}"{% if child.route == current_route %} aria-current="page"{% endif %}
+               class="flex min-h-8 items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 {% if child.route == current_route %}bg-zinc-200 font-medium text-zinc-900{% else %}text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900{% endif %}">
+              <span class="min-w-0 flex-1 truncate">{{ child.label }}</span>
+              {% if child.count %}<span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">{{ child.count_display }}</span>{% endif %}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200">
+    <a href="{% url 'accounts:profile' %}" aria-label="Account — {{ request.user.get_full_name }}"
+       @mouseenter="over($el, '{{ request.user.get_full_name|escapejs }}')" @mouseleave="hide()"
+       @focus="if ($event.target.matches(':focus-visible')) show($el, '{{ request.user.get_full_name|escapejs }}', true)" @blur="hide()"
+       class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">{{ request.user.initials }}</span>
+      <span class="min-w-0 flex-1" :class="!expanded && 'hidden'">
+        <span class="block truncate text-[13px]/5 font-medium">{{ request.user.get_full_name }}</span>
+        <span class="block truncate text-[11px]/4 text-zinc-500">{{ request.user.profile.role_label }}</span>
+      </span>
+    </a>
+    <button type="button" @click="expanded = !expanded" aria-controls="sbd-nav"
+            aria-expanded="{% if sidebar_collapsed %}false{% else %}true{% endif %}" :aria-expanded="expanded"
+            aria-label="Collapse sidebar" :aria-label="expanded ? 'Collapse sidebar' : 'Expand sidebar'"
+            class="hidden h-11 w-full items-center border-t border-zinc-200 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 lg:flex">
+      <span class="flex h-11 w-[68px] shrink-0 items-center justify-center">
+        <span class="flex transition-transform motion-reduce:transition-none" :class="!expanded && 'rotate-180'">
+          <i data-lucide="chevrons-left" class="size-4"></i>
+        </span>
+      </span>
+      <span class="flex-1 text-left" :class="!expanded && 'hidden'">Collapse</span>
+    </button>
+  </div>
+
+  <span aria-hidden="true" x-show="tip" x-cloak x-transition.opacity.duration.100ms x-text="tip"
+        :style="'top: ' + tipTop + 'px; left: ' + tipLeft + 'px'"
+        class="pointer-events-none fixed z-50 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white"></span>
+</div>

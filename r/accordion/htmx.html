@@ -1,0 +1,103 @@
+<!-- Three sections whose bodies are worth a query each and are opened by
+     roughly nobody. The template ships the headers and the counts; the bodies
+     come from the server.
+
+     Alpine does not fetch. It owns open and the two flags the panel paints
+     from; htmx owns the request, the target and the swap. The moment a
+     component reaches for fetch() inside x-data both halves start needing to
+     know about the other.
+
+     hx-trigger="intersect once" on the body, not click on the header. A
+     display:none element never intersects, so the request goes out the first
+     time the panel is genuinely on screen — nothing is fetched for a section
+     nobody opens, and the eleventh open of the same section is not the eleventh
+     request. Putting it on the header instead fires while the panel is still
+     shut whenever the state is restored from a URL or a preference.
+
+     The skeleton is the shape of the answer, roughly the height of what
+     replaces it, so the panel does not resize under the pointer. x-collapse
+     finishes at height auto, so a swap landing after the animation reflows
+     correctly; one landing inside those 200ms would otherwise leave the panel
+     measuring the placeholder. It is aria-hidden — the role="status" beside it
+     is what says something is loading, and two announcements of the same wait
+     is one too many.
+
+     A failure leaves a retry rather than an empty panel, and the retry carries
+     its own hx-get, because hx-trigger="intersect once" has already spent the
+     body's one request. htmx does not swap on a non-2xx, so the skeleton is
+     still there underneath and has to be taken off screen — x-show="!failed"
+     rather than a second wrapper, so there is one thing to remove and one thing
+     to put back when the retry lands. The second section is the same mechanism
+     without the retry, swapping innerHTML into the body it already occupies. -->
+
+<!-- The two sections are independent, so the state is one x-data each. There is
+     no reason opening the invoices should close the audit trail.
+
+     The count on the header comes with the page, not with the panel. It is the
+     reason to open the section, so it cannot be behind the thing it justifies
+     opening. -->
+<div data-kui="accordion/htmx" class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div x-data="{ open: false, failed: false }" @htmx:response-error="failed = true" @htmx:send-error="failed = true">
+    <h3>
+      <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="acc-hx-audit"
+              class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="text-[14px]/5 font-medium">Audit trail</span>
+          <span class="ml-auto text-[12px]/4 tabular-nums text-zinc-500">7 events</span>
+        </span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+        </span>
+      </button>
+    </h3>
+    <div id="acc-hx-audit" x-show="open" x-cloak x-collapse.duration.200ms>
+      <div class="border-t border-zinc-100 px-4 py-3">
+        <div id="acc-hx-audit-body" x-show="!failed" hx-get="/orders/PO-24-1187/audit/" hx-trigger="intersect once" hx-swap="outerHTML">
+          <div aria-hidden="true" class="animate-pulse space-y-2.5 motion-reduce:animate-none">
+            <div class="flex gap-3"><span class="h-3 w-20 rounded bg-zinc-100"></span><span class="h-3 flex-1 rounded bg-zinc-100"></span></div>
+            <div class="flex gap-3"><span class="h-3 w-20 rounded bg-zinc-100"></span><span class="h-3 flex-1 rounded bg-zinc-100"></span></div>
+            <div class="flex gap-3"><span class="h-3 w-20 rounded bg-zinc-100"></span><span class="h-3 flex-1 rounded bg-zinc-100"></span></div>
+          </div>
+          <p role="status" class="sr-only">Loading the audit trail.</p>
+        </div>
+
+        <div x-show="failed" x-cloak class="flex flex-wrap items-center gap-3">
+          <p class="flex min-w-0 items-start gap-2 text-[13px]/5 text-zinc-600">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            The audit trail could not be loaded.
+          </p>
+          <button type="button" @click="failed = false"
+                  hx-get="/orders/PO-24-1187/audit/" hx-target="#acc-hx-audit-body" hx-swap="outerHTML"
+                  class="inline-flex h-9 shrink-0 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Try again
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div x-data="{ open: false }">
+    <h3>
+      <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="acc-hx-invoices"
+              class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="text-[14px]/5 font-medium">Invoices booked</span>
+          <span class="ml-auto text-[12px]/4 tabular-nums text-zinc-500">3 · ₹12,26,400</span>
+        </span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+        </span>
+      </button>
+    </h3>
+    <div id="acc-hx-invoices" x-show="open" x-cloak x-collapse.duration.200ms>
+      <div class="border-t border-zinc-100 px-4 py-3"
+           hx-get="/orders/PO-24-1187/invoices/" hx-trigger="intersect once" hx-swap="innerHTML">
+        <div aria-hidden="true" class="animate-pulse space-y-2.5 motion-reduce:animate-none">
+          <div class="flex gap-3"><span class="h-3 w-28 rounded bg-zinc-100"></span><span class="h-3 flex-1 rounded bg-zinc-100"></span></div>
+          <div class="flex gap-3"><span class="h-3 w-28 rounded bg-zinc-100"></span><span class="h-3 flex-1 rounded bg-zinc-100"></span></div>
+        </div>
+        <p role="status" class="sr-only">Loading the booked invoices.</p>
+      </div>
+    </div>
+  </div>
+</div>

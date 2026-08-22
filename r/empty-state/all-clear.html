@@ -1,0 +1,53 @@
+<!-- The same box read the other way round. Every other state in this entry
+     says something is missing; this one says nothing is left, and the shape does
+     not change — so the glyph and the words have to carry the whole difference.
+     "No approvals found" over a queue somebody has just emptied is demoralising
+     and wrong in one sentence.
+
+     Print the evidence, not the mood. "14 approved today, none waiting" is a
+     fact that can be checked against the log; "All caught up" is exactly what a
+     filter hiding eleven approvals would also produce. The scope line under the
+     count is the same idea — it says what this queue covers, so the claim to be
+     clear is falsifiable rather than cheerful.
+
+     Which is the trap in this variant. A queue emptied by a predicate has not
+     been cleared, and rendering success over one is the create-under-a-filter
+     defect one register worse: the user believes it and goes home. The view may
+     only choose this state when no predicate is in force and the unscoped count
+     for the scope is zero.
+
+     check-circle-2 in text-emerald-600 on the same bg-zinc-200 well every other
+     state uses. There is no green panel and no -50 tint here, for the same
+     reason there is no red one behind the timeout: the tone belongs to the mark,
+     not to a field of colour behind the text.
+
+     No action. There is nothing to widen, nothing to clear and nothing to
+     create, and an offer to do any of them turns a finished queue back into a
+     problem. The one route out is a link to what was done. -->
+<div data-kui="empty-state/all-clear" class="rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Approvals waiting on you</h2>
+    <p role="status" class="text-[12px]/4 text-zinc-500 tabular-nums">0 waiting · 14 approved today</p>
+  </div>
+
+  <div class="flex min-h-72 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="check-circle-2" class="size-5 text-emerald-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">You are through the approval queue</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      Fourteen purchase orders reached you today and all fourteen are cleared. The last was PO-24-1211 for Gujarat Polymers Ltd, ₹8,64,000, at 16:20.
+    </p>
+    <p class="mt-2 max-w-sm text-[12px]/4 text-zinc-500 tabular-nums">
+      All cost centres · orders up to your ₹5,00,000 limit · nothing filtered
+    </p>
+    <a href="#" class="mt-4 text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      See what you approved today
+    </a>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 text-zinc-500 tabular-nums">Orders above ₹5,00,000 go to Nilesh Patil</p>
+    <p class="text-[12px]/4 text-zinc-500 tabular-nums">Checked 21 Aug 2026, 17:02</p>
+  </div>
+</div>

@@ -1,8 +1,22 @@
 <!-- Acting on a selection. Say how many, and say which ones will not go
-     through — a bulk action that silently skips rows is the worst kind. -->
+     through — a bulk action that silently skips rows is the worst kind of bulk
+     action, because the register afterwards looks like it worked and the three
+     orders that did not move are indistinguishable from the ones nobody
+     selected.
+
+     The breakdown is a dl rather than a sentence, so the counts line up in one
+     column and the reader can check that they add to the number in the button.
+     The two icons are the only colour: emerald for what will go through, amber
+     for what routes on. There is no red here because nothing is being
+     destroyed, and using red for "needs a second approval" would spend the
+     alarm colour on a normal working day.
+
+     The button repeats the count as well as the verb. "Approve" alone in a
+     dialog raised from a register is the one place where the user genuinely may
+     not remember whether they had 12 rows or 2 selected. -->
 <div data-kui="alert-dialog/bulk" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve 12 selected</button>
+          class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve 12 selected</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
@@ -29,11 +43,11 @@
         </div>
       </dl>
 
-      <div class="mt-5 flex flex-wrap justify-end gap-2">
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
         <button type="button" @click="open = false"
-                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve 12 orders</button>
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve 12 orders</button>
       </div>
     </div>
   </div>

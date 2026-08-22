@@ -1,0 +1,147 @@
+<!-- views.py
+     def receipt_register(request):
+         # the page answers immediately and the panel fetches itself. Nothing
+         # on this path waits on the register query.
+         return render(request, 'grn/register.html', {'form': FilterForm(request.GET)})
+
+     def receipt_rows(request):
+         # Permission first. Filter by permission and then count and the zero
+         # that comes back has lost its reason — it is indistinguishable from an
+         # empty register, which is the "No orders yet" over a closed scope that
+         # costs a support ticket every time it ships.
+         scopes = request.user.profile.readable_cost_centres
+         if not scopes:
+             return render(request, 'grn/_empty_permission.html',
+                           {'granted_by': settings.ACCESS_OWNER})
+
+         base = GoodsReceipt.objects.filter(cost_centre__in=scopes)
+         form = FilterForm(request.GET)
+
+         # Failure next, because an exception has no count to read. Status 200
+         # with the fragment in the body: htmx does not swap a 500 by default,
+         # so a raised view leaves the spinner turning until somebody reloads.
+         try:
+             rows = list(form.filter(base).select_related('vendor')[:50])
+         except DatabaseError:
+             return render(request, 'grn/_empty_error.html',
+                           {'ref': request.headers.get('X-Request-Id')}, status=200)
+
+         if rows:
+             return render(request, 'grn/_rows.html', {'rows': rows, 'form': form})
+
+         # The count last, and it is the whole component. base.count() is the
+         # unfiltered figure for this scope and it is the only thing that tells
+         # nothing-yet from no-results. One extra indexed count against the
+         # duplicate purchase order that gets raised without it is not a trade
+         # worth arguing about.
+         total = base.count()
+         if form.has_predicates():
+             tpl = 'grn/_empty_filtered.html'
+         elif total:
+             # rows exist and no predicate is set, so a default is hiding them
+             tpl = 'grn/_empty_archived.html'
+         else:
+             tpl = 'grn/_empty_nothing_yet.html'
+         return render(request, tpl, {'form': form, 'total': total})
+
+     urls.py
+         path('grn/', views.receipt_register, name='grn-register'),
+         path('grn/rows/', views.receipt_rows, name='grn-rows'),
+
+     Six fragments, one per state, and not a single {% if %} between them. That
+     is the point of doing it here: by the time a queryset reaches a template
+     every one of these empties is a list of length zero, so {% if not receipts %}
+     cannot tell them apart and picks whichever message was typed first.
+
+     The status line lives in the page, outside hx-target, and the fragment
+     writes into it with hx-swap-oob="innerHTML:#grn-count". The innerHTML: prefix
+     is load-bearing. A plain hx-swap-oob="true" replaces the whole <p>, so the
+     region a screen reader was watching is gone and a different one has arrived
+     with its message already in it — which is not a change and is announced to
+     nobody. Swapping the text inside leaves the region in place and the count is
+     read out.
+
+     The chip removals are real links carrying hx-get, so the register still
+     narrows with JavaScript off and the URL still describes the view somebody is
+     looking at. -->
+
+{% comment %} grn/register.html — everything the swap must survive lives here: the
+   toolbar, the search form and the status line. {% endcomment %}
+<div data-kui="empty-state/django" class="rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Goods receipts</h2>
+    {% comment %} empty at first paint, and that is the point: the region has to be in the
+       document before the first swap for anything written into it to count as a
+       change. {% endcomment %}
+    <p id="grn-count" role="status" class="text-[12px]/4 text-zinc-500 tabular-nums"></p>
+
+    <form hx-get="{% url 'grn-rows' %}" hx-target="#grn-rows" hx-swap="outerHTML"
+          hx-trigger="input changed delay:300ms from:find input, change from:find select"
+          class="ml-auto flex flex-wrap items-center gap-2">
+      <div class="flex min-w-48 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+        <input type="search" name="q" value="{{ form.q.value|default:'' }}"
+               aria-label="Search the receipt register" placeholder="GRN, vendor or material"
+               class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+      </div>
+      <select name="status" aria-label="Status"
+              class="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[13px]/5 focus-visible:border-zinc-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option value="">All statuses</option>
+        <option value="open">Open</option>
+        <option value="qc">Rejected at QC</option>
+      </select>
+    </form>
+  </div>
+
+  {% comment %} the deferred first load. This div is the spinner and it is also what
+     hx-swap="outerHTML" replaces, so nothing has to remove it. {% endcomment %}
+  <div id="grn-rows" hx-get="{% url 'grn-rows' %}" hx-trigger="load" hx-swap="outerHTML"
+       class="flex min-h-64 items-center justify-center p-6">
+    <div class="flex flex-col items-center gap-3 text-center">
+      <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      <p class="text-[13px]/5 text-zinc-600">Loading the receipt register</p>
+    </div>
+  </div>
+</div>
+
+{% comment %} grn/_empty_filtered.html — one of the six. It knows which state it is
+   because the view decided; there is nothing to work out in here. It carries
+   the panel's own bg-white, because the fragment is what fills the panel once
+   the spinner has gone and a fragment with no fill of its own leaves the page
+   showing through the hole the swap made. {% endcomment %}
+<div id="grn-rows" class="bg-white">
+  <div class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-50 px-4 py-2">
+    {% for chip in form.active_chips %}
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+        {{ chip.label }}
+        <a href="?{{ chip.querystring_without }}"
+           hx-get="{% url 'grn-rows' %}?{{ chip.querystring_without }}"
+           hx-target="#grn-rows" hx-swap="outerHTML"
+           aria-label="Remove the filter {{ chip.label }}"
+           class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-3"></i>
+        </a>
+      </span>
+    {% endfor %}
+  </div>
+
+  <div class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">No receipts match these filters</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      There are <span class="font-medium text-zinc-900 tabular-nums">{{ total }}</span> receipts you can see. Drop a filter above and the list widens.
+    </p>
+    {% comment %} no create button in this fragment, and none in _empty_filtered ever. The
+       rows exist; a New receipt here is the duplicate GRN. {% endcomment %}
+    <a href="?" hx-get="{% url 'grn-rows' %}" hx-target="#grn-rows" hx-swap="outerHTML"
+       class="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Clear all filters
+    </a>
+  </div>
+</div>
+
+{% comment %} the count, swapped into the region that was already on the page rather than
+   swapped in as a new one. {% endcomment %}
+<span hx-swap-oob="innerHTML:#grn-count">0 of {{ total }} receipts match these filters</span>

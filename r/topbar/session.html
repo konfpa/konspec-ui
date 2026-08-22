@@ -1,0 +1,73 @@
+<!-- The strip is rendered by the server when the session crosses the warning
+     threshold, and at every other moment it is not in the document at all. A
+     strip that always renders and hides itself with a flag spends 40px of the
+     window on a state that happens once a day, and it is 40px the layout has
+     already reflowed around.
+
+     The clock ticks and is not a live region. Wrap the countdown in aria-live
+     and it announces itself every second, over the top of the form the user is
+     trying to finish before it runs out. What is announced sits in a separate
+     sr-only role="status" that only changes at five minutes and at one — twice
+     in six minutes, politely, which is what the user needs to know and no more.
+
+     secs comes from the server on the render — the browser is told how much
+     time is left, it does not decide. When the counter reaches zero the page
+     reloads and the server says what the truth is; a client that declares the
+     session over is one clock-skew away from signing out a user who still has
+     ten minutes.
+
+     amber-700 for the icon, because a 1.5px amber-500 stroke on white is not
+     legible. amber-500 is the dot weight and this is not a dot.
+
+     The sentence about unsaved input is the whole reason the strip has words in
+     it. Staying signed in keeps the session; it does not keep what is typed
+     into the form below, and a bar that says only "session expiring" gets read
+     as a promise that it does. -->
+<div data-kui="topbar/session" class="min-h-64 bg-zinc-100 text-[14px]/5 text-zinc-900"
+     x-data="{
+       secs: 296,
+       said: '',
+       clock() { const m = Math.floor(this.secs / 60), s = this.secs % 60; return m + ':' + String(s).padStart(2, '0') },
+       tick() {
+         if (this.secs > 0) this.secs--;
+         const m = Math.ceil(this.secs / 60);
+         if (m === 5) this.said = 'Your session ends in 5 minutes.';
+         if (m === 1) this.said = 'Your session ends in 1 minute. Choose Stay signed in to keep it.';
+       }
+     }"
+     x-init="setInterval(() => tick(), 1000)">
+
+  <header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
+    <nav aria-label="Breadcrumb" class="min-w-0 flex-1">
+      <ol class="flex items-center gap-1.5 text-[13px]/5">
+        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+        <li aria-hidden="true" class="hidden text-zinc-500 sm:block">/</li>
+        <li class="min-w-0"><span aria-current="page" class="block truncate font-medium tabular-nums">PO-24-1187</span></li>
+      </ol>
+    </nav>
+    <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RM</span>
+  </header>
+
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 bg-zinc-50 px-3 py-2 sm:px-4">
+    <i data-lucide="alert-triangle" class="size-4 shrink-0 text-amber-700" aria-hidden="true"></i>
+    <p class="min-w-[13rem] flex-1 text-[13px]/5">
+      <span class="font-medium">Your session ends in <span class="tabular-nums" x-text="clock()">4:56</span>.</span>
+      <span class="text-zinc-600">Staying signed in keeps the session, not what is typed into this order.</span>
+    </p>
+    <form method="post" action="#" class="shrink-0">
+      <button type="submit"
+              class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Stay signed in
+      </button>
+    </form>
+  </div>
+
+  <p role="status" class="sr-only" x-text="said"></p>
+
+  <div class="p-4">
+    <div class="rounded-xl border border-zinc-300 bg-white p-4">
+      <p class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
+      <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">₹18,42,000 · 6 lines · promised 22 Aug 2026</p>
+    </div>
+  </div>
+</div>

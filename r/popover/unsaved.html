@@ -1,0 +1,120 @@
+<!-- Light dismiss is the whole point of a popover and it is also how somebody
+     loses a paragraph they had just typed. Discarding without asking is not a
+     small defect: it is silent, it happens on the user's own stray click, and
+     the only evidence is the empty panel next time they open it.
+
+     So the two accidental dismissals — the pointer landing on the page, focus
+     walking out of the root — stop closing the panel while the draft differs
+     from what was saved, and raise a strip inside it instead. Nothing is lost
+     and nothing is written; the user chooses. The two deliberate dismissals do
+     not ask, because they are not accidents: pressing a button named Cancel is
+     already the answer the strip would have been asking for.
+
+     Escape asks once and then means Keep editing, which is the safe half. A
+     first press raises the strip and puts focus on Keep editing so Enter does
+     the reversible thing; a second press takes the strip down and returns the
+     caret to the note. Discard stays one Tab away and is never a keypress the
+     user did not aim at. The trade is real and worth stating plainly: a panel
+     that guards its content can no longer be dismissed by Escape alone, which
+     is one property of a popover given up to keep another. If more guard than
+     this is wanted — a backdrop, a trap, a confirm that must be answered — the
+     control was a dialog from the start, and two fields that are usually
+     abandoned are the reason it is not one here.
+
+     The strip lives inside a role="alert" element that is in the panel from the
+     moment the panel opens, empty. A live region created in the same frame as
+     its first message announces nothing at all, and this one is revealed by
+     x-show rather than inserted by a swap, so the region has to pre-date the
+     text. The alert is assertive rather than polite on purpose: it fires when
+     the user is already walking away, and a polite announcement waiting for a
+     pause is one they will not be there for.
+
+     The trigger closes through the same guard. @click.outside never fires for a
+     click on the trigger — it is inside the root — so a trigger wired straight
+     to close() is a hole in the guard that only shows up when somebody dismisses
+     the panel the way they opened it. -->
+<div data-kui="popover/unsaved" class="relative inline-block"
+     x-data="{
+       open: false, confirming: false,
+       saved: { text: '', share: false },
+       draft: { text: '', share: false },
+       dirty() { return this.draft.text.trim() !== this.saved.text || this.draft.share !== this.saved.share },
+       show() {
+         this.draft = Object.assign({}, this.saved);
+         this.confirming = false;
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs.note.focus()));
+       },
+       guard(fromKey) {
+         if (!this.dirty()) { this.close(fromKey); return }
+         if (this.confirming) return;
+         this.confirming = true;
+         if (fromKey) this.$nextTick(() => requestAnimationFrame(() => this.$refs.keep.focus()));
+       },
+       keep() { this.confirming = false; this.$refs.note.focus() },
+       discard() { this.draft = Object.assign({}, this.saved); this.close() },
+       save() { this.saved = { text: this.draft.text.trim(), share: this.draft.share }; this.close() },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         this.confirming = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       }
+     }"
+     @click.outside="guard(false)"
+     @focusout="if ($event.relatedTarget && !$root.contains($event.relatedTarget)) guard(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); confirming ? keep() : guard(true) }">
+
+  <button type="button" x-ref="trigger" @click="open ? guard(false) : show()"
+          :aria-expanded="open" aria-controls="pop-un"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="message-square-plus" class="size-4 text-zinc-600"></i>Note on this receipt
+    <span x-show="saved.text" x-cloak
+          class="inline-flex min-w-5 items-center justify-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300">1</span>
+  </button>
+
+  <div id="pop-un" x-ref="panel" x-show="open" x-cloak
+       role="dialog" tabindex="-1" aria-labelledby="pop-un-title"
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+    <p id="pop-un-title" class="text-[13px]/5 font-medium tabular-nums">Note on GRN-24-4471</p>
+
+    <div class="mt-3">
+      <label for="un-note" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">What happened</label>
+      <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <textarea id="un-note" x-ref="note" x-model="draft.text" rows="2"
+                  placeholder="Two bundles short against the challan."
+                  class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 outline-none"></textarea>
+      </div>
+    </div>
+
+    <label class="mt-2.5 flex items-center gap-2.5 py-1 text-[13px]/5">
+      <input type="checkbox" x-model="draft.share" class="size-4 shrink-0 accent-zinc-700">
+      Copy this note to the vendor portal
+    </label>
+
+    <!-- present and empty from the moment the panel opens, so the strip it holds
+         is a change to a region rather than a region that arrived with a change -->
+    <div role="alert">
+      <div x-show="confirming" x-cloak
+           class="-mx-4 mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 border-y border-zinc-200 bg-zinc-50 px-4 py-2.5">
+        <p class="flex min-w-0 items-start gap-1.5 text-[12px]/4 font-medium">
+          <i data-lucide="alert-triangle" class="mt-px size-3.5 shrink-0 text-amber-700"></i>This note has not been saved.
+        </p>
+        <div class="ml-auto flex items-center gap-3">
+          <button type="button" @click="discard()"
+                  class="text-[12px]/4 font-medium text-red-600 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Discard</button>
+          <button type="button" x-ref="keep" @click="keep()"
+                  class="rounded-lg border border-zinc-300 bg-white px-2.5 py-1 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Keep editing</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3.5 flex items-center justify-between gap-3 border-t border-zinc-100 pt-3">
+      <button type="button" @click="discard()"
+              class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+      <button type="button" @click="save()" :disabled="!dirty()"
+              class="rounded-lg bg-zinc-700 px-3.5 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:opacity-60 disabled:hover:bg-zinc-700">Save note</button>
+    </div>
+  </div>
+</div>

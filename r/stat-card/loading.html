@@ -13,7 +13,16 @@
 
      aria-busy is on the tile, the bars are aria-hidden, and x-cloak keeps the
      loaded state from flashing before Alpine boots. x-init runs the cycle once
-     so the example resolves; in an application the swap is what clears it. -->
+     so the example resolves; in an application the swap is what clears it.
+
+     The sr-only line is a live region that sits outside both blocks and changes
+     its text, rather than a status message inside the skeleton that appears and
+     disappears with it. A region that is added to the page with its message
+     already in it announces nothing, so the version inside the skeleton was
+     announced neither when the wait started nor when it ended. Out here it says
+     the wait and then says the figure, and the figure is worth saying because
+     the user pressed the button that went and got it. -->
+
 <div data-kui="stat-card/loading" class="max-w-sm"
      x-data="{ busy: true, run() { this.busy = true; setTimeout(() => this.busy = false, 1800) } }"
      x-init="run()">
@@ -31,7 +40,6 @@
       <div class="mt-2 flex h-4 items-center" aria-hidden="true">
         <div class="h-2.5 w-36 rounded bg-zinc-200"></div>
       </div>
-      <p role="status" class="sr-only">Loading open order value</p>
     </div>
 
     <!-- loaded -->
@@ -48,6 +56,9 @@
         <span class="text-zinc-500">vs. July</span>
       </dd>
     </dl>
+
+    <p role="status" class="sr-only"
+       x-text="busy ? 'Loading open order value' : 'Open order value, ₹1.84 Cr, +8.4% vs. July'"></p>
   </div>
 
   <button type="button" @click="run()"

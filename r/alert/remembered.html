@@ -1,0 +1,48 @@
+<!-- alert/dismissible forgets. This one does not, and the difference is one
+     line of localStorage plus a lot of care about what may be kept there.
+
+     A browser key is right for a notice about the application — a policy
+     changing, a shortcut worth knowing, a screen moving — because the notice is
+     about the tool and the server tracks nothing about it per user. It is wrong
+     for a notice about a record. A record changes and a key cannot know that:
+     dismiss "3 invoices unmatched" once and it stays dismissed through the next
+     four that fail. Anything about a record either has no dismiss at all, or it
+     posts one and lets the server decide:
+
+     <button hx-post="/notices/credit-hold/dismiss/"
+             hx-target="#notice-credit-hold" hx-swap="delete">
+
+     which is also the only version that still holds when the same person opens
+     the console on their phone.
+
+     The key carries the date the notice was issued. Reuse a bare kon-notice-2fa
+     and the second edition of that message is invisible to everyone who
+     dismissed the first — the people who most need telling.
+
+     init() runs while x-data initialises, before x-show is evaluated, so
+     someone who dismissed it never watches it appear and go. x-cloak covers the
+     frames before Alpine has booted at all and is not optional here: without it
+     the notice flashes on every single page load for exactly the people who
+     already said they were finished with it. -->
+<div data-kui="alert/remembered"
+     x-data="{
+       key: 'kon-notice-2fa-2026-10',
+       show: true,
+       init() { this.show = localStorage.getItem(this.key) !== '1' },
+       dismiss() { this.show = false; localStorage.setItem(this.key, '1') }
+     }"
+     x-show="show" x-cloak
+     class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+  <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
+  <div class="min-w-0 flex-1">
+    <p class="text-[13px]/5 font-medium">Two-step sign-in becomes mandatory on 01 Oct 2026.</p>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-600">
+      Register a phone now and nothing changes for you on the day.
+      <a href="/account/security/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Set it up</a>
+    </p>
+  </div>
+  <button type="button" @click="dismiss()" aria-label="Dismiss"
+          class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="x" class="size-4"></i>
+  </button>
+</div>

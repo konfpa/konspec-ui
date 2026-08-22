@@ -1,0 +1,147 @@
+<!-- The transport. A region the first response cannot afford to wait for, sent
+     as a skeleton and swapped by htmx the moment the page loads.
+
+     There is no indicator machinery and no delay floor. The skeleton is what
+     the server rendered into the page and hx-swap="outerHTML" is what removes
+     it — the reason the region was deferred is that the query is slow, so there
+     is nothing to wait to find out. The floor belongs to the delayed variant,
+     where the request starts from a click.
+
+     aria-busy and aria-hidden collide on the swap target, and the resolution is
+     the part worth copying. aria-hidden takes the whole subtree out of the
+     accessibility tree, so an aria-busy sharing the element is never read.
+     aria-busy stays on the container the rows will land in and aria-hidden
+     moves down onto each row, which is the same move the form variant makes for
+     a different reason. That container is also what the swap removes, and that
+     is what clears the busy state: a deferred load has no client state and
+     nothing left to turn an attribute off, so the attribute has to leave with
+     the skeleton.
+
+     All three outcomes are here, because a region that only handles the loaded
+     case pulses forever on the other two. {% empty %} is what makes the empty
+     branch impossible to forget — it is part of the loop rather than a template
+     somebody has to remember exists — and the empty state is the list's single
+     item rather than a second root, because one item saying there are none
+     reads correctly where a list of zero items reads as nothing at all. The
+     failure is not a list, so it comes back as a div with the same id; outerHTML
+     does not care what the element it replaces was.
+
+     status=200 on the failure, and it is not a detail. htmx does not swap a
+     response outside 2xx, so a view that raises leaves the bars turning at a
+     request that finished half a minute ago.
+
+     The status region lives in the card header, outside everything the swap
+     touches, and each fragment updates it with hx-swap-oob — a live region that
+     arrives inside a response with its message already in it never changed, so
+     nothing is said, while the same message swapped out of band into a region
+     that was already on the page is a change and is read. This works because
+     the region is a list. Where the deferred region is a table the swap target
+     is the <tbody>, so the header is not rebuilt, and an out-of-band paragraph
+     cannot ride along in that response: htmx parses a bare tbody inside a
+     <table> and the HTML parser moves any non-table element straight back out
+     of it. Announce that case from an HX-Trigger header instead. -->
+
+     views.py
+         from django.db import DatabaseError
+         from django.shortcuts import get_object_or_404, render
+
+         def order_receipts(request, pk):
+             order = get_object_or_404(Order, pk=pk)
+             try:
+                 receipts = list(order.receipts.select_related('posted_by')
+                                              .order_by('-posted_on'))
+             except DatabaseError:
+                 # 200, not 500. htmx does not swap a response outside 2xx, so a
+                 # 500 here leaves the skeleton on screen pulsing at nothing.
+                 return render(request, 'orders/_receipts_failed.html', {'order': order})
+             return render(request, 'orders/_receipts.html',
+                           {'order': order, 'receipts': receipts})
+
+     urls.py
+         path('orders/<int:pk>/receipts/', views.order_receipts, name='order-receipts'),
+
+{# orders/detail.html #}
+<div data-kui="skeleton/django" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">Receipts against {{ order.number }}</h2>
+    <p id="po-receipts-status" role="status" class="sr-only">Loading the receipts</p>
+  </div>
+
+  <div id="po-receipts" aria-busy="true"
+       hx-get="{% url 'order-receipts' order.pk %}"
+       hx-trigger="load"
+       hx-swap="outerHTML"
+       class="animate-pulse divide-y divide-zinc-100 motion-reduce:animate-none">
+    <div class="flex items-start gap-2.5 px-4 py-2.5" aria-hidden="true">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-48 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="flex items-start gap-2.5 px-4 py-2.5" aria-hidden="true">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-40 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="flex items-start gap-2.5 px-4 py-2.5" aria-hidden="true">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-56 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="flex items-start gap-2.5 px-4 py-2.5" aria-hidden="true">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-44 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% comment %} orders/_receipts.html — the whole response and nothing around it, keeping the
+   id so a later request still has a target. No aria-busy: the element that
+   carried it left with the skeleton. {% endcomment %}
+<ul id="po-receipts" role="list" class="divide-y divide-zinc-100">
+  {% for r in receipts %}
+    <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true">
+        <span class="size-1.5 rounded-full {% if r.on_hold %}bg-amber-500{% else %}bg-emerald-600{% endif %}"></span>
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="block tabular-nums">{{ r.number }} · {{ r.quantity|floatformat:"0" }} {{ r.uom }}</span>
+        <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">{{ r.posted_on|date:"d M Y" }} · {{ r.posted_by.get_full_name }}</span>
+      </span>
+    </li>
+  {% empty %}
+    <li class="px-4 py-10 text-center">
+      <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="package-open" class="size-5 text-zinc-500"></i>
+      </span>
+      <span class="mt-3 block text-[14px]/5 font-medium">No receipts against this order</span>
+      <span class="mt-1 block text-[13px]/5 text-zinc-600">The order is open and nothing has been received yet. Receipts appear here as the gate posts them.</span>
+    </li>
+  {% endfor %}
+</ul>
+<p id="po-receipts-status" role="status" class="sr-only" hx-swap-oob="true">{% if receipts %}{{ receipts|length }} receipts loaded{% else %}No receipts against this order{% endif %}</p>
+
+{% comment %} orders/_receipts_failed.html — the same id in the same slot, so the swap
+   always happens and the skeleton always goes away {% endcomment %}
+<div id="po-receipts" class="px-4 py-10 text-center">
+  <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+    <i data-lucide="alert-circle" class="size-5 text-red-600"></i>
+  </span>
+  <p class="mt-3 text-[14px]/5 font-medium">The receipts did not load</p>
+  <p class="mt-1 text-[13px]/5 text-zinc-600">Nothing was changed. The order and its receipts are intact — this is the panel failing to read them.</p>
+  <button type="button"
+          hx-get="{% url 'order-receipts' order.pk %}"
+          hx-target="#po-receipts" hx-swap="outerHTML"
+          class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="rotate-cw" class="size-4"></i>Retry
+  </button>
+</div>
+<p id="po-receipts-status" role="status" class="sr-only" hx-swap-oob="true">The receipts did not load</p>

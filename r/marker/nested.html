@@ -9,10 +9,12 @@
      it and every child mark floats away from the line it opens, so the second
      level stops looking like a list and starts looking like two columns.
 
-     pl-5 is the parent's 6px mark plus its gap-2.5 rounded to a step, so the
-     child marks hang under the parent's text rather than under its mark. Line
-     the two levels of mark up with each other instead and the nesting is
-     invisible. -->
+     pl-5 is a step in from the parent's text, not from the parent's mark. The
+     nested ul already sits inside the content column, so pl-0 would start the
+     child marks under the first letter of the line above them and the two
+     levels would read as one paragraph with a gap in it; repeating the parent's
+     own indent — its 6px mark plus its gap-2.5, rounded to a step — is what
+     makes the second level visible as a second level. -->
 <div data-kui="marker/nested" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
   <h3 class="text-[13px]/5 font-medium">Rejections this month</h3>
 

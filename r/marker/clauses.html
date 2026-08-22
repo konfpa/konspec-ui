@@ -1,0 +1,75 @@
+<!-- The other numbering, and it aligns on the opposite edge. A flat sequence
+     is right-aligned because 9. and 11. are each one integer and the right edge
+     is where the number ends, so pinning it lines the periods up. A dotted
+     clause is read left to right as a section and a clause inside it, so its
+     left edge is the part that carries the meaning — right-align 4.2 against
+     4.10 and the shorter clause hangs further in than the longer one, which is
+     a wobble with no cause a reader can name.
+
+     Both columns are still fixed width and still tabular-nums. w-10 holds 4.10
+     rather than the widest number currently on the page: the first section that
+     runs past nine sub-clauses is the one that spills into the gap, and it does
+     it in the annexure that has already been signed.
+
+     The section numbers are left-aligned as well, even though 4. and 5. are a
+     flat run when you look only at them. Both columns are fixed, so the clause
+     text starts at the same x either way and the only thing the alignment moves
+     is the figure itself — and a section number is a reference people scan down
+     the left of, not a quantity they compare. Right-align it and section 4
+     starts a character further in than section 10, which is the one place in an
+     annexure where a reader is counting on a straight edge.
+
+     The sub-list takes no padding of its own. It sits inside the parent's
+     content column, so the parent's own w-6 and gap-2 have already paid for the
+     indent, and a second one costs a phone another 32px of text width for a
+     step the change of column width has already made. That is the difference
+     from the nested variant, where both levels share one column width and the
+     padding is the only thing separating them.
+
+     The numbers are the document's and never the loop's. A supplier quotes
+     clause 5.2 in a letter; a template that counts renumbers every clause below
+     a deleted one, and then 5.2 in the file and 5.2 in the letter are two
+     different sentences with nothing on either screen to say so. -->
+<div data-kui="marker/clauses" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5">
+  <h3 class="text-[13px]/5 font-medium">Annexure B — commercial terms</h3>
+  <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">RC-26-0041 · Gujarat Polymers Ltd · 04 Apr 2026</p>
+
+  <ol role="list" class="mt-4 space-y-4 text-[13px]/5">
+    <li class="flex items-start gap-2">
+      <span class="w-6 shrink-0 tabular-nums text-zinc-500">4.</span>
+      <div class="min-w-0 flex-1">
+        <p class="font-medium">Delivery and freight</p>
+        <ol role="list" class="mt-1.5 space-y-1.5 text-zinc-600">
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">4.1</span>
+            <span class="min-w-0 flex-1">Material is delivered ex-works Nashik. Freight is billed at actuals against the transporter's receipt and does not carry the contract discount.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">4.2</span>
+            <span class="min-w-0 flex-1 tabular-nums">A delivery window of 14 days from the order date applies to any quantity up to 20 MT.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">4.10</span>
+            <span class="min-w-0 flex-1 tabular-nums">Short receipts beyond 2% of the ordered quantity are debited at the contract rate without further intimation.</span>
+          </li>
+        </ol>
+      </div>
+    </li>
+    <li class="flex items-start gap-2">
+      <span class="w-6 shrink-0 tabular-nums text-zinc-500">5.</span>
+      <div class="min-w-0 flex-1">
+        <p class="font-medium">Payment</p>
+        <ol role="list" class="mt-1.5 space-y-1.5 text-zinc-600">
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">5.1</span>
+            <span class="min-w-0 flex-1 tabular-nums">45 days from the date of the goods receipt note, against a tax invoice quoting the order number.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-10 shrink-0 tabular-nums text-zinc-500">5.2</span>
+            <span class="min-w-0 flex-1 tabular-nums">Interest of 1% a month runs on any amount held beyond the credit period and is set off against the next invoice.</span>
+          </li>
+        </ol>
+      </div>
+    </li>
+  </ol>
+</div>

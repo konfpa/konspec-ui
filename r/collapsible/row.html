@@ -1,0 +1,113 @@
+<!-- One collapsible per record, and the record is what holds the state. Each
+     summary row and its detail row share a <tbody> of their own: a table
+     permits any number of them, and it is the only element that can wrap the
+     pair without the browser reparenting it out of the table, which is what
+     happens to a <div> put in the same place.
+
+     The ids carry the record key — col-grn-3391-2 rather than col-detail — or
+     the second chevron's aria-controls points at the first row's detail and
+     both rows open the same thing. This is the loop case the component is most
+     often wrong in.
+
+     No x-collapse here. A table lays itself out in one pass and a row's height
+     is a function of its cells, so the plugin has nothing stable to animate and
+     the row snaps regardless. x-show alone is honest about it, and it is also
+     safe: Alpine removes the display property rather than writing display
+     block, so the row returns to table-row and the columns stay aligned.
+
+     The trigger is icon-only, so it is named for the row it opens rather than
+     for the act — a column of buttons all called Expand names nothing. Received is dropped
+     below sm instead of scrolled to, because a register that scrolls sideways
+     on a phone is one where the value column is what disappears. -->
+<div data-kui="collapsible/row" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-12 px-2 py-2.5"><span class="sr-only">Batch detail</span></th>
+        <th scope="col" class="px-3 py-2.5">Item</th>
+        <th scope="col" class="hidden px-3 py-2.5 text-right sm:table-cell">Received</th>
+        <th scope="col" class="px-3 py-2.5 text-right">Value</th>
+      </tr>
+    </thead>
+
+    <tbody class="border-b border-zinc-100" x-data="{ open: false }">
+      <tr>
+        <td class="px-2 py-2">
+          <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-grn-3391-1"
+                  aria-label="Batch detail for HDPE granules, grade M60075"
+                  class="flex size-8 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+              <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+            </span>
+          </button>
+        </td>
+        <td class="px-3 py-2">HDPE granules — grade M60075</td>
+        <td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">8,400 kg</td>
+        <td class="px-3 py-2 text-right tabular-nums">₹5,04,000</td>
+      </tr>
+      <tr id="col-grn-3391-1" x-show="open" x-cloak>
+        <td colspan="4" class="p-0">
+          <dl class="grid gap-x-6 gap-y-2 border-t border-zinc-100 bg-zinc-50 px-3 py-3 sm:grid-cols-3">
+            <div><dt class="text-[12px]/4 text-zinc-600">Batch</dt><dd class="tabular-nums">GP/HD/2608-14</dd></div>
+            <div><dt class="text-[12px]/4 text-zinc-600">MFI at 190 °C</dt><dd class="tabular-nums">7.4 g/10 min</dd></div>
+            <div><dt class="text-[12px]/4 text-zinc-600">QC</dt><dd class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Passed 11 Aug 2026</dd></div>
+          </dl>
+        </td>
+      </tr>
+    </tbody>
+
+    <tbody class="border-b border-zinc-100" x-data="{ open: false }">
+      <tr>
+        <td class="px-2 py-2">
+          <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-grn-3391-2"
+                  aria-label="Batch detail for masterbatch, white 20%"
+                  class="flex size-8 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+              <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+            </span>
+          </button>
+        </td>
+        <td class="px-3 py-2">Masterbatch — white 20%</td>
+        <td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">300 kg</td>
+        <td class="px-3 py-2 text-right tabular-nums">₹72,000</td>
+      </tr>
+      <tr id="col-grn-3391-2" x-show="open" x-cloak>
+        <td colspan="4" class="p-0">
+          <dl class="grid gap-x-6 gap-y-2 border-t border-zinc-100 bg-zinc-50 px-3 py-3 sm:grid-cols-3">
+            <div><dt class="text-[12px]/4 text-zinc-600">Batch</dt><dd class="tabular-nums">SE/MB/W-4471</dd></div>
+            <div><dt class="text-[12px]/4 text-zinc-600">Dispersion</dt><dd class="tabular-nums">Grade 2</dd></div>
+            <div><dt class="text-[12px]/4 text-zinc-600">QC</dt><dd class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Passed 11 Aug 2026</dd></div>
+          </dl>
+        </td>
+      </tr>
+    </tbody>
+
+    <tbody x-data="{ open: true }">
+      <tr>
+        <td class="px-2 py-2">
+          <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-grn-3391-3"
+                  aria-label="Batch detail for antioxidant additive"
+                  class="flex size-8 items-center justify-center rounded-lg hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+              <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+            </span>
+          </button>
+        </td>
+        <td class="px-3 py-2">Antioxidant additive</td>
+        <td class="hidden px-3 py-2 text-right tabular-nums sm:table-cell">40 kg</td>
+        <td class="px-3 py-2 text-right tabular-nums">₹28,400</td>
+      </tr>
+      <!-- open at first paint, because this line is the one that is short —
+           so no x-cloak on it, and the row it opens is not a surprise -->
+      <tr id="col-grn-3391-3" x-show="open">
+        <td colspan="4" class="p-0">
+          <dl class="grid gap-x-6 gap-y-2 border-t border-zinc-100 bg-zinc-50 px-3 py-3 sm:grid-cols-3">
+            <div><dt class="text-[12px]/4 text-zinc-600">Batch</dt><dd class="tabular-nums">GP/AO/2608-03</dd></div>
+            <div><dt class="text-[12px]/4 text-zinc-600">Short by</dt><dd class="tabular-nums">4 kg against 44 kg ordered</dd></div>
+            <div><dt class="text-[12px]/4 text-zinc-600">QC</dt><dd class="flex items-center gap-1.5"><span class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>Debit note pending</dd></div>
+          </dl>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

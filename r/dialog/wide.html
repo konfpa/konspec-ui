@@ -1,0 +1,115 @@
+<!-- max-w-3xl, and the content is the argument for it. Three quotes against one
+     requisition are read across, not down: the rate on one is only a fact next
+     to the rate on the other two, and at max-w-md they stack into a list where
+     the comparison is something the user has to do from memory.
+
+     3xl is the last width in the entry. Anything that wants more is a screen —
+     a comparison of eight quotes, or one with a line-item breakdown per vendor,
+     is a page with a URL somebody can send to the approver.
+
+     The tiles are radio/cards, unchanged: :has() paints each tile from its own
+     radio, the radio stays visible so forced-colours mode still shows what was
+     chosen, and the focus indication is an outline on the tile because a 3px
+     ring drawn round a 16px circle lands on top of the circle.
+
+     The rule inside each tile is zinc-300 and not the zinc-100 divider, because
+     a chosen tile takes the zinc-200 fill and a zinc-100 line on zinc-200 is a
+     line you can only find by looking for it. Zinc-300 holds on both fills, and
+     it is the same colour the tinted-shape ring already uses.
+
+     The vendor line under each name is one line and truncates. Wrapped to two
+     on the longest name, it pushes that tile's figures a line lower than the
+     other two, and rows that do not start at the same height are not a
+     comparison — which is the only reason this panel is 3xl in the first place.
+
+     It stacks to one column below sm, which is what makes this legal on a
+     phone. It is still a poor thing to do on a phone, and the fix is not in
+     this component: a comparison that matters at 390px is a screen of its own. -->
+<div data-kui="dialog/wide" x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="git-compare" class="size-4 text-zinc-600"></i>Compare 3 quotes
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="dwide-title"
+         class="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+        <div class="min-w-0">
+          <h2 id="dwide-title" class="text-[16px]/6 font-semibold">Award RFQ-26-0142</h2>
+          <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">MS plate 10 mm · 40 MT · required at Waluj by 12 Sep 2026</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <fieldset>
+          <legend class="mb-2 text-[13px]/5 font-medium">Award the order to</legend>
+          <div class="grid gap-2 sm:grid-cols-3">
+            <label class="rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+              <span class="flex items-start gap-2.5">
+                <input type="radio" name="dwide-award" value="gpl" checked class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                <span class="min-w-0">
+                  <span class="block truncate text-[13px]/5 font-medium">Gujarat Polymers Ltd</span>
+                  <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-500">Vapi · 18 Aug</span>
+                </span>
+              </span>
+              <dl class="mt-3 space-y-1.5 border-t border-zinc-300 pt-2.5">
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Rate</dt><dd class="text-[13px]/5 font-medium tabular-nums">₹78.40 / kg</dd></div>
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Landed</dt><dd class="text-[13px]/5 font-medium tabular-nums">₹32,68,000</dd></div>
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Delivery</dt><dd class="text-[12px]/4 tabular-nums">08 Sep 2026</dd></div>
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Terms</dt><dd class="text-[12px]/4 tabular-nums">45 days</dd></div>
+              </dl>
+            </label>
+
+            <label class="rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+              <span class="flex items-start gap-2.5">
+                <input type="radio" name="dwide-award" value="nst" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                <span class="min-w-0">
+                  <span class="block truncate text-[13px]/5 font-medium">Nashik Steel Traders</span>
+                  <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-500">Nashik · 18 Aug</span>
+                </span>
+              </span>
+              <dl class="mt-3 space-y-1.5 border-t border-zinc-300 pt-2.5">
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Rate</dt><dd class="text-[13px]/5 font-medium tabular-nums">₹77.10 / kg</dd></div>
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Landed</dt><dd class="text-[13px]/5 font-medium tabular-nums">₹32,14,000</dd></div>
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Delivery</dt><dd class="flex items-center gap-1.5 text-[12px]/4 tabular-nums"><i data-lucide="alert-triangle" class="size-3.5 shrink-0 text-amber-700"></i>19 Sep 2026</dd></div>
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Terms</dt><dd class="text-[12px]/4 tabular-nums">30 days</dd></div>
+              </dl>
+            </label>
+
+            <label class="rounded-xl border border-zinc-200 bg-white p-3 [&:not(:has(:checked))]:hover:bg-zinc-50 has-[:checked]:border-zinc-700 has-[:checked]:bg-zinc-200 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-zinc-700/15">
+              <span class="flex items-start gap-2.5">
+                <input type="radio" name="dwide-award" value="sex" class="mt-0.5 size-4 shrink-0 accent-zinc-700">
+                <span class="min-w-0">
+                  <span class="block truncate text-[13px]/5 font-medium">Sharma Extrusions</span>
+                  <span class="mt-0.5 block truncate text-[12px]/4 tabular-nums text-zinc-500">Aurangabad · 19 Aug</span>
+                </span>
+              </span>
+              <dl class="mt-3 space-y-1.5 border-t border-zinc-300 pt-2.5">
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Rate</dt><dd class="text-[13px]/5 font-medium tabular-nums">₹79.90 / kg</dd></div>
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Landed</dt><dd class="text-[13px]/5 font-medium tabular-nums">₹33,04,000</dd></div>
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Delivery</dt><dd class="text-[12px]/4 tabular-nums">05 Sep 2026</dd></div>
+                <div class="flex items-baseline justify-between gap-2"><dt class="text-[12px]/4 text-zinc-600">Terms</dt><dd class="text-[12px]/4 tabular-nums">45 days</dd></div>
+              </dl>
+            </label>
+          </div>
+        </fieldset>
+
+        <p class="mt-3 text-[12px]/4 tabular-nums text-zinc-500">Quoted against RFQ-26-0142 in August 2026. Landed value includes freight and 18% GST on 40 MT.</p>
+      </div>
+
+      <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <a href="/rfq/26-0142/" class="mr-auto text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Open the full comparison</a>
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="open = false"
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Award and raise PO</button>
+      </div>
+    </div>
+  </div>
+</div>

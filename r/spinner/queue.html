@@ -1,0 +1,95 @@
+<!-- A bulk approval running down four orders, and exactly one ring on screen.
+
+     A ring on every queued row is the four-rings page the one-per-region rule
+     warns about: it does not say that four things are loading, it says the screen
+     is broken. Only the unit actually in flight turns. What is behind it says
+     Queued in plain text, what is ahead of it carries its outcome, and where the
+     ring sits is the thing that says how far the run has got — which is the one
+     fact a progress bar over the whole queue would flatten into a percentage.
+
+     There is a denominator here — four orders — and it still does not make this a
+     bar. What is unknown is each posting, and the run is the posting somebody is
+     watching. The count goes in the heading as words.
+
+     The state column is fixed at w-28 and every row keeps it, so nothing shifts
+     as a row moves from Queued to a ring to Approved. Rows are a list rather than
+     a table because at 390px four columns of this would scroll sideways and a
+     queue has no columns worth keeping.
+
+     One role="status" for the whole queue, not one per row. Four regions would
+     announce over each other and only the last would ever be heard. It carries
+     the row that just finished, so the announcement is a fact — "PO-24-1187
+     approved" — rather than the word Loading four times.
+
+     The ring never restarts. It is one animate-spin in one place; the row under
+     it is what changes.
+
+     Approved is marked with the emerald dot and not a Lucide check, because these
+     three states are inserted by x-if after lucide.createIcons() has already run
+     and an <i data-lucide> that arrives later hydrates into nothing. A dot needs
+     no hydration, and it is the same 6px disc the status pills use. The size-4
+     box around it is what keeps the word level with the ring in the row above. -->
+<div data-kui="spinner/queue" class="max-w-lg rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       at: 0,
+       rows: [
+         { po: 'PO-24-1187', vendor: 'Sharma Extrusions', amount: '₹18,42,000' },
+         { po: 'PO-24-1194', vendor: 'Gujarat Polymers Ltd', amount: '₹4,16,500' },
+         { po: 'PO-24-1203', vendor: 'Nashik Steel Traders', amount: '₹9,07,250' },
+         { po: 'PO-24-1211', vendor: 'Halol Fasteners', amount: '₹1,84,900' }
+       ],
+       said: '', t: null,
+       run() {
+         if (this.t) return;
+         this.at = 0; this.said = '';
+         this.t = setInterval(() => {
+           this.at++;
+           if (this.at >= this.rows.length) { clearInterval(this.t); this.t = null }
+           this.said = this.rows[this.at - 1].po + ' approved';
+         }, 1800);
+       }
+     }"
+     x-init="run()"
+     :aria-busy="t !== null">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
+    <p class="text-[14px]/5 font-semibold tabular-nums">Approving 4 orders</p>
+    <button type="button" @click="run()"
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Run again
+    </button>
+  </div>
+
+  <ul role="list" class="divide-y divide-zinc-100">
+    <template x-for="(r, i) in rows" :key="r.po">
+      <li class="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5" :aria-busy="i === at">
+        <span class="min-w-0 flex-1">
+          <span class="block text-[13px]/5 font-medium tabular-nums" x-text="r.po"></span>
+          <span class="block text-[12px]/4 text-zinc-500" x-text="r.vendor"></span>
+        </span>
+        <span class="text-[13px]/5 tabular-nums" x-text="r.amount"></span>
+        <span class="flex w-28 shrink-0 items-center gap-2">
+          <template x-if="i < at">
+            <span class="flex items-center gap-2">
+              <span class="flex size-4 shrink-0 items-center justify-center" aria-hidden="true">
+                <span class="size-1.5 rounded-full bg-emerald-600"></span>
+              </span>
+              <span class="text-[12px]/4 text-zinc-600">Approved</span>
+            </span>
+          </template>
+          <template x-if="i === at">
+            <span class="flex items-center gap-2">
+              <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+              <span class="text-[12px]/4 text-zinc-600">Posting</span>
+            </span>
+          </template>
+          <template x-if="i > at">
+            <span class="text-[12px]/4 text-zinc-500">Queued</span>
+          </template>
+        </span>
+      </li>
+    </template>
+  </ul>
+
+  <p role="status" class="sr-only" x-text="said"></p>
+</div>

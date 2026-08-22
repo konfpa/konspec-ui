@@ -17,8 +17,38 @@
      anchors bottom-0 instead of top-0 when 260px would not fit below it — the
      account menu at the foot of the rail is permanently in that case. And the
      nav does not scroll, because overflow-y:auto would force overflow-x with it
-     and clip every panel at the rail edge. -->
-<div data-kui="sidebar/flyout" class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+     and clip every panel at the rail edge.
+
+     The leaves in a flyout rail still need their bubble. A rail where four of
+     nine items open a named panel and the other five say nothing to a sighted
+     user is worse than one with no labels at all, because the silence looks
+     like a broken flyout rather than an item with no children. They carry
+     tooltip/rail, the same delay group the rail variant uses, and it is one
+     group across the whole panel so crossing from one item to the next does not
+     restart the wait.
+
+     The section triggers carry aria-expanded and nothing about their state in
+     their name. A label reading "Purchase orders, 1,438 — section open" is a
+     literal string that never changes, so it is wrong for the whole time the
+     panel is shut, which is most of the time; the attribute is the only part of
+     a name that a screen reader re-reads. -->
+
+<div data-kui="sidebar/flyout" class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{
+       tip: null, warm: false, timer: 0, cool: 0,
+       over(id) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id) },
+       show(id, now = false) {
+         clearTimeout(this.timer); clearTimeout(this.cool);
+         if (now || this.warm) { this.tip = id; this.warm = true; return }
+         this.timer = setTimeout(() => { this.tip = id; this.warm = true }, 150);
+       },
+       hide() {
+         clearTimeout(this.timer);
+         this.tip = null;
+         this.cool = setTimeout(() => this.warm = false, 800);
+       }
+     }"
+     @keydown.escape.window="hide()">
   <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
     <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-white" aria-hidden="true"><i data-lucide="package" class="size-[18px]"></i></span>
   </div>
@@ -27,9 +57,13 @@
     <ul role="list" class="space-y-1">
       <li class="relative flex justify-center">
         <a href="#" aria-label="Overview"
+           @mouseenter="over('overview')" @mouseleave="hide()"
+           @focus="if ($event.target.matches(':focus-visible')) show('overview', true)" @blur="hide()"
            class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="layout-dashboard" class="size-[18px]"></i>
         </a>
+        <span aria-hidden="true" x-show="tip === 'overview'" x-cloak x-transition.opacity.duration.100ms
+              class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Overview</span>
       </li>
 
       <li class="relative flex justify-center" x-data="{ open: false, flip: false }"
@@ -38,8 +72,8 @@
           @focusin="open = true; flip = $refs.trig.getBoundingClientRect().top + 264 > window.innerHeight"
           @focusout="if (!$el.contains($event.relatedTarget)) open = false"
           @keydown.escape="if (open) { open = false; $refs.trig.focus() }">
-        <a href="#" x-ref="trig" aria-current="page" aria-label="Purchase orders, 1,438 — section open"
-           class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-200 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <a href="#" x-ref="trig" aria-current="page" aria-label="Purchase orders, 12 awaiting GRN" :aria-expanded="open"
+           class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-200 text-zinc-900 ring-1 ring-inset ring-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="file-text" class="size-[18px]"></i>
           <span aria-hidden="true" class="absolute -top-1 -right-1 rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">12</span>
         </a>
@@ -66,7 +100,7 @@
           @focusin="open = true; flip = $refs.trig.getBoundingClientRect().top + 200 > window.innerHeight"
           @focusout="if (!$el.contains($event.relatedTarget)) open = false"
           @keydown.escape="if (open) { open = false; $refs.trig.focus() }">
-        <a href="#" x-ref="trig" aria-label="Vendors, 187"
+        <a href="#" x-ref="trig" aria-label="Vendors, 187" :aria-expanded="open"
            class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="building-2" class="size-[18px]"></i>
         </a>
@@ -87,9 +121,13 @@
 
       <li class="relative flex justify-center">
         <a href="#" aria-label="Materials"
+           @mouseenter="over('materials')" @mouseleave="hide()"
+           @focus="if ($event.target.matches(':focus-visible')) show('materials', true)" @blur="hide()"
            class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
           <i data-lucide="package" class="size-[18px]"></i>
         </a>
+        <span aria-hidden="true" x-show="tip === 'materials'" x-cloak x-transition.opacity.duration.100ms
+              class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Materials</span>
       </li>
     </ul>
   </nav>

@@ -1,0 +1,63 @@
+<!-- A register column asks how many still have to sign. It does not ask whose
+     faces they are, and it has about ninety pixels to answer in — four size-7
+     circles and a +N chip need a hundred and forty, so the stack either clips
+     or takes the width off the vendor name.
+
+     Past four the faces have stopped being read anyway. They become texture:
+     the eye counts the shapes and skips the letters, which is the count with
+     extra steps and a wider column. Drawing the figure directly is the same
+     information at a third of the width.
+
+     Nothing is lost, because the names are on the chip's label. The figure is
+     what is drawn and the list is what is read, which is the same split the
+     stack makes.
+
+     One approver is drawn as the person, not as a 1. A count of one has thrown
+     away the only name the column had, and the circle at that width still
+     carries the name on itself.
+
+     Opening the full list belongs to popover or hovercard. This chip is a
+     label, so it is a span and not a button — a control that looks pressable
+     and does nothing is worse than a plain mark. -->
+<div data-kui="avatar/count" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full table-fixed">
+    <caption class="sr-only">Purchase orders awaiting approval</caption>
+    <thead>
+      <tr class="border-b border-zinc-200 bg-zinc-50 text-left">
+        <th scope="col" class="w-[7.5rem] px-3 py-2 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Order</th>
+        <th scope="col" class="px-3 py-2 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Vendor</th>
+        <th scope="col" class="w-24 px-3 py-2 text-[11px]/4 font-medium uppercase tracking-wider text-zinc-600">Approvers</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-100">
+      <tr>
+        <td class="px-3 py-2.5 text-[13px]/5 font-medium tabular-nums">PO-24-1187</td>
+        <td class="px-3 py-2.5"><span class="block truncate text-[13px]/5">Gujarat Polymers Ltd</span></td>
+        <td class="px-3 py-2.5">
+          <span role="img" aria-label="6 approvers: Ritu Deshpande, Sanjay More, Imran Qureshi and 3 more"
+                class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="users" class="size-3.5 text-zinc-600"></i><span class="tabular-nums">6</span>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2.5 text-[13px]/5 font-medium tabular-nums">PO-24-1191</td>
+        <td class="px-3 py-2.5"><span class="block truncate text-[13px]/5">Shreeji Engineering Works</span></td>
+        <td class="px-3 py-2.5">
+          <span role="img" aria-label="12 approvers on the capital purchase panel"
+                class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <i data-lucide="users" class="size-3.5 text-zinc-600"></i><span class="tabular-nums">12</span>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-3 py-2.5 text-[13px]/5 font-medium tabular-nums">PO-24-1163</td>
+        <td class="px-3 py-2.5"><span class="block truncate text-[13px]/5">Konkan Chemicals Pvt Ltd</span></td>
+        <td class="px-3 py-2.5">
+          <span role="img" aria-label="Approver: Ritu Deshpande"
+                class="flex size-7 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[11px]/4 font-medium text-zinc-600">RD</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

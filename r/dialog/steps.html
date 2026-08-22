@@ -1,0 +1,137 @@
+<!-- A sequence short enough that leaving and coming back is not a thing anybody
+     needs to do. Three steps is the ceiling: past that the user wants a URL per
+     step and a server that remembers, which is form-page/wizard.
+
+     The heading of each step takes focus when the step changes, through
+     tabindex="-1" on it. Without that, Continue moves the whole body and leaves
+     focus on a button that has just relabelled itself, so a keyboard user hears
+     nothing and a screen reader user is still standing on step one. It keeps
+     the ordinary focus outline rather than hiding it with outline-none: the
+     user pressed a key to get here and the mark says where they landed.
+
+     The dialog keeps its name across all three steps. aria-labelledby points at
+     the header title, which is the record, not at the step heading, which
+     changes — a dialog that renames itself twice mid-flow is announced as three
+     different dialogs.
+
+     The rail is progress/steps: one progressbar over the whole strip rather
+     than three, with aria-valuetext saying "Step 2 of 3" because the number a
+     bar computes on its own is a percentage nobody asked for. Done is zinc-700,
+     the step in hand is zinc-400 and what is ahead is zinc-200 — a stage is a
+     position in a sequence, not a state, so no colour goes near it.
+
+     The step heading is the 11px uppercase label rather than another 13px
+     medium line, because the two field labels under it are 13px medium and a
+     heading that measures the same as the things it heads is not a heading.
+
+     The width never changes between steps and the body is capped at the panel
+     height, so the dialog grows downward and only until 80vh. Every step is in
+     the DOM from the start under x-show, which is why the two that are hidden
+     at first paint carry x-cloak. -->
+<div data-kui="dialog/steps"
+     x-data="{
+       open: false, step: 1, last: 3,
+       go(n) { this.step = n; this.$nextTick(() => this.$refs.head.focus()) }
+     }">
+  <button type="button" @click="open = true; step = 1"
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="corner-up-left" class="size-4 text-zinc-600"></i>Return to vendor
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="dstep-title"
+         class="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+      <div class="shrink-0 border-b border-zinc-200 px-5 py-4">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h2 id="dstep-title" class="text-[16px]/6 font-semibold">Return to Sharma Extrusions</h2>
+            <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">GRN 1142 · MS plate 10 mm · <span x-text="'Step ' + step + ' of 3'"></span></p>
+          </div>
+          <button type="button" @click="open = false" aria-label="Close"
+                  class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+
+        <div class="mt-3 flex gap-1" role="progressbar" aria-labelledby="dstep-title"
+             :aria-valuenow="step" aria-valuemin="1" aria-valuemax="3"
+             :aria-valuetext="'Step ' + step + ' of 3'">
+          <span class="h-1.5 flex-1 rounded-full" :class="step > 1 ? 'bg-zinc-700' : 'bg-zinc-400'"></span>
+          <span class="h-1.5 flex-1 rounded-full" :class="step > 2 ? 'bg-zinc-700' : step === 2 ? 'bg-zinc-400' : 'bg-zinc-200'"></span>
+          <span class="h-1.5 flex-1 rounded-full" :class="step === 3 ? 'bg-zinc-400' : 'bg-zinc-200'"></span>
+        </div>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <h3 x-ref="head" tabindex="-1"
+            x-text="step === 1 ? 'What is going back' : step === 2 ? 'How it is going back' : 'Check and raise'"
+            class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"></h3>
+
+        <div x-show="step === 1" class="mt-3">
+          <label for="dstep-qty" class="mb-1.5 block text-[13px]/5 font-medium">Quantity returned <span aria-hidden="true" class="text-red-600">*</span></label>
+          <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input id="dstep-qty" autofocus required inputmode="decimal" value="640" aria-describedby="dstep-qty-help"
+                   class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+            <span class="pr-3 text-[13px]/5 text-zinc-600">kg</span>
+          </div>
+          <p id="dstep-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">4,000 kg received on GRN 1142, none issued yet.</p>
+
+          <label for="dstep-reason" class="mt-4 mb-1.5 block text-[13px]/5 font-medium">Reason <span aria-hidden="true" class="text-red-600">*</span></label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select id="dstep-reason" required class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+              <option>Thickness under tolerance</option>
+              <option>Rust on receipt</option>
+              <option>Damaged in transit</option>
+              <option>Wrong grade supplied</option>
+            </select>
+          </div>
+        </div>
+
+        <div x-show="step === 2" x-cloak class="mt-3">
+          <label for="dstep-lr" class="mb-1.5 block text-[13px]/5 font-medium">Outward LR number</label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input id="dstep-lr" value="VRL/2026/88377" autocomplete="off" spellcheck="false"
+                   class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums outline-none">
+          </div>
+
+          <label for="dstep-date" class="mt-4 mb-1.5 block text-[13px]/5 font-medium">Dispatch date <span aria-hidden="true" class="text-red-600">*</span></label>
+          <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <input id="dstep-date" type="date" required value="2026-08-23" class="w-full bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none">
+          </div>
+          <p class="mt-1.5 text-[12px]/4 text-zinc-500">The gate pass prints against this date.</p>
+        </div>
+
+        <dl x-show="step === 3" x-cloak class="mt-3 divide-y divide-zinc-100">
+          <div class="flex items-baseline justify-between gap-4 py-2.5">
+            <dt class="text-[13px]/5 text-zinc-600">Quantity</dt>
+            <dd class="text-[13px]/5 font-medium tabular-nums">640 kg</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 py-2.5">
+            <dt class="text-[13px]/5 text-zinc-600">Reason</dt>
+            <dd class="text-right text-[13px]/5 font-medium">Thickness under tolerance</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 py-2.5">
+            <dt class="text-[13px]/5 text-zinc-600">Outward LR</dt>
+            <dd class="text-[13px]/5 font-medium tabular-nums">VRL/2026/88377</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 py-2.5">
+            <dt class="text-[13px]/5 text-zinc-600">Debit note value</dt>
+            <dd class="text-[13px]/5 font-medium tabular-nums">₹49,920</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" x-show="step > 1" x-cloak @click="go(step - 1)"
+                class="mr-auto rounded-lg px-4 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Back</button>
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="step === last ? open = false : go(step + 1)"
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span x-text="step === last ? 'Raise debit note' : 'Continue'"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

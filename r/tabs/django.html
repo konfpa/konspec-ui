@@ -8,6 +8,11 @@
      roving tabindex, no key bindings. The browser already knows how to move
      between links.
 
+     Every link carries the focus outline at a negative offset. The row is a
+     scroller, and a positive offset on a link flush against its edge is clipped
+     by it — which is only visible to somebody moving through the row with a
+     keyboard, so it survives every review that used a mouse.
+
      Choose this over the Alpine variants when the panel is expensive, when the
      tab has to be bookmarkable and back-navigable, or when the server already
      has a view per section. Choose the Alpine ones when the panels are cheap
@@ -26,7 +31,7 @@
     {% for key, label in sections %}
       <a href="{% url 'order-detail' order.pk key %}"
          {% if key == section %}aria-current="page"{% endif %}
-         class="shrink-0 whitespace-nowrap rounded-t border-b-2 pb-2.5 text-[13px]/5 {% if key == section %}border-zinc-900 font-semibold text-zinc-900{% else %}border-transparent text-zinc-600 hover:text-zinc-900{% endif %}">
+         class="shrink-0 whitespace-nowrap rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15 {% if key == section %}border-zinc-900 font-semibold text-zinc-900{% else %}border-transparent text-zinc-600 hover:text-zinc-900{% endif %}">
         {{ label }}
       </a>
     {% endfor %}

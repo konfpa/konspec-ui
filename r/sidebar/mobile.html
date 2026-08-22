@@ -12,7 +12,11 @@
      288px, not full width. The hundred pixels of dimmed page beside it are the
      only thing saying you are still on the orders list; a full-bleed nav is
      indistinguishable from having navigated to a menu page, and the back button
-     then has to get you out of somewhere you never went.
+     then has to get you out of somewhere you never went. It is written w-72
+     with a max-width and no breakpoint, because w-full with an sm: override is
+     full-bleed on exactly the 390px phone the sheet exists for — and the
+     backdrop that @click.self dismisses on is then not on screen to tap. The
+     max-width keeps a gutter at 320px, where 288 would leave 32.
 
      The overlay is absolute inside this preview box. In app-shell it is fixed
      inset-0 — the shell is the thing that owns the viewport, and a fixed overlay
@@ -49,7 +53,7 @@
          x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
          x-transition:leave-end="-translate-x-full"
          @click="if ($event.target.closest('a[href]')) nav = false"
-         class="flex h-full w-full flex-col border-r border-zinc-200 bg-white shadow-lg sm:w-72">
+         class="flex h-full w-72 max-w-[calc(100%-3rem)] flex-col border-r border-zinc-200 bg-white shadow-lg">
 
       <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
         <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>

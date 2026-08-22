@@ -7,9 +7,11 @@
 
      Each tile is the loaded tile's geometry, mt-* for mt-*: an 11px uppercase
      label, then mt-1.5 and an h-4 bar in an h-7 box for the text-[24px]/7
-     figure, then mt-1.5 and an h-2 bar in an h-4 box for the delta line. Tile
-     height is identical loaded and loading, which is what stops the whole page
-     below the strip stepping down on arrival.
+     figure, then mt-2 and an h-2 bar in an h-4 box for the delta line. Those
+     two margins are not the same and neither is a rounding of the other —
+     stat-card writes mt-1.5 above the figure and mt-2 above the delta, and
+     using mt-1.5 for both leaves every tile 2px short and the whole strip 2px
+     up from where it will settle.
 
      Figure widths differ across the tiles because the figures do — a count and
      a rupee value are not the same width, and four identical bars read as a
@@ -25,7 +27,7 @@
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open orders</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-16 rounded bg-zinc-200"></div></div>
-      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
     </div>
   </div>
 
@@ -33,7 +35,7 @@
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Open value</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-40 rounded bg-zinc-200"></div></div>
-      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
     </div>
   </div>
 
@@ -41,7 +43,7 @@
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Overdue</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-36 rounded bg-zinc-200"></div></div>
-      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-28 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-4 items-center"><div class="h-2 w-28 rounded bg-zinc-200"></div></div>
     </div>
   </div>
 
@@ -49,7 +51,7 @@
     <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Awaiting approval</p>
     <div class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
       <div class="mt-1.5 flex h-7 items-center"><div class="h-4 w-12 rounded bg-zinc-200"></div></div>
-      <div class="mt-1.5 flex h-4 items-center"><div class="h-2 w-24 rounded bg-zinc-200"></div></div>
+      <div class="mt-2 flex h-4 items-center"><div class="h-2 w-24 rounded bg-zinc-200"></div></div>
     </div>
   </div>
 </div>

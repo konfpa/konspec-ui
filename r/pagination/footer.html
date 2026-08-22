@@ -10,6 +10,13 @@
      The size select resets to page one. Page 30 at 25 rows is row 726; page 30
      at 100 rows is row 2,901, which is past the end of this register, so keeping
      the number would land somebody on an empty page after asking to see more.
+     It also carries selected on the option it starts at, or the browser paints
+     10 until Alpine boots and the control spends a frame disagreeing with the
+     range beside it.
+
+     Only four rows are drawn and the line under them counts the rest off the
+     same three numbers. Written as a literal it is right until the first time
+     somebody changes the page size, and then it says 21 on a page holding 96.
 
      Below md the seven squares are display:none and "Page 12 of 58" stands in
      for them, the range wraps to its own line, and the footer of a table that
@@ -70,7 +77,8 @@
         </tr>
       </template>
       <tr>
-        <td colspan="4" class="px-4 py-2.5 text-[12px]/4 text-zinc-500 tabular-nums">…and 21 more rows on this page</td>
+        <td colspan="4" class="px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500"
+            x-text="'…and ' + (to - from + 1 - shown.length) + ' more rows on this page'">…and 21 more rows on this page</td>
       </tr>
     </tbody>
   </table>
@@ -84,7 +92,7 @@
           <select id="order-pager-size" x-model.number="size" @change="page = 1"
                   class="h-9 bg-transparent px-2 text-[13px]/5 tabular-nums outline-none">
             <option value="10">10</option>
-            <option value="25">25</option>
+            <option value="25" selected>25</option>
             <option value="50">50</option>
             <option value="100">100</option>
           </select>

@@ -1,0 +1,122 @@
+<!-- Rows are already on screen, so the wait keeps them. The page somebody is
+     looking at is the last true answer the server gave; replacing it with grey
+     bars on every press throws away a readable screen and makes a 300ms fetch
+     feel like a reload. They are not dimmed either — half-opacity says "wrong",
+     and these figures are merely previous.
+
+     inert goes on the rows, not on the nav. A scrim stops a mouse and nothing
+     else: Tab still walks into rows that are about to be replaced and Enter
+     still fires a row action against them. Alpine treats inert as a boolean
+     attribute, so a false value removes it rather than writing inert="false",
+     which is a truthy string that would leave the table permanently unreachable.
+
+     The pager is not disabled while the fetch runs. The button somebody just
+     pressed is the one that would be disabled, and a browser blurs a disabled
+     element to the body — so the keyboard user who pressed Next is now at the
+     top of the document. The handler guards instead: a press while busy returns.
+
+     A keystroke and a page press want opposite rules, and both are here. The
+     search restarts the request every time, because only the last thing typed
+     matters; the pager refuses to queue a second page behind the first, because
+     both would arrive and only one of them would be the page under the cursor.
+
+     The ring appears at 500ms, and the delay lives in the bound class over a
+     delay-0 base — leave it in the base and the ring is still turning half a
+     second after the rows have landed. It holds its box with opacity rather than
+     x-show, so the footer does not widen and take the button out from under the
+     cursor. Most fetches answer first and it never paints.
+
+     The rows on screen answer the query the server last answered, not the one
+     in the box. That is the whole reason they are worth keeping and the reason
+     they are inert while the next answer is on its way: they are true about a
+     query somebody has already moved on from, and acting on them would act on
+     the wrong set.
+
+     The announcement is the range line, which is already a role="status" and
+     already says the new answer when it arrives. A second live region saying
+     "Loading" talks over it, so the ring is aria-hidden and is for the eye. -->
+<div data-kui="data-table/paging" x-data="{
+       q: '', applied: '', page: 1, size: 4, busy: false, t: null,
+       all: Array.from({ length: 14 }, (_, i) => ({
+         po: 'PO-24-' + (1187 + i * 3),
+         vendor: ['Sharma Extrusions', 'Nashik Steel Traders', 'Gujarat Polymers Ltd', 'Konkan Chemicals Pvt Ltd'][i % 4],
+         amount: 96750 + (i * 417350) % 4800000,
+         due: String(2 + i % 27).padStart(2, '0') + ' Sep 2026'
+       })),
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get result() {
+         const q = this.applied.trim().toLowerCase();
+         return q ? this.all.filter(o => (o.po + ' ' + o.vendor).toLowerCase().includes(q)) : this.all;
+       },
+       get total() { return this.result.length },
+       get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
+       get from() { return this.total ? (this.page - 1) * this.size + 1 : 0 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get shown() { return this.result.slice((this.page - 1) * this.size, this.page * this.size) },
+       go(n) {
+         if (this.busy || n < 1 || n > this.pages) return;
+         this.busy = true;
+         clearTimeout(this.t);
+         this.t = setTimeout(() => { this.page = n; this.busy = false }, 1200);
+       },
+       search() {
+         this.busy = true;
+         clearTimeout(this.t);
+         this.t = setTimeout(() => { this.applied = this.q; this.page = 1; this.busy = false }, 900);
+       }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" x-model="q" @input.debounce.300ms="search()" aria-label="Search the order register"
+             placeholder="Search PO or vendor"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+  </div>
+
+  <div :inert="busy">
+    <table class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+          <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+          <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+          <th scope="col" class="px-4 py-2.5 text-right font-medium">Due</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="r in shown" :key="r.po">
+          <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+            <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+            <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+            <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+            <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums" x-text="r.due"></td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+
+  <nav aria-label="Register pages" :aria-busy="busy"
+       class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <div class="flex items-center gap-2">
+      <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 opacity-0 transition-opacity delay-0 motion-reduce:animate-none"
+            :class="busy && 'opacity-100 delay-500'" aria-hidden="true"></span>
+      <p role="status" class="text-[13px]/5 text-zinc-600 tabular-nums"
+         x-text="from + '–' + to + ' of ' + total + ' orders'">1–4 of 14 orders</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages">Page 1 of 4</span>
+      <button type="button" @click="go(page - 1)" :disabled="page === 1"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" @click="go(page + 1)" :disabled="page === pages"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>

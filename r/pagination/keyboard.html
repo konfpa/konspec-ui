@@ -1,0 +1,97 @@
+<!-- Count the tab stops on the numbered form: seven page buttons plus two
+     arrows is nine, and the pager sits under the table, so a keyboard user
+     leaving a register walks every one of them on the way to whatever is below
+     it. A row of controls that are all the same kind is a toolbar, and a
+     toolbar is one stop with the arrows moving inside it. Nine becomes three.
+
+     Previous and Next stay outside it and keep their own stops. They are a
+     different kind of control — relative rather than absolute — and they are
+     the two anybody actually uses, so burying them inside an arrow walk to save
+     two stops would cost more than it saved.
+
+     The arrows move focus and do not commit. This is where a toolbar and the
+     radiogroup in button-group part company: there, Right is the choice, and
+     that is right for a filter that costs nothing. Here every page is a fetch,
+     so arrowing from 1 to 72 would fire seventy-one of them. Focus walks,
+     Enter and Space page.
+
+     Home and End are first and last page for free, because the first and last
+     controls in this toolbar are page 1 and page 72 — the truncated row puts
+     the ends in the ends. That is the whole of what First and Last buttons buy,
+     without the two extra controls the edges form has to carry.
+
+     The roving stop follows focus rather than the current page, so tabbing back
+     into the pager returns to the number the user was last on. It falls back to
+     the current page when the window recomputes and the number it was sitting
+     on is no longer a slot — with no slot holding tabindex="0" the row would
+     drop out of the tab order altogether.
+
+     The keys are what hold focus across the swap. x-for keyed on the slot value
+     moves the node for 5 rather than rebuilding the row, so the button that was
+     pressed still has focus after the window shifts around it. Drop the keys
+     and every page change re-renders seven buttons, the focused one among them,
+     and the keyboard lands on the body under a register that just changed. -->
+<nav data-kui="pagination/keyboard" aria-label="Order register pages"
+     x-data="{
+       page: 4, size: 20, total: 1438, roved: 4,
+       n(v) { return v.toLocaleString('en-IN') },
+       get pages() { return Math.max(1, Math.ceil(this.total / this.size)) },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get slots() {
+         const n = this.pages, p = this.page;
+         if (n <= 7) return Array.from({ length: n }, (_, i) => i + 1);
+         if (p <= 4) return [1, 2, 3, 4, 5, 'gap-end', n];
+         if (p >= n - 3) return [1, 'gap-start', n - 4, n - 3, n - 2, n - 1, n];
+         return [1, 'gap-start', p - 1, p, p + 1, 'gap-end', n];
+       },
+       get stop() { return this.slots.includes(this.roved) ? this.roved : this.page },
+       keys() { return [...this.$refs.row.querySelectorAll('button')] },
+       move(d) {
+         const b = this.keys(), i = b.indexOf(document.activeElement);
+         b[Math.min(Math.max(i + d, 0), b.length - 1)].focus();
+       },
+       edge(last) { const b = this.keys(); (last ? b[b.length - 1] : b[0]).focus() },
+       go(n) { this.page = Math.min(Math.max(n, 1), this.pages); this.roved = this.page },
+       prev() { this.page--; this.roved = this.page; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; this.roved = this.page; if (this.page === this.pages) this.$refs.prev.focus() }
+     }"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+
+  <p role="status" class="text-[13px]/5 tabular-nums text-zinc-600"
+     x-text="n(from) + '–' + n(to) + ' of ' + n(total) + ' orders'">61–80 of 1,438 orders</p>
+
+  <div class="flex items-center gap-2">
+    <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden" x-text="'Page ' + page + ' of ' + pages">Page 4 of 72</span>
+
+    <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+
+    <div x-ref="row" role="toolbar" aria-orientation="horizontal" aria-label="Order register page numbers"
+         @keydown.arrow-right.prevent="move(1)" @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+         class="hidden items-center gap-1 md:flex">
+      <template x-for="s in slots" :key="s">
+        <span class="contents">
+          <template x-if="typeof s === 'number'">
+            <button type="button" @click="go(s)" @focus="roved = s" :tabindex="s === stop ? 0 : -1"
+                    :aria-label="'Page ' + s" :aria-current="s === page ? 'page' : false"
+                    class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="s === page ? 'bg-zinc-700 font-medium text-white' : 'hover:bg-zinc-100'"
+                    x-text="s"></button>
+          </template>
+          <template x-if="typeof s !== 'number'">
+            <span aria-hidden="true" class="flex size-9 items-center justify-center text-[13px]/5 text-zinc-500">…</span>
+          </template>
+        </span>
+      </template>
+    </div>
+
+    <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </button>
+  </div>
+</nav>

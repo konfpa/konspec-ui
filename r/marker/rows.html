@@ -1,0 +1,81 @@
+<!-- The register puts the link on the title. Here the whole row is the link,
+     which is right when the second line is worth hearing and wrong when it is
+     not: everything inside the anchor becomes its accessible name, so this row
+     announces as "Overdue, Lot 26-119, HDPE granules, held 11 days, Gujarat
+     Polymers Ltd, 18.5 MT" — a name somebody can act on — while the same shape
+     round a title and "updated 2m ago" gives four rows that all end in noise.
+     That is the whole test. It is not about the row being easier to hit.
+
+     The mark still is not the target. It is aria-hidden inside the anchor and
+     takes no hover and no focus of its own; what got bigger is the item, not
+     the dot. The chevron is decoration for the same reason and carries no
+     title.
+
+     The row is a SURFACE, not a shape, so it hovers one step off the band it
+     crosses — zinc-100 inside a white panel — and it takes no rounding of its
+     own. And it takes the negative focus offset. A full-bleed row inside a card
+     that is overflow-hidden has its left and right edges flush with the clip,
+     so focus-visible:outline-offset-2 draws the top and bottom of an outline
+     and loses both sides.
+
+     The padding lives on the anchor, never on the li. On the li the target
+     stops short of the edge it appears to reach, and the 12px strip the pointer
+     lands on at the bottom of each row belongs to nothing.
+
+     The last row is not a link, and it keeps the same padding and the same
+     marker box. A queue where some rows can be opened and some cannot still has
+     to read as one column of marks; shrinking the row that is not a target is
+     how the column develops a kink nobody can explain.
+
+     The titles wrap rather than truncate, which is why items-start earns its
+     place here more than anywhere else in this entry — at 390px every one of
+     these is three lines and the marks stay on the first. -->
+<div data-kui="marker/rows" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium">Lots on QC hold</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 lots · oldest held 11 days</p>
+  </div>
+
+  <ul role="list" class="divide-y divide-zinc-100">
+    <li>
+      <a href="#" class="flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-red-600"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-[13px]/5 font-medium tabular-nums text-zinc-900">Lot 26-119 · HDPE granules, melt flow index outside the band on two of five samples</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Overdue — </span>Held 11 days · Gujarat Polymers Ltd · 18.5 MT</span>
+        </span>
+        <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-[13px]/5 font-medium tabular-nums text-zinc-900">Lot 26-121 · bags torn in transit, 48 kg written off at the gate</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Approved — </span>Retest with the vendor since 18 Aug 2026 · Sharma Extrusions · 22.0 MT</span>
+        </span>
+        <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="flex items-start gap-2.5 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-[13px]/5 font-medium tabular-nums text-zinc-900">Lot 26-124 · mill certificate not supplied with the consignment</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Held 2 days · Nashik Steel Traders · 6.4 MT</span>
+        </span>
+        <i data-lucide="chevron-right" class="mt-0.5 size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-3">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 font-medium tabular-nums text-zinc-600">Lot 26-126 · moisture above 0.08% on the composite sample</p>
+        <p class="mt-0.5 flex items-start gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <i data-lucide="lock" class="size-3.5 shrink-0 translate-y-px text-zinc-500" aria-hidden="true"></i>
+          <span>Open — being released by Anil Kulkarni since 11:12</span>
+        </p>
+      </div>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,117 @@
+<!-- Two decisions, and the test between them is whether the user could ever
+     come to have the right. A register belonging to a plant they will never be
+     posted to is absent from this nav entirely: a permanently inert row is
+     furniture, and twenty of them turn the panel into a catalogue of the
+     software rather than a list of this person's work. A destination gated on
+     something they can ask for — Approvals, which needs a limit set on their
+     profile — stays visible and inert with the reason on the row, because
+     hiding that one turns "I need approver rights" into "the software is broken
+     for me", and the second sentence produces a support ticket instead of a
+     request.
+
+     The inert row is a span at role="link" with aria-disabled and tabindex="0".
+     Not an anchor with the href removed, which has no role, no focus and no
+     announcement, so the row exists only for people looking at it. Not an
+     anchor keeping its href with aria-disabled on top, which announces as
+     disabled and then navigates anyway on Enter. And not pointer-events-none,
+     which stops the mouse and nothing else.
+
+     The reason is visible and joined to the row with aria-describedby, so it is
+     read after the name rather than buried inside it. A reason that lives in a
+     tooltip does not exist on a phone and is missing for exactly the person who
+     needs it most.
+
+     The row is zinc-500, not zinc-400. Disabled controls are exempt from the
+     contrast minimum, which is a licence to grey out a button nobody needs to
+     read — this row is the opposite, a row whose whole purpose is to be read.
+     The lock and the absent hover say inert; the wash of grey is not needed and
+     costs legibility.
+
+     The count comes off. A queue length on a queue you cannot open is a worse
+     row than one with no number at all: it is information about work you are
+     being told you may not do.
+
+     And the nav says once, at the foot, that it is filtered. A nav that is
+     silently different for every colleague is why two people on a call cannot
+     agree on where anything is. -->
+<div data-kui="sidebar/permissions" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+    <span class="min-w-0 flex-1">
+      <span class="block truncate text-[14px]/5 font-semibold">Operations</span>
+      <span class="block truncate text-[11px]/4 text-zinc-500">Buyer · Vasai plant</span>
+    </span>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+    <p id="sb13-g1" class="px-2.5 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Procurement</p>
+    <ul role="list" aria-labelledby="sb13-g1" class="space-y-0.5">
+      <li>
+        <a href="#" aria-current="page" class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 px-2.5 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Purchase orders</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">148</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="truck" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Goods receipt</span>
+          <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">12</span>
+        </a>
+      </li>
+      <li>
+        <span role="link" aria-disabled="true" tabindex="0" aria-describedby="sb13-why-approvals"
+              class="flex min-h-9 items-start gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="lock" class="mt-0.5 size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate">Approvals</span>
+            <span id="sb13-why-approvals" class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">Needs an approval limit above ₹0</span>
+          </span>
+        </span>
+      </li>
+      <li>
+        <span role="link" aria-disabled="true" tabindex="0" aria-describedby="sb13-why-payments"
+              class="flex min-h-9 items-start gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="lock" class="mt-0.5 size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate">Payment advice</span>
+            <span id="sb13-why-payments" class="mt-0.5 block text-[11px]/4 text-zinc-500">Accounts team only</span>
+          </span>
+        </span>
+      </li>
+    </ul>
+
+    <p id="sb13-g2" class="px-2.5 pt-4 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Master data</p>
+    <ul role="list" aria-labelledby="sb13-g2" class="space-y-0.5">
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Vendors</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="package" class="size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1 truncate">Materials</span>
+          <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">2,418</span>
+        </a>
+      </li>
+      <li>
+        <span role="link" aria-disabled="true" tabindex="0" aria-describedby="sb13-why-rates"
+              class="flex min-h-9 items-start gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="lock" class="mt-0.5 size-[18px] shrink-0"></i>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate">Rate contracts</span>
+            <span id="sb13-why-rates" class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">Role changed 31 Jul 2026</span>
+          </span>
+        </span>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 text-zinc-500">Sections you have no rights to are hidden. <a href="#" class="text-zinc-900 underline underline-offset-2">What I can access</a></p>
+  </div>
+</div>

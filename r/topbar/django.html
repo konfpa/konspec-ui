@@ -1,0 +1,145 @@
+<!-- The bar is a partial the shell template includes, so everything on it
+     comes off the request rather than out of a view: the context pills from the
+     session the server just read, the user from request.user, the queue from a
+     context processor. Per-view context is the wrong home for any of it — the
+     bar renders on every page, and a count supplied by two views out of forty
+     is a bar that is right twice.
+
+       # context_processors.py
+       def bar(request):
+           if not request.user.is_authenticated:
+               return {}
+           return {'approvals': pending_count(request.user)}
+
+     That runs on every response, so pending_count returns a cached integer and
+     never a queryset the template walks. One extra query in this file is one
+     extra query on every page in the application.
+
+     Sign out is a POST carrying a csrf_token, not a link. A GET that ends a
+     session gets followed by link prefetchers, mail scanners and the browser's
+     own speculative fetch, and users are signed out by hovering; Django's
+     LogoutView has refused GET since 5.0 for exactly that. The <form> around it
+     takes role="none", because a form is not a permitted child of role="menu" —
+     without it the menu owns a group nobody asked for and the item inside it
+     stops counting as one of three.
+
+     Every href is {% url %}. A hard-coded /orders/ breaks the day the
+     application is mounted under a prefix, and this is the one template that is
+     on every page when it does.
+
+     The trail is breadcrumbs/django dropped in, not written again. The
+     hamburger takes aria-controls in the shell template, where the sidebar it
+     opens actually exists; it is left off here because this partial renders no
+     sidebar and an aria-controls pointing at nothing is a broken reference. -->
+<div data-kui="topbar/django" class="text-[14px]/5 text-zinc-900">
+  {% if request.impersonator %}
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-zinc-900 px-3 py-2 text-white sm:px-4">
+      <i data-lucide="user-check" class="size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
+      <p class="min-w-[14rem] flex-1 text-[13px]/5">
+        <span class="font-medium">You are signed in as {{ request.user.get_full_name }}.</span>
+        <span class="text-zinc-400">Everything you post is recorded against that account.</span>
+      </p>
+      <form method="post" action="{% url 'impersonate:stop' %}" class="shrink-0">
+        {% csrf_token %}
+        <button type="submit" class="rounded-lg px-2.5 py-1 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          Return to {{ request.impersonator.get_full_name }}
+        </button>
+      </form>
+    </div>
+  {% endif %}
+
+  <header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-3 sm:px-4">
+    <button type="button" aria-label="Open navigation" aria-expanded="false"
+            class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
+      <i data-lucide="menu" class="size-5"></i>
+    </button>
+
+    {% if env_label %}
+      <span class="hidden shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 sm:inline-flex">
+        <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>{{ env_label }}
+      </span>
+    {% endif %}
+
+    <span class="hidden shrink-0 items-center rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 md:inline-flex">{{ request.session.plant_name }}</span>
+
+    {% if not fy.is_current %}
+      <span class="hidden shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 sm:inline-flex">
+        <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>FY {{ fy.label }}
+      </span>
+    {% endif %}
+
+    <nav aria-label="Breadcrumb" class="min-w-0 flex-1">
+      <ol class="flex items-center gap-1.5 text-[13px]/5">
+        {% for label, url in crumbs %}
+          {% if not forloop.first %}<li aria-hidden="true" class="hidden text-zinc-500 sm:block">/</li>{% endif %}
+          {% if forloop.last %}
+            <li class="min-w-0"><span aria-current="page" class="block truncate font-medium tabular-nums">{{ label }}</span></li>
+          {% else %}
+            <li class="hidden sm:block"><a href="{{ url }}" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ label }}</a></li>
+          {% endif %}
+        {% endfor %}
+      </ol>
+    </nav>
+
+    <form role="search" method="get" action="{% url 'search:index' %}" class="hidden shrink-0 lg:block">
+      <label for="bar-q" class="sr-only">Search orders, vendors and materials</label>
+      <div class="flex w-64 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <i data-lucide="search" class="ml-2.5 size-4 shrink-0 text-zinc-500"></i>
+        <input id="bar-q" name="q" type="search" value="{{ request.GET.q|default:'' }}" autocomplete="off"
+               placeholder="Search orders, vendors, materials"
+               class="w-full min-w-0 bg-transparent px-2 py-2 text-[13px]/5 outline-none placeholder:text-zinc-500">
+      </div>
+    </form>
+
+    <a href="{% url 'approvals:index' %}"
+       class="relative flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="bell" class="size-[18px]"></i>
+      {% if approvals %}
+        <span class="sr-only">Approvals, {{ approvals }} waiting on you</span>
+        <span aria-hidden="true" class="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">{% if approvals > 99 %}99+{% else %}{{ approvals }}{% endif %}</span>
+      {% else %}
+        <span class="sr-only">Approvals, none waiting on you</span>
+      {% endif %}
+    </a>
+
+    <div class="relative shrink-0"
+         x-data="{
+           open: false,
+           items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+           show() { this.open = true; this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus())) },
+           close(toTrigger = true) { if (!this.open) return; this.open = false; if (toTrigger) this.$refs.trigger.focus() },
+           move(step) { const i = this.items(), at = i.indexOf(document.activeElement); i[(at + step + i.length) % i.length]?.focus() }
+         }"
+         @click.outside="close(false)"
+         @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+      <button type="button" x-ref="trigger" @click="open ? close(false) : show()" @keydown.arrow-down.prevent="show()"
+              :aria-expanded="open" aria-haspopup="menu" aria-label="Account — {{ request.user.get_full_name }}"
+              class="flex size-9 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        {{ request.user.first_name|first }}{{ request.user.last_name|first }}
+      </button>
+
+      <div x-show="open" x-cloak
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.tab="close(false)"
+           class="absolute right-0 z-40 mt-1 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <div class="px-3 py-2">
+          <p class="truncate text-[13px]/5 font-medium">{{ request.user.get_full_name }}</p>
+          <p class="truncate text-[12px]/4 text-zinc-500">{{ request.user.email }}</p>
+        </div>
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <div x-ref="menu" role="menu" aria-label="Account">
+          <a href="{% url 'accounts:profile' %}" role="menuitem" tabindex="-1" @click="close(false)"
+             class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+            <i data-lucide="user" class="size-4 text-zinc-600"></i>Your profile
+          </a>
+          <form method="post" action="{% url 'logout' %}" role="none">
+            {% csrf_token %}
+            <button type="submit" role="menuitem" tabindex="-1"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </header>
+</div>

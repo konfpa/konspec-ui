@@ -1,0 +1,165 @@
+<!-- Django already draws the seven-slot window. get_elided_page_range with
+     on_each_side=1 and on_ends=1 returns first, a gap or a page, three around
+     the current one, a gap or a page, last — the same shape as the slots()
+     getter in the client variants and for the same reason, so the row does not
+     change width as somebody walks it. It cannot be called from a template
+     because template calls take no arguments, so the view builds it, exactly as
+     data-table/server builds its column list.
+
+     The gap is paginator.ELLIPSIS rather than a literal "…", because comparing
+     against the character means the template breaks the day the constant is
+     translated or changed. It renders the same square as a page and it is
+     aria-hidden.
+
+     Every control keeps a stable id. htmx restores focus after a swap by
+     matching the id of the element that had it, so pressing page 13 leaves the
+     keyboard on #page-13 once the register comes back. Where the pressed
+     control was an end that has now gone dead, its id is on a disabled button
+     and the restore quietly fails, so after-settle puts focus on the first
+     pager link that is still live rather than leaving it on the body.
+
+     The handlers sit on the shell rather than on the nav. htmx fires the swap
+     events at the target or its parent, and the nav is inside the target, so a
+     handler written there is destroyed by the swap it was waiting for and never
+     runs a second time. The shell is the element the swap cannot reach.
+
+     aria-busy goes on the div that is about to be replaced, so it clears itself
+     when the rows land and nothing has to remember to take it off. The removal
+     on after-request is for the case where nothing lands at all.
+
+     hx-sync, not hx-disabled-elt. Disabling the pager while a page is in flight
+     disables the button somebody is holding; replace aborts the request that is
+     still running and issues the new one, which is what a second press on Next
+     was asking for anyway.
+
+     The live region is the part a swap breaks. The swap replaces the whole
+     register including any role="status" inside it, and a live region that is
+     itself replaced announces nothing — it has to be in the document before its
+     text changes. So the visible range is plain text, and one persistent
+     sr-only region outside the target is written by an out-of-band swap. It is
+     the only element here that has to survive the request. -->
+{% load humanize %}
+
+{% comment %} orders/register.html — the page. The shell is only ever rendered here, and
+   nothing swaps it, which is what makes it the place the handlers and the live
+   region can live. {% endcomment %}
+<div data-kui="pagination/django" id="register-shell" hx-sync="this:replace"
+     hx-on::before-request="document.getElementById('register').setAttribute('aria-busy', 'true')"
+     hx-on::after-request="document.getElementById('register').removeAttribute('aria-busy')"
+     hx-on::after-settle="if (document.activeElement === document.body) document.querySelector('#register nav a[id^=pager-]')?.focus()">
+
+  <p id="register-status" role="status" class="sr-only"></p>
+
+  {% include "orders/_register.html" %}
+</div>
+
+{% comment %} orders/_register.html — what a page request renders inside the shell and what
+   every swap returns on its own. {% endcomment %}
+<div id="register" class="rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 sm:table-cell">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in page_obj %}
+        <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium tabular-nums">{{ o.number }}</td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell">{{ o.vendor.name }}</td>
+          <td class="px-4 py-2.5 text-right tabular-nums">₹{{ o.amount|intcomma }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <nav aria-label="Order register pages"
+       class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+
+    <p class="text-[13px]/5 tabular-nums text-zinc-600">
+      {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count|intcomma }} orders
+    </p>
+
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_previous %}
+        <a id="pager-prev" href="?{{ base_query }}&amp;page={{ page_obj.previous_page_number }}" rel="prev" aria-label="Previous page"
+           hx-get="?{{ base_query }}&amp;page={{ page_obj.previous_page_number }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+           class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-left" class="size-4"></i>
+        </a>
+      {% else %}
+        <button id="pager-prev" type="button" disabled aria-label="Previous page"
+                class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-400">
+          <i data-lucide="chevron-left" class="size-4"></i>
+        </button>
+      {% endif %}
+
+      <ul role="list" class="hidden items-center gap-1 md:flex">
+        {% for p in page_range %}
+          <li>
+            {% if p == page_obj.paginator.ELLIPSIS %}
+              <span aria-hidden="true" class="flex size-9 items-center justify-center text-[13px]/5 text-zinc-500">{{ p }}</span>
+            {% elif p == page_obj.number %}
+              <a id="page-{{ p }}" href="?{{ base_query }}&amp;page={{ p }}" aria-label="Page {{ p }}" aria-current="page"
+                 hx-get="?{{ base_query }}&amp;page={{ p }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+                 class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-medium tabular-nums text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ p }}</a>
+            {% else %}
+              <a id="page-{{ p }}" href="?{{ base_query }}&amp;page={{ p }}" aria-label="Page {{ p }}"
+                 hx-get="?{{ base_query }}&amp;page={{ p }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+                 class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ p }}</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if page_obj.has_next %}
+        <a id="pager-next" href="?{{ base_query }}&amp;page={{ page_obj.next_page_number }}" rel="next" aria-label="Next page"
+           hx-get="?{{ base_query }}&amp;page={{ page_obj.next_page_number }}" hx-target="#register" hx-swap="outerHTML" hx-push-url="true"
+           class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-right" class="size-4"></i>
+        </a>
+      {% else %}
+        <button id="pager-next" type="button" disabled aria-label="Next page"
+                class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-400">
+          <i data-lucide="chevron-right" class="size-4"></i>
+        </button>
+      {% endif %}
+    </div>
+  </nav>
+</div>
+
+{% comment %} The out-of-band half, and only on a swap. htmx strips an oob element out of
+   a response and writes it into the node it names; on a full page load it is
+   ordinary markup and would print the sentence on screen. {% endcomment %}
+{% if request.htmx %}
+  <span hx-swap-oob="innerHTML:#register-status">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}, showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} orders</span>
+{% endif %}
+
+{% comment %} orders/views.py
+
+   def register(request):
+       orders = Order.objects.select_related('vendor').order_by('-raised_on')
+       paginator = Paginator(orders, 25)
+       page_obj = paginator.get_page(request.GET.get('page'))
+       template = ('orders/_register.html' if request.htmx
+                   else 'orders/register.html')
+       return render(request, template, {
+           'page_obj': page_obj,
+           'page_range': paginator.get_elided_page_range(
+               page_obj.number, on_each_side=1, on_ends=1),
+           'base_query': urlencode({'q': request.GET.get('q', ''),
+                                    'size': request.GET.get('size', '25')}),
+       })
+
+   get_page rather than page: it takes a page number that is not a number, or
+   is past the end, and returns the first or last page instead of raising, which
+   is what a bookmarked ?page=98 on a register that has since shrunk needs.
+
+   The swap returns the partial and the page returns the shell around it, which
+   is the only reason the shell survives its own swaps. Return the page template
+   to a swap and the response carries a second shell, which htmx drops inside
+   the first one along with a duplicate of every id in it. {% endcomment %}

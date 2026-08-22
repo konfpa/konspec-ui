@@ -56,7 +56,7 @@
     <span x-text="applied.label">01 Aug 2026 – 31 Aug 2026</span>
   </button>
 
-  <div id="pop-dt" x-ref="panel" x-show="open" x-cloak x-transition.opacity.duration.100ms
+  <div id="pop-dt" x-ref="panel" x-show="open" x-cloak
        role="dialog" tabindex="-1" aria-labelledby="pop-dt-title"
        class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
 
@@ -92,7 +92,7 @@
     </div>
 
     <div class="flex items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-4 py-2.5">
-      <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Cancel</button>
+      <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
       <button type="button" @click="apply()"
               class="rounded-lg bg-zinc-700 px-3.5 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Apply</button>
     </div>

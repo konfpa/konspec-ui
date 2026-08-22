@@ -1,0 +1,100 @@
+<!-- The panel opens on the click and the body arrives afterwards, because the
+     row already knows the item and the balances are a query. Waiting for the
+     response before showing anything is the alternative, and it is worse: the
+     button appears to do nothing for as long as the request takes.
+
+     The title comes from the row, so the dialog is labelled from the first
+     frame. A panel whose aria-labelledby points into content that has not
+     arrived is an unlabelled dialog for the length of the request.
+
+     Alpine decides when to fetch and htmx does the fetching, because Alpine
+     does not fetch. The request is a custom event dispatched at the moment the
+     panel opens. loaded is set from htmx:afterSwap rather than from the click,
+     so a failed fetch leaves it false and the next open tries again, while a
+     successful one is never fetched twice for the life of the page.
+
+     The skeleton is the shape of the answer — three rows of a balance, not a
+     grey rectangle. A centred panel is centred on its own height, so one that
+     grows when the data lands moves everything in it, including the close
+     button the user was already reaching for. It is aria-hidden, and the
+     sr-only line beside it is what a reader entering the panel is told while
+     it is busy.
+
+     createIcons runs once at load and never sees markup that arrives in a swap,
+     so there is no <i data-lucide> in what the server sends. What comes back is
+     rows of words and figures. -->
+<div data-kui="dialog/deferred"
+     x-data="{
+       open: false, loaded: false, failed: false,
+       show() {
+         this.open = true;
+         if (!this.loaded) this.$refs.body.dispatchEvent(new CustomEvent('dialog-fetch'));
+       },
+       retry() { this.failed = false; this.$refs.body.dispatchEvent(new CustomEvent('dialog-fetch')) }
+     }"
+     @htmx:after-swap.camel="loaded = true; failed = false"
+     @htmx:response-error.camel="failed = true">
+  <button type="button" @click="show()"
+          class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="warehouse" class="size-4 text-zinc-600"></i>Stock at other plants
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="ddef-title"
+         class="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+        <div class="min-w-0">
+          <h2 id="ddef-title" class="truncate text-[16px]/6 font-semibold">MS angle 50×50×6</h2>
+          <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">Item 1042-MSA-5006 · stock as at 21 Aug 2026</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto px-5 py-2">
+        <div x-ref="body" x-show="!failed"
+             hx-get="/items/1042-MSA-5006/stock/" hx-trigger="dialog-fetch"
+             hx-swap="innerHTML" hx-sync="this:drop"
+             :aria-busy="!loaded">
+          <span x-show="!loaded" class="sr-only">Loading stock at other plants</span>
+          <div class="animate-pulse py-1" aria-hidden="true">
+            <div class="flex items-center justify-between gap-4 border-b border-zinc-100 py-3.5">
+              <div class="h-2.5 w-32 rounded bg-zinc-200"></div>
+              <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+            </div>
+            <div class="flex items-center justify-between gap-4 border-b border-zinc-100 py-3.5">
+              <div class="h-2.5 w-24 rounded bg-zinc-200"></div>
+              <div class="h-2.5 w-16 rounded bg-zinc-200"></div>
+            </div>
+            <div class="flex items-center justify-between gap-4 py-3.5">
+              <div class="h-2.5 w-28 rounded bg-zinc-200"></div>
+              <div class="h-2.5 w-20 rounded bg-zinc-200"></div>
+            </div>
+          </div>
+        </div>
+
+        <div x-show="failed" x-cloak class="py-4">
+          <div class="flex items-start gap-3">
+            <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+            <div class="min-w-0">
+              <p class="text-[13px]/5 font-medium">Could not read the plant balances.</p>
+              <p class="mt-1 text-[12px]/4 text-zinc-600">The item itself is fine — this is the stock service.</p>
+            </div>
+          </div>
+          <button type="button" @click="retry()"
+                  class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="rotate-ccw" class="size-3.5 text-zinc-600"></i>Try again
+          </button>
+        </div>
+      </div>
+
+      <div class="flex shrink-0 justify-end border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

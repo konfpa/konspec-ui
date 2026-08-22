@@ -24,6 +24,14 @@
      every 400ms under a live region queues announcements faster than they can be
      spoken — so the status carries milestones only, at every 25%.
 
+     The handoff itself gets its own message, and it is the total rather than a
+     zero. At the moment the count lands the first milestone has not been crossed
+     yet, so a status written as the milestone alone announces "0 per cent
+     imported" — which is both the least useful thing it could say and, arriving
+     immediately after "Counting the rows", reads as the job having gone
+     backwards. The denominator is the news: that is what the spinner could not
+     give and what the bar exists because of.
+
      x-cloak on the branch hidden at first paint, because Alpine boots after the
      HTML renders and without it the bar flashes under the spinner on load. -->
 <div data-kui="progress/indeterminate" class="max-w-md rounded-xl border border-zinc-300 bg-white p-4"
@@ -80,6 +88,7 @@
        document before either message lands. -->
   <p role="status" class="sr-only"
      x-text="phase === 'counting' ? 'Counting the rows in the upload'
-             : phase === 'done' ? 'Import finished, 3,100 rows'
+             : phase === 'done' ? 'Import finished, ' + total.toLocaleString('en-IN') + ' rows'
+             : said === 0 ? 'Importing ' + total.toLocaleString('en-IN') + ' rows'
              : said + ' per cent imported'"></p>
 </div>

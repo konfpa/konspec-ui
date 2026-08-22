@@ -1,0 +1,61 @@
+<!-- The segmented run says a stage is a position and spends three greys on it.
+     This is the one exception, and it is an exception because a rejected stage
+     has stopped being a position: the run halted at it and will not advance
+     until somebody approves a deviation or sends the lot back. red-600 is the
+     dot-or-bar shade from the semantic table, on the block that failed and on
+     no other block.
+
+     Nothing here is zinc-400. In the ordinary strip that grey is the stage in
+     progress, and there is no stage in progress — painting block 4 with it says
+     the run moved past the rejection, which is the single fact this panel exists
+     to deny.
+
+     aria-valuenow stays at 2 and does not advance to 3. Two stages completed;
+     the third was attempted and refused, and a valuenow of 3 announces the
+     failed one as done. The valuetext carries the halt, because "2 of 6" read on
+     its own is a run that is merely early.
+
+     No aria-live anywhere in it. The rejection happened on the floor on 19 Aug
+     and this panel is being read afterwards; a live region would announce it as
+     news every time the page rendered.
+
+     The reason line is part of the component, not decoration under it. A strip
+     with a red block in it can say that a stage failed and cannot say which
+     limit, which lot or what clears it, and "Rejected" with no figure beside it
+     is a screen somebody has to leave in order to act on. -->
+<div data-kui="progress/stage-failed" class="max-w-xl rounded-xl border border-zinc-300 bg-white p-4">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+    <h3 id="pg-halt-stage" class="text-[13px]/5 font-medium">GRN-24-0912 · Inward to putaway</h3>
+    <p class="text-[13px]/5 tabular-nums text-red-600">Stopped at stage 3 of 6</p>
+  </div>
+
+  <div class="mt-2.5 flex gap-1"
+       role="progressbar" aria-labelledby="pg-halt-stage"
+       aria-valuenow="2" aria-valuemin="0" aria-valuemax="6"
+       aria-valuetext="Stage 3 of 6, inward QC rejected — the run has stopped">
+    <span class="h-2 flex-1 rounded-full bg-zinc-700"></span>
+    <span class="h-2 flex-1 rounded-full bg-zinc-700"></span>
+    <span class="h-2 flex-1 rounded-full bg-red-600"></span>
+    <span class="h-2 flex-1 rounded-full bg-zinc-200"></span>
+    <span class="h-2 flex-1 rounded-full bg-zinc-200"></span>
+    <span class="h-2 flex-1 rounded-full bg-zinc-200"></span>
+  </div>
+
+  <div class="mt-1.5 hidden gap-1 sm:flex" aria-hidden="true">
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Gate entry</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Unloaded</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 font-medium text-zinc-900">Inward QC</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">GRN posted</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Putaway</span>
+    <span class="min-w-0 flex-1 truncate text-[11px]/4 text-zinc-500">Invoice</span>
+  </div>
+
+  <div class="mt-3 flex items-start gap-2.5 border-t border-zinc-100 pt-3">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 font-medium">Inward QC rejected 2 of 8 bags on 19 Aug</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Moisture 0.42% against a 0.25% limit · lot GP-4471, Gujarat Polymers Ltd. Nothing moves to putaway until a deviation is approved or the lot goes back on a return note.</p>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-500">Raised by Ritu Deshpande · <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">open the QC record</a></p>
+    </div>
+  </div>
+</div>

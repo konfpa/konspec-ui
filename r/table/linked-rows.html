@@ -1,0 +1,139 @@
+<!-- One anchor per row, in the identifying cell, stretched over the row with
+     after:absolute after:inset-0 against a relative <tr>. The three obvious
+     alternatives are all worse. An <a> wrapped around a <tr> is deleted by the
+     parser before any stylesheet sees it. An <a> in every cell is six tab stops
+     for one record and sixty on a page of ten. A click handler on the <tr> is
+     not a link at all: middle-click does not open a tab, Ctrl-click does not
+     either, the status bar shows no URL, and nothing is copyable.
+
+     Anything else in the row that is interactive has to be lifted above the
+     overlay — relative z-10 on the vendor link and on the actions cell — or the
+     stretched anchor eats their clicks and every control in the row silently
+     opens the record instead of doing its own job.
+
+     The cost is real and worth stating: a stretched anchor makes the row text
+     unselectable by dragging. A register whose figures get copied into an email
+     should link from the PO number alone and leave the row inert.
+
+     Keyboard focus tints the row as well as drawing the outline on the anchor,
+     through has-[a:focus-visible]. Without it a keyboard user tabbing down the
+     column gets a 12px outline on a PO number and no sense of which row they
+     are on.
+
+     Below md the card is the link and the row menu is gone. Two overlapping hit
+     targets inside a 44px card is a coin toss on a phone; the actions live on
+     the record. -->
+<div data-kui="table/linked-rows" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Status</th>
+        <th scope="col" class="w-12 px-4 py-2.5"><span class="sr-only">Row actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="relative border-b border-zinc-100 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+        <td class="px-4 py-2 font-medium tabular-nums">
+          <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1187</a>
+        </td>
+        <td class="px-4 py-2">
+          <a href="#" class="relative z-10 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Sharma Extrusions</a>
+        </td>
+        <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap">₹18,42,000</td>
+        <td class="px-4 py-2">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+        </td>
+        <td class="relative z-10 w-12 px-4 py-2 text-right">
+          <button type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for PO-24-1187"
+                  class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="more-horizontal" class="size-4"></i>
+          </button>
+        </td>
+      </tr>
+      <tr class="relative border-b border-zinc-100 hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+        <td class="px-4 py-2 font-medium tabular-nums">
+          <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1191</a>
+        </td>
+        <td class="px-4 py-2">
+          <a href="#" class="relative z-10 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Nashik Steel Traders</a>
+        </td>
+        <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap">₹4,68,500</td>
+        <td class="px-4 py-2">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+          </span>
+        </td>
+        <td class="relative z-10 w-12 px-4 py-2 text-right">
+          <button type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for PO-24-1191"
+                  class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="more-horizontal" class="size-4"></i>
+          </button>
+        </td>
+      </tr>
+      <tr class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+        <td class="px-4 py-2 font-medium tabular-nums">
+          <a href="#" class="underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1194</a>
+        </td>
+        <td class="px-4 py-2">
+          <a href="#" class="relative z-10 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Gujarat Polymers Ltd</a>
+        </td>
+        <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap">₹27,10,400</td>
+        <td class="px-4 py-2">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+          </span>
+        </td>
+        <td class="relative z-10 w-12 px-4 py-2 text-right">
+          <button type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for PO-24-1194"
+                  class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="more-horizontal" class="size-4"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+      <div class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1187</a>
+          <span class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</span>
+        </div>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">Sharma Extrusions</p>
+        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+        </span>
+      </div>
+    </li>
+    <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+      <div class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1191</a>
+          <span class="shrink-0 text-[14px]/5 tabular-nums">₹4,68,500</span>
+        </div>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">Nashik Steel Traders</p>
+        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>Approved
+        </span>
+      </div>
+    </li>
+    <li class="relative hover:bg-zinc-100 has-[a:focus-visible]:bg-zinc-100">
+      <div class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <a href="#" class="text-[14px]/5 font-medium tabular-nums underline underline-offset-2 after:absolute after:inset-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1194</a>
+          <span class="shrink-0 text-[14px]/5 tabular-nums">₹27,10,400</span>
+        </div>
+        <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd</p>
+        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
+        </span>
+      </div>
+    </li>
+  </ul>
+</div>

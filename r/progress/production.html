@@ -18,6 +18,15 @@
      shrinking it. The bar in the last row is zinc-700 at 0%, which renders as a
      bare rail — a step that has not started, not a step at 2px.
 
+     Operation 10 is the same overshoot one level down and is drawn the same way.
+     It reports 12,480 kg against a plan of 12,000, so it cannot print a flat
+     emerald 100% under a panel heading that says 104%: a reader comparing the
+     two would take the operation as having landed on plan and the variance as
+     coming from somewhere further down the route. Amber, clamped, with the true
+     figure in aria-valuetext, exactly as above. Operation 20 is emerald at a
+     real 100% — 12,480 trimmed of 12,480 — which is what the difference between
+     the two rows is there to show.
+
      Nothing in the panel is focusable except the link out to the order, which is
      the record number in text. A progressbar is output, and Tab has nothing to do
      inside one. -->
@@ -83,10 +92,11 @@
         <span class="flex items-center gap-2 sm:order-3">
           <span class="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-zinc-200"
                 role="progressbar" aria-label="Operation 10, blow moulding"
-                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-            <span class="block h-full rounded-full bg-emerald-600" style="width: 100%"></span>
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+                aria-valuetext="104% built, over by 480 kg">
+            <span class="block h-full rounded-full bg-amber-500" style="width: 100%"></span>
           </span>
-          <span class="w-10 shrink-0 text-right text-[12px]/4 tabular-nums text-zinc-600">100%</span>
+          <span class="w-10 shrink-0 text-right text-[12px]/4 tabular-nums text-amber-700">104%</span>
         </span>
         <span class="text-[12px]/4 tabular-nums text-zinc-500 sm:order-2 sm:pr-4">12,480 / 12,000 kg</span>
       </li>

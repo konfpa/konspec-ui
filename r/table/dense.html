@@ -1,3 +1,17 @@
+<!-- The same table at py-1.5 and px-3 instead of py-2.5 and px-4, which puts
+     about half again as many rows in the same height. Nothing else changes: the
+     type stays at 13px, because a register read all day is read at the body
+     size and dropping it to 12 to fit one more row is a trade nobody asked for.
+
+     Density is a property of the screen, not of the record. A stores clerk
+     reconciling four hundred lines wants this; the same table on a dashboard
+     beside three charts wants the default. Do not mix the two in one view — two
+     row heights on one page reads as a rendering fault.
+
+     The overdue date is red text rather than a red row. Colour marks the one
+     fact that is wrong, and red-600 is the shade the token table gives for a
+     mark you read. A tinted row would say the whole record is in an alarm
+     state, which is not what a late delivery date means. -->
 <div data-kui="table/dense" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="w-full text-[13px]/5">
     <thead>
@@ -14,36 +28,36 @@
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1187</td>
         <td class="px-3 py-1.5">Sharma Extrusions</td>
         <td class="px-3 py-1.5 text-zinc-600">Fabrication</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹18,42,000</td>
-        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums">12 Aug</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹18,42,000</td>
+        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">12 Aug</td>
       </tr>
       <tr class="border-b border-zinc-100 hover:bg-zinc-100">
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1191</td>
         <td class="px-3 py-1.5">Nashik Steel Traders</td>
         <td class="px-3 py-1.5 text-zinc-600">Dispatch</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹4,68,500</td>
-        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums">19 Aug</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹4,68,500</td>
+        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">19 Aug</td>
       </tr>
       <tr class="border-b border-zinc-100 hover:bg-zinc-100">
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1194</td>
         <td class="px-3 py-1.5">Gujarat Polymers Ltd</td>
         <td class="px-3 py-1.5 text-zinc-600">Compounding</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹27,10,400</td>
-        <td class="px-3 py-1.5 text-right text-red-600 tabular-nums">02 Aug</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹27,10,400</td>
+        <td class="px-3 py-1.5 text-right text-red-600 tabular-nums whitespace-nowrap">02 Aug</td>
       </tr>
       <tr class="border-b border-zinc-100 hover:bg-zinc-100">
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1199</td>
         <td class="px-3 py-1.5">Nashik Steel Traders</td>
         <td class="px-3 py-1.5 text-zinc-600">Maintenance</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹1,32,900</td>
-        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums">22 Aug</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹1,32,900</td>
+        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">22 Aug</td>
       </tr>
       <tr class="hover:bg-zinc-100">
         <td class="px-3 py-1.5 font-medium tabular-nums">PO-24-1203</td>
         <td class="px-3 py-1.5">Sharma Extrusions</td>
         <td class="px-3 py-1.5 text-zinc-600">Tooling</td>
-        <td class="px-3 py-1.5 text-right tabular-nums">₹96,750</td>
-        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums">28 Jul</td>
+        <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">₹96,750</td>
+        <td class="px-3 py-1.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">28 Jul</td>
       </tr>
     </tbody>
   </table>

@@ -1,0 +1,94 @@
+<!-- table-fixed first, and every width declared on the header. Under the
+     default auto layout one long description takes as much width as it wants
+     and squeezes the figures beside it into two lines each, so the column that
+     matters least decides the shape of the ones that matter most. Fixed layout
+     also gives every cell a definite width, which is what truncate needs — on
+     an auto-layout table it silently does nothing.
+
+     Three values, three different answers, and the choice is not a matter of
+     taste.
+
+     An identifier never truncates. A batch reference cut off at the column edge
+     is not a shortened value, it is a different value, and somebody will read
+     it into an email or type it into a search. It wraps instead, with break-all
+     because it has no spaces to wrap at.
+
+     A description clamps to two lines. Most of it is readable in place, the row
+     height stays bounded, and nothing is claimed to be complete.
+
+     Only incidental prose truncates, and title is a pointer-only affordance
+     that reaches nobody on a keyboard or a phone — so a value is only allowed
+     to truncate when the full text is one click away on the record itself.
+
+     align-top on the rows, or a two-line cell centres itself against the
+     single-line ones and the column of figures stops being a straight line.
+     Figures take whitespace-nowrap as well, or ₹10,44,000 breaks between the
+     symbol and the digits in a narrow column.
+
+     At 390px nothing truncates at all. A phone is short of width, not of
+     height, and the card can afford four lines. -->
+<div data-kui="table/long-values" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="hidden w-full table-fixed text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-[34%] px-4 py-2.5 font-medium">Item</th>
+        <th scope="col" class="w-[22%] px-4 py-2.5 font-medium">Vendor batch</th>
+        <th scope="col" class="w-[16%] px-4 py-2.5 text-right font-medium">Received</th>
+        <th scope="col" class="w-[28%] px-4 py-2.5 font-medium">Remark</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 align-top">
+        <td class="px-4 py-2.5">
+          <span class="line-clamp-2">Low density polyethylene granules, natural, film grade, MFI 0.9, 25 kg laminated bags</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">ITM-1042</span>
+        </td>
+        <td class="px-4 py-2.5 break-all tabular-nums text-zinc-600">GJ-POLY/2026/HDPE-NAT-25KG/4471</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">12,000 kg</td>
+        <td class="px-4 py-2.5">
+          <span class="block truncate text-zinc-600" title="Two bags short against the challan; short-supply note raised with the vendor on 05 Sep 2026.">Two bags short against the challan; short-supply note raised</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 align-top">
+        <td class="px-4 py-2.5">
+          <span class="line-clamp-2">Masterbatch, white, 60% titanium dioxide, food contact grade</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">ITM-1091</span>
+        </td>
+        <td class="px-4 py-2.5 break-all tabular-nums text-zinc-600">MB-WHT-60/AUG26/L-0912</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">250 kg</td>
+        <td class="px-4 py-2.5 text-zinc-500">—</td>
+      </tr>
+      <tr class="align-top">
+        <td class="px-4 py-2.5">
+          <span class="line-clamp-2">M12 × 60 hexagon head bolt, property class 8.8, zinc plated, with nut and washer</span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500">ITM-3310</span>
+        </td>
+        <td class="px-4 py-2.5 break-all tabular-nums text-zinc-600">NSTL/FAST/26-27/HEAT-K4419</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">4,000 nos</td>
+        <td class="px-4 py-2.5">
+          <span class="block truncate text-zinc-600" title="Mill test certificate pending; released to stores against an undertaking.">Mill test certificate pending; released against undertaking</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="px-4 py-3">
+      <p class="text-[13px]/5 font-medium">Low density polyethylene granules, natural, film grade, MFI 0.9, 25 kg laminated bags</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-1042 · 12,000 kg</p>
+      <p class="mt-1 text-[12px]/4 break-all tabular-nums text-zinc-500">GJ-POLY/2026/HDPE-NAT-25KG/4471</p>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-600">Two bags short against the challan; short-supply note raised with the vendor on 05 Sep 2026.</p>
+    </li>
+    <li class="px-4 py-3">
+      <p class="text-[13px]/5 font-medium">Masterbatch, white, 60% titanium dioxide, food contact grade</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-1091 · 250 kg</p>
+      <p class="mt-1 text-[12px]/4 break-all tabular-nums text-zinc-500">MB-WHT-60/AUG26/L-0912</p>
+    </li>
+    <li class="px-4 py-3">
+      <p class="text-[13px]/5 font-medium">M12 × 60 hexagon head bolt, property class 8.8, zinc plated, with nut and washer</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">ITM-3310 · 4,000 nos</p>
+      <p class="mt-1 text-[12px]/4 break-all tabular-nums text-zinc-500">NSTL/FAST/26-27/HEAT-K4419</p>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-600">Mill test certificate pending; released to stores against an undertaking.</p>
+    </li>
+  </ul>
+</div>

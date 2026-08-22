@@ -16,10 +16,14 @@
      The trail is the parent and the current page, never four crumbs. Four
      crumbs at 390px either wrap onto a second line or push the page sideways,
      and both are worse than showing two. The last crumb is the one that is
-     never truncated — it is the one that says where you are. -->
+     never truncated — it is the one that says where you are.
+
+     The hamburger has aria-expanded and no aria-controls: the sheet it opens is
+     the sidebar's and is not in this block, and an aria-controls naming an id
+     that is not on the page is a broken reference rather than a hint. -->
 <div data-kui="topbar/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
   <header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-2">
-    <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="tb-ph-nav"
+    <button type="button" aria-label="Open navigation" aria-expanded="false"
             class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="menu" class="size-5"></i>
     </button>
@@ -47,7 +51,7 @@
     </button>
   </header>
 
-  <div class="flex flex-wrap items-center gap-1.5 border-b border-zinc-200 bg-white px-3 pb-2">
+  <div class="flex flex-wrap items-center gap-1.5 border-b border-zinc-200 bg-white px-3 pt-1.5 pb-2">
     <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">Vasai plant</span>
     <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-1 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">
       <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>FY 2024-25

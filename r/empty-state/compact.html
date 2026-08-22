@@ -7,7 +7,13 @@
      What it does not drop is the distinction between the states. The first tile
      has nothing yet and offers the create route; the second has rows that a
      filter is hiding and offers to clear it; the third failed and offers Retry.
-     Shrinking the box is not a reason to collapse four messages into "No data".
+     Shrinking the box is not a reason to collapse the states into "No data".
+
+     The tile title is the heading and the message under it is a paragraph. A
+     second heading inside a 110px box adds a level to the document outline that
+     nobody navigates by, which is the opposite of the rule in the full-size
+     variants, where the panel title is an h2 and the empty headline is the h3
+     under it.
 
      No min-height here. A tile sized to a fixed grid row already has its height
      from the grid, and adding one on top of it is how a dashboard ends up with
@@ -32,7 +38,7 @@
         <i data-lucide="filter-x" class="size-4 text-zinc-600"></i>
       </span>
       <p class="mt-2 text-[13px]/5 font-medium">None for Dispatch</p>
-      <p class="mt-0.5 text-[12px]/4 text-zinc-500">Seven overdue across the other cost centres.</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums">Seven overdue across the other cost centres.</p>
       <button type="button"
               class="mt-2 text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Show all cost centres

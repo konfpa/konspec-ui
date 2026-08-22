@@ -1,0 +1,144 @@
+<!-- A queue with a fixed height is where the absolutely-positioned bubble
+     runs out of room, and it is worth saying exactly why rather than reaching
+     for position:fixed.
+
+     overflow-y:auto computes overflow-x to auto as well. There is no such
+     thing as a box that scrolls one axis and lets a child hang out of the
+     other, so a bubble placed above, below or right of a row in this list is
+     either cut off at the box edge or gives the list a horizontal scrollbar it
+     never had. The bubble goes inside the box, on the row it belongs to,
+     left of the button — where the only thing it can cover is the row text,
+     which is still there when it closes.
+
+     Scrolling hides it. A wheel under a stationary pointer moves the row out
+     from under the cursor without firing mouseleave, and the bubble is left
+     naming the batch that used to be there — in a queue of near-identical
+     numbers, pointing confidently at the wrong record. The handler is bound on
+     the scroller and on the window, because the page moves too, and it is
+     passive so the list still scrolls at full rate.
+
+     What focus opened survives a scroll, and that distinction is not
+     decoration. Tabbing to a row that is half out of view makes the browser
+     scroll it into view, which fires scroll a frame after the focus handler
+     opened the label — so a scroll handler that closed everything would close
+     the label the keypress just asked for, every time, and the queue would be
+     unlabelled for exactly the people who need the labels. via records which
+     input opened it.
+
+     The header sits outside the scroller so it does not scroll away, and the
+     card keeps its rounded corners while the scroller keeps square ones —
+     rounding the scroller would clip the first and last row against a curve. -->
+<div data-kui="tooltip/scrolling" class="max-w-md rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       open: null, via: null, timer: 0,
+       over(id) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id, 'pointer') },
+       show(id, how) {
+         clearTimeout(this.timer);
+         const d = how === 'focus' ? 0 : 150;
+         this.timer = setTimeout(() => { this.open = id; this.via = how }, d);
+       },
+       hide() { clearTimeout(this.timer); this.open = null; this.via = null },
+       scrolled() { if (this.via === 'pointer') this.hide() }
+     }"
+     @scroll.window.passive="scrolled()"
+     @keydown.escape.window="hide()">
+
+  <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-2">
+    <h3 class="text-[13px]/5 font-medium">Inspection queue</h3>
+    <span class="text-[12px]/4 tabular-nums text-zinc-500">6 on hold</span>
+  </div>
+
+  <div class="max-h-56 overflow-y-auto" @scroll.passive="scrolled()">
+
+    <div class="flex items-center gap-3 border-b border-zinc-100 px-4 py-2 hover:bg-zinc-100">
+      <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+      <span class="min-w-0 flex-1 truncate text-[13px]/5"><span class="font-medium tabular-nums">B-2608-14</span> · HDPE blow moulding</span>
+      <span class="relative inline-flex shrink-0">
+        <button type="button" aria-label="Open the inspection for B-2608-14"
+                @mouseenter="over('b14')" @mouseleave="hide()"
+                @focus="if ($event.target.matches(':focus-visible')) show('b14', 'focus')" @blur="hide()"
+                class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="clipboard-check" class="size-4"></i>
+        </button>
+        <span aria-hidden="true" x-show="open === 'b14'" x-cloak x-transition.opacity.duration.100ms
+              class="pointer-events-none absolute top-1/2 right-full z-40 mr-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Open the inspection</span>
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3 border-b border-zinc-100 px-4 py-2 hover:bg-zinc-100">
+      <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+      <span class="min-w-0 flex-1 truncate text-[13px]/5"><span class="font-medium tabular-nums">B-2608-15</span> · HDPE blow moulding</span>
+      <span class="relative inline-flex shrink-0">
+        <button type="button" aria-label="Open the inspection for B-2608-15"
+                @mouseenter="over('b15')" @mouseleave="hide()"
+                @focus="if ($event.target.matches(':focus-visible')) show('b15', 'focus')" @blur="hide()"
+                class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="clipboard-check" class="size-4"></i>
+        </button>
+        <span aria-hidden="true" x-show="open === 'b15'" x-cloak x-transition.opacity.duration.100ms
+              class="pointer-events-none absolute top-1/2 right-full z-40 mr-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Open the inspection</span>
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3 border-b border-zinc-100 px-4 py-2 hover:bg-zinc-100">
+      <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+      <span class="min-w-0 flex-1 truncate text-[13px]/5"><span class="font-medium tabular-nums">B-2608-16</span> · LLDPE film grade</span>
+      <span class="relative inline-flex shrink-0">
+        <button type="button" aria-label="Open the inspection for B-2608-16"
+                @mouseenter="over('b16')" @mouseleave="hide()"
+                @focus="if ($event.target.matches(':focus-visible')) show('b16', 'focus')" @blur="hide()"
+                class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="clipboard-check" class="size-4"></i>
+        </button>
+        <span aria-hidden="true" x-show="open === 'b16'" x-cloak x-transition.opacity.duration.100ms
+              class="pointer-events-none absolute top-1/2 right-full z-40 mr-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Open the inspection</span>
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3 border-b border-zinc-100 px-4 py-2 hover:bg-zinc-100">
+      <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+      <span class="min-w-0 flex-1 truncate text-[13px]/5"><span class="font-medium tabular-nums">B-2608-17</span> · LLDPE film grade</span>
+      <span class="relative inline-flex shrink-0">
+        <button type="button" aria-label="Open the inspection for B-2608-17"
+                @mouseenter="over('b17')" @mouseleave="hide()"
+                @focus="if ($event.target.matches(':focus-visible')) show('b17', 'focus')" @blur="hide()"
+                class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="clipboard-check" class="size-4"></i>
+        </button>
+        <span aria-hidden="true" x-show="open === 'b17'" x-cloak x-transition.opacity.duration.100ms
+              class="pointer-events-none absolute top-1/2 right-full z-40 mr-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Open the inspection</span>
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3 border-b border-zinc-100 px-4 py-2 hover:bg-zinc-100">
+      <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+      <span class="min-w-0 flex-1 truncate text-[13px]/5"><span class="font-medium tabular-nums">B-2608-18</span> · PP copolymer</span>
+      <span class="relative inline-flex shrink-0">
+        <button type="button" aria-label="Open the inspection for B-2608-18"
+                @mouseenter="over('b18')" @mouseleave="hide()"
+                @focus="if ($event.target.matches(':focus-visible')) show('b18', 'focus')" @blur="hide()"
+                class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="clipboard-check" class="size-4"></i>
+        </button>
+        <span aria-hidden="true" x-show="open === 'b18'" x-cloak x-transition.opacity.duration.100ms
+              class="pointer-events-none absolute top-1/2 right-full z-40 mr-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Open the inspection</span>
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3 px-4 py-2 hover:bg-zinc-100">
+      <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>
+      <span class="min-w-0 flex-1 truncate text-[13px]/5"><span class="font-medium tabular-nums">B-2608-19</span> · PP copolymer</span>
+      <span class="relative inline-flex shrink-0">
+        <button type="button" aria-label="Open the inspection for B-2608-19"
+                @mouseenter="over('b19')" @mouseleave="hide()"
+                @focus="if ($event.target.matches(':focus-visible')) show('b19', 'focus')" @blur="hide()"
+                class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="clipboard-check" class="size-4"></i>
+        </button>
+        <span aria-hidden="true" x-show="open === 'b19'" x-cloak x-transition.opacity.duration.100ms
+              class="pointer-events-none absolute top-1/2 right-full z-40 mr-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Open the inspection</span>
+      </span>
+    </div>
+
+  </div>
+</div>

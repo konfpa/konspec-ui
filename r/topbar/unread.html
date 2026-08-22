@@ -1,0 +1,49 @@
+<!-- The number belongs to the server and it changes while the user is reading
+     something else, so it is polled. What is polled is the mark inside the
+     control and never the control itself: swap the anchor and htmx takes the
+     focused element out of the document mid-Tab, and any panel hanging off it
+     closes halfway through being read.
+
+     Naming the trigger is what makes the poll safe on a control that also
+     navigates. hx-trigger replaces the default, so htmx listens for the timer
+     and for nothing else, and the click follows the href the way it would with
+     no htmx on the page at all. Leave hx-trigger off and the bell stops being a
+     link the first time the script loads.
+
+     The accessible name is the contents of the swapped fragment rather than an
+     aria-label. An aria-label is a string the swap cannot reach, so the disc
+     would read 12 while the control went on announcing three, and nothing on
+     screen would say which was wrong. The disc itself is aria-hidden, or the
+     figure is announced twice.
+
+     Nothing here is a live region. aria-live on the mark interrupts whatever
+     the user is in the middle of, once a minute, all day. The announcement is a
+     separate role="status" — polite by definition — that the reply swaps out of
+     band, and only when the count has gone up, so a queue draining in the
+     background says nothing:
+
+       <span id="tb-queue"> … 12 … </span>
+       <p id="tb-queue-live" hx-swap-oob="true" role="status" class="sr-only">4 more orders need your approval.</p>
+
+     Past 99 the mark reads 99+ and stops growing. tabular-nums and a min-w on
+     the disc, or the bar shifts sideways as digits arrive and the avatar moves
+     out from under the cursor. Graphite, not red: red is the alarm state, and a
+     bell that is red every morning has nothing left to say on the morning
+     something is genuinely late. -->
+<header data-kui="topbar/unread" class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4">
+  <p class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">Purchase orders</p>
+
+  <a href="/approvals/"
+     hx-get="/approvals/mark/" hx-trigger="every 60s" hx-target="#tb-queue" hx-swap="outerHTML"
+     class="relative flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="bell" class="size-[18px]"></i>
+    <span id="tb-queue">
+      <span class="sr-only">Approvals, 12 waiting on you</span>
+      <span aria-hidden="true" class="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">12</span>
+    </span>
+  </a>
+
+  <p id="tb-queue-live" role="status" class="sr-only"></p>
+
+  <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">RM</span>
+</header>

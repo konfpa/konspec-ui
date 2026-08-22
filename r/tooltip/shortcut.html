@@ -20,6 +20,7 @@
 <div data-kui="tooltip/shortcut" class="flex flex-wrap items-center gap-3"
      x-data="{
        open: null, timer: 0,
+       over(id) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id) },
        show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
        hide() { clearTimeout(this.timer); this.open = null }
      }"
@@ -27,7 +28,7 @@
 
   <span class="relative inline-flex">
     <button type="button" aria-describedby="tt-save" aria-keyshortcuts="Control+S"
-            @mouseenter="show('save')" @mouseleave="hide()"
+            @mouseenter="over('save')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('save', 0)" @blur="hide()"
             class="flex items-center gap-2 rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="save" class="size-4"></i>Save draft
@@ -41,7 +42,7 @@
 
   <span class="relative inline-flex">
     <button type="button" aria-label="Search orders" aria-describedby="tt-search" aria-keyshortcuts="Control+K"
-            @mouseenter="show('search')" @mouseleave="hide()"
+            @mouseenter="over('search')" @mouseleave="hide()"
             @focus="if ($event.target.matches(':focus-visible')) show('search', 0)" @blur="hide()"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="search" class="size-4"></i>

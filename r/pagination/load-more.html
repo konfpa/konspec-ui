@@ -29,9 +29,9 @@
          what: ['Approved PO-24-1187', 'Posted GRN-26-0442', 'Raised debit note DN-26-0117'][i % 3]
        })) },
        more() {
-         const wasLast = this.shown + this.step >= this.total;
+         const finishes = this.shown + this.step >= this.total;
          this.shown = Math.min(this.shown + this.step, this.total);
-         if (wasLast) this.$refs.count.focus();
+         if (finishes) this.$refs.count.focus();
        }
      }">
 

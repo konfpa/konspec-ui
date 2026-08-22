@@ -14,18 +14,18 @@
   <div class="flex min-h-14 items-center gap-3 px-4 py-3">
     <div class="min-w-0 flex-1">
       <h3 class="truncate text-[16px]/6 font-semibold">GST breakup</h3>
-      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Invoice INV-7741 · 12/08/2026 · Gujarat Polymers Ltd</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Invoice INV-7741 · 12 Aug 2026 · Gujarat Polymers Ltd</p>
     </div>
     <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-gst"
             aria-label="GST breakup"
-            class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-zinc-200">
-      <span class="flex transition-transform" :class="open && 'rotate-180'">
+            class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
         <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
       </span>
     </button>
   </div>
 
-  <div id="col-gst" x-show="open" x-collapse.duration.200ms>
+  <div id="col-gst" x-show="open" x-collapse.duration.200ms class="motion-reduce:transition-none!">
     <dl class="divide-y divide-zinc-100 border-t border-zinc-100 px-4 text-[14px]/5">
       <div class="flex items-center justify-between gap-3 py-2.5">
         <dt class="text-zinc-600">Taxable value</dt><dd class="tabular-nums">₹18,42,000.00</dd>

@@ -1,0 +1,113 @@
+<!-- The record pane of a list-detail screen, or a sheet: the card is a fixed
+     height, the tab row holds the top of it, and only the panel scrolls. Let
+     the page scroll instead and the row is gone by the third line of an
+     activity log, which is the moment the tabs are most wanted.
+
+     min-h-0 on the panel wrapper is what makes that true. A flex item defaults
+     to min-height:auto and refuses to shrink below its content, so without it
+     the card grows past 420px and nothing scrolls anywhere.
+
+     Each panel is its own scroller, and the scroll offset is saved and restored
+     by hand. display:none does not remember a scroll position, it destroys it:
+     switching to Activity and back puts Lines at the top again, with no
+     indication that anything moved, so somebody reading line 40 of an order
+     loses their place every time they check a receipt. Reading scrollTop before
+     the switch is the whole fix.
+
+     The panels sit flush against the card edge, so their focus outline takes
+     the negative offset — overflow-hidden on the card clips the positive one
+     and the focused panel would show no outline at all along its top. -->
+<div data-kui="tabs/pinned" x-id="['tab', 'panel']"
+     x-data="{
+       tab: 'lines',
+       pos: {},
+       items: [
+         { id: 'lines',    label: 'Lines',    count: 8 },
+         { id: 'activity', label: 'Activity' },
+         { id: 'terms',    label: 'Terms' }
+       ],
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       panelEl(id) { return Array.from(this.$refs.body.children).find(e => e.dataset.panel === id); },
+       move(step) {
+         const n = this.items.length;
+         const i = this.items.findIndex(t => t.id === this.tab);
+         this.pick(this.items[(i + step + n) % n].id);
+       },
+       pick(id) {
+         const leaving = this.panelEl(this.tab);
+         if (leaving) this.pos[this.tab] = leaving.scrollTop;
+         this.tab = id;
+         this.$nextTick(() => {
+           const panel = this.panelEl(id);
+           if (panel) panel.scrollTop = this.pos[id] || 0;
+           const el = this.tabEls().find(e => e.dataset.tab === id);
+           if (el) el.focus();
+         });
+       }
+     }"
+     class="flex h-[420px] max-w-xl flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="shrink-0 border-b border-zinc-200 px-4 pt-3">
+    <div x-ref="list" role="tablist" aria-label="Order detail sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="pick(items[0].id)"
+         @keydown.end.prevent="pick(items[items.length - 1].id)"
+         class="-mb-px flex gap-6">
+      <template x-for="t in items" :key="t.id">
+        <button type="button" role="tab" :data-tab="t.id"
+                :id="$id('tab', t.id)" :aria-controls="$id('panel', t.id)"
+                :aria-selected="tab === t.id ? 'true' : 'false'"
+                :tabindex="tab === t.id ? 0 : -1"
+                @click="pick(t.id)"
+                class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
+          <span x-text="t.label"></span>
+          <template x-if="t.count">
+            <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="t.count"></span>
+          </template>
+        </button>
+      </template>
+    </div>
+  </div>
+
+  <div x-ref="body" class="min-h-0 flex-1">
+    <div role="tabpanel" data-panel="lines" tabindex="0" :id="$id('panel', 'lines')" :aria-labelledby="$id('tab', 'lines')"
+         x-show="tab === 'lines'"
+         class="h-full overflow-y-auto overscroll-contain focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15">
+      <ul role="list" class="divide-y divide-zinc-100 text-[13px]/5">
+        <li class="flex items-baseline justify-between gap-4 px-4 py-2.5"><span class="min-w-0 truncate">HDPE-BLM-45 · 12.0 MT</span><span class="shrink-0 tabular-nums">₹10,44,000</span></li>
+        <li class="flex items-baseline justify-between gap-4 px-4 py-2.5"><span class="min-w-0 truncate">HDPE-BLM-52 · 6.5 MT</span><span class="shrink-0 tabular-nums">₹5,72,000</span></li>
+        <li class="flex items-baseline justify-between gap-4 px-4 py-2.5"><span class="min-w-0 truncate">LDPE-FLM-12 · 2.0 MT</span><span class="shrink-0 tabular-nums">₹1,94,000</span></li>
+        <li class="flex items-baseline justify-between gap-4 px-4 py-2.5"><span class="min-w-0 truncate">MB-WHT-08 · 400 kg</span><span class="shrink-0 tabular-nums">₹68,000</span></li>
+        <li class="flex items-baseline justify-between gap-4 px-4 py-2.5"><span class="min-w-0 truncate">FAS-HEX-M12 · 1,200 nos</span><span class="shrink-0 tabular-nums">₹42,000</span></li>
+        <li class="flex items-baseline justify-between gap-4 px-4 py-2.5"><span class="min-w-0 truncate">FAS-NUT-M12 · 1,200 nos</span><span class="shrink-0 tabular-nums">₹18,000</span></li>
+        <li class="flex items-baseline justify-between gap-4 px-4 py-2.5"><span class="min-w-0 truncate">PKG-BAG-25 · 900 nos</span><span class="shrink-0 tabular-nums">₹22,500</span></li>
+        <li class="flex items-baseline justify-between gap-4 px-4 py-2.5"><span class="min-w-0 truncate">Freight to Vasai plant</span><span class="shrink-0 tabular-nums">₹81,500</span></li>
+      </ul>
+      <p class="flex items-baseline justify-between gap-4 border-t border-zinc-200 bg-zinc-50 px-4 py-2.5 text-[13px]/5 font-medium">
+        <span>8 lines before tax</span><span class="tabular-nums">₹18,42,000</span>
+      </p>
+    </div>
+
+    <div role="tabpanel" data-panel="activity" tabindex="0" :id="$id('panel', 'activity')" :aria-labelledby="$id('tab', 'activity')"
+         x-show="tab === 'activity'" x-cloak
+         class="h-full overflow-y-auto overscroll-contain p-4 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15">
+      <ol role="list" class="space-y-3 text-[13px]/5">
+        <li><p class="font-medium">Order approved</p><p class="tabular-nums text-zinc-500">R. Menon · 05 Aug 2026, 11:04</p></li>
+        <li><p class="font-medium">Delivery window moved to 04 Sep 2026</p><p class="tabular-nums text-zinc-500">A. Prabhu · 12 Aug 2026, 16:20</p></li>
+        <li><p class="font-medium">GRN-26-0431 posted, 12.0 MT</p><p class="tabular-nums text-zinc-500">Stores · 28 Aug 2026, 09:12</p></li>
+        <li><p class="font-medium">Quality hold raised on HDPE-BLM-45</p><p class="tabular-nums text-zinc-500">QC lab · 28 Aug 2026, 14:45</p></li>
+        <li><p class="font-medium">GRN-26-0438 posted, 6.5 MT</p><p class="tabular-nums text-zinc-500">Stores · 02 Sep 2026, 10:30</p></li>
+        <li><p class="font-medium">Hold released after retest</p><p class="tabular-nums text-zinc-500">QC lab · 03 Sep 2026, 15:02</p></li>
+        <li><p class="font-medium">GRN-26-0442 posted, 2.0 MT</p><p class="tabular-nums text-zinc-500">Stores · 06 Sep 2026, 08:55</p></li>
+        <li><p class="font-medium">Invoice GP/26/1442 received</p><p class="tabular-nums text-zinc-500">Accounts · 09 Sep 2026, 12:10</p></li>
+      </ol>
+    </div>
+
+    <div role="tabpanel" data-panel="terms" tabindex="0" :id="$id('panel', 'terms')" :aria-labelledby="$id('tab', 'terms')"
+         x-show="tab === 'terms'" x-cloak
+         class="h-full overflow-y-auto overscroll-contain p-4 text-[14px]/5 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15">
+      <p class="text-zinc-600">Payment 45 days from GRN. Freight paid by Konspec. Rejection returned at vendor cost within 14 days.</p>
+    </div>
+  </div>
+</div>

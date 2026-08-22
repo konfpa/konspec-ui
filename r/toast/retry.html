@@ -1,0 +1,125 @@
+<!-- A rate typed into a line-item grid saves itself, and the save failed. The
+     toast keeps the failure on screen with no timer and offers the one thing
+     worth offering: the same request again. Nothing on the order changed, and
+     the message says so — a failure that does not say what state the record is
+     in leaves the user to guess, and they guess wrong.
+
+     Every push carries a key, and a push whose key is already on screen patches
+     that toast instead of adding another. An autosave that fails every ten
+     seconds otherwise builds a wall of identical cards, each announcing the
+     same sentence, none of them the one the user is reading. Patching also
+     means an unchanged message is announced once: the default aria-relevant
+     reports text that changed, and rewriting the same string changes nothing.
+
+     A key does not survive a change of region, which is why the danger toast is
+     closed rather than patched when the retry succeeds. Whether a message
+     interrupts is decided by the region its node sits in, so a node cannot be
+     recoloured from failure to confirmation in place — it would be a
+     confirmation announced assertively, cutting off whatever was being read.
+
+     Retry is not the only route. The rate is still in the cell, the line is
+     still unsaved, and the grid's own Save posts the whole thing. A toast that
+     is the only way to recover from an error is an alert that was written in
+     the wrong component. -->
+<div data-kui="toast/retry" x-data="{
+       toasts: [], seq: 0, tries: 0,
+       still: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+       region(tone) { return tone === 'danger' ? 'assertive' : 'polite'; },
+       push(t) {
+         const old = t.key ? this.toasts.find(x => x.key === t.key) : null;
+         if (old && this.region(old.tone) === this.region(t.tone)) {
+           clearTimeout(old.timer);
+           Object.assign(old, t);
+           this.hydrate(old);
+           return old.id;
+         }
+         if (old) this.close(old.id);
+         const n = { id: ++this.seq, tone: 'pending', ms: 0, timer: 0, ...t };
+         if (n.tone === 'danger') n.ms = 0;
+         this.toasts.push(n);
+         this.hydrate(n);
+         return n.id;
+       },
+       hydrate(t) {
+         this.$nextTick(() => {
+           if (document.querySelector('[data-lucide]:not(svg)')) lucide.createIcons();
+           this.start(t);
+         });
+       },
+       start(t) { if (t && t.ms && !this.still) { clearTimeout(t.timer); t.timer = setTimeout(() => this.close(t.id), t.ms); } },
+       pause(t) { clearTimeout(t.timer); },
+       close(id) {
+         const t = this.toasts.find(x => x.id === id);
+         if (t) clearTimeout(t.timer);
+         this.toasts = this.toasts.filter(x => x.id !== id);
+       },
+       bucket(name) { return this.toasts.filter(t => this.region(t.tone) === name); },
+       save() {
+         this.tries++;
+         this.push({ key: 'rate', tone: 'pending', ms: 0, text: 'Saving the rate on line 3', meta: 'MS angle 50×50 · ₹58,400 per MT' });
+         setTimeout(() => {
+           if (this.tries > 1) this.push({ key: 'rate', tone: 'success', ms: 5000, text: 'Rate saved on line 3', meta: 'MS angle 50×50 · ₹58,400 per MT · order total ₹4,82,000' });
+           else this.push({ key: 'rate', tone: 'danger', text: 'The rate on line 3 was not saved', meta: 'The server did not answer. Nothing on PO-24-1187 has changed.' });
+         }, 1200);
+       }
+     }">
+
+  <button type="button" x-ref="fire" @click="save()"
+          class="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Save rate
+  </button>
+
+  <div class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:left-4 sm:w-96">
+    <div role="alert" aria-live="assertive" class="flex flex-col gap-2">
+      <template x-for="t in bucket('assertive')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <span class="mt-0.5 flex size-4 shrink-0 text-red-600"><i data-lucide="alert-circle" class="size-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+          </div>
+          <button type="button" @click="save()"
+                  class="shrink-0 rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            Retry
+          </button>
+          <button type="button" aria-label="Dismiss"
+                  @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div role="status" aria-live="polite" class="flex flex-col gap-2">
+      <template x-for="t in bucket('polite')" :key="t.id">
+        <div class="pointer-events-auto flex items-start gap-3 rounded-xl border border-zinc-300 bg-white px-3.5 py-3 shadow-lg"
+             @pointerenter="pause(t)" @pointerleave="start(t)" @focusin="pause(t)" @focusout="start(t)"
+             x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:enter-start="translate-y-2 opacity-0"
+             x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+             x-transition:leave-end="translate-y-2 opacity-0">
+          <template x-if="t.tone === 'pending'">
+            <span class="mt-0.5 size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 motion-reduce:animate-none" aria-hidden="true"></span>
+          </template>
+          <template x-if="t.tone === 'success'">
+            <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
+          </template>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
+          </div>
+          <button type="button" aria-label="Dismiss"
+                  @click="close(t.id); if ($event.detail === 0) $refs.fire.focus()"
+                  class="-mt-1 -mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+</div>

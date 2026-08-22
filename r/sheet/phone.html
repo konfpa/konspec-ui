@@ -1,0 +1,90 @@
+<!-- The same sheet where the panel is the whole screen. Three things change and
+     all three are about the bottom of the screen being where the hand is.
+
+     The footer stacks and the buttons go full width, because two 96px buttons
+     pinned to the right of a 390px panel are a target the thumb has to reach
+     across the screen for. flex-col-reverse rather than flex-col so the source
+     order does not change with the breakpoint: the secondary action stays first
+     in the DOM, where tab order and a screen reader reach it before the commit,
+     while on screen the commit sits directly under the record it acts on and
+     the secondary takes the bottom edge, which is where a mis-tap lands. Above
+     sm the same two go back to a row, primary last.
+
+     The title wraps instead of truncating. At 448px a truncated lot name is a
+     minor annoyance; at 390px it eats the part that tells two lots apart, and
+     there is no page behind the panel to read it off. A header two lines tall on
+     a phone is cheaper than a record nobody can identify.
+
+     Each pair in the body stacks label over value below sm. A baseline row with
+     the label left and the value right works down to about 320px of panel and
+     then starts hyphenating both halves against each other.
+
+     The close control stays an X and stays top right. A back chevron would be
+     the fourth thing on this screen promising the browser's back gesture, and
+     the sheet is not a history entry — pressing the system back button while it
+     is open leaves the application. It grows to 36px below sm, because 28px is a
+     mouse target.
+
+     No safe-area padding is written here. This is not a bar pinned to the bottom
+     edge of the viewport; it is the foot of a fixed panel, and the browser's own
+     chrome sits below it. -->
+<div data-kui="sheet/phone" x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open PO-24-1204</button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false" @click.self="open = false"
+       class="fixed inset-0 z-50 flex justify-end bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="sheet-phone-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-x-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-x-full"
+         class="flex h-full w-full flex-col border-l border-zinc-300 bg-white shadow-lg sm:w-[28rem]">
+
+      <div class="flex items-start justify-between gap-3 border-b border-zinc-200 px-4 py-3.5 sm:px-5 sm:py-4">
+        <div class="min-w-0">
+          <p class="text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase tabular-nums">PO-24-1204</p>
+          <h2 id="sheet-phone-title" class="mt-0.5 text-[16px]/6 font-semibold">Bearing housings — machined, September lot</h2>
+          <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">Nashik Steel Traders · raised 11 Aug 2026</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close"
+                class="-mr-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:size-7">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto px-4 py-3 sm:px-5 sm:py-4">
+        <dl class="divide-y divide-zinc-100">
+          <div class="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+            <dt class="text-[13px]/5 text-zinc-600">Status</dt>
+            <dd class="text-[13px]/5 font-medium"><span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300"><span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Approved</span></dd>
+          </div>
+          <div class="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+            <dt class="text-[13px]/5 text-zinc-600">Order value</dt>
+            <dd class="text-[13px]/5 font-medium tabular-nums sm:text-right">₹2,74,300</dd>
+          </div>
+          <div class="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+            <dt class="text-[13px]/5 text-zinc-600">Payment terms</dt>
+            <dd class="text-[13px]/5 font-medium sm:text-right">Against delivery, 2% early payment discount inside 7 days</dd>
+          </div>
+          <div class="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+            <dt class="text-[13px]/5 text-zinc-600">Delivery by</dt>
+            <dd class="text-[13px]/5 font-medium tabular-nums sm:text-right">19 Sep 2026</dd>
+          </div>
+          <div class="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+            <dt class="text-[13px]/5 text-zinc-600">Ship to</dt>
+            <dd class="text-[13px]/5 font-medium sm:text-right">Plant 2, Waluj MIDC, Chhatrapati Sambhajinagar</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="flex flex-col-reverse gap-2 border-t border-zinc-200 bg-zinc-100 px-4 py-3 sm:flex-row sm:justify-end sm:px-5">
+        <button type="button"
+                class="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:py-2">Print order</button>
+        <button type="button"
+                class="w-full rounded-lg bg-zinc-700 px-4 py-2.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto sm:py-2">Record GRN</button>
+      </div>
+    </div>
+  </div>
+</div>

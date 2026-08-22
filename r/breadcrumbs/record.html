@@ -1,23 +1,34 @@
 <!-- A record page. The status and the copy button belong to the record, not to
-     the trail, so they sit after the last crumb rather than inside it — putting
-     them inside makes the accessible name of the current page read
-     "PO-24-1187 Awaiting GRN Copy order number". -->
-<nav data-kui="breadcrumbs/record" aria-label="Breadcrumb">
-  <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
-    <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
-    <li aria-hidden="true" class="text-zinc-500">/</li>
-    <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
-    <li aria-hidden="true" class="text-zinc-500">/</li>
-    <li><a href="#" class="text-zinc-600 hover:text-zinc-900">Purchase orders</a></li>
-    <li aria-hidden="true" class="text-zinc-500">/</li>
-    <li class="flex items-center gap-2">
-      <span aria-current="page" class="font-medium tabular-nums text-zinc-900">PO-24-1187</span>
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
-        <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Awaiting GRN
-      </span>
-      <button type="button" aria-label="Copy order number" class="text-zinc-600 hover:text-zinc-900">
-        <i data-lucide="copy" class="size-3.5"></i>
-      </button>
-    </li>
-  </ol>
-</nav>
+     the trail, so they sit outside the <ol> entirely — one flex row holding the
+     nav and then the controls.
+
+     Inside the last <li> they would be read as part of the fourth list item:
+     "PO-24-1187 Awaiting GRN Copy order number" announced as one crumb, in an
+     ordered list whose last entry is now a control. Outside it, the list has
+     four crumbs and the pill is a sibling of the trail, which is what it is.
+
+     The pill is badge's locked shape, copied class for class — graphite, and
+     the state lives in the 6px dot. A trail is not the place to invent a second
+     status treatment. -->
+<div data-kui="breadcrumbs/record" class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+  <nav aria-label="Breadcrumb">
+    <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Home</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+      <li aria-hidden="true" class="text-zinc-500">/</li>
+      <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">PO-24-1187</span></li>
+    </ol>
+  </nav>
+
+  <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+    <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Awaiting GRN
+  </span>
+
+  <button type="button" aria-label="Copy order number"
+          class="inline-flex size-7 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="copy" class="size-3.5"></i>
+  </button>
+</div>

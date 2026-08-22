@@ -11,6 +11,11 @@
      The parent of the current page gets a dot, not aria-current. There is one
      current page per document and it is the leaf.
 
+     aria-expanded is written twice — once as a literal matching the seed and
+     once bound. A bound attribute does not exist until Alpine boots, so the
+     literal is what a reader hitting the page mid-load is given, and getting it
+     from the same seed the markup already renders costs nothing.
+
      x-collapse animates the wrapper, so the wrapper carries nothing but x-show
      and the id: border-box means height:0 cannot go below padding and borders,
      so a panel carrying them bottoms out and then vanishes in one frame. The ul
@@ -31,7 +36,7 @@
     </a>
 
     <div>
-      <button type="button" @click="open.orders = !open.orders" :aria-expanded="open.orders" aria-controls="sb3-orders"
+      <button type="button" @click="open.orders = !open.orders" aria-expanded="true" :aria-expanded="open.orders" aria-controls="sb3-orders"
               class="flex min-h-9 w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
         <span class="min-w-0 flex-1 truncate">Purchase orders</span>
@@ -70,7 +75,7 @@
     </div>
 
     <div>
-      <button type="button" @click="open.vendors = !open.vendors" :aria-expanded="open.vendors" aria-controls="sb3-vendors"
+      <button type="button" @click="open.vendors = !open.vendors" aria-expanded="false" :aria-expanded="open.vendors" aria-controls="sb3-vendors"
               class="flex min-h-9 w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
         <span class="min-w-0 flex-1 truncate">Vendors</span>
@@ -90,7 +95,7 @@
     </div>
 
     <div>
-      <button type="button" @click="open.quality = !open.quality" :aria-expanded="open.quality" aria-controls="sb3-quality"
+      <button type="button" @click="open.quality = !open.quality" aria-expanded="false" :aria-expanded="open.quality" aria-controls="sb3-quality"
               class="flex min-h-9 w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="flask-conical" class="size-[18px] shrink-0"></i>
         <span class="min-w-0 flex-1 truncate">Quality</span>

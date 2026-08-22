@@ -1,0 +1,114 @@
+{% comment %} templates/vendors/_sections.html
+
+   Four things the server decides that the browser cannot.
+
+   1. Which sections exist. A section the signed-in user may not read is not
+      rendered closed, it is not rendered at all — x-show renders the markup and
+      hides it, so a collapsed panel is not a permission boundary and the
+      landed-cost breakdown behind one is in the page source of everybody who
+      can load the page.
+
+   2. Which section starts open. A section holding a bound form with errors is
+      rendered open, because the alternative is a user pressing Save against a
+      shut panel and being told nothing. x-cloak goes on only where the panel
+      starts closed: on one that starts open it holds the panel hidden until
+      Alpine boots, which is the exact flash x-cloak exists to prevent.
+
+   3. The panel ids. Rendered in a loop they take the record key and the section
+      slug, or the second header's aria-controls points at the first panel and
+      every row opens the same section.
+
+   4. The error counts on the headers. {{ section.form.errors }} is a dict
+      keyed by field name, so its length is the number of failing fields, and a
+      shut section that is wrong has to say so on the row.
+
+   views.py
+       sections = [
+           {'slug': 'general',    'label': 'General',          'form': general_form},
+           {'slug': 'bank',       'label': 'Bank details',     'form': bank_form},
+           {'slug': 'compliance', 'label': 'Tax registration', 'form': tax_form},
+       ] {% endcomment %}
+
+<form method="post" novalidate action="{% url 'vendor-update' vendor.pk %}">
+  {% csrf_token %}
+
+  {% if any_errors %}
+    <div role="alert" tabindex="-1" x-data x-init="$el.focus()"
+         class="mb-4 rounded-xl border border-zinc-300 bg-white px-4 py-3 focus:outline-3 focus:outline-offset-2 focus:outline-zinc-700/15">
+      <div class="flex items-start gap-3">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+        <div class="min-w-0">
+          <p class="text-[13px]/5 font-medium tabular-nums">This vendor was not saved — {{ error_count }} field{{ error_count|pluralize }} need{{ error_count|pluralize:"s," }} attention.</p>
+          <ul class="mt-2 space-y-1 text-[12px]/4 text-zinc-600">
+            {% comment %} every section holding an error is rendered open, so a plain
+               fragment link reaches a control that is actually on screen {% endcomment %}
+            {% for section in sections %}
+              {% for field in section.form %}
+                {% if field.errors %}
+                  <li>
+                    <a href="#{{ field.auto_id }}" class="font-medium text-zinc-900 underline underline-offset-2">{{ field.label }}</a>
+                    <span>— {{ field.errors.0 }}</span>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div data-kui="accordion/django" class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+    {% for section in sections %}
+      <div x-data="{ open: {% if section.form.errors %}true{% else %}false{% endif %} }">
+        <h3>
+          <button type="button" @click="open = !open" :aria-expanded="open"
+                  aria-controls="acc-{{ vendor.pk }}-{{ section.slug }}"
+                  class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+              <span class="text-[14px]/5 font-medium">{{ section.label }}</span>
+              {% if section.form.errors %}
+                <span class="ml-auto flex items-center gap-1.5 text-[12px]/4 font-medium tabular-nums text-red-600">
+                  <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>
+                  {{ section.form.errors|length }} to fix
+                </span>
+              {% else %}
+                <span class="ml-auto text-[12px]/4 tabular-nums text-zinc-500">{{ section.form.fields|length }} field{{ section.form.fields|length|pluralize }}</span>
+              {% endif %}
+            </span>
+            <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+              <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+            </span>
+          </button>
+        </h3>
+
+        <div id="acc-{{ vendor.pk }}-{{ section.slug }}" x-show="open"
+             {% if not section.form.errors %}x-cloak{% endif %} x-collapse.duration.200ms>
+          <div class="border-t border-zinc-100 px-4 py-4">
+            {{ section.form.as_div }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    {% comment %} Not rendered rather than rendered disabled, so the figures are not in the
+       response at all. The header stays, because a section that silently
+       disappears reads as a section that does not exist. {% endcomment %}
+    {% if not perms.purchasing.view_cost %}
+      <div>
+        <h3>
+          <button type="button" disabled aria-expanded="false"
+                  class="flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left text-zinc-500">
+            <i data-lucide="lock" class="size-4 shrink-0"></i>
+            <span class="min-w-0 flex-1 text-[14px]/5 font-medium">Margin and landed cost</span>
+          </button>
+        </h3>
+        <p class="px-4 pb-2.5 pl-11 text-[12px]/4 text-zinc-500">Category managers and above.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Save vendor
+  </button>
+</form>

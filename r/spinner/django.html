@@ -49,6 +49,7 @@
      role="status" is on the panel, which survives the swap. A status region that
      arrives inside a fragment with its message already in it never changed, so
      there is nothing for a screen reader to report. -->
+{% load humanize %}
 
 {# orders/register.html #}
 <div data-kui="spinner/django" id="register" class="relative overflow-hidden rounded-xl border border-zinc-300 bg-white"
@@ -61,7 +62,7 @@
     <button type="button"
             hx-get="{% url 'order-register-rows' %}"
             hx-target="#register-rows" hx-swap="outerHTML"
-            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100">
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Refresh
     </button>
   </div>
@@ -91,8 +92,8 @@
      x-text="busy ? 'Refreshing the order register' : ''"></p>
 </div>
 
-{# orders/_register_rows.html — the whole response and nothing around it,
-   keeping the id so the next Refresh still has a target #}
+{% comment %} orders/_register_rows.html — the whole response and nothing around it,
+   keeping the id so the next Refresh still has a target {% endcomment %}
 <div id="register-rows" :inert="busy">
   <table class="w-full text-[13px]/5">
     <thead>
@@ -114,8 +115,8 @@
   </table>
 </div>
 
-{# orders/_register_failed.html — the spinner resolved into an error, in the
-   same slot and at the same height, so the panel does not change size #}
+{% comment %} orders/_register_failed.html — the spinner resolved into an error, in the
+   same slot and at the same height, so the panel does not change size {% endcomment %}
 <div id="register-rows" class="flex min-h-64 flex-col items-center justify-center gap-2 p-6 text-center">
   <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
     <i data-lucide="alert-circle" class="size-4 text-red-600"></i>
@@ -124,7 +125,7 @@
   <p class="text-[12px]/4 text-zinc-500">Nothing was changed.</p>
   <button type="button" hx-get="{% url 'order-register-rows' %}"
           hx-target="#register-rows" hx-swap="outerHTML"
-          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200">
+          class="mt-1 inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry
   </button>
 </div>

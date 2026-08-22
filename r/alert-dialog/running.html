@@ -1,0 +1,82 @@
+<!-- The act is irreversible and it takes a few seconds, so the dialog stays up
+     for the length of it and cannot be answered twice.
+
+     The shape being rejected is the common one: close on the click, post in the
+     background, report with a toast. It returns the user to a screen that still
+     shows the old state with nothing spinning on it, and if the post fails the
+     failure arrives in a corner of a page they may already have left. Keeping
+     the overlay up costs one flag and makes the wait legible.
+
+     Two mechanisms, doing two different jobs. htmx owns what the button looks
+     like, because htmx is the only thing that knows every ending a request has
+     — done, failed, timed out, aborted — and a hand-rolled busy flag is still
+     spinning through three of them. hx-disabled-elt stops the second post for
+     the same reason: htmx re-enables on every outcome, and a @click that sets a
+     flag only ever remembers the happy one. Alpine owns what the dialog
+     refuses, because the dialog is Alpine's. It reads the same request through
+     htmx:before-request and htmx:after-request, which htmx dispatches in both
+     the camelCase and the kebab-case form, and only the second one is writable
+     as an Alpine event name.
+
+     Escape is refused while busy and Cancel is genuinely disabled. Both answers
+     have already been given; a cancel that never reaches the server would be a
+     lie about a write that is already happening. The refusal is visible — the
+     button says Posting — rather than an Escape that silently does nothing.
+
+     While both buttons are disabled there is nothing tabbable left inside, and
+     x-trap falls back to the element it is on, so focus stays in the overlay
+     instead of dropping into the page behind.
+
+     The confirm does not go grey while it waits. A greyed-out button says you
+     cannot do this, when the truth is that you already have.
+
+     The dialog is closed by the server, not by the click: the view answers with
+     HX-Trigger: grn-posted once the ledger write has committed. hx-swap="none"
+     because there is nothing on this panel to replace — a failure comes back
+     the same way and lands in the refused shape below. -->
+<div data-kui="alert-dialog/running"
+     x-data="{ open: false, busy: false }"
+     @htmx:before-request="busy = true"
+     @htmx:after-request="busy = false"
+     @grn-posted.window="busy = false; open = false">
+  <button type="button" @click="open = true"
+          class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Post GRN 4417</button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="if (!busy) open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="post-title" aria-describedby="post-body"
+         :aria-busy="busy"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <h2 id="post-title" class="text-[16px]/6 font-semibold">Post GRN 4417 to stock</h2>
+      <p id="post-body" class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+        Nashik Steel Traders · 7,800 kg against PO-24-1187 · ₹10,14,000. Posting writes the stock entry
+        and the purchase accrual to the ledger dated 04 Sep 2026. A posted GRN is undone by a credit
+        note, never by deleting it.
+      </p>
+
+      <p role="status" class="mt-4 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4 text-zinc-600">
+        <span x-show="!busy">Nothing is written until you press Post GRN.</span>
+        <span x-show="busy" x-cloak class="flex items-start gap-2">
+          <span class="mt-px shrink-0 text-zinc-500"><i data-lucide="loader-circle" class="size-3.5 animate-spin"></i></span>
+          <span>Posting to the ledger. This takes a few seconds — leave the dialog open until it finishes.</span>
+        </span>
+      </p>
+
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <button type="button" @click="open = false" :disabled="busy"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-300 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">Cancel</button>
+
+        <button type="button"
+                hx-post="/grn/4417/post/" hx-swap="none" hx-disabled-elt="this"
+                class="group inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:hover:bg-zinc-700">
+          <span class="group-[.htmx-request]:hidden"><i data-lucide="check" class="size-4"></i></span>
+          <span class="hidden group-[.htmx-request]:inline"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+          <span class="grid">
+            <span class="col-start-1 row-start-1 group-[.htmx-request]:invisible">Post GRN</span>
+            <span class="invisible col-start-1 row-start-1 group-[.htmx-request]:visible">Posting…</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

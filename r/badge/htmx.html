@@ -1,0 +1,43 @@
+<!-- A queue count goes stale the moment somebody else approves something, and
+     a stale count is worse than none: it is the number people decide whether to
+     open the screen on at all.
+
+     Poll the badge, not the toolbar around it. hx-get on the count with
+     hx-swap="innerHTML" leaves the button, its focus and anything hanging off
+     it untouched; polling the button instead drops focus and closes its menu
+     every thirty seconds, on a schedule nobody can see. hx-sync="this:drop"
+     throws away a poll that arrives while one is still in flight, which is what
+     a tab left open on a slow VPN does all afternoon.
+
+     aria-live goes on the span that stays, never on the fragment. htmx replaces
+     elements, and a live region that is itself replaced is a new live region —
+     new ones announce nothing, so the count updates silently and measures as
+     correct.
+
+     The icon button is named from its contents rather than from aria-label,
+     which is the whole reason it is shaped this way. A count in aria-label
+     cannot be polled: the swap would have to rewrite an attribute on an element
+     it is not replacing. An sr-only string beside the digits is part of the
+     name, and the server returns both. Re-run lucide.createIcons() after a swap
+     that brings in new icons, guarded as the shell already guards it. -->
+<div data-kui="badge/htmx" class="flex flex-wrap items-center gap-4">
+  <button type="button" class="group flex h-9 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    Pending approval
+    <span aria-live="polite"
+          hx-get="/approvals/pending/count/"
+          hx-trigger="load, every 30s, approvals:changed from:body"
+          hx-swap="innerHTML" hx-sync="this:drop"
+          class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300 group-hover:bg-zinc-300">12</span>
+  </button>
+
+  <button type="button" class="relative flex size-9 items-center justify-center rounded-lg border border-zinc-300 bg-white hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="bell" class="size-4" aria-hidden="true"></i>
+    <span class="sr-only">Notifications</span>
+    <span aria-live="polite"
+          hx-get="/notifications/count/"
+          hx-trigger="load, every 30s" hx-swap="innerHTML" hx-sync="this:drop"
+          class="absolute -top-1.5 -right-1.5 rounded-full bg-zinc-700 px-1.5 text-[11px]/4 font-medium tabular-nums text-white">
+      <span aria-hidden="true">99+</span><span class="sr-only">, 99 or more unread</span>
+    </span>
+  </button>
+</div>

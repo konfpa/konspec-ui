@@ -19,6 +19,13 @@
      The card is not overflow-hidden. Header cells are rounded instead, or the
      top row's bubbles are cut off at the header rule.
 
+     A register scrolls, and a wheel under a stationary pointer moves the row
+     out from under it without a mouseleave — leaving a bubble naming the
+     receipt that used to be there. The window scroll handler closes what the
+     pointer opened and leaves what focus opened alone, because tabbing to a
+     row scrolls it into view and that scroll would otherwise close the label
+     the same keypress just opened.
+
      Below sm the action bar folds to a single menu button. Four 36px targets
      and a value column do not fit in 390px, and the answer is never a table
      that scrolls sideways — the dropdown behind that button carries the same
@@ -26,23 +33,26 @@
      to everything these tooltips say. -->
 <div data-kui="tooltip/row-actions" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
-       open: null, warm: false, timer: 0, cool: 0,
+       open: null, via: null, warm: false, timer: 0, cool: 0,
+       over(id) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id) },
        show(id, now = false) {
          clearTimeout(this.timer); clearTimeout(this.cool);
-         if (now || this.warm) { this.open = id; this.warm = true; return }
-         this.timer = setTimeout(() => { this.open = id; this.warm = true }, 400);
+         if (now || this.warm) { this.open = id; this.via = now ? 'focus' : 'pointer'; this.warm = true; return }
+         this.timer = setTimeout(() => { this.open = id; this.via = 'pointer'; this.warm = true }, 400);
        },
        hide() {
          clearTimeout(this.timer);
-         this.open = null;
+         this.open = null; this.via = null;
          this.cool = setTimeout(() => this.warm = false, 800);
        },
+       scrolled() { if (this.via === 'pointer') this.hide() },
        rows: [
          { id: 'GRN-2608-041', po: 'PO-24-1187', vendor: 'Gujarat Polymers Ltd', value: '₹18,42,000', dot: 'bg-emerald-600', status: 'Closed' },
          { id: 'GRN-2608-040', po: 'PO-24-1186', vendor: 'Konkan Fabricators', value: '₹1,15,400', dot: 'bg-zinc-500', status: 'Open' },
          { id: 'GRN-2608-039', po: 'PO-24-1185', vendor: 'Deshpande Traders', value: '₹96,750', dot: 'bg-amber-500', status: 'Approved' }
        ]
      }"
+     @scroll.window.passive="scrolled()"
      @keydown.escape.window="hide()">
   <table class="w-full text-left text-[13px]/5">
     <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
@@ -70,7 +80,7 @@
 
               <span class="relative inline-flex">
                 <button type="button" :aria-label="'Open ' + r.id"
-                        @mouseenter="show(r.id + ':open')" @mouseleave="hide()"
+                        @mouseenter="over(r.id + ':open')" @mouseleave="hide()"
                         @focus="if ($event.target.matches(':focus-visible')) show(r.id + ':open', true)" @blur="hide()"
                         class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
                   <i data-lucide="eye" class="size-4"></i>
@@ -81,7 +91,7 @@
 
               <span class="relative inline-flex">
                 <button type="button" :aria-label="'Print ' + r.id"
-                        @mouseenter="show(r.id + ':print')" @mouseleave="hide()"
+                        @mouseenter="over(r.id + ':print')" @mouseleave="hide()"
                         @focus="if ($event.target.matches(':focus-visible')) show(r.id + ':print', true)" @blur="hide()"
                         class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
                   <i data-lucide="printer" class="size-4"></i>
@@ -92,7 +102,7 @@
 
               <span class="relative inline-flex">
                 <button type="button" :aria-label="'Attach a document to ' + r.id"
-                        @mouseenter="show(r.id + ':attach')" @mouseleave="hide()"
+                        @mouseenter="over(r.id + ':attach')" @mouseleave="hide()"
                         @focus="if ($event.target.matches(':focus-visible')) show(r.id + ':attach', true)" @blur="hide()"
                         class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
                   <i data-lucide="paperclip" class="size-4"></i>
@@ -103,7 +113,7 @@
 
               <span class="relative inline-flex">
                 <button type="button" :aria-label="'More actions on ' + r.id"
-                        @mouseenter="show(r.id + ':more')" @mouseleave="hide()"
+                        @mouseenter="over(r.id + ':more')" @mouseleave="hide()"
                         @focus="if ($event.target.matches(':focus-visible')) show(r.id + ':more', true)" @blur="hide()"
                         class="flex size-8 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
                   <i data-lucide="more-horizontal" class="size-4"></i>

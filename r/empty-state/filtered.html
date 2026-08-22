@@ -11,11 +11,22 @@
      button — two graphite buttons side by side make the user choose before they
      have read why they are choosing.
 
+     Clearing everything deletes the control that did it, along with the chips
+     and the block they were in, so the handler moves focus to the count line.
+     It is still on the page, it is tabindex="-1" for exactly this, and it is
+     also the sentence that says what just happened. Left alone, the browser
+     drops focus on the body and the next Tab restarts at the top of the
+     document.
+
      The role="status" sits on the toolbar, above the swap. It was in the
      document before any chip was touched, so writing the new count into it is a
      change a screen reader reports. Put it inside the empty block instead and
      it arrives with its message already in it, which is not a change and is
-     announced to nobody. -->
+     announced to nobody.
+
+     The chip strip is bg-zinc-50 — a band recessed inside a white panel — and
+     its divider is zinc-200. A zinc-100 band under a zinc-100 divider draws the
+     divider in the fill it sits on, which is a hairline nobody can see. -->
 <div data-kui="empty-state/filtered" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        filters: ['Gujarat Polymers Ltd', 'Gate 2', 'Rejected at QC', '01–12 Aug'],
@@ -24,11 +35,12 @@
 
   <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
     <h2 class="text-[14px]/5 font-semibold">Goods receipts</h2>
-    <p role="status" class="text-[12px]/4 text-zinc-500 tabular-nums"
+    <p role="status" x-ref="count" tabindex="-1"
+       class="text-[12px]/4 text-zinc-500 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
        x-text="filters.length ? '0 of ' + total + ' receipts match these filters' : total + ' receipts'"></p>
   </div>
 
-  <div x-show="filters.length" class="flex flex-wrap items-center gap-2 border-b border-zinc-100 bg-zinc-100 px-4 py-2">
+  <div x-show="filters.length" class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-50 px-4 py-2">
     <template x-for="f in filters" :key="f">
       <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
         <span x-text="f"></span>
@@ -53,7 +65,7 @@
               class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Drop the date range
       </button>
-      <button type="button" @click="filters = []"
+      <button type="button" @click="filters = []; $nextTick(() => $refs.count.focus())"
               class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Clear all filters
       </button>

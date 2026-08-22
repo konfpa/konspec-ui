@@ -1,0 +1,143 @@
+<!-- templates/orders/_menubar.html
+
+   Two ways a command can be unavailable, decided in two places on purpose.
+
+   A command the user is not permitted to run is not rendered. A greyed Void
+   order that will never ungrey is a permanent tease, and it also tells this
+   buyer exactly which powers somebody at the next desk has. A command they may
+   run but not yet is rendered, disabled, and carries the reason, because that
+   one comes back: the reason is a fact about the record and records change.
+
+   Which means a menu can empty out, and the permission check has to go around
+   the whole wrapper rather than around the items. Leave the trigger behind and
+   the bar has a title that opens an empty panel, the arrows walk into it and
+   land nowhere, and the roving focus has a stop that does nothing.
+
+   For the same reason the tab stop is rendered rather than hard-coded. at
+   starts on the first menu the server actually emitted; written as file on a
+   bar whose File menu was dropped, no trigger ever matches, none of them takes
+   tabindex 0, and Tab walks straight past the bar into the form.
+
+   aria-keyshortcuts is a claim that a handler is listening, so it is rendered
+   only where the view says one is bound. The reason text is rendered too: the
+   server is the only thing that knows the GRN number and the date it posted.
+
+   views.py
+       def menus(self, order, user):
+           edit = [
+               {'id': 'insert', 'label': 'Insert line', 'icon': 'rows-3',
+                'hint': 'Ctrl Enter', 'keys': 'Control+Enter', 'locked': ''},
+               {'id': 'delete', 'label': 'Delete line', 'icon': 'trash-2',
+                'locked': order.grn_lock_reason},   # '' when the line is free
+           ]
+           out = [{'id': 'file', 'label': 'File', 'items': self.file_items(order, user)}]
+           if user.has_perm('purchasing.change_order'):
+               out.append({'id': 'edit', 'label': 'Edit', 'items': edit})
+           return out + [{'id': 'view', 'label': 'View', 'items': VIEW_ITEMS}] -->
+<div data-kui="menubar/django" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       open: null, at: '{{ menus.0.id }}', typed: '', clock: null,
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Purchase order commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+    {% for m in menus %}
+      <div class="relative max-md:static">
+        <button type="button" role="menuitem" aria-haspopup="menu" data-menu="{{ m.id }}"
+                :aria-expanded="open === '{{ m.id }}'" :tabindex="at === '{{ m.id }}' ? 0 : -1"
+                @click="open === '{{ m.id }}' ? close() : show('{{ m.id }}')"
+                @mouseenter="if (open !== null) to('{{ m.id }}')"
+                @keydown.arrow-down.prevent="show('{{ m.id }}')" @keydown.arrow-up.prevent="show('{{ m.id }}', true)"
+                @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+                @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+                class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                :class="open === '{{ m.id }}' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">{{ m.label }}</button>
+
+        <div x-show="open === '{{ m.id }}'" x-cloak data-panel="{{ m.id }}" role="menu" aria-label="{{ m.label }}"
+             @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+             @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+             @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+             @keydown.tab="close()"
+             class="absolute top-full left-0 z-40 mt-1 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+          {% for item in m.items %}
+            {% if item.locked %}
+              <button type="button" role="menuitem" tabindex="-1" aria-disabled="true" @click.prevent
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 opacity-60 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="{{ item.icon }}" class="size-4 text-zinc-600"></i>{{ item.label }}
+                <span class="ml-auto shrink-0 pl-6 text-[12px]/4 tabular-nums text-zinc-500">{{ item.locked }}</span>
+              </button>
+            {% else %}
+              <button type="button" role="menuitem" tabindex="-1"
+                      {% if item.keys %}aria-keyshortcuts="{{ item.keys }}"{% endif %}
+                      @click="close()"
+                      class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+                <i data-lucide="{{ item.icon }}" class="size-4 text-zinc-600"></i>{{ item.label }}
+                {% if item.hint %}
+                  <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">{{ item.hint }}</span>
+                {% endif %}
+              </button>
+            {% endif %}
+          {% endfor %}
+
+          <!-- An item-level permission check is fine where the menu holds
+               other things. This one is the last item in File; the day it
+               becomes the only item in a menu, the check moves up to the
+               wrapper, or the bar keeps a title that opens nothing. -->
+          {% if m.id == 'file' and perms.purchasing.void_order %}
+            <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+            <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                    class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+              <i data-lucide="ban" class="size-4"></i>Void order
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="px-4 py-3">
+    <h2 class="text-[16px]/6 font-semibold tabular-nums">{{ order.number }} — {{ order.vendor.name }}</h2>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+      {{ order.get_status_display }} · {{ order.lines.count }} lines · ₹{{ order.subtotal|floatformat:0 }} before tax
+    </p>
+  </div>
+</div>

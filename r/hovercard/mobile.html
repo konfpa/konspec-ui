@@ -35,12 +35,12 @@
      @hovercard-open.window="if ($event.detail !== $root) shut()">
 
   <div class="flex items-center justify-between gap-3">
-    <a href="/orders/1187/" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums">PO-24-1187</a>
+    <a href="/orders/1187/" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">PO-24-1187</a>
     <button type="button" x-show="!fine" x-cloak
             @click="open ? shut() : show(0)"
             :aria-expanded="open ? 'true' : 'false'" aria-controls="po-1187-preview"
             aria-label="Preview PO-24-1187"
-            class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100">
+            class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="info" class="size-4"></i>
     </button>
   </div>

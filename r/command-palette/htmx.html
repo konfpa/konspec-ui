@@ -1,0 +1,229 @@
+<!-- Nobody ships 1,284 orders, 248 vendors and 9,412 items to the browser so
+     a palette can filter them. The records are searched on the server; the
+     actions are not, because filtering a dozen strings the template already
+     holds does not need a round trip and an action list that arrives late is
+     an action list that is missing at the moment somebody types three letters
+     and presses Enter.
+
+     htmx makes the request and Alpine never fetches. The trigger filter binds
+     to the event name, not to the end of the spec — input[this.value.length >
+     1] changed delay:300ms — and written the other way round the two-character
+     floor is parsed as part of the modifier and never applies. delay is a
+     debounce rather than a throttle, and hx-sync this:replace drops a request
+     still in flight so two keystrokes inside 300ms cannot settle on the older
+     answer.
+
+     Below the floor nothing fires at all, so deleting back to one character
+     clears the record rows in script. Otherwise last search's answer sits
+     there under a query that did not produce it, and it is indistinguishable
+     from a result.
+
+     Because htmx replaced half the rows without telling Alpine, there is no
+     array to index into. rows() reads the option elements out of the DOM on
+     every move and paint() tints them by classList — including the Alpine
+     rows, which is why no row carries a :class binding for the highlight. Two
+     mechanisms for one piece of state drift apart on the first keystroke that
+     lands mid-request. rows() also filters on offsetParent, because focus and
+     measurement both treat a display:none row as absent while querySelectorAll
+     happily returns it.
+
+     Painting after a swap waits a frame as well as a tick. The record group is
+     behind x-show until the count says there is something in it, and one
+     microtask later the rows are still display:none — offsetParent says they
+     are not there, the sweep finds nothing to highlight, and the first row of
+     a fresh answer only lights up when somebody presses an arrow key. Measure
+     what exists, never what is still display:none.
+
+     paint() clears the tint from every option and not only from the ones on
+     screen. A row that is hidden while it is highlighted keeps the class it
+     was wearing, and comes back tinted underneath a second tinted row — two
+     rows that both look like the one Enter would take.
+
+     A failure that lands after the query has fallen below the floor is not
+     reported. The request belonged to a query that is no longer in the box, so
+     the retry row would offer to send a search nobody asked for, quoting one
+     character back at them.
+
+     Every swap puts the highlight back on the first row. The rows are
+     different rows: an index into the old answer means nothing against the
+     new one, and Enter on a stale index opens whatever moved into that slot.
+
+     The swap target takes role="none" so a generic div does not sit inside the
+     listbox as an unnamed group of nothing. Its children are still exposed to
+     the group above it, which is where the label lives.
+
+     Retry is a row and not a button, for the same reason every other row is:
+     a button inside the panel is a tab stop inside a widget that has none. It
+     carries no hx-get of its own either. The input's trigger list holds a
+     second event — retry — and the row dispatches it on the input, so the
+     request is still made by the element that holds the query, still carries
+     the same parameters and is still governed by hx-sync. A second hx-get on
+     the row is a second element asking the same endpoint with no idea what is
+     in the box.
+
+     The failure is announced as well as drawn: a red line inside a panel says
+     nothing to a screen reader if the live region only ever reports counts.
+
+     The server returns rows and nothing else, each already wearing its role
+     and a unique id, because aria-activedescendant is going to point at one:
+
+       <div id="cph-po-1187" role="option" class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">…</div> -->
+<div data-kui="command-palette/htmx" x-data="{
+       open: false, q: '', ai: 0, aid: null,
+       loading: false, failed: false, searched: false, found: 0,
+       actions: [
+         { id: 'new-po',    label: 'New purchase order', icon: 'plus',          key: 'N' },
+         { id: 'post-grn',  label: 'Post goods receipt', icon: 'package-check', key: 'G' },
+         { id: 'approvals', label: 'Go to my approvals', icon: 'check-check',   key: 'A' }
+       ],
+       get acts() {
+         const s = this.q.trim().toLowerCase();
+         return this.actions.filter(a => a.label.toLowerCase().includes(s));
+       },
+       rows() { return [...this.$refs.list.querySelectorAll('[role=option]')].filter(el => el.offsetParent !== null); },
+       paint() {
+         const all = [...this.$refs.list.querySelectorAll('[role=option]')];
+         all.forEach(el => el.classList.remove('bg-zinc-100'));
+         const el = this.rows()[this.ai];
+         all.forEach(x => { if (x === el) x.classList.add('bg-zinc-100'); });
+         this.aid = el ? el.id : null;
+         if (el) el.scrollIntoView({ block: 'nearest' });
+       },
+       repaint() { this.$nextTick(() => requestAnimationFrame(() => this.paint())); },
+       move(n) {
+         const r = this.rows();
+         if (!r.length) return;
+         this.ai = Math.min(r.length - 1, Math.max(0, this.ai + n));
+         this.paint();
+       },
+       typed(v) {
+         this.q = v; this.ai = 0; this.failed = false;
+         if (v.trim().length < 2) { this.searched = false; this.found = 0; this.$refs.records.innerHTML = ''; }
+         this.repaint();
+       },
+       landed() {
+         this.searched = true; this.failed = false;
+         this.found = this.$refs.records.querySelectorAll('[role=option]').length;
+         this.ai = 0; this.repaint();
+       },
+       retry() { if (this.q.trim().length > 1) this.$refs.q.dispatchEvent(new Event('retry')); },
+       get announce() {
+         if (!this.open) return '';
+         if (this.loading) return 'Searching records';
+         if (this.failed) return 'The record search did not answer. The actions still work.';
+         const a = this.acts.length + (this.acts.length === 1 ? ' action' : ' actions');
+         if (!this.searched) return a;
+         if (!this.found) return 'No records. ' + a + '.';
+         const r = this.found + (this.found === 1 ? ' record' : ' records');
+         return this.acts.length ? r + ' and ' + a : r;
+       },
+       show() {
+         this.open = true; this.q = ''; this.ai = 0;
+         this.searched = false; this.failed = false; this.found = 0;
+         this.$refs.records.innerHTML = '';
+         this.repaint();
+       },
+       hide() { this.open = false; this.q = ''; this.ai = 0; this.aid = null; this.searched = false; this.found = 0; },
+       take(el) { if (!el) return; if (el.dataset.act === 'retry') { this.retry(); return; } this.hide(); },
+       commit() { this.take(this.rows()[this.ai]); }
+     }"
+     @keydown.window.meta.k.prevent="show()"
+     @keydown.window.ctrl.k.prevent="show()"
+     @keydown.escape.window="hide()"
+     @htmx:before-request.camel="loading = true; failed = false"
+     @htmx:after-request.camel="loading = false; if (!$event.detail.successful && q.trim().length > 1) { failed = true; searched = false; found = 0; $refs.records.innerHTML = ''; repaint() }"
+     @htmx:after-swap.camel="landed()">
+
+  <button type="button" @click="show()" aria-haspopup="dialog"
+          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="search" class="size-4 text-zinc-600"></i>
+    <span class="flex-1 text-left">Search Operations</span>
+    <kbd aria-hidden="true" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/40 px-3 pt-16 sm:pt-24">
+    <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
+         class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+
+      <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
+        <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+        <label for="cph-q" class="sr-only">Search orders, vendors and actions</label>
+        <input id="cph-q" x-ref="q" type="text" role="combobox" autocomplete="off" autofocus
+               aria-autocomplete="list" aria-controls="cph-list"
+               :aria-expanded="open" :aria-activedescendant="aid"
+               placeholder="Search orders, vendors, actions…"
+               hx-get="/search/records/"
+               hx-trigger="input[this.value.length > 1] changed delay:300ms, retry"
+               hx-target="#cph-records" hx-swap="innerHTML" hx-sync="this:replace"
+               @input="typed($event.target.value)"
+               @keydown.arrow-down.prevent="move(1)"
+               @keydown.arrow-up.prevent="move(-1)"
+               @keydown.enter.prevent="commit()"
+               class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        <span class="flex size-4 shrink-0 items-center justify-center" x-show="loading" x-cloak>
+          <i data-lucide="loader-circle" class="size-4 animate-spin text-zinc-600"></i>
+        </span>
+        <button type="button" @click="hide()" class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px]/4 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Esc</button>
+      </div>
+
+      <div id="cph-list" x-ref="list" role="listbox" aria-label="Results" class="max-h-80 overflow-y-auto pb-1"
+           @click="take($event.target.closest('[role=option]'))"
+           @mousemove="const el = $event.target.closest('[role=option]'); if (el) { ai = rows().indexOf(el); paint() }"
+           @mousedown.prevent>
+
+        <div role="group" aria-label="Actions" x-show="acts.length">
+          <p aria-hidden="true"
+             class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Actions</p>
+          <!-- no :class for the highlight: paint() owns the tint for every row
+               in the listbox, the swapped ones included -->
+          <template x-for="a in acts" :key="a.id">
+            <div :id="'cph-' + a.id" role="option" class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+              <span class="flex size-4 shrink-0 items-center justify-center text-zinc-600">
+                <i :data-lucide="a.icon" class="size-4"></i>
+              </span>
+              <span class="min-w-0 flex-1 truncate" x-text="a.label"></span>
+              <kbd class="shrink-0 rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500" x-text="a.key"></kbd>
+            </div>
+          </template>
+        </div>
+
+        <div role="group" aria-label="Records" x-show="found > 0" x-cloak>
+          <p aria-hidden="true"
+             class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Records</p>
+          <!-- role="none" so the swap target is not an unnamed group inside the
+               listbox; its rows still belong to the group above -->
+          <div id="cph-records" x-ref="records" role="none"></div>
+        </div>
+
+        <div id="cph-retry" role="option" data-act="retry" x-show="failed" x-cloak
+             class="flex items-start gap-2.5 px-3 py-2 text-[13px]/5">
+          <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center text-zinc-600">
+            <i data-lucide="rotate-ccw" class="size-4"></i>
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="block">The record search did not answer</span>
+            <span class="block text-[12px]/4 text-zinc-500">Take this row to search for “<span x-text="q"></span>” again. The actions above still work.</span>
+          </span>
+        </div>
+      </div>
+
+      <div x-show="!searched && !failed && !loading" x-cloak class="border-t border-zinc-100 px-4 py-4 text-center">
+        <p class="text-[13px]/5 tabular-nums text-zinc-500">Type two characters to search 1,284 orders, 248 vendors and 9,412 items.</p>
+      </div>
+
+      <div x-show="searched && !found && !loading" x-cloak class="border-t border-zinc-100 px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">No record matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Records are searched by number, name and code — PO-24-1187, VEN-0142.</p>
+      </div>
+
+      <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
+        <span class="ml-auto">Operations</span>
+      </div>
+
+      <p role="status" class="sr-only" x-text="announce"></p>
+    </div>
+  </div>
+</div>

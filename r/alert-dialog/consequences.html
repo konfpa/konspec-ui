@@ -1,0 +1,124 @@
+<!-- When the consequence is a list rather than a sentence. Nine documents go
+     read-only and the user is entitled to see which nine before answering,
+     which is more than a paragraph can carry and more than a toast afterwards
+     can repair.
+
+     The panel becomes the three-part shape a scrolling dialog uses — fixed
+     head, scrolling body, fixed footer, capped at 80vh — for one reason: the
+     confirm button must never be below the fold. Let the whole panel grow and
+     scroll instead and the answer to the question sits somewhere off the bottom
+     of a phone, and the user scrolls a list they were not reading to find it.
+
+     min-h-0 on the body is what allows the flex child to shrink. Without it the
+     body takes its content height, the panel overflows its own max-h and the
+     footer leaves the viewport — the exact defect the max-h was added to
+     prevent.
+
+     The scroller carries tabindex="0" and a name. A region that scrolls under
+     the wheel and cannot be reached by Tab is unreachable to anyone on a
+     keyboard, and this is the one place in the component where that matters
+     most, because the list is what the answer depends on. It takes the inset
+     focus outline, since the panel is overflow-hidden and would clip an
+     outward one.
+
+     That also makes the scroller the first focusable element, so focus opens on
+     the list rather than on Cancel. That is the right trade here — the destroy
+     button is still last, and the thing the trap lands on is the thing that has
+     to be read. -->
+<div data-kui="alert-dialog/consequences" x-data="{ open: false }">
+  <button type="button" @click="open = true"
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Lock August 2026</button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="lock-title" aria-describedby="lock-body"
+         class="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+      <div class="shrink-0 px-5 pt-5 pb-3">
+        <h2 id="lock-title" class="text-[16px]/6 font-semibold">Lock the August 2026 period</h2>
+        <p id="lock-body" class="mt-1.5 text-[13px]/5 text-zinc-600">
+          <span class="tabular-nums">9 documents</span> dated on or before 31 Aug 2026 become read-only and
+          no entry can be posted into the period again. Only the finance controller can reopen it.
+        </p>
+      </div>
+
+      <div tabindex="0" role="group" aria-label="Documents locked by this change"
+           class="min-h-0 flex-1 overflow-y-auto border-y border-zinc-200 px-5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700">
+        <ul>
+          <li class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">GRN 1142 · Nashik Steel Traders</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">Goods receipt · 04 Aug 2026</p>
+            </div>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹18,42,000</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">GRN 1147 · Gujarat Polymers Ltd</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">Goods receipt · 09 Aug 2026</p>
+            </div>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹4,82,000</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">PI-26-0418 · Deccan Fasteners Pvt Ltd</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">Purchase invoice · 12 Aug 2026</p>
+            </div>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹3,84,500</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">PI-26-0421 · Konkan Chemicals Pvt Ltd</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">Purchase invoice · 14 Aug 2026</p>
+            </div>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹96,400</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">TO-26-0092 · Wada to Bhiwandi</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">Transfer order · 18 Aug 2026</p>
+            </div>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">12.4 MT</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">JV-26-0311 · Freight accrual</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">Journal voucher · 21 Aug 2026</p>
+            </div>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,18,750</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">PMT-26-0177 · Baroda Fasteners</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">Vendor payment · 24 Aug 2026</p>
+            </div>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹7,50,000</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5">
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">GRN 1153 · Sharma Extrusions</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">Goods receipt · 28 Aug 2026</p>
+            </div>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹2,64,300</span>
+          </li>
+          <li class="flex items-center justify-between gap-4 py-2.5">
+            <div class="min-w-0">
+              <p class="truncate text-[13px]/5 font-medium">JV-26-0318 · Depreciation, August</p>
+              <p class="text-[12px]/4 tabular-nums text-zinc-500">Journal voucher · 31 Aug 2026</p>
+            </div>
+            <span class="shrink-0 text-[13px]/5 tabular-nums">₹9,42,180</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="flex shrink-0 flex-col-reverse gap-2 bg-zinc-100 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-[12px]/4 tabular-nums text-zinc-600">Locked by Ritu Deshpande · takes effect at once</p>
+        <div class="flex flex-col-reverse gap-2 sm:flex-row">
+          <button type="button" @click="open = false"
+                  class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+          <button type="button" @click="open = false"
+                  class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Lock the period</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

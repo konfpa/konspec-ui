@@ -1,0 +1,87 @@
+<!-- The act needs one piece of information before it can happen, and without
+     it the act is worthless: a rejection with no reason sends the buyer back to
+     the same order with nothing to change. So the question and the field are
+     one interruption rather than two screens.
+
+     One field, and it is required. The moment a second field is genuinely
+     needed this has stopped being a question and become a form, and a form
+     belongs in dialog or on a page — an alert dialog that grew four inputs is a
+     modal form wearing an alarm icon, and it loses the one property that made
+     it worth interrupting for.
+
+     The select is first in the DOM, so the trap opens on the thing that has to
+     be filled in rather than on Cancel. The confirm is genuinely disabled until
+     the reason is chosen, and the note is required only for Other, which is the
+     one choice that carries no information by itself.
+
+     The note is not a second question, it is the same one — which is why it
+     sits under the reason rather than beside it, and why its help text says who
+     reads it. A free-text box with no audience named gets filled with "as
+     discussed".
+
+     The select takes appearance-none and a drawn chevron on a pointer-events-
+     none span, because a select with both the platform arrow and a drawn one
+     has two arrows, and a span over the right end of the control swallows the
+     click that opens the list. -->
+<div data-kui="alert-dialog/reason" x-data="{ open: false, reason: '', note: '' }">
+  <button type="button" @click="open = true; reason = ''; note = ''"
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reject order</button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="rej-title" aria-describedby="rej-body"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <h2 id="rej-title" class="text-[16px]/6 font-semibold">Reject PO-24-1191</h2>
+      <p id="rej-body" class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+        Deccan Fasteners Pvt Ltd · ₹3,84,500 · raised 02 Sep 2026. The order returns to draft and
+        Anil Kulkarni is emailed the reason.
+      </p>
+
+      <div class="mt-4">
+        <label for="rej-reason" class="mb-1.5 block text-[13px]/5 font-medium">
+          Reason <span aria-hidden="true" class="text-red-600">*</span>
+        </label>
+        <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="rej-reason" name="reason" x-model="reason" required
+                  class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+            <option value="" selected disabled hidden>Choose a reason</option>
+            <option value="rate">Rate above the running contract</option>
+            <option value="qty">Quantity exceeds the indent</option>
+            <option value="vendor">Vendor documents expired</option>
+            <option value="budget">No budget left on this cost centre</option>
+            <option value="other">Other</option>
+          </select>
+          <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+            <i data-lucide="chevron-down" class="size-4"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <label for="rej-note" class="mb-1.5 block text-[13px]/5 font-medium">
+          Note to the buyer
+          <span x-show="reason === 'other'" x-cloak aria-hidden="true" class="text-red-600">*</span>
+        </label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <textarea id="rej-note" name="note" rows="3" x-model="note" aria-describedby="rej-note-help"
+                    :required="reason === 'other'"
+                    class="block w-full resize-none bg-transparent px-3 py-2 text-[14px]/5 outline-none placeholder:text-zinc-500"
+                    placeholder="Quote the contract rate, or the indent line that does not match."></textarea>
+        </div>
+        <p id="rej-note-help" class="mt-1.5 text-[12px]/4 text-zinc-500">
+          Goes into the rejection email and onto the order history. Required when the reason is Other.
+        </p>
+      </div>
+
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <button type="button" @click="open = false"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="open = false"
+                :disabled="!reason || (reason === 'other' && note.trim() === '')"
+                class="rounded-lg border border-transparent bg-red-600 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-300 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
+          Reject order
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

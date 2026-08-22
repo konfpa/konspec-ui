@@ -74,7 +74,7 @@
 
     <div class="flex justify-end gap-2 border-t border-zinc-200 px-4 py-3">
       <button type="button" x-ref="fire" @click="post()" :disabled="posted"
-              class="rounded-lg bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="rounded-lg border border-transparent bg-zinc-700 px-3 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-300 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:bg-zinc-200">
         Post GRN
       </button>
     </div>
@@ -93,7 +93,7 @@
            x-transition:leave-end="translate-y-2 opacity-0">
         <span class="mt-0.5 flex size-4 shrink-0 text-emerald-600"><i data-lucide="check-circle-2" class="size-4"></i></span>
         <div class="min-w-0 flex-1">
-          <p class="text-[13px]/5 font-medium" x-text="t.text"></p>
+          <p class="text-[13px]/5 font-medium tabular-nums" x-text="t.text"></p>
           <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600" x-text="t.meta"></p>
         </div>
         <button type="button"

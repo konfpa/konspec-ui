@@ -1,0 +1,101 @@
+<!-- Three empties in one box, and the middle one is the one that gets skipped.
+     Nothing typed, not enough typed, and enough typed with nothing matching are
+     three different facts, and a lookup that renders the second as the third
+     lies about the masters. Two characters into an item search that queries at
+     three, "No items match hd" tells a storekeeper the item does not exist —
+     and the conscientious ones raise a request to have it created, for an item
+     that was sitting there under a third character they had not finished
+     typing.
+
+     Count the shortfall rather than gesturing at it. "The search runs at 3
+     characters and you have typed 2" ends the guessing; "keep typing" does not
+     say for how long.
+
+     No action on the threshold state. The user is already pressing the only
+     keys that help, and a button beside a search box somebody is mid-word in is
+     a target for a stray click. This is the second of the two states in the
+     entry with nothing to press, and it is for the opposite reason to the
+     first: permission has nothing the account may do, and this one has nothing
+     the component can do better than the user already is.
+
+     The status region stays silent below the threshold. It reports the count
+     once the search has actually run, because a sentence written into it on
+     every keypress queues one announcement per key and buries the count that
+     finally matters. The shortfall is drawn, in the panel, where the person
+     typing can see it without being read to. -->
+<div data-kui="empty-state/too-short" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       min: 3,
+       q: 'hd',
+       items: [
+         { code: 'RM-HDPE-NAT', name: 'HDPE granules, natural', hsn: '3901 20 00', stock: '1,240 kg' },
+         { code: 'RM-HDPE-BLU', name: 'HDPE granules, blue', hsn: '3901 20 00', stock: '0 kg' },
+         { code: 'SC-HDPE-FLM', name: 'HDPE film scrap', hsn: '3915 10 00', stock: '320 kg' },
+         { code: 'RM-MS-ANG50', name: 'MS angle 50x50x5', hsn: '7216 21 00', stock: '4.6 MT' }
+       ],
+       get hits() {
+         const q = this.q.trim().toLowerCase();
+         return this.items.filter(i => (i.code + ' ' + i.name + ' ' + i.hsn).toLowerCase().includes(q));
+       },
+       get mode() {
+         const n = this.q.trim().length;
+         if (!n) return 'idle';
+         if (n < this.min) return 'short';
+         return this.hits.length ? 'rows' : 'none';
+       }
+     }">
+
+  <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 px-4 py-3">
+    <div class="flex min-w-48 flex-1 items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="ml-3 size-4 shrink-0 text-zinc-600"></i>
+      <input type="search" x-model="q" aria-label="Search the item master"
+             placeholder="Item code, description or HSN"
+             class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+    <p role="status" class="text-[12px]/4 text-zinc-500 tabular-nums"
+       x-text="mode === 'rows' ? hits.length + ' of 4,180 items' : mode === 'none' ? 'No items match this search' : ''"></p>
+  </div>
+
+  <div x-show="mode === 'short'" class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="search" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">The search has not run yet</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      It runs at <span class="font-medium text-zinc-900 tabular-nums" x-text="min"></span> characters and you have typed <span class="font-medium text-zinc-900 tabular-nums" x-text="q.trim().length"></span>. Nothing has been looked up, so nothing here says the item is missing.
+    </p>
+    <p class="mt-2 text-[12px]/4 text-zinc-500 tabular-nums">4,180 items across Silvassa and Umbergaon</p>
+  </div>
+
+  <div x-show="mode === 'idle'" x-cloak class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="package-search" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">Search the item master</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      Raw material, bought-out parts, consumables and scrap codes. Search by item code, description or HSN.
+    </p>
+  </div>
+
+  <div x-show="mode === 'none'" x-cloak class="flex min-h-64 flex-col items-center justify-center px-6 py-12 text-center">
+    <span class="flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="search-x" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[16px]/6 font-semibold">No items match this search</h3>
+    <p class="mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+      The search ran across 4,180 items and matched nothing for <span class="font-medium text-zinc-900" x-text="q"></span>. It covers the item code, the description and the HSN.
+    </p>
+  </div>
+
+  <ul x-show="mode === 'rows'" x-cloak role="list" class="divide-y divide-zinc-100 text-[13px]/5">
+    <template x-for="i in hits" :key="i.code">
+      <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 px-4 py-2.5">
+        <span class="min-w-0">
+          <span class="font-medium tabular-nums" x-text="i.code"></span>
+          <span class="text-zinc-600" x-text="' · ' + i.name"></span>
+        </span>
+        <span class="text-zinc-600 tabular-nums" x-text="'HSN ' + i.hsn + ' · ' + i.stock"></span>
+      </li>
+    </template>
+  </ul>
+</div>

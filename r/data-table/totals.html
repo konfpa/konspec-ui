@@ -1,0 +1,133 @@
+<!-- Two totals, because there are two questions and they have different
+     answers: what is on this page, and what the filter is worth. Page the
+     register and the first figure moves while the second holds still. A footer
+     that sums the five visible rows and calls it "Total" is the defect this
+     variant exists to prevent — it is off by every row the user has not paged
+     to, it looks right, and nothing on screen contradicts it.
+
+     The whole register is in the browser here, so both figures are added up. On
+     a real screen the client holds one page and the filter total arrives with it
+     as one more number in the response, which changes where the second figure
+     comes from and not what it means. Either way it is never the sum of what is
+     on screen.
+
+     It is a real <tfoot>, not a strip after the table. The cells sit in the
+     columns they total, so the figures line up under them at any width, and a
+     screen reader reading down the Amount column reaches the total in that
+     column rather than a paragraph after the table. It is written after the
+     <tbody> and the browser paints it last; it does not need moving and it must
+     not be a second <thead>.
+
+     The label cell is a <th scope="row"> spanning the columns that carry no
+     figure, and both rows say in words what they are the total of. Two
+     right-aligned figures under one column with no labels are a puzzle.
+
+     Quantity totals only where the unit is the same. These orders are all in MT,
+     so the column adds up; a register mixing MT with nos and litres gets no
+     quantity total at all, because a figure summed across three different units
+     is not a number anybody can use.
+
+     Below md the table restacks into cards and a tfoot has no columns to line up
+     with, so the same two totals become a strip at the foot of the list, labels
+     left and figures right. -->
+<div data-kui="data-table/totals" x-data="{
+       page: 1, size: 5,
+       rows: Array.from({ length: 42 }, (_, i) => ({
+         po: 'PO-24-' + (1187 + i * 4),
+         vendor: ['Sharma Extrusions', 'Nashik Steel Traders', 'Gujarat Polymers Ltd', 'Konkan Chemicals Pvt Ltd'][i % 4],
+         qty: (75 + (i * 137) % 1900) / 100,
+         amount: 96750 + (i * 417350) % 4800000
+       })),
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       tonnes(n) { return n.toLocaleString('en-IN', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' MT' },
+       sum(rows, key) { return rows.reduce((t, r) => t + r[key], 0) },
+       get pages() { return Math.ceil(this.rows.length / this.size) },
+       get shown() { return this.rows.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.rows.length) }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Open orders · HDPE</h2>
+    <p class="text-[12px]/4 text-zinc-500 tabular-nums" x-text="rows.length + ' orders match'"></p>
+  </div>
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Vendor</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Quantity</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in shown" :key="r.po">
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="px-4 py-2.5 text-zinc-600" x-text="r.vendor"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="tonnes(r.qty)"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+    <tfoot>
+      <tr class="border-b border-zinc-100 bg-zinc-50">
+        <th scope="row" colspan="2" class="px-4 py-2.5 text-left text-[13px]/5 font-medium">
+          This page
+        </th>
+        <td class="px-4 py-2.5 text-right font-medium tabular-nums" x-text="tonnes(sum(shown, 'qty'))"></td>
+        <td class="px-4 py-2.5 text-right font-medium tabular-nums" x-text="money(sum(shown, 'amount'))"></td>
+      </tr>
+      <tr class="bg-zinc-50">
+        <th scope="row" colspan="2" class="px-4 py-2.5 text-left text-[13px]/5 font-medium">
+          All <span class="tabular-nums" x-text="rows.length"></span> orders in this filter
+        </th>
+        <td class="px-4 py-2.5 text-right font-semibold tabular-nums" x-text="tonnes(sum(rows, 'qty'))"></td>
+        <td class="px-4 py-2.5 text-right font-semibold tabular-nums" x-text="money(sum(rows, 'amount'))"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <template x-for="r in shown" :key="r.po">
+      <li class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <span class="text-[14px]/5 font-medium tabular-nums" x-text="r.po"></span>
+          <span class="text-[14px]/5 tabular-nums" x-text="money(r.amount)"></span>
+        </div>
+        <p class="mt-0.5 flex items-baseline justify-between gap-3 text-[13px]/5 text-zinc-600">
+          <span x-text="r.vendor"></span>
+          <span class="tabular-nums" x-text="tonnes(r.qty)"></span>
+        </p>
+      </li>
+    </template>
+  </ul>
+
+  <div class="space-y-1 border-t border-zinc-200 bg-zinc-50 px-4 py-3 md:hidden">
+    <p class="flex items-baseline justify-between gap-3 text-[13px]/5">
+      <span class="font-medium">This page</span>
+      <span class="tabular-nums"><span x-text="tonnes(sum(shown, 'qty'))"></span> · <span x-text="money(sum(shown, 'amount'))"></span></span>
+    </p>
+    <p class="flex items-baseline justify-between gap-3 text-[13px]/5">
+      <span class="font-medium">All <span class="tabular-nums" x-text="rows.length"></span> orders in this filter</span>
+      <span class="font-semibold tabular-nums"><span x-text="tonnes(sum(rows, 'qty'))"></span> · <span x-text="money(sum(rows, 'amount'))"></span></span>
+    </p>
+  </div>
+
+  <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="from + '–' + to + ' of ' + rows.length + ' orders'"></p>
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
+      <button type="button" @click="page--" :disabled="page === 1"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" @click="page++" :disabled="page === pages"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>

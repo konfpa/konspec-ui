@@ -1,0 +1,74 @@
+<!-- The same seven slots, rendered as anchors, because a page is a place and
+     not a gesture. ?page=1&amp;size=20 in the address bar is what makes the
+     register survive a refresh, arrive intact in a colleague's message, and
+     come back where it was when somebody opens PO-24-1204 and presses Back. A
+     pager built from buttons and client state loses all three without breaking
+     anything on screen, which is why nobody ever reports it.
+
+     Anchors also hand back the gestures a button never had. Middle-click,
+     Ctrl-click and long-press open page 5 in a new tab, and three tabs of one
+     register at three pages is how a buyer actually reconciles a month. A
+     button offers no context menu at all and swallows every one of them.
+
+     Previous is a <button disabled> rather than an anchor, which is the reason
+     to draw page one here. An anchor has no unavailable state: aria-disabled on
+     an <a href> leaves it focusable, clickable and in the context menu and
+     stops nothing, and removing the href stops it being a link at all, so it
+     leaves the tab order without ever announcing why. The one element with a
+     real unavailable state is a button, and swapping to it keeps the width,
+     which is the same reason the ends never disappear.
+
+     rel="next" costs one attribute on the anchor that already means it, and a
+     prefetcher and a reader mode both read it; rel="prev" goes on the opposite
+     anchor wherever there is one to put it on. The range is a plain paragraph
+     rather than a role="status", because every one of these is a real
+     navigation and a page load announces itself. -->
+<nav data-kui="pagination/links" aria-label="Ledger pages"
+     class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
+
+  <p class="text-[13px]/5 tabular-nums text-zinc-600">1–20 of 1,438 entries</p>
+
+  <div class="flex items-center gap-2">
+    <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden">Page 1 of 72</span>
+
+    <button type="button" disabled aria-label="Previous page"
+            class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-400">
+      <i data-lucide="chevron-left" class="size-4"></i>
+    </button>
+
+    <ul role="list" class="hidden items-center gap-1 md:flex">
+      <li>
+        <a href="?page=1&amp;size=20" aria-label="Page 1" aria-current="page"
+           class="flex size-9 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-medium tabular-nums text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">1</a>
+      </li>
+      <li>
+        <a href="?page=2&amp;size=20" aria-label="Page 2"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">2</a>
+      </li>
+      <li>
+        <a href="?page=3&amp;size=20" aria-label="Page 3"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">3</a>
+      </li>
+      <li>
+        <a href="?page=4&amp;size=20" aria-label="Page 4"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">4</a>
+      </li>
+      <li>
+        <a href="?page=5&amp;size=20" aria-label="Page 5"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">5</a>
+      </li>
+      <li>
+        <span aria-hidden="true" class="flex size-9 items-center justify-center text-[13px]/5 text-zinc-500">…</span>
+      </li>
+      <li>
+        <a href="?page=72&amp;size=20" aria-label="Page 72"
+           class="flex size-9 items-center justify-center rounded-lg text-[13px]/5 tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">72</a>
+      </li>
+    </ul>
+
+    <a href="?page=2&amp;size=20" rel="next" aria-label="Next page"
+       class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-right" class="size-4"></i>
+    </a>
+  </div>
+</nav>

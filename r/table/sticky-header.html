@@ -1,0 +1,143 @@
+<!-- border-separate border-spacing-0 is the whole trick, and it is not
+     cosmetic. Preflight sets border-collapse: collapse, and in a collapsed
+     table the borders belong to the table rather than to the cells, so the rule
+     under the header does not travel with the header when it sticks: the
+     labels float over the rows with nothing between them and the first row
+     looks like part of the head. Separated borders give the cells their own,
+     and the price is that the row rules move from the <tr> onto the <td>.
+
+     sticky goes on each <th>, not on the <thead> or the <tr>. Sticky table
+     sections are newer than sticky cells and still disagree between engines
+     about what a sticky <tr> does with its border; a sticky cell has behaved
+     the same way everywhere for years.
+
+     Each header cell carries bg-zinc-50 — the recessed band a table head takes
+     anyway. Without a fill of its own a sticky header is transparent and the
+     rows scroll straight through the labels, which is legible for exactly the
+     first two rows.
+
+     z-10 is the layer the rest of the system expects a sticky table head to sit
+     in, below the z-30 application header and well below the z-50 overlays.
+
+     The scroller is the div around the table, not the table, because a table is
+     not a scroll container. It takes overscroll-contain so that reaching the
+     last receipt does not hand the wheel to the page behind it and jump the
+     user somewhere else entirely.
+
+     Below md the table is gone and so is the sticky head: the cards are read in
+     the page's own scroll and a header of column names would have nothing to
+     label. -->
+<div data-kui="table/sticky-header" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="hidden max-h-80 overflow-y-auto overscroll-contain md:block">
+    <table class="w-full border-separate border-spacing-0 text-[13px]/5">
+      <thead>
+        <tr class="text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">GRN number</th>
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">Vendor</th>
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 font-medium">Item</th>
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium">Received</th>
+          <th scope="col" class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-right font-medium">Value</th>
+        </tr>
+      </thead>
+      <tbody class="[&>tr:last-child>td]:border-b-0">
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0448</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Gujarat Polymers Ltd</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">HDPE granules</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">12,000 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹10,44,000</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0447</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Nashik Steel Traders</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">M12 hex bolt</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">4,000 nos</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹96,000</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0446</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Gujarat Polymers Ltd</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Masterbatch white</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">250 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹61,250</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0445</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Sharma Extrusions</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">MS angle 50×50×5</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">2,400 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,53,600</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0444</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Qureshi Metals</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Stretch film 23 micron</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">300 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹52,500</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0443</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Nashik Steel Traders</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">MS plate 6 mm</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">1,850 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹1,29,500</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0442</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Gujarat Polymers Ltd</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">LLDPE granules</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">8,000 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹7,04,000</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0441</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Qureshi Metals</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Aluminium section</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">640 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹2,17,600</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0440</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Sharma Extrusions</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Die steel H13</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">180 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹96,750</td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <td class="border-b border-zinc-100 px-4 py-2.5 font-medium tabular-nums">GRN-26-0439</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5">Nashik Steel Traders</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-zinc-600">Welding electrodes</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">120 kg</td>
+          <td class="border-b border-zinc-100 px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹28,800</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ul class="divide-y divide-zinc-100 md:hidden">
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">GRN-26-0448</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹10,44,000</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · HDPE granules</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">12,000 kg received</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">GRN-26-0447</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹96,000</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Nashik Steel Traders · M12 hex bolt</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4,000 nos received</p>
+    </li>
+    <li class="px-4 py-3">
+      <div class="flex items-baseline justify-between gap-3">
+        <span class="text-[14px]/5 font-medium tabular-nums">GRN-26-0446</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹61,250</span>
+      </div>
+      <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · Masterbatch white</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">250 kg received</p>
+    </li>
+  </ul>
+</div>

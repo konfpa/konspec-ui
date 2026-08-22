@@ -1,0 +1,213 @@
+<!-- The Lines menu acts on whatever is ticked in the sheet below it, and the
+     count goes in the item labels because there is nowhere else it can go. The
+     panel opens over the sheet, so at the moment somebody is reading "Set
+     delivery date" the rows they ticked are underneath it. A bound label — "Set
+     delivery date on 3 lines" — is the only place the count can be read at the
+     instant the decision is made, and it is bound rather than written, or the
+     menu says three the second time it is opened with five rows ticked.
+
+     The count does not go on the trigger. A title that grows from Lines to
+     Lines (3) shifts every menu to the right of it while the pointer is resting
+     on one, and the bar whose positions the user learned is a different bar
+     after every tick. The bar is furniture; the panel is where the state goes.
+
+     With nothing selected the items stay exactly where they are, take
+     aria-disabled and say "Select a line first" in the hint column. Rendering
+     them only once something is ticked makes the fourth item of the menu Delete
+     on one visit and nothing at all on the next, which is the defect the
+     disabled rows in states exist to prevent — a menu is learned by position,
+     and the position has to survive a checkbox.
+
+     Select all is a command and belongs in the menu. The checkboxes are not:
+     they are real inputs in the sheet, because a menuitemcheckbox per line
+     inside the panel would be a second copy of the selection, hidden behind a
+     trigger, disagreeing with the visible one within a minute. -->
+<div data-kui="menubar/selection" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       open: null, at: 'file', typed: '', clock: null,
+       sel: [],
+       all: ['1', '2', '3', '4'],
+       label(verb) {
+         if (!this.sel.length) return verb + ' lines';
+         return verb + ' ' + this.sel.length + (this.sel.length === 1 ? ' line' : ' lines');
+       },
+       trigs() { return [...this.$refs.bar.querySelectorAll('[data-menu]')] },
+       items() {
+         const p = this.$refs.bar.querySelector('[data-panel=' + this.open + ']');
+         return p ? [...p.querySelectorAll('[role^=menuitem]')] : [];
+       },
+       to(id) {
+         this.at = id;
+         this.trigs().find(t => t.dataset.menu === id)?.focus();
+         if (this.open !== null) this.open = id;
+       },
+       show(id, last = false) {
+         this.open = id; this.at = id;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus();
+         }));
+       },
+       close(back = true) {
+         if (this.open === null) return;
+         const id = this.open; this.open = null;
+         if (back) this.to(id);
+       },
+       step(n) {
+         const t = this.trigs(), i = t.findIndex(e => e.dataset.menu === this.at);
+         this.to(t[(i + n + t.length) % t.length].dataset.menu);
+       },
+       jump(last) { const t = this.trigs(); this.to((last ? t[t.length - 1] : t[0]).dataset.menu) },
+       move(n) { const i = this.items(), a = i.indexOf(document.activeElement); i[(a + n + i.length) % i.length]?.focus() },
+       edge(last) { const i = this.items(); (last ? i[i.length - 1] : i[0])?.focus() },
+       type(e) {
+         if (!e.target.dataset.menu || e.key === ' ' || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+         clearTimeout(this.clock);
+         this.typed += e.key.toLowerCase();
+         this.clock = setTimeout(() => { this.typed = '' }, 500);
+         const t = this.trigs().find(x => x.textContent.trim().toLowerCase().startsWith(this.typed));
+         if (t) { e.preventDefault(); this.to(t.dataset.menu) }
+       }
+     }"
+     @click.outside="close(false)"
+     @keydown="type($event)"
+     @keydown.escape="if (open !== null) { $event.stopPropagation(); close() }">
+
+  <div x-ref="bar" role="menubar" aria-label="Rate contract commands"
+       class="relative flex items-center gap-0.5 border-b border-zinc-100 px-1 py-1">
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="file"
+              :aria-expanded="open === 'file'" :tabindex="at === 'file' ? 0 : -1"
+              @click="open === 'file' ? close() : show('file')"
+              @mouseenter="if (open !== null) to('file')"
+              @keydown.arrow-down.prevent="show('file')" @keydown.arrow-up.prevent="show('file', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'file' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">File</button>
+
+      <div x-show="open === 'file'" x-cloak data-panel="file" role="menu" aria-label="File"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" aria-keyshortcuts="Control+S" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="save" class="size-4 text-zinc-600"></i>Save revision
+          <span aria-hidden="true" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Ctrl S</span>
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="sheet" class="size-4 text-zinc-600"></i>Export to Excel
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="lines"
+              :aria-expanded="open === 'lines'" :tabindex="at === 'lines' ? 0 : -1"
+              @click="open === 'lines' ? close() : show('lines')"
+              @mouseenter="if (open !== null) to('lines')"
+              @keydown.arrow-down.prevent="show('lines')" @keydown.arrow-up.prevent="show('lines', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'lines' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">Lines</button>
+
+      <div x-show="open === 'lines'" x-cloak data-panel="lines" role="menu" aria-label="Lines"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+
+        <button type="button" role="menuitem" tabindex="-1" @click="sel = [...all]; close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <span class="flex text-zinc-600"><i data-lucide="list-checks" class="size-4"></i></span>
+          <span x-text="'Select all ' + all.length + ' lines'"></span>
+        </button>
+
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+
+        <button type="button" role="menuitem" tabindex="-1" :aria-disabled="!sel.length"
+                @click="if (sel.length) close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"
+                :class="sel.length ? 'hover:bg-zinc-100' : 'opacity-60'">
+          <span class="flex text-zinc-600"><i data-lucide="copy" class="size-4"></i></span>
+          <span x-text="label('Duplicate')"></span>
+          <span x-show="!sel.length" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Select a line first</span>
+        </button>
+
+        <button type="button" role="menuitem" tabindex="-1" :aria-disabled="!sel.length"
+                @click="if (sel.length) close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"
+                :class="sel.length ? 'hover:bg-zinc-100' : 'opacity-60'">
+          <span class="flex text-zinc-600"><i data-lucide="calendar" class="size-4"></i></span>
+          <span x-text="label('Set delivery date on')"></span>
+          <span x-show="!sel.length" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Select a line first</span>
+        </button>
+
+        <button type="button" role="menuitem" tabindex="-1" :aria-disabled="!sel.length"
+                @click="if (sel.length) close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"
+                :class="sel.length ? 'hover:bg-zinc-100' : 'opacity-60'">
+          <span class="flex text-zinc-600"><i data-lucide="percent" class="size-4"></i></span>
+          <span x-text="label('Apply contract rate to')"></span>
+          <span x-show="!sel.length" class="ml-auto shrink-0 pl-6 text-[12px]/4 text-zinc-500">Select a line first</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-md:static">
+      <button type="button" role="menuitem" aria-haspopup="menu" data-menu="view"
+              :aria-expanded="open === 'view'" :tabindex="at === 'view' ? 0 : -1"
+              @click="open === 'view' ? close() : show('view')"
+              @mouseenter="if (open !== null) to('view')"
+              @keydown.arrow-down.prevent="show('view')" @keydown.arrow-up.prevent="show('view', true)"
+              @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+              @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
+              class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'view' && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">View</button>
+
+      <div x-show="open === 'view'" x-cloak data-panel="view" role="menu" aria-label="View"
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
+           @keydown.home.prevent="edge(false)" @keydown.end.prevent="edge(true)"
+           @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
+           @keydown.tab="close()"
+           class="absolute top-full left-0 z-40 mt-1 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="close()"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
+          <i data-lucide="history" class="size-4 text-zinc-600"></i>Rate history
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="divide-y divide-zinc-100">
+    <label class="flex items-center gap-3 px-4 py-2.5 text-[13px]/5 hover:bg-zinc-100">
+      <input type="checkbox" value="1" x-model="sel" class="size-4 shrink-0 rounded accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">HDPE granules — grade 5200B</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹94/kg</span>
+    </label>
+    <label class="flex items-center gap-3 px-4 py-2.5 text-[13px]/5 hover:bg-zinc-100">
+      <input type="checkbox" value="2" x-model="sel" class="size-4 shrink-0 rounded accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">LDPE granules — grade 1020FA</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹102/kg</span>
+    </label>
+    <label class="flex items-center gap-3 px-4 py-2.5 text-[13px]/5 hover:bg-zinc-100">
+      <input type="checkbox" value="3" x-model="sel" class="size-4 shrink-0 rounded accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">Masterbatch — natural</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹390/kg</span>
+    </label>
+    <label class="flex items-center gap-3 px-4 py-2.5 text-[13px]/5 hover:bg-zinc-100">
+      <input type="checkbox" value="4" x-model="sel" class="size-4 shrink-0 rounded accent-zinc-700">
+      <span class="min-w-0 flex-1 truncate">Carton 400×300×250</span>
+      <span class="shrink-0 tabular-nums text-zinc-600">₹38/nos</span>
+    </label>
+  </div>
+
+  <p class="border-t border-zinc-100 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+    RC-2026-041 · Gujarat Polymers Ltd · <span x-text="sel.length"></span> of 4 lines selected
+  </p>
+</div>

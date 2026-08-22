@@ -1,0 +1,163 @@
+<!-- The card previews the material, not the line. Quantity, rate and amount
+     are already in the row the pointer is resting on, so putting them in the
+     card would spend every figure it has restating what the user is looking
+     at. What it adds is what the row cannot hold — what is in stock, what is
+     already committed against it, and what it last cost.
+
+     The freight line at the foot carries no card, and that is the rule rather
+     than an oversight. A hovercard goes on a reference to a record; freight is
+     a charge with nothing behind it, and a register where every cell twitches
+     as the pointer crosses it is harder to read than one with no cards at all.
+
+     Dense rows and the same 320px card. Density is the reason the open delay
+     matters more here than anywhere: at py-1.5 the pointer crosses four
+     triggers in the distance it crosses two in a comfortable table.
+
+     The pill says Active, following the vendor card. The five fixed statuses
+     describe what a record is doing and a material is not doing anything; the
+     standing of a thing takes emerald and the record words are left to
+     records. -->
+<div data-kui="hovercard/item" class="rounded-xl border border-zinc-300 bg-white">
+  <table class="w-full text-left text-[13px]/5">
+    <thead class="border-b border-zinc-200 bg-zinc-50 text-[11px]/4 tracking-wider text-zinc-600 uppercase">
+      <tr>
+        <th scope="col" class="rounded-tl-xl px-3 py-1.5 font-medium">Item</th>
+        <th scope="col" class="px-3 py-1.5 text-right font-medium">Qty</th>
+        <th scope="col" class="hidden px-3 py-1.5 text-right font-medium sm:table-cell">Rate</th>
+        <th scope="col" class="rounded-tr-xl px-3 py-1.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5">
+          <span class="relative inline-block"
+                x-data="{
+                  open: false, timer: 0,
+                  show(d = 350) {
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(() => {
+                      this.open = true;
+                      window.dispatchEvent(new CustomEvent('hovercard-open', { detail: this.$root }));
+                    }, d);
+                  },
+                  hide() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = false, 200); },
+                  shut() { clearTimeout(this.timer); this.open = false; }
+                }"
+                @mouseenter="show()" @mouseleave="hide()"
+                @focusin="show(0)" @focusout="hide()"
+                @keydown.escape.window="shut()"
+                @hovercard-open.window="if ($event.detail !== $root) shut()">
+
+            <a href="/items/hdpe-blm-45/" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">HDPE-BLM-45</a>
+
+            <div x-show="open" x-cloak x-transition.opacity.duration.150ms
+                 class="absolute top-full left-0 z-40 pt-2">
+              <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="truncate text-[14px]/5 font-semibold tabular-nums">HDPE-BLM-45</p>
+                    <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600 tabular-nums">Blow moulding granule · 45 MFI</p>
+                  </div>
+                  <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Active
+                  </span>
+                </div>
+                <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">In stock · Waluj</dt>
+                    <dd class="text-[12px]/4 font-medium tabular-nums">42.500 MT</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">Committed</dt>
+                    <dd class="text-[12px]/4 tabular-nums">18.000 MT</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">Last rate</dt>
+                    <dd class="text-[12px]/4 tabular-nums">₹86.40 / kg</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">HSN</dt>
+                    <dd class="text-[12px]/4 tabular-nums">3901 2000</dd>
+                  </div>
+                </dl>
+                <p class="mt-3 border-t border-zinc-100 pt-3 text-[12px]/4 text-zinc-500 tabular-nums">Last received 16 Aug 2026 · Gujarat Polymers Ltd</p>
+              </div>
+            </div>
+          </span>
+        </td>
+        <td class="px-3 py-1.5 text-right tabular-nums">1.200 MT</td>
+        <td class="hidden px-3 py-1.5 text-right tabular-nums sm:table-cell">₹87.00</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">₹1,04,400</td>
+      </tr>
+
+      <tr class="border-b border-zinc-100">
+        <td class="px-3 py-1.5">
+          <span class="relative inline-block"
+                x-data="{
+                  open: false, timer: 0,
+                  show(d = 350) {
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(() => {
+                      this.open = true;
+                      window.dispatchEvent(new CustomEvent('hovercard-open', { detail: this.$root }));
+                    }, d);
+                  },
+                  hide() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = false, 200); },
+                  shut() { clearTimeout(this.timer); this.open = false; }
+                }"
+                @mouseenter="show()" @mouseleave="hide()"
+                @focusin="show(0)" @focusout="hide()"
+                @keydown.escape.window="shut()"
+                @hovercard-open.window="if ($event.detail !== $root) shut()">
+
+            <a href="/items/ldpe-flm-12/" class="font-medium text-zinc-900 underline underline-offset-2 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">LDPE-FLM-12</a>
+
+            <div x-show="open" x-cloak x-transition.opacity.duration.150ms
+                 class="absolute top-full left-0 z-40 pt-2">
+              <div class="w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="truncate text-[14px]/5 font-semibold tabular-nums">LDPE-FLM-12</p>
+                    <p class="mt-0.5 truncate text-[12px]/4 text-zinc-600 tabular-nums">Film grade · 12 MFI</p>
+                  </div>
+                  <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                    <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Active
+                  </span>
+                </div>
+                <dl class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">In stock · Waluj</dt>
+                    <dd class="text-[12px]/4 font-medium tabular-nums">3.250 MT</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">Committed</dt>
+                    <dd class="text-[12px]/4 tabular-nums">3.000 MT</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">Last rate</dt>
+                    <dd class="text-[12px]/4 tabular-nums">₹97.00 / kg</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-3">
+                    <dt class="text-[12px]/4 text-zinc-600">HSN</dt>
+                    <dd class="text-[12px]/4 tabular-nums">3901 1010</dd>
+                  </div>
+                </dl>
+                <p class="mt-3 border-t border-zinc-100 pt-3 text-[12px]/4 text-zinc-500 tabular-nums">Last received 02 Aug 2026 · Vapi Polymer Works</p>
+              </div>
+            </div>
+          </span>
+        </td>
+        <td class="px-3 py-1.5 text-right tabular-nums">0.400 MT</td>
+        <td class="hidden px-3 py-1.5 text-right tabular-nums sm:table-cell">₹97.00</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">₹38,800</td>
+      </tr>
+
+      <tr>
+        <td class="px-3 py-1.5 text-zinc-600">Freight · Vapi to Waluj</td>
+        <td class="px-3 py-1.5 text-right text-zinc-500 tabular-nums">—</td>
+        <td class="hidden px-3 py-1.5 text-right text-zinc-500 tabular-nums sm:table-cell">—</td>
+        <td class="px-3 py-1.5 text-right tabular-nums">₹9,500</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

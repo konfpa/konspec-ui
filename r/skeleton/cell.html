@@ -1,0 +1,81 @@
+<!-- The rows are real and one column is not. Ordered quantity comes out of the
+     order; stock at the plant comes from a second system, one line at a time,
+     and arrives whenever it arrives.
+
+     This is not the case the rules forbid. Greying rows somebody is reading
+     deletes values they can see, and that is the spinner's scrim. These cells
+     have never held a value, so the block is that cell's first paint, and the
+     test is exactly that: is anything legible being replaced. Nothing here is.
+
+     aria-busy is on the <td> and not on the table. The table is not busy —
+     three of its cells are, and the rest are finished and should be read as
+     finished. A busy attribute on the table tells a screen reader the whole
+     register is in flight, and the eleven cells that already answered stop
+     counting.
+
+     The bar is w-16 and ml-auto: about the width of "3,240 kg", right-aligned
+     in the right-aligned column. Wider than the widest answer and the column
+     holds a width nothing needs for the length of the wait, then snaps narrower
+     when the figures land — the same reflow this component exists to prevent,
+     arriving one column at a time.
+
+     animate-pulse is on each block rather than on a wrapper, because there is
+     no wrapper that contains only blocks: the rows are real. They stay in phase
+     anyway, because every block was in the first paint. Cells only leave this
+     state and never enter it, so nothing starts an animation late.
+
+     Three columns and no restack. This table wraps at 390px rather than
+     becoming cards, because the point of it is the column, and a column that
+     becomes a card is not one. -->
+<div data-kui="skeleton/cell" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">Order lines · PO-24-1187</h2>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Stock at Nashik is read from the plant system one line at a time.</p>
+  </div>
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">Item</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Ordered</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">At Nashik</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5">PP copolymer, 1100 MFI</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">12,000 kg</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">3,240 kg</td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5">Masterbatch, black 2%</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">800 kg</td>
+        <td class="px-4 py-2.5" aria-busy="true">
+          <div class="flex h-5 items-center" aria-hidden="true">
+            <div class="ml-auto h-2.5 w-16 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div>
+          </div>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <td class="px-4 py-2.5">HDPE blow moulding grade</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">6,500 kg</td>
+        <td class="px-4 py-2.5" aria-busy="true">
+          <div class="flex h-5 items-center" aria-hidden="true">
+            <div class="ml-auto h-2.5 w-16 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="px-4 py-2.5">Calcium carbonate filler</td>
+        <td class="px-4 py-2.5 text-right tabular-nums">2,400 kg</td>
+        <td class="px-4 py-2.5" aria-busy="true">
+          <div class="flex h-5 items-center" aria-hidden="true">
+            <div class="ml-auto h-2.5 w-16 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p role="status" class="sr-only">Stock at Nashik is still loading for 3 of 4 lines</p>
+</div>

@@ -436,6 +436,7 @@
       "related": [
         "data-table",
         "empty-state",
+        "checkbox",
         "skeleton"
       ],
       "variants": [
@@ -452,12 +453,40 @@
           "name": "Row actions"
         },
         {
+          "id": "totals",
+          "name": "A column that totals"
+        },
+        {
+          "id": "grouped",
+          "name": "Rows under subheadings"
+        },
+        {
+          "id": "linked-rows",
+          "name": "The row opens its record"
+        },
+        {
+          "id": "long-values",
+          "name": "A value too long for its column"
+        },
+        {
           "id": "dense",
           "name": "Dense"
         },
         {
+          "id": "sticky-header",
+          "name": "The header stays put"
+        },
+        {
+          "id": "sticky-column",
+          "name": "The first column stays put"
+        },
+        {
           "id": "responsive",
           "name": "Responsive"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from a queryset"
         }
       ],
       "detail": "r/table.json"
@@ -466,10 +495,12 @@
       "id": "data-table",
       "name": "Data table",
       "category": "data",
-      "description": "The register screen assembled: a table with a search box, sortable headers, column visibility, row selection and a pager, all running off one array of records.",
+      "description": "The register screen assembled: a table with a search box, filters, sortable headers, column visibility, row selection, totals and a pager, all running off one array of records.",
       "related": [
         "table",
         "pagination",
+        "empty-state",
+        "skeleton",
         "dropdown"
       ],
       "variants": [
@@ -480,6 +511,38 @@
         {
           "id": "compact",
           "name": "Compact"
+        },
+        {
+          "id": "loading",
+          "name": "First paint, before any rows"
+        },
+        {
+          "id": "paging",
+          "name": "A later page in flight"
+        },
+        {
+          "id": "empty",
+          "name": "A register with nothing in it"
+        },
+        {
+          "id": "filters",
+          "name": "Filters in force, removable one at a time"
+        },
+        {
+          "id": "bulk",
+          "name": "A selection that outlives the page"
+        },
+        {
+          "id": "totals",
+          "name": "A column that has to total"
+        },
+        {
+          "id": "expandable",
+          "name": "A row that opens its lines"
+        },
+        {
+          "id": "export",
+          "name": "Exporting what is on screen"
         },
         {
           "id": "server",
@@ -497,7 +560,8 @@
         "data-table",
         "table",
         "empty-state",
-        "spinner"
+        "spinner",
+        "input-group"
       ],
       "variants": [
         {
@@ -509,12 +573,24 @@
           "name": "Numbered with truncation"
         },
         {
+          "id": "links",
+          "name": "Pages that are real links"
+        },
+        {
           "id": "range",
           "name": "The range line"
         },
         {
+          "id": "unknown-total",
+          "name": "When there is no total to count"
+        },
+        {
           "id": "page-size",
           "name": "With page size"
+        },
+        {
+          "id": "jump",
+          "name": "Typing the page number"
         },
         {
           "id": "dense",
@@ -525,8 +601,16 @@
           "name": "Disabled at the ends"
         },
         {
+          "id": "keyboard",
+          "name": "One tab stop for the whole number row"
+        },
+        {
           "id": "loading",
           "name": "While a page is in flight"
+        },
+        {
+          "id": "failed",
+          "name": "The page that did not arrive"
         },
         {
           "id": "load-more",
@@ -535,6 +619,10 @@
         {
           "id": "footer",
           "name": "Order register footer"
+        },
+        {
+          "id": "django",
+          "name": "Django paginator, swapped by htmx"
         }
       ],
       "detail": "r/pagination.json"
@@ -548,7 +636,9 @@
         "card",
         "chart",
         "skeleton",
-        "progress"
+        "progress",
+        "empty-state",
+        "button-group"
       ],
       "variants": [
         {
@@ -572,12 +662,32 @@
           "name": "Value is a status"
         },
         {
+          "id": "target",
+          "name": "A fraction of a target"
+        },
+        {
           "id": "dense",
           "name": "Dense strip"
         },
         {
+          "id": "period",
+          "name": "Rebasing the period"
+        },
+        {
+          "id": "filter",
+          "name": "Tiles that filter the register"
+        },
+        {
           "id": "loading",
           "name": "Loading"
+        },
+        {
+          "id": "stale",
+          "name": "Computed at 06:00"
+        },
+        {
+          "id": "failed",
+          "name": "The read failed"
         },
         {
           "id": "empty",
@@ -630,8 +740,32 @@
           "name": "Sparkline"
         },
         {
+          "id": "table",
+          "name": "Figures beside the shape"
+        },
+        {
+          "id": "toggle",
+          "name": "Series switched off from the legend"
+        },
+        {
+          "id": "period",
+          "name": "Redrawn when the period changes"
+        },
+        {
+          "id": "responsive",
+          "name": "Twelve months on a phone"
+        },
+        {
           "id": "empty",
           "name": "Empty"
+        },
+        {
+          "id": "loading",
+          "name": "Waiting for the data"
+        },
+        {
+          "id": "failed",
+          "name": "The data did not arrive"
         },
         {
           "id": "django",
@@ -665,12 +799,24 @@
           "name": "Segmented"
         },
         {
+          "id": "stage-failed",
+          "name": "A stage that was rejected"
+        },
+        {
           "id": "inline",
           "name": "In a register row"
         },
         {
           "id": "tones",
           "name": "Over a limit"
+        },
+        {
+          "id": "stalled",
+          "name": "Stopped, and why"
+        },
+        {
+          "id": "elapsed",
+          "name": "Days left, not days spent"
         },
         {
           "id": "stacked",
@@ -687,6 +833,14 @@
         {
           "id": "production",
           "name": "A production order"
+        },
+        {
+          "id": "htmx",
+          "name": "Climbing from the server"
+        },
+        {
+          "id": "django",
+          "name": "Rendering the width server-side"
         }
       ],
       "detail": "r/progress.json"
@@ -695,7 +849,7 @@
       "id": "empty-state",
       "name": "Empty state",
       "category": "data",
-      "description": "What a region shows when it has nothing to draw. Four different situations wearing one shape — nothing created yet, nothing matching the query, nothing this account may see, and nothing that loaded — and the whole job of the component is saying which one it is.",
+      "description": "What a region shows when it has nothing to draw. Several situations wearing one shape — nothing created yet, nothing matching the query, nothing asked for yet, nothing left to do, nothing this account may see and nothing that loaded — and the whole job of the component is saying which one it is.",
       "related": [
         "data-table",
         "skeleton",
@@ -711,8 +865,24 @@
           "name": "No search results"
         },
         {
+          "id": "too-short",
+          "name": "Below the search threshold"
+        },
+        {
           "id": "filtered",
           "name": "Behind an active filter set"
+        },
+        {
+          "id": "archived",
+          "name": "Emptied by a default nobody set"
+        },
+        {
+          "id": "prerequisite",
+          "name": "Waiting on a choice above"
+        },
+        {
+          "id": "all-clear",
+          "name": "Empty because the work is done"
         },
         {
           "id": "error",
@@ -737,6 +907,10 @@
         {
           "id": "register",
           "name": "The GRN register, nothing today"
+        },
+        {
+          "id": "django",
+          "name": "Choosing the state in the view"
         }
       ],
       "detail": "r/empty-state.json"
@@ -765,6 +939,14 @@
           "name": "Table rows"
         },
         {
+          "id": "dense",
+          "name": "The dense register at 32px a row"
+        },
+        {
+          "id": "cell",
+          "name": "One column still answering"
+        },
+        {
           "id": "card",
           "name": "Card"
         },
@@ -787,6 +969,22 @@
         {
           "id": "record",
           "name": "Purchase order detail loading"
+        },
+        {
+          "id": "append",
+          "name": "More rows under rows already read"
+        },
+        {
+          "id": "delayed",
+          "name": "No blocks for a cached answer"
+        },
+        {
+          "id": "states",
+          "name": "Rows, nothing, or the load failed"
+        },
+        {
+          "id": "django",
+          "name": "A deferred region, server side"
         }
       ],
       "detail": "r/skeleton.json"
@@ -815,6 +1013,10 @@
           "name": "Numbered lines"
         },
         {
+          "id": "clauses",
+          "name": "Clause numbers in an annexure"
+        },
+        {
           "id": "checklist",
           "name": "Icon checklist"
         },
@@ -823,8 +1025,20 @@
           "name": "Activity feed with a rail"
         },
         {
+          "id": "pending",
+          "name": "A run that is still going"
+        },
+        {
           "id": "register",
           "name": "Status marks down a register"
+        },
+        {
+          "id": "rows",
+          "name": "The whole row is the target"
+        },
+        {
+          "id": "grouped",
+          "name": "Groups down one column of marks"
         },
         {
           "id": "nested",
@@ -837,6 +1051,10 @@
         {
           "id": "dense",
           "name": "In a cell and in prose"
+        },
+        {
+          "id": "django",
+          "name": "Marks chosen from the record"
         }
       ],
       "detail": "r/marker.json"
@@ -849,7 +1067,9 @@
       "related": [
         "skeleton",
         "progress",
-        "button"
+        "button",
+        "empty-state",
+        "pagination"
       ],
       "variants": [
         {
@@ -865,12 +1085,24 @@
           "name": "With a label"
         },
         {
+          "id": "motion",
+          "name": "What reduced motion changes"
+        },
+        {
           "id": "panel",
           "name": "Centred in a panel"
         },
         {
           "id": "inline",
           "name": "Beside a control"
+        },
+        {
+          "id": "slot",
+          "name": "A ring in a box that cannot move"
+        },
+        {
+          "id": "queue",
+          "name": "One row in flight, the rest waiting"
         },
         {
           "id": "overlay",
@@ -881,8 +1113,16 @@
           "name": "The 500ms floor"
         },
         {
+          "id": "phases",
+          "name": "A wait that changes what it is doing"
+        },
+        {
           "id": "states",
           "name": "Running, slow, failed"
+        },
+        {
+          "id": "stalled",
+          "name": "Too long, and the way out"
         },
         {
           "id": "django",
@@ -915,12 +1155,28 @@
           "name": "Dismissible"
         },
         {
+          "id": "remembered",
+          "name": "Dismissed for good"
+        },
+        {
           "id": "action",
           "name": "With action"
         },
         {
+          "id": "confirm",
+          "name": "When the action destroys something"
+        },
+        {
+          "id": "responsive",
+          "name": "Action and dismiss at 390px"
+        },
+        {
           "id": "records",
           "name": "With affected records"
+        },
+        {
+          "id": "overflow",
+          "name": "More records than fit"
         },
         {
           "id": "progress",
@@ -933,6 +1189,10 @@
         {
           "id": "form-errors",
           "name": "Form error summary"
+        },
+        {
+          "id": "htmx",
+          "name": "Swapped in by the server"
         },
         {
           "id": "django",
@@ -949,7 +1209,8 @@
       "related": [
         "alert",
         "alert-dialog",
-        "spinner"
+        "spinner",
+        "progress"
       ],
       "variants": [
         {
@@ -965,6 +1226,10 @@
           "name": "With undo action"
         },
         {
+          "id": "held",
+          "name": "Held while nobody can see it"
+        },
+        {
           "id": "link",
           "name": "Link to the record"
         },
@@ -977,8 +1242,16 @@
           "name": "Stack, capped at three"
         },
         {
+          "id": "bulk",
+          "name": "One action, eleven rows"
+        },
+        {
           "id": "pending",
           "name": "Pending, then resolved"
+        },
+        {
+          "id": "retry",
+          "name": "Failed, and offering the retry"
         },
         {
           "id": "dismiss-all",
@@ -987,6 +1260,18 @@
         {
           "id": "posting",
           "name": "Posting a GRN"
+        },
+        {
+          "id": "phone",
+          "name": "Above the keyboard at 390px"
+        },
+        {
+          "id": "htmx",
+          "name": "Raised by the server"
+        },
+        {
+          "id": "django",
+          "name": "Messages after a redirect"
         }
       ],
       "detail": "r/toast.json"
@@ -995,32 +1280,57 @@
       "id": "alert-dialog",
       "name": "Alert dialog",
       "category": "feedback",
-      "description": "A dialog that interrupts to ask one question with two answers. Unlike a plain dialog it does not dismiss on a backdrop click — the user has to choose.",
+      "description": "A dialog that interrupts to ask one question the user has to answer before anything else happens. Unlike a plain dialog it does not dismiss on a backdrop click, and unlike an in-place confirm it has room for the reason.",
       "related": [
         "dialog",
+        "button",
         "alert",
         "sheet"
       ],
       "variants": [
         {
           "id": "confirm",
-          "name": "Confirm"
+          "name": "One question, two answers"
         },
         {
           "id": "destructive",
-          "name": "Destructive"
+          "name": "What goes with it"
         },
         {
           "id": "typed",
           "name": "Typed confirmation"
         },
         {
+          "id": "reason",
+          "name": "Asking for a reason first"
+        },
+        {
+          "id": "consequences",
+          "name": "Reading the list before answering"
+        },
+        {
           "id": "bulk",
-          "name": "Bulk action"
+          "name": "Acting on a selection"
+        },
+        {
+          "id": "blocked",
+          "name": "Nothing to confirm"
+        },
+        {
+          "id": "running",
+          "name": "While the act runs"
+        },
+        {
+          "id": "refused",
+          "name": "The server said no"
         },
         {
           "id": "unsaved",
           "name": "Three answers"
+        },
+        {
+          "id": "django",
+          "name": "Answering with a real POST"
         }
       ],
       "detail": "r/alert-dialog.json"
@@ -1033,6 +1343,7 @@
       "related": [
         "alert-dialog",
         "sheet",
+        "drawer",
         "form-page"
       ],
       "variants": [
@@ -1047,6 +1358,34 @@
         {
           "id": "reference",
           "name": "Reference panel"
+        },
+        {
+          "id": "submitting",
+          "name": "In flight, and not twice"
+        },
+        {
+          "id": "errors",
+          "name": "The server said no"
+        },
+        {
+          "id": "deferred",
+          "name": "Body fetched after it opens"
+        },
+        {
+          "id": "steps",
+          "name": "Three steps in one panel"
+        },
+        {
+          "id": "stacked",
+          "name": "A second dialog over the first"
+        },
+        {
+          "id": "wide",
+          "name": "Wide enough to compare"
+        },
+        {
+          "id": "phone",
+          "name": "Full screen at 390px"
         }
       ],
       "detail": "r/dialog.json"
@@ -1055,9 +1394,11 @@
       "id": "sheet",
       "name": "Sheet",
       "category": "feedback",
-      "description": "A panel that slides in from the right over the page. Shows a record, or the filters for a list, without losing the user's place in it.",
+      "description": "A panel that slides in from the right edge, full height and a fixed width, over a list that stays visible behind it. Where one row of a register is read, amended, or walked one record to the next without giving up your place in the list.",
       "related": [
         "dialog",
+        "drawer",
+        "alert-dialog",
         "list-detail",
         "table"
       ],
@@ -1068,7 +1409,39 @@
         },
         {
           "id": "filters",
-          "name": "Filters"
+          "name": "Filters for the list behind"
+        },
+        {
+          "id": "loading",
+          "name": "Open before the record arrives"
+        },
+        {
+          "id": "failed",
+          "name": "The record did not load"
+        },
+        {
+          "id": "form",
+          "name": "A few fields and a commit"
+        },
+        {
+          "id": "unsaved",
+          "name": "Leaving with work in it"
+        },
+        {
+          "id": "walk",
+          "name": "Next record without closing"
+        },
+        {
+          "id": "stacked",
+          "name": "A second sheet over the first"
+        },
+        {
+          "id": "phone",
+          "name": "At 390px"
+        },
+        {
+          "id": "htmx",
+          "name": "Body fetched on open"
         }
       ],
       "detail": "r/sheet.json"
@@ -1077,11 +1450,12 @@
       "id": "drawer",
       "name": "Drawer",
       "category": "feedback",
-      "description": "A panel that rises from the bottom edge, sized to its content and capped short of the viewport. The phone-shaped place to put a short action list or a quick filter, because the bottom of the screen is where the thumb already is.",
+      "description": "A panel flush to a horizontal edge of the viewport, sized to its content and capped short of the screen. The phone-shaped place to put a short action list, a quick filter, one record being edited, or the tray a multi-select fills.",
       "related": [
         "sheet",
         "dialog",
-        "dropdown"
+        "dropdown",
+        "alert-dialog"
       ],
       "variants": [
         {
@@ -1095,6 +1469,38 @@
         {
           "id": "long",
           "name": "Longer than the cap"
+        },
+        {
+          "id": "loading",
+          "name": "Fetching what it opens on"
+        },
+        {
+          "id": "error",
+          "name": "The content did not arrive"
+        },
+        {
+          "id": "edit",
+          "name": "One line, committed or discarded"
+        },
+        {
+          "id": "guarded",
+          "name": "Dirty, and the backdrop is not a way out"
+        },
+        {
+          "id": "top",
+          "name": "Down from the top edge"
+        },
+        {
+          "id": "persistent",
+          "name": "Stays open beside the page"
+        },
+        {
+          "id": "phone",
+          "name": "The whole panel at 390px"
+        },
+        {
+          "id": "django",
+          "name": "Django action drawer"
         }
       ],
       "detail": "r/drawer.json"
@@ -1119,6 +1525,14 @@
           "name": "Inline, without the pill"
         },
         {
+          "id": "unknown",
+          "name": "Nothing to report"
+        },
+        {
+          "id": "axes",
+          "name": "Two states on one record"
+        },
+        {
           "id": "sizes",
           "name": "Sizes"
         },
@@ -1135,12 +1549,24 @@
           "name": "Removable tag"
         },
         {
+          "id": "overflow",
+          "name": "Tags that do not fit"
+        },
+        {
           "id": "count",
           "name": "Count badge"
         },
         {
           "id": "table",
           "name": "In a table"
+        },
+        {
+          "id": "header",
+          "name": "Beside a record title"
+        },
+        {
+          "id": "htmx",
+          "name": "A count the server keeps current"
         },
         {
           "id": "django",
@@ -1169,8 +1595,16 @@
           "name": "Four placements"
         },
         {
+          "id": "edge",
+          "name": "Anchored so it cannot leave the page"
+        },
+        {
           "id": "truncated",
           "name": "Only when the text is clipped"
+        },
+        {
+          "id": "inline",
+          "name": "A term inside a sentence"
         },
         {
           "id": "shortcut",
@@ -1189,8 +1623,20 @@
           "name": "With an arrow"
         },
         {
+          "id": "scrolling",
+          "name": "Inside a scrolling list"
+        },
+        {
           "id": "delay-group",
           "name": "Delay group along a toolbar"
+        },
+        {
+          "id": "rail",
+          "name": "On a collapsed icon rail"
+        },
+        {
+          "id": "touch",
+          "name": "What the phone gets instead"
         },
         {
           "id": "row-actions",
@@ -1206,6 +1652,7 @@
       "description": "A card of record detail that opens under a link on hover or focus, after a deliberate delay, and stays open long enough to be read and clicked.",
       "related": [
         "tooltip",
+        "popover",
         "dropdown",
         "card"
       ],
@@ -1223,12 +1670,28 @@
           "name": "Person card"
         },
         {
+          "id": "item",
+          "name": "Material on a line-items row"
+        },
+        {
+          "id": "long",
+          "name": "Too long to preview"
+        },
+        {
           "id": "placement",
           "name": "Flipping and clamping"
         },
         {
+          "id": "trail",
+          "name": "References inside a line of prose"
+        },
+        {
           "id": "htmx",
           "name": "Fetched on first open"
+        },
+        {
+          "id": "cached",
+          "name": "One fetch per record, not per row"
         },
         {
           "id": "loading",
@@ -1237,6 +1700,10 @@
         {
           "id": "error",
           "name": "Failed to load"
+        },
+        {
+          "id": "restricted",
+          "name": "Refused, and gone"
         },
         {
           "id": "mobile",
@@ -1273,12 +1740,28 @@
           "name": "Column picker"
         },
         {
+          "id": "column-filter",
+          "name": "Filter from a column header"
+        },
+        {
           "id": "date-range",
           "name": "Date range"
         },
         {
           "id": "inline-edit",
           "name": "Inline edit in a scrolling table"
+        },
+        {
+          "id": "read-only",
+          "name": "A field the user may not change"
+        },
+        {
+          "id": "unsaved",
+          "name": "Clicking away from unsaved input"
+        },
+        {
+          "id": "saving",
+          "name": "Writing, and the server saying no"
         },
         {
           "id": "arrow",
@@ -1295,6 +1778,10 @@
         {
           "id": "htmx",
           "name": "Body fetched on first open"
+        },
+        {
+          "id": "django",
+          "name": "Django filter form"
         }
       ],
       "detail": "r/popover.json"
@@ -1303,7 +1790,7 @@
       "id": "avatar",
       "name": "Avatar",
       "category": "feedback",
-      "description": "Initials in a circle standing in for a person. There are no photographs in this system, so a zinc tint and two letters is the whole thing.",
+      "description": "Initials in a circle standing in for a person. Nothing in this system uploads a photograph, so a zinc tint and two letters is the component; where the identity provider hands one over, the photograph is a layer painted on top of the letters.",
       "related": [
         "badge",
         "tooltip",
@@ -1319,12 +1806,28 @@
           "name": "The signed-in user"
         },
         {
+          "id": "photo",
+          "name": "When the photograph does not arrive"
+        },
+        {
+          "id": "derived",
+          "name": "Names that do not give you two initials"
+        },
+        {
+          "id": "org",
+          "name": "Not a person"
+        },
+        {
           "id": "with-name",
           "name": "With name and role"
         },
         {
           "id": "stacked",
           "name": "Stacked group"
+        },
+        {
+          "id": "count",
+          "name": "When the count matters more than the faces"
         },
         {
           "id": "in-row",
@@ -1341,6 +1844,10 @@
         {
           "id": "placeholder",
           "name": "Unassigned"
+        },
+        {
+          "id": "django",
+          "name": "One include, four branches"
         }
       ],
       "detail": "r/avatar.json"
@@ -2658,12 +3165,24 @@
           "name": "Pill"
         },
         {
+          "id": "card",
+          "name": "Sectioning a card"
+        },
+        {
           "id": "scrollable",
           "name": "Scrollable"
         },
         {
+          "id": "select",
+          "name": "A select below sm"
+        },
+        {
           "id": "vertical",
           "name": "Vertical"
+        },
+        {
+          "id": "pinned",
+          "name": "A row that stays over a scrolling panel"
         },
         {
           "id": "url",
@@ -2674,8 +3193,16 @@
           "name": "Server-loaded panels"
         },
         {
+          "id": "retry",
+          "name": "The panel did not load"
+        },
+        {
           "id": "states",
           "name": "Count, flag and unavailable"
+        },
+        {
+          "id": "guard",
+          "name": "Leaving a panel with unsaved edits"
         },
         {
           "id": "django",
@@ -2692,7 +3219,8 @@
       "related": [
         "page-header",
         "tabs",
-        "sidebar"
+        "sidebar",
+        "skeleton"
       ],
       "variants": [
         {
@@ -2712,6 +3240,18 @@
           "name": "Collapsed middle"
         },
         {
+          "id": "loading",
+          "name": "The parents are still loading"
+        },
+        {
+          "id": "restricted",
+          "name": "A level you cannot open"
+        },
+        {
+          "id": "ambiguous",
+          "name": "When the parent is a choice"
+        },
+        {
           "id": "responsive",
           "name": "On a phone"
         },
@@ -2720,8 +3260,16 @@
           "name": "Above a page title"
         },
         {
+          "id": "sequence",
+          "name": "Steps are not levels"
+        },
+        {
           "id": "back",
           "name": "One level deep"
+        },
+        {
+          "id": "htmx",
+          "name": "The trail follows the swap"
         },
         {
           "id": "django",
@@ -2762,8 +3310,24 @@
           "name": "Disabled and destructive items"
         },
         {
+          "id": "readonly",
+          "name": "One reason for a whole menu"
+        },
+        {
+          "id": "selection",
+          "name": "Items that act on the selection"
+        },
+        {
+          "id": "confirm",
+          "name": "A destructive item that asks first"
+        },
+        {
           "id": "dense",
           "name": "Dense, embedded in an editor"
+        },
+        {
+          "id": "sticky",
+          "name": "Pinned over a scrolling document"
         },
         {
           "id": "collapsed",
@@ -2776,6 +3340,10 @@
         {
           "id": "htmx",
           "name": "A command that posts"
+        },
+        {
+          "id": "django",
+          "name": "Rendered by the server"
         }
       ],
       "detail": "r/menubar.json"
@@ -2820,12 +3388,32 @@
           "name": "Inside the section"
         },
         {
+          "id": "deep",
+          "name": "Two levels down"
+        },
+        {
+          "id": "restricted",
+          "name": "A link you cannot follow"
+        },
+        {
+          "id": "scoped",
+          "name": "Scoped to a plant"
+        },
+        {
+          "id": "edge",
+          "name": "Panel at the right edge"
+        },
+        {
           "id": "phone",
           "name": "On a phone"
         },
         {
           "id": "htmx",
           "name": "Fetched on first open"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from the server"
         }
       ],
       "detail": "r/navigation-menu.json"
@@ -2838,7 +3426,9 @@
       "related": [
         "app-shell",
         "topbar",
-        "navigation-menu"
+        "navigation-menu",
+        "tooltip",
+        "command-palette"
       ],
       "variants": [
         {
@@ -2850,8 +3440,24 @@
           "name": "Group labels and counts"
         },
         {
+          "id": "counts-async",
+          "name": "Counts still arriving, and counts that failed"
+        },
+        {
           "id": "nested",
           "name": "Nested children"
+        },
+        {
+          "id": "record",
+          "name": "Where you are, two levels down"
+        },
+        {
+          "id": "filter",
+          "name": "Filtering a long navigation"
+        },
+        {
+          "id": "permissions",
+          "name": "Destinations this user may not open"
         },
         {
           "id": "rail",
@@ -2876,6 +3482,10 @@
         {
           "id": "skeleton",
           "name": "Loading a permission-filtered nav"
+        },
+        {
+          "id": "django",
+          "name": "Rendered by the server"
         }
       ],
       "detail": "r/sidebar.json"
@@ -2891,7 +3501,8 @@
         "breadcrumbs",
         "command-palette",
         "dropdown",
-        "page-header"
+        "page-header",
+        "alert"
       ],
       "variants": [
         {
@@ -2907,6 +3518,10 @@
           "name": "Notifications and account menu"
         },
         {
+          "id": "unread",
+          "name": "A count that arrives while you are reading"
+        },
+        {
           "id": "toggle",
           "name": "Sidebar trigger below lg"
         },
@@ -2915,8 +3530,20 @@
           "name": "Company, plant and financial year"
         },
         {
+          "id": "impersonation",
+          "name": "Signed in as somebody else"
+        },
+        {
+          "id": "session",
+          "name": "The session is about to end"
+        },
+        {
           "id": "compact",
           "name": "Document title and actions"
+        },
+        {
+          "id": "crowded",
+          "name": "When the record name is longer than the bar"
         },
         {
           "id": "sticky",
@@ -2929,6 +3556,10 @@
         {
           "id": "assembled",
           "name": "Procurement console header"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from the request"
         }
       ],
       "detail": "r/topbar.json"
@@ -2955,6 +3586,34 @@
         {
           "id": "cards",
           "name": "Bordered card list"
+        },
+        {
+          "id": "summary",
+          "name": "What the closed row says"
+        },
+        {
+          "id": "expand-all",
+          "name": "Opening the whole set at once"
+        },
+        {
+          "id": "form",
+          "name": "A field that failed inside a closed section"
+        },
+        {
+          "id": "states",
+          "name": "Locked, empty and not collapsible"
+        },
+        {
+          "id": "phone",
+          "name": "At 390px"
+        },
+        {
+          "id": "htmx",
+          "name": "Panel fetched the first time it opens"
+        },
+        {
+          "id": "django",
+          "name": "Server-rendered"
         }
       ],
       "detail": "r/accordion.json"
@@ -2999,6 +3658,26 @@
           "name": "Locked, empty and open on desktop"
         },
         {
+          "id": "tail",
+          "name": "The rest of a long list"
+        },
+        {
+          "id": "row",
+          "name": "Expanding a table row"
+        },
+        {
+          "id": "errors",
+          "name": "Opened by an error inside it"
+        },
+        {
+          "id": "findable",
+          "name": "Findable while closed"
+        },
+        {
+          "id": "htmx",
+          "name": "Fetched on first open, and the fetch that failed"
+        },
+        {
           "id": "django",
           "name": "Server-rendered"
         }
@@ -3012,13 +3691,50 @@
       "description": "A ⌘K overlay for jumping to a record or firing an action by typing. It is a shortcut over the navigation, never the only route to something.",
       "related": [
         "combobox",
-        "sidebar",
-        "dropdown"
+        "dialog",
+        "dropdown",
+        "sidebar"
       ],
       "variants": [
         {
           "id": "default",
           "name": "Default"
+        },
+        {
+          "id": "recents",
+          "name": "What it shows before anything is typed"
+        },
+        {
+          "id": "kinds",
+          "name": "One number, five kinds of record"
+        },
+        {
+          "id": "unavailable",
+          "name": "A row this account may not fire"
+        },
+        {
+          "id": "no-results",
+          "name": "Nothing matched, and the way out of it"
+        },
+        {
+          "id": "argument",
+          "name": "An action that asks for one more thing"
+        },
+        {
+          "id": "prefix",
+          "name": "A prefix character switches the mode"
+        },
+        {
+          "id": "phone",
+          "name": "The overlay takes the screen at 390px"
+        },
+        {
+          "id": "htmx",
+          "name": "Records searched on the server"
+        },
+        {
+          "id": "django",
+          "name": "Rendered by the shell, filtered by permission"
         }
       ],
       "detail": "r/command-palette.json"

@@ -11,16 +11,23 @@
      ]
 
      Build it in the view, not in the template. A trail assembled from
-     request.path is browsing history wearing a hierarchy's clothes. -->
+     request.path is browsing history wearing a hierarchy's clothes.
+
+     A pair whose url is None renders as text wherever it falls, not only at the
+     end, which is what a level the user may not open looks like coming out of a
+     get_queryset that filtered it: the label is still known to the record, the
+     link is not there to be followed, and the loop needs no third case. -->
 <nav data-kui="breadcrumbs/django" aria-label="Breadcrumb">
   <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
     {% for label, url in crumbs %}
       {% if not forloop.first %}<li aria-hidden="true" class="text-zinc-500">/</li>{% endif %}
       <li>
         {% if forloop.last %}
-          <span aria-current="page" class="font-medium text-zinc-900">{{ label }}</span>
+          <span aria-current="page" class="font-medium tabular-nums text-zinc-900">{{ label }}</span>
+        {% elif url %}
+          <a href="{{ url }}" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">{{ label }}</a>
         {% else %}
-          <a href="{{ url }}" class="text-zinc-600 hover:text-zinc-900">{{ label }}</a>
+          <span class="text-zinc-500">{{ label }}<span class="sr-only">, not available to you</span></span>
         {% endif %}
       </li>
     {% endfor %}

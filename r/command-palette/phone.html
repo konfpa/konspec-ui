@@ -1,0 +1,151 @@
+<!-- There is no ⌘K on a phone and no Escape key either, so both ends of the
+     desktop palette have to be rebuilt. The way in is a real 44px button in
+     the bar, and the way out is a Cancel control inside the panel — a light
+     dismiss on the backdrop is not enough when there is no backdrop left to
+     press.
+
+     Below sm the overlay stops being a panel over the page and becomes the
+     screen: no scrim, no rounded corners, no border, and the panel is a flex
+     column pinned to the top edge. Centring it is the defect this variant
+     exists to prevent — focusing the input raises the software keyboard, the
+     keyboard takes the bottom half of the screen, and a centred panel opens
+     underneath it.
+
+     The list scrolls inside the panel, not the document: min-h-0 flex-1
+     overflow-y-auto on the list and overflow-hidden on the panel. Without the
+     min-h-0 a flex child refuses to shrink below its content, the panel grows
+     past the viewport, and the browser scrolls the whole overlay — which
+     scrolls the search box off the top of a screen whose bottom half is
+     already keyboard.
+
+     x-trap.noscroll earns more here than anywhere else. Without the scroll
+     lock the page behind a fixed overlay still moves under a finger, so a
+     drag that overshoots the end of the results scrolls the register the
+     user is trying to leave.
+
+     The keyboard hints go. There are no arrow keys to press, so the footer
+     legend is sm-and-up, and so is the ⌘K reminder on the trigger. What
+     replaces them is the phone keyboard's own return key, labelled by
+     enterkeyhint="go", which commits the row the palette already highlighted.
+
+     A query here is a code, not prose: autocapitalize="none" and
+     spellcheck="false" stop the keyboard capitalising po-24 and offering to
+     correct grn. Rows are 44px below sm and 36px above, because a thumb and a
+     mouse do not need the same target. -->
+<div data-kui="command-palette/phone" x-data="{
+       open: false, q: '', ai: 0,
+       groups: [
+         { name: 'Actions', items: [
+           { id: 'new-po',    label: 'New purchase order', icon: 'plus' },
+           { id: 'post-grn',  label: 'Post goods receipt', icon: 'package-check' },
+           { id: 'approvals', label: 'Go to my approvals', icon: 'check-check' }
+         ] },
+         { name: 'Recent records', items: [
+           { id: 'po-1187',    label: 'PO-24-1187 — Gujarat Polymers Ltd', sub: 'HDPE granules · 14 lines', amount: '₹18,42,000', icon: 'file-text' },
+           { id: 'po-1179',    label: 'PO-24-1179 — Sharma Steel Traders', sub: 'Receipt overdue 9 days',   amount: '₹2,74,900',  icon: 'file-text' },
+           { id: 'grn-0442',   label: 'GRN-0442 — Sharma Steel Traders',   sub: '12.400 MT · 3 lines held',                       icon: 'package-check' },
+           { id: 'ven-deccan', label: 'Deccan Fasteners Pvt Ltd',          sub: 'Vendor · VEN-0219',                              icon: 'building-2' }
+         ] }
+       ],
+       match(g) {
+         const s = this.q.trim().toLowerCase();
+         if (!s) return g.items;
+         return g.items.filter(o => (o.label + ' ' + (o.sub || '') + ' ' + g.name).toLowerCase().includes(s));
+       },
+       get list() { return this.groups.flatMap(g => this.match(g)); },
+       rowId(o) { return 'cpp-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { this.open = true; this.q = ''; this.ai = 0; },
+       hide() { this.open = false; this.q = ''; this.ai = 0; },
+       move(n) {
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { this.hide(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @keydown.window.meta.k.prevent="show()"
+     @keydown.window.ctrl.k.prevent="show()"
+     @keydown.escape.window="hide()">
+
+  <div class="flex items-center gap-2 rounded-xl border border-zinc-300 bg-white px-3 py-2">
+    <span class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">Purchase orders</span>
+    <button type="button" @click="show()" aria-haspopup="dialog" aria-label="Search Operations"
+            class="flex size-11 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:size-9">
+      <i data-lucide="search" class="size-[18px]"></i>
+    </button>
+  </div>
+
+  <!-- flex-col plus items-center centres the panel horizontally at sm and
+       stacks it from the top edge below sm, which is the one arrangement that
+       does not put the box where the keyboard is about to be -->
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       class="fixed inset-0 z-50 flex flex-col items-center bg-white sm:bg-zinc-900/40 sm:px-3 sm:pt-24">
+    <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
+         class="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-white sm:max-h-[70vh] sm:max-w-xl sm:flex-none sm:rounded-xl sm:border sm:border-zinc-300 sm:shadow-lg">
+
+      <div class="flex shrink-0 items-center gap-2 border-b border-zinc-100 px-3">
+        <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+        <label for="cpp-q" class="sr-only">Search orders, vendors and actions</label>
+        <input id="cpp-q" x-model="q" type="text" role="combobox" autocomplete="off" autofocus
+               autocapitalize="none" spellcheck="false" enterkeyhint="go"
+               aria-autocomplete="list" aria-controls="cpp-list"
+               :aria-expanded="open" :aria-activedescendant="activeId"
+               placeholder="Search orders, vendors, actions…"
+               @input="ai = 0"
+               @keydown.arrow-down.prevent="move(1)"
+               @keydown.arrow-up.prevent="move(-1)"
+               @keydown.enter.prevent="commit()"
+               class="w-full min-w-0 bg-transparent py-3.5 text-[16px]/6 outline-none placeholder:text-zinc-500 sm:py-3 sm:text-[14px]/5">
+        <!-- the only way out below sm, where there is no Escape key and no
+             backdrop left to press -->
+        <button type="button" @click="hide()"
+                class="shrink-0 rounded-lg px-2 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:hidden">Cancel</button>
+        <button type="button" @click="hide()"
+                class="hidden shrink-0 rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px]/4 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:block">Esc</button>
+      </div>
+
+      <div id="cpp-list" role="listbox" aria-label="Results" class="min-h-0 flex-1 overflow-y-auto pb-1 sm:max-h-80 sm:flex-none">
+        <template x-for="g in groups" :key="g.name">
+          <div role="group" :aria-label="g.name" x-show="match(g).length">
+            <p aria-hidden="true"
+               class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+               x-text="g.name"></p>
+            <template x-for="o in match(g)" :key="o.id">
+              <div :id="rowId(o)" role="option"
+                   @mousedown.prevent @click="pick(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+                   :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+                   class="flex items-center gap-3 px-4 py-3 text-[14px]/5 sm:gap-2.5 sm:px-3 sm:py-2 sm:text-[13px]/5">
+                <span class="flex size-4 shrink-0 items-center justify-center text-zinc-600">
+                  <i :data-lucide="o.icon" class="size-4"></i>
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate tabular-nums" x-text="o.label"></span>
+                  <span x-show="o.sub" class="block truncate text-[12px]/4 tabular-nums text-zinc-500" x-text="o.sub"></span>
+                </span>
+                <span x-show="o.amount" class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="o.amount"></span>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">Nothing matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Try an order number — PO-24-1187 — or a vendor name.</p>
+      </div>
+
+      <!-- no arrow keys on a phone, so no legend about them -->
+      <div class="hidden shrink-0 items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500 sm:flex">
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
+        <span class="ml-auto">Operations</span>
+      </div>
+
+      <p role="status" class="sr-only"
+         x-text="open ? (list.length === 1 ? '1 result' : list.length + ' results') : ''"></p>
+    </div>
+  </div>
+</div>

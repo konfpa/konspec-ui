@@ -1,0 +1,96 @@
+<!-- The one arrangement where grey blocks and real records share a screen
+     legitimately, and the reason is geometric rather than an exception. The
+     three grey rows sit below the last row anybody has read, in space that was
+     empty a moment ago, so nothing legible is replaced. Put the same bars over
+     the four rows above and you have deleted four records mid-read, which is
+     the case the spinner's scrim exists for.
+
+     Three, because the step is three. Draw a guess and the footer moves twice —
+     down to wherever the guess put it, then back to where the batch actually
+     ended — and the second move happens after the eye has already gone to find
+     the button.
+
+     The rows are pagination/load-more's rows, class for class: px-4 py-2.5, a
+     20px line, mt-0.5, a 16px second line. 58px either way, and the divider
+     above each of them is 1px, so the footer lands exactly 177px lower and
+     stops. The skeleton block carries its own border-t for the divider the
+     loaded list will draw between the fourth row and the fifth, or the footer
+     travels 176px now and 177px on arrival.
+
+     The button is not disabled while the batch is in flight, and that is not an
+     oversight. Browsers drop focus from a disabled element to the body, so
+     disabling the control somebody just pressed sends their next Tab back to
+     the top of the page — mid-request, with no warning. aria-disabled says the
+     same thing, the handler refuses the second press, and focus stays where the
+     user put it.
+
+     The count is a role="status", so the arrival is announced. Rows appended
+     below the fold are silent otherwise: the only other feedback is that the
+     button moved, which is not feedback if you cannot see it. -->
+<div data-kui="skeleton/append" class="max-w-md rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       shown: 4, step: 3, total: 10, busy: false, said: '',
+       get rows() { return Array.from({ length: this.shown }, (_, i) => ({
+         id: 'ENT-26-' + (3140 + i),
+         who: ['Ritu Deshpande', 'Amit Kulkarni', 'Farida Qureshi'][i % 3],
+         what: ['Approved PO-24-1187', 'Posted GRN-26-0442', 'Raised debit note DN-26-0117'][i % 3]
+       })) },
+       more() {
+         if (this.busy || this.shown >= this.total) return;
+         this.busy = true;
+         this.said = 'Loading ' + this.step + ' more entries';
+         setTimeout(() => {
+           this.shown = Math.min(this.shown + this.step, this.total);
+           this.busy = false;
+           this.said = 'Showing ' + this.shown + ' of ' + this.total + ' entries';
+         }, 1400);
+       }
+     }"
+     :aria-busy="busy">
+
+  <ul role="list" class="divide-y divide-zinc-100">
+    <template x-for="r in rows" :key="r.id">
+      <li class="flex items-start gap-2.5 px-4 py-2.5 text-[13px]/5">
+        <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="min-w-0 flex-1">
+          <span class="block" x-text="r.what"></span>
+          <span class="mt-0.5 block text-[12px]/4 tabular-nums text-zinc-500" x-text="r.who + ' · ' + r.id"></span>
+        </span>
+      </li>
+    </template>
+  </ul>
+
+  <ul x-show="busy" x-cloak class="animate-pulse divide-y divide-zinc-100 border-t border-zinc-100 motion-reduce:animate-none" aria-hidden="true">
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <span class="min-w-0 flex-1">
+        <span class="flex h-5 items-center"><span class="h-2.5 w-48 rounded bg-zinc-200"></span></span>
+        <span class="mt-0.5 flex h-4 items-center"><span class="h-2 w-36 rounded bg-zinc-200"></span></span>
+      </span>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <span class="min-w-0 flex-1">
+        <span class="flex h-5 items-center"><span class="h-2.5 w-40 rounded bg-zinc-200"></span></span>
+        <span class="mt-0.5 flex h-4 items-center"><span class="h-2 w-44 rounded bg-zinc-200"></span></span>
+      </span>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      <span class="min-w-0 flex-1">
+        <span class="flex h-5 items-center"><span class="h-2.5 w-56 rounded bg-zinc-200"></span></span>
+        <span class="mt-0.5 flex h-4 items-center"><span class="h-2 w-32 rounded bg-zinc-200"></span></span>
+      </span>
+    </li>
+  </ul>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p role="status" class="sr-only" x-text="said"></p>
+    <p class="text-[13px]/5 tabular-nums text-zinc-600"
+       x-text="'Showing ' + shown + ' of ' + total + ' entries'">Showing 4 of 10 entries</p>
+    <button type="button" x-show="shown < total" @click="more()" :aria-disabled="busy"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>Load 3 more
+    </button>
+  </div>
+</div>

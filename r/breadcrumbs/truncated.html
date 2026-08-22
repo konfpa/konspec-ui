@@ -1,16 +1,22 @@
 <!-- Vendor and project names run long. The middle crumbs truncate; the last one
      never does. min-w-0 on the <li> is what makes truncate work at all inside a
-     flex row — without it the item refuses to shrink below its content. -->
+     flex row — without it the item refuses to shrink below its content.
+
+     title is a fallback, not the fix. It never appears on a touch device and it
+     cannot be reached by keyboard, so the full label has to exist somewhere
+     else on the page as well — as the h1, or as the record line under it. What
+     title buys is the mouse user checking which of two rate contracts this is
+     without leaving the page. -->
 <nav data-kui="breadcrumbs/truncated" aria-label="Breadcrumb">
   <ol class="flex flex-nowrap items-center gap-1.5 text-[13px]/5">
-    <li class="shrink-0"><a href="#" class="text-zinc-600 hover:text-zinc-900">Home</a></li>
+    <li class="shrink-0"><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Home</a></li>
     <li aria-hidden="true" class="shrink-0 text-zinc-500">/</li>
     <li class="min-w-0 max-w-[14ch] shrink">
-      <a href="#" title="Procurement &amp; stores" class="block truncate text-zinc-600 hover:text-zinc-900">Procurement &amp; stores</a>
+      <a href="#" title="Procurement &amp; stores" class="block truncate text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement &amp; stores</a>
     </li>
     <li aria-hidden="true" class="shrink-0 text-zinc-500">/</li>
     <li class="min-w-0 max-w-[18ch] shrink">
-      <a href="#" title="Gujarat Polymers Ltd — annual rate contract" class="block truncate text-zinc-600 hover:text-zinc-900">Gujarat Polymers Ltd — annual rate contract</a>
+      <a href="#" title="Gujarat Polymers Ltd — annual rate contract" class="block truncate text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Gujarat Polymers Ltd — annual rate contract</a>
     </li>
     <li aria-hidden="true" class="shrink-0 text-zinc-500">/</li>
     <li class="shrink-0"><span aria-current="page" class="font-medium tabular-nums text-zinc-900">PO-24-1187</span></li>

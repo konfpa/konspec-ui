@@ -21,6 +21,13 @@
      the only copy of a name, so focus has to open it; here it is a second
      copy, so the pointer is enough.
 
+     The bubble wraps, which is the exception the one-line rule allows for a
+     string that was already too long for its column. It is capped at
+     calc(100vw-2rem) and anchored right-0 until sm, because this is the last
+     column of the table: a left-anchored bubble on a cell that starts halfway
+     across a 390px screen finishes well past the right edge of it, and a
+     register that scrolls sideways on a phone is the defect rule 16 names.
+
      The card is not overflow-hidden — that is what clips a bubble at the row
      it opens on — so the header cells are rounded instead. truncate on the
      cell itself would clip it too, which is why the ellipsis lives on an inner
@@ -28,6 +35,7 @@
 <div data-kui="tooltip/truncated" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, timer: 0,
+       over(id, el) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id, el) },
        show(id, el, d = 150) {
          clearTimeout(this.timer);
          if (el.scrollWidth <= el.clientWidth + 1) return;
@@ -49,10 +57,10 @@
         <td class="px-4 py-2.5">
           <span class="relative block">
             <span x-ref="long"
-                  @mouseenter="show('long', $refs.long)" @mouseleave="hide()"
+                  @mouseenter="over('long', $refs.long)" @mouseleave="hide()"
                   class="block truncate text-zinc-600">MS angles 50×50×6 and plates 10 mm, IS 2062 E250 BR, Waluj plant August lot</span>
             <span aria-hidden="true" x-show="open === 'long'" x-cloak x-transition.opacity.duration.100ms
-                  class="pointer-events-none absolute top-full left-0 z-40 mt-1.5 max-w-sm rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white">MS angles 50×50×6 and plates 10 mm, IS 2062 E250 BR, Waluj plant August lot</span>
+                  class="pointer-events-none absolute top-full right-0 z-40 mt-1.5 max-w-[calc(100vw-2rem)] rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white sm:right-auto sm:left-0 sm:max-w-sm">MS angles 50×50×6 and plates 10 mm, IS 2062 E250 BR, Waluj plant August lot</span>
           </span>
         </td>
       </tr>
@@ -61,10 +69,10 @@
         <td class="px-4 py-2.5">
           <span class="relative block">
             <span x-ref="short"
-                  @mouseenter="show('short', $refs.short)" @mouseleave="hide()"
+                  @mouseenter="over('short', $refs.short)" @mouseleave="hide()"
                   class="block truncate text-zinc-600">HR coil 2.5 mm</span>
             <span aria-hidden="true" x-show="open === 'short'" x-cloak x-transition.opacity.duration.100ms
-                  class="pointer-events-none absolute top-full left-0 z-40 mt-1.5 max-w-sm rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white">HR coil 2.5 mm</span>
+                  class="pointer-events-none absolute top-full right-0 z-40 mt-1.5 max-w-[calc(100vw-2rem)] rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white sm:right-auto sm:left-0 sm:max-w-sm">HR coil 2.5 mm</span>
           </span>
         </td>
       </tr>

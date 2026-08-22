@@ -1,0 +1,101 @@
+<!-- One <tbody> per group, not a flat body with heading rows scattered through
+     it. The grouping then lives in the structure of the table rather than in
+     the styling of some of its rows, which is what lets scope="colgroup" work:
+     every cell under the heading is named by it.
+
+     The heading is a <th>, never a <td>. As a <td> the vendor name is a data
+     value in a column that has no header, and the rows below it are attached to
+     nothing at all.
+
+     The subtotal sits in the amount column, in the heading row. A separate
+     subtotal row under each group doubles the number of rows the eye has to
+     skip and puts the figure a long way from the name it belongs to; in the
+     heading it lands in the same column as the amounts it sums, so one vertical
+     scan reads group, group, group.
+
+     The heading band is bg-zinc-50 — a recessed band inside a white panel.
+     zinc-100 is the page fill and would read as a gap in the panel rather than
+     as part of it.
+
+     The groups do not collapse. A register is scanned, not navigated, and a
+     collapsed group hides the rows its subtotal is made of while leaving the
+     subtotal on screen. -->
+<div data-kui="table/grouped" x-data="{
+       groups: [
+         { vendor: 'Gujarat Polymers Ltd', rows: [
+           { po: 'PO-24-1194', dept: 'Compounding', due: '02 Aug', amount: 2710400 },
+           { po: 'PO-24-1210', dept: 'Compounding', due: '21 Aug', amount: 342500 },
+           { po: 'PO-24-1218', dept: 'Compounding', due: '04 Sep', amount: 132000 }
+         ] },
+         { vendor: 'Sharma Extrusions', rows: [
+           { po: 'PO-24-1187', dept: 'Fabrication', due: '12 Aug', amount: 1842000 },
+           { po: 'PO-24-1203', dept: 'Tooling', due: '28 Jul', amount: 96750 }
+         ] },
+         { vendor: 'Nashik Steel Traders', rows: [
+           { po: 'PO-24-1191', dept: 'Dispatch', due: '19 Aug', amount: 468500 },
+           { po: 'PO-24-1206', dept: 'Maintenance', due: '22 Aug', amount: 132900 }
+         ] }
+       ],
+       fmt(n) { return '₹' + n.toLocaleString('en-IN') },
+       sum(g) { return g.rows.reduce((s, r) => s + r.amount, 0) },
+       count(g) { return g.rows.length + (g.rows.length === 1 ? ' order' : ' orders') }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">PO number</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Department</th>
+        <th scope="col" class="px-4 py-2.5 font-medium">Due</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <template x-for="g in groups" :key="g.vendor">
+      <tbody>
+        <tr class="border-t border-zinc-200 bg-zinc-50">
+          <th scope="colgroup" colspan="3" class="px-4 py-2 text-left text-[12px]/4 font-medium">
+            <span x-text="g.vendor"></span>
+            <span class="ml-2 font-normal tabular-nums text-zinc-500" x-text="count(g)"></span>
+          </th>
+          <td class="px-4 py-2 text-right text-[12px]/4 font-medium tabular-nums whitespace-nowrap" x-text="fmt(sum(g))"></td>
+        </tr>
+        <template x-for="r in g.rows" :key="r.po">
+          <tr class="border-t border-zinc-100 hover:bg-zinc-100">
+            <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.po"></td>
+            <td class="px-4 py-2.5 text-zinc-600" x-text="r.dept"></td>
+            <td class="px-4 py-2.5 text-zinc-600 tabular-nums" x-text="r.due"></td>
+            <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="fmt(r.amount)"></td>
+          </tr>
+        </template>
+      </tbody>
+    </template>
+  </table>
+
+  <!-- below md the same three groups, each an <h3> band over its own list. The
+       heading keeps its subtotal, because the subtotal is the reason a register
+       is grouped in the first place. -->
+  <div class="md:hidden">
+    <template x-for="g in groups" :key="g.vendor">
+      <section>
+        <h3 class="flex items-baseline justify-between gap-3 border-y border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 font-medium">
+          <span>
+            <span x-text="g.vendor"></span>
+            <span class="ml-1.5 font-normal tabular-nums text-zinc-500" x-text="count(g)"></span>
+          </span>
+          <span class="shrink-0 tabular-nums" x-text="fmt(sum(g))"></span>
+        </h3>
+        <ul class="divide-y divide-zinc-100">
+          <template x-for="r in g.rows" :key="r.po">
+            <li class="flex items-baseline justify-between gap-3 px-4 py-2.5">
+              <span>
+                <span class="block text-[13px]/5 font-medium tabular-nums" x-text="r.po"></span>
+                <span class="block text-[12px]/4 tabular-nums text-zinc-500"><span x-text="r.dept"></span> · due <span x-text="r.due"></span></span>
+              </span>
+              <span class="shrink-0 text-[13px]/5 tabular-nums" x-text="fmt(r.amount)"></span>
+            </li>
+          </template>
+        </ul>
+      </section>
+    </template>
+  </div>
+</div>

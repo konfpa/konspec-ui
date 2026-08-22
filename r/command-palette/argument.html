@@ -1,0 +1,144 @@
+<!-- Assign to whom. Half the actions worth putting in a palette need a second
+     word before they mean anything, and firing them on Enter and then opening
+     a dialog to ask throws away the one thing the palette is good at: the
+     hands are already on the keyboard and the query box is already focused.
+
+     So choosing that row does not fire it. It changes what the palette is
+     searching: the query clears, a chip goes into the box naming what has been
+     chosen already, the placeholder and the list become people, and Enter now
+     commits the pair. The row said so before it was pressed — the label ends
+     in an ellipsis and carries a chevron, which is what separates a row that
+     does something from a row that asks something.
+
+     Backspace on an empty query goes back a step, the same gesture that
+     removes a chip in a multiselect, and the first Escape does too. Escape
+     closing outright from the second step would drop the record along with the
+     panel and put the user back on the page with nothing to show for it; the
+     second Escape still closes, so nothing is trapped.
+
+     The chip is aria-hidden and the step is carried by two things that are
+     already read: the input's own label, which is sr-only and changes with the
+     step, and the listbox name. A visible chip left in the tree is announced
+     as loose text beside a field whose name already says the same thing.
+
+     The status line names the step as well as the count, because a screen
+     reader user pressing Enter on "Assign PO-24-1187 to…" hears the list
+     change and nothing else. -->
+<div data-kui="command-palette/argument" x-data="{
+       open: false, q: '', ai: 0, mode: 'root',
+       modes: {
+         root:   { name: 'Search orders, vendors and actions', list: 'Results', ph: 'Search orders, vendors, actions…' },
+         assign: { name: 'Search people to assign PO-24-1187 to', list: 'People PO-24-1187 can be assigned to', ph: 'Search buyers and approvers', chip: 'Assign PO-24-1187 to' }
+       },
+       rows: {
+         root: [
+           { id: 'assign',   label: 'Assign PO-24-1187 to…',        sub: 'Moves the order into somebody else\'s queue', icon: 'user-plus', arg: 'assign' },
+           { id: 'duplicate', label: 'Duplicate PO-24-1187',        sub: 'Opens a new draft with the same 14 lines',    icon: 'copy' },
+           { id: 'print',    label: 'Print PO-24-1187',             sub: 'The vendor copy, with the terms annexure',    icon: 'printer' },
+           { id: 'po-1187',  label: 'PO-24-1187 — Gujarat Polymers Ltd', sub: 'HDPE granules · 14 lines',               icon: 'file-text' }
+         ],
+         assign: [
+           { id: 'ritu',   label: 'Ritu Deshpande',  sub: 'Procurement lead · approves to ₹25,00,000', icon: 'user' },
+           { id: 'sameer', label: 'Sameer Kulkarni', sub: 'Buyer · Nashik · 18 open orders',           icon: 'user' },
+           { id: 'anita',  label: 'Anita Rao',       sub: 'Buyer · Silvassa · 6 open orders',          icon: 'user' },
+           { id: 'vikas',  label: 'Vikas Menon',     sub: 'Stores · receipts only',                    icon: 'user' }
+         ]
+       },
+       get m() { return this.modes[this.mode]; },
+       get list() {
+         const s = this.q.trim().toLowerCase();
+         return this.rows[this.mode].filter(o => (o.label + ' ' + (o.sub || '')).toLowerCase().includes(s));
+       },
+       rowId(o) { return 'cpa-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { this.open = true; this.q = ''; this.ai = 0; this.mode = 'root'; },
+       hide() { this.open = false; this.q = ''; this.ai = 0; this.mode = 'root'; },
+       into(k) { this.mode = k; this.q = ''; this.ai = 0; },
+       back() { if (this.mode === 'root') { this.hide(); return; } this.mode = 'root'; this.q = ''; this.ai = 0; },
+       move(n) {
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { if (o.arg) { this.into(o.arg); return; } this.hide(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @keydown.window.meta.k.prevent="show()"
+     @keydown.window.ctrl.k.prevent="show()"
+     @keydown.escape.window="if (open) back()">
+
+  <button type="button" @click="show()" aria-haspopup="dialog"
+          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="search" class="size-4 text-zinc-600"></i>
+    <span class="flex-1 text-left">Search Operations</span>
+    <kbd aria-hidden="true" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/40 px-3 pt-16 sm:pt-24">
+    <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
+         class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+
+      <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
+        <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+        <!-- aria-hidden: the input's label and the listbox name both say which
+             step this is, and a third copy is read out as loose text -->
+        <span x-show="m.chip" x-cloak aria-hidden="true"
+              class="shrink-0 rounded-md bg-zinc-200 px-2 py-1 text-[12px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300"
+              x-text="m.chip"></span>
+        <label for="cpa-q" class="sr-only" x-text="m.name">Search orders, vendors and actions</label>
+        <input id="cpa-q" x-model="q" type="text" role="combobox" autocomplete="off" autofocus
+               aria-autocomplete="list" aria-controls="cpa-list"
+               :aria-expanded="open" :aria-activedescendant="activeId"
+               :placeholder="m.ph"
+               @input="ai = 0"
+               @keydown.backspace="if (!q && mode !== 'root') { $event.preventDefault(); back() }"
+               @keydown.arrow-down.prevent="move(1)"
+               @keydown.arrow-up.prevent="move(-1)"
+               @keydown.enter.prevent="commit()"
+               class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        <button type="button" @click="back()"
+                class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px]/4 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                x-text="mode === 'root' ? 'Esc' : 'Back'">Esc</button>
+      </div>
+
+      <div id="cpa-list" role="listbox" :aria-label="m.list" class="max-h-80 overflow-y-auto py-1">
+        <template x-for="(o, i) in list" :key="o.id">
+          <div :id="rowId(o)" role="option"
+               @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+               :class="i === ai ? 'bg-zinc-100' : ''"
+               class="flex items-start gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center text-zinc-600">
+              <i :data-lucide="o.icon" class="size-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate tabular-nums" x-text="o.label"></span>
+              <span x-show="o.sub" class="block truncate text-[12px]/4 tabular-nums text-zinc-500" x-text="o.sub"></span>
+            </span>
+            <!-- the chevron and the ellipsis in the label are the promise that
+                 Enter here asks rather than acts -->
+            <span x-show="o.arg" class="mt-0.5 flex size-4 shrink-0 items-center justify-center text-zinc-500">
+              <i data-lucide="chevron-right" class="size-4"></i>
+            </span>
+          </div>
+        </template>
+      </div>
+
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">Nothing matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500" x-text="mode === 'root' ? 'Try an order number — PO-24-1187.' : 'Only people who can hold a purchase order are listed.'"></p>
+      </div>
+
+      <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> <span x-text="mode === 'root' ? 'open' : 'assign'">open</span></span>
+        <span x-show="mode !== 'root'" x-cloak><kbd class="rounded border border-zinc-200 px-1 py-0.5">⌫</kbd> back</span>
+        <span class="ml-auto" x-text="mode === 'root' ? 'Operations' : 'Step 2 of 2'">Operations</span>
+      </div>
+
+      <p role="status" class="sr-only"
+         x-text="open ? (mode === 'root' ? list.length + (list.length === 1 ? ' result' : ' results') : m.chip + '. ' + list.length + (list.length === 1 ? ' person.' : ' people.')) : ''"></p>
+    </div>
+  </div>
+</div>

@@ -11,7 +11,7 @@
      nowhere: that word belongs to a tab, which swaps a panel in this document
      rather than moving you.
 
-     The trigger keeps its zinc-100 tint whether the panel is open or not, so
+     The trigger keeps its zinc-200 tint whether the panel is open or not, so
      "where I am" and "what is open" are the same colour. They are only ever
      confusable for a moment, since the chevron rotates and the panel is on
      screen, and the alternative — a second marker for the current section — is
@@ -57,7 +57,7 @@
               @mouseenter="hover('proc')"
               @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
               @keydown.arrow-down.prevent="jump('proc')"
-              class="flex items-center gap-1.5 rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              class="flex items-center gap-1.5 rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Procurement
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -65,13 +65,13 @@
       </button>
 
       <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
-           id="nmcur-p-proc" aria-labelledby="nmcur-t-proc"
+           id="nmcur-p-proc" role="group" aria-labelledby="nmcur-t-proc"
            class="absolute top-full left-0 z-40 pt-2">
         <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
           <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
           <li>
             <a href="/procurement/orders/" aria-current="page"
-               class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a>
+               class="block rounded-lg bg-zinc-200 px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a>
           </li>
           <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
           <li><a href="/procurement/contracts/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Rate contracts</a></li>

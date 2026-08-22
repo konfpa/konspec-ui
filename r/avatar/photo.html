@@ -1,0 +1,55 @@
+<!-- Nothing in this application uploads a photograph. The only ones that exist
+     came back from the identity provider with the sign-in, which means the URL
+     is somebody else's, it expires, it 404s for the half of the directory that
+     never set a picture, and on a plant network the proxy refuses it outright.
+     Failure is the ordinary case here, not the edge one.
+
+     So the initials are not a fallback. They are the resting content of the
+     circle and the photograph is a layer over them, removed on error. The two
+     obvious alternatives both fail in the field: swapping src to a placeholder
+     image trades one request that can fail for another, and hiding the img on
+     error leaves an empty circle unless something was already underneath it.
+
+     onerror rather than an Alpine @error, and this is the one place inline HTML
+     wins outright. An image error fires while the document is still parsing,
+     long before Alpine boots, so a listener bound afterwards never hears it and
+     the broken-image glyph stays on screen.
+
+     The edge is its own layer. An inset ring is painted under the element's
+     content, so ring-1 ring-inset on the circle disappears behind the
+     photograph exactly where a pale photograph needs an edge most. The overlay
+     span draws it above the image and keeps drawing it after the image is gone.
+
+     alt is empty on all of them. The circle is already aria-hidden because the
+     name is written beside it, and alt text here would say the name twice. -->
+<div data-kui="avatar/photo" class="space-y-3">
+  <div class="flex items-center gap-3">
+    <span class="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-600" aria-hidden="true">RD
+      <img src="/media/directory/ritu-deshpande.jpg" alt="" onerror="this.remove()" class="absolute inset-0 size-full object-cover">
+      <span class="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-zinc-300"></span>
+    </span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium">Ritu Deshpande</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">Directory photograph</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <span class="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-200 text-[13px]/5 font-medium text-zinc-600" aria-hidden="true">SM
+      <img src="/media/directory/expired-token.jpg" alt="" onerror="this.remove()" class="absolute inset-0 size-full object-cover">
+      <span class="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-zinc-300"></span>
+    </span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium">Sanjay More</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">Photograph failed to load</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-hidden="true">IQ</span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium">Imran Qureshi</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">No photograph on the account</p>
+    </div>
+  </div>
+</div>

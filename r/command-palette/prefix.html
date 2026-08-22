@@ -1,0 +1,142 @@
+<!-- Somebody who types PO all day knows before they press ⌘K whether they
+     want a record or a command, and a mixed list makes them read past the half
+     they did not want. One character at the front of the query says which:
+     > for actions, # for records, @ for people.
+
+     The character stays in the box as ordinary typed text. Lifting it into a
+     mode variable and hiding it behind a chip means two things now describe
+     the same state, and the pair go out of step the first time somebody edits
+     the middle of the query — so mode and term are both derived from q and
+     there is nothing to keep in step. Backspace is what leaves the mode,
+     because Backspace is what deletes the character.
+
+     Position 0 only. A hash in the middle of a query is a hash somebody is
+     searching for, and treating it as a prefix means "MS angle #2" silently
+     searches for "2".
+
+     The prefix on its own, with nothing after it, lists everything of that
+     kind. That is how anybody finds out what > holds — nobody reads a legend
+     first — and it is why the empty term is not treated as an empty query.
+
+     The legend is in the footer where the arrow keys already are. The trade is
+     stated plainly: a literal > cannot be searched for from here, and the
+     register's own filter is where that belongs. -->
+<div data-kui="command-palette/prefix" x-data="{
+       open: false, q: '', ai: 0,
+       kinds: { '>': 'actions', '#': 'records', '@': 'people' },
+       titles: { actions: 'Actions', records: 'Records', people: 'People', all: 'Results' },
+       data: {
+         actions: [
+           { id: 'new-po',    label: 'New purchase order',  sub: 'Operations · draft',            icon: 'plus' },
+           { id: 'post-grn',  label: 'Post goods receipt',  sub: 'Against an open order',         icon: 'package-check' },
+           { id: 'approvals', label: 'Go to my approvals',  sub: '3 waiting on you',              icon: 'check-check' },
+           { id: 'gstr2b',    label: 'Reconcile GSTR-2B',   sub: 'August 2026 · 41 unmatched',    icon: 'receipt' }
+         ],
+         records: [
+           { id: 'po-1187',    label: 'PO-24-1187 — Gujarat Polymers Ltd', sub: 'HDPE granules · 14 lines', icon: 'file-text' },
+           { id: 'po-1179',    label: 'PO-24-1179 — Sharma Steel Traders', sub: 'Closed 02 Sep 2026',       icon: 'file-text' },
+           { id: 'grn-0442',   label: 'GRN-0442 — Sharma Steel Traders',   sub: '12.400 MT · 3 lines held', icon: 'package-check' },
+           { id: 'ven-deccan', label: 'Deccan Fasteners Pvt Ltd',          sub: 'Vendor · VEN-0219',        icon: 'building-2' }
+         ],
+         people: [
+           { id: 'ritu',   label: 'Ritu Deshpande',  sub: 'Procurement lead · approves to ₹25,00,000', icon: 'user' },
+           { id: 'sameer', label: 'Sameer Kulkarni', sub: 'Buyer · Nashik',                            icon: 'user' },
+           { id: 'anita',  label: 'Anita Rao',       sub: 'Buyer · Silvassa',                          icon: 'user' }
+         ]
+       },
+       get mode() { return this.kinds[this.q.slice(0, 1)] || 'all'; },
+       get term() { return (this.mode === 'all' ? this.q : this.q.slice(1)).trim().toLowerCase(); },
+       get pool() { return this.mode === 'all' ? [].concat(this.data.actions, this.data.records, this.data.people) : this.data[this.mode]; },
+       get list() { return this.pool.filter(o => (o.label + ' ' + (o.sub || '')).toLowerCase().includes(this.term)); },
+       rowId(o) { return 'cpx-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { this.open = true; this.q = ''; this.ai = 0; },
+       hide() { this.open = false; this.q = ''; this.ai = 0; },
+       move(n) {
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) { this.hide(); },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @keydown.window.meta.k.prevent="show()"
+     @keydown.window.ctrl.k.prevent="show()"
+     @keydown.escape.window="hide()">
+
+  <button type="button" @click="show()" aria-haspopup="dialog"
+          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="search" class="size-4 text-zinc-600"></i>
+    <span class="flex-1 text-left">Search Operations</span>
+    <kbd aria-hidden="true" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/40 px-3 pt-16 sm:pt-24">
+    <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
+         class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+
+      <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
+        <span class="flex size-4 shrink-0 items-center justify-center text-zinc-600">
+          <i :data-lucide="mode === 'actions' ? 'chevron-right' : (mode === 'records' ? 'hash' : (mode === 'people' ? 'at-sign' : 'search'))" class="size-4"></i>
+        </span>
+        <label for="cpx-q" class="sr-only"
+               x-text="mode === 'all' ? 'Search everything' : 'Search ' + mode">Search everything</label>
+        <input id="cpx-q" x-model="q" type="text" role="combobox" autocomplete="off" autofocus
+               aria-autocomplete="list" aria-controls="cpx-list"
+               :aria-expanded="open" :aria-activedescendant="activeId"
+               placeholder="Search, or type &gt; for actions"
+               @input="ai = 0"
+               @keydown.arrow-down.prevent="move(1)"
+               @keydown.arrow-up.prevent="move(-1)"
+               @keydown.enter.prevent="commit()"
+               class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        <button type="button" @click="hide()" class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px]/4 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Esc</button>
+      </div>
+
+      <!-- the mode label belongs to the whole panel rather than to a section
+           of the list, so it sits above the listbox and not inside it: one
+           group whose name is the listbox's name is noise, and a bare
+           paragraph is not a permitted child of a listbox -->
+      <p aria-hidden="true"
+         class="border-b border-zinc-100 px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+         x-text="titles[mode]"></p>
+
+      <div id="cpx-list" role="listbox" :aria-label="titles[mode]" class="max-h-80 overflow-y-auto pb-1">
+        <template x-for="(o, i) in list" :key="o.id">
+          <div :id="rowId(o)" role="option"
+               @mousedown.prevent @click="pick(o)" @mousemove="ai = i"
+               :class="i === ai ? 'bg-zinc-100' : ''"
+               class="flex items-start gap-2.5 px-3 py-2 text-[13px]/5">
+            <span class="mt-0.5 flex size-4 shrink-0 items-center justify-center text-zinc-600">
+              <i :data-lucide="o.icon" class="size-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate tabular-nums" x-text="o.label"></span>
+              <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500" x-text="o.sub"></span>
+            </span>
+          </div>
+        </template>
+      </div>
+
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">No <span x-text="mode === 'all' ? 'result' : mode.replace(/s$/, '')"></span> matches “<span x-text="term"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Delete the prefix to search everything.</p>
+      </div>
+
+      <!-- the legend lives beside the arrow keys, because a mode nobody knows
+           about is a mode nobody uses -->
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">&gt;</kbd> actions</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">#</kbd> records</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">@</kbd> people</span>
+        <span class="ml-auto">Operations</span>
+      </div>
+
+      <p role="status" class="sr-only"
+         x-text="open ? titles[mode] + ', ' + list.length + (list.length === 1 ? ' result' : ' results') : ''"></p>
+    </div>
+  </div>
+</div>

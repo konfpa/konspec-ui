@@ -1,13 +1,25 @@
 <!-- Two labels for one item and both are compulsory. aria-label on the anchor is
      the real name; the dark bubble is a sibling span marked aria-hidden, or the
-     item is announced twice. Ship only the bubble and the rail is eleven links
+     item is announced twice. Ship only the bubble and the rail is nine links
      called nothing to anyone not looking at it.
 
-     The bubble cannot live on the i element: createIcons() replaces that node
-     with an svg and takes every binding written against it along too. And
-     group-hover alone is not enough — group-focus-within is what makes the rail
-     usable from the keyboard, and it is the half everybody forgets because they
-     test with a mouse.
+     The bubble is tooltip/rail pasted, not a bubble of this entry's own, and the
+     reason is that the CSS-only form this variant used to carry fails on two
+     counts. group-hover holds no state, so Escape cannot dismiss the label and
+     the dismissible half of 1.4.13 is simply unmet. And group-focus-within fires
+     on the focus a click leaves behind, so tapping a destination leaves its name
+     sitting over the page that has just opened underneath it. focus-visible and
+     one delay group fix both, and the 150ms warm-up is shorter than the
+     toolbar's 400ms because a pointer resting on a rail item is nearly always
+     asking what it is.
+
+     The bubble cannot live on the i element either way: createIcons() replaces
+     that node with an svg and takes every binding written against it along too.
+
+     The current item is bg-zinc-200 with its ring. At 68px the active state has
+     stopped being a full-bleed row and become a 40px shape, and a tinted shape
+     carries ring-1 ring-inset ring-zinc-300 or it has no edge against the white
+     rail around it.
 
      Counts do not survive at 40px. Two digits fit as a pill overhanging the
      corner and three do not, and the pill needs ring-2 ring-white to hold an
@@ -18,90 +30,133 @@
      This nav deliberately does not scroll: overflow-y:auto forces overflow-x to
      auto, so a scrolling rail clips its own tooltips at the right edge. More
      destinations than fit needs the flyout variant. -->
-<div data-kui="sidebar/rail" class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
+<div data-kui="sidebar/rail" class="flex h-[560px] w-[68px] flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{
+       tip: null, warm: false, timer: 0, cool: 0,
+       over(id) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id) },
+       show(id, now = false) {
+         clearTimeout(this.timer); clearTimeout(this.cool);
+         if (now || this.warm) { this.tip = id; this.warm = true; return }
+         this.timer = setTimeout(() => { this.tip = id; this.warm = true }, 150);
+       },
+       hide() {
+         clearTimeout(this.timer);
+         this.tip = null;
+         this.cool = setTimeout(() => this.warm = false, 800);
+       }
+     }"
+     @keydown.escape.window="hide()">
+
   <div class="flex h-14 shrink-0 items-center justify-center border-b border-zinc-200">
     <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-700 text-white" aria-hidden="true"><i data-lucide="package" class="size-[18px]"></i></span>
   </div>
 
   <nav aria-label="Main" class="min-h-0 flex-1 space-y-1 py-2">
-    <div class="group relative flex justify-center">
+    <div class="relative flex justify-center">
       <a href="#" aria-label="Overview"
+         @mouseenter="over('overview')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('overview', true)" @blur="hide()"
          class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="layout-dashboard" class="size-[18px]"></i>
       </a>
-      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Overview</span>
+      <span aria-hidden="true" x-show="tip === 'overview'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Overview</span>
     </div>
 
-    <div class="group relative flex justify-center">
+    <div class="relative flex justify-center">
       <a href="#" aria-current="page" aria-label="Purchase orders, 148 open"
-         class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-200 text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+         @mouseenter="over('orders')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('orders', true)" @blur="hide()"
+         class="relative flex size-10 items-center justify-center rounded-lg bg-zinc-200 text-zinc-900 ring-1 ring-inset ring-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="file-text" class="size-[18px]"></i>
         <span aria-hidden="true" class="absolute -top-1 -right-1 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
       </a>
-      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Purchase orders — 148 open</span>
+      <span aria-hidden="true" x-show="tip === 'orders'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white">Purchase orders — 148 open</span>
     </div>
 
-    <div class="group relative flex justify-center">
+    <div class="relative flex justify-center">
       <a href="#" aria-label="Goods receipt, 12 awaiting GRN"
+         @mouseenter="over('grn')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('grn', true)" @blur="hide()"
          class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="truck" class="size-[18px]"></i>
         <span aria-hidden="true" class="absolute -top-1 -right-1 rounded-full bg-zinc-700 px-1 text-[11px]/4 font-medium tabular-nums text-white ring-2 ring-white">12</span>
       </a>
-      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Goods receipt — 12 awaiting</span>
+      <span aria-hidden="true" x-show="tip === 'grn'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white">Goods receipt — 12 awaiting</span>
     </div>
 
-    <div class="group relative flex justify-center">
+    <div class="relative flex justify-center">
       <a href="#" aria-label="Invoices, 148 on hold"
+         @mouseenter="over('invoices')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('invoices', true)" @blur="hide()"
          class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="receipt" class="size-[18px]"></i>
         <span aria-hidden="true" class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-red-600 ring-2 ring-white"></span>
       </a>
-      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Invoices — 148 on hold</span>
+      <span aria-hidden="true" x-show="tip === 'invoices'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white">Invoices — 148 on hold</span>
     </div>
 
     <div class="mx-4 border-t border-zinc-100"></div>
 
-    <div class="group relative flex justify-center">
+    <div class="relative flex justify-center">
       <a href="#" aria-label="Vendors, 187"
+         @mouseenter="over('vendors')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('vendors', true)" @blur="hide()"
          class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="building-2" class="size-[18px]"></i>
       </a>
-      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Vendors — 187</span>
+      <span aria-hidden="true" x-show="tip === 'vendors'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white">Vendors — 187</span>
     </div>
 
-    <div class="group relative flex justify-center">
+    <div class="relative flex justify-center">
       <a href="#" aria-label="Materials"
+         @mouseenter="over('materials')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('materials', true)" @blur="hide()"
          class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="package" class="size-[18px]"></i>
       </a>
-      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Materials</span>
+      <span aria-hidden="true" x-show="tip === 'materials'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Materials</span>
     </div>
 
-    <div class="group relative flex justify-center">
+    <div class="relative flex justify-center">
       <a href="#" aria-label="Rate contracts, 6 expiring"
+         @mouseenter="over('contracts')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('contracts', true)" @blur="hide()"
          class="relative flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="scale" class="size-[18px]"></i>
         <span aria-hidden="true" class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-amber-500 ring-2 ring-white"></span>
       </a>
-      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Rate contracts — 6 expiring</span>
+      <span aria-hidden="true" x-show="tip === 'contracts'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white">Rate contracts — 6 expiring</span>
     </div>
 
-    <div class="group relative flex justify-center">
+    <div class="relative flex justify-center">
       <a href="#" aria-label="Analytics"
+         @mouseenter="over('analytics')" @mouseleave="hide()"
+         @focus="if ($event.target.matches(':focus-visible')) show('analytics', true)" @blur="hide()"
          class="flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chart-no-axes-column" class="size-[18px]"></i>
       </a>
-      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Analytics</span>
+      <span aria-hidden="true" x-show="tip === 'analytics'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Analytics</span>
     </div>
   </nav>
 
   <div class="shrink-0 border-t border-zinc-200 py-2">
-    <div class="group relative flex justify-center">
+    <div class="relative flex justify-center">
       <button type="button" aria-label="Account — Akshay Prabhu, Level 2 approver"
+              @mouseenter="over('account')" @mouseleave="hide()"
+              @focus="if ($event.target.matches(':focus-visible')) show('account', true)" @blur="hide()"
               class="flex size-10 items-center justify-center rounded-lg hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[11px]/4 font-semibold text-zinc-900 ring-1 ring-inset ring-zinc-300">AP</span>
       </button>
-      <span aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Akshay Prabhu</span>
+      <span aria-hidden="true" x-show="tip === 'account'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-1/2 left-full z-40 ml-1.5 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Akshay Prabhu</span>
     </div>
   </div>
 </div>

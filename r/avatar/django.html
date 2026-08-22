@@ -1,0 +1,54 @@
+<!-- Four things decide what a circle looks like — whether there is a person at
+     all, whether that person is you, whether a photograph came back with the
+     sign-in, and whether the name is already written beside it. Spread those
+     across call sites and every screen gets three of the four right.
+
+     # people/models.py
+     LEGAL = {'ltd', 'pvt', 'llp', 'inc', 'co'}
+
+     @property
+     def initials(self):
+         parts = [p for p in self.display_name.split()
+                  if p.strip('.').lower() not in LEGAL]
+         if not parts:
+             return ''
+         if len(parts) == 1:
+             return parts[0][:2].upper()
+         return (parts[0][0] + parts[-1][0]).upper()
+
+     upper() is a no-op on Devanagari, which is what you want — there is no
+     capital form to reach for and forcing one changes nothing. Empty initials
+     are the signal to draw the icon, and they are returned rather than guessed,
+     because the guess would be letters off an email address.
+
+     # the call sites
+     {% include "people/_avatar.html" with person=entry.actor named=True %}
+     {% include "people/_avatar.html" with person=order.approver %}
+
+     named is what the caller promises: the full name is written next to this,
+     so the circle can go silent. Leaving it off labels the avatar, and that is
+     deliberately the safe default — a name read twice is a nuisance, a name
+     nobody can reach is a person who cannot be identified at all.
+
+     The photograph is inside the same include so its onerror is not something a
+     call site can forget. Django escapes the URL and the name in the attributes
+     for free; do not mark either safe. -->
+{# people/_avatar.html #}
+<span data-kui="avatar/django"
+      class="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full text-[13px]/5 font-medium {% if not person %}border border-dashed border-zinc-300 text-zinc-600{% elif person == request.user %}bg-zinc-700 text-white{% else %}bg-zinc-200 text-zinc-600{% endif %}"
+      {% if named %}aria-hidden="true"{% else %}role="img" aria-label="{% if person %}{{ person.display_name }}{% if person == request.user %}, you{% endif %}{% else %}Unassigned{% endif %}"{% endif %}>
+  {% if not person %}
+    <i data-lucide="user" class="size-4"></i>
+  {% elif person.initials %}
+    {{ person.initials }}
+    {% if person.photo_url %}
+      <img src="{{ person.photo_url }}" alt="" onerror="this.remove()" class="absolute inset-0 size-full object-cover">
+    {% endif %}
+    {% if person != request.user %}
+      <span class="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-zinc-300"></span>
+    {% endif %}
+  {% else %}
+    <i data-lucide="at-sign" class="size-4"></i>
+    <span class="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-zinc-300"></span>
+  {% endif %}
+</span>

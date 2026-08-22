@@ -17,17 +17,27 @@
      role="status" line. Without the live region the arrival is silent — the
      blocks are decorative and the links appear with nothing announcing them.
      Nothing in here is focusable, so a Tab during the wait skips straight past
-     to the footer rather than landing on a grey rectangle. -->
+     to the footer rather than landing on a grey rectangle.
+
+     The live region sits outside the swapped container, which is the half that
+     is easy to get wrong. Put it inside and the swap destroys the region and
+     inserts a new one in the same frame as its text: a live region has to be in
+     the document before its content changes or nothing is announced, so the
+     arrival that the region existed to report is the one thing it cannot
+     report. The response therefore carries the region's new text as an
+     out-of-band innerHTML swap — hx-swap-oob="innerHTML:#sb9-status" on an
+     element in the reply — which writes into a region that never left. sr-only
+     is position:absolute, so it costs the flex column no height. -->
 <div data-kui="sidebar/skeleton" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900">
   <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
     <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
     <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
   </div>
 
+  <p id="sb9-status" class="sr-only" role="status">Loading navigation</p>
+
   <div class="min-h-0 flex-1 overflow-y-auto px-3 py-2" aria-busy="true"
        hx-get="/nav/" hx-trigger="load" hx-swap="outerHTML">
-    <p class="sr-only" role="status">Loading navigation</p>
-
     <div class="animate-pulse space-y-0.5 motion-reduce:animate-none" aria-hidden="true">
       <div class="px-2.5 pt-1 pb-2"><div class="h-2 w-20 rounded bg-zinc-200"></div></div>
       <div class="flex min-h-9 items-center gap-3 px-2.5 py-2">

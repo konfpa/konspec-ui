@@ -1,0 +1,114 @@
+<!-- A 390px card gives the plot roughly 300px, and twelve month labels do not
+     fit in it. Chart.js answers that by rotating them to fifty degrees, which
+     eats a third of the height and leaves a chart whose axis is a fan.
+
+     maxRotation: 0 forbids the rotation and autoSkip drops whichever labels do
+     not fit — Aug, Oct, Dec and so on, six of twelve on a phone and all twelve
+     on a desk. Dropping labels beats shortening them: abbreviating to initials
+     turns June, July and January into J, J and J, which is a shorter axis that
+     says less than a blank one.
+
+     autoSkip runs on every layout pass, not once at init. That is the whole
+     reason it is Chart.js' decision and not a matchMedia check written here —
+     the box also narrows when the sidebar expands and when the card moves from
+     a two-column grid to one, neither of which is a window resize.
+
+     maxTicksLimit on the value axis for the same reason: five gridlines is a
+     scale, nine is a hatch pattern.
+
+     Nothing is lost by thinning the axis. The tooltip reads the raw label
+     rather than whatever survived it, so a month the axis dropped still names
+     itself under the cursor, and the fallback table carries all twelve rows
+     whatever is on screen. The axis is a scale, not the data. -->
+<div data-kui="chart/responsive" class="rounded-xl border border-zinc-300 bg-white p-4 sm:p-5"
+     x-data="{
+       chart: null, gone: false,
+       init() { this.wait(() => this.draw()); },
+       /* Tailwind's browser build compiles after first paint, so a class can
+          still be uncompiled when Alpine initialises and getComputedStyle
+          hands back transparent. Check every swatch, not the first: they do
+          not all land in the same pass. With a compiled stylesheet this
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
+       wait(fn) {
+         if (this.gone) return;
+         const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
+         probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+           ? fn()
+           : requestAnimationFrame(() => this.wait(fn));
+       },
+       draw() {
+         Chart.defaults.font.family = getComputedStyle(this.$root).fontFamily;
+         const grid = getComputedStyle(this.$root).borderTopColor;
+         const ink  = getComputedStyle(this.$refs.legend).color;
+         const tone = Array.from(this.$refs.legend.querySelectorAll('[data-series]'))
+                           .map(el => getComputedStyle(el).backgroundColor);
+         this.chart = new Chart(this.$refs.canvas, {
+           type: 'bar',
+           data: {
+             labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+             datasets: [{
+               label: 'Receipts posted',
+               data: [38, 41, 34, 46, 39, 44, 52, 47, 49, 55, 51, 58],
+               backgroundColor: tone[0], borderRadius: 3, maxBarThickness: 22
+             }]
+           },
+           options: {
+             responsive: true, maintainAspectRatio: false,
+             interaction: { mode: 'index', intersect: false },
+             scales: {
+               x: {
+                 grid: { display: false }, border: { color: grid },
+                 ticks: { color: ink, autoSkip: true, maxRotation: 0, autoSkipPadding: 10 }
+               },
+               y: {
+                 beginAtZero: true,
+                 grid: { color: grid }, border: { display: false },
+                 ticks: { color: ink, padding: 8, maxTicksLimit: 5 }
+               }
+             }
+           }
+         });
+       },
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
+     }">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+    <h3 class="text-[14px]/5 font-semibold">Receipts posted by month</h3>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">Rolling twelve months</p>
+  </div>
+
+  <ul x-ref="legend" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]/4 text-zinc-600">
+    <li class="flex items-center gap-1.5">
+      <span data-series class="size-2 rounded-full bg-zinc-600" aria-hidden="true"></span>Receipts posted
+    </li>
+  </ul>
+
+  <div class="mt-4 h-56 sm:h-64">
+    <canvas x-ref="canvas" role="img"
+            aria-label="Receipts posted each month over the last twelve months, rising from 38 to 58 with a low of 34 in November."></canvas>
+  </div>
+
+  <div class="sr-only">
+    <table>
+      <caption>Receipts posted by month, rolling twelve months to August 2026</caption>
+      <thead><tr><th scope="col">Month</th><th scope="col">Receipts posted</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">September 2025</th><td>38</td></tr>
+        <tr><th scope="row">October 2025</th><td>41</td></tr>
+        <tr><th scope="row">November 2025</th><td>34</td></tr>
+        <tr><th scope="row">December 2025</th><td>46</td></tr>
+        <tr><th scope="row">January 2026</th><td>39</td></tr>
+        <tr><th scope="row">February 2026</th><td>44</td></tr>
+        <tr><th scope="row">March 2026</th><td>52</td></tr>
+        <tr><th scope="row">April 2026</th><td>47</td></tr>
+        <tr><th scope="row">May 2026</th><td>49</td></tr>
+        <tr><th scope="row">June 2026</th><td>55</td></tr>
+        <tr><th scope="row">July 2026</th><td>51</td></tr>
+        <tr><th scope="row">August 2026</th><td>58</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

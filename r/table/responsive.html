@@ -1,3 +1,21 @@
+<!-- Two renderings of the same records, one hidden at each breakpoint. Not a
+     table in a horizontal scroller, and not a table with three columns hidden
+     below md: the first is unusable on a phone and the second quietly takes
+     data away from the person least able to go and look it up.
+
+     The card carries the same fields in the same order as the row. The identity
+     and the money go on the first line, because those are what a phone user is
+     scanning for; the descriptive fields follow on one line separated by a
+     middot; the status and the date close it.
+
+     Both renderings are in the DOM at once, which is the thing to watch. Give
+     either of them a form control with a name and it posts even while
+     display:none, so the same record is submitted twice — checkbox/table has
+     the working version of that.
+
+     md is the breakpoint because five columns of thirteen-pixel text with px-4
+     padding stop fitting somewhere around 700px, not because 768 is a round
+     number. Count the columns before copying this. -->
 <div data-kui="table/responsive" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
   <table class="hidden w-full text-[13px]/5 md:table">
     <thead>
@@ -14,15 +32,15 @@
         <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1187</td>
         <td class="px-4 py-2.5">Sharma Extrusions</td>
         <td class="px-4 py-2.5 text-zinc-600">Fabrication</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹18,42,000</td>
-        <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums">12 Aug</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹18,42,000</td>
+        <td class="px-4 py-2.5 text-right text-zinc-600 tabular-nums whitespace-nowrap">12 Aug</td>
       </tr>
       <tr class="hover:bg-zinc-100">
         <td class="px-4 py-2.5 font-medium tabular-nums">PO-24-1194</td>
         <td class="px-4 py-2.5">Gujarat Polymers Ltd</td>
         <td class="px-4 py-2.5 text-zinc-600">Compounding</td>
-        <td class="px-4 py-2.5 text-right tabular-nums">₹27,10,400</td>
-        <td class="px-4 py-2.5 text-right text-red-600 tabular-nums">02 Aug</td>
+        <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">₹27,10,400</td>
+        <td class="px-4 py-2.5 text-right text-red-600 tabular-nums whitespace-nowrap">02 Aug</td>
       </tr>
     </tbody>
   </table>
@@ -31,12 +49,12 @@
     <li class="px-4 py-3">
       <div class="flex items-baseline justify-between gap-3">
         <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1187</span>
-        <span class="text-[14px]/5 tabular-nums">₹18,42,000</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹18,42,000</span>
       </div>
       <p class="mt-0.5 text-[13px]/5 text-zinc-600">Sharma Extrusions · Fabrication</p>
       <div class="mt-2 flex items-center gap-2">
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-900">
-          <span class="size-1.5 rounded-full bg-zinc-700"></span>Open
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
         </span>
         <span class="text-[12px]/4 text-zinc-500 tabular-nums">Due 12 Aug</span>
       </div>
@@ -44,12 +62,12 @@
     <li class="px-4 py-3">
       <div class="flex items-baseline justify-between gap-3">
         <span class="text-[14px]/5 font-medium tabular-nums">PO-24-1194</span>
-        <span class="text-[14px]/5 tabular-nums">₹27,10,400</span>
+        <span class="shrink-0 text-[14px]/5 tabular-nums">₹27,10,400</span>
       </div>
       <p class="mt-0.5 text-[13px]/5 text-zinc-600">Gujarat Polymers Ltd · Compounding</p>
       <div class="mt-2 flex items-center gap-2">
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 px-2 py-0.5 text-[12px]/4 text-zinc-700">
-          <span class="size-1.5 rounded-full bg-red-600"></span>Overdue
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+          <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>Overdue
         </span>
         <span class="text-[12px]/4 text-zinc-500 tabular-nums">Due 02 Aug</span>
       </div>

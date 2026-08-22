@@ -3,8 +3,10 @@
      of four cards: at this size four separate borders and four gaps is more
      furniture than data.
 
-     The rules are hairlines drawn by gap-px over a zinc-100 background rather
-     than by divide-x. divide-x has to be undone at every breakpoint where the
+     The rules are hairlines drawn by gap-px over a zinc-200 background rather
+     than by divide-x, and zinc-200 rather than zinc-100 because the strip sits
+     on the page: a 1px gap in the page colour is a gap in the strip and not a
+     rule through it. divide-x has to be undone at every breakpoint where the
      column count changes, and it draws nothing between the two rows at 390px;
      the gap paints both axes at any column count and reflows nothing, because a
      1px gap is a gap and not a border.
@@ -15,11 +17,18 @@
      strip. Four copies of "vs. July" at 11px is four chances to disagree with
      itself and nothing gained.
 
+     The rupee mark stays inside the figure here, which is the one place this
+     component allows it. Stepping the unit down from 16px lands it at 11px
+     beside a 16px number, which is not a quieter unit, it is an unreadable one;
+     and the argument for splitting them — keeping the digits at the same x
+     across a row — is already gone, because these figures are separated by
+     rules rather than aligned against each other.
+
      Below sm it is two columns, not one: at this size two 16px figures fit side
      by side on a 390px screen, and eight rows of one number each is a list
      nobody scrolls. -->
 <div data-kui="stat-card/dense" class="max-w-3xl">
-  <div class="overflow-hidden rounded-xl border border-zinc-200">
+  <div class="overflow-hidden rounded-xl border border-zinc-300">
     <dl class="grid grid-cols-2 gap-px bg-zinc-200 sm:grid-cols-4">
 
       <div class="bg-white px-3 py-2.5">

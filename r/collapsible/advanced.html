@@ -29,16 +29,16 @@
 
   <div class="mt-5 rounded-xl border border-zinc-200 bg-white">
     <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="col-advanced"
-            class="flex h-12 w-full items-center gap-3 px-4 text-left">
+            class="flex h-12 w-full items-center gap-3 px-4 text-left focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="sliders-horizontal" class="size-4 shrink-0 text-zinc-600"></i>
       <span class="flex-1 text-[14px]/5 font-medium">Advanced options</span>
       <span class="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">4 fields</span>
-      <span class="flex transition-transform" :class="open && 'rotate-180'">
+      <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
         <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
       </span>
     </button>
 
-    <div id="col-advanced" x-show="open" x-cloak x-collapse.duration.200ms>
+    <div id="col-advanced" x-show="open" x-cloak x-collapse.duration.200ms class="motion-reduce:transition-none!">
       <div class="space-y-4 border-t border-zinc-100 px-4 py-4">
         <div>
           <label for="ao-freight" class="mb-1.5 block text-[13px]/5 font-medium">Freight terms</label>
@@ -75,5 +75,5 @@
     </div>
   </div>
 
-  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Release order</button>
+  <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Release order</button>
 </form>

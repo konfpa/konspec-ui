@@ -1,0 +1,37 @@
+<!-- Four things want the first row — icon, text, action, dismiss — and at
+     390px there is room for three. Which one leaves is the whole variant.
+
+     The action leaves, and it leaves downward at full width. Sending the
+     dismiss away instead was tried and is worse: it is the control that costs
+     nothing to press and everything to hunt for, and moving it off the corner
+     where every other close button in the console lives makes it unfindable on
+     the device where it matters most. Shrinking the text instead gives three
+     words a line beside a button, which is not a sentence anybody reads.
+
+     Order utilities are doing the work rather than a second copy of the markup
+     behind a breakpoint. The dismiss sits before the action in the source so
+     that the wrap lands the way it should on a phone — icon, text and dismiss
+     on the first row, action alone on the second — and sm:order-2 and
+     sm:order-3 put them back in reading order above the breakpoint, where the
+     dismiss belongs on the far right. Duplicating the block with hidden and
+     sm:flex instead ships two copies of one button, and the second one is where
+     the aria-label goes stale.
+
+     The full-width action spans the whole body rather than indenting to line up
+     under the text. An indent needs a width of 100% minus the icon column,
+     which is an arbitrary calc that has to be corrected every time the icon
+     size changes, and it buys nothing at a width where the button is the only
+     thing on its row. -->
+<div data-kui="alert/responsive" class="flex flex-wrap items-start gap-x-3 gap-y-2.5 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+  <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+  <div class="min-w-[12rem] flex-1">
+    <p class="text-[13px]/5 font-medium">The rate contract for HDPE-BLM-45 expires on 30 Sep 2026.</p>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-600">Gujarat Polymers Ltd · <span class="tabular-nums">₹96,400</span> per MT until then, spot rate after.</p>
+  </div>
+  <button type="button" aria-label="Dismiss"
+          class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:order-3">
+    <i data-lucide="x" class="size-4"></i>
+  </button>
+  <button type="button"
+          class="inline-flex h-9 w-full items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:order-2 sm:h-8 sm:w-auto">Start the renewal</button>
+</div>

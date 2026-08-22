@@ -24,7 +24,10 @@
 
      The current page stays enabled. Disable it to show it cannot be pressed and
      the click that got you there blurs the element under the cursor, because a
-     browser drops focus from a disabled element to the body.
+     browser drops focus from a disabled element to the body. The ends cannot
+     avoid that — one of them has to go dead at each limit — so each handler
+     hands focus to its opposite number on the way out, which is why Previous
+     and Next call prev() and next() here rather than go().
 
      Below md the row is display:none and "Page 4 of 15" stands in its place.
      Seven squares and two buttons and a range do not fit in 390px, and the
@@ -42,7 +45,9 @@
          if (p >= n - 3) return [1, 'gap-start', n - 4, n - 3, n - 2, n - 1, n];
          return [1, 'gap-start', p - 1, p, p + 1, 'gap-end', n];
        },
-       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) }
+       go(n) { this.page = Math.min(Math.max(n, 1), this.pages) },
+       prev() { this.page--; if (this.page === 1) this.$refs.next.focus() },
+       next() { this.page++; if (this.page === this.pages) this.$refs.prev.focus() }
      }"
      class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-2.5">
 
@@ -52,7 +57,7 @@
   <div class="flex items-center gap-2">
     <span class="text-[13px]/5 tabular-nums text-zinc-600 md:hidden" x-text="'Page ' + page + ' of ' + pages">Page 4 of 15</span>
 
-    <button type="button" aria-label="Previous page" @click="go(page - 1)" :disabled="page === 1"
+    <button type="button" x-ref="prev" aria-label="Previous page" @click="prev()" :disabled="page === 1"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-left" class="size-4"></i>
     </button>
@@ -73,7 +78,7 @@
       </template>
     </ul>
 
-    <button type="button" aria-label="Next page" @click="go(page + 1)" :disabled="page === pages"
+    <button type="button" x-ref="next" aria-label="Next page" @click="next()" :disabled="page === pages"
             class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
       <i data-lucide="chevron-right" class="size-4"></i>
     </button>

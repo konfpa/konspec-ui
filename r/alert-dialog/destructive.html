@@ -1,6 +1,21 @@
+<!-- The same shape carrying the one fact people are most often not told: what
+     else disappears. A delete that reads "this cannot be undone" and says
+     nothing about the GRN and the two approvals hanging off the record is
+     technically true and practically useless — the user finds out what the
+     cascade took when they go looking for the GRN a week later.
+
+     Colour is in the icon and in the one line that states the cascade, and
+     nowhere else. A dialog with a red band across it shouts at the same volume
+     whether it is deleting a draft or a posted order, so the volume stops
+     carrying information.
+
+     The confirm is the solid red fill rather than a red-bordered white button.
+     There is one destructive shape in this system and this is it; a red outline
+     reads as a secondary action, which is exactly wrong for the button that
+     does the deleting. -->
 <div data-kui="alert-dialog/destructive" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200">Delete order</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Delete order</button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
@@ -10,19 +25,19 @@
         <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
         <div class="min-w-0">
           <h2 id="del-title" class="text-[16px]/6 font-semibold">Delete PO-24-1187</h2>
-          <p class="mt-1.5 text-[13px]/5 text-zinc-600">
-            Nashik Steel Traders · <span class="tabular-nums">₹18,42,000</span> · raised 04 Aug 2024.
+          <p class="mt-1.5 text-[13px]/5 tabular-nums text-zinc-600">
+            Nashik Steel Traders · ₹18,42,000 · raised 04 Aug 2026.
           </p>
           <p id="del-body" class="mt-2 text-[13px]/5 font-medium text-red-600">
             GRN 1142 and 2 approvals are linked to this order and will be deleted with it. This cannot be undone.
           </p>
         </div>
       </div>
-      <div class="mt-5 flex flex-wrap justify-end gap-2">
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
         <button type="button" @click="open = false"
-                class="rounded-lg bg-red-600 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-red-700">Delete order</button>
+                class="rounded-lg bg-red-600 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-red-700 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Delete order</button>
       </div>
     </div>
   </div>

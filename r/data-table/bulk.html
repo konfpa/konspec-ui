@@ -1,0 +1,140 @@
+<!-- Twelve orders, four to a page, and the selection is an array of PO numbers
+     on the root — so it survives paging, sorting and filtering, and the count in
+     the bar is the whole of it. That is the right default for approving,
+     exporting and tagging.
+
+     The bar states the scope as well as the size. "5 selected" over a paged
+     register does not say whether the other two pages are in it, and the user
+     finds that out from the confirmation dialog or from the audit log, so the
+     second line spells out how many are on this page and how many are not.
+
+     Ticking every row on the page is not selecting the query, and the escalation
+     line is where the difference is drawn. The header box can only ever speak
+     for the four rows under it; selecting all twelve is a second, deliberate act
+     with its own count, and it is undone by the same line it was made from.
+     Touching any row afterwards drops the claim, because the selection is no
+     longer the query.
+
+     Drop the selection on a page change only where the action cannot be undone
+     and the rows it would run against are no longer on screen — a bulk cancel, a
+     posting run. Where you do, say so where the count was rather than clearing
+     it silently: a selection that disappears without a word reads as a bug and
+     gets rebuilt by hand.
+
+     indeterminate is a property with no matching attribute, so the header box is
+     bound with x-effect on the element itself; the root has no $refs at the time
+     the component initialises.
+
+     At 390px the vendor and the status pill go and the checkbox, the PO number
+     and the figure stay. A screen somebody is selecting on has to show what is
+     ticked and what it is worth; everything else is a column they can page to a
+     wider screen for. -->
+<div data-kui="data-table/bulk" x-data="{
+       page: 1, size: 4, sel: ['PO-24-1187', 'PO-24-1191'], all: false,
+       rows: Array.from({ length: 12 }, (_, i) => ({
+         po: 'PO-24-' + (1187 + i * 4),
+         vendor: ['Sharma Extrusions', 'Nashik Steel Traders', 'Gujarat Polymers Ltd', 'Konkan Chemicals Pvt Ltd'][i % 4],
+         amount: 96750 + (i * 417350) % 4800000,
+         status: ['Open', 'Approved', 'Overdue', 'Open'][i % 4]
+       })),
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       get pages() { return Math.ceil(this.rows.length / this.size) },
+       get shown() { return this.rows.slice((this.page - 1) * this.size, this.page * this.size) },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.rows.length) },
+       get onPage() { return this.shown.filter(r => this.sel.includes(r.po)).length },
+       get scope() {
+         if (this.all) return 'Every order that matches the current filters';
+         if (this.sel.length === this.onPage) return 'All of them on this page';
+         return this.onPage + ' on this page · ' + (this.sel.length - this.onPage) + ' on other pages';
+       },
+       get every() { return this.shown.length > 0 && this.shown.every(r => this.sel.includes(r.po)) },
+       get some() { return !this.every && this.shown.some(r => this.sel.includes(r.po)) },
+       toggleAll(on) {
+         this.all = false;
+         const ids = this.shown.map(r => r.po);
+         this.sel = on ? [...new Set([...this.sel, ...ids])] : this.sel.filter(id => !ids.includes(id));
+       }
+     }"
+     class="rounded-xl border border-zinc-300 bg-white">
+
+  <div x-show="sel.length" x-cloak class="border-b border-zinc-200 bg-zinc-100">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2">
+      <div class="min-w-0">
+        <p class="text-[13px]/5 font-medium tabular-nums"><span x-text="sel.length"></span> selected</p>
+        <p class="text-[12px]/4 text-zinc-600 tabular-nums" x-text="scope"></p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" class="inline-flex h-8 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
+        <button type="button" class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export</button>
+        <button type="button" class="inline-flex h-8 items-center rounded-lg px-3 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel orders</button>
+      </div>
+      <button type="button" @click="sel = []; all = false"
+              class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
+    </div>
+
+    <p x-show="every && !all" x-cloak class="border-t border-zinc-200 px-4 py-1.5 text-[12px]/4 text-zinc-600 tabular-nums">
+      All <span x-text="shown.length"></span> orders on this page are selected.
+      <button type="button" @click="sel = rows.map(r => r.po); all = true"
+              class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Select all <span x-text="rows.length"></span> orders that match
+      </button>
+    </p>
+    <p x-show="all" x-cloak class="border-t border-zinc-200 px-4 py-1.5 text-[12px]/4 text-zinc-600 tabular-nums">
+      All <span x-text="rows.length"></span> matching orders are selected.
+      <button type="button" @click="sel = shown.map(r => r.po); all = false"
+              class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Select only this page
+      </button>
+    </p>
+  </div>
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="w-10 px-4 py-2.5">
+          <input type="checkbox" :aria-label="'Select the ' + shown.length + ' orders on this page'"
+                 :checked="every" x-effect="$el.indeterminate = some" @change="toggleAll($event.target.checked)"
+                 class="size-4 shrink-0 accent-zinc-700">
+        </th>
+        <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap">PO number</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Vendor</th>
+        <th scope="col" class="hidden px-4 py-2.5 font-medium sm:table-cell">Status</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="r in shown" :key="r.po">
+        <tr class="border-b border-zinc-100 last:border-0" :class="sel.includes(r.po) ? 'bg-zinc-100' : 'hover:bg-zinc-50'">
+          <td class="px-4 py-2.5">
+            <input type="checkbox" :value="r.po" x-model="sel" @change="all = false" :aria-label="'Select ' + r.po" class="size-4 shrink-0 accent-zinc-700">
+          </td>
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
+          <td class="hidden px-4 py-2.5 text-zinc-600 sm:table-cell" x-text="r.vendor"></td>
+          <td class="hidden px-4 py-2.5 sm:table-cell">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[12px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+              <span class="size-1.5 shrink-0 rounded-full" :class="dot[r.status]" aria-hidden="true"></span><span x-text="r.status"></span>
+            </span>
+          </td>
+          <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="from + '–' + to + ' of ' + rows.length + ' orders'"></p>
+    <div class="flex items-center gap-2">
+      <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
+      <button type="button" @click="page--" :disabled="page === 1"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="chevron-left" class="size-4"></i>Previous
+      </button>
+      <button type="button" @click="page++" :disabled="page === pages"
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Next<i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>

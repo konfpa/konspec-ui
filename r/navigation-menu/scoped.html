@@ -1,0 +1,104 @@
+<!-- Every link in this panel points at one plant's data, so the panel says
+     which, once, at the top. Repeating "Vasai" on every row spends the six
+     words a description is worth, and a count that moves when the plant changes
+     reads as data going missing unless the scope is written where the user has
+     already looked.
+
+     The scope is in the path — /p/vasai/inventory/stock/ — and not only in the
+     session, which is the part that gets left out. Held in the session it is
+     shared by every tab: switching plant in the second one silently changes the
+     first, which goes on showing a bar that is now lying about where it points.
+     A path segment makes each tab answer for itself, and it is what makes Copy
+     link address produce a URL that still means the same thing tomorrow and to
+     the person it is pasted to.
+
+     The strip states the scope; it does not change it. Switching plant reloads
+     every count, every filter and every open record, and a whole-application
+     action does not belong in a panel that closes when the pointer leaves it —
+     so this links to where it is done instead.
+
+     The strip is last in the DOM and first on screen. Down from the trigger
+     lands on the first link in the panel and that link has to be a destination,
+     not the plant switcher; order-first moves the box and leaves the tab order
+     where it was, which is the correct direction for that trade. It is the same
+     decision the featured rail makes and comes out the other way.
+
+     The strip is zinc-100, a surface inside the white panel, and the link in it
+     steps to zinc-200 rather than to the zinc-100 it is sitting on. -->
+<nav data-kui="navigation-menu/scoped" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <a href="/p/vasai/dashboard/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Dashboard</a>
+    </li>
+
+    <li class="relative">
+      <button type="button" x-ref="inv" id="nms-t-inv"
+              aria-controls="nms-p-inv" :aria-expanded="open === 'inv'"
+              @mouseenter="hover('inv')"
+              @click="open === 'inv' ? shut($refs.inv) : jump('inv')"
+              @keydown.arrow-down.prevent="jump('inv')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'inv' ? 'bg-zinc-200 font-medium text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
+        Inventory
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'inv' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="invPanel" x-show="open === 'inv'" x-cloak
+           id="nms-p-inv" role="group" aria-labelledby="nms-t-inv"
+           class="absolute top-full left-0 z-40 pt-2">
+        <div class="flex w-72 max-w-[calc(100vw_-_1.5rem)] flex-col rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <ul class="mt-1">
+            <li><a href="/p/vasai/inventory/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Inventory</a></li>
+            <li><a href="/p/vasai/inventory/stock/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stock on hand</a></li>
+            <li>
+              <a href="/p/vasai/inventory/grn/" class="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                Goods receipt
+                <span class="rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300">7</span>
+              </a>
+            </li>
+            <li><a href="/p/vasai/inventory/transfers/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Transfers to Silvassa</a></li>
+            <li><a href="/p/vasai/inventory/ledger/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Item ledger</a></li>
+          </ul>
+
+          <div class="order-first rounded-lg bg-zinc-100 p-3">
+            <span class="block text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Showing</span>
+            <span class="mt-1 block text-[13px]/5 font-medium tabular-nums text-zinc-900">Vasai plant, FY 2026-27</span>
+            <a href="/settings/context/"
+               class="mt-2 inline-block rounded-lg px-2 py-1 text-[12px]/4 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Change plant or year</a>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <a href="/p/vasai/reports/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reports</a>
+    </li>
+  </ul>
+</nav>

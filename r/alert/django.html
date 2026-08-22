@@ -1,13 +1,48 @@
-<!-- {% if messages %}{% for message in messages %} … {% endfor %}{% endif %}
-     Swap the icon and its colour on message.tags: success / warning / error,
-     anything else falls through to the neutral info icon. Give error and
-     warning role="alert"; success and info do not need it. -->
-<div data-kui="alert/django" x-data="{ show: true }" x-show="show" x-cloak
-     class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
-  <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
-  <p class="min-w-0 flex-1 text-[13px]/5 font-medium">GRN 1142 posted against PO-24-1187.</p>
-  <button type="button" @click="show = false" aria-label="Dismiss"
-          class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900">
-    <i data-lucide="x" class="size-4"></i>
-  </button>
+<!-- The messages framework renders after a redirect, which means every message
+     in this loop is in a document the browser has just loaded. None of them
+     carries role="alert" and none of them should: a live role on markup that
+     was there at first paint announces nothing, and adding it produces a block
+     that measures as accessible and says nothing to anybody. The page load is
+     the announcement. If a failure genuinely has to be read before the user
+     goes further, it is not a message — it is alert/form-errors on the form
+     that refused, which takes focus.
+
+     The icon and its colour come from one filter over message.tags rather than
+     from a chain of {% if %} in the template, so the mapping cannot differ
+     between two screens showing the same message. Add the templatetags module
+     to Tailwind's content globs: these class names live in Python and nothing
+     the scanner already reads mentions them.
+
+     # templatetags/ui.py
+     ICON = {'success': 'check-circle-2', 'warning': 'alert-triangle', 'error': 'alert-circle'}
+     TONE = {'success': 'text-emerald-600', 'warning': 'text-amber-700', 'error': 'text-red-600'}
+
+     @register.filter
+     def message_icon(tags):
+         return next((ICON[t] for t in tags.split() if t in ICON), 'info')
+
+     @register.filter
+     def message_tone(tags):
+         return next((TONE[t] for t in tags.split() if t in TONE), 'text-zinc-500')
+
+     tags is a space-separated string and may carry more than the level — the
+     split is what stops "success safe" falling through to the neutral icon.
+
+     Dismiss is browser state and the messages are consumed by the render
+     anyway, so there is nothing to record: they do not come back. -->
+{% load ui %}
+{% if messages %}
+<div class="space-y-2">
+  {% for message in messages %}
+  <div data-kui="alert/django" x-data="{ show: true }" x-show="show" x-cloak
+       class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+    <i data-lucide="{{ message.tags|message_icon }}" class="mt-0.5 size-4 shrink-0 {{ message.tags|message_tone }}"></i>
+    <p class="min-w-0 flex-1 text-[13px]/5 font-medium">{{ message }}</p>
+    <button type="button" @click="show = false" aria-label="Dismiss"
+            class="-mr-1 -mt-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="x" class="size-4"></i>
+    </button>
+  </div>
+  {% endfor %}
 </div>
+{% endif %}

@@ -3,23 +3,32 @@
      the field's raw value — never repeated per template. Repeating it is
      exactly how one screen ends up amber and another green for the same record.
 
+     Draft is the one state whose text differs as well as its dot: zinc-600
+     rather than zinc-700, because it is not real yet. That is why the table
+     holds a pair and there are two filters over it rather than one filter and a
+     hardcoded text class that quietly gets Draft wrong.
+
      # templatetags/ui.py
-     DOT = {
-         'open':     'bg-zinc-400',
-         'approved': 'bg-amber-500',
-         'overdue':  'bg-red-600',
-         'closed':   'bg-emerald-600',
-         'draft':    'bg-zinc-300',
+     STATUS = {
+         'open':     ('bg-zinc-500',   'text-zinc-700'),
+         'approved': ('bg-amber-500',  'text-zinc-700'),
+         'overdue':  ('bg-red-600',    'text-zinc-700'),
+         'closed':   ('bg-emerald-600','text-zinc-700'),
+         'draft':    ('bg-zinc-400',   'text-zinc-600'),
      }
 
      @register.filter
      def status_dot(value):
-         return DOT.get(value, DOT['open'])
+         return STATUS.get(value, STATUS['open'])[0]
+
+     @register.filter
+     def status_text(value):
+         return STATUS.get(value, STATUS['open'])[1]
 
      The label comes from get_status_display, so it follows the model's choices
      and reads identically on every screen. -->
 {% load ui %}
-<span data-kui="badge/django" class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+<span data-kui="badge/django" class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2.5 py-0.5 text-[12px]/4 font-medium whitespace-nowrap {{ order.status|status_text }} ring-1 ring-inset ring-zinc-300">
   <span class="size-1.5 rounded-full {{ order.status|status_dot }}" aria-hidden="true"></span>
   {{ order.get_status_display }}
 </span>

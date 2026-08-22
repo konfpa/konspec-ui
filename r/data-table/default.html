@@ -8,6 +8,11 @@
      its label says; the count in the bulk bar is the whole selection, which
      survives paging and filtering.
 
+     The sort select is md:hidden and duplicates nothing. Below md the header
+     row is gone, so without it the register a phone gets is sorted by whatever
+     the server chose and there is no way to change it — the sortable headers
+     are a desktop affordance and the sort itself is not.
+
      The panel is not overflow-hidden: the column menu opens out of it. -->
 <div data-kui="data-table/default" x-data="{
        q: '', col: 'po', dir: 'asc', page: 1, size: 5, sel: [],
@@ -24,7 +29,7 @@
          { po: 'PO-24-1218', vendor: 'Gujarat Polymers Ltd', dept: 'Tooling', amount: 1290500, status: 'Open', due: '08 Sep' },
          { po: 'PO-24-1221', vendor: 'Sharma Extrusions', dept: 'Maintenance', amount: 43200, status: 'Closed', due: '31 Jul' }
        ],
-       dot: { Open: 'bg-zinc-700', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
+       dot: { Open: 'bg-zinc-500', Approved: 'bg-amber-500', Overdue: 'bg-red-600', Closed: 'bg-emerald-600', Draft: 'bg-zinc-400' },
        money(n) { return '₹' + n.toLocaleString('en-IN') },
        sortBy(c) { this.dir = this.col === c && this.dir === 'asc' ? 'desc' : 'asc'; this.col = c; this.page = 1 },
        ariaSort(c) { return this.col === c ? (this.dir === 'asc' ? 'ascending' : 'descending') : 'none' },
@@ -55,10 +60,25 @@
              class="w-full bg-transparent px-2 py-1.5 text-[13px]/5 outline-none placeholder:text-zinc-500">
     </div>
 
+    <div class="min-w-0 md:hidden">
+      <label for="dt-sort" class="sr-only">Sort the register</label>
+      <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+        <select id="dt-sort" @change="const [c, d] = $event.target.value.split('-'); col = c; dir = d; page = 1"
+                class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+          <option value="po-asc">PO number</option>
+          <option value="vendor-asc">Vendor</option>
+          <option value="amount-desc">Highest amount</option>
+        </select>
+        <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+          <i data-lucide="chevron-down" class="size-3.5"></i>
+        </span>
+      </div>
+    </div>
+
     <div class="relative" x-data="{ open: false }" @click.outside="open = false"
          @keydown.escape="if (open) { open = false; $refs.colTrigger.focus() }">
       <button type="button" x-ref="colTrigger" @click="open = !open" :aria-expanded="open" aria-haspopup="true"
-              class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100">
+              class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="columns-3" class="size-4 text-zinc-600"></i>Columns
         <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
       </button>
@@ -78,12 +98,12 @@
   </div>
 
   <div x-show="sel.length" x-cloak class="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-zinc-100 px-4 py-2">
-    <span class="text-[13px]/5 font-medium"><span x-text="sel.length"></span> selected</span>
+    <span class="text-[13px]/5 font-medium tabular-nums"><span x-text="sel.length"></span> selected</span>
     <div class="flex flex-wrap items-center gap-2">
-      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Approve</button>
-      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">Export</button>
+      <button type="button" class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Approve</button>
+      <button type="button" class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Export</button>
     </div>
-    <button type="button" @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2">Clear</button>
+    <button type="button" @click="sel = []" class="ml-auto text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear</button>
   </div>
 
   <table x-show="filtered.length" class="hidden w-full text-[13px]/5 md:table">
@@ -95,20 +115,20 @@
                  class="size-4 shrink-0 accent-zinc-700">
         </th>
         <th scope="col" :aria-sort="ariaSort('po')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'po' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('po')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'po' && 'text-zinc-900'">
             PO number
             <span class="invisible" :class="{ 'invisible': col !== 'po', 'rotate-180': ariaSort('po') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th scope="col" :aria-sort="ariaSort('vendor')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'vendor' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('vendor')" class="flex items-center gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'vendor' && 'text-zinc-900'">
             Vendor
             <span class="invisible" :class="{ 'invisible': col !== 'vendor', 'rotate-180': ariaSort('vendor') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
         </th>
         <th x-show="cols.dept" scope="col" class="px-4 py-2.5 font-medium">Department</th>
         <th scope="col" :aria-sort="ariaSort('amount')" class="px-4 py-2.5">
-          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900" :class="col === 'amount' && 'text-zinc-900'">
+          <button type="button" @click="sortBy('amount')" class="flex w-full items-center justify-end gap-1 text-[11px]/4 font-medium tracking-wider uppercase hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15" :class="col === 'amount' && 'text-zinc-900'">
             Amount
             <span class="invisible" :class="{ 'invisible': col !== 'amount', 'rotate-180': ariaSort('amount') === 'descending' }"><i data-lucide="chevron-up" class="size-3.5"></i></span>
           </button>
@@ -123,7 +143,7 @@
           <td class="px-4 py-2.5">
             <input type="checkbox" :value="r.po" x-model="sel" :aria-label="'Select ' + r.po" class="size-4 shrink-0 accent-zinc-700">
           </td>
-          <td class="px-4 py-2.5 font-medium tabular-nums" x-text="r.po"></td>
+          <td class="px-4 py-2.5 font-medium whitespace-nowrap tabular-nums" x-text="r.po"></td>
           <td class="px-4 py-2.5" x-text="r.vendor"></td>
           <td x-show="cols.dept" class="px-4 py-2.5 text-zinc-600" x-text="r.dept"></td>
           <td class="px-4 py-2.5 text-right tabular-nums" x-text="money(r.amount)"></td>
@@ -167,7 +187,7 @@
     </span>
     <p class="mt-3 text-[16px]/6 font-semibold">No orders match this search</p>
     <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">Nothing in the register matches <span class="font-medium text-zinc-900" x-text="q"></span>. Search on a PO number, a vendor or a department.</p>
-    <button type="button" @click="q = ''; page = 1" class="mt-4 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Clear the search</button>
+    <button type="button" @click="q = ''; page = 1" class="mt-4 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear the search</button>
   </div>
 
   <nav aria-label="Register pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
@@ -176,11 +196,11 @@
     <div class="flex items-center gap-2">
       <span class="text-[13px]/5 text-zinc-600 tabular-nums" x-text="'Page ' + page + ' of ' + pages"></span>
       <button type="button" @click="page--" :disabled="page === 1"
-              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         <i data-lucide="chevron-left" class="size-4"></i>Previous
       </button>
       <button type="button" @click="page++" :disabled="page === pages"
-              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400">
+              class="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-[13px]/5 font-medium enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Next<i data-lucide="chevron-right" class="size-4"></i>
       </button>
     </div>

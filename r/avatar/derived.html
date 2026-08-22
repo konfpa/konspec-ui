@@ -1,0 +1,65 @@
+<!-- The two-word English name is the case that never breaks, and it is roughly
+     a third of this directory. The rest of these rows are what the server has
+     to answer, and they are the reason the initials are computed once on the
+     model rather than sliced out of a name in a template on every screen.
+
+     Three or more words takes the first and the last, because which of them is
+     the family name changes by state and the rule cannot depend on knowing.
+     A single word takes two letters of itself, since one letter is not a name.
+     A company drops its legal suffix first, or a third of the vendor list comes
+     out PL. Devanagari takes one akshara per word and steps the text down,
+     because two aksharas set wider than two Latin capitals and touch the ring.
+
+     An account with no name at all — a shared mailbox, a service login — takes
+     the icon. Letters off the local part would give ST for stores@, AC for
+     accounts@ and PU for purchase@, and a page of vendor mailboxes would read
+     as three colleagues nobody can find in the directory.
+
+     The company row is square, for the reason avatar/org sets out: it is not a
+     person and a circle says it is. -->
+<div data-kui="avatar/derived" class="max-w-md divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white">
+  <div class="flex items-center gap-3 px-4 py-2.5">
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-hidden="true">SM</span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium">Sanjay More</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">Two words — the first letter of each</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-3 px-4 py-2.5">
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-hidden="true">VK</span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium">Venkataraman Balasubramanian Krishnamurthy</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">Three or more — the first and the last</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-3 px-4 py-2.5">
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-hidden="true">SU</span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium">Sunita</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">One word — its first two letters</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-3 px-4 py-2.5">
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[12px]/4 font-medium text-zinc-600" aria-hidden="true">रिदे</span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium">रितु देशपांडे</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">Devanagari — one akshara per word, a step smaller</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-3 px-4 py-2.5">
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-[13px]/5 font-medium text-zinc-600" aria-hidden="true">GP</span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium">Gujarat Polymers Ltd</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">A company — the legal suffix drops out first</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-3 px-4 py-2.5">
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300 text-zinc-600" aria-hidden="true">
+      <i data-lucide="at-sign" class="size-4"></i>
+    </span>
+    <div class="min-w-0">
+      <p class="truncate text-[13px]/5 font-medium">stores@gujaratpolymers.in</p>
+      <p class="truncate text-[12px]/4 text-zinc-600">No name — the icon, never letters off the address</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<!-- Two places where the wait happens inside something that already has a size,
+     and the size is not allowed to change while it waits.
+
+     The filter is the first. Both selects are the same control at two moments,
+     drawn side by side so the point is checkable: the ring sits in the same
+     absolutely positioned box the chevron sits in, so the field is exactly as
+     wide loading as it is loaded and the filter bar does not re-wrap under the
+     cursor when the options land. appearance-none is what removes the browser's
+     own arrow, which would otherwise sit behind the ring. The overlay is
+     pointer-events-none, so a click anywhere across the field still opens the
+     select rather than landing on a decoration.
+
+     The ring in that box is aria-hidden and says nothing, which is why the select
+     carries aria-busy="true" and an aria-describedby onto the line underneath.
+     Without it a screen reader on that field gets its label and no explanation of
+     why it holds one option.
+
+     The total is the second, and it is the harder half. An h-5 slot holds the
+     height and does nothing about width, so a right-aligned figure column still
+     jumps sideways when ₹18,42,000 lands where a 16px ring was. The ring and the
+     widest figure the cell can hold go in one grid cell — same col-start-1
+     row-start-1 the button entry uses to hold a label width — with the figure
+     left invisible, which keeps its box while removing it from the accessibility
+     tree. min-w on the cell would be a guess; the string is the measurement.
+
+     In a real table this reservation belongs on the column header instead. One
+     w-* on the <th> settles the width for every cell at once, and a per-cell
+     grid inside a table is a width fight with the table layout algorithm. -->
+<div data-kui="spinner/slot" class="max-w-md space-y-4">
+
+  <div class="rounded-xl border border-zinc-300 bg-white p-4">
+    <label for="sp-plant" class="mb-1.5 block text-[13px]/5 font-medium">Plant</label>
+    <div class="relative">
+      <select id="sp-plant" name="plant" aria-busy="true" aria-describedby="sp-plant-wait"
+              class="w-full appearance-none rounded-lg border border-zinc-200 bg-white py-2 pr-9 pl-3 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option>All plants</option>
+      </select>
+      <span class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+        <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+      </span>
+    </div>
+    <p id="sp-plant-wait" role="status" class="mt-1.5 text-[12px]/4 text-zinc-500">Loading the plant list</p>
+
+    <!-- the same control once the options are in, at the same width -->
+    <label for="sp-plant-done" class="mt-4 mb-1.5 block text-[13px]/5 font-medium">Plant, once the list has arrived</label>
+    <div class="relative">
+      <select id="sp-plant-done" name="plant_done"
+              class="w-full appearance-none rounded-lg border border-zinc-200 bg-white py-2 pr-9 pl-3 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option>All plants</option>
+        <option>Nashik</option>
+        <option>Silvassa</option>
+        <option>Halol</option>
+      </select>
+      <span class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+        <i data-lucide="chevron-down" class="size-4"></i>
+      </span>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="flex items-center justify-between gap-4 border-b border-zinc-100 px-4 py-2.5">
+      <span class="text-[13px]/5 text-zinc-600">Received value</span>
+      <span class="text-[13px]/5 font-medium tabular-nums">₹12,52,560</span>
+    </div>
+    <div class="flex items-center justify-between gap-4 px-4 py-2.5">
+      <span class="text-[13px]/5 text-zinc-600">Closing stock, revalued</span>
+      <span class="grid">
+        <span class="invisible col-start-1 row-start-1 text-[13px]/5 font-medium tabular-nums">₹18,42,000</span>
+        <span class="col-start-1 row-start-1 flex items-center justify-end">
+          <span class="size-4 shrink-0 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+        </span>
+      </span>
+    </div>
+    <p role="status" class="sr-only">Revaluing closing stock at 31 Aug 2026</p>
+  </div>
+</div>

@@ -1,0 +1,145 @@
+<!-- The panel below is drawn in the state after a rejection, because that is
+     the state this variant exists for. The server's first render of the same
+     block is border-zinc-200, aria-invalid="false" and a help line in place of
+     the message.
+
+     Three rules, and each one is a defect somebody shipped.
+
+     A panel that is writing cannot be light-dismissed. A click on the page
+     while the POST is in flight would close the panel over a request whose
+     answer nobody will ever see, and the user is left with no idea whether the
+     rejection was recorded. So both pointer dismissals and Escape are refused
+     while busy is true. Escape still stops propagating, though — otherwise the
+     press the popover declined to act on travels up and closes the sheet around
+     it, leaving the request in flight and its panel gone.
+
+     busy is set from htmx:beforeRequest and cleared from htmx:afterRequest, and
+     that is what makes it safe to gate on. afterRequest fires on a 2xx, on a
+     4xx, on a network failure, on a timeout and on an abort, so there is no
+     path that leaves the flag stuck and the panel undismissable. A flag driven
+     by anything else — a timer, an optimistic setTimeout — is the one that
+     forgets a case.
+
+     Disabling the submit button while it has focus blurs it, because a disabled
+     element is not focusable and the browser puts focus on the body. The panel
+     is then a dialog with no focus in it, root-scoped Escape never fires again,
+     and the user is stuck with a message they cannot dismiss. afterRequest puts
+     focus back, and only if it has actually left the root: querySelector for
+     the rejected field, falling back to the panel. Never move focus when it is
+     still inside — that takes the caret away from wherever the user tabbed to
+     while they waited.
+
+     htmx does not swap a 4xx. That is the correct default and it is also why a
+     server-rendered field error never appears: the response body is discarded
+     and only htmx:responseError fires. One line in beforeSwap opts the 422 back
+     in, and isError is deliberately left alone, so afterRequest still reports
+     the request as unsuccessful and the panel stays open on it.
+
+     The swap target is the field block, so nothing inside it carries an Alpine
+     directive. Alpine does not initialise nodes htmx inserts unless the
+     application wires it to, and an x-ref, an x-model or an x-show in swapped
+     content is a binding pointing at a node that is no longer in the document.
+     The panel's own refs stay outside the target, and the field is found by
+     query rather than by ref.
+
+     The message is a role="alert" inside the block the swap replaces, so it
+     arrives as an inserted node — which every reader announces. The offline
+     line below it is the other kind: Alpine reveals it, so it needs a region
+     that was already there, exactly as the unsaved guard does. A transport
+     failure has no response to render, which is the whole reason it is drawn
+     in the page rather than swapped in.
+
+     Success closes the panel. The response is the same field block re-rendered
+     clean, so a second open is not looking at the last rejection, plus an
+     hx-swap-oob fragment for the register row behind. A 204 would be tidier and
+     is wrong: with nothing to swap, the target keeps the error it had. -->
+<div data-kui="popover/saving" class="relative inline-block"
+     x-data="{
+       open: false, busy: false, offline: false,
+       show() {
+         this.open = true;
+         this.$nextTick(() => requestAnimationFrame(() => {
+           const f = this.$refs.panel.querySelector('[name=qty]');
+           if (f) { f.focus(); f.select() }
+         }));
+       },
+       close(toTrigger = true) {
+         if (!this.open) return;
+         this.open = false;
+         if (toTrigger) this.$refs.trigger.focus();
+       }
+     }"
+     @click.outside="if (!busy) close(false)"
+     @focusout="if (!busy && $event.relatedTarget && !$root.contains($event.relatedTarget)) close(false)"
+     @keydown.escape="if (open) { $event.stopPropagation(); if (!busy) close() }"
+     @htmx:before-request.camel="busy = true; offline = false"
+     @htmx:send-error.camel="offline = true"
+     @htmx:before-swap.camel="if ($event.detail.xhr.status === 422) $event.detail.shouldSwap = true"
+     @htmx:after-request.camel="
+       busy = false;
+       if ($event.detail.successful) close();
+       else if (!$root.contains(document.activeElement))
+         ($refs.panel.querySelector('[aria-invalid=true]') || $refs.panel).focus()">
+
+  <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+          :aria-expanded="open" aria-controls="pop-sv"
+          class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="package-x" class="size-4 text-zinc-600"></i>Record a rejection
+  </button>
+
+  <div id="pop-sv" x-ref="panel" x-show="open" x-cloak :aria-busy="busy"
+       role="dialog" tabindex="-1" aria-labelledby="pop-sv-title"
+       class="absolute top-full left-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+    <form hx-post="/grn/4471/lines/2/reject/" hx-target="#sv-qty-field" hx-swap="outerHTML" hx-sync="this:drop">
+      <p id="pop-sv-title" class="text-[13px]/5 font-medium tabular-nums">GRN-24-4471 · line 2</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">MS plate 10 mm · 12,000 kg received</p>
+      <p role="status" class="sr-only" x-text="busy ? 'Recording the rejection' : ''"></p>
+
+      <div id="sv-qty-field" class="mt-3">
+        <label for="sv-qty" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">Rejected quantity</label>
+        <div class="flex items-center rounded-lg border border-red-600 bg-white focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-red-600/15">
+          <input id="sv-qty" name="qty" value="13000" inputmode="numeric"
+                 aria-invalid="true" aria-describedby="sv-qty-msg"
+                 class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+          <span class="pr-3 text-[13px]/5 text-zinc-500">kg</span>
+        </div>
+        <p id="sv-qty-msg" role="alert" class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 font-medium tabular-nums text-red-600">
+          <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0"></i>Rejected quantity cannot exceed the 12,000 kg received.
+        </p>
+      </div>
+
+      <div class="mt-3">
+        <label for="sv-reason" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">Rejection reason</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <select id="sv-reason" name="reason" class="w-full bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+            <option value="short">Short supply</option>
+            <option value="damage" selected>Damaged in transit</option>
+            <option value="spec">Off specification</option>
+            <option value="docs">Documents not matching</option>
+          </select>
+        </div>
+      </div>
+
+      <div role="alert">
+        <div x-show="offline" x-cloak class="mt-3 flex items-start gap-2.5 rounded-lg bg-zinc-100 px-3 py-2.5">
+          <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+          <p class="text-[12px]/4">The request did not reach the server. Nothing has been recorded — the panel is still holding what you typed.</p>
+        </div>
+      </div>
+
+      <div class="mt-3.5 flex items-center justify-between gap-3 border-t border-zinc-100 pt-3">
+        <button type="button" @click="close()" :disabled="busy"
+                class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:text-zinc-400 disabled:no-underline">Cancel</button>
+        <button type="submit" :disabled="busy"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-zinc-700 px-3.5 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:hover:bg-zinc-700">
+          <span x-show="busy" x-cloak class="flex"><i data-lucide="loader-circle" class="size-3.5 animate-spin"></i></span>
+          <span class="grid">
+            <span class="col-start-1 row-start-1" :class="busy ? 'invisible' : ''">Record rejection</span>
+            <span class="invisible col-start-1 row-start-1" :class="busy ? 'visible' : ''">Recording…</span>
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

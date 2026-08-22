@@ -1,0 +1,106 @@
+<!-- The last trigger in the bar, whose panel would otherwise hang off the
+     right of the viewport and push the page sideways. Its wrapper takes right-0
+     instead of left-0, so that panel grows inwards from the trigger's right
+     edge while the first one still grows outwards from its left.
+
+     Which side a panel opens on is decided here, in the markup, rather than
+     measured when it opens. Measuring means laying the panel out before it is
+     visible and reading its width back, and the first open near the edge is the
+     one that jumps. The order of the items in a bar is known when the page is
+     written, and the last one opens left.
+
+     Either alignment keeps the panel's top edge under its own trigger, which
+     is the part that matters to the pointer: the route from trigger to panel
+     stays vertical. It is also why a panel too wide for either is anchored to
+     the nav at w-full — see columns — instead of being nudged sideways. The
+     nudge is what turns the route into a diagonal, the diagonal crosses the
+     neighbouring trigger, and that trigger takes the pointer and swaps the
+     panel out from under it.
+
+     max-w stays on both regardless. At 390px neither alignment can promise a
+     panel narrower than the screen, and the phone variant replaces this
+     anyway. -->
+<nav data-kui="navigation-menu/edge" aria-label="Main" class="relative rounded-xl border border-zinc-300 bg-white p-1"
+     x-data="{
+       open: null,
+       timer: 0,
+       fine: window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+       hover(id) {
+         if (!this.fine) return;
+         clearTimeout(this.timer);
+         if (this.open) { this.open = id; return }
+         this.timer = setTimeout(() => this.open = id, 140);
+       },
+       leave() { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = null, 280) },
+       jump(id) {
+         clearTimeout(this.timer);
+         this.open = id;
+         this.$nextTick(() => requestAnimationFrame(() => this.$refs[id + 'Panel']?.querySelector('a')?.focus()));
+       },
+       shut(back) { clearTimeout(this.timer); this.open = null; if (back) back.focus() }
+     }"
+     @mouseenter="clearTimeout(timer)"
+     @mouseleave="leave()"
+     @focusout="if (!$el.contains($event.relatedTarget)) shut()"
+     @click.outside="shut()"
+     @keydown.escape="if (open) { $event.stopPropagation(); shut($refs[open]) }">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li class="relative">
+      <button type="button" x-ref="proc" id="nme-t-proc"
+              aria-controls="nme-p-proc" :aria-expanded="open === 'proc'"
+              @mouseenter="hover('proc')"
+              @click="open === 'proc' ? shut($refs.proc) : jump('proc')"
+              @keydown.arrow-down.prevent="jump('proc')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'proc' ? 'bg-zinc-200 font-medium text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
+        Procurement
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'proc' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="procPanel" x-show="open === 'proc'" x-cloak
+           id="nme-p-proc" role="group" aria-labelledby="nme-t-proc"
+           class="absolute top-full left-0 z-40 pt-2">
+        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <li><a href="/procurement/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All of Procurement</a></li>
+          <li><a href="/procurement/orders/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+          <li><a href="/procurement/requisitions/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Requisitions</a></li>
+          <li><a href="/vendors/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Vendors</a></li>
+        </ul>
+      </div>
+    </li>
+
+    <li>
+      <a href="/inventory/" @mouseenter="if (open) shut()"
+         class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Inventory</a>
+    </li>
+
+    <li class="relative">
+      <button type="button" x-ref="rep" id="nme-t-rep"
+              aria-controls="nme-p-rep" :aria-expanded="open === 'rep'"
+              @mouseenter="hover('rep')"
+              @click="open === 'rep' ? shut($refs.rep) : jump('rep')"
+              @keydown.arrow-down.prevent="jump('rep')"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'rep' ? 'bg-zinc-200 font-medium text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
+        Reports
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'rep' && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
+        </span>
+      </button>
+
+      <div x-ref="repPanel" x-show="open === 'rep'" x-cloak
+           id="nme-p-rep" role="group" aria-labelledby="nme-t-rep"
+           class="absolute top-full right-0 z-40 pt-2">
+        <ul class="w-64 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+          <li><a href="/reports/" class="block rounded-lg px-3 py-2 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">All reports</a></li>
+          <li><a href="/reports/consumption/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Consumption by project</a></li>
+          <li><a href="/reports/ageing/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Invoice ageing</a></li>
+          <li><a href="/reports/price-trend/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Landed rate trend</a></li>
+          <li><a href="/reports/gst/" class="block rounded-lg px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GSTR-2B reconciliation</a></li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+</nav>

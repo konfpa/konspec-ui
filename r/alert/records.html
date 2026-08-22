@@ -1,24 +1,38 @@
-<!-- When the message is about a set of rows, name them. "4 invoices failed"
-     with no list means someone has to go hunting for which four. -->
+<!-- When the message is about a set of rows, name them. "3 invoices failed"
+     with no list means somebody has to go hunting for which three, and the
+     hunting happens in a register that does not have a filter for "the ones
+     that failed in the run I just started".
+
+     Each row is the reference and the vendor, then the figure that made it a
+     problem, in a tabular column so three amounts can be compared without
+     reading them. The link goes to the invoice rather than to a filtered list,
+     because at this length the user is going to open all of them.
+
+     This one carries role="alert" and earns it: it is the answer to a payment
+     run the user started, inserted into the page after it loaded. Render the
+     same alert on every page load instead and the role does nothing at all —
+     drop it and let the sentence carry the message.
+
+     Past five rows this shape stops working. That is alert/overflow. -->
 <div data-kui="alert/records" class="rounded-lg border border-zinc-300 bg-white px-4 py-3" role="alert">
   <div class="flex items-start gap-3">
     <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
     <div class="min-w-0">
-      <p class="text-[13px]/5 font-medium">3 invoices could not be matched to a GRN.</p>
+      <p class="text-[13px]/5 font-medium"><span class="tabular-nums">3</span> invoices could not be matched to a GRN.</p>
       <p class="mt-0.5 text-[12px]/4 text-zinc-600">They stay out of the payment run until a GRN is posted against each one.</p>
     </div>
   </div>
   <ul class="mt-3 space-y-1.5 border-t border-zinc-100 pt-3 text-[12px]/4">
     <li class="flex items-center justify-between gap-4">
-      <a href="#" class="truncate text-zinc-900 underline underline-offset-2">INV-8841 · Nashik Steel Traders</a>
+      <a href="/invoices/INV-8841/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">INV-8841 · Nashik Steel Traders</a>
       <span class="shrink-0 tabular-nums text-zinc-600">₹4,26,500</span>
     </li>
     <li class="flex items-center justify-between gap-4">
-      <a href="#" class="truncate text-zinc-900 underline underline-offset-2">INV-8836 · Gujarat Polymers Ltd</a>
+      <a href="/invoices/INV-8836/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">INV-8836 · Gujarat Polymers Ltd</a>
       <span class="shrink-0 tabular-nums text-zinc-600">₹1,18,240</span>
     </li>
     <li class="flex items-center justify-between gap-4">
-      <a href="#" class="truncate text-zinc-900 underline underline-offset-2">INV-8829 · Sharma Extrusions</a>
+      <a href="/invoices/INV-8829/" class="truncate text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">INV-8829 · Sharma Extrusions</a>
       <span class="shrink-0 tabular-nums text-zinc-600">₹87,900</span>
     </li>
   </ul>

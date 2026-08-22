@@ -8,53 +8,61 @@
      activation are those the same thing, which is why the other variants can
      get away with one variable.
 
-     The hx- attributes and the panel id are written out rather than generated
-     with $id(): htmx reads them when it processes the element, and that is not
-     guaranteed to be after Alpine has bound them. Two of these on one page need
-     their ids changed by hand. -->
-<div data-kui="tabs/lazy" x-data="{
+     The tabs are written out rather than rendered by x-for, and that is not a
+     style choice. htmx wires an element when it first processes the document; a
+     button created later by Alpine is never processed, so its hx-get is a
+     string attribute and the click does nothing at all — no request, no error,
+     no clue. Written out, they are in the document htmx reads. It follows that
+     the row is walked through the DOM instead of an array, which is the same
+     list without a second copy of it in JavaScript.
+
+     The ids are static for the same reason, so they carry a po- prefix of their
+     own. Two of these on one page need that prefix changed by hand. -->
+<div data-kui="tabs/lazy"
+     x-data="{
        tab: 'summary',
        cursor: 'summary',
-       items: [
-         { id: 'summary',  label: 'Summary' },
-         { id: 'lines',    label: 'Lines' },
-         { id: 'receipts', label: 'Receipts' },
-         { id: 'history',  label: 'History' }
-       ],
        tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
        move(step) {
-         const n = this.items.length;
-         const i = this.items.findIndex(t => t.id === this.cursor);
-         this.focusTab(this.items[(i + step + n) % n].id);
+         const els = this.tabEls();
+         const i = els.findIndex(e => e.dataset.tab === this.cursor);
+         this.focusTab(els[(i + step + els.length) % els.length]);
        },
-       focusTab(id) {
-         this.cursor = id;
-         this.$nextTick(() => {
-           const el = this.tabEls().find(e => e.dataset.tab === id);
-           if (el) el.focus();
-         });
-       },
+       edge(last) { const els = this.tabEls(); this.focusTab(last ? els[els.length - 1] : els[0]); },
+       focusTab(el) { if (!el) return; this.cursor = el.dataset.tab; el.focus(); },
        pick(id) { this.tab = id; this.cursor = id; }
      }">
   <div class="border-b border-zinc-200">
     <div x-ref="list" role="tablist" aria-label="Purchase order sections"
          @keydown.arrow-right.prevent="move(1)"
          @keydown.arrow-left.prevent="move(-1)"
-         @keydown.home.prevent="focusTab(items[0].id)"
-         @keydown.end.prevent="focusTab(items[items.length - 1].id)"
+         @keydown.home.prevent="edge(false)"
+         @keydown.end.prevent="edge(true)"
          class="-mb-px flex gap-6">
-      <template x-for="t in items" :key="t.id">
-        <button type="button" role="tab" :data-tab="t.id"
-                :id="'po-tab-' + t.id" aria-controls="po-panel"
-                :aria-selected="tab === t.id ? 'true' : 'false'"
-                :tabindex="cursor === t.id ? 0 : -1"
-                @click="pick(t.id)"
-                :hx-get="'/orders/1187/' + t.id + '/'"
-                hx-target="#po-panel" hx-swap="innerHTML" hx-indicator="#po-panel"
-                class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                :class="tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'"
-                x-text="t.label"></button>
-      </template>
+      <button type="button" role="tab" data-tab="summary" id="po-tab-summary" aria-controls="po-panel"
+              :aria-selected="tab === 'summary' ? 'true' : 'false'" :tabindex="cursor === 'summary' ? 0 : -1"
+              @click="pick('summary')"
+              hx-get="/orders/1187/summary/" hx-target="#po-panel" hx-swap="innerHTML" hx-indicator="#po-panel"
+              class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="tab === 'summary' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">Summary</button>
+      <button type="button" role="tab" data-tab="lines" id="po-tab-lines" aria-controls="po-panel"
+              :aria-selected="tab === 'lines' ? 'true' : 'false'" :tabindex="cursor === 'lines' ? 0 : -1"
+              @click="pick('lines')"
+              hx-get="/orders/1187/lines/" hx-target="#po-panel" hx-swap="innerHTML" hx-indicator="#po-panel"
+              class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="tab === 'lines' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">Lines</button>
+      <button type="button" role="tab" data-tab="receipts" id="po-tab-receipts" aria-controls="po-panel"
+              :aria-selected="tab === 'receipts' ? 'true' : 'false'" :tabindex="cursor === 'receipts' ? 0 : -1"
+              @click="pick('receipts')"
+              hx-get="/orders/1187/receipts/" hx-target="#po-panel" hx-swap="innerHTML" hx-indicator="#po-panel"
+              class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="tab === 'receipts' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">Receipts</button>
+      <button type="button" role="tab" data-tab="history" id="po-tab-history" aria-controls="po-panel"
+              :aria-selected="tab === 'history' ? 'true' : 'false'" :tabindex="cursor === 'history' ? 0 : -1"
+              @click="pick('history')"
+              hx-get="/orders/1187/history/" hx-target="#po-panel" hx-swap="innerHTML" hx-indicator="#po-panel"
+              class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="tab === 'history' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">History</button>
     </div>
   </div>
 

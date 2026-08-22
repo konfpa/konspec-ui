@@ -1,0 +1,66 @@
+<!-- The server holds both figures, so the server draws the bar. A client that
+     divides done by total has to be sent both numbers anyway and then rounds
+     them a second time, which is how a panel ends up printing 40% over a fill
+     drawn at 39.6%. Nothing here computes anything; the markup below is the
+     fragment exactly as it came back at 1,240 rows.
+
+     hx-trigger and hx-swap="outerHTML" sit on the same element, so each response
+     replaces the thing that was polling and the response's own attributes decide
+     whether there is another poll. The finished render carries no hx-trigger and
+     no aria-busy, and the polling stops with no client-side condition left to
+     get wrong. Where the polled element is not the one being replaced, the other
+     stop is an HTTP 286, which htmx reads as "cancel this poll".
+
+     Expect the rail to step rather than slide. The fill is a new element on every
+     landing, so transition-[width] has no previous width to move from and never
+     fires — correct at a two-second cadence, and buying the slide would mean
+     keeping the fill across the swap and writing only its style attribute, which
+     is more machinery than a 2% step is worth.
+
+     The live region is outside everything the server replaces. A role="status"
+     that arrives inside a fragment with its text already in it never changed, so
+     nothing is announced; this one stays in the document and is written into
+     with hx-swap-oob="innerHTML:#import-8841-status".
+
+     Milestones, not landings. A two-second poll on a six-minute job lands 180
+     times, and a status that spoke on every one would be minutes behind the work
+     inside the first minute, so the view emits the out-of-band status only when
+     the percentage crosses a multiple of 25. The bar takes no aria-live at all.
+
+     # views.py
+     def import_progress(request, pk):
+         job = RateCardImport.objects.get(pk=pk)
+         crossed = job.percent // 25 > job.announced // 25
+         if crossed:
+             job.announced = job.percent
+             job.save(update_fields=['announced'])
+         # imports/_progress.html renders the div below, and renders it without
+         # hx-trigger and without aria-busy once job.finished is true
+         return render(request, 'imports/_progress.html',
+                       {'job': job, 'announce': crossed})
+
+     {# imports/_progress.html, at the end #}
+     {% if announce %}<span hx-swap-oob="innerHTML:#import-8841-status">{{ job.percent }} per cent imported</span>{% endif %} -->
+<div data-kui="progress/htmx" class="max-w-md">
+
+  <div id="import-8841"
+       hx-get="/imports/8841/progress/"
+       hx-trigger="every 2s"
+       hx-swap="outerHTML"
+       aria-busy="true"
+       class="rounded-xl border border-zinc-300 bg-white p-4">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 id="pg-hx-import" class="text-[13px]/5 font-medium">Importing the August rate card</h3>
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">40%</p>
+    </div>
+    <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+         role="progressbar" aria-labelledby="pg-hx-import"
+         aria-valuenow="1240" aria-valuemin="0" aria-valuemax="3100"
+         aria-valuetext="1,240 of 3,100 rows imported">
+      <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 40%"></div>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">1,240 of 3,100 rows · started 11:04, you can leave this page and it keeps running</p>
+  </div>
+
+  <p id="import-8841-status" role="status" class="sr-only">Importing 3,100 rows</p>
+</div>

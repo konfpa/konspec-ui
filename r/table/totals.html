@@ -1,0 +1,113 @@
+<!-- The total is a <tfoot>, not one more <tr> at the end of the body. In the
+     body a total row is a record as far as everything else on the screen is
+     concerned: a select-all ticks it, a sort carries it into the middle of the
+     table, and a reader walking rows is read one more line and never told it is
+     a sum. In the foot it is outside all three, and the browser keeps it at the
+     bottom whatever order the body ends up in.
+
+     Each figure is named by a <th scope="row"> in its own row, so it is
+     announced with a word attached to it rather than as a bare number at the
+     end of the table. The first foot row keeps the columns — the taxable total
+     sits under the taxable column — and the derived rows below it slide right,
+     which is how an invoice foot has always read.
+
+     The totals come from the same array as the rows, so the body and the foot
+     cannot disagree. On a paged register they come from the server over the
+     whole query instead, and the label has to change with them: a foot that
+     quietly sums the twenty rows on screen under a header saying 148 receipts
+     is the defect the wording here exists to prevent.
+
+     Received has no total. 12,000 kg and 4,000 nos do not add up, so the cell
+     carries an em dash and the reason sits under the table — a number there
+     would be read as a figure rather than as nonsense. -->
+<div data-kui="table/totals" x-data="{
+       lines: [
+         { code: 'ITM-1042', name: 'HDPE granules — natural', qty: '12,000 kg', rate: 87, base: 1044000 },
+         { code: 'ITM-1091', name: 'Masterbatch — white 60%', qty: '250 kg', rate: 245, base: 61250 },
+         { code: 'ITM-3310', name: 'M12 hex bolt — 8.8 zinc', qty: '4,000 nos', rate: 24, base: 96000 },
+         { code: 'ITM-5140', name: 'Stretch film — 23 micron', qty: '300 kg', rate: 175, base: 52500 }
+       ],
+       fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN') },
+       get taxable() { return this.lines.reduce((s, l) => s + l.base, 0) },
+       get tax() { return Math.round(this.taxable * 0.18) },
+       get total() { return this.taxable + this.tax }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">GRN-26-0448 · Gujarat Polymers Ltd</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Received at Silvassa on 04 Sep 2026 against PO-24-1194</p>
+  </div>
+
+  <table class="hidden w-full text-[13px]/5 md:table">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 font-medium">Item</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Received</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Rate</th>
+        <th scope="col" class="px-4 py-2.5 text-right font-medium">Taxable value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="l in lines" :key="l.code">
+        <tr class="border-b border-zinc-100">
+          <td class="px-4 py-2.5">
+            <span class="block" x-text="l.name"></span>
+            <span class="block text-[12px]/4 tabular-nums text-zinc-500" x-text="l.code"></span>
+          </td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="l.qty"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="fmt(l.rate)"></td>
+          <td class="px-4 py-2.5 text-right tabular-nums whitespace-nowrap" x-text="fmt(l.base)"></td>
+        </tr>
+      </template>
+    </tbody>
+    <tfoot class="bg-zinc-50">
+      <tr class="border-t border-zinc-200">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium text-zinc-600">Total of these 4 lines</th>
+        <td class="px-4 py-2 text-right text-zinc-500 tabular-nums">—</td>
+        <td class="px-4 py-2"></td>
+        <td class="px-4 py-2 text-right font-medium tabular-nums whitespace-nowrap" x-text="fmt(taxable)"></td>
+      </tr>
+      <tr>
+        <th scope="row" colspan="3" class="px-4 py-2 text-right text-[12px]/4 font-medium text-zinc-600">IGST at 18%</th>
+        <td class="px-4 py-2 text-right tabular-nums whitespace-nowrap" x-text="fmt(tax)"></td>
+      </tr>
+      <tr>
+        <th scope="row" colspan="3" class="px-4 pt-1 pb-2.5 text-right text-[13px]/5 font-semibold">Receipt value</th>
+        <td class="px-4 pt-1 pb-2.5 text-right text-[14px]/5 font-semibold tabular-nums whitespace-nowrap" x-text="fmt(total)"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- below md the four lines are cards and the foot is a strip that repeats
+       every figure. The total is the reason this screen was opened; it is not
+       something a phone is given a reduced version of. -->
+  <div class="divide-y divide-zinc-100 md:hidden">
+    <template x-for="l in lines" :key="l.code">
+      <div class="px-4 py-3">
+        <div class="flex items-baseline justify-between gap-3">
+          <span class="text-[13px]/5 font-medium" x-text="l.name"></span>
+          <span class="shrink-0 text-[13px]/5 tabular-nums" x-text="fmt(l.base)"></span>
+        </div>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <span x-text="l.code"></span> · <span x-text="l.qty"></span> at <span x-text="fmt(l.rate)"></span>
+        </p>
+      </div>
+    </template>
+  </div>
+  <dl class="space-y-1 border-t border-zinc-200 bg-zinc-50 px-4 py-3 md:hidden">
+    <div class="flex items-baseline justify-between gap-3">
+      <dt class="text-[12px]/4 text-zinc-600">Total of these 4 lines</dt>
+      <dd class="text-[13px]/5 font-medium tabular-nums" x-text="fmt(taxable)"></dd>
+    </div>
+    <div class="flex items-baseline justify-between gap-3">
+      <dt class="text-[12px]/4 text-zinc-600">IGST at 18%</dt>
+      <dd class="text-[13px]/5 tabular-nums" x-text="fmt(tax)"></dd>
+    </div>
+    <div class="flex items-baseline justify-between gap-3">
+      <dt class="text-[13px]/5 font-semibold">Receipt value</dt>
+      <dd class="text-[14px]/5 font-semibold tabular-nums" x-text="fmt(total)"></dd>
+    </div>
+  </dl>
+
+  <p class="border-t border-zinc-200 px-4 py-2 text-[12px]/4 text-zinc-500">Received quantity is not totalled — these lines are in kg and in nos.</p>
+</div>

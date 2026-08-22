@@ -1,8 +1,25 @@
+<!-- The base shape, and every other variant here is this one with something
+     added. Three decisions are load-bearing.
+
+     There is no @click.self on the backdrop, and that single omission is the
+     whole difference between this component and dialog. The user is being asked
+     a question; a click that missed the panel is not an answer to it.
+
+     Escape is still wired, because the alternative is a modal with no keyboard
+     exit, and a trap is a worse failure than an accidental dismissal. Escape
+     means cancel and nothing else.
+
+     Cancel is first in the DOM and the confirm is last, so the focus trap opens
+     on the safe answer. Visually they read left to right, which is the reverse
+     of the risk order, and that is fine — the eye reads the primary button on
+     the right and the keyboard lands on the harmless one.
+
+     The heading names the record and the button repeats the verb. Someone who
+     reads only the two buttons still knows what is about to happen. -->
 <div data-kui="alert-dialog/confirm" x-data="{ open: false }">
   <button type="button" @click="open = true"
-          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200">Close order</button>
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Close order</button>
 
-  <!-- no @click.self here, and that is deliberate: the backdrop does not answer for the user -->
   <div x-show="open" x-cloak x-trap.noscroll="open" @keydown.escape.window="open = false"
        class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
     <div role="alertdialog" aria-modal="true" aria-labelledby="close-title" aria-describedby="close-body"
@@ -12,11 +29,11 @@
         Sharma Extrusions · <span class="tabular-nums">₹18,42,000</span>. All 6 lines are fully received.
         Closing stops any further GRN against this order. You can reopen it from the order page.
       </p>
-      <div class="mt-5 flex flex-wrap justify-end gap-2">
+      <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <button type="button" @click="open = false"
-                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100">Cancel</button>
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
         <button type="button" @click="open = false"
-                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800">Close order</button>
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Close order</button>
       </div>
     </div>
   </div>

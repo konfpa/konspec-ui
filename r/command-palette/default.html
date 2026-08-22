@@ -16,6 +16,10 @@
      written display when $nextTick runs, so focus() on the input is a silent
      no-op.
 
+     The ⌘K hint on the trigger is aria-hidden. It is a reminder of the
+     shortcut, not part of the button's name, and left in the tree the button
+     is announced as "Search Operations ⌘K".
+
      The letters on the action rows are the application's own shortcuts, shown
      so people learn them. The palette does not listen for them: inside a
      search box, N has to type an N. -->
@@ -56,17 +60,17 @@
      @keydown.window.ctrl.k.prevent="show()"
      @keydown.escape.window="hide()">
 
-  <button type="button" @click="show()"
-          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-200">
+  <button type="button" @click="show()" aria-haspopup="dialog"
+          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="search" class="size-4 text-zinc-600"></i>
     <span class="flex-1 text-left">Search Operations</span>
-    <kbd class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
+    <kbd aria-hidden="true" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
   </button>
 
   <div x-show="open" x-cloak x-trap.noscroll="open"
-       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/30 px-3 pt-16 sm:pt-24">
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/40 px-3 pt-16 sm:pt-24">
     <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
-         class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+         class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
 
       <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
         <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
@@ -80,7 +84,7 @@
                @keydown.arrow-up.prevent="move(-1)"
                @keydown.enter.prevent="commit()"
                class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
-        <button type="button" @click="hide()" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4 text-zinc-500">Esc</button>
+        <button type="button" @click="hide()" class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px]/4 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Esc</button>
       </div>
 
       <div id="cp-list" role="listbox" aria-label="Results" class="max-h-80 overflow-y-auto pb-1">
@@ -100,7 +104,7 @@
                   <i :data-lucide="o.icon" class="size-4"></i>
                 </span>
                 <span class="min-w-0 flex-1">
-                  <span class="block truncate" x-text="o.label"></span>
+                  <span class="block truncate tabular-nums" x-text="o.label"></span>
                   <span x-show="o.sub" class="block truncate text-[12px]/4 text-zinc-500"><span x-text="o.sub"></span><span
                         x-show="o.flag" class="font-medium text-red-600"> · <span x-text="o.flag"></span></span></span>
                 </span>

@@ -14,15 +14,58 @@
      every page load. @alpinejs/persist would do all of this in one directive and
      is not on the page, so $persist is not an option here.
 
+     The collapsed label cannot be a sibling span the way sidebar/rail writes it,
+     and this is the one place the rail's own rule bites. This nav scrolls, and
+     overflow-y:auto computes overflow-x to auto with it — there is no box that
+     scrolls one axis and lets a child hang out of the other. A bubble anchored
+     at left-full inside this scroller is cut off at 68px and gives the column a
+     sideways scrollbar it never had. So there is one bubble, at the root and
+     outside the scroller, positioned fixed from the trigger rectangle read on
+     open. That is the machinery the rail avoids by refusing to scroll, and the
+     price of it is real: an unanchored bubble has to close on scroll and on
+     resize, because nothing moves it when the thing it names moves.
+
+     It is gated on !expanded, so nothing opens while the label is already on the
+     row — a bubble that survives the expand sits on top of the label it
+     duplicates until the mouse moves — and on focus-visible, so clicking a
+     destination does not leave its name over the page that has just opened.
+     Escape clears it, which a CSS-only group-hover bubble cannot do.
+
      Labels hide with a plain hidden so the rail can be seen at 390px; inside
      app-shell it is lg:hidden, because below lg there is no rail state at all.
+     Each anchor carries an aria-label, because the visible label is display:none
+     at 68px and a name assembled from hidden text is no name at all.
+
      The control keeps its icon in a fixed 68px box so its centre does not move
-     between the two widths — centre it in the strip and the second click misses. -->
+     between the two widths — centre it in the strip and the second click misses.
+     Its aria-expanded and its name are written statically as well as bound,
+     because the state before Alpine boots is the state the static markup shows
+     and a control with neither attribute in the HTML has no name for the first
+     frame. -->
 <div data-kui="sidebar/collapse" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
-     x-data="{ expanded: true, ready: false }"
+     x-data="{
+       expanded: true, ready: false,
+       tip: '', tipTop: 0, tipLeft: 0, warm: false, timer: 0, cool: 0,
+       over(el, text) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(el, text) },
+       show(el, text, now = false) {
+         if (this.expanded) return;
+         clearTimeout(this.timer); clearTimeout(this.cool);
+         const put = () => {
+           const r = el.getBoundingClientRect();
+           this.tipTop = r.top + r.height / 2; this.tipLeft = r.right + 6;
+           this.tip = text; this.warm = true;
+         };
+         if (now || this.warm) { put(); return }
+         this.timer = setTimeout(put, 150);
+       },
+       hide() { clearTimeout(this.timer); this.tip = ''; this.cool = setTimeout(() => this.warm = false, 800) }
+     }"
      x-init="expanded = localStorage.getItem('kon-sidebar') !== '0';
              $nextTick(() => ready = true);
-             $watch('expanded', v => localStorage.setItem('kon-sidebar', v ? '1' : '0'))"
+             $watch('expanded', v => { localStorage.setItem('kon-sidebar', v ? '1' : '0'); hide() })"
+     @keydown.escape.window="hide()"
+     @scroll.window.passive="hide()"
+     @resize.window="hide()"
      @keydown.window="if ($event.key === '[' && !/^(input|textarea|select)$/i.test($event.target.tagName)) expanded = !expanded"
      :class="[ expanded ? 'w-64' : 'w-[68px]', ready && 'transition-all duration-200 motion-reduce:transition-none' ]">
 
@@ -31,65 +74,61 @@
     <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold" :class="!expanded && 'hidden'">Operations</span>
   </div>
 
-  <nav id="sb6-nav" aria-label="Main" class="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain py-2" :class="expanded ? 'px-3' : 'px-3.5'">
-    <div class="group relative">
-      <a href="#" aria-current="page" aria-label="Purchase orders, 148 open"
-         class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
-         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
-        <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
-        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Purchase orders</span>
-        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600" :class="!expanded && 'hidden'">148</span>
-      </a>
-      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Purchase orders — 148</span>
-    </div>
+  <nav id="sb6-nav" aria-label="Main" class="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain py-2"
+       :class="expanded ? 'px-3' : 'px-3.5'" @scroll.passive="hide()">
+    <a href="#" aria-current="page" aria-label="Purchase orders, 148 open"
+       @mouseenter="over($el, 'Purchase orders — 148')" @mouseleave="hide()"
+       @focus="if ($event.target.matches(':focus-visible')) show($el, 'Purchase orders — 148', true)" @blur="hide()"
+       class="flex min-h-9 items-center gap-3 rounded-lg bg-zinc-200 py-2 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+       :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+      <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Purchase orders</span>
+      <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600" :class="!expanded && 'hidden'">148</span>
+    </a>
 
-    <div class="group relative">
-      <a href="#" aria-label="Goods receipt, 12 awaiting GRN"
-         class="relative flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
-         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
-        <i data-lucide="truck" class="size-[18px] shrink-0"></i>
-        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Goods receipt</span>
-        <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" :class="!expanded && 'hidden'">12</span>
-        <span x-show="!expanded" x-cloak aria-hidden="true" class="absolute top-1 right-1 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
-      </a>
-      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Goods receipt — 12 awaiting</span>
-    </div>
+    <a href="#" aria-label="Goods receipt, 12 awaiting GRN"
+       @mouseenter="over($el, 'Goods receipt — 12 awaiting')" @mouseleave="hide()"
+       @focus="if ($event.target.matches(':focus-visible')) show($el, 'Goods receipt — 12 awaiting', true)" @blur="hide()"
+       class="relative flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+       :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+      <i data-lucide="truck" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Goods receipt</span>
+      <span class="shrink-0 rounded-full bg-zinc-200 px-1.5 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" :class="!expanded && 'hidden'">12</span>
+      <span x-show="!expanded" x-cloak aria-hidden="true" class="absolute top-1 right-1 size-2 rounded-full bg-zinc-700 ring-2 ring-white"></span>
+    </a>
 
-    <div class="group relative">
-      <a href="#" aria-label="Vendors, 187"
-         class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
-         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
-        <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
-        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Vendors</span>
-        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600" :class="!expanded && 'hidden'">187</span>
-      </a>
-      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white group-hover:block group-focus-within:block">Vendors — 187</span>
-    </div>
+    <a href="#" aria-label="Vendors, 187"
+       @mouseenter="over($el, 'Vendors — 187')" @mouseleave="hide()"
+       @focus="if ($event.target.matches(':focus-visible')) show($el, 'Vendors — 187', true)" @blur="hide()"
+       class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+       :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+      <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Vendors</span>
+      <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600" :class="!expanded && 'hidden'">187</span>
+    </a>
 
-    <div class="group relative">
-      <a href="#" aria-label="Materials"
-         class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
-         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
-        <i data-lucide="package" class="size-[18px] shrink-0"></i>
-        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Materials</span>
-      </a>
-      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Materials</span>
-    </div>
+    <a href="#" aria-label="Materials"
+       @mouseenter="over($el, 'Materials')" @mouseleave="hide()"
+       @focus="if ($event.target.matches(':focus-visible')) show($el, 'Materials', true)" @blur="hide()"
+       class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+       :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+      <i data-lucide="package" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Materials</span>
+    </a>
 
-    <div class="group relative">
-      <a href="#" aria-label="Analytics"
-         class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
-         :class="expanded ? 'px-2.5' : 'justify-center px-0'">
-        <i data-lucide="chart-no-axes-column" class="size-[18px] shrink-0"></i>
-        <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Analytics</span>
-      </a>
-      <span x-show="!expanded" x-cloak aria-hidden="true" class="pointer-events-none absolute top-1/2 left-full z-40 ml-1 hidden -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white group-hover:block group-focus-within:block">Analytics</span>
-    </div>
+    <a href="#" aria-label="Analytics"
+       @mouseenter="over($el, 'Analytics')" @mouseleave="hide()"
+       @focus="if ($event.target.matches(':focus-visible')) show($el, 'Analytics', true)" @blur="hide()"
+       class="flex min-h-9 items-center gap-3 rounded-lg py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+       :class="expanded ? 'px-2.5' : 'justify-center px-0'">
+      <i data-lucide="chart-no-axes-column" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate" :class="!expanded && 'hidden'">Analytics</span>
+    </a>
   </nav>
 
   <div class="shrink-0 border-t border-zinc-200">
-    <button type="button" @click="expanded = !expanded" :aria-expanded="expanded" aria-controls="sb6-nav"
-            :aria-label="expanded ? 'Collapse sidebar' : 'Expand sidebar'"
+    <button type="button" @click="expanded = !expanded" aria-expanded="true" :aria-expanded="expanded" aria-controls="sb6-nav"
+            aria-label="Collapse sidebar" :aria-label="expanded ? 'Collapse sidebar' : 'Expand sidebar'"
             class="flex h-11 w-full items-center text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
       <span class="flex h-11 w-[68px] shrink-0 items-center justify-center">
         <span class="flex transition-transform motion-reduce:transition-none" :class="!expanded && 'rotate-180'">
@@ -100,4 +139,8 @@
       <kbd class="mr-3 rounded border border-zinc-200 bg-zinc-100 px-1.5 text-[11px]/4 text-zinc-600" :class="!expanded && 'hidden'">[</kbd>
     </button>
   </div>
+
+  <span aria-hidden="true" x-show="tip" x-cloak x-transition.opacity.duration.100ms x-text="tip"
+        :style="'top: ' + tipTop + 'px; left: ' + tipLeft + 'px'"
+        class="pointer-events-none fixed z-50 -translate-y-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 tabular-nums whitespace-nowrap text-white"></span>
 </div>

@@ -1,0 +1,102 @@
+<!-- The dialog stops being dismissible for exactly as long as its own POST is
+     running. Escape and the backdrop are gated on busy, and the close button is
+     disabled, because a dismissal in that window tells the user they cancelled
+     something the server is already doing — and the receipt posts anyway.
+
+     busy is set from htmx:beforeRequest and cleared from htmx:afterRequest, not
+     from afterSwap. afterRequest fires on every ending there is, including a
+     500, a timeout and an abort, so the panel cannot be left permanently
+     undismissable by a request that failed. Closing on success is the same
+     event, guarded on detail.successful: a failed submit leaves the panel open
+     with everything the user typed still in it.
+
+     Three things stop the second post and they stop different second posts.
+     hx-disabled-elt takes the submit button out while the request runs; hx-sync
+     with this:drop throws away a submit raised from a field with Enter, which
+     the disabled button never sees; and the server is idempotent on the GRN
+     number, because neither of the first two survives a lost connection.
+
+     One owner per disabled attribute. htmx disables the button that fires the
+     request, and Alpine disables the two that dismiss, because they are off for
+     the same reason Escape is and go back on from the same event. Two owners
+     writing the same attribute is how a control ends up permanently disabled by
+     whichever of them lost the race.
+
+     The fields are not disabled. htmx has already collected the values, so
+     disabling them would be safe, and it would still be wrong: a form greying
+     out under the user reads as the form being taken away, when the truth is
+     that it is being sent.
+
+     The wait is written into a status line that is in the footer at rest with
+     nothing in it. A live region created at the moment it has something to say
+     is a live region that says nothing. Below sm it takes a line of its own:
+     sharing 390px with two buttons either truncates the sentence or leaves the
+     primary hanging on a row by itself. -->
+<div data-kui="dialog/submitting" x-data="{ open: false, busy: false }">
+  <button type="button" @click="open = true"
+          class="flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="package-check" class="size-4"></i>Post GRN
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       @keydown.escape.window="if (!busy) open = false"
+       @click.self="if (!busy) open = false"
+       @htmx:before-request.camel="busy = true"
+       @htmx:after-request.camel="busy = false; if ($event.detail.successful) open = false"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="dsub-title" :aria-busy="busy"
+         class="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+      <div class="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 px-5 py-4">
+        <div class="min-w-0">
+          <h2 id="dsub-title" class="text-[16px]/6 font-semibold">Post GRN 1142</h2>
+          <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-600">PO-24-1187 · Gujarat Polymers Ltd</p>
+        </div>
+        <button type="button" @click="open = false" aria-label="Close" :disabled="busy"
+                class="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:text-zinc-400 disabled:hover:bg-transparent disabled:hover:text-zinc-400">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <form hx-post="/grn/1142/post/" hx-target="#grn-1142-row" hx-swap="outerHTML"
+            hx-disabled-elt="#dsub-save" hx-indicator="#dsub-save" hx-sync="this:drop"
+            class="flex min-h-0 flex-1 flex-col">
+        <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          <div>
+            <label for="dsub-qty" class="mb-1.5 block text-[13px]/5 font-medium">Quantity accepted <span aria-hidden="true" class="text-red-600">*</span></label>
+            <div class="flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="dsub-qty" name="quantity" autofocus required inputmode="decimal" value="18,400"
+                     aria-describedby="dsub-qty-help"
+                     class="w-full bg-transparent px-3 py-2 text-right text-[14px]/5 tabular-nums outline-none">
+              <span class="pr-3 text-[13px]/5 text-zinc-600">kg</span>
+            </div>
+            <p id="dsub-qty-help" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Challan says 18,400 kg. Outstanding on the order is 24,000 kg.</p>
+          </div>
+
+          <div class="mt-4">
+            <label for="dsub-lr" class="mb-1.5 block text-[13px]/5 font-medium">LR number</label>
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input id="dsub-lr" name="lr_number" value="VRL/2026/88214" autocomplete="off" spellcheck="false"
+                     class="w-full bg-transparent px-3 py-2 font-mono text-[14px]/5 tabular-nums outline-none">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-zinc-200 bg-zinc-100 px-5 py-3">
+          <p role="status" class="text-[12px]/4 tabular-nums text-zinc-600"
+             :class="busy ? 'w-full sm:mr-auto sm:w-auto' : ''"
+             x-text="busy ? 'Posting to the stock ledger…' : ''"></p>
+          <button type="button" @click="open = false" :disabled="busy"
+                  class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:text-zinc-400 disabled:hover:bg-white">Cancel</button>
+          <button id="dsub-save" type="submit"
+                  class="group inline-flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="hidden group-[.htmx-request]:inline"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+            <span class="grid">
+              <span class="col-start-1 row-start-1 group-[.htmx-request]:invisible">Post receipt</span>
+              <span class="invisible col-start-1 row-start-1 group-[.htmx-request]:visible">Posting…</span>
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

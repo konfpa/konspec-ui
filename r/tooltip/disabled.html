@@ -6,8 +6,10 @@
      which is not disabled and does see the pointer. The button stays properly
      disabled. Do not put tabindex="0" on that span to "fix" the keyboard — it
      adds a tab stop announced as nothing, in front of a control that cannot be
-     operated. This form is pointer-only by construction, which is fine when
-     the reason is a reminder rather than news.
+     operated. This form is pointer-only by construction, and pointer-only
+     means mouse-only: it is unreachable from the keyboard and unreachable on a
+     phone, which is the same failure a touch device produces on every tooltip
+     in this entry, arriving here on a desktop as well.
 
      Right, and the better answer whenever the reason actually matters: leave
      the button enabled in the DOM, mark it aria-disabled="true" and neutralise
@@ -16,42 +18,53 @@
      into the name computation. The disabled: variants do not apply to it, so
      the flat look is written as plain classes.
 
-     Either way the reason is on the page as well. A rule that decides whether
-     somebody can post a receipt is not something to hide behind a hover. -->
-<div data-kui="tooltip/disabled" class="flex flex-wrap items-center gap-3">
+     Either way the reason is printed under the buttons as well, which is what
+     the line at the foot of this card is. A rule that decides whether somebody
+     can post a receipt is not something to hide behind a hover, and the test
+     is to read the card with both bubbles deleted and check that nothing has
+     gone with them. -->
+<div data-kui="tooltip/disabled" class="max-w-md rounded-xl border border-zinc-300 bg-white p-4">
 
-  <span class="relative inline-flex"
-        x-data="{
-          open: false, timer: 0,
-          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
-          hide() { clearTimeout(this.timer); this.open = false }
-        }"
-        @mouseenter="show()" @mouseleave="hide()"
-        @keydown.escape.window="hide()">
-    <button type="button" disabled aria-describedby="tt-void"
-            class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 disabled:pointer-events-none">
-      <i data-lucide="ban" class="size-4"></i>Void GRN
-    </button>
-    <span id="tt-void" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
-          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Already invoiced — voiding is closed</span>
-  </span>
+  <div class="flex flex-wrap items-center gap-3">
 
-  <span class="relative inline-flex"
-        x-data="{
-          open: false, timer: 0,
-          show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
-          hide() { clearTimeout(this.timer); this.open = false }
-        }"
-        @keydown.escape.window="hide()">
-    <button type="button" aria-disabled="true" aria-describedby="tt-post"
-            @click.prevent
-            @mouseenter="show()" @mouseleave="hide()"
-            @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
-            class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
-      <i data-lucide="check-circle-2" class="size-4"></i>Post to stock
-    </button>
-    <span id="tt-post" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
-          class="pointer-events-none absolute bottom-full left-1/2 z-40 mb-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Needs a Level 2 approver</span>
-  </span>
+    <span class="relative inline-flex"
+          x-data="{
+            open: false, timer: 0,
+            over() { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show() },
+            show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+            hide() { clearTimeout(this.timer); this.open = false }
+          }"
+          @mouseenter="over()" @mouseleave="hide()"
+          @keydown.escape.window="hide()">
+      <button type="button" disabled aria-describedby="tt-void"
+              class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 disabled:pointer-events-none">
+        <i data-lucide="ban" class="size-4"></i>Void GRN
+      </button>
+      <span id="tt-void" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute bottom-full left-0 z-40 mb-1.5 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Already invoiced — voiding is closed</span>
+    </span>
+
+    <span class="relative inline-flex"
+          x-data="{
+            open: false, timer: 0,
+            over() { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show() },
+            show(d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = true, d) },
+            hide() { clearTimeout(this.timer); this.open = false }
+          }"
+          @keydown.escape.window="hide()">
+      <button type="button" aria-disabled="true" aria-describedby="tt-post"
+              @click.prevent
+              @mouseenter="over()" @mouseleave="hide()"
+              @focus="if ($event.target.matches(':focus-visible')) show(0)" @blur="hide()"
+              class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="check-circle-2" class="size-4"></i>Post to stock
+      </button>
+      <span id="tt-post" role="tooltip" x-show="open" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute bottom-full right-0 z-40 mb-1.5 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Needs a Level 2 approver</span>
+    </span>
+
+  </div>
+
+  <p class="mt-3 text-[12px]/4 text-zinc-500">GRN-2608-041 was invoiced on 12 Sep 2026, so it can no longer be voided. Posting to stock above ₹10,00,000 is released by a Level 2 approver.</p>
 
 </div>

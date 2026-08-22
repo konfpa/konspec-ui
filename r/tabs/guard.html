@@ -1,0 +1,136 @@
+<!-- A panel holding a form the user has typed into. Switching away throws the
+     typing out, and the row gives no sign that it is about to, so this tab set
+     asks first.
+
+     Which is why it activates manually. Automatic activation and a guard cannot
+     coexist: arrowing from Terms to Lines would raise the question, and
+     arrowing on to History would raise it again, so a user walking the row with
+     the keyboard is interrogated once per tab crossed for a switch they never
+     asked for. The arrows move focus, Enter or Space commits, and only the
+     commit reaches the guard.
+
+     Three answers, not two. Forced to choose between losing the work and
+     staying put, people pick the destructive one to get out of the dialog.
+     Keep editing is the safe answer and comes first; Discard is the one that
+     loses data and says so in words; Save and switch is what the user usually
+     wanted. In a real screen Save posts the form and only then commits the
+     switch, so a failed save leaves the tab where it was.
+
+     The dirty tab carries the same 6px dot the status rule gives every state
+     mark, with the word beside it in sr-only text, so the row says which
+     section is unsaved even while the user is reading another one.
+
+     dirty is one flag on the root, set by a single @input on the form wrapper
+     rather than one handler per field. The same flag is what a beforeunload
+     handler should read: this guard stops a tab switch and nothing else, and a
+     closed browser tab loses exactly as much. -->
+<div data-kui="tabs/guard" x-id="['tab', 'panel', 'guard', 'terms-field', 'remark-field']"
+     x-data="{
+       tab: 'terms',
+       cursor: 'terms',
+       dirty: false,
+       pending: null,
+       tabEls() { return Array.from(this.$refs.list.querySelectorAll('[role=tab]')); },
+       move(step) {
+         const els = this.tabEls();
+         const i = els.findIndex(e => e.dataset.tab === this.cursor);
+         this.focusTab(els[(i + step + els.length) % els.length]);
+       },
+       edge(last) { const els = this.tabEls(); this.focusTab(last ? els[els.length - 1] : els[0]); },
+       focusTab(el) { if (!el) return; this.cursor = el.dataset.tab; el.focus(); },
+       ask(id) {
+         if (id === this.tab) return;
+         if (this.dirty) { this.pending = id; return; }
+         this.commit(id);
+       },
+       commit(id) {
+         this.tab = id;
+         this.pending = null;
+         this.$nextTick(() => this.focusTab(this.tabEls().find(e => e.dataset.tab === id)));
+       },
+       stay() {
+         this.pending = null;
+         this.$nextTick(() => this.focusTab(this.tabEls().find(e => e.dataset.tab === this.cursor)));
+       }
+     }">
+  <div class="border-b border-zinc-200">
+    <div x-ref="list" role="tablist" aria-label="Purchase order sections"
+         @keydown.arrow-right.prevent="move(1)"
+         @keydown.arrow-left.prevent="move(-1)"
+         @keydown.home.prevent="edge(false)"
+         @keydown.end.prevent="edge(true)"
+         class="-mb-px flex gap-6">
+      <button type="button" role="tab" data-tab="terms" @click="ask('terms')"
+              :id="$id('tab', 'terms')" :aria-controls="$id('panel', 'terms')"
+              :aria-selected="tab === 'terms' ? 'true' : 'false'" :tabindex="cursor === 'terms' ? 0 : -1"
+              class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="tab === 'terms' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">
+        Terms
+        <span x-show="dirty" x-cloak class="flex items-center gap-1.5">
+          <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+          <span class="sr-only">unsaved changes</span>
+        </span>
+      </button>
+      <button type="button" role="tab" data-tab="lines" @click="ask('lines')"
+              :id="$id('tab', 'lines')" :aria-controls="$id('panel', 'lines')"
+              :aria-selected="tab === 'lines' ? 'true' : 'false'" :tabindex="cursor === 'lines' ? 0 : -1"
+              class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="tab === 'lines' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">Lines</button>
+      <button type="button" role="tab" data-tab="history" @click="ask('history')"
+              :id="$id('tab', 'history')" :aria-controls="$id('panel', 'history')"
+              :aria-selected="tab === 'history' ? 'true' : 'false'" :tabindex="cursor === 'history' ? 0 : -1"
+              class="shrink-0 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="tab === 'history' ? 'border-zinc-900 font-semibold text-zinc-900' : 'border-transparent text-zinc-600 hover:text-zinc-900'">History</button>
+    </div>
+  </div>
+
+  <div class="pt-4 text-[14px]/5">
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'terms')" :aria-labelledby="$id('tab', 'terms')"
+         x-show="tab === 'terms'" @input="dirty = true"
+         class="max-w-md space-y-4 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <div>
+        <label :for="$id('terms-field')" class="mb-1.5 block text-[13px]/5 font-medium">Payment terms</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input :id="$id('terms-field')" type="text" name="payment_terms" value="45 days from GRN"
+                 class="block w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 outline-none">
+        </div>
+      </div>
+      <div>
+        <label :for="$id('remark-field')" class="mb-1.5 block text-[13px]/5 font-medium">Remark to the vendor</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <textarea :id="$id('remark-field')" name="remark" rows="3"
+                    class="block w-full min-w-0 resize-y bg-transparent px-3 py-2 text-[14px]/5 outline-none">Freight to Vasai plant is on the vendor for this order only.</textarea>
+        </div>
+      </div>
+      <p class="text-[12px]/4 text-zinc-500">Type in either field, then move to another tab.</p>
+    </div>
+
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'lines')" :aria-labelledby="$id('tab', 'lines')"
+         x-show="tab === 'lines'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <p>8 lines, <span class="font-medium tabular-nums">₹18,42,000</span> before tax.</p>
+    </div>
+    <div role="tabpanel" tabindex="0" :id="$id('panel', 'history')" :aria-labelledby="$id('tab', 'history')"
+         x-show="tab === 'history'" x-cloak class="rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <p class="tabular-nums text-zinc-600">Approved by R. Menon on 05 Aug 2026, revised once.</p>
+    </div>
+  </div>
+
+  <div x-show="pending" x-cloak x-trap.noscroll="pending" @keydown.escape.window="stay()"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4">
+    <div role="alertdialog" aria-modal="true" :aria-labelledby="$id('guard', 'title')" :aria-describedby="$id('guard', 'body')"
+         class="w-full max-w-md rounded-xl border border-zinc-300 bg-white p-5 shadow-lg">
+      <h2 :id="$id('guard', 'title')" class="text-[16px]/6 font-semibold">Leave Terms without saving?</h2>
+      <p :id="$id('guard', 'body')" class="mt-1.5 text-[13px]/5 text-zinc-600">
+        The payment terms and the vendor remark have been edited. Switching sections now loses both.
+      </p>
+      <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
+        <button type="button" @click="stay()"
+                class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Keep editing</button>
+        <button type="button" @click="dirty = false; commit(pending)"
+                class="rounded-lg px-4 py-2 text-[13px]/5 font-medium text-red-600 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Discard changes</button>
+        <button type="button" @click="dirty = false; commit(pending)"
+                class="rounded-lg bg-zinc-700 px-4 py-2 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save and switch</button>
+      </div>
+    </div>
+  </div>
+</div>

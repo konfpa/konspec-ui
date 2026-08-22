@@ -1,8 +1,8 @@
 <!-- Assembled: the Silvassa gate at 11:04 on a day nothing has arrived. Three
      receipts were logged yesterday, so this is not a new register and it is not
      a filter hiding anything either — it is a scope with nothing in it, and
-     that is a fifth shading of nothing-yet with its own two answers. Widen the
-     scope, or log the receipt that is standing at the gate.
+     that is a shading of nothing-yet with its own two answers. Widen the scope,
+     or log the receipt that is standing at the gate.
 
      Both answers are on the panel and only one of them is filled. Log a goods
      receipt is the create action and it is safe here in a way it never is under
@@ -11,10 +11,15 @@
 
      The status region is the sentence beside the title. It was rendered with
      the panel, before any scope button was pressed, so writing the new count
-     into it is a change and gets read out. The scope buttons are the segmented
-     control from the button-group entry, copied rather than reinvented: a real
-     radiogroup with one Tab stop, a roving tabindex and aria-checked, so which
-     day is showing is announced and not only tinted.
+     into it is a change and gets read out. It is also where focus goes when the
+     empty state's own link changes the scope, because that link is removed
+     along with the block it sits in and the browser would otherwise drop focus
+     on the body.
+
+     The scope buttons are the segmented control from the button-group entry,
+     copied rather than reinvented: a real radiogroup with one Tab stop, a roving
+     tabindex and aria-checked, so which day is showing is announced and not only
+     tinted.
 
      The empty state replaces the table rather than sitting inside it, because
      the emptiness is the scope and not a query — there is no sort and no column
@@ -44,7 +49,8 @@
   <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 px-4 py-3">
     <div class="min-w-0">
       <h2 class="text-[14px]/5 font-semibold">Goods receipts · Silvassa</h2>
-      <p role="status" class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums"
+      <p role="status" x-ref="count" tabindex="-1"
+         class="mt-0.5 text-[12px]/4 text-zinc-500 tabular-nums focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
          x-text="rows.length ? rows.length + ' receipts on ' + label : 'No goods receipts on ' + label"></p>
     </div>
     <div role="radiogroup" aria-label="Date scope" x-ref="grp"
@@ -112,10 +118,10 @@
     </p>
     <div class="mt-4 flex w-full max-w-xs flex-col items-center gap-3 sm:w-auto sm:max-w-none sm:flex-row">
       <button type="button"
-              class="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/30 sm:w-auto">
+              class="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 sm:w-auto">
         <i data-lucide="truck" class="size-4"></i>Log a goods receipt
       </button>
-      <button type="button" @click="scope = 'yesterday'"
+      <button type="button" @click="scope = 'yesterday'; $nextTick(() => $refs.count.focus())"
               class="text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         Show yesterday instead
       </button>

@@ -1,0 +1,97 @@
+<!-- Half the panel is live and half of it is settled, which is the ordinary
+     state of a line on an approved order — the rate was signed off and the
+     delivery date was not.
+
+     The rate is readonly and not disabled, and the difference is the whole
+     variant. A disabled input is not focusable, so it is skipped by Tab, by
+     forms mode in every screen reader and by the browser's own find; its value
+     cannot be selected or copied in some engines; and it is not submitted, so a
+     form that round-trips silently drops the field. readonly keeps all four and
+     gives up only the caret. Use disabled for a control that is not part of
+     this form at all, and readonly for a value that is part of it and settled.
+
+     The reason is aria-describedby from the field rather than a line floating
+     near it. Described, it is read the moment focus lands on the locked box,
+     which is exactly when the user is asking why nothing is happening; loose
+     under the field it is read only by somebody already browsing the panel line
+     by line. The link inside the description is the way out, so the panel is
+     not a dead end.
+
+     The trigger is not disabled either. Disabling it takes the only route to
+     the explanation away, and there is nowhere else to put one — a title
+     attribute has no keyboard route and a tooltip has no route on a phone. The
+     button opens something and it does that perfectly; what is unavailable is
+     the edit, and the panel is where that is said.
+
+     The locked wrapper is bg-zinc-50 — a band recessed into white — and not an
+     amber or a red tint. Nothing is wrong here. Something is finished, and
+     colour in this system says what a record is doing.
+
+     Focus opens on the delivery date and not on the rate, because the rate is
+     the field that does not respond to typing and landing the caret in it is a
+     silent way of saying nothing. -->
+<div data-kui="popover/read-only" class="flex items-center justify-between gap-4 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+  <div class="min-w-0">
+    <p class="truncate text-[13px]/5 font-medium tabular-nums">MS plate 10 mm</p>
+    <p class="mt-0.5 truncate text-[12px]/4 tabular-nums text-zinc-500">PO-24-1187 · line 2 · 4,000 kg</p>
+  </div>
+
+  <div class="relative shrink-0"
+       x-data="{
+         open: false,
+         show() {
+           this.open = true;
+           this.$nextTick(() => requestAnimationFrame(() => this.$refs.date.focus()));
+         },
+         close(toTrigger = true) {
+           if (!this.open) return;
+           this.open = false;
+           if (toTrigger) this.$refs.trigger.focus();
+         }
+       }"
+       @click.outside="close(false)"
+       @focusout="if ($event.relatedTarget && !$root.contains($event.relatedTarget)) close(false)"
+       @keydown.escape="if (open) { $event.stopPropagation(); close() }">
+
+    <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
+            :aria-expanded="open" aria-controls="pop-ro"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-2.5 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="pencil" class="size-3.5 text-zinc-600"></i>Edit line
+    </button>
+
+    <div id="pop-ro" x-ref="panel" x-show="open" x-cloak
+         role="dialog" tabindex="-1" aria-labelledby="pop-ro-title"
+         class="absolute top-full right-0 z-40 mt-1.5 w-80 max-w-[calc(100vw_-_1.5rem)] rounded-xl border border-zinc-300 bg-white p-4 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+
+      <p id="pop-ro-title" class="text-[13px]/5 font-medium tabular-nums">PO-24-1187 · line 2</p>
+
+      <div class="mt-3">
+        <label for="ro-rate" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">Rate per kg</label>
+        <div class="flex items-center rounded-lg border border-zinc-200 bg-zinc-50 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <span class="pl-3 text-[13px]/5 text-zinc-500">₹</span>
+          <input id="ro-rate" name="rate" value="78.00" readonly aria-describedby="ro-rate-why"
+                 class="w-full bg-transparent px-2 py-2 text-right text-[14px]/5 tabular-nums text-zinc-600 outline-none">
+          <span class="flex pr-3 text-zinc-500"><i data-lucide="lock" class="size-3.5"></i></span>
+        </div>
+        <p id="ro-rate-why" class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-600">
+          Locked by approval on 16 Aug 2026 · R. Mehta.
+          <a href="/orders/1187/amend/" class="font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Raise an amendment</a> to change it.
+        </p>
+      </div>
+
+      <div class="mt-3">
+        <label for="ro-date" class="mb-1.5 block text-[12px]/4 font-medium text-zinc-600">Promised delivery</label>
+        <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+          <input id="ro-date" x-ref="date" name="promised" type="date" value="2026-09-04"
+                 class="w-full bg-transparent px-2.5 py-2 text-[13px]/5 tabular-nums outline-none">
+        </div>
+      </div>
+
+      <div class="mt-3.5 flex items-center justify-end gap-3 border-t border-zinc-100 pt-3">
+        <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
+        <button type="button" @click="close()"
+                class="rounded-lg bg-zinc-700 px-3.5 py-1.5 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

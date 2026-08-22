@@ -1,0 +1,101 @@
+<!-- The one arrangement where the trigger belongs below the panel, and what
+     that costs. This panel is the tail of a list whose head is already on
+     screen, so the control has to sit under the last visible row — above the
+     list it is a button promising six more lines the eye cannot follow to.
+
+     Which puts it exactly where opening moves it. Six rows appear above the
+     trigger and it travels down the page by their height; closing then leaves
+     whoever pressed it looking at empty space where the list used to end.
+     toggle() scrolls it back after the collapse has finished. block: 'nearest'
+     so a trigger that never left the window is not moved at all, and the wait
+     is the animation's own duration plus a frame, because the plugin fires no
+     event to hang this on and a scroll taken mid-collapse measures a height
+     that is still moving.
+
+     The first four lines are never hidden, and that is the point of a tail: the
+     register reads, prints and answers Ctrl-F for the lines it shows, with only
+     the rest behind the disclosure. A collapsible over the whole list hides the
+     record from its own page.
+
+     Nothing inside the panel takes focus, so opening does not move the caret —
+     it stays on the trigger, and aria-expanded is what says the list grew. -->
+<div data-kui="collapsible/tail" class="max-w-xl rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       open: false,
+       toggle() {
+         const closing = this.open;
+         this.open = !closing;
+         if (closing) setTimeout(() => this.$refs.more.scrollIntoView({ block: 'nearest' }), 220);
+       }
+     }">
+  <div class="flex h-12 items-center gap-3 border-b border-zinc-200 px-4">
+    <h3 class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">PO-24-1211 — Nashik Steel Traders</h3>
+    <span class="shrink-0 text-[13px]/5 tabular-nums text-zinc-600">10 lines · ₹18,42,000</span>
+  </div>
+
+  <ul class="divide-y divide-zinc-100">
+    <li class="flex items-baseline gap-3 px-4 py-2.5">
+      <span class="min-w-0 flex-1 truncate text-[13px]/5">MS plate 10 mm — IS 2062 E250</span>
+      <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">14.000 MT</span>
+      <span class="shrink-0 text-[13px]/5 tabular-nums">₹8,68,000</span>
+    </li>
+    <li class="flex items-baseline gap-3 px-4 py-2.5">
+      <span class="min-w-0 flex-1 truncate text-[13px]/5">MS angle 50 × 50 × 6</span>
+      <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">4.200 MT</span>
+      <span class="shrink-0 text-[13px]/5 tabular-nums">₹2,43,600</span>
+    </li>
+    <li class="flex items-baseline gap-3 px-4 py-2.5">
+      <span class="min-w-0 flex-1 truncate text-[13px]/5">MS channel 100 × 50</span>
+      <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">3.100 MT</span>
+      <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,79,800</span>
+    </li>
+    <li class="flex items-baseline gap-3 px-4 py-2.5">
+      <span class="min-w-0 flex-1 truncate text-[13px]/5">MS flat 40 × 6</span>
+      <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">1.800 MT</span>
+      <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,02,600</span>
+    </li>
+  </ul>
+
+  <div id="col-tail-1211" x-show="open" x-cloak x-collapse.duration.200ms class="motion-reduce:transition-none!">
+    <ul class="divide-y divide-zinc-100 border-t border-zinc-100">
+      <li class="flex items-baseline gap-3 px-4 py-2.5">
+        <span class="min-w-0 flex-1 truncate text-[13px]/5">MS round bar 20 mm</span>
+        <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">2.400 MT</span>
+        <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,38,000</span>
+      </li>
+      <li class="flex items-baseline gap-3 px-4 py-2.5">
+        <span class="min-w-0 flex-1 truncate text-[13px]/5">Chequered plate 5 mm</span>
+        <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">1.200 MT</span>
+        <span class="shrink-0 text-[13px]/5 tabular-nums">₹76,800</span>
+      </li>
+      <li class="flex items-baseline gap-3 px-4 py-2.5">
+        <span class="min-w-0 flex-1 truncate text-[13px]/5">HR coil 2 mm</span>
+        <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">2.600 MT</span>
+        <span class="shrink-0 text-[13px]/5 tabular-nums">₹1,53,400</span>
+      </li>
+      <li class="flex items-baseline gap-3 px-4 py-2.5">
+        <span class="min-w-0 flex-1 truncate text-[13px]/5">Welding electrodes E7018</span>
+        <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">240 nos</span>
+        <span class="shrink-0 text-[13px]/5 tabular-nums">₹21,600</span>
+      </li>
+      <li class="flex items-baseline gap-3 px-4 py-2.5">
+        <span class="min-w-0 flex-1 truncate text-[13px]/5">Cutting consumables</span>
+        <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">1 lot</span>
+        <span class="shrink-0 text-[13px]/5 tabular-nums">₹19,200</span>
+      </li>
+      <li class="flex items-baseline gap-3 px-4 py-2.5">
+        <span class="min-w-0 flex-1 truncate text-[13px]/5">Freight — Nashik to Vasai</span>
+        <span class="hidden shrink-0 text-[13px]/5 tabular-nums text-zinc-600 sm:block">—</span>
+        <span class="shrink-0 text-[13px]/5 tabular-nums">₹39,000</span>
+      </li>
+    </ul>
+  </div>
+
+  <button type="button" x-ref="more" @click="toggle()" :aria-expanded="open" aria-controls="col-tail-1211"
+          class="flex h-11 w-full items-center justify-center gap-1.5 border-t border-zinc-200 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <span x-text="open ? 'Show fewer lines' : 'Show 6 more lines'">Show 6 more lines</span>
+    <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-180'">
+      <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
+    </span>
+  </button>
+</div>

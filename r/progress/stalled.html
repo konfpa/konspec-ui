@@ -1,0 +1,88 @@
+<!-- A fill has no velocity. A rail at 68% that is climbing and a rail at 68%
+     that fell over four hours ago are the same picture, and the reading the
+     second one gets is "still going", because that is what a bar means. So the
+     difference is drawn twice: the fill takes the record's state out of the
+     dot-or-bar column — graphite running, amber-500 held, red-600 failed — and
+     the line under it says what stopped and what clears it.
+
+     The value is not reset. 2,107 rows were posted before the import fell over
+     and every one of them is still posted, so a rail that snaps back to zero on
+     failure describes work being undone and invites somebody to run the whole
+     file again. It keeps the ground it took; the words say it will take no more.
+
+     aria-valuetext carries the state, not just the arithmetic. "1,922 of 3,100
+     rows posted" read on its own is a job in flight, and nothing in the three
+     numbers tells a reader that this one will never reach 3,100.
+
+     aria-busy is on the running row and on neither of the others. It belongs to
+     the region that is waiting, and a row left at aria-busy="true" after a
+     failed import tells a screen reader that everything in it is mid-update and
+     not to be trusted, with no later event coming to correct that.
+
+     Retry acts on the job, not on the bar. The rail stays output with no
+     tabindex and nothing to focus; the button sits beside it and has a name of
+     its own, because "Retry" three rows down a list names nothing. -->
+<div data-kui="progress/stalled" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Background jobs</h2>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Started today · Nashik plant</p>
+  </div>
+  <ul role="list" class="divide-y divide-zinc-100">
+
+    <li class="px-4 py-3" aria-busy="true">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-job-run" class="text-[13px]/5 font-medium">Posting the August rate card</h3>
+        <p class="text-[13px]/5 tabular-nums text-zinc-600">62%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-job-run"
+           aria-valuenow="1922" aria-valuemin="0" aria-valuemax="3100"
+           aria-valuetext="1,922 of 3,100 rows posted, running">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700 transition-[width] duration-300 motion-reduce:transition-none"
+             style="width: 62%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">1,922 of 3,100 rows · last row posted 4 seconds ago</p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-job-held" class="text-[13px]/5 font-medium">Posting GRN-24-0912 to the ledger</h3>
+        <p class="text-[13px]/5 tabular-nums text-amber-700">Held at 41%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-job-held"
+           aria-valuenow="7" aria-valuemin="0" aria-valuemax="17"
+           aria-valuetext="7 of 17 lines posted, held since 09:40">
+        <div class="h-full min-w-[2px] rounded-full bg-amber-500" style="width: 41%"></div>
+      </div>
+      <p class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <i data-lucide="alert-triangle" class="mt-0.5 size-3.5 shrink-0 text-amber-700"></i>
+        <span>7 of 17 lines posted · held since 09:40, waiting on the QC deviation for lot GP-4471. The seven that posted stay posted.</span>
+      </p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-job-failed" class="text-[13px]/5 font-medium">Importing the vendor price list</h3>
+        <p class="text-[13px]/5 tabular-nums text-red-600">Stopped at 68%</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-job-failed"
+           aria-valuenow="2107" aria-valuemin="0" aria-valuemax="3100"
+           aria-valuetext="Stopped at 2,107 of 3,100 rows, the import failed">
+        <div class="h-full min-w-[2px] rounded-full bg-red-600" style="width: 68%"></div>
+      </div>
+      <p class="mt-1.5 flex items-start gap-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+        <i data-lucide="alert-circle" class="mt-0.5 size-3.5 shrink-0 text-red-600"></i>
+        <span>Failed at row 2,108 · HSN 39231090 is not in the item master. Rows 1 to 2,107 were posted and stay posted; a retry starts at 2,108.</span>
+      </p>
+      <div class="mt-2.5 flex flex-wrap items-center gap-2">
+        <button type="button"
+                class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Retry the price list import
+        </button>
+        <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Download the rejected rows</a>
+      </div>
+    </li>
+  </ul>
+</div>

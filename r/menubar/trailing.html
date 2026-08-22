@@ -90,7 +90,7 @@
                   @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
                   @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
                   class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                  :class="open === m.id && 'bg-zinc-200 text-zinc-900'" x-text="m.label"></button>
+                  :class="open === m.id && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'" x-text="m.label"></button>
 
           <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
                @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"

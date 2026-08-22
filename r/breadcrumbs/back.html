@@ -1,6 +1,11 @@
 <!-- Not a breadcrumb, and that is the point. One level deep there is nothing to
      trace, so a trail of two is ceremony. A back link says the same thing in
-     less space and gives a bigger target on a phone. -->
-<a data-kui="breadcrumbs/back" href="#" class="inline-flex items-center gap-1.5 text-[13px]/5 text-zinc-600 hover:text-zinc-900">
+     less space and gives a bigger target on a phone.
+
+     It names the place it goes to. "Back" on its own is the browser button
+     wearing a page's clothes: it points at history, so it lands somewhere
+     different depending on how the user arrived, which is the one thing this
+     component exists not to do. -->
+<a data-kui="breadcrumbs/back" href="#" class="inline-flex items-center gap-1.5 py-1 text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
   <i data-lucide="chevron-left" class="size-4"></i>Purchase orders
 </a>

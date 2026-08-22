@@ -16,14 +16,34 @@
      other pill in the system — a column of amber pills reads as a warning
      about the page rather than a fact about the context.
 
+     The account menu moves real focus item to item. role="menu" with
+     tabindex="-1" on every item and nothing moving focus into the list is a
+     menu no keyboard can reach: Tab skips it because every item is out of the
+     tab order, and arrows do nothing because nothing is listening. Either the
+     trigger opens the menu and focuses its first item, or the items are not
+     menu items.
+
+     The hamburger carries no aria-controls. The sheet it opens is the
+     sidebar's, and the sidebar is app-shell's, not this block's; aria-controls
+     naming an id that does not exist on the page is a broken reference. Point
+     it at the sidebar's own id in the shell.
+
      Add to the page around it:
        [id] { scroll-margin-top: 88px } -->
-<div data-kui="topbar/assembled" class="relative bg-zinc-100 text-[14px]/5 text-zinc-900" x-data="{ open: '' }" @keydown.escape.window="open = ''">
+<div data-kui="topbar/assembled" class="relative bg-zinc-100 text-[14px]/5 text-zinc-900"
+     x-data="{
+       open: '',
+       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+       show() { this.open = 'account'; this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus())) },
+       close(toTrigger = true) { if (!this.open) return; this.open = ''; if (toTrigger) this.$refs.account.focus() },
+       move(step) { const i = this.items(), at = i.indexOf(document.activeElement); i[(at + step + i.length) % i.length]?.focus() }
+     }"
+     @keydown.escape="if (open) { $event.stopPropagation(); close() }">
   <a href="#main-console" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-3 sm:px-4"
-          @click.outside="open = ''">
-    <button type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="console-nav"
+          @click.outside="close(false)">
+    <button type="button" aria-label="Open navigation" aria-expanded="false"
             class="-ml-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 lg:hidden">
       <i data-lucide="menu" class="size-5"></i>
     </button>
@@ -36,10 +56,10 @@
 
     <nav aria-label="Breadcrumb" class="min-w-0 flex-1">
       <ol class="flex items-center gap-1.5 text-[13px]/5">
-        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Procurement</a></li>
-        <li aria-hidden="true" class="hidden text-zinc-400 sm:block">/</li>
-        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900">Purchase orders</a></li>
-        <li aria-hidden="true" class="hidden text-zinc-400 sm:block">/</li>
+        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Procurement</a></li>
+        <li aria-hidden="true" class="hidden text-zinc-500 sm:block">/</li>
+        <li class="hidden sm:block"><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchase orders</a></li>
+        <li aria-hidden="true" class="hidden text-zinc-500 sm:block">/</li>
         <li class="min-w-0"><span aria-current="page" class="block truncate font-medium tabular-nums">PO-24-1187</span></li>
       </ol>
     </nav>
@@ -66,24 +86,26 @@
     </button>
 
     <div class="relative shrink-0">
-      <button type="button" @click="open = open === 'account' ? '' : 'account'"
+      <button type="button" x-ref="account" @click="open === 'account' ? close(false) : show()"
+              @keydown.arrow-down.prevent="show()"
               :aria-expanded="open === 'account'" aria-haspopup="menu" aria-label="Account — Rajesh Menon"
               class="flex size-9 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-300 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
         RM
       </button>
       <div x-show="open === 'account'" x-cloak
+           @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.tab="close(false)"
            class="absolute right-0 z-40 mt-1 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
         <div class="px-3 py-2">
           <p class="truncate text-[13px]/5 font-medium">Rajesh Menon</p>
           <p class="truncate text-[12px]/4 text-zinc-500">rajesh.menon@konspec.com</p>
         </div>
         <div role="separator" class="my-1 h-px bg-zinc-100"></div>
-        <div role="menu" aria-label="Account">
-          <button type="button" role="menuitem" tabindex="-1" @click="open = ''"
+        <div x-ref="menu" role="menu" aria-label="Account">
+          <button type="button" role="menuitem" tabindex="-1" @click="close()"
                   class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
             <i data-lucide="user" class="size-4 text-zinc-600"></i>Your profile
           </button>
-          <button type="button" role="menuitem" tabindex="-1" @click="open = ''"
+          <button type="button" role="menuitem" tabindex="-1" @click="close()"
                   class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
             <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
           </button>

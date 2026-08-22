@@ -8,10 +8,15 @@
      colour changes. Adding a border on scroll moves every row below it down one
      pixel and the nav twitches under the cursor.
 
-     The panel is bg-white so the active row has a step to move into. Tint the
-     panel zinc-100 and bg-zinc-100 on the current item measures 1.00 against its
-     own container: not low contrast, the same colour. Hover paints that tint
-     too, so weight is what separates "you are here" from "the pointer is here".
+     more is measured in x-init rather than assumed true. @scroll never fires on
+     a nav that does not overflow, so a hardcoded true draws a footer edge
+     claiming there is more list below it for every user whose role has six
+     destinations — which is the majority of them.
+
+     The current row is bg-zinc-200 and hover is bg-zinc-100, one step apart on
+     purpose. Give the current row the hover fill and it is the hover state left
+     switched on: the mark disappears the moment the pointer crosses the nav, and
+     weight is then the only thing left saying which row is the page.
 
      The counts sit inside the anchor, which is why they need no aria work — the
      name is already "Purchase orders, 148". Lift one out into a span positioned
@@ -29,6 +34,7 @@
   </div>
 
   <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2"
+       x-init="more = $el.scrollHeight - $el.clientHeight > 1"
        @scroll="scrolled = $el.scrollTop > 0; more = $el.scrollHeight - $el.scrollTop - $el.clientHeight > 1">
 
     <p id="sb1-g1" class="px-2.5 pt-1 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase">Procurement</p>

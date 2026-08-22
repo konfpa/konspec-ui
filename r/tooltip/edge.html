@@ -1,0 +1,88 @@
+<!-- Three bubbles in one card header, each anchored to the side that cannot
+     run off the screen, and the choice is made in the markup rather than
+     measured at runtime.
+
+     The back button is the first control on the row, so a centred bubble hangs
+     half of itself off the left of the card and, at 390px, off the page. It
+     takes left-0 and grows inwards.
+
+     Print is in the middle of the group with a control either side of it, and
+     that is the only condition under which centring is safe. Nothing about it
+     is a default.
+
+     Export is the last control on the row. It takes right-0, and its label is
+     long enough that a nowrap bubble would still be wider than the card, so it
+     gives up whitespace-nowrap and takes max-w-[calc(100vw-2rem)] instead. A
+     nowrap bubble ignores a max width — the box is capped and the line runs
+     straight out of it — so the two go together or neither works. This is one
+     of the two places the one-line rule bends, and it bends here because the
+     alternative is a page that scrolls sideways on a phone.
+
+     All three hang below the row rather than above it. This is a card header,
+     and above a card header is the page header — the bottom placement is the
+     same decision the topbar makes and has nothing to do with the sides.
+
+     No arrow on the anchored two. An arrow only tells the truth while the
+     bubble is centred on the trigger, and pointing it back at a bubble that
+     has been shifted is more machinery than a label is worth.
+
+     Nothing here reads getBoundingClientRect. In a bar with a known number of
+     controls the overflow is known when the markup is written, and a placement
+     chosen once beats a clamp recomputed on every open — which also has to be
+     recomputed on resize, on scroll, and on the sidebar collapsing. -->
+<div data-kui="tooltip/edge" class="rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       open: null, timer: 0,
+       over(id) { if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) this.show(id) },
+       show(id, d = 150) { clearTimeout(this.timer); this.timer = setTimeout(() => this.open = id, d) },
+       hide() { clearTimeout(this.timer); this.open = null }
+     }"
+     @keydown.escape.window="hide()">
+
+  <div class="flex items-center gap-2 border-b border-zinc-200 px-3 py-2">
+
+    <span class="relative inline-flex shrink-0">
+      <button type="button" aria-label="Back to the register"
+              @mouseenter="over('back')" @mouseleave="hide()"
+              @focus="if ($event.target.matches(':focus-visible')) show('back', 0)" @blur="hide()"
+              class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="arrow-left" class="size-4"></i>
+      </button>
+      <span aria-hidden="true" x-show="open === 'back'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-full left-0 z-40 mt-1.5 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Back to the register</span>
+    </span>
+
+    <p class="min-w-0 flex-1 truncate text-[13px]/5 font-medium tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</p>
+
+    <span class="relative inline-flex shrink-0">
+      <button type="button" aria-label="Print order"
+              @mouseenter="over('print')" @mouseleave="hide()"
+              @focus="if ($event.target.matches(':focus-visible')) show('print', 0)" @blur="hide()"
+              class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="printer" class="size-4"></i>
+      </button>
+      <span aria-hidden="true" x-show="open === 'print'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-full left-1/2 z-40 mt-1.5 -translate-x-1/2 rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 whitespace-nowrap text-white">Print order</span>
+    </span>
+
+    <span class="relative inline-flex shrink-0">
+      <button type="button" aria-label="Export the order lines"
+              @mouseenter="over('export')" @mouseleave="hide()"
+              @focus="if ($event.target.matches(':focus-visible')) show('export', 0)" @blur="hide()"
+              class="flex size-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="download" class="size-4"></i>
+      </button>
+      <span aria-hidden="true" x-show="open === 'export'" x-cloak x-transition.opacity.duration.100ms
+            class="pointer-events-none absolute top-full right-0 z-40 mt-1.5 max-w-[calc(100vw-2rem)] rounded-lg bg-zinc-900 px-2 py-1 text-[12px]/4 text-white">Export the order lines as a spreadsheet</span>
+    </span>
+
+  </div>
+
+  <dl class="grid grid-cols-2 gap-x-4 gap-y-2 px-3 py-3 text-[13px]/5">
+    <dt class="text-zinc-500">Order value</dt>
+    <dd class="text-right font-medium tabular-nums">₹18,42,000</dd>
+    <dt class="text-zinc-500">Delivery window</dt>
+    <dd class="text-right tabular-nums">04 Sep 2026 – 11 Sep 2026</dd>
+  </dl>
+
+</div>

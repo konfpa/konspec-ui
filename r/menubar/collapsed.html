@@ -17,7 +17,12 @@
      for four menus of five items, not for forty commands, where the phone
      answer is a page.
 
-     The breakpoint is md, not sm: what overflows is the count, not the width. -->
+     The breakpoint is md, not sm: what overflows is the count, not the width.
+
+     The rule between sections is bound on the index rather than written as
+     first:border-t-0. x-for inserts what it renders after the <template>
+     element, so nothing it produces is ever :first-child and the sheet draws a
+     rule flush under its own top edge. -->
 <div data-kui="menubar/collapsed" class="rounded-xl border border-zinc-300 bg-white"
      x-data="{
        open: null, at: 'file', sheet: false, typed: '', clock: null,
@@ -106,7 +111,7 @@
                   @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)"
                   @keydown.home.prevent="jump(false)" @keydown.end.prevent="jump(true)"
                   class="rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                  :class="open === m.id && 'bg-zinc-200 text-zinc-900'" x-text="m.label"></button>
+                  :class="open === m.id && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'" x-text="m.label"></button>
 
           <div x-show="open === m.id" x-cloak :data-panel="m.id" role="menu" :aria-label="m.label"
                @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)"
@@ -131,7 +136,7 @@
               @click="sheet ? sClose(false) : sShow()"
               @keydown.arrow-down.prevent="sShow()" @keydown.arrow-up.prevent="sShow(true)"
               class="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-700 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="sheet && 'bg-zinc-200 text-zinc-900'">
+              :class="sheet && 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300'">
         <i data-lucide="menu" class="size-4"></i>Menu
       </button>
 
@@ -140,8 +145,9 @@
            @keydown.home.prevent="sEdge(false)" @keydown.end.prevent="sEdge(true)"
            @keydown.tab="sClose()"
            class="absolute top-full left-0 z-40 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
-        <template x-for="m in menus" :key="m.id">
-          <div role="group" :aria-label="m.label" class="border-t border-zinc-100 py-1 first:border-t-0">
+        <template x-for="(m, mi) in menus" :key="m.id">
+          <div role="group" :aria-label="m.label" class="py-1"
+               :class="mi > 0 && 'border-t border-zinc-100'">
             <p aria-hidden="true" class="px-3 pb-1 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase" x-text="m.label"></p>
             <template x-for="it in m.items" :key="it.label">
               <button type="button" role="menuitem" tabindex="-1" @click="sClose()"

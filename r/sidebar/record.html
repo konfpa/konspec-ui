@@ -1,0 +1,96 @@
+<!-- The page on screen is PO-24-1187 and no nav item is that page. The wrong
+     answer, and the common one, is to mark the list it came from: aria-current
+     on Purchase orders says the orders list is what you are looking at, which
+     is false, and it leaves the nav saying nothing about which of 1,438 records
+     is open.
+
+     So the server renders a leaf for it. The record page and only the record
+     page emits this row, pinned under the list it belongs to, and it is gone on
+     the next navigation. It is not a recent-items list — a nav that accumulates
+     history stops being a map of the application and becomes a pile of tabs.
+
+     Three weights, not two. Idle rows are zinc-600 at 400; the ancestors of the
+     current page — All orders, and the section above it — take zinc-900 at 500
+     with no fill; the record row alone takes the fill as well. That ladder is
+     what lets someone glance at the panel and read the whole path without
+     opening a breadcrumb.
+
+     Exactly one aria-current="page", and it is the record. The ancestors get
+     the weight and nothing else: a second aria-current, whatever its value,
+     makes both of them meaningless.
+
+     The document number leads and the vendor truncates after it. PO-24-1187 is
+     what the user matches against the tab they left open; "Gujarat Poly…" is
+     not, and a row that truncates the number instead is a row nobody can use.
+     The status dot rides at the end because the record has a state and the list
+     rows do not. -->
+<div data-kui="sidebar/record" class="flex h-[560px] w-64 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
+     x-data="{ open: { orders: true } }">
+  <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-zinc-200 px-4">
+    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-white"><i data-lucide="package" class="size-[18px]"></i></span>
+    <span class="min-w-0 flex-1 truncate text-[14px]/5 font-semibold">Operations</span>
+  </div>
+
+  <nav aria-label="Main" class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="layout-dashboard" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate">Overview</span>
+    </a>
+
+    <div>
+      <button type="button" @click="open.orders = !open.orders" aria-expanded="true" :aria-expanded="open.orders" aria-controls="sb11-orders"
+              class="flex min-h-9 w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="file-text" class="size-[18px] shrink-0"></i>
+        <span class="min-w-0 flex-1 truncate">Purchase orders</span>
+        <span x-show="!open.orders" x-cloak class="size-1.5 shrink-0 rounded-full bg-zinc-700" aria-hidden="true"></span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open.orders && 'rotate-180'">
+          <i data-lucide="chevron-down" class="size-3.5 text-zinc-500"></i>
+        </span>
+      </button>
+      <div id="sb11-orders" x-show="open.orders" x-collapse.duration.200ms>
+        <ul role="list" class="ml-[26px] space-y-0.5 border-l border-zinc-100 py-1 pl-2">
+          <li>
+            <a href="#" class="flex min-h-8 items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1 truncate">All orders</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">1,438</span>
+            </a>
+            <ul role="list" class="mt-0.5 ml-2.5 space-y-0.5 border-l border-zinc-100 pl-2">
+              <li>
+                <a href="#" aria-current="page" class="flex min-h-8 items-center gap-2 rounded-lg bg-zinc-200 px-2.5 py-1.5 text-[13px]/5 font-medium text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <span class="min-w-0 flex-1 truncate tabular-nums">PO-24-1187 · Gujarat Polymers Ltd</span>
+                  <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="#" class="flex min-h-8 items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1 truncate">Awaiting GRN</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">12</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex min-h-8 items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="min-w-0 flex-1 truncate">Overdue over 7 days</span>
+              <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">18</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="building-2" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate">Vendors</span>
+      <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-600">187</span>
+    </a>
+    <a href="#" class="flex min-h-9 items-center gap-3 rounded-lg px-2.5 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="package" class="size-[18px] shrink-0"></i>
+      <span class="min-w-0 flex-1 truncate">Materials</span>
+    </a>
+  </nav>
+
+  <div class="shrink-0 border-t border-zinc-200 px-4 py-2.5">
+    <p class="text-[12px]/4 text-zinc-500">The pinned row exists only while that record is open.</p>
+  </div>
+</div>

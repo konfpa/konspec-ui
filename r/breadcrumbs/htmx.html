@@ -1,0 +1,78 @@
+<!-- A receipt queue where opening a row swaps the pane instead of loading a
+     page. The trail sits outside that swap, so unless something moves it, it
+     goes on naming the record the user opened first. A trail that is wrong is
+     worse than a trail that is missing: nothing about it looks stale.
+
+     So the response carries the trail back out of band. The pane markup is the
+     body of the reply and the nav is addressed by id alongside it:
+
+       <nav id="bc-trail" aria-label="Breadcrumb" hx-swap-oob="true"> … </nav>
+
+     The server renders it because the server is the only side that knows the
+     hierarchy. Rebuilding the trail in the browser out of the row that was
+     clicked is history again, and it produces a different path for the same
+     record depending on which queue somebody came through.
+
+     hx-push-url is what keeps the address bar honest, and it is also the test
+     of the whole arrangement: paste the pushed URL into a new tab and the
+     server has to render this page, this pane and this trail with no htmx
+     involved. If it cannot, the trail was a client-side fiction.
+
+     Every row is a real anchor with a real href, so the queue still works with
+     a middle click, with a bookmark, and with JavaScript off.
+
+     The trail is not a live region. Walking a queue of forty receipts would
+     announce four crumbs on every arrow key, over the top of the pane the user
+     is trying to hear. What is announced is the record, so the pane heading
+     carries tabindex="-1" and takes focus after the swap — the moving of that
+     focus is list-detail's job and not this component's. -->
+<div data-kui="breadcrumbs/htmx" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <nav id="bc-trail" aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+        <li><a href="/" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Home</a></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><a href="/stores/" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Stores</a></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><a href="/stores/grn/" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Goods receipt</a></li>
+        <li aria-hidden="true" class="text-zinc-500">/</li>
+        <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">GRN-26-0418</span></li>
+      </ol>
+    </nav>
+  </div>
+
+  <ul class="divide-y divide-zinc-100 border-b border-zinc-200">
+    <li>
+      <a href="/stores/grn/26-0418/"
+         hx-get="/stores/grn/26-0418/pane/" hx-target="#bc-pane" hx-swap="innerHTML"
+         hx-push-url="/stores/grn/26-0418/"
+         class="flex items-center justify-between gap-3 bg-zinc-100 px-4 py-2.5 text-[13px]/5 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15">
+        <span class="truncate font-medium tabular-nums">GRN-26-0418</span>
+        <span class="shrink-0 tabular-nums text-zinc-500">18 Aug 2026</span>
+      </a>
+    </li>
+    <li>
+      <a href="/stores/grn/26-0419/"
+         hx-get="/stores/grn/26-0419/pane/" hx-target="#bc-pane" hx-swap="innerHTML"
+         hx-push-url="/stores/grn/26-0419/"
+         class="flex items-center justify-between gap-3 px-4 py-2.5 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15">
+        <span class="truncate tabular-nums">GRN-26-0419</span>
+        <span class="shrink-0 tabular-nums text-zinc-500">19 Aug 2026</span>
+      </a>
+    </li>
+    <li>
+      <a href="/stores/grn/26-0420/"
+         hx-get="/stores/grn/26-0420/pane/" hx-target="#bc-pane" hx-swap="innerHTML"
+         hx-push-url="/stores/grn/26-0420/"
+         class="flex items-center justify-between gap-3 px-4 py-2.5 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-zinc-700/15">
+        <span class="truncate tabular-nums">GRN-26-0420</span>
+        <span class="shrink-0 tabular-nums text-zinc-500">19 Aug 2026</span>
+      </a>
+    </li>
+  </ul>
+
+  <div id="bc-pane" class="px-4 py-3">
+    <h2 tabindex="-1" class="text-[16px]/6 font-semibold tracking-tight tabular-nums">GRN-26-0418</h2>
+    <p class="mt-0.5 text-[13px]/5 tabular-nums text-zinc-600">Sharma Steel &amp; Alloys · 9 lines · 24.500 MT received at Silvassa</p>
+  </div>
+</div>

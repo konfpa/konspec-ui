@@ -1,16 +1,21 @@
 <!-- Nobody is a real state and needs a real rendering. An empty circle reads
-     as a loading bug; a dashed one with a verb reads as an invitation. -->
+     as a loading bug; a dashed one with a verb reads as an invitation.
+
+     Dashed and unfilled rather than tinted, because a filled circle with an
+     icon in it is how avatar/org draws an automated user — and a queue where
+     the unassigned rows look like a system account is worse than one where they
+     look like nothing at all. -->
 <div data-kui="avatar/placeholder" class="flex flex-wrap items-center gap-6">
   <div class="flex items-center gap-3">
-    <span class="flex size-9 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-300 text-zinc-500" aria-hidden="true">
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-300 text-zinc-600" aria-hidden="true">
       <i data-lucide="user" class="size-4"></i>
     </span>
     <div class="min-w-0">
       <p class="truncate text-[13px]/5 text-zinc-600">Unassigned</p>
-      <p class="truncate text-[12px]/4 text-zinc-500">PO-24-1191 · raised 18 Aug</p>
+      <p class="truncate text-[12px]/4 tabular-nums text-zinc-500">PO-24-1191 · raised 18 Aug</p>
     </div>
   </div>
-  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200">
+  <button type="button" class="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
     <i data-lucide="user-plus" class="size-4 text-zinc-600"></i>Assign approver
   </button>
 </div>

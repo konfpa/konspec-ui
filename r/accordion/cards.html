@@ -1,45 +1,63 @@
+<!-- A register of records rather than the sections of one record, so the items
+     are separate cards with space between them and each one carries the icon,
+     the vendor and the value that identify it. The single-open rule still
+     holds: these are long, and two open at once is a page nobody can scan.
+
+     The amount is not hidden at any width. It was, behind sm:block, and 390px
+     is exactly where the closed row matters most — the phone is where somebody
+     scrolls a list of receipts looking for the one worth opening, and a row
+     without its figure gives them no reason to open any of them. The title
+     truncates instead, because the GRN number is at the front of it.
+
+     min-h-14 rather than h-14: the header is two lines of text and has to be
+     able to take a third at 390px. What it must not do is change height when
+     the panel opens, and nothing here does. -->
 <div data-kui="accordion/cards" x-data="{ open: 'grn-3391' }" class="space-y-2">
-  <div class="rounded-xl border border-zinc-200 bg-white">
+  <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
     <h3>
-      <button @click="open = open === 'grn-3391' ? '' : 'grn-3391'" :aria-expanded="open === 'grn-3391'" aria-controls="acc-grn-3391"
-              class="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left">
-        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
+      <button type="button" @click="open = open === 'grn-3391' ? '' : 'grn-3391'" :aria-expanded="open === 'grn-3391'" aria-controls="acc-grn-3391"
+              class="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
           <i data-lucide="package-check" class="size-4 text-zinc-600"></i>
         </span>
         <span class="min-w-0 flex-1">
           <span class="block truncate text-[14px]/5 font-medium">GRN-3391 — Gujarat Polymers Ltd</span>
-          <span class="block text-[12px]/4 text-zinc-600">Posted 11 August · 4 lines</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-600">Posted 11 Aug 2026 · 4 lines</span>
         </span>
-        <span class="hidden text-[13px]/5 tabular-nums sm:block">₹6,18,400</span>
-        <span class="flex transition-transform" :class="open === 'grn-3391' && 'rotate-180'">
+        <span class="shrink-0 text-[13px]/5 tabular-nums">₹6,18,400</span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open === 'grn-3391' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
         </span>
       </button>
     </h3>
-    <div id="acc-grn-3391" x-show="open === 'grn-3391'" class="border-t border-zinc-100 px-4 py-3 text-[14px]/5 text-zinc-600">
-      HDPE granules 8,400 kg received against 8,600 kg ordered. Short-closed by R. Menon.
+    <div id="acc-grn-3391" x-show="open === 'grn-3391'" x-collapse.duration.200ms>
+      <div class="border-t border-zinc-100 px-4 py-3 text-[14px]/5 text-zinc-600">
+        HDPE granules 8,400 kg received against 8,600 kg ordered. Short-closed by R. Menon.
+      </div>
     </div>
   </div>
 
-  <div class="rounded-xl border border-zinc-200 bg-white">
+  <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white">
     <h3>
-      <button @click="open = open === 'grn-3388' ? '' : 'grn-3388'" :aria-expanded="open === 'grn-3388'" aria-controls="acc-grn-3388"
-              class="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left">
-        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
+      <button type="button" @click="open = open === 'grn-3388' ? '' : 'grn-3388'" :aria-expanded="open === 'grn-3388'" aria-controls="acc-grn-3388"
+              class="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 ring-1 ring-inset ring-zinc-300">
           <i data-lucide="package-check" class="size-4 text-zinc-600"></i>
         </span>
         <span class="min-w-0 flex-1">
           <span class="block truncate text-[14px]/5 font-medium">GRN-3388 — Sharma Steel Traders</span>
-          <span class="block text-[12px]/4 text-zinc-600">Posted 8 August · 2 lines</span>
+          <span class="block text-[12px]/4 tabular-nums text-zinc-600">Posted 08 Aug 2026 · 2 lines</span>
         </span>
-        <span class="hidden text-[13px]/5 tabular-nums sm:block">₹2,74,900</span>
-        <span class="flex transition-transform" :class="open === 'grn-3388' && 'rotate-180'">
+        <span class="shrink-0 text-[13px]/5 tabular-nums">₹2,74,900</span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open === 'grn-3388' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
         </span>
       </button>
     </h3>
-    <div id="acc-grn-3388" x-show="open === 'grn-3388'" x-cloak class="border-t border-zinc-100 px-4 py-3 text-[14px]/5 text-zinc-600">
-      MS angle 50×50×6 — 12.4 t accepted, mill test certificates on file.
+    <div id="acc-grn-3388" x-show="open === 'grn-3388'" x-cloak x-collapse.duration.200ms>
+      <div class="border-t border-zinc-100 px-4 py-3 text-[14px]/5 text-zinc-600">
+        MS angle 50×50×6 — 12.4 MT accepted, mill test certificates on file.
+      </div>
     </div>
   </div>
 </div>

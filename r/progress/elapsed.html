@@ -1,0 +1,74 @@
+<!-- Everywhere else in this entry a full rail is the good end. Here it is the
+     bad one: the denominator is the delivery window and the fill is time spent,
+     so the bar reaching 100% is the promised date arriving with the material
+     still outside the gate.
+
+     That inverts what goes beside it. The figure on the heading baseline is what
+     is left — "5 days left" — and not the 64% the arithmetic makes of it, because
+     nobody chasing a vendor can act on a percentage of a window whose length is
+     not in front of them. This is the one variant that drops the percentage
+     entirely, and aria-valuetext says the same thing the eye is given.
+
+     The colours run in the opposite direction to a receipt bar and they are
+     still the semantic table rather than a gradient: graphite while there is
+     room, amber-500 as the window closes, red-600 past the date. Nothing here
+     ever turns emerald-600 — a window that filled completely is not a success,
+     and green on the last row would read as the order having landed.
+
+     Past the date the drawing clamps and the number does not, exactly as an
+     over-receipt does. A window overrun by three days and one overrun by three
+     weeks are both a full red rail, so the days late are carried in words.
+
+     The rail does not tick. It is repainted when the page is, because a bar
+     animating towards a deadline is motion carrying nothing anybody can use at
+     the resolution of a day. -->
+<div data-kui="progress/elapsed" class="max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h2 class="text-[14px]/5 font-semibold">Delivery windows</h2>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-500">Open orders against their promised date · as at 22 Aug</p>
+  </div>
+  <ul role="list" class="divide-y divide-zinc-100">
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-win-a" class="text-[13px]/5 font-medium">PO-24-1187 · Sharma Extrusions</h3>
+        <p class="text-[13px]/5 tabular-nums text-zinc-600">5 days left</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-win-a"
+           aria-valuenow="9" aria-valuemin="0" aria-valuemax="14"
+           aria-valuetext="5 of 14 days left, due 27 Aug 2026">
+        <div class="h-full min-w-[2px] rounded-full bg-zinc-700" style="width: 64%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Raised 13 Aug, due 27 Aug 2026 · 8,160 of 12,000 kg already received</p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-win-b" class="text-[13px]/5 font-medium">PO-24-1194 · Gujarat Polymers Ltd</h3>
+        <p class="text-[13px]/5 tabular-nums text-amber-700">1 day left</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-win-b"
+           aria-valuenow="20" aria-valuemin="0" aria-valuemax="21"
+           aria-valuetext="1 of 21 days left, due 23 Aug 2026">
+        <div class="h-full min-w-[2px] rounded-full bg-amber-500" style="width: 95%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Raised 02 Aug, due 23 Aug 2026 · nothing received, no despatch advice on file</p>
+    </li>
+
+    <li class="px-4 py-3">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 id="pg-win-c" class="text-[13px]/5 font-medium">PO-24-1203 · Nashik Steel Traders</h3>
+        <p class="text-[13px]/5 tabular-nums text-red-600">3 days over</p>
+      </div>
+      <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200"
+           role="progressbar" aria-labelledby="pg-win-c"
+           aria-valuenow="10" aria-valuemin="0" aria-valuemax="10"
+           aria-valuetext="3 days past the promised date of 19 Aug 2026">
+        <div class="h-full min-w-[2px] rounded-full bg-red-600" style="width: 100%"></div>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Raised 09 Aug, due 19 Aug 2026 · 6 of 14 lines received, penalty clause runs from 20 Aug</p>
+    </li>
+  </ul>
+</div>

@@ -1,13 +1,17 @@
 <div data-kui="chart/stacked" class="rounded-xl border border-zinc-300 bg-white p-5"
      x-data="{
-       chart: null,
+       chart: null, gone: false,
        init() { this.wait(() => this.draw()); },
        /* Tailwind's browser build compiles after first paint, so a class can
           still be uncompiled when Alpine initialises and getComputedStyle
           hands back transparent. Check every swatch, not the first: they do
           not all land in the same pass. With a compiled stylesheet this
-          passes on the first frame and costs nothing. */
+          passes on the first frame and costs nothing. The gone flag is the
+          teardown case: a card swapped out by htmx while the loop is still
+          running would otherwise resolve a frame later and build a Chart on
+          a detached canvas that nothing is left alive to destroy. */
        wait(fn) {
+         if (this.gone) return;
          const probes = Array.from(this.$refs.legend.querySelectorAll('[data-series]'));
          probes.every(el => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
            ? fn()
@@ -39,7 +43,7 @@
            }
          });
        },
-       destroy() { this.chart && this.chart.destroy(); }
+       destroy() { this.gone = true; this.chart && this.chart.destroy(); }
      }">
 
   <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">

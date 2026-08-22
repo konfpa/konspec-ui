@@ -1,7 +1,24 @@
+<!-- The four tones in the order they turn up on a console screen: neutral,
+     finished, waiting, refused. The card is identical in all four — white, a
+     zinc-300 edge, the same padding — and the icon is the only thing that
+     changes. Tinting the body was tried and reverted: three amber panels down a
+     dashboard read as an outage, and the one red panel underneath them stopped
+     being the thing anybody looked at first.
+
+     The icon is decorative and unlabelled, so the sentence carries the severity
+     on its own. "Order value exceeds your approval limit" says what the red
+     circle says. "Something went wrong" needs the icon to be seen, and is
+     therefore not a sentence anyone should ship.
+
+     None of these carries role="alert", and that is deliberate rather than an
+     omission. All four are conditions that are already true when the page
+     renders, and a live role on markup that was in the document at first paint
+     announces nothing — it measures as accessible and is silent. The announced
+     case is a message that arrives after a request, which is alert/htmx. -->
 <div data-kui="alert/tags" class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="info" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
   <div class="min-w-0">
-    <p class="text-[13px]/5 font-medium">Rate contract with Sharma Extrusions expires on 30 Sep 2024.</p>
+    <p class="text-[13px]/5 font-medium">Rate contract with Sharma Extrusions expires on 30 Sep 2026.</p>
     <p class="mt-0.5 text-[12px]/4 text-zinc-600">Orders raised after that date will price at the spot rate.</p>
   </div>
 </div>
@@ -10,22 +27,22 @@
   <i data-lucide="check-circle-2" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
   <div class="min-w-0">
     <p class="text-[13px]/5 font-medium">PO-24-1187 emailed to Sharma Extrusions.</p>
-    <p class="mt-0.5 text-[12px]/4 text-zinc-600">Sent by Ritu Deshpande, 19 Aug 2024 at 11:42.</p>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-600">Sent by Ritu Deshpande, 19 Aug 2026 at 11:42.</p>
   </div>
 </div>
 
 <div class="mt-2 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
   <div class="min-w-0">
-    <p class="text-[13px]/5 font-medium">GRN pending for 3 orders older than 30 days.</p>
+    <p class="text-[13px]/5 font-medium">GRN pending for <span class="tabular-nums">3</span> orders older than 30 days.</p>
     <p class="mt-0.5 text-[12px]/4 text-zinc-600">Nashik Steel Traders, Gujarat Polymers Ltd, Sharma Extrusions.</p>
   </div>
 </div>
 
-<div class="mt-2 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3" role="alert">
+<div class="mt-2 flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
   <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
   <div class="min-w-0">
     <p class="text-[13px]/5 font-medium">Order value <span class="tabular-nums">₹18,42,000</span> exceeds your approval limit.</p>
-    <p class="mt-0.5 text-[12px]/4 text-zinc-600">Anything above ₹10,00,000 goes to the plant head.</p>
+    <p class="mt-0.5 text-[12px]/4 text-zinc-600">Anything above <span class="tabular-nums">₹10,00,000</span> goes to the plant head.</p>
   </div>
 </div>

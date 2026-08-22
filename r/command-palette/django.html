@@ -1,0 +1,174 @@
+{% comment %}
+   templates/_command_palette.html — included once, by the shell, never by a
+   page. Two copies is two ⌘K handlers racing for the same keystroke, two
+   overlays, two focus traps, and two sets of row ids where the second silently
+   wins every getElementById the first one does.
+
+   The prose is {% comment %} and not {# #}. A hash comment is single-line
+   only — the tokeniser matches it without DOTALL — so a block like this one
+   written that way is not a comment at all, it is text, and every tag inside
+   it renders. That includes the include below, which would render this
+   template inside itself.
+
+   base.html, inside the app shell
+       {% include '_command_palette.html' %}
+
+   The action list is built in the view and not in the template. An
+   {% if perms %} around each row inside x-data would work, but it puts the
+   permission rules in an HTML attribute where nobody auditing permissions will
+   look, and the same list has to drive the menu that this palette accelerates.
+   One function, two consumers.
+
+   views.py / palette.py
+       def palette_actions(user):
+           out = []
+           if user.has_perm('purchasing.add_purchaseorder'):
+               out.append({'id': 'new-po', 'label': 'New purchase order',
+                           'icon': 'plus', 'url': reverse('order-new')})
+           if user.has_perm('stores.add_goodsreceipt'):
+               out.append({'id': 'post-grn', 'label': 'Post goods receipt',
+                           'icon': 'package-check', 'url': reverse('grn-new')})
+           if user.has_perm('purchasing.approve_purchaseorder'):
+               out.append({'id': 'approvals', 'label': 'Go to my approvals',
+                           'icon': 'check-check', 'url': reverse('approvals')})
+           # a POST, because it changes something. See the form below.
+           out.append({'id': 'resync', 'label': 'Resync the vendor master',
+                       'icon': 'refresh-cw', 'url': reverse('vendor-resync'),
+                       'method': 'post'})
+           return out
+
+   context_processors.py — the palette is on every page, so its data is on
+   every context. Anything more expensive than these two queries belongs behind
+   the htmx variant instead of in a context processor.
+       def palette(request):
+           if not request.user.is_authenticated:
+               return {}
+           return {'palette_actions': palette_actions(request.user),
+                   'palette_recents': recent_for(request.user)[:5]}
+
+   Both lists go through json_script. Never interpolate a queryset into an
+   x-data attribute: one vendor called M/s D'Souza Traders ends the attribute
+   early and the component stops parsing. json_script escapes for exactly that.
+
+   recent_for(user) returns the same shape the rows are drawn from — id,
+   label, sub, amount, icon and url — because the row id is 'cpd-' + o.id and
+   aria-activedescendant is going to point at it.
+
+   A row that a permission check dropped must be dropped from the menu as well.
+   A palette that lists an action the view refuses is a 403 with extra steps,
+   and a palette that hides one the menu still shows teaches people to distrust
+   it.
+{% endcomment %}
+
+{{ palette_actions|json_script:"cpd-actions" }}
+{{ palette_recents|json_script:"cpd-recents" }}
+
+<div data-kui="command-palette/django" x-data="{
+       open: false, q: '', ai: 0,
+       groups: [
+         { name: 'Actions', items: JSON.parse(document.getElementById('cpd-actions').textContent) },
+         { name: 'Recent records', items: JSON.parse(document.getElementById('cpd-recents').textContent) }
+       ],
+       match(g) {
+         const s = this.q.trim().toLowerCase();
+         if (!s) return g.items;
+         return g.items.filter(o => (o.label + ' ' + (o.sub || '') + ' ' + g.name).toLowerCase().includes(s));
+       },
+       get list() { return this.groups.flatMap(g => this.match(g)); },
+       rowId(o) { return 'cpd-' + o.id; },
+       get activeId() { return this.open && this.list[this.ai] ? this.rowId(this.list[this.ai]) : null; },
+       scroll() { this.$nextTick(() => { const el = document.getElementById(this.activeId); if (el) el.scrollIntoView({ block: 'nearest' }); }); },
+       show() { this.open = true; this.q = ''; this.ai = 0; },
+       hide() { this.open = false; this.q = ''; this.ai = 0; },
+       move(n) {
+         if (!this.list.length) return;
+         this.ai = Math.min(this.list.length - 1, Math.max(0, this.ai + n));
+         this.scroll();
+       },
+       pick(o) {
+         this.open = false;
+         if (o.method === 'post') { this.$refs.fire.action = o.url; this.$refs.fire.submit(); return; }
+         window.location.assign(o.url);
+       },
+       commit() { const o = this.list[this.ai]; if (o) this.pick(o); }
+     }"
+     @keydown.window.meta.k.prevent="show()"
+     @keydown.window.ctrl.k.prevent="show()"
+     @keydown.escape.window="hide()">
+
+  {% comment %}
+    An action that changes something is a POST. A row that navigates to a GET
+    which mutates is fired by anything that follows links — a prefetcher, a
+    link preview, a browser restoring tabs — and the palette is a place where
+    one keystroke follows a link.
+  {% endcomment %}
+  <form x-ref="fire" method="post" action="" class="hidden">{% csrf_token %}</form>
+
+  <button type="button" @click="show()" aria-haspopup="dialog"
+          class="flex w-full max-w-sm items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[13px]/5 text-zinc-500 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+    <i data-lucide="search" class="size-4 text-zinc-600"></i>
+    <span class="flex-1 text-left">Search {{ request.user.plant.name|default:"Operations" }}</span>
+    <kbd aria-hidden="true" class="rounded border border-zinc-200 px-1.5 py-0.5 text-[11px]/4">⌘K</kbd>
+  </button>
+
+  <div x-show="open" x-cloak x-trap.noscroll="open"
+       class="fixed inset-0 z-50 flex items-start justify-center bg-zinc-900/40 px-3 pt-16 sm:pt-24">
+    <div role="dialog" aria-modal="true" aria-label="Command palette" @click.outside="hide()"
+         class="w-full max-w-xl overflow-hidden rounded-xl border border-zinc-300 bg-white shadow-lg">
+
+      <div class="flex items-center gap-2 border-b border-zinc-100 px-3">
+        <i data-lucide="search" class="size-4 shrink-0 text-zinc-600"></i>
+        <label for="cpd-q" class="sr-only">Search orders, vendors and actions</label>
+        <input id="cpd-q" x-model="q" type="text" role="combobox" autocomplete="off" autofocus
+               aria-autocomplete="list" aria-controls="cpd-list"
+               :aria-expanded="open" :aria-activedescendant="activeId"
+               placeholder="Search orders, vendors, actions…"
+               @input="ai = 0"
+               @keydown.arrow-down.prevent="move(1)"
+               @keydown.arrow-up.prevent="move(-1)"
+               @keydown.enter.prevent="commit()"
+               class="w-full min-w-0 bg-transparent py-3 text-[14px]/5 outline-none placeholder:text-zinc-500">
+        <button type="button" @click="hide()" class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 text-[11px]/4 text-zinc-500 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Esc</button>
+      </div>
+
+      <div id="cpd-list" role="listbox" aria-label="Results" class="max-h-80 overflow-y-auto pb-1">
+        <template x-for="g in groups" :key="g.name">
+          <div role="group" :aria-label="g.name" x-show="match(g).length">
+            <p aria-hidden="true"
+               class="sticky top-0 z-10 border-b border-zinc-100 bg-white px-3 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-500 uppercase"
+               x-text="g.name"></p>
+            <template x-for="o in match(g)" :key="o.id">
+              <div :id="rowId(o)" role="option"
+                   @mousedown.prevent @click="pick(o)" @mousemove="ai = list.findIndex(x => x.id === o.id)"
+                   :class="list[ai] && list[ai].id === o.id ? 'bg-zinc-100' : ''"
+                   class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5">
+                <span class="flex size-4 shrink-0 items-center justify-center text-zinc-600">
+                  <i :data-lucide="o.icon" class="size-4"></i>
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate tabular-nums" x-text="o.label"></span>
+                  <span x-show="o.sub" class="block truncate text-[12px]/4 tabular-nums text-zinc-500" x-text="o.sub"></span>
+                </span>
+                <span x-show="o.amount" class="hidden shrink-0 text-[12px]/4 tabular-nums text-zinc-600 sm:block" x-text="o.amount"></span>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <div x-show="!list.length" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">Nothing matches “<span x-text="q"></span>”</p>
+        <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Try an order number — PO-24-1187 — or a vendor name.</p>
+      </div>
+
+      <div class="flex items-center gap-3 border-t border-zinc-100 px-3 py-2 text-[11px]/4 text-zinc-500">
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↑↓</kbd> move</span>
+        <span><kbd class="rounded border border-zinc-200 px-1 py-0.5">↵</kbd> open</span>
+        <span class="ml-auto">{{ request.user.get_short_name }}</span>
+      </div>
+
+      <p role="status" class="sr-only"
+         x-text="open ? (list.length === 1 ? '1 result' : list.length + ' results') : ''"></p>
+    </div>
+  </div>
+</div>

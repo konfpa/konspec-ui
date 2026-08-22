@@ -1,0 +1,74 @@
+<!-- A heading between two groups of items is not a list item. Write it as an
+     li and it is announced as item 1 of 4, so every count in the region is off
+     by one and the group's own count is the one people were reading. Drop it
+     between two lis without an li round it and the parser lifts it out of the
+     list, which fixes the count by deleting the association. The shape that
+     works is the plain one: a real heading, and one ul per group under it,
+     pointing back at the heading with aria-labelledby so the count belongs to
+     the group and the group has a name.
+
+     The heading is full-bleed and recessed — bg-zinc-50, the band a table
+     header takes inside a white surface — rather than indented to the text
+     column. Indenting it makes the column of marks look as though it restarts
+     at every group, and the one thing the column is for is that it does not
+     restart. The marks run one straight edge from the first item to the last
+     regardless of how many bands sit between them.
+
+     Colour is still the exception rather than the sorting. The groups are the
+     due weeks and the dots are what each line is doing, so this week's group
+     holds a red dot and a graphite one; grouping by status and then colouring
+     every dot in a group to match its heading paints the same fact twice and
+     spends the palette on a heading that already says it. -->
+<div data-kui="marker/grouped" class="max-w-md overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[13px]/5 font-medium">Deliveries due</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">7 lines · next three weeks</p>
+  </div>
+
+  <h4 id="due-week-34" class="border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">This week · 24–30 Aug</h4>
+  <ul role="list" aria-labelledby="due-week-34" class="divide-y divide-zinc-100">
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-red-600"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1187 · Sharma Extrusions</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Overdue — </span>Due 12 Aug 2026 · 3,000 kg · part received</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1194 · Gujarat Polymers Ltd</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Due 28 Aug 2026 · 20 MT</p>
+      </div>
+    </li>
+  </ul>
+
+  <h4 id="due-week-35" class="border-y border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Next week · 31 Aug–06 Sep</h4>
+  <ul role="list" aria-labelledby="due-week-35" class="divide-y divide-zinc-100">
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1201 · Qureshi Metals</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Due 02 Sep 2026 · 4.2 MT</p>
+      </div>
+    </li>
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1203 · Deshpande Traders</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Approved — </span>Due 05 Sep 2026 · awaiting the vendor's despatch advice</p>
+      </div>
+    </li>
+  </ul>
+
+  <h4 id="due-week-36" class="border-y border-zinc-100 bg-zinc-50 px-4 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">07–13 Sep</h4>
+  <ul role="list" aria-labelledby="due-week-36" class="divide-y divide-zinc-100">
+    <li class="flex items-start gap-2.5 px-4 py-2.5">
+      <span class="flex h-5 shrink-0 items-center" aria-hidden="true"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+      <div class="min-w-0 flex-1 text-[13px]/5">
+        <p class="tabular-nums">PO-24-1209 · Konkan Fabricators</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><span class="sr-only">Open — </span>Due 09 Sep 2026 · 120 nos</p>
+      </div>
+    </li>
+  </ul>
+</div>

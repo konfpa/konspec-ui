@@ -1,0 +1,43 @@
+<!-- A deep link straight to a receipt. The URL carries the record and nothing
+     else: which order it was raised against, and therefore which vendor sits
+     above it, is not known until the record comes back.
+
+     Two of the four crumbs are drawn for real through the wait, and they are
+     the two the page already has. The root is a constant. GRN-26-0418 came out
+     of the URL and is already the h1 under this trail, so greying it out would
+     flash away the one fact the page can state and land it again a moment
+     later.
+
+     Bars stand only where the route proves a level exists. A receipt URL proves
+     there is a register above it and a section above that, so those two can
+     wait as bars. Nothing proves the depth above a search result or a
+     cross-linked record, and a guessed placeholder draws a trail that is a
+     different length when it resolves.
+
+     The bar reserves the line, not the width — no label width is knowable in
+     advance, so the crumbs to its right do move when the labels land. What must
+     not move is anything below: the row is one line tall now and one line tall
+     afterwards, so the h1 and the record card under it stay where they are.
+
+     animate-pulse sits on each bar rather than on a wrapper around the list,
+     because real crumbs are interleaved with the placeholders and neither the
+     root nor the record number has any business pulsing. Both bars start in the
+     same paint, so they stay in phase. aria-hidden moves down onto the <li> for
+     the same reason, and the sr-only status sits outside them, or it would be
+     hidden along with the thing it is announcing. -->
+<nav data-kui="breadcrumbs/loading" aria-label="Breadcrumb" aria-busy="true">
+  <span class="sr-only" role="status">Loading the trail for GRN-26-0418</span>
+  <ol class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+    <li><a href="#" class="text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Home</a></li>
+    <li aria-hidden="true" class="text-zinc-500">/</li>
+    <li aria-hidden="true" class="flex h-5 items-center">
+      <span class="h-2.5 w-20 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></span>
+    </li>
+    <li aria-hidden="true" class="text-zinc-500">/</li>
+    <li aria-hidden="true" class="flex h-5 items-center">
+      <span class="h-2.5 w-32 animate-pulse rounded bg-zinc-200 motion-reduce:animate-none"></span>
+    </li>
+    <li aria-hidden="true" class="text-zinc-500">/</li>
+    <li><span aria-current="page" class="font-medium tabular-nums text-zinc-900">GRN-26-0418</span></li>
+  </ol>
+</nav>

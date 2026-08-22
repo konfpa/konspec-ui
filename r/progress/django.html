@@ -1,0 +1,72 @@
+<!-- Every figure on this bar is computed in the model, because both of the
+     things a template can reach for are wrong.
+
+     {% widthratio received ordered 100 %} rounds to a whole number, so 40 kg
+     against 12,000 renders 0 and the fill collapses to nothing — the exact case
+     min-w-[2px] exists for, defeated one level above it. It has no clamp either,
+     so an over-receipt renders width: 104%, and the same tag reused for
+     aria-valuenow puts an ARIA value outside its own declared range. Django has
+     no min filter to clamp with, which is why fill_pct and aria_now are
+     properties rather than arithmetic in the markup.
+
+     Localisation is the second trap and the quieter one. floatformat runs its
+     output through the active locale, and these sites group figures the Indian
+     way — NUMBER_GROUPING = (3, 2, 0) in a FORMAT_MODULE_PATH — so a plain
+     {{ qty|floatformat:0 }} inside aria-valuemax emits 12,000. A comma is not a
+     number: the attribute is invalid and what gets announced is not twelve
+     thousand. The u suffix turns localisation off per filter, so every ARIA
+     attribute here takes floatformat:'0u' and every visible figure takes
+     intcomma, which is where the grouping was wanted. The width takes '1u' for
+     the same reason — a locale whose decimal separator is a comma writes
+     width: 68,4% and the browser drops the declaration.
+
+     Do not put the width in a class. class="w-[{{ pct }}%]" scans as the token
+     w-[{{, Tailwind emits no rule, and the rail comes back empty rather than
+     broken, which is why it survives review.
+
+     {% if po.received_qty %} around the fill, so a Decimal('0') renders no fill
+     element at all rather than one floored to 2px.
+
+     # models.py
+     class PurchaseOrder(models.Model):
+         @property
+         def received_pct(self):
+             if not self.ordered_qty:
+                 return Decimal('0')
+             return self.received_qty / self.ordered_qty * 100
+
+         @property
+         def fill_pct(self):       # what the rail draws
+             return min(self.received_pct, Decimal('100'))
+
+         @property
+         def aria_now(self):       # clamped into the declared range
+             return min(self.received_qty, self.ordered_qty)
+
+         @property
+         def over_by(self):
+             return max(self.received_qty - self.ordered_qty, Decimal('0')) -->
+{% load humanize %}
+<div data-kui="progress/django" class="rounded-xl border border-zinc-300 bg-white p-4">
+  <div class="flex items-baseline justify-between gap-3">
+    <h3 id="pg-recv-{{ po.pk }}" class="text-[13px]/5 font-medium">Receipt against {{ po.number }}</h3>
+    <p class="text-[13px]/5 tabular-nums {% if po.over_by %}text-amber-700{% else %}text-zinc-600{% endif %}">{{ po.received_pct|floatformat:'0u' }}%</p>
+  </div>
+
+  <div class="mt-2 h-2 overflow-hidden rounded-full bg-zinc-200"
+       role="progressbar" aria-labelledby="pg-recv-{{ po.pk }}"
+       aria-valuenow="{{ po.aria_now|floatformat:'0u' }}"
+       aria-valuemin="0" aria-valuemax="{{ po.ordered_qty|floatformat:'0u' }}"
+       aria-valuetext="{{ po.received_qty|intcomma }} of {{ po.ordered_qty|intcomma }} {{ po.uom }} received{% if po.over_by %}, over by {{ po.over_by|intcomma }} {{ po.uom }}{% endif %}">
+    {% if po.received_qty %}
+      <div class="h-full min-w-[2px] rounded-full {% if po.over_by %}bg-amber-500{% else %}bg-zinc-700{% endif %} transition-[width] duration-300 motion-reduce:transition-none"
+           style="width: {{ po.fill_pct|floatformat:'1u' }}%"></div>
+    {% endif %}
+  </div>
+
+  <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">
+    {{ po.received_qty|intcomma }} of {{ po.ordered_qty|intcomma }} {{ po.uom }} received · {{ po.vendor.name }}
+    {% if po.over_by %} · over by {{ po.over_by|intcomma }} {{ po.uom }}, awaiting a variance note{% endif %}
+    {% if po.last_grn_on %} · last GRN {{ po.last_grn_on|date:"d M Y" }}{% endif %}
+  </p>
+</div>

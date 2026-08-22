@@ -1,10 +1,24 @@
-<div data-kui="accordion/single" class="divide-y divide-zinc-100 rounded-xl border border-zinc-300 bg-white" x-data="{ open: 'terms' }">
+<!-- One x-data for the whole group, holding the id of the section that is open
+     rather than a flag per section. That is what makes opening one close the
+     others without any section needing to know the others exist.
+
+     It is the id and not the index, so reordering the sections — or filtering
+     one out on a permission — does not move the open state onto whichever
+     section slid into slot 1.
+
+     The empty string is the closed state. Clicking the open header sets it, so
+     the set can be fully closed; drop that and the group always has one section
+     open and the first click on the open one does nothing.
+
+     Terms starts open and carries no x-cloak. The other two start closed and
+     do. -->
+<div data-kui="accordion/single" class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-300 bg-white" x-data="{ open: 'terms' }">
   <div>
     <h3>
-      <button @click="open = open === 'terms' ? '' : 'terms'" :aria-expanded="open === 'terms'" aria-controls="acc-terms"
-              class="flex h-12 w-full items-center gap-3 px-4 text-left">
-        <span class="flex-1 text-[14px]/5 font-medium">Payment terms</span>
-        <span class="flex transition-transform" :class="open === 'terms' && 'rotate-180'">
+      <button type="button" @click="open = open === 'terms' ? '' : 'terms'" :aria-expanded="open === 'terms'" aria-controls="acc-terms"
+              class="flex h-12 w-full items-center gap-3 px-4 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">Payment terms</span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open === 'terms' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
         </span>
       </button>
@@ -17,26 +31,26 @@
   </div>
   <div>
     <h3>
-      <button @click="open = open === 'tax' ? '' : 'tax'" :aria-expanded="open === 'tax'" aria-controls="acc-tax"
-              class="flex h-12 w-full items-center gap-3 px-4 text-left">
-        <span class="flex-1 text-[14px]/5 font-medium">Tax and GST</span>
-        <span class="flex transition-transform" :class="open === 'tax' && 'rotate-180'">
+      <button type="button" @click="open = open === 'tax' ? '' : 'tax'" :aria-expanded="open === 'tax'" aria-controls="acc-tax"
+              class="flex h-12 w-full items-center gap-3 px-4 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">Tax and GST</span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open === 'tax' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
         </span>
       </button>
     </h3>
     <div id="acc-tax" x-show="open === 'tax'" x-cloak x-collapse.duration.200ms>
       <div class="px-4 pb-3 text-[14px]/5 text-zinc-600">
-        IGST 18% on <span class="tabular-nums">₹18,42,000</span>. Vendor GSTIN 24AABCG1429P1ZK verified 12 July.
+        IGST 18% on <span class="tabular-nums">₹18,42,000</span>. Vendor GSTIN 24AABCG1429P1ZK verified 12 Jul 2026.
       </div>
     </div>
   </div>
   <div>
     <h3>
-      <button @click="open = open === 'qc' ? '' : 'qc'" :aria-expanded="open === 'qc'" aria-controls="acc-qc"
-              class="flex h-12 w-full items-center gap-3 px-4 text-left">
-        <span class="flex-1 text-[14px]/5 font-medium">Inspection</span>
-        <span class="flex transition-transform" :class="open === 'qc' && 'rotate-180'">
+      <button type="button" @click="open = open === 'qc' ? '' : 'qc'" :aria-expanded="open === 'qc'" aria-controls="acc-qc"
+              class="flex h-12 w-full items-center gap-3 px-4 text-left hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="min-w-0 flex-1 truncate text-[14px]/5 font-medium">Inspection</span>
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open === 'qc' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
         </span>
       </button>

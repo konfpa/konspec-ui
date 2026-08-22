@@ -1,0 +1,100 @@
+<!-- The ladder, running in real time. A ring that has turned for forty seconds is
+     indistinguishable from a hung page, and the only move a user has left is a
+     reload — which on a form posts the thing twice. So the wait grows a second
+     line at ten seconds and an escape at twenty-five.
+
+     Both thresholds are the real ones and the request in this demo is written
+     never to land, so the two rungs arrive when they would arrive on a screen.
+     Nothing here counts seconds at the user. A visible timer turns a slow report
+     into something to watch, and the reading changes nothing they can act on.
+
+     The escalation goes inside the one role="status" that was already there, so
+     what is announced is the change. A second region beside it would be a new
+     thing announcing itself while the first still has nothing new to say.
+
+     Stop waiting is the only focusable thing this component ever offers, and it
+     has to do more than clear a flag. A stop that only stops drawing leaves the
+     request running, and its answer lands two minutes later on top of whatever
+     the user did next — abort it: controller.abort() on a fetch,
+     htmx.trigger(el, 'htmx:abort') on an htmx request. Then resolve the panel
+     into a state that says it was stopped and offers a smaller version of the
+     same question, because a user who has waited twenty-five seconds for 14
+     months of receipts wants three of them, not the same request again.
+
+     Pressing Stop removes the button that was pressed, and a browser drops focus
+     from a removed element to the body — so the keyboard user who stopped the
+     report is at the top of the document with no idea what happened. Focus moves
+     to the line that says it, which is tabindex="-1" for exactly that reason and
+     is also the sentence somebody needs. Try again does the same in the other
+     direction. The first paint does not, because start() only moves focus when it
+     was pressed.
+
+     Stopped is the info glyph in a zinc-200 well, not the danger one. Nothing
+     failed and nothing was written; a red icon here would file an alarm against a
+     decision the user made. A request that genuinely failed lands in this same
+     box at this same height, and that picture is the third card of the states
+     variant.
+
+     Both branches are min-h-40, so the panel is the same height stopping as it
+     was waiting and the page below it does not jump. Both are x-show rather than
+     x-if, because each holds a Lucide icon and an <i data-lucide> inserted after
+     createIcons() has run comes up empty. x-cloak on the branch that is hidden at
+     first paint. -->
+<div data-kui="spinner/stalled" class="max-w-md rounded-xl border border-zinc-300 bg-white p-5"
+     x-data="{
+       state: 'running', elapsed: 0, said: '', tick: null,
+       start(pressed) {
+         clearInterval(this.tick);
+         this.state = 'running'; this.elapsed = 0; this.said = '';
+         this.$nextTick(() => {
+           this.said = 'Building the ageing report';
+           if (pressed) this.$refs.running.focus();
+         });
+         this.tick = setInterval(() => {
+           this.elapsed++;
+           if (this.elapsed === 10) this.said = 'Still building the ageing report. 14 months of receipts across five plants.';
+           if (this.elapsed === 25) this.said = 'The ageing report is slower than usual. You can stop waiting.';
+         }, 1000);
+       },
+       stop() {
+         clearInterval(this.tick); this.tick = null;
+         this.state = 'stopped';
+         this.said = 'Stopped. The report was not built and nothing was changed.';
+         this.$nextTick(() => this.$refs.stopped.focus());
+       }
+     }"
+     x-init="start()"
+     :aria-busy="state === 'running'">
+
+  <div x-show="state === 'running'" class="flex min-h-40 flex-col items-center justify-center gap-3 text-center">
+    <span class="size-8 shrink-0 animate-spin rounded-full border-[3px] border-zinc-200 border-t-zinc-700" aria-hidden="true"></span>
+    <div>
+      <p x-ref="running" tabindex="-1" class="text-[13px]/5 text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Building the ageing report</p>
+      <p x-show="elapsed >= 10" x-cloak class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Still working. 14 months of receipts across five plants.</p>
+    </div>
+    <button type="button" x-show="elapsed >= 25" x-cloak @click="stop()"
+            class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="circle-x" class="size-3.5 text-zinc-600"></i>Stop waiting
+    </button>
+  </div>
+
+  <div x-show="state === 'stopped'" x-cloak class="flex min-h-40 flex-col items-center justify-center gap-2 text-center">
+    <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="info" class="size-4 text-zinc-500"></i>
+    </span>
+    <p x-ref="stopped" tabindex="-1" class="mt-1 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">You stopped waiting</p>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">The report was not built. Nothing was changed.</p>
+    <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
+      <button type="button"
+              class="inline-flex h-8 items-center gap-2 rounded-lg border border-transparent bg-zinc-700 px-3 text-[12px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Build one month instead
+      </button>
+      <button type="button" @click="start(true)"
+              class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="rotate-cw" class="size-3.5 text-zinc-600"></i>Try again
+      </button>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="said"></p>
+</div>

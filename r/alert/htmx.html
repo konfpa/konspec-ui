@@ -1,0 +1,55 @@
+<!-- The alert that arrives without a page load, and the one variant where the
+     accessibility work is not in the alert at all.
+
+     The region ships in the template, empty, from first paint:
+
+     <div id="po-submit-notice" aria-live="polite" aria-atomic="true" class="empty:hidden"></div>
+
+     Nothing between the tags. Assistive technology watches a live region from
+     the moment it is registered, so a region created in the same frame as its
+     first message counts as content that was always there and announces
+     nothing — it renders correctly, it reviews as accessible, and it is silent
+     for the people it was added for. :empty also counts a newline as content,
+     so a region written across two lines keeps its gap in the column with
+     nothing in it. It is drawn here holding a response so the shape is visible;
+     the server returns everything from the inner div down.
+
+     hx-swap="innerHTML", never outerHTML. outerHTML replaces the region with
+     the response, which unregisters the live region and registers a new one
+     that already has the message inside it — the same silence reached from the
+     other direction, and it passes review because the alert is plainly on the
+     screen.
+
+     Polite, not assertive: this alert stays until it is dealt with, so nothing
+     is lost by letting the sentence in progress finish. aria-atomic because the
+     swap changes three nodes at once and without it the region reads only the
+     line that moved. The fragment carries no role="alert" of its own — a live
+     role inside a live region is one message announced twice.
+
+     Focus does not move. The user pressed Submit and may be typing elsewhere by
+     now; the alert is on screen and reachable, and taking the caret is a worse
+     defect than the one it fixes. -->
+<div data-kui="alert/htmx" class="space-y-2">
+  <div id="po-submit-notice" aria-live="polite" aria-atomic="true" class="empty:hidden">
+    <div class="flex items-start gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3">
+      <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+      <div class="min-w-0">
+        <p class="text-[13px]/5 font-medium">PO-24-1187 was not submitted — Gujarat Polymers Ltd is on credit hold.</p>
+        <p class="mt-0.5 text-[12px]/4 text-zinc-600">
+          <span class="tabular-nums">₹9,64,300</span> outstanding beyond <span class="tabular-nums">90</span> days.
+          <a href="/vendors/gujarat-polymers/ledger/" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the ledger</a>, or ask accounts to release the hold.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <form hx-post="/orders/PO-24-1187/submit/"
+        hx-target="#po-submit-notice" hx-swap="innerHTML"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-disabled-elt="#po-submit"
+        class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-300 bg-white px-4 py-3">
+    <p class="min-w-[12rem] flex-1 text-[13px]/5 tabular-nums text-zinc-600">6 lines · ₹18,42,000 · delivery 04 Sep 2026</p>
+    <button id="po-submit" type="submit"
+            class="inline-flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:hover:bg-zinc-700">Submit for approval</button>
+  </form>
+</div>

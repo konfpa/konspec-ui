@@ -40,7 +40,7 @@
     </thead>
     <tbody>
       <tr class="border-b border-zinc-100">
-        <td class="px-4 py-2 text-zinc-600">MS angle 50×50×6</td>
+        <td class="px-4 py-2 tabular-nums text-zinc-600">MS angle 50×50×6</td>
         <td class="px-4 py-2 text-right tabular-nums">12,000 kg</td>
         <td class="px-4 py-2 text-right"
             x-data="{
@@ -70,8 +70,9 @@
             @htmx:after-request.camel="if ($event.detail.successful) close()">
 
           <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
-                  :aria-expanded="open" aria-controls="pop-ed1" aria-label="Edit rate for MS angle 50×50×6"
-                  class="-mr-2 inline-flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  :aria-expanded="open" aria-controls="pop-ed1"
+                  class="relative -mr-2 inline-flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="sr-only">Edit rate for MS angle 50×50×6</span>
             <span id="ed1-val" class="tabular-nums">₹57.00</span>
             <i data-lucide="pencil" class="size-3.5 text-zinc-500"></i>
           </button>
@@ -79,7 +80,7 @@
           <div id="pop-ed1" x-ref="panel" x-show="open" x-cloak
                :style="'left: ' + x + 'px; top: ' + y + 'px'"
                role="dialog" tabindex="-1" aria-labelledby="pop-ed1-title"
-               class="fixed z-40 w-64 rounded-xl border border-zinc-200 bg-white p-3 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+               class="fixed z-40 w-64 rounded-xl border border-zinc-300 bg-white p-3 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <form hx-post="/orders/1187/lines/1/rate/" hx-target="#ed1-val" hx-swap="innerHTML">
               <p id="pop-ed1-title" class="text-[12px]/4 font-medium text-zinc-600">Rate per kg</p>
               <div class="mt-1.5 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -89,7 +90,7 @@
               </div>
               <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Rate contract RC-118 · ₹54.00 to ₹60.00</p>
               <div class="mt-2.5 flex items-center justify-end gap-2">
-                <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Cancel</button>
+                <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
                 <button type="submit"
                         class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save</button>
               </div>
@@ -99,7 +100,7 @@
       </tr>
 
       <tr>
-        <td class="px-4 py-2 text-zinc-600">MS plate 10 mm</td>
+        <td class="px-4 py-2 tabular-nums text-zinc-600">MS plate 10 mm</td>
         <td class="px-4 py-2 text-right tabular-nums">4,000 kg</td>
         <td class="px-4 py-2 text-right"
             x-data="{
@@ -129,8 +130,9 @@
             @htmx:after-request.camel="if ($event.detail.successful) close()">
 
           <button type="button" x-ref="trigger" @click="open ? close(false) : show()"
-                  :aria-expanded="open" aria-controls="pop-ed2" aria-label="Edit rate for MS plate 10 mm"
-                  class="-mr-2 inline-flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  :aria-expanded="open" aria-controls="pop-ed2"
+                  class="relative -mr-2 inline-flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="sr-only">Edit rate for MS plate 10 mm</span>
             <span id="ed2-val" class="tabular-nums">₹78.00</span>
             <i data-lucide="pencil" class="size-3.5 text-zinc-500"></i>
           </button>
@@ -138,7 +140,7 @@
           <div id="pop-ed2" x-ref="panel" x-show="open" x-cloak
                :style="'left: ' + x + 'px; top: ' + y + 'px'"
                role="dialog" tabindex="-1" aria-labelledby="pop-ed2-title"
-               class="fixed z-40 w-64 rounded-xl border border-zinc-200 bg-white p-3 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+               class="fixed z-40 w-64 rounded-xl border border-zinc-300 bg-white p-3 text-left shadow-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
             <form hx-post="/orders/1187/lines/2/rate/" hx-target="#ed2-val" hx-swap="innerHTML">
               <p id="pop-ed2-title" class="text-[12px]/4 font-medium text-zinc-600">Rate per kg</p>
               <div class="mt-1.5 flex items-center rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
@@ -148,7 +150,7 @@
               </div>
               <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-500">Rate contract RC-118 · ₹74.00 to ₹82.00</p>
               <div class="mt-2.5 flex items-center justify-end gap-2">
-                <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2">Cancel</button>
+                <button type="button" @click="close()" class="text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Cancel</button>
                 <button type="submit"
                         class="rounded-lg bg-zinc-700 px-3 py-1.5 text-[12px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save</button>
               </div>

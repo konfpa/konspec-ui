@@ -1,0 +1,93 @@
+<!-- Next was pressed, the request for page 13 came back 502, and the rows on
+     screen are still page 12. The pager says page 12, because that is what is
+     underneath it. Rolling the number forward and leaving the old rows there is
+     the one thing that cannot be allowed: the strip then describes a page the
+     user is not looking at, and the next Previous takes them to page 11 from a
+     page they never saw.
+
+     A failed page is not an empty page. The reflex is to render the empty-state
+     — "No orders match this filter" — and it is a lie told at the worst
+     possible moment: somebody who has spent a minute narrowing a filter is now
+     told their filter is wrong when the truth is a gateway timed out. Empty is
+     a fact about the register. This is a fact about the network.
+
+     The failure line replaces the range and takes role="alert", because it is
+     the one thing here worth interrupting for. It carries what failed and what
+     to do, and the red is in the icon: a red field behind the text would read
+     as a status the register is in rather than as a request that did not land.
+
+     Nothing is disabled. Previous still goes back to page 11, which works,
+     because the failure belongs to one request and not to the control. Retry
+     re-issues that same request rather than reloading the screen — a reload
+     throws away rows that are on screen and correct, and on a register somebody
+     has filtered it throws away the minute they spent filtering.
+
+     x-cloak on the range, which is hidden at first paint here. Without it the
+     range and the failure line both paint for a frame and the strip is briefly
+     twice its height.
+
+     In this snippet Next always fails and Retry always works, so both halves of
+     the state can be walked. In a real screen both go through the same request
+     and the failure flag is set by its rejection. -->
+<div data-kui="pagination/failed" class="max-w-xl rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       page: 12, pages: 58, size: 25, total: 1438, failed: true, busy: false,
+       n(v) { return v.toLocaleString('en-IN') },
+       get from() { return (this.page - 1) * this.size + 1 },
+       get to() { return Math.min(this.page * this.size, this.total) },
+       get rows() { return [0, 1, 2].map(i => 'PO-24-' + (1461 + (this.page - 1) * 3 + i)) },
+       retry() { if (this.busy) return; this.busy = true; setTimeout(() => { this.page++; this.failed = false; this.busy = false }, 1200) },
+       next() { if (this.busy) return; this.busy = true; setTimeout(() => { this.failed = true; this.busy = false }, 900) },
+       prev() { if (this.busy) return; this.page--; this.failed = false }
+     }">
+
+  <table class="w-full text-[13px]/5">
+    <thead>
+      <tr class="border-b border-zinc-200 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5">PO number</th>
+        <th scope="col" class="px-4 py-2.5">Vendor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <template x-for="p in rows" :key="p">
+        <tr class="border-b border-zinc-100 last:border-0">
+          <td class="px-4 py-2.5 font-medium tabular-nums" x-text="p"></td>
+          <td class="px-4 py-2.5 text-zinc-600">Gujarat Polymers Ltd</td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
+
+  <nav aria-label="Order register pages" :aria-busy="busy"
+       class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-4 py-2.5">
+
+    <p role="status" x-show="!failed" x-cloak class="text-[13px]/5 tabular-nums text-zinc-600"
+       x-text="n(from) + '–' + n(to) + ' of ' + n(total) + ' orders'">301–325 of 1,438 orders</p>
+
+    <p role="alert" x-show="failed" class="flex items-start gap-2 text-[13px]/5 text-zinc-900">
+      <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+      <span>
+        <span class="font-medium tabular-nums" x-text="'Page ' + (page + 1) + ' did not load.'">Page 13 did not load.</span>
+        <span class="tabular-nums text-zinc-600" x-text="'You are still on page ' + page + ' of ' + pages + '.'">You are still on page 12 of 58.</span>
+      </span>
+    </p>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="button" x-show="failed" @click="retry()"
+              class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span :class="busy && 'animate-spin'"><i data-lucide="rotate-cw" class="size-4"></i></span>
+        <span class="tabular-nums" x-text="busy ? 'Retrying…' : 'Try page ' + (page + 1) + ' again'">Try page 13 again</span>
+      </button>
+      <button type="button" @click="prev()" :disabled="page === 1"
+              class="inline-flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              aria-label="Previous page">
+        <i data-lucide="chevron-left" class="size-4"></i>
+      </button>
+      <button type="button" @click="next()" :disabled="page === pages"
+              class="inline-flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-white enabled:hover:bg-zinc-100 disabled:text-zinc-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              aria-label="Next page">
+        <i data-lucide="chevron-right" class="size-4"></i>
+      </button>
+    </div>
+  </nav>
+</div>

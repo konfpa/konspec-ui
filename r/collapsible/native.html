@@ -25,11 +25,11 @@
      pseudo. group-open on the wrapping span is what rotates the chevron —
      still a span, never the <i>, because Lucide replaces that element. -->
 <details data-kui="collapsible/native" class="group max-w-xl rounded-xl border border-zinc-300 bg-white">
-  <summary class="flex h-12 list-none items-center gap-3 px-4 [&::-webkit-details-marker]:hidden">
+  <summary class="flex h-12 list-none items-center gap-3 px-4 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15 [&::-webkit-details-marker]:hidden">
     <i data-lucide="history" class="size-4 shrink-0 text-zinc-600"></i>
     <span class="flex-1 text-[14px]/5 font-medium">Audit trail</span>
     <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">7 events</span>
-    <span class="flex shrink-0 transition-transform group-open:rotate-180">
+    <span class="flex shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none">
       <i data-lucide="chevron-down" class="size-4 text-zinc-600"></i>
     </span>
   </summary>
@@ -37,23 +37,23 @@
   <div class="border-t border-zinc-100 px-4 py-3">
     <ol class="space-y-3 text-[13px]/5">
       <li class="flex gap-3">
-        <span class="w-20 shrink-0 tabular-nums text-zinc-500">11/08/2026</span>
+        <span class="w-24 shrink-0 tabular-nums text-zinc-500">11 Aug 2026</span>
         <span class="min-w-0">GRN-3391 posted against 4 lines — <span class="text-zinc-600">S. Kulkarni, stores</span></span>
       </li>
       <li class="flex gap-3">
-        <span class="w-20 shrink-0 tabular-nums text-zinc-500">09/08/2026</span>
-        <span class="min-w-0">Delivery date moved to 22/08/2026 — <span class="text-zinc-600">vendor email</span></span>
+        <span class="w-24 shrink-0 tabular-nums text-zinc-500">09 Aug 2026</span>
+        <span class="min-w-0">Delivery date moved to 22 Aug 2026 — <span class="text-zinc-600">vendor email</span></span>
       </li>
       <li class="flex gap-3">
-        <span class="w-20 shrink-0 tabular-nums text-zinc-500">04/08/2026</span>
+        <span class="w-24 shrink-0 tabular-nums text-zinc-500">04 Aug 2026</span>
         <span class="min-w-0">Order released — <span class="text-zinc-600">R. Menon</span></span>
       </li>
       <li class="flex gap-3">
-        <span class="w-20 shrink-0 tabular-nums text-zinc-500">02/08/2026</span>
+        <span class="w-24 shrink-0 tabular-nums text-zinc-500">02 Aug 2026</span>
         <span class="min-w-0">Approved at <span class="tabular-nums">₹18,42,000</span> — <span class="text-zinc-600">A. Deshmukh, plant head</span></span>
       </li>
       <li class="flex gap-3">
-        <span class="w-20 shrink-0 tabular-nums text-zinc-500">01/08/2026</span>
+        <span class="w-24 shrink-0 tabular-nums text-zinc-500">01 Aug 2026</span>
         <span class="min-w-0">Raised from requisition REQ-24-0884 — <span class="text-zinc-600">R. Menon</span></span>
       </li>
     </ol>

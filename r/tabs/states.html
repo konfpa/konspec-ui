@@ -2,13 +2,22 @@
      and not yet.
 
      The red dot follows the status rule — colour lives in a 6px marker, never
-     in a field of colour behind the label. The unavailable tab keeps
-     aria-disabled so it is still announced and still explains itself, but the
-     arrows skip it, because arrowing onto something you cannot open is a dead
-     end with no way to know why. It also drops aria-controls: there is no panel
-     to point at, and a reference to an id that is not in the document is worse
-     than no reference at all. -->
-<div data-kui="tabs/states" x-id="['tab', 'panel']"
+     in a field of colour behind the label — and it is paired with sr-only text,
+     because a dot with no words beside it says nothing at all to a screen
+     reader and nothing to anyone who cannot separate red from grey. Both live
+     inside the button, so they join the accessible name: "Receipts 3, 2 lines
+     short".
+
+     The unavailable tab keeps aria-disabled so it is still announced and still
+     drawn, but the arrows skip it, because this row activates automatically and
+     arrowing onto a tab that cannot open would try to open it. It also drops
+     aria-controls: there is no panel to point at, and a reference to an id that
+     is not in the document is worse than no reference at all.
+
+     The reason is a line of text under the row, tied to the tab with
+     aria-describedby. Not a title attribute: there is nothing to hover on a
+     phone, and a tooltip that never opens is an explanation nobody gets. -->
+<div data-kui="tabs/states" x-id="['tab', 'panel', 'why']"
      x-data="{
        tab: 'lines',
        items: [
@@ -44,11 +53,12 @@
                 :id="$id('tab', t.id)"
                 :aria-selected="tab === t.id ? 'true' : 'false'"
                 :aria-disabled="t.off ? 'true' : null"
+                :aria-describedby="t.off ? $id('why') : null"
                 :aria-controls="t.off ? null : $id('panel', t.id)"
                 :tabindex="tab === t.id ? 0 : -1"
                 @click="pick(t.id)"
                 class="flex shrink-0 items-center gap-2 rounded-t border-b-2 pb-2.5 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-                :class="t.off ? 'cursor-not-allowed border-transparent text-zinc-400'
+                :class="t.off ? 'border-transparent text-zinc-400'
                               : tab === t.id ? 'border-zinc-900 font-semibold text-zinc-900'
                                              : 'border-transparent text-zinc-600 hover:text-zinc-900'">
           <span x-text="t.label"></span>
@@ -80,7 +90,7 @@
     </div>
   </div>
 
-  <p class="mt-3 flex items-center gap-1.5 text-[12px]/4 text-zinc-500">
+  <p :id="$id('why')" class="mt-3 flex items-center gap-1.5 text-[12px]/4 text-zinc-500">
     <i data-lucide="lock" class="size-3.5 shrink-0"></i>Invoices opens once a GRN is posted.
   </p>
 </div>

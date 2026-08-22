@@ -51,8 +51,8 @@
               @mouseenter="hover('modules')"
               @click="open === 'modules' ? shut($refs.modules) : jump('modules')"
               @keydown.arrow-down.prevent="jump('modules')"
-              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
-              :class="open === 'modules' ? 'bg-zinc-200 font-medium text-zinc-900' : 'text-zinc-600 hover:text-zinc-900'">
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="open === 'modules' ? 'bg-zinc-200 font-medium text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">
         Modules
         <span class="flex transition-transform motion-reduce:transition-none" :class="open === 'modules' && 'rotate-180'">
           <i data-lucide="chevron-down" class="size-3.5 text-zinc-600"></i>
@@ -75,7 +75,7 @@
   </ul>
 
   <div x-ref="modulesPanel" x-show="open === 'modules'" x-cloak
-       id="nmc-p-modules" aria-labelledby="nmc-t-modules"
+       id="nmc-p-modules" role="group" aria-labelledby="nmc-t-modules"
        class="absolute top-full left-0 z-40 w-full pt-2">
     <div class="rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
       <div class="grid gap-x-4 gap-y-4 sm:grid-cols-3">
