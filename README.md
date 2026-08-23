@@ -7,73 +7,44 @@
 
 # Konspec UI
 
-**A component library for internal data applications — written for the agents that build them.**
+Copy-paste HTML components and page patterns for internal data applications.
 
-[![CI](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml)
-[![components](https://img.shields.io/badge/components-78-18181b?style=flat-square)](#components)
-[![variants](https://img.shields.io/badge/variants-916-18181b?style=flat-square)](#components)
-[![build step](https://img.shields.io/badge/build_step-none-18181b?style=flat-square)](#running-it-locally)
-[![licence](https://img.shields.io/badge/licence-MIT-18181b?style=flat-square)](LICENSE)
-
-**[konfpa.github.io/konspec-ui](https://konfpa.github.io/konspec-ui/)** · [llms.txt](https://konfpa.github.io/konspec-ui/llms.txt) · [r/index.json](https://konfpa.github.io/konspec-ui/r/index.json)
-
-Tailwind CSS v4, Alpine.js, htmx and Lucide. No build step, no npm install,<br>no design tokens to import — the Tailwind class *is* the token. Every component is HTML you copy.
+[Browse the library](https://konfpa.github.io/konspec-ui/) · [Component index](https://konfpa.github.io/konspec-ui/r/index.json) · [Agent reference](https://konfpa.github.io/konspec-ui/llms.txt)
 
 </div>
 
----
+## What it is
 
-## If you are an agent
+Konspec UI is a deliberately opinionated library for operational software: registers, approvals, records, imports, reconciliation, and the dense forms that support them. It is not a package to install. You choose a documented variant, copy its HTML, and adapt the content in your own application.
 
-Three steps, in order. Do not skip the first.
+The demos use Tailwind CSS v4, Alpine.js, htmx, and Lucide. The snippets are plain HTML, so you remain in control of your template system, data handling, CSP, and deployment.
 
-```
-1. Read   https://konfpa.github.io/konspec-ui/llms.txt
-          rules, tokens, and every component with its variant ids
+## Start here
 
-2. Fetch  https://konfpa.github.io/konspec-ui/r/<id>/<variant>.html
-          the markup, one variant at a time. The body IS the markup.
+### Using the library
 
-3. Copy   the response body verbatim, then change the copy
+1. Browse the [component index](https://konfpa.github.io/konspec-ui/) and select a component or page pattern.
+2. Read its guidance and choose the closest existing variant.
+3. Copy the variant markup from `/r/<component>/<variant>.html` and change the data, labels, and links for your application.
 
-Component rules, anatomy, accessibility:  /r/<id>.json      ~5k tokens, no markup
-Arrived without reading llms.txt:         /r/index.json     ~39k tokens
-Pre-split shape, back-compat only:        /r/<id>.full.json ~26k tokens
-```
+For example, the raw markup for the first Button variant is at [`/r/button/default.html`](https://konfpa.github.io/konspec-ui/r/button/default.html). Component rules, anatomy, behaviour, and accessibility notes live at `/r/<component>.json`.
 
-`/registry.json` is a pointer, not the registry. It was the whole system in one
-file — 7.2 MB, roughly 11× a 200k context window — so every agent that fetched
-it got a silently truncated response in which the components above the cut
-looked complete and the ones below it looked absent. It now returns the table
-above instead.
+Every authenticated application screen uses `app-shell`, with page content inside its `<main>`. The documented exceptions are `auth-page`, `error-page`, `portal-page`, and `focus-page`.
 
-`llms.txt` is 55 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
+### Working with an agent
 
-Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
+Read [`llms.txt`](https://konfpa.github.io/konspec-ui/llms.txt) in full before asking an agent to build with Konspec UI. It contains the visual rules, token choices, component inventory, and variant identifiers. Then fetch only the needed raw variant endpoint and copy its markup before editing it.
 
-**Every signed-in screen is `app-shell`.** That one is not a choice to weigh. If a
-signed-in user can reach the page, the page is the shell with your content inside
-`<main>`. `auth-page` and `error-page` are the only two screens that sit outside it.
-Do not assemble a substitute out of `sidebar` and `topbar`, and do not start a page at
-`<main>` because the screen looked simple — the shell carries the skip link, the nav
-landmark, the off-canvas focus trap, the command palette and the keyboard shortcuts,
-and a page without it drops all of them without ever looking wrong. See rule 2.
+Do not recreate a component from a prose description or invent an undocumented variant. If the library lacks a pattern, open a request so it can be designed once instead of diverging across applications.
 
-## If you are a person
+## Design commitments
 
-Browse the [component index](https://konfpa.github.io/konspec-ui/#components). Each written-up component has a page with every variant rendered live beside the exact string that produced it, plus its rules, behaviour, anatomy and accessibility requirements — and a **Copy for agent** button that puts the whole thing on your clipboard as markdown.
-
-## What it is for
-
-Internal tools: purchase orders, GRNs, approvals, ledgers. Dense tables, long forms, real records with money and dates in them. It is deliberately not a marketing-site kit.
-
-- **Light theme only.** A second theme doubles the review surface for no benefit in an office tool.
-- **The accent is graphite.** `zinc-700`. Red, amber and green are reserved for what a record is *doing*, never for decoration — so an overdue row still means something.
-- **Colour lives in a dot or an icon**, never as a field of colour behind text. Twelve tinted pills down a column read as a traffic light and stop meaning anything by the twelfth row.
-- **Survives 390px.** Nothing scrolls sideways on a phone.
-- **Nothing left to choice.** Where two agents could reasonably pick differently, the mapping is locked and written down.
-
-Every rule in `llms.txt` exists because breaking it produced a visible defect at least once. They are not style preferences.
+- Designed for internal, data-heavy tools rather than marketing sites.
+- Light theme only; graphite is the accent.
+- Semantic colour communicates record state, not decoration.
+- Status colour appears in a dot, icon, or other small signal—not a tinted field behind text.
+- Pages must remain usable at 390px without horizontal page scrolling.
+- Existing component variants are the source of truth for interaction and accessibility patterns.
 
 <!-- components:start -->
 ## Components
@@ -190,40 +161,40 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 
 <!-- components:end -->
 
-## Running it locally
+## Local development
 
 ```bash
 git clone git@github.com:konfpa/konspec-ui.git
 cd konspec-ui
-python3 serve.py 8051          # http://localhost:8051
+python3 serve.py 8051
 ```
 
-`serve.py` exists only to send `charset=utf-8`; `python -m http.server` defaults to windows-1252 and turns every em dash into `â€"`.
+Open <http://localhost:8051>. The included server sends UTF-8 headers so text-based endpoints render correctly.
 
-## Changing something
-
-`assets/spec.js` and `assets/reg/*.js` are the only sources. Everything else — `r/`, `registry.json`, `llms.txt`, `assets/counts.js`, the component table above — is generated. `r/` is wiped and rewritten on every build, so a renamed variant cannot leave a stale endpoint behind serving markup that no longer exists.
+Consumers do not need a build step. Contributors use the following commands:
 
 ```bash
-node tools/build.js            # regenerate
-node tools/build.js --check    # fail if the generated files are stale
-node tools/sweep.js            # load every page in a browser and check it runs
+node tools/build.js          # regenerate derived files
+node tools/build.js --check  # verify generated files are current
+
+npm ci                       # required only for browser checks
+npx playwright install chromium
+node tools/sweep.js          # run the responsive browser sweep
 ```
 
-`build.js` reads the markup and is plain Node with no dependencies. `sweep.js` reads the rendered page — it opens all 79 pages in headless Chromium at 1280px and again at 390px, and fails on a console error, an icon that never hydrated, an element still cloaked after Alpine booted, a control that draws no focus outline, or a page wider than the phone. It needs `npm ci` and `npx playwright install chromium` first; nothing this repo publishes does.
+## Repository guide
 
-Never hand-edit a generated file. The landing page and the component pages render from the same two sources, so a component only has to be described once.
+| Path | Purpose |
+|---|---|
+| `assets/spec.js` | Shared design rules and system metadata. |
+| `assets/reg/*.js` | Component definitions and variant markup. |
+| `components/` | Documentation-page shells for rendered components. |
+| `tools/build.js` | Generates the catalog, agent reference, registry endpoints, and counts. |
+| `tools/sweep.js` | Browser-level checks for runtime, focus, and responsive defects. |
+| `r/`, `llms.txt`, `registry.json` | Generated output; do not edit by hand. |
 
-To add a component: append it to the right group in `assets/reg/`, run the build, then copy any existing page in `components/` and change three lines — the `<title>`, the meta description and `window.COMPONENT_ID`. The page needs nothing else.
-
-[CONTRIBUTING.md](CONTRIBUTING.md) has the long version — the source layout, what the build lints for, and what makes a variant worth adding.
-
-## Contributing
-
-A missing component is a decision for a person, not a gap for an agent to fill. If you needed something that is not here, [open a request](https://github.com/konfpa/konspec-ui/issues/new?template=missing-component.yml) — name it, say what it has to do, and it gets added properly once rather than approximated in five codebases.
-
-Bug reports, variant requests and pull requests are all welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution workflow, [SECURITY.md](SECURITY.md) for vulnerability reporting, and [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Licence
 
-[MIT](LICENSE) © Konspec Industries.
+MIT © Konspec Industries.

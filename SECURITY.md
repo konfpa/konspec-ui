@@ -1,29 +1,19 @@
-# Security
+# Security policy
 
-Konspec UI ships static HTML, CSS classes and small Alpine expressions. It has
-no server, no build step and no runtime dependencies of its own — the markup you
-copy runs entirely in your application, under your CSP.
+## Reporting a vulnerability
 
-## Reporting
+Please report suspected vulnerabilities privately through [GitHub Security Advisories](https://github.com/konfpa/konspec-ui/security/advisories/new). Do not open a public issue for a reproducible security flaw.
 
-If you find something exploitable in the markup — an XSS-prone pattern in a
-component, an Alpine expression that evaluates user data unsafely, an
-`href`/`src` shape that invites injection — report it privately through
-[GitHub Security Advisories](https://github.com/konfpa/konspec-ui/security/advisories/new)
-rather than opening a public issue.
+Include the affected component and variant, a minimal reproduction, the input or conditions required to trigger it, and any suggested mitigation. We will acknowledge the report, investigate it, and coordinate disclosure where appropriate.
 
-Please include the component and variant id (`select/cascade`), and the input
-that triggers it.
+## Scope
 
-## Scope notes
+Konspec UI publishes static HTML examples and small client-side expressions. Security concerns in scope include unsafe markup patterns, injection-prone handling of links or untrusted values, and client-side expressions that could evaluate user-controlled data unexpectedly.
 
-- The site loads Tailwind, Alpine, htmx and Lucide **from CDNs** for the demo
-  pages. That is a documentation convenience, not a recommendation — pin and
-  self-host those in production.
-- Every component assumes the values placed into it are already escaped by your
-  template layer. No component uses `x-html`; if a change introduces one, it
-  needs justifying in review.
+Applications that copy these snippets remain responsible for escaping data, validating URLs, authentication and authorization, CSP, dependency pinning, and their own server-side security controls.
+
+The documentation site demonstrates Tailwind CSS, Alpine.js, htmx, and Lucide through CDN assets. That is for documentation convenience; production applications should choose, pin, and preferably self-host their dependencies according to their security requirements.
 
 ## Supported versions
 
-The `main` branch is the only supported version. Fixes land there.
+The current `main` branch is supported. Security fixes are published there first.
