@@ -36,12 +36,18 @@ Three steps, in order. Do not skip the first.
 
 3. Copy   the response body verbatim, then change the copy
 
-Component rules, anatomy, accessibility:  /r/<id>.json
-Arrived without reading llms.txt:         /r/index.json
-Never fetch /registry.json — the whole system in one file, ~725k tokens.
+Component rules, anatomy, accessibility:  /r/<id>.json      ~5k tokens, no markup
+Arrived without reading llms.txt:         /r/index.json     ~39k tokens
+Pre-split shape, back-compat only:        /r/<id>.full.json ~26k tokens
 ```
 
-`llms.txt` is 53 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
+`/registry.json` is a pointer, not the registry. It was the whole system in one
+file — 7.2 MB, roughly 11× a 200k context window — so every agent that fetched
+it got a silently truncated response in which the components above the cut
+looked complete and the ones below it looked absent. It now returns the table
+above instead.
+
+`llms.txt` is 54 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 

@@ -5,18 +5,18 @@
 You are reading the entry point for this design system. It is written for agents.
 Read all of it before writing markup for a Konspec application, then fetch the
 variants you need one at a time from /r/ and copy their markup verbatim.
-Do not fetch registry.json: it is the whole system in one response and will
-not fit in your context. The Machine-readable section at the end has the
-endpoints and what each one costs.
+registry.json is not one of them: it used to be the whole system in one
+response and is now a short pointer at these endpoints. The Machine-readable
+section at the end has each one and what it costs.
 
 ## Protocol
 
 1. **Read llms.txt** — The stack, the tokens and the hard rules in one file, generated from the same source as this page. It is short. Read all of it.
    `GET /llms.txt`
-2. **Fetch one variant at a time and copy verbatim** — The response body of a variant endpoint is the markup itself: no JSON envelope, no escaping, nothing to parse. Copy the string. Do not paraphrase markup you have already been handed, and do not reformat it into your own idiom. llms.txt lists every component with its variant ids, so once you have read it you can build these URLs yourself and never need an index. Fetch r/<id>.json when you need a component's rules, anatomy or accessibility notes rather than its markup, and r/index.json only if you arrived without reading llms.txt.
+2. **Fetch one variant at a time and copy verbatim** — The response body of a variant endpoint is the markup itself: no JSON envelope, no escaping, nothing to parse. Copy the string. Do not paraphrase markup you have already been handed, and do not reformat it into your own idiom. llms.txt lists every component with its variant ids, so once you have read it you can build these URLs yourself and never need an index. Fetch r/<id>.json when you need a component's rules, anatomy or accessibility notes rather than its markup: it carries no html at all, so it is a few thousand tokens rather than the tens of thousands it used to be, and it is also where the variant names live when an id alone does not tell you which one to take. Fetch r/index.json only if you arrived without reading llms.txt.
    `GET /r/<id>/<variant>.html  →  the markup, ready to paste`
-3. **Never fetch registry.json** — It still exists and is still generated, so nothing that already points at it breaks, but it is the entire system in one response and it will not fit in your context: a few megabytes, several times a 200k window. An agent that fetches it gets a truncated file, and a truncated registry is worse than none, because the components that survived the cut look complete and the ones that did not look absent. This is stated as its own step because an agent told only to use the new endpoints will reach for the old file the moment the new ones look incomplete.
-   `// use /r/ — registry.json is back-compat only`
+3. **Fetch the smallest thing that answers the question** — Three sizes, and the gap between them is wide enough that taking the wrong one costs more than the answer is worth. A variant is the markup and nothing else, a thousand tokens or two, and it is the only one of the three you need in order to build a screen. r/<id>.json is the component with its markup taken out — the rules, the anatomy, the behaviour, the accessibility notes and the name of every variant — and you fetch it when you need to know why a component is shaped the way it is, or which of its variants to take. r/index.json is every component summarised in one file, and it is for an agent that arrived here without reading llms.txt. registry.json is none of these any more: it was the entire system in one response, several times a context window, and it now returns a short pointer at these endpoints instead. It had to stop being the whole file because an agent that fetched it got a truncated one, and a truncated registry is worse than none — the components above the cut look complete and the ones below it look absent, and nothing in the response says which is which.
+   `GET /r/<id>.json  →  rules and variant names, no markup`
 4. **Match the reference implementation** — A complete procurement dashboard built only from these components. When the docs and a real screen disagree about spacing or hierarchy, the screen wins.
    `GET /reference/`
 5. **Ask rather than choose** — If a colour, size, pattern, component or layout is not defined here, it does not exist yet. Stop and flag it rather than filling the gap yourself: name what is missing and what it has to do, and let a person add it to the framework. Adding one is a decision for a person, not a default you pick because the page looked empty. An invented component is worse than a blocked screen, because it ships, gets copied, and never gets the accessibility work. This covers missing variants of components that do exist, not just missing components.
@@ -166,9 +166,11 @@ A verdict about a figure — In tolerance, Needs a reason, Blocked — is not a 
 
 One line each, with the variant ids that entry has. The markup for one variant
 is at /r/<id>/<variant>.html and the rules, anatomy and accessibility notes for
-a component are at /r/<id>.json. Fetch those before building anything, rather
-than reconstructing a component from the one-line description here: the
-description tells you which one to fetch, not what it looks like.
+a component are at /r/<id>.json, which carries no markup and is a few thousand
+tokens. Fetch those before building anything, rather than reconstructing a
+component from the one-line description here: the description tells you which
+one to fetch, not what it looks like. Where an id alone does not settle which
+variant you want, /r/<id>.json names them all.
 
 This list is a closed set, not a starting point. If what you are about to build
 is on it, you must build it from the registry entry rather than from scratch.
@@ -287,9 +289,10 @@ thing that answers the question.
 | endpoint | size | cost | what it is |
 |---|---|--:|---|
 | [r/index.json](r/index.json) | 136 KB | ~39k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
-| `r/<id>.json` | median 91 KB, largest 189 KB (`search-page`) | ~26k tokens / ~54k tokens | One component: rules, anatomy, behaviour, accessibility, and every variant with its html. |
+| `r/<id>.json` | median 16 KB, largest 27 KB (`sidebar`) | ~5k tokens / ~8k tokens | One component: rules, anatomy, behaviour, accessibility, and the id and name of every variant. No markup. |
 | `r/<id>/<variant>.html` | median 6 KB, largest 45 KB (`app-shell/default`) | ~2k tokens / ~13k tokens | The markup, raw. No JSON envelope, no escaping, paste as-is. |
-| [registry.json](registry.json) | 7.2 MB | ~2107k tokens | Everything at once. **Do not fetch this.** It is roughly 11× a 200k context window and exists only so older integrations do not break. |
+| `r/<id>.full.json` | median 91 KB, largest 189 KB (`search-page`) | ~26k tokens / ~54k tokens | The component and every variant's html in one file — what `r/<id>.json` used to be. Back-compat; you want the two rows above. |
+| [registry.json](registry.json) | 1 KB | ~406 tokens | A pointer at this table. It was 7.2 MB, about 11× a 200k context window, and every agent that fetched it got a silently truncated file. |
 
 The component list above prints every variant id, so once you have read this
 file you can build a variant URL yourself and skip r/index.json entirely:

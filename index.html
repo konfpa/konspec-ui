@@ -92,8 +92,9 @@
           '   Copy it verbatim. llms.txt lists every component with its variant ids.',
           '3. Need the rules, anatomy or accessibility notes for a component:',
           '   GET ' + this.origin + 'r/<component-id>.json',
-          '4. Never fetch ' + this.origin + 'registry.json. It is the whole system in one',
-          '   file and will not fit in context.',
+          '4. Fetch the smallest thing that answers the question. A variant is ~1k',
+          '   tokens, a component ~5k, the whole index ~39k. registry.json is a',
+          '   pointer, not the registry — do not reach for it.',
           '',
           'Every signed-in screen is app-shell. Copy the shell, put the page inside',
           '<main>. auth-page and error-page are the only two screens outside it.',
@@ -306,7 +307,7 @@
           rules and notes. Fetch the smallest thing that answers the question.
         </span>
         <span class="mt-2 block font-mono text-[11px]/4 text-zinc-500">
-          <span x-text="counts.variants"></span> variant endpoints · median ~1k tokens · registry.json is ~<span x-text="Math.round(counts.registryKB/3.6/1000)"></span>k and must not be fetched
+          <span x-text="counts.variants"></span> variant endpoints · median ~1k tokens · a component without its markup is ~5k · nothing here asks you to fetch a megabyte
         </span>
       </span>
     </a>

@@ -1,11 +1,12 @@
 {
   "$schema": "https://konspec.internal/ui/registry.schema.json",
   "endpoints": {
-    "index": "/r/index.json — this file: the spec, and every component summarised with its variant ids. No markup, no per-component prose.",
-    "note": "Fetch the smallest thing that answers the question. llms.txt already lists every component with its variant ids, so an agent that read it can build a variant URL directly and never needs this file.",
-    "component": "/r/<id>.json — one component: rules, anatomy, behaviour, accessibility, and every variant with its html",
+    "read_first": "/llms.txt — the rules, the tokens and every component with its variant ids. Short, and written to be read whole.",
+    "index": "/r/index.json — the spec, and every component summarised with its variant ids. No markup, no per-component prose.",
+    "note": "Fetch the smallest thing that answers the question. llms.txt already lists every component with its variant ids, so an agent that read it can build a variant URL directly and never needs the index.",
+    "component": "/r/<id>.json — one component: rules, anatomy, behaviour, accessibility, and the id and name of every variant. No html.",
     "variant": "/r/<id>/<variant>.html — the markup, raw, ready to paste",
-    "full": "/registry.json — the whole system in one file. Do not fetch it; it will not fit in context."
+    "component_full": "/r/<id>.full.json — the pre-split shape, component prose and every variant's html in one file. Back-compat; prefer the two above."
   },
   "name": "Konspec UI",
   "version": "0.4.0",

@@ -85,41 +85,46 @@ const fmtSize = bytes => bytes >= 1024 * 1024
   ? (bytes / 1024 / 1024).toFixed(1) + ' MB'
   : Math.round(bytes / 1024) + ' KB';
 
+/* Measured, not emitted. registry.json used to be this string; it is now a
+   pointer, and the size it would have been is the one number the pointer has
+   to carry, because "do not fetch this" is an instruction and "you would have
+   spent 2.1M tokens" is a reason. Built here rather than at the write site so
+   the figure comes from the same object the /r endpoints are cut from. */
 const registryBody = JSON.stringify(json, null, 2) + '\n';
 const registryBytes = Buffer.byteLength(registryBody);
-const WARNING =
-  'This file is the entire system in one response: ' + fmtSize(registryBytes) +
-  ', roughly ' + tok(registryBytes).toLocaleString('en-US') + ' tokens. It will not ' +
-  'fit in an agent context window. Fetch /r/index.json, then /r/<id>/<variant>.html.';
-
-const registryOut =
-  JSON.stringify({ $schema: json.$schema, warning: WARNING, ...json }, null, 2) + '\n';
 
 /* ── /r — the registry, fetchable in pieces ────────────────────────────────
-   registry.json is one 2.5 MB response and the protocol used to tell agents to
-   fetch it whole, which is not a thing any of them can do. These are the same
-   data at three granularities, generated from the same source, so there is no
-   second source of truth to drift.
+   registry.json was one 7.2 MB response and the protocol used to tell agents
+   to fetch it whole, which is not a thing any of them can do. These are the
+   same data at four granularities, generated from the same source, so there is
+   no second source of truth to drift.
 
      r/index.json            spec + one summary per component, no html
-     r/<id>.json             one component, complete, with its variants
+     r/<id>.json             one component: its prose, and its variants named
      r/<id>/<variant>.html   the markup and nothing else
+     r/<id>.full.json        the two above in one file, back-compat only
+
+   The split between the middle two is the whole point: an agent after a
+   component's rules should not be handed 20k tokens of markup to get them.
 
    The variant endpoint is raw HTML rather than JSON on purpose: the whole point
    is paste with zero parsing, and an envelope would put escaping back in. */
 const rFiles = new Map();
 
+const ENDPOINTS = {
+  read_first: '/llms.txt — the rules, the tokens and every component with its variant ids. Short, and written to be read whole.',
+  index: '/r/index.json — the spec, and every component summarised with its variant ids. No markup, no per-component prose.',
+  note: 'Fetch the smallest thing that answers the question. llms.txt already ' +
+        'lists every component with its variant ids, so an agent that read it ' +
+        'can build a variant URL directly and never needs the index.',
+  component: '/r/<id>.json — one component: rules, anatomy, behaviour, accessibility, and the id and name of every variant. No html.',
+  variant: '/r/<id>/<variant>.html — the markup, raw, ready to paste',
+  component_full: '/r/<id>.full.json — the pre-split shape, component prose and every variant\'s html in one file. Back-compat; prefer the two above.'
+};
+
 const indexJson = {
   $schema: json.$schema,
-  endpoints: {
-    index: '/r/index.json — this file: the spec, and every component summarised with its variant ids. No markup, no per-component prose.',
-    note: 'Fetch the smallest thing that answers the question. llms.txt already ' +
-          'lists every component with its variant ids, so an agent that read it ' +
-          'can build a variant URL directly and never needs this file.',
-    component: '/r/<id>.json — one component: rules, anatomy, behaviour, accessibility, and every variant with its html',
-    variant: '/r/<id>/<variant>.html — the markup, raw, ready to paste',
-    full: '/registry.json — the whole system in one file. Do not fetch it; it will not fit in context.'
-  },
+  endpoints: ENDPOINTS,
   ...json,
   /* A summary, not the component minus its html. Stripping only html still
      leaves 590 KB: the per-component prose is 463 KB of it (rules alone are
@@ -139,13 +144,74 @@ const indexJson = {
 };
 rFiles.set('r/index.json', JSON.stringify(indexJson, null, 2) + '\n');
 
+/* The component without its markup. llms.txt sends agents here for a
+   component's rules, anatomy and accessibility notes, and for years the file
+   they landed on carried every variant's html as well: 79% of a median 91 KB
+   response was markup that the reader, by definition, had not asked for. The
+   variants list keeps the id, the name and the path, because the name is the
+   thing that tells an agent which variant to take — `Idle, busy, disabled`
+   answers a question that the id `states` does not — and it was previously
+   reachable only by fetching either this file whole or the 136 KB index.
+   The markup is one fetch away and is the same string it always was. */
+const slimComponent = c => ({
+  id: c.id,
+  name: c.name,
+  category: c.category,
+  markup: 'No html in this file. Each variant below carries the path to its own ' +
+          'markup at r/' + c.id + '/<variant>.html — fetch the one you need.',
+  description: c.description,
+  when_to_use: c.when_to_use,
+  rules: c.rules,
+  anatomy: c.anatomy,
+  behaviour: c.behaviour,
+  accessibility: c.accessibility,
+  related: c.related,
+  variants: c.variants.map(v => ({
+    id: v.id,
+    name: v.name,
+    markup: 'r/' + c.id + '/' + v.id + '.html'
+  }))
+});
+
 for (const c of json.components) {
-  rFiles.set('r/' + c.id + '.json', JSON.stringify(c, null, 2) + '\n');
+  rFiles.set('r/' + c.id + '.json',
+             JSON.stringify(slimComponent(c), null, 2) + '\n');
+  /* Back-compat only, and deliberately not linked from llms.txt: the shape
+     r/<id>.json had before the split, for anything already parsing it. */
+  rFiles.set('r/' + c.id + '.full.json', JSON.stringify(c, null, 2) + '\n');
   for (const v of c.variants) {
     rFiles.set('r/' + c.id + '/' + v.id + '.html',
                v.html.endsWith('\n') ? v.html : v.html + '\n');
   }
 }
+
+/* ── registry.json, now a pointer ──────────────────────────────────────────
+   It carried the whole system: 7.2 MB, roughly 11x a 200k window. No agent
+   could fetch it, and the failure was silent — the response truncates, the
+   components above the cut parse as complete, the ones below it are simply
+   absent, and nothing in the file says a cut happened. A stub fails loudly
+   instead: anything still pointing here gets a small, valid JSON document
+   that says where the registry went, which is a bug report rather than a
+   corrupt half of a component library. The URL keeps resolving, so no link
+   anywhere on the web 404s; it just stops lying about what it returns. */
+const registryOut = JSON.stringify({
+  $schema: json.$schema,
+  name: json.name,
+  version: json.version,
+  purpose: json.purpose,
+  generated_by: json.generated_by,
+  moved: 'This file no longer contains the registry. It was ' +
+         fmtSize(registryBytes) + ' — about ' +
+         tok(registryBytes).toLocaleString('en-US') + ' tokens, or ' +
+         Math.round(tok(registryBytes) / 200000) + 'x a 200k context window — so ' +
+         'every agent that fetched it received a silently truncated file. The ' +
+         'same data is at the endpoints below, in pieces sized to be read.',
+  read_first: 'llms.txt',
+  endpoints: ENDPOINTS,
+  components: json.components.length,
+  variants: json.components.reduce((a, c) => a + c.variants.length, 0)
+}, null, 2) + '\n';
+const registryStubBytes = Buffer.byteLength(registryOut);
 
 /* sizes quoted in llms.txt, measured rather than guessed */
 const median = ns => {
@@ -159,6 +225,11 @@ const compSizes = json.components.map(c => ({
 const varSizes = json.components.flatMap(c => c.variants.map(v => ({
   id: c.id + '/' + v.id, bytes: Buffer.byteLength(rFiles.get('r/' + c.id + '/' + v.id + '.html'))
 })));
+const fullSizes = json.components.map(c => ({
+  id: c.id, bytes: Buffer.byteLength(rFiles.get('r/' + c.id + '.full.json'))
+}));
+const fullMed = median(fullSizes.map(x => x.bytes));
+const fullMax = fullSizes.reduce((a, b) => (b.bytes > a.bytes ? b : a));
 const compMed = median(compSizes.map(x => x.bytes));
 const varMed = median(varSizes.map(x => x.bytes));
 const compMax = compSizes.reduce((a, b) => (b.bytes > a.bytes ? b : a));
@@ -183,9 +254,9 @@ P('');
 P('You are reading the entry point for this design system. It is written for agents.');
 P('Read all of it before writing markup for a Konspec application, then fetch the');
 P('variants you need one at a time from /r/ and copy their markup verbatim.');
-P('Do not fetch registry.json: it is the whole system in one response and will');
-P('not fit in your context. The Machine-readable section at the end has the');
-P('endpoints and what each one costs.');
+P('registry.json is not one of them: it used to be the whole system in one');
+P('response and is now a short pointer at these endpoints. The Machine-readable');
+P('section at the end has each one and what it costs.');
 P('');
 
 P('## Protocol');
@@ -284,9 +355,11 @@ P('## Components');
 P('');
 P('One line each, with the variant ids that entry has. The markup for one variant');
 P('is at /r/<id>/<variant>.html and the rules, anatomy and accessibility notes for');
-P('a component are at /r/<id>.json. Fetch those before building anything, rather');
-P('than reconstructing a component from the one-line description here: the');
-P('description tells you which one to fetch, not what it looks like.');
+P('a component are at /r/<id>.json, which carries no markup and is a few thousand');
+P('tokens. Fetch those before building anything, rather than reconstructing a');
+P('component from the one-line description here: the description tells you which');
+P('one to fetch, not what it looks like. Where an id alone does not settle which');
+P('variant you want, /r/<id>.json names them all.');
 P('');
 P('This list is a closed set, not a starting point. If what you are about to build');
 P('is on it, you must build it from the registry entry rather than from scratch.');
@@ -328,14 +401,17 @@ P('| [r/index.json](r/index.json) | ' + fmtSize(idxBytes) + ' | ~' + fmtTok(idxB
   ' | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |');
 P('| `r/<id>.json` | median ' + fmtSize(compMed) + ', largest ' + fmtSize(compMax.bytes) +
   ' (`' + compMax.id + '`) | ~' + fmtTok(compMed) + ' / ~' + fmtTok(compMax.bytes) +
-  ' | One component: rules, anatomy, behaviour, accessibility, and every variant with its html. |');
+  ' | One component: rules, anatomy, behaviour, accessibility, and the id and name of every variant. No markup. |');
 P('| `r/<id>/<variant>.html` | median ' + fmtSize(varMed) + ', largest ' + fmtSize(varMax.bytes) +
   ' (`' + varMax.id + '`) | ~' + fmtTok(varMed) + ' / ~' + fmtTok(varMax.bytes) +
   ' | The markup, raw. No JSON envelope, no escaping, paste as-is. |');
-P('| [registry.json](registry.json) | ' + fmtSize(registryBytes) + ' | ~' + fmtTok(registryBytes) +
-  ' | Everything at once. **Do not fetch this.** It is roughly ' +
-  Math.round(tok(registryBytes) / 200000) + '× a 200k context window and exists only so older ' +
-  'integrations do not break. |');
+P('| `r/<id>.full.json` | median ' + fmtSize(fullMed) + ', largest ' + fmtSize(fullMax.bytes) +
+  ' (`' + fullMax.id + '`) | ~' + fmtTok(fullMed) + ' / ~' + fmtTok(fullMax.bytes) +
+  ' | The component and every variant\'s html in one file — what `r/<id>.json` used to be. Back-compat; you want the two rows above. |');
+P('| [registry.json](registry.json) | ' + fmtSize(registryStubBytes) + ' | ~' + fmtTok(registryStubBytes) +
+  ' | A pointer at this table. It was ' + fmtSize(registryBytes) + ', about ' +
+  Math.round(tok(registryBytes) / 200000) + '× a 200k context window, and every agent that ' +
+  'fetched it got a silently truncated file. |');
 P('');
 P('The component list above prints every variant id, so once you have read this');
 P('file you can build a variant URL yourself and skip r/index.json entirely:');
@@ -556,9 +632,11 @@ for (const m of llmsOut.matchAll(/\/r\/([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*
   const rel = 'r/' + m[1] + '/' + m[2] + '.html';
   if (!rFiles.has(rel)) badLinks.push(m[0] + ' — no such endpoint');
 }
-for (const m of llmsOut.matchAll(/\/r\/([a-z0-9][a-z0-9-]*)\.json/g)) {
+/* `.full` is part of the name, not a second extension: without the optional
+   group, /r/button.full.json fails to match and the lint waves it through. */
+for (const m of llmsOut.matchAll(/\/r\/([a-z0-9][a-z0-9-]*(?:\.full)?)\.json/g)) {
   const rel = 'r/' + m[1] + '.json';
-  if (m[1] !== 'index' && !rFiles.has(rel)) badLinks.push(m[0] + ' — no such endpoint');
+  if (!rFiles.has(rel)) badLinks.push(m[0] + ' — no such endpoint');
 }
 if (badLinks.length) {
   console.error('ENDPOINT LINT failed — llms.txt points at URLs this build does not emit:');

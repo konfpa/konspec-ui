@@ -56,7 +56,7 @@
     <nav class="ml-auto flex items-center gap-1 text-[13px]/5">
       <a href="../index.html#rules" class="hidden rounded-lg px-3 py-2 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 sm:block">Rules</a>
       <a href="../llms.txt" class="rounded-lg px-3 py-2 font-mono text-[12px]/4 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900">llms.txt</a>
-      <a href="../registry.json" class="hidden rounded-lg px-3 py-2 font-mono text-[12px]/4 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 sm:block">registry.json</a>
+      <a href="../r/page-header.json" class="hidden rounded-lg px-3 py-2 font-mono text-[12px]/4 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 sm:block">r/page-header.json</a>
       <button @click="copy(forAgent(), 'nav')"
               class="ml-2 flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-zinc-900 px-3.5 py-2 text-[13px]/5 font-medium text-white transition hover:bg-zinc-700">
         <i :data-lucide="copied === 'nav' ? 'check' : 'clipboard'" class="size-3.5 shrink-0"></i>
@@ -271,9 +271,10 @@
           <h2 class="text-[24px]/7 font-bold tracking-tight text-white">Hand this component to an agent</h2>
           <p class="mt-3 max-w-[58ch] text-[14px]/6 text-zinc-400">
             Copies the description, the rules, the behaviour, the accessibility requirements and every
-            variant's markup as one markdown block. The same content is in
-            <code class="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-300">registry.json</code>
-            under <code class="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-300" x-text="'components[id=' + c.id + ']'"></code>.
+            variant's markup as one markdown block. The same content is at
+            <code class="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-300" x-text="'r/' + c.id + '.full.json'"></code>, and the same
+            component without its markup at
+            <code class="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[12px]/4 text-zinc-300" x-text="'r/' + c.id + '.json'"></code>.
           </p>
         </div>
         <button @click="copy(forAgent(), 'foot')"
