@@ -1,0 +1,14 @@
+{
+  "name": "konspec-ui",
+  "private": true,
+  "description": "Copy-paste HTML components for internal data applications.",
+  "//": "No version field: assets/spec.js is where this library states its version, and a second copy of it here would drift. This file exists only to pin the browser tools/sweep.js drives.",
+  "scripts": {
+    "build": "node tools/build.js",
+    "check": "node tools/build.js --check",
+    "sweep": "node tools/sweep.js"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

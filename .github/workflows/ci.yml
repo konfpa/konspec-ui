@@ -24,3 +24,38 @@ jobs:
       # the focus and endpoint lints, which fail the build rather than warn.
       - name: node tools/build.js --check
         run: node tools/build.js --check
+
+  sweep:
+    name: Every page runs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      # The browser is cached on the lockfile, because the download is ~120 MB
+      # and the version only moves when playwright does. The system libraries it
+      # links against are not cached with it, so they are installed every run —
+      # a restored browser that cannot start is the one failure this job must
+      # not have.
+      - uses: actions/cache@v4
+        id: browser
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+
+      - run: npx playwright install-deps chromium
+
+      - if: steps.browser.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      # Loads all 75 pages in a real browser and fails on anything build.js
+      # cannot see from the markup: a console error, an icon that never
+      # hydrated, an element still cloaked after Alpine booted, a control with
+      # no focus outline, or a page wider than 390px on a phone.
+      - name: node tools/sweep.js
+        run: node tools/sweep.js

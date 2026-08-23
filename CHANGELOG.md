@@ -5,6 +5,34 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`tools/sweep.js`**, and a CI job that runs it. It loads all 75 pages in
+  headless Chromium, at 1280px and again at 390px, and fails on the defects
+  `build.js` cannot see because they do not exist until the page runs: a console
+  error or a 404 on a file this repo serves, a Lucide icon that never hydrated,
+  an element still carrying `x-cloak` after Alpine initialised, a control that
+  draws no focus outline, and a page wider than the phone. The focus check is
+  the reason it exists — `build.js` reads class strings, so
+  `has-[:focus-visible]:ring-3` slips past its regex, while focusing all 6,934
+  controls one at a time under keyboard modality and reading the outline back
+  off the rendered box does not care how the outline was written. It credits an
+  outline drawn by a wrapper, which is where the whole forms group puts it.
+  `npm ci` and `npx playwright install chromium` are a contributor's
+  dependency; `node tools/build.js` is still plain Node with none.
+
+### Changed
+
+- The app-shell sidebar foot reads **Konspec Apps** rather than Konspec Gateway.
+
+### Fixed
+
+- The landing page's type-scale column was 599px wide at 390px and took the
+  whole page out to 648px. A grid item will not shrink below its min-content
+  without `min-w-0`, and the specimen row sets its own font size.
+
 ## [0.4.0] - 2026-08-22
 
 ### Added

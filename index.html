@@ -441,7 +441,10 @@
     </div>
 
     <div class="mt-7 grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-      <div>
+      <!-- min-w-0: a grid item refuses to shrink below its min-content without it,
+           and the specimen row below sets its own font-size, so at 390px this
+           column held 599px and took the whole page out to 648. -->
+      <div class="min-w-0">
         <template x-for="t in spec.tokens.type" :key="t[0]">
           <div class="flex items-baseline gap-4 border-b border-zinc-100 py-2.5 last:border-0">
             <code class="w-[112px] shrink-0 font-mono text-[12px]/4 text-zinc-500" x-text="t[0]"></code>

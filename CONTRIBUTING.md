@@ -66,13 +66,19 @@ python3 serve.py 8051          # http://localhost:8051
 
 node tools/build.js            # regenerate after any source change
 node tools/build.js --check    # what CI runs; fails if generated files are stale
+
+npm ci                         # once, for the sweep only
+npx playwright install chromium
+node tools/sweep.js            # load every page in a browser and check it
+node tools/sweep.js select     # or just the one you are working on
 ```
 
 `serve.py` exists only to send `charset=utf-8`; `python -m http.server` defaults
 to windows-1252 and turns every em dash into `â€"`.
 
-There is no npm install and no build step for *consumers* — `tools/build.js` is
-plain Node with no dependencies, and it only regenerates this repo's own files.
+There is no npm install and no build step for *consumers*, and `tools/build.js`
+is still plain Node with no dependencies. The `npm ci` above buys one thing: a
+browser for `tools/sweep.js`. Nothing this repo publishes needs it.
 
 ## Adding a component
 
@@ -85,7 +91,11 @@ plain Node with no dependencies, and it only regenerates this repo's own files.
    nothing else — it renders from the same source as the landing page, so a
    component is only ever described once.
 
-## What the build lints
+## What the checks catch
+
+There are two, and the split is what they can see. `build.js` reads the markup,
+so it catches anything wrong in the string. `sweep.js` reads the rendered page,
+so it catches what is only wrong once the page has run.
 
 `node tools/build.js` fails, not warns, on:
 
@@ -99,7 +109,25 @@ plain Node with no dependencies, and it only regenerates this repo's own files.
 - **Staleness.** `--check` compares all 470+ generated files, including files the
   build no longer emits.
 
-Both lints exist because the failure they catch is invisible in review.
+`node tools/sweep.js` loads all 75 pages in headless Chromium, at 1280px and
+again at 390px, and fails on:
+
+- **A console error**, uncaught exception, or 404 on a file this repo serves. A
+  path a snippet is only demonstrating — `avatar/photo` points an `<img>` at a
+  file that is meant to 404 so the fallback runs — is not one of ours.
+- **An icon that never hydrated.** Lucide swaps `<i data-lucide>` for an `<svg>`;
+  one left behind is a control that renders empty.
+- **An element still carrying `x-cloak`** once Alpine has initialised, which
+  means Alpine never reached it and the page is showing a hole.
+- **A control with no focus outline.** Every keyboard-reachable control is
+  focused one at a time under keyboard modality and the outline is read back off
+  the rendered box — its own, or the wrapper's, which is where half the forms
+  group draws it. This is the check `build.js` cannot do: its focus lint reads
+  class strings, and `has-[:focus-visible]:ring-3` breaks the regex.
+- **A page wider than 390px**, naming the element that pushed it. Content inside
+  a horizontal scroller is exempt, because a region may scroll sideways.
+
+All of these exist because the failure they catch is invisible in review.
 
 ## Pull requests
 

@@ -197,7 +197,10 @@ python3 serve.py 8051          # http://localhost:8051
 ```bash
 node tools/build.js            # regenerate
 node tools/build.js --check    # fail if the generated files are stale
+node tools/sweep.js            # load every page in a browser and check it runs
 ```
+
+`build.js` reads the markup and is plain Node with no dependencies. `sweep.js` reads the rendered page — it opens all 75 pages in headless Chromium at 1280px and again at 390px, and fails on a console error, an icon that never hydrated, an element still cloaked after Alpine booted, a control that draws no focus outline, or a page wider than the phone. It needs `npm ci` and `npx playwright install chromium` first; nothing this repo publishes does.
 
 Never hand-edit a generated file. The landing page and the component pages render from the same two sources, so a component only has to be described once.
 
