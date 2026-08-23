@@ -7,16 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-23
+
 ### Added
 
-- **`tools/sweep.js`**, and a CI job that runs it. It loads all 75 pages in
+- **Four components the library kept being asked for and did not have**, which
+  take it from 74 components to 78 and from 860 variants to 916:
+  `permission-matrix` (13), `tree-view` (14), `timeline` (15) and
+  `filter-builder` (14). Each of the four was previously assembled from scratch
+  every time it was needed, which is the condition rule 1 exists to end.
+  `timeline` is the history strip a record page places, and it defers to
+  `audit-page` for the searchable log of the whole system rather than competing
+  with it. `tree-view` claims `role="tree"` in only two of its variants, because
+  a tree is a single tab stop and rows carrying links, checkboxes and menus are
+  better served as nested disclosures; the entry states that boundary rather
+  than leaving it to the caller. `filter-builder` is deliberately the step above
+  `data-table/filters`, and says so: two or three fixed filters must not become
+  a builder, because a strip of selects reads at rest and a builder reads as an
+  empty form. `permission-matrix` takes the scroller contract in the two
+  variants that need it and drops a column in the two that do not.
+- **`tools/sweep.js`**, and a CI job that runs it. It loads all 79 pages in
   headless Chromium, at 1280px and again at 390px, and fails on the defects
   `build.js` cannot see because they do not exist until the page runs: a console
   error or a 404 on a file this repo serves, a Lucide icon that never hydrated,
   an element still carrying `x-cloak` after Alpine initialised, a control that
   draws no focus outline, and a page wider than the phone. The focus check is
   the reason it exists — `build.js` reads class strings, so
-  `has-[:focus-visible]:ring-3` slips past its regex, while focusing all 6,934
+  `has-[:focus-visible]:ring-3` slips past its regex, while focusing all 7,576
   controls one at a time under keyboard modality and reading the outline back
   off the rendered box does not care how the outline was written. It credits an
   outline drawn by a wrapper, which is where the whole forms group puts it.
@@ -25,10 +42,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **`registry.json` is no longer the registry.** It was the entire system in one
+  response — 7.2 MB, roughly 11 times a 200k context window — so every agent
+  that fetched it received a silently truncated file, which is worse than none:
+  the components above the cut look complete and the ones below it look absent,
+  and nothing in the response says which is which. It now returns a short
+  pointer at the endpoints that replaced it. Markup moved out of `r/<id>.json`,
+  which is now the rules, anatomy, behaviour, accessibility notes and variant
+  names at a few thousand tokens; the markup for one variant is at
+  `r/<id>/<variant>.html`, raw and ready to paste. `r/<id>.full.json` keeps the
+  pre-split shape for back-compatibility.
 - The app-shell sidebar foot reads **Konspec Apps** rather than Konspec Gateway.
 
 ### Fixed
 
+- **Any note quoting a long unbreakable token widened its own documentation
+  page**, in every component page at once. The shell renders `notes`,
+  `behaviour`, `a11y`, `anatomy` and `when` into flex and grid children, and
+  `overflow-wrap: break-word` does not reduce an element's min-content
+  contribution — so the token set the track width and took the document past
+  390px no matter how many ancestors were given `min-w-0`. The five prose
+  elements now take `wrap-anywhere`, which is `overflow-wrap: anywhere` and does
+  reduce min-content, so no ancestor chain is involved and ordinary prose still
+  breaks at spaces. It was latent rather than live — the longest token in the
+  library was 49 characters and cleared 390px with about 20px to spare — and it
+  was found because a component author reworded a note to dodge it. Verified by
+  writing a 120-character token into all 50 to 73 prose elements of a page and
+  measuring the document at 390px.
 - **The published site, which had been stuck on the previous version.** GitHub
   Pages runs Jekyll unless told not to, Liquid claims the same `{% %}`
   delimiters Django does, and a changelog entry that quoted a Django tag in
@@ -366,6 +406,9 @@ remove yet.
   a tinted pill, so a column of twelve rows still means something at the
   twelfth.
 
+[0.5.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.5.0
+[0.4.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.4.0
+[0.3.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.3.0
 [0.2.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.2.0
 [0.1.1]: https://github.com/konfpa/konspec-ui/releases/tag/v0.1.1
 [0.1.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.1.0
