@@ -106,7 +106,7 @@
       <i data-lucide="compass" class="mt-0.5 size-[18px] shrink-0 text-zinc-600"></i>
       <p class="text-[14px]/6">
         <span class="font-semibold">When to use.</span>
-        <span class="text-zinc-600" x-text="c.when"></span>
+        <span class="wrap-anywhere text-zinc-600" x-text="c.when"></span>
       </p>
     </div>
   </div>
@@ -209,8 +209,8 @@
           <div class="flex gap-4 border-b border-zinc-100 bg-white px-5 py-4 last:border-0">
             <span class="flex size-6 shrink-0 items-center justify-center rounded-md bg-zinc-100 font-mono text-[11px]/4 font-semibold text-zinc-600" x-text="i + 1"></span>
             <div class="min-w-0">
-              <dt class="text-[14px]/5 font-semibold" x-text="a[0]"></dt>
-              <dd class="mt-1 text-[13px]/5 text-zinc-600" x-text="a[1]"></dd>
+              <dt class="wrap-anywhere text-[14px]/5 font-semibold" x-text="a[0]"></dt>
+              <dd class="mt-1 wrap-anywhere text-[13px]/5 text-zinc-600" x-text="a[1]"></dd>
             </div>
           </div>
         </template>
@@ -224,7 +224,7 @@
         <template x-for="b in c.behaviour" :key="b">
           <li class="flex gap-3 rounded-xl border border-zinc-200 bg-white px-5 py-4">
             <i data-lucide="corner-down-right" class="mt-0.5 size-4 shrink-0 text-zinc-500"></i>
-            <span class="text-[13px]/5" x-text="b"></span>
+            <span class="wrap-anywhere text-[13px]/5" x-text="b"></span>
           </li>
         </template>
       </ul>
@@ -243,7 +243,7 @@
         <template x-for="n in c.notes" :key="n">
           <li class="flex gap-3 rounded-xl border border-zinc-200 bg-white px-5 py-4">
             <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
-            <span class="text-[13px]/5" x-text="n"></span>
+            <span class="wrap-anywhere text-[13px]/5" x-text="n"></span>
           </li>
         </template>
       </ul>
@@ -256,7 +256,7 @@
         <template x-for="a in c.a11y" :key="a">
           <li class="flex gap-3 rounded-xl border border-zinc-200 bg-white px-5 py-4">
             <i data-lucide="check" class="mt-0.5 size-4 shrink-0 text-emerald-600"></i>
-            <span class="text-[13px]/5" x-text="a"></span>
+            <span class="wrap-anywhere text-[13px]/5" x-text="a"></span>
           </li>
         </template>
       </ul>
